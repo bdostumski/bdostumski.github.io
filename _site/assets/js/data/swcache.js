@@ -39,7 +39,7 @@ const allowedDomains = [
     'localhost:4000',
 
     
-        'media.licdn.com',
+        'bdostumski.github.io',
     
 
     'fonts.gstatic.com',
