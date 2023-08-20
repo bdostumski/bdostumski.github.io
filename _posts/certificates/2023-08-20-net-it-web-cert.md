@@ -4,6 +4,9 @@ author: Borislav Dostumski
 date: 2023-08-20 1:33:00 +0800
 categories: [Certificates]
 tags: [Web Development]
+image:
+  path: ./images/net-it-web-dev-cert.jpeg
+  alt: NetIt Web Development Certificate
 ---
 ![NetIt Web Development Certificate](./images/net-it-web-dev-cert.jpeg)
 <br/>
