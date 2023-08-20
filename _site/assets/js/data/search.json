@@ -1,11 +1,45 @@
 [
   
   {
+    "title": "SQL? – work with data from the clob::JSON column – issue SOLVED",
+    "url": "/posts/sql-clob/",
+    "categories": "Issues",
+    "tags": "Issues",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "ANSWER IS:  UPDATE public.product SET validity_date = to_timestamp(clob::json-&gt;’validityDate’::text #» ‘{}’, ‘yyyy-MM-dd’)::timestamp WHERE id = ‘6331f937-1890-9600-01fd-eafd88efa78f’;  UPDATE p...",
+    "content": "ANSWER IS:  UPDATE public.product SET validity_date = to_timestamp(clob::json-&gt;’validityDate’::text #» ‘{}’, ‘yyyy-MM-dd’)::timestamp WHERE id = ‘6331f937-1890-9600-01fd-eafd88efa78f’;  UPDATE public.product SET validity_date = to_timestamp(clob::json-&gt;’validityDate’::text #» ‘{}’, ‘yyyy-MM-dd’)::timestamp WHERE person_id = ‘d887e1b2-189e-4b49-a740-9c4c251ef68b’;  UPDATE public.product SET person_id = clob::json-&gt;’personId’::text #» ‘{}’ WHERE id = ‘6331f937-1890-9600-01fd-eafd88efa78f’;  SELECT * FROM public.product WHERE id=’6331f937-1890-9600-01fd-eafd88efa78f’;  SELECT id, person_id, validity_date FROM public.product WHERE validity_date IS NULL;      UPDATE public.product SET validity_date = to_timestamp(clob::json-&gt;’validityDate’::text #» ‘{}’, ‘yyyy-MM-dd’)::timestamp WHERE validity_date IS NULL;    SELECT id, person_id, validity_date FROM public.product WHERE person_id IS NULL;  UPDATE public.product SET person_id = clob::json-&gt;’personId’::text #» ‘{}’ WHERE person_id IS NULL;  Update sql request          SELECT id, person_id, validity_date FROM public.product WHERE person_id IS NULL OR validity_date IS NULL ORDER BY id DESC LIMIT 5 OFFSET 0;      EXPLAIN ANALYZE WITH rows AS (SELECT person_id FROM public.product ORDER BY id DESC LIMIT 5 OFFSET 0)      UPDATE public.product SET person_id = clob::json-&gt;’personId’::text #» ‘{}’ WHERE EXISTS(SELECT * FROM rows WHERE rows.person_id IS NULL);      WITH filter_rows AS (SELECT id FROM public.product WHERE validity_date IS NULL OR person_id IS NULL ORDER BY id DESC OFFSET 0 LIMIT 5)UPDATE public.product main_rowsSET validity_date = to_timestamp(main_rows.clob::json-&gt;’validityDate’::text #&gt;&gt; ‘{}’, ‘yyyy-MM-dd’)::timestamp,person_id = main_rows.clob::json-&gt;’personId’::text #&gt;&gt; ‘{}’FROM filter_rowsWHERE main_rows.id = filter_rows.idRETURNING main_rows.id, main_rows.person_id, main_rows.validity_date;  ALTER TABLE public.product ADD person_id VARCHAR(255) NOT NULL UNIQUE;  ALTER TABLE public.product DROP COLUMN person_id;  SEARCH SCRIPT          SELECT * FROM public.product WHERE clob::json-&gt;’productNumber’::text #» ‘{}’ = ‘0000003665’      =================================MIGRATION SCRIPT:  ALTER TABLE public.product DROP COLUMN person_id;  CREATE INDEX index_person_id ON public.product (person_id);  ALTER TABLE public.product ADD person_id VARCHAR(255);UPDATE public.productSET person_id = clob::json-&gt;’personId’::text #&gt;&gt; ‘{}’WHERE person_id IS NULL;  ALTER TABLE public.product ADD validity_date TIMESTAMP without time zone NULL;UPDATE public.productSET validity_date = to_timestamp(clob::json-&gt;’validityDate’::text #&gt;&gt; ‘{}’, ‘yyyy-MM-dd’)::timestampWHERE validity_date IS NULL;UPDATE public.productSET person_id = clob::json-&gt;’personId’::text #&gt;&gt; ‘{}’,validity_date = to_timestamp(clob::json-&gt;’validityDate’::text #&gt;&gt; ‘{}’, ‘yyyy-MM-dd’)::timestampWHERE person_id IS NULL OR validity_date IS NULL;=================================THE ANSWER IS:  SELECT id, person_id, validity_date FROM public.product WHERE validity_date IS NULL OR person_id IS NULL ORDER BY id DESC LIMIT 5 OFFSET 0;  SELECT * FROM public.product WHERE id = ‘6336e118-1890-9600-0192-2b3cda14cd4a’;  SELECT * FROM public.product WHERE id = ‘6329df6c-1890-9600-0157-61aa29e323bb’;WITH rows AS (SELECT * FROM public.product WHERE validity_date IS NULL OR person_id IS NULL ORDER BY id DESC LIMIT 5 OFFSET 0)UPDATE public.product main_rowsSET validity_date = to_timestamp(main_rows.clob::json-&gt;’validityDate’::text #&gt;&gt; ‘{}’, ‘yyyy-MM-dd’)::timestamp,person_id = main_rows.clob::json-&gt;’personId’::text #&gt;&gt; ‘{}’FROM rowsWHERE main_rows.id = rows.idRETURNING main_rows.id, main_rows.person_id, main_rows.validity_date;=================================  SELECT * FROM public.product WHERE validity_date &gt;= NOW() AND person_id = ‘f6ae122e-4d4d-45ab-a396-536d4bd8fb1c’ ORDER BY validity_date DESC;  SELECT clob::json-&gt;’personId’ as person_id FROM public.product WHERE validity_date &gt;= NOW() AND person_id = ‘f6ae122e-4d4d-45ab-a396-536d4bd8fb1c’ ORDER BY validity_date DESC;"
+  },
+  
+  {
+    "title": "Telerik Alpha Java Track",
+    "url": "/posts/telerik-alpha-java-track/",
+    "categories": "Certificates",
+    "tags": "Telerik Alpha Java Track",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "During 440+ hours of intensive training, I gain access to key practical knowledge and insights needed to become the next Java developer — advanced Java, object-oriented programming, data structures...",
+    "content": "During 440+ hours of intensive training, I gain access to key practical knowledge and insights needed to become the next Java developer — advanced Java, object-oriented programming, data structures and algorithms, high-quality code, unit testing, databases, front-end fundamentals, Spring MVC.20% of the program was dedicated to polishing my soft skills. I develop the ability to manage feedback and expectations, ask the right questions, prioritize, and stick to high-value activities."
+  },
+  
+  {
     "title": "NetIt Web Certificate",
     "url": "/posts/net-it-web-cert/",
     "categories": "Certificates",
     "tags": "Web Development",
-    "date": "2023-08-19 20:33:00 +0300",
+    "date": "2023-08-20 00:00:00 +0300",
     
 
 
@@ -15,6 +49,125 @@
     
     "snippet": "During my training, I was able to learn and use all the technologies I need to develop a complete web application like front-end, back-end, databases, CMS, and Web Server Administration.",
     "content": "During my training, I was able to learn and use all the technologies I need to develop a complete web application like front-end, back-end, databases, CMS, and Web Server Administration."
+  },
+  
+  {
+    "title": "Microservices with Istio and IBM Cloud Kubernetes Service",
+    "url": "/posts/ibm-microservices/",
+    "categories": "Certificates",
+    "tags": "IBM Developer Skills Network",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "In this course, I learned about the twelve-factor app methodology, microservices, and Istio foundational technologies to connect, manage, and secure those microservices. I learned how to put all of...",
+    "content": "In this course, I learned about the twelve-factor app methodology, microservices, and Istio foundational technologies to connect, manage, and secure those microservices. I learned how to put all of those technologies together in IBM Cloud Kubernetes Service. These cloud-native technologies are the essentials for building new apps for the cloud. Microservices are the building blocks for cloud architecture."
+  },
+  
+  {
+    "title": "Docker Essentials A Developer Introduction",
+    "url": "/posts/ibm-docker-essentials/",
+    "categories": "Certificates",
+    "tags": "IBM Developer Skills Network",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "In this course, I learned how to use containers for my applications. I started with the basics: creating and running Docker containers, understand the layering and union file system, using best pra...",
+    "content": "In this course, I learned how to use containers for my applications. I started with the basics: creating and running Docker containers, understand the layering and union file system, using best practices when developing Dockerfiles. By the end of the course, I learned how to run containers in production and how to solve problems of advanced orchestration such as high availability, service discovery, and reconciliation."
+  },
+  
+  {
+    "title": "Learn Spring",
+    "url": "/posts/baeldung-learn-spring/",
+    "categories": "Certificates",
+    "tags": "Baeldung",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "Learn Spring  Module 1 – Getting Started With Spring 5  Module 2 – Dependency Injection and the Spring Context  Module 3 – Project Configuration  Module 4 – Deep Dive Into Spring Boot 2  Module 5 –...",
+    "content": "Learn Spring  Module 1 – Getting Started With Spring 5  Module 2 – Dependency Injection and the Spring Context  Module 3 – Project Configuration  Module 4 – Deep Dive Into Spring Boot 2  Module 5 – Persistence and Data Access  Module 6 – Web Basics and Spring MVC  Module 7 – Templating Engines and Spring MVC  Module 8 – Building a REST API  Module 9 – Advanced Features in Spring"
+  },
+  
+  {
+    "title": "Learn Spring Data JPA",
+    "url": "/posts/baeldung-learn-spring-data-jpa/",
+    "categories": "Certificates",
+    "tags": "Baeldung",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "Learn Spring Data JPA  Module 1 - Getting Started with Spring Data JPA  Module 2 - Spring Data Repositories  Module 3 - Spring Data Custom Queries with JPQL and native SQL  Module 4 - Pagination an...",
+    "content": "Learn Spring Data JPA  Module 1 - Getting Started with Spring Data JPA  Module 2 - Spring Data Repositories  Module 3 - Spring Data Custom Queries with JPQL and native SQL  Module 4 - Pagination and Sorting  Module 5 - Alternate Querying Methods  Module 6 - Advanced Features"
+  },
+  
+  {
+    "title": "Amigoscode",
+    "url": "/posts/amigoscode/",
+    "categories": "Certificates",
+    "tags": "Amigoscode Software Development",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "Terminal, Bash &amp; VIM Essentials  Terminal and Shell  VimGit and Github Essentials  What is Git  Setup Git  Git commits  Git branches  Git push  Git rebase  Git merge  GitHub  Pull RequestsRelat...",
+    "content": "Terminal, Bash &amp; VIM Essentials  Terminal and Shell  VimGit and Github Essentials  What is Git  Setup Git  Git commits  Git branches  Git push  Git rebase  Git merge  GitHub  Pull RequestsRelational Database and SQL Essentials  Create Tables  Create Databases  CRUD operations  Filtering Data  Joins  Working with Dates  Aggregate Functions  Postgres Extensions  Sequences  Database ConstraintsSpring Boot | React | AWS – Upload Images using AWS API  Spring Boot backend  React frontend  Amazon S3 to store files (images)Spring Security  Getting Started with Spring Security  Users Roles and Authorities  Permission-Based Authentication  Form-Based Authentication  Database Authentication  JSON Web TokensSpring Data MongoDB  Setup MongoDB running on Docker  MongoDB Collections and Documents  CRUD operations using MongoRepository  Queries using MongoTemplate  Indexes for unique constraints  Building a Restful APIGetting Started with Spring Boot  Overview of Spring Boot  Sring Web MVC  JSON for Java  Datbase Connectivity with Spring Data JPA  Building CRUD API  Build on practical experienceFunctional Programming &amp; Java Streams  What is Java Functional Programming  Pure Functions  Lambdas  Java Functional Interfaces: Function, Suppliers, Consummers Predicates  Java Combinator Pattern  Imperative vs Declarative  Java Streams API: Map, Filter, Reduce, Flatmap, Min, Max  Java Streams API: Map, Filter, Reduce, Flatmap, Min, Max  Java Streams API: Map, Filter, Reduce, Flatmap, Min, MaxGetting Started with Python  The Basics  Operators  Control Flow  Data Structures  Loops  Functions  Classes  Working with Dates  Working with Files  Fetching Data from Internet  ModulesMaster The Best Python IDE PyCharmMaster The Best Python IDE PyCharm"
+  },
+  
+  {
+    "title": "Full Stack Spring Boot & React (PROFESSIONAL)",
+    "url": "/posts/amigoscode-full-stack-professional/",
+    "categories": "Certificates",
+    "tags": "Amigoscode Software Development, Full Stack Development",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "Build and Automate Deployment using Spring Boot | React | Maven | Docker | AWS, and CICD with GitHub Actions  Spring Boot Backend API  Front end with React.js Hooks and Functions Components  Maven ...",
+    "content": "Build and Automate Deployment using Spring Boot | React | Maven | Docker | AWS, and CICD with GitHub Actions  Spring Boot Backend API  Front end with React.js Hooks and Functions Components  Maven Build Tool  Databases using Postgres on Docker  Spring Data JPA  Server and Client Side Error Handling  Packaging applications for deployment using Docker and Jib  Software Deployment Automation with GitHub Actions  Software Deployment Monitoring with Slack  Unit and Integration Testing"
+  },
+  
+  {
+    "title": "Microservices and Distributed Systems",
+    "url": "/posts/amigoscode-distributed-systems/",
+    "categories": "Certificates",
+    "tags": "Amigoscode Software Development, Microservices, Distributed Systems",
+    "date": "2023-08-20 00:00:00 +0300",
+    
+
+
+
+
+
+    
+    "snippet": "Building and Deploying Microservices from scratch  Bootstrap With Maven  Create Microservices  Microservice Communication via HTTP  Service Discovery with Eureka  Open Feign  Distributed Tracing  A...",
+    "content": "Building and Deploying Microservices from scratch  Bootstrap With Maven  Create Microservices  Microservice Communication via HTTP  Service Discovery with Eureka  Open Feign  Distributed Tracing  API Gateway With Spring Cloud Gateway  Message Queues  RabbitMQ  Packaging Microservices to Runnable Jar  Packaging Jars to Docker Images  Kubernetes AKA k8s  Deploying Postgres RabbitMQ and Zipkin to k8s  Refactoring Microservices for k8s  Deploying Microservices to k8s  Managed Kubernetes Cluster with Linode  Kafka  Bringing Back API Gateway for Security  Security – API Key Authentication"
   }
   
 ]
