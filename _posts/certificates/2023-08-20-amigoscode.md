@@ -2,7 +2,7 @@
 title: Amigoscode 
 author: Borislav Dostumski
 categories: [Certificates]
-tags: [Amigoscode]
+tags: [Amigoscode Software Development]
 ---
 
 ![Terminal, Bash & VIM Essentials](../../assets/img/certificates/certificate-of-completion-for-terminal-bash-vim-essentials-1-1024x656.jpg)
@@ -28,7 +28,7 @@ tags: [Amigoscode]
 
 <hr/>
 
-![Relational Database and SQL Essentials](../../assets/img/certificates/certificate-of-completion-for-relational-database-and-sql-essentials-1024x656.jpg);
+![Relational Database and SQL Essentials](../../assets/img/certificates/certificate-of-completion-for-relational-database-and-sql-essentials-1024x656.jpg)
 
 #### Relational Database and SQL Essentials
 - Create Tables
@@ -51,7 +51,7 @@ tags: [Amigoscode]
 
 <hr/>
 
-![Spring Security](../../assets/img/certificates/certificate-of-completion-for-spring-security-1024x656.jpg);
+![Spring Security](../../assets/img/certificates/certificate-of-completion-for-spring-security-1024x656.jpg)
 
 #### Spring Security
 - Getting Started with Spring Security
@@ -63,7 +63,7 @@ tags: [Amigoscode]
 
 <hr/>
 
-![Spring Data MongoDB](../../assets/img/certificates/certificate-of-completion-for-spring-data-mongodb-1024x656.jpg);
+![Spring Data MongoDB](../../assets/img/certificates/certificate-of-completion-for-spring-data-mongodb-1024x656.jpg)
 
 #### Spring Data MongoDB
 - Setup MongoDB running on Docker
@@ -75,7 +75,7 @@ tags: [Amigoscode]
 
 <hr/>
 
-![Getting Started with Spring Boot](../../assets/img/certificates/certificate-of-completion-for-getting-started-with-spring-boot-1024x656.jpg);
+![Getting Started with Spring Boot](../../assets/img/certificates/certificate-of-completion-for-getting-started-with-spring-boot-1024x656.jpg)
 
 #### Getting Started with Spring Boot
 - Overview of Spring Boot
@@ -87,7 +87,7 @@ tags: [Amigoscode]
 
 <hr/>
 
-![Functional Programming & Java Streams](../../assets/img/certificates/certificate-of-completion-for-java-functional-programming-1024x656.jpg);
+![Functional Programming & Java Streams](../../assets/img/certificates/certificate-of-completion-for-java-functional-programming-1024x656.jpg)
 
 #### Functional Programming & Java Streams
 - What is Java Functional Programming
@@ -102,11 +102,11 @@ tags: [Amigoscode]
 
 <hr/>
 
-![Getting Started with Java](../../assets/img/certificates/certificate-of-completion-for-getting-started-with-java-1024x725.jpg);
+![Getting Started with Java](../../assets/img/certificates/certificate-of-completion-for-getting-started-with-java-1024x725.jpg)
 
 <hr/>
 
-![Getting Started with Java](../../assets/img/certificates/certificate-of-completion-for-getting-started-with-python-1024x656.jpg);
+![Getting Started with Java](../../assets/img/certificates/certificate-of-completion-for-getting-started-with-python-1024x656.jpg)
 
 #### Getting Started with Python
 - The Basics
@@ -128,4 +128,3 @@ tags: [Amigoscode]
 <hr/>
 
 #### Master The Best Python IDE PyCharm
-
