@@ -1,5 +1,5 @@
 ---
-title: NetIt Web Certificate
+title: NetIt Web Development
 author: Borislav Dostumski
 categories: [Certificates]
 tags: [Web Development]
