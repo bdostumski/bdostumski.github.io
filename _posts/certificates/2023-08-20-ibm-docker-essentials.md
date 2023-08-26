@@ -1,6 +1,6 @@
 ---
 title: Docker Essentials A Developer Introduction
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [IBM Developer Skills Network]
 ---

@@ -1,6 +1,6 @@
 ---
 title: Amigoscode 
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [Amigoscode Software Development]
 ---

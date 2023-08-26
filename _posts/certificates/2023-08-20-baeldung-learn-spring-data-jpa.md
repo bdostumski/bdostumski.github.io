@@ -1,6 +1,6 @@
 ---
 title: Learn Spring Data JPA
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [Baeldung]
 ---

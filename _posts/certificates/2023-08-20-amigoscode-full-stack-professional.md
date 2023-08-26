@@ -1,6 +1,6 @@
 ---
 title: Full Stack Spring Boot & React (PROFESSIONAL) 
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [Amigoscode Software Development, Full Stack Development]
 ---

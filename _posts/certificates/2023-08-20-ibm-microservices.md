@@ -1,6 +1,6 @@
 ---
 title: Microservices with Istio and IBM Cloud Kubernetes Service 
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [IBM Developer Skills Network]
 ---

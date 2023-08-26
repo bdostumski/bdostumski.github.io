@@ -1,6 +1,6 @@
 ---
 title: NetIt Web Development
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [Web Development]
 ---

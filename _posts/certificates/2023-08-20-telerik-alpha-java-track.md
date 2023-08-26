@@ -1,6 +1,6 @@
 ---
 title: Telerik Alpha Java Track
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [Telerik Alpha Java Track]
 ---

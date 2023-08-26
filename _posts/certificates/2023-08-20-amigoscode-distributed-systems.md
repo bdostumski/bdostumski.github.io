@@ -1,6 +1,6 @@
 ---
 title: Microservices and Distributed Systems 
-author: Borislav Dostumski
+author: bdostumski
 categories: [Certificates]
 tags: [Amigoscode Software Development, Microservices, Distributed Systems]
 ---
