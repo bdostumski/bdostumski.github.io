@@ -23,7 +23,6 @@ const resource = [
     /* --- Favicons & compressed JS --- */
     
     
-        '/assets/img/favicons/alien_dark.ico',
         '/assets/img/favicons/alien_dark.jpg',
         '/assets/img/favicons/alien_light.jpg',
         '/assets/img/favicons/android-chrome-192x192.png',
@@ -31,6 +30,7 @@ const resource = [
         '/assets/img/favicons/apple-touch-icon.png',
         '/assets/img/favicons/favicon-16x16.png',
         '/assets/img/favicons/favicon-32x32.png',
+        '/assets/img/favicons/favicon.ico',
         '/assets/img/favicons/favicon.ico-old',
         '/assets/img/favicons/mstile-150x150.png'
 ];
