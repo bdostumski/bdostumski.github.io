@@ -23,14 +23,14 @@ const resource = [
     /* --- Favicons & compressed JS --- */
     
     
-        '/assets/img/favicons/alien_dark.jpg',
-        '/assets/img/favicons/android-chrome-192x192.png',
-        '/assets/img/favicons/android-chrome-512x512.png',
-        '/assets/img/favicons/apple-touch-icon.png',
-        '/assets/img/favicons/favicon-16x16.png',
-        '/assets/img/favicons/favicon-32x32.png',
-        '/assets/img/favicons/favicon.ico',
-        '/assets/img/favicons/mstile-150x150.png',
+        '/assets/img/favicons/hide-alien_dark.jpg',
+        '/assets/img/favicons/hide-android-chrome-192x192.png',
+        '/assets/img/favicons/hide-android-chrome-512x512.png',
+        '/assets/img/favicons/hide-apple-touch-icon.png',
+        '/assets/img/favicons/hide-favicon-16x16.png',
+        '/assets/img/favicons/hide-favicon-32x32.png',
+        '/assets/img/favicons/hide-favicon.ico',
+        '/assets/img/favicons/hide-mstile-150x150.png',
         '/assets/img/favicons/old/android-chrome-192x192.png',
         '/assets/img/favicons/old/android-chrome-512x512.png',
         '/assets/img/favicons/old/apple-touch-icon.png',
