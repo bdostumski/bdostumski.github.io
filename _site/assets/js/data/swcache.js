@@ -24,15 +24,20 @@ const resource = [
     
     
         '/assets/img/favicons/alien_dark.jpg',
-        '/assets/img/favicons/alien_light.jpg',
         '/assets/img/favicons/android-chrome-192x192.png',
         '/assets/img/favicons/android-chrome-512x512.png',
         '/assets/img/favicons/apple-touch-icon.png',
         '/assets/img/favicons/favicon-16x16.png',
         '/assets/img/favicons/favicon-32x32.png',
         '/assets/img/favicons/favicon.ico',
-        '/assets/img/favicons/favicon.ico-old',
-        '/assets/img/favicons/mstile-150x150.png'
+        '/assets/img/favicons/mstile-150x150.png',
+        '/assets/img/favicons/old/android-chrome-192x192.png',
+        '/assets/img/favicons/old/android-chrome-512x512.png',
+        '/assets/img/favicons/old/apple-touch-icon.png',
+        '/assets/img/favicons/old/favicon-16x16.png',
+        '/assets/img/favicons/old/favicon-32x32.png',
+        '/assets/img/favicons/old/favicon.ico',
+        '/assets/img/favicons/old/mstile-150x150.png'
 ];
 
 /* The request url with below domain will be cached */
