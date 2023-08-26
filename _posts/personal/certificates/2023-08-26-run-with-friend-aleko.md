@@ -5,4 +5,4 @@ categories: [Personal]
 tags: [Personal]
 ---
 
-![In the footsteps of Aleko with a friend](../../../_site/assets/img/personal/certificates/in-the-footsteps-of-aleko-with-a-friend.jpg)
+![In the footsteps of Aleko with a friend](../../../assets/img/personal/certificates/run-with-friend-aleko-steps.jpg)
