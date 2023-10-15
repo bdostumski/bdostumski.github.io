@@ -5,7 +5,7 @@ categories: [Certificates]
 tags: [Baeldung]
 ---
 
-![Microservices and Distributed Systems](../../assets/img/certificates/learn-spring-the-certification-class-1-1024x807.jpg)
+![Learn Spring](../../assets/img/certificates/learn-spring-the-certification-class-1-1024x807.jpg)
 
 #### Learn Spring
 - Module 1 – Getting Started With Spring 5
