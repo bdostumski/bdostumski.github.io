@@ -7,7 +7,7 @@ tags: [Baeldung]
 
 ![Spring Security Core](../../assets/img/certificates/certificate-of-completion-for-learn-spring-security-core-the-certification-class.jpg)
 
-#### Learn Spring
+#### Learn Spring Security
 - Module 1 – Secure a Simple Spring MVC Application
 - Module 2 – A Full Registration Flow
 - Module 3 – Remember Me

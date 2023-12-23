@@ -7,7 +7,7 @@ tags: [Baeldung]
 
 ![REST With Spring](../../assets/img/certificates/certificate-of-completion-for-rest-with-spring-the-certification-class.jpg)
 
-#### Learn Spring
+#### Learn Spring REST
 - Module 1 – The Basics of REST with Spring
 - Module 2 – REST and HTTP Semantics
 - Module 3 – Simple Security for REST
