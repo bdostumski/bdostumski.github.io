@@ -7,7 +7,6 @@ collection: about
 
 ### My beginning in Computer Science 🤓
 
-
 - Windows NT Inside View by David Solomon
 - MCSE Training Kit Windows 2000 Server Tom I, II by Microsoft Certified Professional
 - UNIX System Administrator's Bible by Paul Iarrera
@@ -21,7 +20,6 @@ collection: about
 
 
 ### My 1999's Computer Specifications (recovered by memory) 🤯
-
 
 - CPU: Intel Pentium III clock rate 533 MHz overclocked up to 733 MHz 256 KB L2 Cache
 - GPU: 3dfx Voodoo 3 32 bit 16 MB 143 MHz core clock speed
