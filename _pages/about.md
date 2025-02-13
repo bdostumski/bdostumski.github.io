@@ -5,6 +5,14 @@ classes: wide
 permalink: /about/
 collection: about
 ---
+ 
+<a href="https://www.16personalities.com/profiles/174cea7f4333b" style="text-decoration:none;">
+    <span style="background-color: #e3ae10; color: black; padding: 5px 10px; border-radius: 2px;"><i class="fas fa-chess"> INTJ-A</i></span>
+</a>
+&nbsp;
+<a href="https://www.hackerrank.com/profile/b_dostumski" style="text-decoration:none">
+    <span style="background-color: #207a35; color: white; padding: 5px 10px; border-radius: 2px;"><i class="fa-brands fa-hackerrank"> HackerRank </i></span>
+</a>
 
 ### My beginning in Computer Science 🤓
 
