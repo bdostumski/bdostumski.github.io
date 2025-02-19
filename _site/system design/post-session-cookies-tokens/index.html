@@ -1,0 +1,676 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.26.2 by Michael Rose
+  Copyright 2013-2024 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+
+<html lang="en-US" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Session Cookies and Tokens - CoreHub Blog</title>
+<meta name="description" content="What is a Session?">
+
+
+  <meta name="author" content="Borislav<br/>Dostumski">
+  
+  <meta property="article:author" content="Borislav<br/>Dostumski">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="CoreHub Blog">
+<meta property="og:title" content="Session Cookies and Tokens">
+<meta property="og:url" content="http://localhost:4000/system%20design/post-session-cookies-tokens/">
+
+
+  <meta property="og:description" content="What is a Session?">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2025-02-19T00:00:00+02:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/system%20design/post-session-cookies-tokens/">
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="CoreHub Blog Feed">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide" dir="ltr">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/website/universe.png" alt="CoreHub Blog"></a>
+        
+        <a class="site-title" href="/">
+          CoreHub Blog
+          <span class="site-subtitle">Version 1.0</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a
+                href="/"
+                
+                
+              >Home</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/categories/"
+                
+                
+              >Categories</a>
+            </li><li class="masthead__menu-item">
+              <a
+                href="/tags/"
+                
+                
+              >Tags</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/" itemprop="item"><span itemprop="name">Home</span></a>
+
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="/categories/#system-design" itemprop="item"><span itemprop="name">System design</span></a>
+          <meta itemprop="position" content="2" />
+        </li>
+        <span class="sep">/</span>
+      
+    
+      
+      
+        <li class="current">Session Cookies and Tokens</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/personal/Borislav_Dostumski.jpg" alt="Borislav<br/>Dostumski" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Borislav<br/>Dostumski</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>Software Enginner</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+            <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="/certificates/" rel="nofollow noopener noreferrer me"><i class="fa-solid fa-user-graduate" aria-hidden="true"></i><span class="label">Certificates</span></a></li>
+          
+        
+          
+            <li><a href="/about/" rel="nofollow noopener noreferrer me"><i class="fas fa-user-astronaut" aria-hidden="true"></i><span class="label">About Me</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Session Cookies and Tokens">
+    <meta itemprop="description" content="What is a Session?">
+    <meta itemprop="datePublished" content="2025-02-19T00:00:00+02:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">
+            <a href="http://localhost:4000/system%20design/post-session-cookies-tokens/" itemprop="url">Session Cookies and Tokens
+</a>
+          </h1>
+          
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <h2 id="what-is-a-session">What is a Session?</h2>
+
+<p>A session is a temporary state maintained on the server that tracks a user’s activity across multiple requests. It typically stores user authentication details, preferences, or other data needed during an interaction.</p>
+
+<h3 id="how-it-works">How It Works</h3>
+
+<ul>
+  <li>User logs in → Server creates a session (stores it in memory, database, or file).</li>
+  <li>The server generates a session ID and sends it to the client in a cookie.</li>
+  <li>The client sends the session ID on every request → Server retrieves session data.</li>
+</ul>
+
+<h2 id="what-is-a-cookie">What is a Cookie?</h2>
+
+<p>A cookie is a small piece of data stored on the client (browser) and sent to the server with every request. It can store user preferences, authentication details, or tracking information.</p>
+
+<h3 id="how-it-works-1">How It Works</h3>
+
+<ul>
+  <li>Server sends a Set-Cookie header → Browser stores the cookie.</li>
+  <li>Browser sends the cookie with every subsequent request.</li>
+</ul>
+
+<h3 id="types-of-cookies">Types of Cookies</h3>
+
+<ul>
+  <li>Session Cookies: Deleted when the browser is closed.</li>
+  <li>Persistent Cookies: Stored for a long time (set expiration date).</li>
+  <li>Secure Cookies: Only sent over HTTPS.</li>
+  <li>HttpOnly Cookies: Not accessible by JavaScript (prevents XSS attacks).</li>
+  <li>SameSite Cookies: Prevents CSRF attacks by restricting cross-site requests.</li>
+</ul>
+
+<h2 id="what-is-a-token">What is a Token?</h2>
+
+<p>A token is a cryptographic string used to authenticate users without storing state on the server. The most common type is JSON Web Token (JWT).</p>
+
+<h3 id="how-it-works-2">How It Works</h3>
+
+<ul>
+  <li>User logs in → Server generates a JWT and sends it to the client.</li>
+  <li>Client stores the JWT in localStorage, sessionStorage, or a cookie.</li>
+  <li>The client sends the JWT with every request in the Authorization header.</li>
+  <li>The server verifies the JWT using a secret key (HMAC) or public/private key pair (RSA).</li>
+</ul>
+
+<h2 id="comparison">Comparison</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Session</th>
+      <th>Cookies</th>
+      <th>Tokens</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Definition</td>
+      <td>A server-side mechanism to store user state.</td>
+      <td>Small pieces of data stored in the browser.</td>
+      <td>A cryptographic string used for authentication and authorization.</td>
+    </tr>
+    <tr>
+      <td>Storage</td>
+      <td>Stored on the server.</td>
+      <td>Stored on the client (browser).</td>
+      <td>Stored on the client but verified by the server.</td>
+    </tr>
+    <tr>
+      <td>Security</td>
+      <td>More secure (server-side).</td>
+      <td>Less secure (can be stolen via XSS).</td>
+      <td>More secure if implemented properly (e.g., JWT signed with HMAC or RSA).</td>
+    </tr>
+    <tr>
+      <td>Persistence</td>
+      <td>Lives as long as the session is active (until timeout or logout).</td>
+      <td>Can be persistent (stored on disk) or session-based (deleted on close).</td>
+      <td>Can be persistent, usually with an expiration time.</td>
+    </tr>
+    <tr>
+      <td>Use Case</td>
+      <td>Maintaining user authentication across multiple requests.</td>
+      <td>Storing small amounts of client-side data like preferences or session IDs.</td>
+      <td>API authentication (JWT), stateless authentication, Single Sign-On (SSO).</td>
+    </tr>
+    <tr>
+      <td>Access Scope</td>
+      <td>Server-only.</td>
+      <td>Client-side but can be sent to the server.</td>
+      <td>Client-side but verifiable by the server.</td>
+    </tr>
+    <tr>
+      <td>Example</td>
+      <td>PHP $_SESSION, Express express-session</td>
+      <td>document.cookie = “user=John”</td>
+      <td>JWT (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="how-they-work-together">How They Work Together</h2>
+
+<ul>
+  <li><strong>Session + Cookies:</strong> A session ID is stored in a cookie and sent with each request to maintain authentication.</li>
+  <li><strong>Tokens (JWT) + Cookies:</strong> JWTs can be stored in cookies (HttpOnly for security) or localStorage/sessionStorage.</li>
+  <li><strong>Tokens vs. Sessions:</strong> Sessions require server storage, while tokens (like JWT) allow stateless authentication.</li>
+</ul>
+
+<h2 id="best-practices">Best Practices</h2>
+
+<h3 id="for-sessions">For Sessions</h3>
+
+<ul>
+  <li>Use secure cookies for session IDs (HttpOnly, Secure, SameSite=Strict).</li>
+  <li>Regenerate session IDs on login to prevent session fixation.</li>
+  <li>Set a timeout for inactive sessions.</li>
+</ul>
+
+<h3 id="for-cookies">For Cookies</h3>
+
+<ul>
+  <li>Use HttpOnly and Secure flags to prevent JavaScript access.</li>
+  <li>Use SameSite=Strict or Lax to prevent CSRF attacks.</li>
+  <li>Encrypt sensitive data (don’t store passwords in cookies).</li>
+</ul>
+
+<h3 id="for-tokens-jwt">For Tokens (JWT)</h3>
+
+<ul>
+  <li>Use short-lived tokens (e.g., 15 min) + refresh tokens.</li>
+  <li>Store JWTs in HttpOnly cookies instead of localStorage.</li>
+  <li>Sign JWTs with strong algorithms (HS256 for shared secret, RS256 for public/private key pairs).</li>
+</ul>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#http" class="page__taxonomy-item p-category" rel="tag">Http</a><span class="sep">, </span>
+    
+      <a href="/tags/#oauth" class="page__taxonomy-item p-category" rel="tag">OAuth</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#system-design" class="page__taxonomy-item p-category" rel="tag">System Design</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2025-02-19T00:00:00+02:00">February 19, 2025</time></p>
+
+      </footer>
+
+      <section class="page__share">
+  <h4 class="page__share-title">Share on</h4>
+
+  <a href="https://twitter.com/intent/tweet?text=Session+Cookies+and+Tokens%20http%3A%2F%2Flocalhost%3A4000%2Fsystem%2520design%2Fpost-session-cookies-tokens%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2Fsystem%2520design%2Fpost-session-cookies-tokens%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://localhost:4000/system%20design/post-session-cookies-tokens/" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/system%20design/post-http/" class="pagination--pager" title="HTTP (Hypertext Transfer Protocol)">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    
+<div class="page__related">
+  
+  <h2 class="page__related-title">You may also enjoy</h2>
+  <div class="grid__wrapper">
+    
+      
+      
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <p class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/system%20design/post-http/" rel="permalink">HTTP (Hypertext Transfer Protocol)
+</a>
+      
+    </p>
+    
+
+
+    <p class="archive__item-excerpt" itemprop="description">Hypertext Transfer Protocol (HTTP) is an application-layer protocol for transmitting hypermedia documents.
+
+</p>
+  </article>
+</div>
+
+    
+  </div>
+</div>
+
+  
+  
+</div>
+
+      
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+
+  <ul class="social-icons">
+    <!--
+    
+      <li><strong>Tech Stack:</strong></li>
+    
+  -->
+    
+      
+        
+          <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://github.com/bdostumski/learning-workspace/tree/main/linux" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> Arch Linux</a></li>
+        
+      
+        
+          <li><a href="https://github.com/bdostumski/learning-workspace/tree/main/problem-solving/dsa" rel="nofollow noopener noreferrer"><i class="fas fa-brain" aria-hidden="true"></i> Problem Solving</a></li>
+        
+      
+        
+          <li><a href="https://github.com/bdostumski/learning-workspace/tree/main/programming" rel="nofollow noopener noreferrer"><i class="fas fa-code" aria-hidden="true"></i> Programming</a></li>
+        
+      
+        
+          <li><a href="https://github.com/bdostumski/learning-workspace/tree/main/database" rel="nofollow noopener noreferrer"><i class="fas fa-database" aria-hidden="true"></i> Databases</a></li>
+        
+      
+        
+          <li><a href="https://github.com/bdostumski/learning-workspace/tree/main/devops" rel="nofollow noopener noreferrer"><i class="fas fa-network-wired" aria-hidden="true"></i> DevOps</a></li>
+        
+      
+    
+<!--
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  -->
+  </ul>
+</div>
+
+<!-- <div class="page__footer-copyright">&copy; 2025 <a href="http://localhost:4000">CoreHub Blog</a>. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/jekyll-themes/minimal-mistakes/" rel="nofollow">Minimal Mistakes</a>.</div> -->
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+  </body>
+</html>
