@@ -233,7 +233,11 @@ During my training, I was able to learn and use all the technologies I need to d
 
 -------------------------------------------------------------------------------
 
-### Udemy
+### Udemy - NodeJS
+
+Learning Node.js by building real-world applications with Node JS, Express, and MongoDB.
+
+[Certificate](../assets/images/certificates/udemy/nodejs.jpg)
 
 -------------------------------------------------------------------------------
 
