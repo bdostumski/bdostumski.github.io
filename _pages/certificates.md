@@ -243,7 +243,7 @@ Learning Node.js by building real-world applications with Node JS, Express, and 
 
 Master the Linux Command Line
 
-[Certificate](../assets/images/certificates/udemy/master-the-linux-command-line.jpg
+[Certificate](../assets/images/certificates/udemy/master-the-linux-command-line.jpg)
 
 -------------------------------------------------------------------------------
 
