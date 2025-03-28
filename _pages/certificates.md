@@ -239,6 +239,12 @@ Learning Node.js by building real-world applications with Node JS, Express, and 
 
 [Certificate](../assets/images/certificates/udemy/nodejs.jpg)
 
+### Udemy - Linux CLI Mastery
+
+Master the Linux Command Line
+
+[Certificate](../assets/images/certificates/udemy/master-the-linux-command-line.jpg
+
 -------------------------------------------------------------------------------
 
 ### Personal - Financial Markets Trading
