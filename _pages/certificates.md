@@ -245,6 +245,12 @@ Master the Linux Command Line
 
 [Certificate](../assets/images/certificates/udemy/master-the-linux-command-line.jpg)
 
+### Udemy - Vim Advanced
+
+Vim advanced tutorial
+
+[Certificate](../assets/images/certificates/udemy/vim-advanced.jpg)
+
 -------------------------------------------------------------------------------
 
 ### Personal - Financial Markets Trading
