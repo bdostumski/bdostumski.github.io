@@ -251,6 +251,12 @@ Vim advanced tutorial
 
 [Certificate](../assets/images/certificates/udemy/vim-advanced.jpg)
 
+### Udemy - Linux Shell Scripting
+
+A project-based approach to learning
+
+[Certificate](../assets/images/certificates/udemy/linux-shell-scripting.jpg)
+
 -------------------------------------------------------------------------------
 
 ### Personal - Financial Markets Trading
