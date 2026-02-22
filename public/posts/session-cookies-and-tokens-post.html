@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Session Cookies and Tokens</title>
+<meta name="description" content="Session Cookies and Tokens" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Session Cookies and Tokens</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org6b7a63b" class="outline-2">
+<h2 id="org6b7a63b">What is a Session?</h2>
+<div class="outline-text-2" id="text-org6b7a63b">
+<p>
+A session is a temporary state maintained on the server that tracks a user’s activity across multiple requests. It typically stores user authentication details, preferences, or other data needed during an interaction.
+</p>
+</div>
+<div id="outline-container-org2a052c1" class="outline-3">
+<h3 id="org2a052c1">How It Works</h3>
+<div class="outline-text-3" id="text-org2a052c1">
+<ul class="org-ul">
+<li>User logs in → Server creates a session (stores it in memory, database, or file).</li>
+<li>The server generates a session ID and sends it to the client in a cookie.</li>
+<li>The client sends the session ID on every request → Server retrieves session data.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org89ba1d6" class="outline-2">
+<h2 id="org89ba1d6">What is a Cookie?</h2>
+<div class="outline-text-2" id="text-org89ba1d6">
+<p>
+A cookie is a small piece of data stored on the client (browser) and sent to the server with every request. It can store user preferences, authentication details, or tracking information.
+</p>
+</div>
+<div id="outline-container-org05de1ae" class="outline-3">
+<h3 id="org05de1ae">How It Works</h3>
+<div class="outline-text-3" id="text-org05de1ae">
+<ul class="org-ul">
+<li>Server sends a Set-Cookie header → Browser stores the cookie.</li>
+<li>Browser sends the cookie with every subsequent request.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org612da08" class="outline-3">
+<h3 id="org612da08">Types of Cookies</h3>
+<div class="outline-text-3" id="text-org612da08">
+<ul class="org-ul">
+<li>Session Cookies: Deleted when the browser is closed.</li>
+<li>Persistent Cookies: Stored for a long time (set expiration date).</li>
+<li>Secure Cookies: Only sent over HTTPS.</li>
+<li>HttpOnly Cookies: Not accessible by JavaScript (prevents XSS attacks).</li>
+<li>SameSite Cookies: Prevents CSRF attacks by restricting cross-site requests.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc1840f7" class="outline-2">
+<h2 id="orgc1840f7">What is a Token?</h2>
+<div class="outline-text-2" id="text-orgc1840f7">
+<p>
+A token is a cryptographic string used to authenticate users without storing state on the server. The most common type is JSON Web Token (JWT).
+</p>
+</div>
+<div id="outline-container-orgfe21a23" class="outline-3">
+<h3 id="orgfe21a23">How It Works</h3>
+<div class="outline-text-3" id="text-orgfe21a23">
+<ul class="org-ul">
+<li>User logs in → Server generates a JWT and sends it to the client.</li>
+<li>Client stores the JWT in localStorage, sessionStorage, or a cookie.</li>
+<li>The client sends the JWT with every request in the Authorization header.</li>
+<li>The server verifies the JWT using a secret key (HMAC) or public/private key pair (RSA).</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7e80bb8" class="outline-3">
+<h3 id="org7e80bb8">Comparison</h3>
+<div class="outline-text-3" id="text-org7e80bb8">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Feature</th>
+<th scope="col" class="org-left">Session</th>
+<th scope="col" class="org-left">Cookies</th>
+<th scope="col" class="org-left">Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><b>Definition</b></td>
+<td class="org-left">A server-side mechanism to store user state.</td>
+<td class="org-left">Small pieces of data stored in the browser.</td>
+<td class="org-left">A cryptographic string used for authentication and authorization.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Storage</b></td>
+<td class="org-left">Stored on the server.</td>
+<td class="org-left">Stored on the client (browser).</td>
+<td class="org-left">Stored on the client but verified by the server.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Security</b></td>
+<td class="org-left">More secure (server-side).</td>
+<td class="org-left">Less secure (can be stolen via XSS).</td>
+<td class="org-left">More secure if implemented properly (e.g., JWT signed with HMAC or RSA).</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Persistence</b></td>
+<td class="org-left">Lives as long as the session is active (until timeout or logout).</td>
+<td class="org-left">Can be persistent (stored on disk) or session-based (deleted on close).</td>
+<td class="org-left">Can be persistent, usually with an expiration time.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Use Case</b></td>
+<td class="org-left">Maintaining user authentication across multiple requests.</td>
+<td class="org-left">Storing small amounts of client-side data like preferences or session IDs.</td>
+<td class="org-left">API authentication (JWT), stateless authentication, Single Sign-On (SSO).</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Access Scope</b></td>
+<td class="org-left">Server-only.</td>
+<td class="org-left">Client-side but can be sent to the server.</td>
+<td class="org-left">Client-side but verifiable by the server.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Example</b></td>
+<td class="org-left">PHP $<sub>SESSION</sub>, Express express-session</td>
+<td class="org-left">document.cookie = “user=John”</td>
+<td class="org-left">JWT (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-orge4e4e6c" class="outline-2">
+<h2 id="orge4e4e6c">How They Work Together</h2>
+<div class="outline-text-2" id="text-orge4e4e6c">
+<ol class="org-ol">
+<li>Session + Cookies: A session ID is stored in a cookie and sent with each request to maintain authentication.</li>
+<li>Tokens (JWT) + Cookies: JWTs can be stored in cookies (HttpOnly for security) or localStorage/sessionStorage.</li>
+<li>Tokens vs. Sessions: Sessions require server storage, while tokens (like JWT) allow stateless authentication.</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org0b0e65d" class="outline-2">
+<h2 id="org0b0e65d">Best Practices</h2>
+<div class="outline-text-2" id="text-org0b0e65d">
+</div>
+<div id="outline-container-org766254b" class="outline-3">
+<h3 id="org766254b">For Sessions</h3>
+<div class="outline-text-3" id="text-org766254b">
+<ul class="org-ul">
+<li>Use secure cookies for session IDs (HttpOnly, Secure, SameSite=Strict).</li>
+<li>Regenerate session IDs on login to prevent session fixation.</li>
+<li>Set a timeout for inactive sessions.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org37f136f" class="outline-3">
+<h3 id="org37f136f">For Cookies</h3>
+<div class="outline-text-3" id="text-org37f136f">
+<ul class="org-ul">
+<li>Use HttpOnly and Secure flags to prevent JavaScript access.</li>
+<li>Use SameSite=Strict or Lax to prevent CSRF attacks.</li>
+<li>Encrypt sensitive data (don’t store passwords in cookies).</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org873bb33" class="outline-3">
+<h3 id="org873bb33">For Tokens (JWT)</h3>
+<div class="outline-text-3" id="text-org873bb33">
+<ul class="org-ul">
+<li>Use short-lived tokens (e.g., 15 min) + refresh tokens.</li>
+<li>Store JWTs in HttpOnly cookies instead of localStorage.</li>
+<li>Sign JWTs with strong algorithms (HS256 for shared secret, RS256 for public/private key pairs).</li>
+</ul>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://github.com/bdostumski/learning-workspace/tree/main/linux" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

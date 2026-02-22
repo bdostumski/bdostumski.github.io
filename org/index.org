@@ -1,0 +1,127 @@
+#+TITLE: Index
+#+OPTIONS: toc:nil num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+PROPERTY: header-args:emacs-lisp :results value raw :exports results
+#+INCLUDE: "./header.org"
+
+* Recent Posts
+
+#+BEGIN_SRC emacs-lisp
+(require 'subr-x)
+
+(defun index--posts-dir ()
+  "Return absolute path to the posts directory (org/posts)."
+  (let* ((this-file (or (buffer-file-name)
+                        (expand-file-name "org/index.org" default-directory)))
+         (org-dir (file-name-directory this-file)))
+    (expand-file-name "posts" org-dir)))
+
+(defun index--read-org-title-and-date (file)
+  "Return (TITLE DATE SLUG) for FILE."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (let* ((title (or (when (re-search-forward "^#\\+TITLE:[ \t]+\\(.+\\)$" nil t)
+                        (string-trim (match-string 1)))
+                      (file-name-base file)))
+           (date (when (re-search-forward "^#\\+DATE:[ \t]+\\(.+\\)$" nil t)
+                   (string-trim (match-string 1))))
+           (slug (file-name-base file)))
+      (list title date slug))))
+
+(defun index-generate-recent-posts ()
+  "Generate an Org list of the 5 most recent blog posts."
+  (let* ((base-dir (file-name-as-directory (index--posts-dir)))
+         (files (directory-files base-dir t "\\.org\\'" t)))
+    (let ((posts (mapcar #'index--read-org-title-and-date files)))
+      ;; Sort by date descending, unknown dates last
+      (setq posts
+            (sort posts
+                  (lambda (a b)
+                    (let ((da (nth 1 a))
+                          (db (nth 1 b)))
+                      (cond
+                       ((and da db) (string> da db))
+                       (da t)
+                       (t nil))))))
+      ;; Take only the first 5
+      (when (> (length posts) 5)
+        (setq posts (seq-take posts 5)))
+      (mapconcat
+       (lambda (post)
+         (let ((title (nth 0 post))
+               (date  (nth 1 post))
+               (slug  (nth 2 post)))
+           (format "- %s[[./posts/%s.html][%s]]"
+                   (if date (format "%s – " date) "")
+                   slug
+                   title)))
+       posts
+       "\n"))))
+
+;; Return the generated list to Org Babel
+(index-generate-recent-posts)
+#+END_SRC
+
+
+* Recent Certificates
+
+#+BEGIN_SRC emacs-lisp
+(require 'subr-x)
+
+(defun index--certificates-dir ()
+  "Return absolute path to the certificates directory (org/certificates)."
+  (let* ((this-file (or (buffer-file-name)
+                        (expand-file-name "org/index.org" default-directory)))
+         (org-dir (file-name-directory this-file)))
+    (expand-file-name "certificates" org-dir)))
+
+(defun index--read-org-cert-title-and-date (file)
+  "Return (TITLE DATE SLUG) for FILE."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (let* ((title (or (when (re-search-forward "^#\\+TITLE:[ \t]+\\(.+\\)$" nil t)
+                        (string-trim (match-string 1)))
+                      (file-name-base file)))
+           (date (when (re-search-forward "^#\\+DATE:[ \t]+\\(.+\\)$" nil t)
+                   (string-trim (match-string 1))))
+           (slug (file-name-base file)))
+      (list title date slug))))
+
+(defun index-generate-recent-certificates ()
+  "Generate an Org list of the 5 most recent certificates."
+  (let* ((base-dir (file-name-as-directory (index--certificates-dir)))
+         (files (directory-files base-dir t "\\.org\\'" t)))
+    (let ((certs (mapcar #'index--read-org-cert-title-and-date files)))
+      ;; Sort by date descending, unknown dates last
+      (setq certs
+            (sort certs
+                  (lambda (a b)
+                    (let ((da (nth 1 a))
+                          (db (nth 1 b)))
+                      (cond
+                       ((and da db) (string> da db))
+                       (da t)
+                       (t nil))))))
+      ;; Take only the first 5
+      (when (> (length certs) 5)
+        (setq certs (seq-take certs 5)))
+      (mapconcat
+       (lambda (cert)
+         (let ((title (nth 0 cert))
+               (date  (nth 1 cert))
+               (slug  (nth 2 cert)))
+           (format "- %s[[./certificates/%s.html][%s]]"
+                   (if date (format "%s – " date) "")
+                   slug
+                   title)))
+       certs
+       "\n"))))
+
+;; Return the generated list to Org Babel
+(index-generate-recent-certificates)
+#+END_SRC
+
+#+INCLUDE: "./footer.org"

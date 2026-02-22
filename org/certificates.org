@@ -1,0 +1,68 @@
+#+TITLE: Certificates
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+PROPERTY: header-args:emacs-lisp :results value raw :exports results
+#+INCLUDE: "./header.org"
+
+* Certificates
+
+#+BEGIN_SRC emacs-lisp
+(require 'subr-x)  ;; for string-trim
+
+(defun certificates--posts-dir ()
+  "Return absolute path to the certificates directory (org/certificates)."
+  (let* ((this-file (or (buffer-file-name)
+                        (expand-file-name "certificates.org" default-directory)))
+         (org-cert-dir  (file-name-directory this-file)))
+    (expand-file-name "certificates" org-cert-dir)))
+
+(defun certificates--read-org-title-and-date (file)
+  "Return (TITLE DATE SLUG) for FILE.
+
+DATE is read from #+DATE: in the file, or nil if not found.
+SLUG is the file name without directory and extension."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (let* ((title (or (when (re-search-forward "^#\\+TITLE:[ \t]+\\(.+\\)$" nil t)
+                        (string-trim (match-string 1)))
+                      (file-name-base file)))
+           (date (when (re-search-forward "^#\\+DATE:[ \t]+\\(.+\\)$" nil t)
+                   (string-trim (match-string 1))))
+           (slug (file-name-base file)))
+      (list title date slug))))
+
+(defun certificates-generate-posts-list ()
+  "Generate an Org list of certificates from files in org/certificates/."
+  (let* ((base-dir (file-name-as-directory (certificates--posts-dir)))
+         (files (directory-files base-dir t "\\.org\\'" t)))
+    (message "DEBUG certificates-generate-posts-list: base-dir=%s files=%S" base-dir files)
+    (let ((posts (mapcar #'certificates--read-org-title-and-date files)))
+      ;; Sort by date descending, unknown dates last
+      (setq posts
+            (sort posts
+                  (lambda (a b)
+                    (let ((da (nth 1 a))
+                          (db (nth 1 b)))
+                      (cond
+                       ((and da db) (string< da db))
+                       (da t)
+                       (t nil))))))
+      (mapconcat
+       (lambda (post)
+         (let ((title (nth 0 post))
+               (date  (nth 1 post))
+               (slug  (nth 2 post)))
+           (format "- %s[[./certificates/%s.html][%s]]"
+                   (if date (format "%s – " date) "")
+                   slug
+                   title)))
+       posts
+       "\n"))))
+
+;; Return the generated list to Org Babel
+(certificates-generate-posts-list)
+#+END_SRC
+
+#+INCLUDE: "./footer.org"
