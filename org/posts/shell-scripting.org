@@ -1,0 +1,612 @@
+#+TITLE: Shell Scripting Q&A
+#+DATE: 2026-06-15
+#+TAGS: Shell, Linux, Scripting
+#+DESCRIPTION: A comprehensive Q&A covering Shell Scripting from beginner to advanced level.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Shell Scripting Q&A (Beginner to Advanced)
+
+A comprehensive question and answer guide for Shell Scripting — from the very basics to advanced topics.
+Use it to study, review, or prepare for interviews.
+
+-----
+
+* Beginner
+
+** Q: What is a shell?
+
+A shell is a command-line interpreter that provides an interface between the user and the operating system kernel.
+It reads commands typed by the user and executes them.
+Common shells include ~bash~, ~sh~, ~zsh~, ~fish~, and ~dash~.
+
+** Q: What is a shell script?
+
+A shell script is a plain text file containing a sequence of shell commands that are executed in order.
+Shell scripts are used to automate repetitive tasks, manage files, and configure systems.
+
+** Q: What is a shebang and why is it important?
+
+The shebang (~#!~) is the first line of a shell script that tells the operating system which interpreter to use to execute the script.
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "Hello, World!"
+#+END_SRC
+
+Without the shebang the script may be run with the wrong shell or fail to execute directly.
+
+** Q: How do you make a shell script executable?
+
+#+BEGIN_SRC bash
+chmod +x script.sh
+./script.sh
+#+END_SRC
+
+~chmod +x~ adds execute permission, and ~./~ runs it from the current directory.
+
+** Q: How do you print output to the terminal?
+
+#+BEGIN_SRC bash
+echo "Hello, World!"
+printf "Name: %s\n" "Alice"
+#+END_SRC
+
+~echo~ is simple and appends a newline automatically.
+~printf~ gives more control over formatting (similar to C's printf).
+
+** Q: How do you define and use a variable?
+
+#+BEGIN_SRC bash
+name="Alice"
+echo "Hello, ${name}"
+#+END_SRC
+
+- No spaces around ~=~ when assigning.
+- Prefix the variable name with ~$~ to read its value.
+
+** Q: What is the difference between single quotes and double quotes?
+
+#+BEGIN_SRC bash
+name="World"
+echo 'Hello $name'   # prints: Hello $name  (no expansion)
+echo "Hello $name"   # prints: Hello World  (variable expanded)
+#+END_SRC
+
+Single quotes treat everything literally.
+Double quotes allow variable and command substitution.
+
+** Q: How do you read input from the user?
+
+#+BEGIN_SRC bash
+read -p "Enter your name: " name
+echo "Hello, $name"
+#+END_SRC
+
+~read~ stores the input in a variable.
+~-p~ displays a prompt before waiting for input.
+
+** Q: How do you write comments in a shell script?
+
+#+BEGIN_SRC bash
+# This is a single-line comment
+echo "Running script..."  # inline comment
+#+END_SRC
+
+Only single-line comments (~#~) exist in shell.
+There is no native multi-line comment syntax, but a heredoc trick is sometimes used.
+
+** Q: How do you perform arithmetic in shell?
+
+#+BEGIN_SRC bash
+a=5
+b=3
+sum=$((a + b))
+echo "Sum: $sum"        # prints: Sum: 8
+
+# Alternative with expr
+result=$(expr $a \* $b)
+echo "Product: $result" # prints: Product: 15
+#+END_SRC
+
+~$((...))~ is the preferred modern syntax for integer arithmetic.
+
+** Q: What are common comparison operators for numbers?
+
+| Operator | Meaning                  |
+|----------+--------------------------|
+| ~-eq~    | Equal                    |
+| ~-ne~    | Not equal                |
+| ~-lt~    | Less than                |
+| ~-le~    | Less than or equal       |
+| ~-gt~    | Greater than             |
+| ~-ge~    | Greater than or equal    |
+
+#+BEGIN_SRC bash
+if [ $a -gt $b ]; then
+  echo "$a is greater than $b"
+fi
+#+END_SRC
+
+** Q: How do you write an if-else statement?
+
+#+BEGIN_SRC bash
+age=18
+if [ $age -ge 18 ]; then
+  echo "Adult"
+elif [ $age -ge 13 ]; then
+  echo "Teenager"
+else
+  echo "Child"
+fi
+#+END_SRC
+
+** Q: What are the basic loop types in shell?
+
+#+BEGIN_SRC bash
+# for loop
+for i in 1 2 3 4 5; do
+  echo "Number: $i"
+done
+
+# while loop
+count=1
+while [ $count -le 5 ]; do
+  echo "Count: $count"
+  ((count++))
+done
+
+# until loop (runs until condition becomes true)
+until [ $count -gt 5 ]; do
+  echo "Count: $count"
+  ((count++))
+done
+#+END_SRC
+
+** Q: What is $0, $1, $2 ... $@ and $#?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "Script name : $0"
+echo "First arg   : $1"
+echo "Second arg  : $2"
+echo "All args    : $@"
+echo "Arg count   : $#"
+#+END_SRC
+
+| Variable | Meaning                              |
+|----------+--------------------------------------|
+| ~$0~     | Name of the script                   |
+| ~$1~-~$9~| Positional parameters (arguments)    |
+| ~$@~     | All arguments as separate strings    |
+| ~$*~     | All arguments as a single string     |
+| ~$#~     | Number of arguments                  |
+
+** Q: What does $? represent?
+
+~$?~ holds the exit status (return code) of the last executed command.
+~0~ means success; any non-zero value means failure.
+
+#+BEGIN_SRC bash
+ls /nonexistent
+echo "Exit code: $?"  # prints a non-zero value (e.g. 2)
+#+END_SRC
+
+-----
+
+* Intermediate
+
+** Q: What is the difference between [ ] and [[ ]]?
+
+~[ ]~ is the POSIX-compliant test command available in all shells.
+~[[ ]]~ is a bash/ksh/zsh extension that is more powerful and less error-prone.
+
+#+BEGIN_SRC bash
+# [[ ]] supports regex matching and logical operators without quoting issues
+name="Alice"
+if [[ $name == A* ]]; then
+  echo "Name starts with A"
+fi
+#+END_SRC
+
+Prefer ~[[ ]]~ in bash scripts for safety and additional features.
+
+** Q: How do you define and call a function?
+
+#+BEGIN_SRC bash
+greet() {
+  local name="$1"
+  echo "Hello, $name!"
+}
+
+greet "Alice"
+greet "Bob"
+#+END_SRC
+
+Use ~local~ to limit a variable's scope to the function.
+Functions return an exit code (0–255), not a value — use ~echo~ to return data.
+
+** Q: How do you capture the output of a command?
+
+#+BEGIN_SRC bash
+# Command substitution
+today=$(date +%Y-%m-%d)
+echo "Today is: $today"
+
+# Backtick style (older, avoid)
+files=`ls`
+#+END_SRC
+
+Prefer ~$(...)~ over backticks — it is more readable and supports nesting.
+
+** Q: What is a heredoc and when do you use it?
+
+A heredoc lets you pass a multi-line string to a command without creating a temporary file.
+
+#+BEGIN_SRC bash
+cat <<EOF
+Line 1
+Line 2
+Today is $(date)
+EOF
+#+END_SRC
+
+Use ~<<'EOF'~ (single-quoted delimiter) to disable variable expansion inside the heredoc.
+
+** Q: How do arrays work in bash?
+
+#+BEGIN_SRC bash
+# Declare an array
+fruits=("apple" "banana" "cherry")
+
+echo "${fruits[0]}"     # apple
+echo "${fruits[@]}"     # all elements
+echo "${#fruits[@]}"    # number of elements
+
+# Append an element
+fruits+=("date")
+
+# Loop over array
+for fruit in "${fruits[@]}"; do
+  echo "$fruit"
+done
+#+END_SRC
+
+** Q: What is the difference between $@ and $* in arrays and functions?
+
+When double-quoted:
+- ~"$@"~ expands each element as a separate quoted word — safe for filenames with spaces.
+- ~"$*"~ expands all elements as a single word joined by the first character of ~IFS~.
+
+Always prefer ~"$@"~ when iterating over arguments or array elements.
+
+** Q: What are special variables $$ and $!?
+
+| Variable | Meaning                                  |
+|----------+------------------------------------------|
+| ~$$~     | PID of the current shell/script          |
+| ~$!~     | PID of the last background command       |
+| ~$-~     | Current shell option flags               |
+| ~$_~     | Last argument of the previous command    |
+
+** Q: How do you handle errors and exit codes?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+set -e          # exit immediately on error
+set -u          # treat unset variables as errors
+set -o pipefail # catch errors in pipelines
+
+cp source.txt dest.txt || { echo "Copy failed"; exit 1; }
+#+END_SRC
+
+Using ~set -euo pipefail~ at the top of scripts is considered best practice.
+
+** Q: What is process substitution?
+
+Process substitution allows you to treat the output of a command as a file.
+
+#+BEGIN_SRC bash
+# Compare output of two commands
+diff <(ls dir1) <(ls dir2)
+
+# Read from a process as if it were a file
+while IFS= read -r line; do
+  echo "Line: $line"
+done < <(grep "ERROR" logfile.txt)
+#+END_SRC
+
+** Q: What is the difference between source (.) and executing a script?
+
+#+BEGIN_SRC bash
+source script.sh  # or: . script.sh
+./script.sh
+#+END_SRC
+
+- ~source~ / ~.~ runs the script in the *current* shell — variable changes persist.
+- ~./script.sh~ runs the script in a *subshell* — changes do not affect the parent shell.
+
+** Q: How do you work with files and directories?
+
+#+BEGIN_SRC bash
+# Test conditions
+[ -f file.txt ]   && echo "Is a regular file"
+[ -d /tmp ]       && echo "Is a directory"
+[ -r file.txt ]   && echo "Is readable"
+[ -w file.txt ]   && echo "Is writable"
+[ -x script.sh ]  && echo "Is executable"
+[ -s file.txt ]   && echo "Is non-empty"
+[ -e path ]       && echo "Exists"
+#+END_SRC
+
+** Q: How does string manipulation work in bash?
+
+#+BEGIN_SRC bash
+str="Hello, World!"
+
+echo "${#str}"           # Length: 13
+echo "${str:7:5}"        # Substring: World
+echo "${str,,}"          # Lowercase: hello, world!
+echo "${str^^}"          # Uppercase: HELLO, WORLD!
+echo "${str/World/Bash}" # Replace first: Hello, Bash!
+echo "${str//l/L}"       # Replace all:   HeLLo, WorLd!
+echo "${str#Hello, }"    # Remove prefix: World!
+echo "${str%!}"          # Remove suffix: Hello, World
+#+END_SRC
+
+** Q: How do you use case statements?
+
+#+BEGIN_SRC bash
+read -p "Enter a fruit: " fruit
+case "$fruit" in
+  apple)
+    echo "You chose apple."
+    ;;
+  banana | mango)
+    echo "You chose a tropical fruit."
+    ;;
+  *)
+    echo "Unknown fruit."
+    ;;
+esac
+#+END_SRC
+
+** Q: What is IFS and how does it affect word splitting?
+
+~IFS~ (Internal Field Separator) controls how bash splits words.
+Default value is space, tab, and newline.
+
+#+BEGIN_SRC bash
+IFS=',' read -ra parts <<< "one,two,three"
+for part in "${parts[@]}"; do
+  echo "$part"
+done
+#+END_SRC
+
+Always restore ~IFS~ after changing it to avoid side effects.
+
+-----
+
+* Advanced
+
+** Q: What is the difference between soft links and hard links?
+
+#+BEGIN_SRC bash
+ln -s target.txt symlink.txt  # soft (symbolic) link
+ln   target.txt hardlink.txt  # hard link
+#+END_SRC
+
+- A *soft link* is a pointer to a path — it breaks if the target is deleted or moved.
+- A *hard link* is another directory entry pointing to the same inode — it survives deletion of the original filename.
+
+** Q: How do you write robust scripts using traps?
+
+~trap~ lets you catch signals and errors to perform cleanup before the script exits.
+
+#+BEGIN_SRC bash
+#!/bin/bash
+tmpfile=$(mktemp)
+
+cleanup() {
+  echo "Cleaning up..."
+  rm -f "$tmpfile"
+}
+
+trap cleanup EXIT        # runs on any exit
+trap 'echo "Interrupted"' INT  # runs on Ctrl+C (SIGINT)
+
+echo "Working..." > "$tmpfile"
+# ... rest of script ...
+#+END_SRC
+
+** Q: How do named pipes (FIFOs) work?
+
+#+BEGIN_SRC bash
+mkfifo mypipe
+echo "Hello from producer" > mypipe &   # writer (runs in background)
+cat mypipe                               # reader (blocks until writer writes)
+rm mypipe
+#+END_SRC
+
+Named pipes allow inter-process communication between unrelated processes.
+
+** Q: How do you implement a mutex/lock in shell scripts?
+
+#+BEGIN_SRC bash
+LOCKFILE="/tmp/myscript.lock"
+
+acquire_lock() {
+  if ! mkdir "$LOCKFILE" 2>/dev/null; then
+    echo "Script is already running. Exiting."
+    exit 1
+  fi
+}
+
+release_lock() {
+  rmdir "$LOCKFILE"
+}
+
+trap release_lock EXIT
+acquire_lock
+
+echo "Critical section running..."
+#+END_SRC
+
+Using ~mkdir~ for locking is atomic on most file systems, making it safer than ~touch~.
+
+** Q: How do you run commands in parallel and wait for them?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+pids=()
+
+for i in 1 2 3 4; do
+  sleep "$i" &
+  pids+=($!)
+done
+
+for pid in "${pids[@]}"; do
+  wait "$pid" && echo "PID $pid finished OK" || echo "PID $pid failed"
+done
+#+END_SRC
+
+~&~ runs a command in the background, ~wait~ waits for it, ~$!~ captures its PID.
+
+** Q: What is a subshell and how does it affect variable scope?
+
+A subshell is a child process created by the current shell.
+Variables set in a subshell are not visible in the parent.
+
+#+BEGIN_SRC bash
+x=10
+(
+  x=20
+  echo "Inside subshell: x=$x"   # 20
+)
+echo "Outside subshell: x=$x"    # 10 — unchanged
+#+END_SRC
+
+Subshells are created by ~(...)~, pipelines, command substitution, and background jobs.
+
+** Q: How do you handle long options and flags with getopts / getopt?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+usage() { echo "Usage: $0 [-n name] [-v]" >&2; exit 1; }
+
+verbose=0
+name=""
+
+while getopts ":n:v" opt; do
+  case $opt in
+    n) name="$OPTARG" ;;
+    v) verbose=1 ;;
+    :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
+   \?) echo "Invalid option: -$OPTARG" >&2; usage ;;
+  esac
+done
+
+shift $((OPTIND - 1))
+echo "Name: $name, Verbose: $verbose, Remaining args: $*"
+#+END_SRC
+
+~getopts~ is POSIX-compliant and built-in.
+Use ~getopt~ (external) for long options (~--name~).
+
+** Q: How does coproc work in bash?
+
+~coproc~ creates a coprocess — a background process with bidirectional pipes to the current shell.
+
+#+BEGIN_SRC bash
+coproc my_proc { cat; }
+
+echo "Hello" >&"${my_proc[1]}"   # write to coprocess stdin
+read line <&"${my_proc[0]}"      # read from coprocess stdout
+echo "Got: $line"
+#+END_SRC
+
+Useful when you need a persistent two-way communication channel with a child process.
+
+** Q: How do you use associative arrays (hash maps)?
+
+Associative arrays require bash 4.0+.
+
+#+BEGIN_SRC bash
+declare -A capitals
+
+capitals["France"]="Paris"
+capitals["Germany"]="Berlin"
+capitals["Japan"]="Tokyo"
+
+echo "${capitals["France"]}"       # Paris
+
+# Iterate over key-value pairs
+for country in "${!capitals[@]}"; do
+  echo "$country -> ${capitals[$country]}"
+done
+#+END_SRC
+
+** Q: How do you profile and debug a shell script?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+set -x    # print each command and its expanded form before execution
+set -v    # print shell input lines as they are read
+
+# Measure execution time of a section
+time {
+  for i in $(seq 1 1000); do
+    :
+  done
+}
+#+END_SRC
+
+You can also run a script with ~bash -x script.sh~ without modifying it.
+Use ~PS4='+(${BASH_SOURCE}:${LINENO}): '~ to include file and line number in trace output.
+
+** Q: What are the differences between exec, fork, and source in shell?
+
+| Mechanism   | Description                                                         |
+|-------------+---------------------------------------------------------------------|
+| ~fork~      | Shell creates a child process; parent waits for it to finish        |
+| ~exec~      | Replaces the current process image — no child is created            |
+| ~source/. ~ | Runs commands in the current shell process; no new process created  |
+
+#+BEGIN_SRC bash
+exec /bin/bash    # replaces current shell — the original process is gone
+#+END_SRC
+
+** Q: How do you write a self-contained script that detects its own location?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "Script is located in: $SCRIPT_DIR"
+#+END_SRC
+
+This works correctly even when the script is sourced, symlinked, or called from a different directory.
+
+** Q: What are some security best practices for shell scripting?
+
+1. *Always quote variables* — ~"$var"~ prevents word splitting and globbing issues.
+2. *Validate input* — never trust user-supplied data.
+3. *Avoid ~eval~* — it executes arbitrary code and is a common injection vector.
+4. *Use absolute paths* for critical commands in scripts run as root.
+5. *Restrict permissions* — scripts that contain secrets should not be world-readable.
+6. *Use ~set -euo pipefail~* — catch errors early.
+7. *Sanitize filenames* — use ~--~ to separate options from filenames (e.g., ~rm -- "$file"~).
+8. *Prefer mktemp* for temporary files instead of predictable names.
+
+#+BEGIN_SRC bash
+# Unsafe
+tmpfile="/tmp/myapp-$$"
+
+# Safe
+tmpfile=$(mktemp /tmp/myapp-XXXXXX)
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
