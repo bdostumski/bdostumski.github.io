@@ -176,13 +176,13 @@ echo "All args    : $@"
 echo "Arg count   : $#"
 #+END_SRC
 
-| Variable | Meaning                              |
-|----------+--------------------------------------|
-| ~$0~     | Name of the script                   |
-| ~$1~-~$9~| Positional parameters (arguments)    |
-| ~$@~     | All arguments as separate strings    |
-| ~$*~     | All arguments as a single string     |
-| ~$#~     | Number of arguments                  |
+| Variable     | Meaning                              |
+|--------------+--------------------------------------|
+| ~$0~         | Name of the script                   |
+| =$1= to =$9= | Positional parameters (arguments)    |
+| ~$@~         | All arguments as separate strings    |
+| ~$*~         | All arguments as a single string     |
+| ~$#~         | Number of arguments                  |
 
 ** Q: What does $? represent?
 
@@ -198,10 +198,10 @@ echo "Exit code: $?"  # prints a non-zero value (e.g. 2)
 
 * Intermediate
 
-** Q: What is the difference between [ ] and [[ ]]?
+** Q: What is the difference between =[ ]= and =[[ ]]=?
 
-~[ ]~ is the POSIX-compliant test command available in all shells.
-~[[ ]]~ is a bash/ksh/zsh extension that is more powerful and less error-prone.
+=[ ]= is the POSIX-compliant test command available in all shells.
+=[[ ]]= is a bash/ksh/zsh extension that is more powerful and less error-prone.
 
 #+BEGIN_SRC bash
 # [[ ]] supports regex matching and logical operators without quoting issues
@@ -211,7 +211,7 @@ if [[ $name == A* ]]; then
 fi
 #+END_SRC
 
-Prefer ~[[ ]]~ in bash scripts for safety and additional features.
+Prefer =[[ ]]= in bash scripts for safety and additional features.
 
 ** Q: How do you define and call a function?
 
@@ -253,7 +253,7 @@ Today is $(date)
 EOF
 #+END_SRC
 
-Use ~<<'EOF'~ (single-quoted delimiter) to disable variable expansion inside the heredoc.
+Use =<<'EOF'= (single-quoted delimiter) to disable variable expansion inside the heredoc.
 
 ** Q: How do arrays work in bash?
 
@@ -277,8 +277,8 @@ done
 ** Q: What is the difference between $@ and $* in arrays and functions?
 
 When double-quoted:
-- ~"$@"~ expands each element as a separate quoted word — safe for filenames with spaces.
-- ~"$*"~ expands all elements as a single word joined by the first character of ~IFS~.
+- ="$@"= expands each element as a separate quoted word — safe for filenames with spaces.
+- ="$*"= expands all elements as a single word joined by the first character of ~IFS~.
 
 Always prefer ~"$@"~ when iterating over arguments or array elements.
 
@@ -302,7 +302,7 @@ set -o pipefail # catch errors in pipelines
 cp source.txt dest.txt || { echo "Copy failed"; exit 1; }
 #+END_SRC
 
-Using ~set -euo pipefail~ at the top of scripts is considered best practice.
+Using =set -euo pipefail= at the top of scripts is considered best practice.
 
 ** Q: What is process substitution?
 
@@ -325,8 +325,8 @@ source script.sh  # or: . script.sh
 ./script.sh
 #+END_SRC
 
-- ~source~ / ~.~ runs the script in the *current* shell — variable changes persist.
-- ~./script.sh~ runs the script in a *subshell* — changes do not affect the parent shell.
+- =source= / =.= runs the script in the *current* shell — variable changes persist.
+- =./script.sh= runs the script in a *subshell* — changes do not affect the parent shell.
 
 ** Q: How do you work with files and directories?
 
@@ -568,11 +568,11 @@ Use ~PS4='+(${BASH_SOURCE}:${LINENO}): '~ to include file and line number in tra
 
 ** Q: What are the differences between exec, fork, and source in shell?
 
-| Mechanism   | Description                                                         |
-|-------------+---------------------------------------------------------------------|
-| ~fork~      | Shell creates a child process; parent waits for it to finish        |
-| ~exec~      | Replaces the current process image — no child is created            |
-| ~source/. ~ | Runs commands in the current shell process; no new process created  |
+| Mechanism  | Description                                                         |
+|------------+---------------------------------------------------------------------|
+| ~fork~     | Shell creates a child process; parent waits for it to finish        |
+| ~exec~     | Replaces the current process image — no child is created            |
+| =source/.= | Runs commands in the current shell process; no new process created  |
 
 #+BEGIN_SRC bash
 exec /bin/bash    # replaces current shell — the original process is gone
