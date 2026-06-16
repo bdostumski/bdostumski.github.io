@@ -57,6 +57,22 @@ printf "Name: %s\n" "Alice"
 ~echo~ is simple and appends a newline automatically.
 ~printf~ gives more control over formatting (similar to C's printf).
 
+** Q: What are the differences between echo and printf?
+
+#+BEGIN_SRC bash
+# echo with escape sequences (requires -e flag)
+echo -e "Line1\nLine2"     # prints two lines
+echo -n "No newline"       # suppress trailing newline
+
+# printf — always interprets escape sequences, no flag needed
+printf "Line1\nLine2\n"    # prints two lines
+printf "%-10s %5d\n" "age" 25  # formatted columns
+printf "%s\n" "$@"         # safely print each argument on its own line
+#+END_SRC
+
+Prefer ~printf~ in scripts — it behaves consistently across shells and does not interpret
+leading dashes or escape sequences by default.
+
 ** Q: How do you define and use a variable?
 
 #+BEGIN_SRC bash
@@ -66,6 +82,56 @@ echo "Hello, ${name}"
 
 - No spaces around ~=~ when assigning.
 - Prefix the variable name with ~$~ to read its value.
+
+** Q: What are environment variables and how do you manage them?
+
+Environment variables are variables inherited by child processes.
+
+#+BEGIN_SRC bash
+# Set and export a variable to child processes
+export MY_VAR="hello"
+
+# View all environment variables
+env
+printenv
+
+# View a single variable
+printenv HOME
+echo "$PATH"
+
+# Unset a variable
+unset MY_VAR
+
+# Set a variable only for one command (inline)
+MY_VAR="world" ./script.sh
+#+END_SRC
+
+Variables set without ~export~ are local to the current shell and not visible in child processes.
+
+** Q: How does redirection work in shell?
+
+#+BEGIN_SRC bash
+# Redirect stdout to a file (overwrite)
+echo "hello" > output.txt
+
+# Redirect stdout to a file (append)
+echo "world" >> output.txt
+
+# Redirect stdin from a file
+sort < names.txt
+
+# Redirect stderr to a file
+ls /bad 2> errors.txt
+
+# Redirect both stdout and stderr to a file
+./script.sh > all.log 2>&1
+./script.sh &> all.log       # bash shorthand
+
+# Discard output entirely
+./noisy-script.sh > /dev/null 2>&1
+#+END_SRC
+
+The order of redirections matters: ~2>&1~ must come *after* ~>~.
 
 ** Q: What is the difference between single quotes and double quotes?
 
@@ -78,15 +144,38 @@ echo "Hello $name"   # prints: Hello World  (variable expanded)
 Single quotes treat everything literally.
 Double quotes allow variable and command substitution.
 
+** Q: How do pipes and command chaining work?
+
+#+BEGIN_SRC bash
+# Pipe — pass stdout of one command as stdin to the next
+ls -l | grep ".sh" | wc -l
+
+# && — run next command only if previous succeeded (exit 0)
+mkdir /tmp/mydir && cd /tmp/mydir
+
+# || — run next command only if previous failed (non-zero exit)
+cd /missing || echo "Directory not found"
+
+# ; — run commands sequentially regardless of exit code
+echo "start" ; sleep 2 ; echo "done"
+#+END_SRC
+
 ** Q: How do you read input from the user?
 
 #+BEGIN_SRC bash
 read -p "Enter your name: " name
 echo "Hello, $name"
+
+# Silent input (e.g. passwords)
+read -s -p "Password: " pass
+echo ""
+
+# Read with timeout
+read -t 10 -p "Answer within 10s: " answer
 #+END_SRC
 
 ~read~ stores the input in a variable.
-~-p~ displays a prompt before waiting for input.
+~-p~ displays a prompt, ~-s~ hides input, ~-t~ sets a timeout in seconds.
 
 ** Q: How do you write comments in a shell script?
 
@@ -115,14 +204,14 @@ echo "Product: $result" # prints: Product: 15
 
 ** Q: What are common comparison operators for numbers?
 
-| Operator | Meaning                  |
-|----------+--------------------------|
-| ~-eq~    | Equal                    |
-| ~-ne~    | Not equal                |
-| ~-lt~    | Less than                |
-| ~-le~    | Less than or equal       |
-| ~-gt~    | Greater than             |
-| ~-ge~    | Greater than or equal    |
+| Operator | Meaning               |
+|----------+-----------------------|
+| ~-eq~    | Equal                 |
+| ~-ne~    | Not equal             |
+| ~-lt~    | Less than             |
+| ~-le~    | Less than or equal    |
+| ~-gt~    | Greater than          |
+| ~-ge~    | Greater than or equal |
 
 #+BEGIN_SRC bash
 if [ $a -gt $b ]; then
@@ -151,6 +240,11 @@ for i in 1 2 3 4 5; do
   echo "Number: $i"
 done
 
+# C-style for loop
+for ((i=0; i<5; i++)); do
+  echo "i=$i"
+done
+
 # while loop
 count=1
 while [ $count -le 5 ]; do
@@ -176,13 +270,13 @@ echo "All args    : $@"
 echo "Arg count   : $#"
 #+END_SRC
 
-| Variable     | Meaning                              |
-|--------------+--------------------------------------|
-| ~$0~         | Name of the script                   |
-| =$1= to =$9= | Positional parameters (arguments)    |
-| ~$@~         | All arguments as separate strings    |
-| ~$*~         | All arguments as a single string     |
-| ~$#~         | Number of arguments                  |
+| Variable     | Meaning                           |
+|--------------+-----------------------------------|
+| ~$0~         | Name of the script                |
+| =$1= to =$9= | Positional parameters (arguments) |
+| ~$@~         | All arguments as separate strings |
+| ~$*~         | All arguments as a single string  |
+| ~$#~         | Number of arguments               |
 
 ** Q: What does $? represent?
 
@@ -209,9 +303,33 @@ name="Alice"
 if [[ $name == A* ]]; then
   echo "Name starts with A"
 fi
+
+# Regex matching with =~
+if [[ "$name" =~ ^[A-Z][a-z]+$ ]]; then
+  echo "Name looks like a proper noun"
+fi
 #+END_SRC
 
 Prefer =[[ ]]= in bash scripts for safety and additional features.
+
+** Q: How do you use regular expressions in shell?
+
+#+BEGIN_SRC bash
+# =~ operator inside [[ ]] for regex matching
+email="user@example.com"
+if [[ "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+  echo "Valid email"
+fi
+
+# grep with regex
+echo "foo123" | grep -E '^[a-z]+[0-9]+$'
+
+# Case-insensitive regex match
+grep -iE 'error|warn' logfile.txt
+#+END_SRC
+
+Captured groups from ~=~~ are stored in the ~BASH_REMATCH~ array:
+~${BASH_REMATCH[0]}~ is the full match, ~${BASH_REMATCH[1]}~ is the first group.
 
 ** Q: How do you define and call a function?
 
@@ -251,9 +369,32 @@ Line 1
 Line 2
 Today is $(date)
 EOF
+
+# Indented heredoc (bash 4.4+ with <<-)
+cat <<-EOF
+	Indented line 1
+	Indented line 2
+EOF
 #+END_SRC
 
 Use =<<'EOF'= (single-quoted delimiter) to disable variable expansion inside the heredoc.
+
+** Q: What is a here-string?
+
+A here-string (~<<<~) passes a single string as stdin to a command — a compact alternative to echo+pipe.
+
+#+BEGIN_SRC bash
+# Instead of: echo "hello world" | read -r a b
+read -r a b <<< "hello world"
+echo "$a"   # hello
+echo "$b"   # world
+
+# Useful with grep, tr, etc.
+grep "foo" <<< "foo bar baz"
+
+# Pass a variable as stdin
+tr '[:lower:]' '[:upper:]' <<< "$str"
+#+END_SRC
 
 ** Q: How do arrays work in bash?
 
@@ -274,6 +415,26 @@ for fruit in "${fruits[@]}"; do
 done
 #+END_SRC
 
+** Q: How do you read a file into an array with mapfile / readarray?
+
+#+BEGIN_SRC bash
+# Read all lines of a file into an array
+mapfile -t lines < /etc/hosts
+# or equivalently:
+readarray -t lines < /etc/hosts
+
+echo "${lines[0]}"          # first line
+echo "${#lines[@]}"         # total number of lines
+
+# Loop over lines
+for line in "${lines[@]}"; do
+  echo "$line"
+done
+#+END_SRC
+
+The ~-t~ flag strips the trailing newline from each line.
+Both ~mapfile~ and ~readarray~ are synonyms and require bash 4.0+.
+
 ** Q: What is the difference between $@ and $* in arrays and functions?
 
 When double-quoted:
@@ -284,12 +445,12 @@ Always prefer ~"$@"~ when iterating over arguments or array elements.
 
 ** Q: What are special variables $$ and $!?
 
-| Variable | Meaning                                  |
-|----------+------------------------------------------|
-| ~$$~     | PID of the current shell/script          |
-| ~$!~     | PID of the last background command       |
-| ~$-~     | Current shell option flags               |
-| ~$_~     | Last argument of the previous command    |
+| Variable | Meaning                               |
+|----------+---------------------------------------|
+| ~$$~     | PID of the current shell/script       |
+| ~$!~     | PID of the last background command    |
+| ~$-~     | Current shell option flags            |
+| ~$_~     | Last argument of the previous command |
 
 ** Q: How do you handle errors and exit codes?
 
@@ -339,7 +500,135 @@ source script.sh  # or: . script.sh
 [ -x script.sh ]  && echo "Is executable"
 [ -s file.txt ]   && echo "Is non-empty"
 [ -e path ]       && echo "Exists"
+[ -L link ]       && echo "Is a symbolic link"
+[ -nt newer.txt ] && echo "Is newer than"
+[ -ot older.txt ] && echo "Is older than"
 #+END_SRC
+
+** Q: How do you use grep, sed, and awk?
+
+#+BEGIN_SRC bash
+# grep — search for patterns in text
+grep "error" logfile.txt          # lines containing "error"
+grep -i "error" logfile.txt       # case-insensitive
+grep -r "TODO" ./src/             # recursive search
+grep -v "debug" logfile.txt       # invert match (exclude lines)
+grep -c "error" logfile.txt       # count matching lines
+grep -n "error" logfile.txt       # show line numbers
+
+# sed — stream editor (find & replace, delete, insert)
+sed 's/foo/bar/' file.txt         # replace first occurrence per line
+sed 's/foo/bar/g' file.txt        # replace all occurrences
+sed -i 's/foo/bar/g' file.txt     # edit file in place
+sed '/^#/d' file.txt              # delete comment lines
+sed -n '5,10p' file.txt           # print lines 5 to 10
+
+# awk — pattern scanning and processing
+awk '{print $1}' file.txt         # print first field (column)
+awk -F: '{print $1}' /etc/passwd  # use : as delimiter
+awk '$3 > 100' data.txt           # print rows where column 3 > 100
+awk '{sum += $1} END {print sum}' numbers.txt  # sum a column
+awk 'NR==5' file.txt              # print line 5
+#+END_SRC
+
+** Q: How do you use cut, tr, sort, uniq, and wc?
+
+#+BEGIN_SRC bash
+# cut — extract fields or characters
+cut -d',' -f1,3 data.csv          # fields 1 and 3, comma-delimited
+cut -c1-10 file.txt               # first 10 characters of each line
+
+# tr — translate or delete characters
+echo "Hello World" | tr 'a-z' 'A-Z'    # uppercase
+echo "hello   world" | tr -s ' '       # squeeze multiple spaces
+echo "hello" | tr -d 'l'               # delete character
+
+# sort — sort lines
+sort file.txt                     # alphabetical
+sort -n numbers.txt               # numeric sort
+sort -r file.txt                  # reverse sort
+sort -u file.txt                  # sort and remove duplicates
+sort -t',' -k2 data.csv           # sort CSV by second field
+
+# uniq — filter duplicate adjacent lines (use after sort)
+sort file.txt | uniq              # remove duplicates
+sort file.txt | uniq -c           # count occurrences
+sort file.txt | uniq -d           # show only duplicates
+
+# wc — word/line/character count
+wc -l file.txt                    # line count
+wc -w file.txt                    # word count
+wc -c file.txt                    # byte count
+#+END_SRC
+
+** Q: How do you use the find command?
+
+#+BEGIN_SRC bash
+# Find files by name
+find /home -name "*.log"
+
+# Find files by type (f=file, d=dir, l=symlink)
+find /tmp -type f
+find /var -type d -name "cache"
+
+# Find by size
+find . -size +10M                 # larger than 10 MB
+find . -size -1k                  # smaller than 1 KB
+
+# Find by modification time
+find . -mtime -7                  # modified in the last 7 days
+find . -mtime +30                 # modified more than 30 days ago
+
+# Execute a command on found files
+find . -name "*.tmp" -delete
+find . -name "*.sh" -exec chmod +x {} \;
+
+# Find and print with null delimiter (safe for filenames with spaces)
+find . -name "*.txt" -print0 | xargs -0 grep "TODO"
+#+END_SRC
+
+** Q: How does xargs work?
+
+~xargs~ builds and executes commands from standard input — useful for processing lists of files or items.
+
+#+BEGIN_SRC bash
+# Basic usage — pass stdin as arguments
+echo "file1 file2 file3" | xargs rm
+
+# One argument per line (-L 1)
+cat filelist.txt | xargs -L 1 echo "Processing:"
+
+# Use null delimiter to handle filenames with spaces
+find . -name "*.log" -print0 | xargs -0 rm -f
+
+# Run in parallel (-P)
+cat urls.txt | xargs -P 4 -I{} curl -O {}
+
+# -I{} — replace {} with each input item
+ls *.txt | xargs -I{} cp {} /backup/
+#+END_SRC
+
+** Q: How do you use the select statement for interactive menus?
+
+~select~ generates a numbered menu from a list and loops until explicitly broken.
+
+#+BEGIN_SRC bash
+#!/bin/bash
+PS3="Choose an option: "   # the select prompt variable
+
+select choice in "Start" "Stop" "Restart" "Quit"; do
+  case $choice in
+    Start)   echo "Starting..." ;;
+    Stop)    echo "Stopping..." ;;
+    Restart) echo "Restarting..." ;;
+    Quit)    break ;;
+    *)       echo "Invalid option $REPLY" ;;
+  esac
+done
+#+END_SRC
+
+~REPLY~ holds the raw number the user typed.
+~PS3~ sets the prompt shown below the menu.
 
 ** Q: How does string manipulation work in bash?
 
@@ -354,6 +643,12 @@ echo "${str/World/Bash}" # Replace first: Hello, Bash!
 echo "${str//l/L}"       # Replace all:   HeLLo, WorLd!
 echo "${str#Hello, }"    # Remove prefix: World!
 echo "${str%!}"          # Remove suffix: Hello, World
+
+# Default value if variable is unset or empty
+echo "${name:-"stranger"}"
+
+# Assign default if unset
+: "${config_file:=/etc/app.conf}"
 #+END_SRC
 
 ** Q: How do you use case statements?
@@ -366,6 +661,9 @@ case "$fruit" in
     ;;
   banana | mango)
     echo "You chose a tropical fruit."
+    ;;
+  [0-9]*)
+    echo "That looks like a number, not a fruit."
     ;;
   *)
     echo "Unknown fruit."
@@ -383,6 +681,12 @@ IFS=',' read -ra parts <<< "one,two,three"
 for part in "${parts[@]}"; do
   echo "$part"
 done
+
+# Save and restore IFS
+OLD_IFS="$IFS"
+IFS=':'
+read -ra paths <<< "$PATH"
+IFS="$OLD_IFS"
 #+END_SRC
 
 Always restore ~IFS~ after changing it to avoid side effects.
@@ -414,12 +718,85 @@ cleanup() {
   rm -f "$tmpfile"
 }
 
-trap cleanup EXIT        # runs on any exit
+trap cleanup EXIT              # runs on any exit
 trap 'echo "Interrupted"' INT  # runs on Ctrl+C (SIGINT)
+trap 'echo "Terminated"' TERM  # runs on kill (SIGTERM)
+trap 'echo "Line $LINENO"' ERR # runs on any error (with set -e)
 
 echo "Working..." > "$tmpfile"
 # ... rest of script ...
 #+END_SRC
+
+** Q: What are Linux signals and how do you send them?
+
+Signals are software interrupts sent to processes to notify them of events.
+
+| Signal    | Number | Default action       | Common use                         |
+|-----------+--------+----------------------+------------------------------------|
+| ~SIGHUP~  |      1 | Terminate            | Reload config (daemons)            |
+| ~SIGINT~  |      2 | Terminate            | Ctrl+C — interrupt                 |
+| ~SIGQUIT~ |      3 | Core dump            | Ctrl+\                             |
+| ~SIGKILL~ |      9 | Terminate (forceful) | Cannot be caught or ignored        |
+| ~SIGTERM~ |     15 | Terminate (graceful) | Default signal sent by ~kill~      |
+| ~SIGSTOP~ |     19 | Stop process         | Cannot be caught or ignored        |
+| ~SIGTSTP~ |     20 | Stop process         | Ctrl+Z — suspend to background     |
+| ~SIGUSR1~ |     10 | Terminate            | User-defined signal                |
+| ~SIGUSR2~ |     12 | Terminate            | User-defined signal                |
+
+#+BEGIN_SRC bash
+kill -15 $PID       # send SIGTERM (graceful shutdown)
+kill -9  $PID       # send SIGKILL (force kill)
+kill -HUP $PID      # send SIGHUP (reload)
+kill -l             # list all signals
+pkill -f "myapp"    # kill by process name pattern
+#+END_SRC
+
+** Q: How do job control (fg, bg, jobs, disown) work?
+
+#+BEGIN_SRC bash
+# Run a command in the background
+sleep 100 &
+
+# List background jobs
+jobs
+# [1]+  Running    sleep 100 &
+
+# Bring job 1 to foreground
+fg %1
+
+# Suspend foreground job (Ctrl+Z), then send to background
+bg %1
+
+# Disown a job — detach it from the shell (survives shell exit)
+disown %1
+
+# Run a command immune to hangup signal (survives logout)
+nohup ./long-running.sh &
+
+# Check if a specific PID is running
+kill -0 $PID && echo "Running" || echo "Not running"
+#+END_SRC
+
+** Q: What is ulimit and how do you use it?
+
+~ulimit~ controls the resource limits available to the shell and its child processes.
+
+#+BEGIN_SRC bash
+ulimit -a             # show all current limits
+
+ulimit -n 4096        # max open file descriptors
+ulimit -u 100         # max number of user processes
+ulimit -v $((512*1024)) # max virtual memory (KB)
+ulimit -s 8192        # max stack size (KB)
+ulimit -t 60          # max CPU time (seconds)
+
+# Soft vs hard limits
+ulimit -Sn            # show soft limit for open files
+ulimit -Hn            # show hard limit for open files
+#+END_SRC
+
+Hard limits can only be raised by root.
+Soft limits can be raised up to the hard limit by the user.
 
 ** Q: How do named pipes (FIFOs) work?
 
@@ -431,6 +808,29 @@ rm mypipe
 #+END_SRC
 
 Named pipes allow inter-process communication between unrelated processes.
+
+** Q: What are /dev/fd, /dev/tcp, and /dev/udp?
+
+These are special virtual files provided by the kernel and bash.
+
+#+BEGIN_SRC bash
+# /dev/fd — file descriptor access
+ls /dev/fd            # 0=stdin, 1=stdout, 2=stderr
+exec 3> output.txt    # open fd 3 for writing
+echo "hello" >&3
+exec 3>&-             # close fd 3
+
+# /dev/tcp — open a TCP socket (bash built-in, no netcat needed)
+exec 3<>/dev/tcp/example.com/80
+echo -e "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n" >&3
+cat <&3
+exec 3>&-
+
+# /dev/udp — open a UDP socket
+echo "hello" > /dev/udp/127.0.0.1/9999
+#+END_SRC
+
+~/dev/tcp~ and ~/dev/udp~ are bash extensions — not available in plain ~sh~.
 
 ** Q: How do you implement a mutex/lock in shell scripts?
 
@@ -540,7 +940,13 @@ capitals["France"]="Paris"
 capitals["Germany"]="Berlin"
 capitals["Japan"]="Tokyo"
 
-echo "${capitals["France"]}"       # Paris
+echo "${capitals[France]}"         # Paris
+echo "${!capitals[@]}"             # all keys
+echo "${capitals[@]}"              # all values
+echo "${#capitals[@]}"             # number of entries
+
+# Delete an entry
+unset 'capitals[Germany]'
 
 # Iterate over key-value pairs
 for country in "${!capitals[@]}"; do
@@ -568,14 +974,112 @@ Use ~PS4='+(${BASH_SOURCE}:${LINENO}): '~ to include file and line number in tra
 
 ** Q: What are the differences between exec, fork, and source in shell?
 
-| Mechanism  | Description                                                         |
-|------------+---------------------------------------------------------------------|
-| ~fork~     | Shell creates a child process; parent waits for it to finish        |
-| ~exec~     | Replaces the current process image — no child is created            |
-| =source/.= | Runs commands in the current shell process; no new process created  |
+| Mechanism  | Description                                                        |
+|------------+--------------------------------------------------------------------|
+| ~fork~     | Shell creates a child process; parent waits for it to finish       |
+| ~exec~     | Replaces the current process image — no child is created           |
+| =source/.= | Runs commands in the current shell process; no new process created |
 
 #+BEGIN_SRC bash
 exec /bin/bash    # replaces current shell — the original process is gone
+#+END_SRC
+
+** Q: What are bash vs sh compatibility gotchas?
+
+#+BEGIN_SRC bash
+#!/bin/sh   # strict POSIX sh — many bash features are unavailable
+
+# These are bash-only — will FAIL under /bin/sh:
+# [[ ]]          — use [ ] instead
+# arrays         — not supported
+# (( ))          — use expr or [ ] for arithmetic
+# local          — not POSIX (works in most sh implementations but not guaranteed)
+# $'...'         — ANSI-C quoting
+# &>             — use > file 2>&1
+# {a..z}         — brace expansion
+# mapfile        — bash 4+ only
+# source         — use . instead
+# echo -e        — not portable; use printf
+#+END_SRC
+
+If portability is required, use ~#!/bin/sh~ and validate with ~checkbashisms~ or ~shellcheck~.
+
+** Q: How do you write a script logging pattern?
+
+#+BEGIN_SRC bash
+#!/bin/bash
+
+# Log levels
+LOG_FILE="/var/log/myscript.log"
+
+log() {
+  local level="$1"
+  shift
+  local message="$*"
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
+}
+
+log_info()  { log "INFO " "$@"; }
+log_warn()  { log "WARN " "$@" >&2; }
+log_error() { log "ERROR" "$@" >&2; }
+
+# Usage
+log_info  "Script started"
+log_warn  "Configuration file missing — using defaults"
+log_error "Failed to connect to database"
+#+END_SRC
+
+** Q: How do you integrate a shell script with cron?
+
+#+BEGIN_SRC bash
+# Edit the crontab for the current user
+crontab -e
+
+# Crontab syntax:
+# ┌──────── minute        (0–59)
+# │ ┌────── hour          (0–23)
+# │ │ ┌──── day of month  (1–31)
+# │ │ │ ┌── month         (1–12)
+# │ │ │ │ ┌ day of week   (0–7, 0 and 7 = Sunday)
+# │ │ │ │ │
+# * * * * *  command
+
+# Examples
+0 * * * *     /home/user/backup.sh         # every hour at :00
+30 2 * * *    /scripts/cleanup.sh          # every day at 02:30
+0 0 * * 0     /scripts/weekly-report.sh   # every Sunday at midnight
+*/5 * * * *   /scripts/check-health.sh    # every 5 minutes
+
+# Cron environment is minimal — always use absolute paths
+# and explicitly set needed variables at the top of your script:
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOME=/home/user
+#+END_SRC
+
+Cron does not load ~.bashrc~ or ~.profile~ — always use absolute paths and export ~PATH~ explicitly.
+
+** Q: What are eval risks and safer alternatives?
+
+#+BEGIN_SRC bash
+# DANGEROUS — eval executes arbitrary code
+user_input="rm -rf /"
+eval "$user_input"    # catastrophic!
+
+# Safer alternative: use variable indirection
+var_name="greeting"
+declare "$var_name=hello"
+echo "${!var_name}"   # hello  (indirect expansion)
+
+# Safer alternative: use arrays instead of dynamic variable names
+declare -A data
+data["key"]="value"
+echo "${data[key]}"
+
+# If eval is truly needed, sanitize input strictly
+safe_name="${input//[^a-zA-Z0-9_]/}"
+eval "echo \"\$$safe_name\""
 #+END_SRC
 
 ** Q: How do you write a self-contained script that detects its own location?
@@ -598,6 +1102,8 @@ This works correctly even when the script is sourced, symlinked, or called from 
 6. *Use ~set -euo pipefail~* — catch errors early.
 7. *Sanitize filenames* — use ~--~ to separate options from filenames (e.g., ~rm -- "$file"~).
 8. *Prefer mktemp* for temporary files instead of predictable names.
+9. *Use ShellCheck* — a static analysis tool that catches common bugs and pitfalls.
+10. *Avoid storing secrets in scripts* — use environment variables or a secrets manager.
 
 #+BEGIN_SRC bash
 # Unsafe
@@ -605,6 +1111,7 @@ tmpfile="/tmp/myapp-$$"
 
 # Safe
 tmpfile=$(mktemp /tmp/myapp-XXXXXX)
+trap 'rm -f "$tmpfile"' EXIT
 #+END_SRC
 
 -----
