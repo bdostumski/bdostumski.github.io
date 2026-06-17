@@ -1,0 +1,1160 @@
+#+TITLE: Linux OS
+#+DATE: 2026-06-17
+#+TAGS: Linux
+#+DESCRIPTION: A comprehensive Q&A covering Linux OS from beginner to advanced level.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Linux OS Q&A (Beginner to Advanced)
+
+A comprehensive question and answer guide for Linux Operating System — from the very basics to advanced topics.
+Use it to study, review, or prepare for interviews.
+
+-----
+
+* Beginner
+
+** Q: What is Linux?
+
+Linux is a free, open-source operating system kernel created by Linus Torvalds in 1991.
+It manages hardware resources and allows software applications to run on a computer.
+Linux is Unix-like and forms the core of many operating systems called Linux distributions (Ubuntu, CentOS, Fedora, etc.).
+
+** Q: What is the difference between Linux and other operating systems?
+
+- *Free and Open Source* — Source code is publicly available
+- *Multi-user* — Multiple users can use system simultaneously
+- *Multitasking* — Multiple programs run at the same time
+- *Portable* — Runs on various hardware platforms
+- *Secure* — User accounts, file permissions, encryption
+- *Stable* — Can run for years without restart
+- *Flexible* — Can be customized for various purposes
+
+** Q: What is a Linux distribution?
+
+A Linux distribution is a complete operating system built around the Linux kernel, including:
+
+- Linux kernel
+- GNU tools and utilities
+- Package manager
+- Pre-installed software
+- Init system
+- Desktop environment (optional)
+
+Popular distributions: Ubuntu, Debian, CentOS, Fedora, Red Hat Enterprise Linux (RHEL), Arch Linux, Slackware, openSUSE
+
+** Q: What is a terminal or shell?
+
+A terminal is a text-based interface where you interact with the operating system.
+A shell is a command-line interpreter that processes your commands.
+Common shells include Bash (Bourne Again Shell), Zsh, Fish, and Ksh.
+
+** Q: What are the basic Linux commands?
+
+Essential commands include:
+
+| Command | Purpose                      |
+|---------+------------------------------|
+| ls      | list directory contents      |
+| pwd     | print working directory      |
+| cd      | change directory             |
+| mkdir   | create a directory           |
+| rmdir   | remove empty directory       |
+| touch   | create an empty file         |
+| cat     | display file contents        |
+| cp      | copy files                   |
+| mv      | move/rename files            |
+| rm      | remove files                 |
+| sudo    | execute as superuser         |
+| man     | display manual pages         |
+| which   | locate a command             |
+| alias   | create command shortcuts     |
+
+** Q: How do I get help on a command?
+
+Multiple ways:
+
+#+BEGIN_SRC bash
+man command_name              # Full manual page
+command_name --help           # Quick help
+command_name -h               # Quick help (alternative)
+info command_name             # Info page (more detailed)
+whatis command_name           # One-line description
+apropos keyword               # Search by keyword
+#+END_SRC
+
+** Q: What is the Linux file system hierarchy?
+
+Linux follows the Filesystem Hierarchy Standard (FHS):
+
+| Directory   | Purpose                                |
+|-------------+----------------------------------------|
+| /           | Root directory, top of file system     |
+| /bin        | Essential command binaries             |
+| /sbin       | System administration binaries         |
+| /boot       | Boot files and kernel image            |
+| /dev        | Device files                           |
+| /etc        | System configuration files             |
+| /home       | User home directories                  |
+| /lib        | Essential shared libraries             |
+| /lib64      | 64-bit shared libraries                |
+| /media      | Mount points for removable media       |
+| /mnt        | Mount points for temporary filesystems |
+| /opt        | Optional third-party software          |
+| /proc       | Virtual filesystem with process info   |
+| /root       | Root user's home directory             |
+| /run        | Runtime data (PID files, sockets)      |
+| /srv        | Service data                           |
+| /sys        | Virtual filesystem for hardware info   |
+| /tmp        | Temporary files (cleared on reboot)    |
+| /usr        | User programs and data                 |
+| /var        | Variable data (logs, caches, mail)     |
+
+** Q: What is the difference between relative and absolute paths?
+
+- *Absolute paths* start with =/= and specify the complete path from root
+  #+BEGIN_SRC bash
+  /home/user/documents/file.txt
+  #+END_SRC
+  Always work regardless of current directory
+
+- *Relative paths* are relative to the current directory
+  #+BEGIN_SRC bash
+  documents/file.txt
+  ../documents/file.txt
+  #+END_SRC
+  Depend on current working directory
+  ~.~ represents current directory, ~..~ represents parent directory
+
+** Q: How do I check file permissions?
+
+Use ~ls -l~ to view detailed file information:
+
+#+BEGIN_SRC bash
+-rw-r--r-- 1 user group 1024 Jan 15 10:30 file.txt
+#+END_SRC
+
+Breaking down permissions:
+- First character: file type (=-= for file, =d= for directory, =l= for symlink)
+- Next 3 characters: owner permissions (read, write, execute)
+- Next 3 characters: group permissions
+- Last 3 characters: others permissions
+
+Each set uses: =r= (read=4), =w= (write=2), =x= (execute=1)
+
+** Q: What file types exist in Linux?
+
+- *Regular files* — Contain data (documents, images, etc.)
+- *Directories* — Containers for files
+- *Symbolic links* — References to other files
+- *Character devices* — Devices like terminals (=/dev/tty=)
+- *Block devices* — Storage devices like hard drives (=/dev/sda=)
+- *Named pipes (FIFO)* — Inter-process communication
+- *Sockets* — Network communication endpoints
+
+Check file type: ~file filename~ or ~ls -l~ (first character)
+
+** Q: What is the difference between a user and root?
+
+- *Regular user* — Limited permissions, can only access own files, cannot install system software
+- *Root (superuser)* — Unlimited permissions, can access/modify any file or system setting, UID is 0
+
+Running as root is dangerous; use sudo for specific tasks.
+
+** Q: How do I change file permissions?
+
+Use the ~chmod~ command with symbolic or numeric notation:
+
+Symbolic notation:
+#+BEGIN_SRC bash
+chmod u+x file.txt              # Add execute for owner
+chmod g-w file.txt              # Remove write for group
+chmod o=r file.txt              # Set read-only for others
+chmod a-rwx file.txt            # Remove all permissions
+#+END_SRC
+
+Numeric notation (sum rwx values):
+#+BEGIN_SRC bash
+chmod 755 file.txt              # rwxr-xr-x (7+5+5)
+chmod 644 file.txt              # rw-r--r-- (6+4+4)
+chmod 700 file.txt              # rwx------ (7+0+0)
+#+END_SRC
+
+** Q: How do I change file ownership?
+
+Use ~chown~ and ~chgrp~:
+
+#+BEGIN_SRC bash
+chown newuser file.txt              # Change owner
+chown newuser:newgroup file.txt      # Change owner and group
+chgrp newgroup file.txt             # Change group only
+chown -R user:group directory/      # Recursive change
+#+END_SRC
+
+** Q: What is sudo and how do I use it?
+
+~sudo~ (superuser do) allows permitted users to execute commands as another user (usually root):
+
+#+BEGIN_SRC bash
+sudo apt update                     # Run with root privileges
+sudo -u username command            # Run as specific user
+sudo -l                             # List permitted commands
+sudo !!                             # Repeat last command with sudo
+#+END_SRC
+
+The user is prompted for their password. Configuration in =/etc/sudoers=.
+
+** Q: What is a user group?
+
+A group is a collection of users with shared permissions. Benefits:
+
+- Share files and directories with multiple users
+- Assign permissions to groups instead of individuals
+- Easier permission management
+
+Common groups:
+- ~sudo~ — Users allowed to use sudo
+- ~wheel~ — Alternative to sudo group
+- ~docker~ — Users allowed to use Docker
+- ~audio~, ~video~ — Multimedia device access
+
+-----
+
+* Intermediate
+
+** Q: What is a package manager?
+
+A package manager automates the installation, removal, updating, and configuration of software packages. It:
+
+- Resolves dependencies automatically
+- Maintains package database
+- Enables easy software discovery
+- Simplifies system maintenance
+
+Different distributions use different package managers:
+
+| Distribution       | Package Manager |
+|--------------------+-----------------|
+| Debian/Ubuntu      | apt, apt-get    |
+| Red Hat/CentOS     | yum, dnf, rpm   |
+| Arch Linux         | pacman          |
+| openSUSE           | zypper          |
+
+** Q: What's the difference between apt and apt-get?
+
+~apt~ is a newer, user-friendly interface introduced to simplify package management tasks:
+
+- ~apt~ — High-level, user-friendly commands
+- ~apt-get~ — Lower-level tool with more options
+- ~apt-cache~ — Separate tool for searching packages
+
+~apt~ combines functionality from ~apt-get~ and ~apt-cache~ with better user experience, colorized output, and simplified syntax.
+
+For most users, ~apt~ is recommended; ~apt-get~ remains available for scripts.
+
+** Q: How do I install, update, and remove packages?
+
+Common commands (using apt as example):
+
+#+BEGIN_SRC bash
+sudo apt update              # Update package list
+sudo apt upgrade             # Upgrade all packages
+sudo apt full-upgrade        # Upgrade with dependency resolution
+sudo apt install package     # Install package
+sudo apt remove package      # Remove package (keep config)
+sudo apt purge package       # Remove package and config
+sudo apt autoremove          # Remove unused dependencies
+sudo apt search keyword      # Search for package
+sudo apt show package        # Show package information
+#+END_SRC
+
+** Q: What is the difference between update, upgrade, and dist-upgrade?
+
+- ~apt update~ — Refreshes package list (doesn't install anything)
+- ~apt upgrade~ — Installs available updates (safe)
+- ~apt dist-upgrade~ / ~apt full-upgrade~ — Upgrades with dependency resolution (may remove packages)
+
+** Q: What is a process?
+
+A process is a running instance of a program. Each process has:
+
+- Process ID (PID) — Unique identifier
+- Parent Process ID (PPID) — PID of parent process
+- Process state (running, sleeping, zombie, etc.)
+- Memory usage and allocation
+- CPU usage and scheduling information
+- File descriptors (open files)
+- Environment variables
+
+** Q: What is a background and foreground process?
+
+- *Foreground process* — Runs in foreground, takes terminal input/output, blocks terminal until completion
+- *Background process* — Runs in background, doesn't use terminal, allows other commands
+  - Start with ~&~: ~command &~
+  - Move running to background: Press Ctrl+Z then ~bg~
+
+** Q: How do I view running processes?
+
+Common tools:
+
+#+BEGIN_SRC bash
+ps                          # Current shell processes
+ps aux                      # All processes detailed
+ps -ef                      # All processes in different format
+ps -ef --forest             # Process tree
+top                         # Real-time process monitor
+htop                        # Interactive process viewer
+pgrep process_name          # Find PID by name
+pidof program_name          # Get PID of program
+lsof                        # List open files
+#+END_SRC
+
+** Q: What do the columns in ps aux mean?
+
+~ps aux~ output columns:
+
+| Column  | Meaning                            |
+|---------+------------------------------------|
+| USER    | Process owner                      |
+| PID     | Process ID                         |
+| %CPU    | CPU usage percentage               |
+| %MEM    | Memory usage percentage            |
+| VSZ     | Virtual memory size in KB          |
+| RSS     | Resident set size (physical) in KB |
+| TTY     | Terminal (? = no terminal)         |
+| STAT    | Process state                      |
+| START   | Start time                         |
+| TIME    | CPU time used                      |
+| COMMAND | Command line                       |
+
+** Q: How do I stop or kill a process?
+
+Use the ~kill~ command with different signals:
+
+#+BEGIN_SRC bash
+kill PID                    # Terminate gracefully (SIGTERM=15)
+kill -9 PID                 # Force kill (SIGKILL=9)
+kill -STOP PID              # Pause process
+kill -CONT PID              # Resume process
+killall process_name        # Kill by name
+pkill pattern               # Kill by pattern
+#+END_SRC
+
+Signal reference:
+- 1 (HUP) — Hang up
+- 2 (INT) — Interrupt (Ctrl+C)
+- 9 (KILL) — Force kill
+- 15 (TERM) — Terminate (default)
+- 19 (STOP) — Stop
+- 18 (CONT) — Continue
+
+** Q: What are the different process states?
+
+Process states visible in ~ps~ output:
+
+| State | Meaning                          |
+|-------|----------------------------------|
+| R     | Running                          |
+| S     | Sleeping (interruptible)         |
+| D     | Disk sleep (uninterruptible)     |
+| Z     | Zombie                           |
+| T     | Stopped                          |
+| W     | Paging                           |
+| X     | Dead                             |
+
+** Q: What is a zombie process?
+
+A zombie (defunct) process is a process that has terminated but whose parent hasn't called ~wait()~ to collect its status.
+
+Characteristics:
+- Appears in ~ps~ output with ~<defunct>~ label
+- No resources consumed except PID table entry
+- Cannot be killed with normal signals
+
+Solutions:
+- Wait for parent to call wait() and reap zombie
+- Kill the parent process (parent's death causes init to reap)
+
+** Q: What is a daemon?
+
+A daemon is a background process that runs continuously, typically without a controlling terminal. Characteristics:
+
+- Runs in background continuously
+- No standard input/output
+- Often started at boot
+- Performs system or network tasks
+- Named with 'd' suffix (sshd, httpd, mysqld, etc.)
+
+Common daemons:
+- ~sshd~ — SSH server
+- ~httpd~ / ~nginx~ — Web server
+- ~mysqld~ — MySQL database
+- ~cron~ — Task scheduler
+- ~syslog~ — System logging
+
+** Q: How do I check system information?
+
+Useful commands:
+
+#+BEGIN_SRC bash
+uname -a                    # Complete system information
+uname -r                    # Kernel version
+hostnamectl                 # Hostname and OS info
+lsb_release -a              # Linux release information
+cat /etc/os-release         # OS details
+cat /proc/version           # Kernel and compiler info
+#+END_SRC
+
+** Q: How do I check CPU information?
+
+#+BEGIN_SRC bash
+lscpu                       # CPU architecture and model
+cat /proc/cpuinfo           # Detailed per-core CPU info
+nproc                       # Number of processors
+top -n 1 | head -n 20       # CPU usage
+#+END_SRC
+
+** Q: How do I check memory usage?
+
+#+BEGIN_SRC bash
+free -h                     # Memory summary (human-readable)
+free -m                     # In megabytes
+cat /proc/meminfo           # Detailed memory information
+vmstat                      # Virtual memory statistics
+top                         # Real-time memory monitoring
+ps aux                      # Per-process memory usage
+#+END_SRC
+
+Memory types:
+- =total~ — Total installed RAM
+- =used~ — Currently used
+- =free~ — Not currently used
+- =available~ — Can be allocated to processes
+- =buffers~ — Cache for file system buffers
+- =cached~ — Page cache
+- =swap~ — Disk-based virtual memory
+
+** Q: How do I check disk usage?
+
+#+BEGIN_SRC bash
+df -h                       # Filesystem usage (human-readable)
+df -i                       # Inode usage
+du -sh *                    # Size of items in current directory
+du -h directory/            # Recursive size
+lsblk                       # Block devices
+fdisk -l                    # Partition table
+parted -l                   # Partition information
+#+END_SRC
+
+Columns in ~df -h~:
+- =Filesystem~ — Device name
+- =Size~ — Total size
+- =Used~ — Used space
+- =Avail~ — Available space
+- =Use%~ — Usage percentage
+- =Mounted on~ — Mount point
+
+** Q: How do I check system uptime and load average?
+
+#+BEGIN_SRC bash
+uptime                      # System uptime and load average
+cat /proc/uptime            # Uptime in seconds
+systemd-analyze             # Boot time analysis
+#+END_SRC
+
+Load average (in uptime output):
+- 1-minute average
+- 5-minute average
+- 15-minute average
+
+On single-core: load 1.0 = 100% CPU utilization
+On quad-core: load 4.0 = 100% CPU utilization
+
+** Q: How do I check network configuration?
+
+Common commands:
+
+#+BEGIN_SRC bash
+ip addr show                # IP addresses (modern)
+ifconfig                    # Network interfaces (older)
+ip route show               # Routing table
+route -n                    # Routing table (alternative)
+ip link show                # Network interfaces info
+#+END_SRC
+
+** Q: How do I test network connectivity?
+
+#+BEGIN_SRC bash
+ping host                   # Test ICMP connectivity
+ping -c 3 host              # Ping 3 times
+traceroute host             # Trace route to destination
+mtr host                    # Real-time network diagnostics
+telnet host port            # Test TCP connection
+nc -zv host port            # Test port connectivity
+#+END_SRC
+
+** Q: How do I perform DNS lookups?
+
+#+BEGIN_SRC bash
+nslookup domain             # DNS lookup
+dig domain                  # Detailed DNS info
+host domain                 # Quick DNS lookup
+getent hosts domain         # Check /etc/hosts and DNS
+cat /etc/resolv.conf        # DNS servers configuration
+#+END_SRC
+
+** Q: How do I check network statistics and connections?
+
+#+BEGIN_SRC bash
+netstat -an                 # All connections (deprecated)
+ss -an                      # Socket statistics (modern)
+ss -tlnp                    # Listening TCP ports with programs
+ss -ulnp                    # Listening UDP ports with programs
+netstat -i                  # Network interfaces stats
+netstat -r                  # Routing table
+#+END_SRC
+
+** Q: How do I download files from the internet?
+
+#+BEGIN_SRC bash
+wget url                    # Download file
+wget -O filename url        # Download with custom name
+wget -q url                 # Quiet mode
+wget -r url                 # Recursive download
+curl url                    # Display content
+curl -O url                 # Download and save
+curl -o filename url        # Download with custom name
+curl -L url                 # Follow redirects
+#+END_SRC
+
+** Q: How do I use grep effectively?
+
+#+BEGIN_SRC bash
+grep "pattern" file.txt             # Search for pattern
+grep -i "pattern" file.txt          # Case-insensitive
+grep -r "pattern" directory/        # Recursive search
+grep -n "pattern" file.txt          # Show line numbers
+grep -E "regex" file.txt            # Extended regex
+grep -v "pattern" file.txt          # Invert match
+grep -c "pattern" file.txt          # Count matches
+grep -l "pattern" *.txt             # List files with matches
+grep -A 3 "pattern" file.txt        # Show 3 lines after match
+grep -B 2 "pattern" file.txt        # Show 2 lines before match
+grep -C 2 "pattern" file.txt        # Show 2 lines context
+#+END_SRC
+
+** Q: What is piping and how do I use it?
+
+Piping connects command output to another command's input using ~|~:
+
+#+BEGIN_SRC bash
+cat file.txt | grep "keyword"       # Filter file contents
+cat file.txt | grep "keyword" | wc -l  # Count matches
+ls -l | sort -k5 -rn               # List and sort by size
+ps aux | grep process_name         # Find process
+cat /var/log/syslog | tail -20     # Last 20 log lines
+#+END_SRC
+
+Related operators:
+- ~>~ — Redirect output to file (overwrite)
+- ~>>~ — Append output to file
+- ~<~ — Redirect input from file
+- ~2>~ — Redirect error output
+- ~&>~ — Redirect both output and error
+
+** Q: How do I work with file input/output redirection?
+
+Redirection operators:
+
+#+BEGIN_SRC bash
+command > file.txt              # Write to file (overwrite)
+command >> file.txt             # Append to file
+command < input.txt             # Read from file
+command > output.txt 2>&1       # Redirect output and error
+command 2> error.txt            # Redirect errors only
+command 2> /dev/null            # Discard errors
+cmd1 | cmd2                      # Pipe output to command
+cmd1 | tee file.txt | cmd2       # Tee: output to file and command
+#+END_SRC
+
+File descriptors:
+- 0 — stdin (standard input)
+- 1 — stdout (standard output)
+- 2 — stderr (standard error)
+
+** Q: What are important configuration files?
+
+Key system configuration files:
+
+#+BEGIN_SRC
+/etc/hostname               # System hostname
+/etc/hosts                  # Hostname to IP mapping
+/etc/fstab                  # Filesystem mount configuration
+/etc/sudoers                # sudo permissions
+/etc/ssh/sshd_config        # SSH server configuration
+/etc/sysctl.conf            # Kernel parameters
+/etc/environment            # Global environment variables
+/etc/profile                # Login shell initialization
+/etc/bashrc                 # Interactive shell initialization
+/etc/crontab                # System-wide cron jobs
+#+END_SRC
+
+** Q: What is /etc/fstab and how do I configure it?
+
+File system table (=/etc/fstab~) defines which filesystems are mounted at boot:
+
+#+BEGIN_SRC
+/dev/sda1       /           ext4    defaults            0 1
+/dev/sda2       /boot       ext4    defaults            0 2
+/dev/sda3       swap        swap    defaults            0 0
+192.168.1.1:/nfs /mnt/nfs   nfs     defaults            0 0
+#+END_SRC
+
+Fields:
+- Device/UUID — Filesystem location
+- Mount point — Where to mount
+- Filesystem type — ext4, xfs, nfs, swap, etc.
+- Mount options — defaults, ro, noatime, etc.
+- Dump flag — 0=don't backup, 1=backup
+- Pass number — fsck order (0=skip, 1=root, 2=other)
+
+** Q: How do I mount and unmount filesystems?
+
+#+BEGIN_SRC bash
+mount device mount_point            # Mount filesystem
+mount -t type device mount_point    # Mount with type
+mount -o remount,ro /               # Remount as read-only
+mount -o bind /src /dest            # Bind mount
+umount mount_point                  # Unmount
+umount -l mount_point               # Lazy unmount
+umount -f mount_point               # Force unmount
+mount | grep ext4                   # Show mounted ext4 filesystems
+#+END_SRC
+
+** Q: What is the boot process in Linux?
+
+Boot sequence:
+
+1. *BIOS/UEFI* — Hardware initialization and self-test
+2. *Bootloader (GRUB/LILO)* — Loads kernel and initrd/initramfs
+3. *Kernel initialization* — Kernel decompresses and starts
+4. *Early userspace* — initrd/initramfs mounts root filesystem
+5. *init/systemd (PID 1)* — First user-space process, starts services
+6. *Runlevel/target* — System reaches multi-user or graphical target
+7. *Login services* — Display login prompt
+
+View boot process:
+
+#+BEGIN_SRC bash
+dmesg | head -50                    # Kernel messages
+journalctl -b                       # Current boot messages
+systemd-analyze                     # Boot time analysis
+#+END_SRC
+
+** Q: What is GRUB and how do I edit it?
+
+GRUB (GRand Unified Bootloader) is the bootloader. Configuration:
+
+#+BEGIN_SRC bash
+sudo grub-mkconfig -o /boot/grub/grub.cfg  # Generate config
+#+END_SRC
+
+Edit in:
+- =/etc/default/grub~ — Main config file
+- =/etc/grub.d/~ — Configuration scripts
+
+Common parameters in /etc/default/grub:
+- ~GRUB_DEFAULT=0~ — Default menu entry
+- ~GRUB_TIMEOUT=5~ — Timeout in seconds
+- ~GRUB_CMDLINE_LINUX="quiet splash"~ — Kernel arguments
+
+Changes require regenerating config with ~grub-mkconfig~.
+
+-----
+
+* Advanced
+
+** Q: How do I use nice and renice?
+
+Process scheduling and priority control:
+
+- Nice values range from -20 (highest priority) to +19 (lowest priority)
+- Default nice value: 0
+- Each increment reduces CPU priority
+
+#+BEGIN_SRC bash
+nice -n 10 program              # Start with nice 10 (lower priority)
+renice -n 5 -p PID              # Change running process
+renice -n -5 -p PID             # Increase priority (needs privileges)
+ps aux | grep program           # View NI column for nice value
+#+END_SRC
+
+** Q: What are system limits and how do I configure them?
+
+System limits in =/etc/security/limits.conf~:
+
+#+BEGIN_SRC
+username soft nofile 1024       # Max open files
+username hard nofile 2048
+@groupname soft nproc 100       # Max processes
+@groupname hard nproc 200
+#+END_SRC
+
+Check limits:
+
+#+BEGIN_SRC bash
+ulimit -a                       # Show all limits
+ulimit -n                       # Max open files
+ulimit -u                       # Max user processes
+ulimit -m                       # Max memory
+ulimit -c                       # Core dump size
+#+END_SRC
+
+Set limits for current session:
+
+#+BEGIN_SRC bash
+ulimit -n 4096                  # Set max open files
+ulimit -u 256                   # Set max processes
+#+END_SRC
+
+** Q: How do I configure static IP address?
+
+Using Netplan (Ubuntu 18+):
+
+#+BEGIN_SRC yaml
+# /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: false
+      addresses:
+        - 192.168.1.100/24
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+#+END_SRC
+
+Apply: ~sudo netplan apply~
+
+** Q: How do I set up firewalls?
+
+UFW (Uncomplicated Firewall):
+
+#+BEGIN_SRC bash
+ufw enable
+ufw allow 22/tcp         # Allow SSH
+ufw allow 80/tcp         # Allow HTTP
+ufw deny 23/tcp          # Deny Telnet
+ufw status
+#+END_SRC
+
+iptables (lower level):
+
+#+BEGIN_SRC bash
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -P INPUT DROP
+iptables-save > /etc/iptables/rules.v4
+#+END_SRC
+
+** Q: How do I troubleshoot network issues?
+
+Diagnostic tools:
+
+#+BEGIN_SRC bash
+ping host                       # Test ICMP connectivity
+traceroute host                 # Trace route to destination
+mtr host                        # Real-time network diagnostics
+netstat -an | grep ESTABLISHED  # Show established connections
+ss -tlnp                        # Show listening ports
+tcpdump -i eth0 -n              # Capture packets
+nmap host                       # Port scanning
+#+END_SRC
+
+** Q: What is umask and how do I use it?
+
+Umask determines default permissions for new files and directories:
+
+- Default: ~0022~ = rw-r--r-- (644) for files, rwxr-xr-x (755) for directories
+- Set: ~umask 0077~ for more restrictive permissions
+
+Calculation:
+- Files: 0666 (max permissions) - umask
+- Directories: 0777 - umask
+
+Example: 0666 - 0022 = 0644 (rw-r--r--)
+
+Set umask:
+
+#+BEGIN_SRC bash
+umask 0077                      # Current session
+echo "umask 0077" >> ~/.bashrc  # Permanent
+#+END_SRC
+
+** Q: What is setuid, setgid, and sticky bit?
+
+Special permissions on files and directories:
+
+*setuid (Set User ID)* — Runs as file owner:
+
+#+BEGIN_SRC bash
+chmod u+s program               # Add setuid
+chmod 4755 program              # Numeric form
+#+END_SRC
+
+Shows as =s= in owner execute position: ~rwsr-xr-x~
+
+*setgid (Set Group ID)* — Runs as group owner:
+
+#+BEGIN_SRC bash
+chmod g+s program
+chmod 2755 program
+#+END_SRC
+
+Shows as =s= in group execute position: ~rwxr-sr-x~
+
+*Sticky bit* — Only owner can delete files:
+
+#+BEGIN_SRC bash
+chmod +t directory
+chmod 1777 directory
+#+END_SRC
+
+Shows as =t= in others execute position: ~rwxrwxrwt~ (like /tmp)
+
+** Q: What is Access Control Lists (ACLs)?
+
+ACLs provide more granular permission control than traditional permissions:
+
+#+BEGIN_SRC bash
+getfacl file.txt                    # View ACL
+setfacl -m u:username:rwx file.txt  # Give user permissions
+setfacl -m g:groupname:rx file.txt  # Give group permissions
+setfacl -x u:username file.txt      # Remove user ACL
+setfacl -b file.txt                 # Remove all ACLs
+#+END_SRC
+
+ACL entry format: ~[u|g]:[name]:[permissions]~
+- =u~ — User
+- =g~ — Group
+- No name — Applies to owner/owning group
+- Permissions: r=4, w=2, x=1
+
+** Q: What is SELinux and how is it different from standard permissions?
+
+SELinux (Security-Enhanced Linux) provides Mandatory Access Control (MAC):
+
+- Standard permissions: Discretionary (user can change)
+- SELinux: Mandatory (enforced by policy)
+
+SELinux context: ~user_u:role_r:type_t:level_s~
+
+States:
+
+- Enforcing — Policies enforced
+- Permissive — Violations logged but not enforced
+- Disabled — SELinux disabled
+
+Commands:
+
+#+BEGIN_SRC bash
+getenforce                          # Get current state
+setenforce 0                        # Set permissive
+setenforce 1                        # Set enforcing
+ls -Z                               # Show SELinux context
+ps -Z                               # Process context
+chcon -t httpd_sys_content_t file   # Change context
+restorecon -v file                  # Restore default context
+#+END_SRC
+
+** Q: How do I use sudo effectively and securely?
+
+sudo configuration in =/etc/sudoers~ (edit with ~sudo visudo~):
+
+#+BEGIN_SRC
+user1 ALL=(ALL) ALL                 # Full sudo access
+user1 ALL=(ALL) NOPASSWD: ALL       # No password required
+%wheel ALL=(ALL) ALL                # All group members
+user1 ALL=(ALL) /usr/bin/ls         # Only specific command
+#+END_SRC
+
+Logging:
+
+#+BEGIN_SRC bash
+sudo -l                             # List permitted commands
+sudo -i                             # Login as root
+sudo -u username command            # Run as specific user
+cat /var/log/auth.log | grep sudo   # View sudo usage
+#+END_SRC
+
+** Q: What is the Linux kernel and how does it manage resources?
+
+The kernel is the core managing:
+
+- *Process management* — Scheduling, context switching, resource allocation
+- *Memory management* — Virtual memory, paging, memory protection
+- *I/O management* — Device drivers, interrupts
+- *Filesystem* — File operations, permissions, mounting
+- *Networking* — Network protocols, packet processing
+- *Interrupt handling* — Hardware and software interrupts
+
+Check kernel: ~uname -r~, ~cat /proc/version~
+
+** Q: What are kernel modules and how do I work with them?
+
+Loadable Kernel Modules (LKM) extend kernel without recompiling:
+
+#+BEGIN_SRC bash
+lsmod                               # List loaded modules
+modinfo module_name                 # Module information
+modprobe module_name                # Load with dependencies
+modprobe -r module_name             # Remove module
+insmod /path/to/module.ko           # Load directly
+rmmod module_name                   # Unload directly
+#+END_SRC
+
+Locations: =/lib/modules/$(uname -r)/kernel/~
+
+** Q: How do I tune kernel parameters with sysctl?
+
+Kernel parameters in =/proc/sys/~:
+
+#+BEGIN_SRC bash
+sysctl -a                           # Show all parameters
+sysctl kernel.panic                 # Show specific parameter
+sysctl -w kernel.panic=10           # Change parameter
+sysctl -p                           # Load from /etc/sysctl.conf
+#+END_SRC
+
+Persistent configuration in =/etc/sysctl.conf~:
+
+#+BEGIN_SRC
+kernel.panic = 10
+net.core.somaxconn = 1024
+net.ipv4.tcp_max_syn_backlog = 2048
+vm.swappiness = 10
+#+END_SRC
+
+Important parameters:
+- ~kernel.panic~ — Seconds before reboot on panic
+- ~net.core.somaxconn~ — Max socket listen backlog
+- ~vm.swappiness~ — Swap usage preference (0-100)
+- ~fs.file-max~ — Max open files system-wide
+
+** Q: What is dmesg and how do I use it?
+
+dmesg shows kernel ring buffer (boot and system messages):
+
+#+BEGIN_SRC bash
+dmesg                               # Show all messages
+dmesg | tail -50                    # Last 50 messages
+dmesg -l err                        # Only errors
+dmesg --level=warn,err              # Warnings and errors
+dmesg -H                            # Human-readable timestamps
+dmesg -w                            # Follow in real-time
+journalctl -b                       # Alternative: systemd journal
+#+END_SRC
+
+Useful for:
+- Hardware detection issues
+- Driver problems
+- Kernel panics
+- System failures
+
+** Q: How do I work with logical volumes (LVM)?
+
+LVM abstracts physical disks:
+
+#+BEGIN_SRC bash
+# Physical volumes
+pvcreate /dev/sda1 /dev/sdb1        # Create PV
+pvs                                 # List PVs
+
+# Volume groups
+vgcreate vg0 /dev/sda1              # Create VG
+vgs                                 # List VGs
+vgextend vg0 /dev/sdb1              # Add to VG
+
+# Logical volumes
+lvcreate -L 10G -n lv0 vg0          # Create LV
+lvs                                 # List LVs
+lvextend -L +5G /dev/vg0/lv0        # Grow LV
+resize2fs /dev/vg0/lv0              # Resize filesystem
+#+END_SRC
+
+** Q: How do I set up and manage RAID?
+
+RAID combines multiple disks:
+
+RAID levels:
+
+- *RAID 0* — Striping only (no redundancy)
+- *RAID 1* — Mirroring (full redundancy)
+- *RAID 5* — Striping with parity (1 disk loss tolerance)
+- *RAID 6* — Dual parity (2 disk loss tolerance)
+- *RAID 10* — Mirrored stripe
+
+Setup with mdadm:
+
+#+BEGIN_SRC bash
+mdadm --create /dev/md0 --level=5 --raid-devices=3 \
+  /dev/sda1 /dev/sdb1 /dev/sdc1
+cat /proc/mdstat                    # RAID status
+mdadm --detail /dev/md0             # Detailed status
+#+END_SRC
+
+** Q: How do I encrypt filesystems with LUKS?
+
+LUKS (Linux Unified Key Setup) full-disk encryption:
+
+#+BEGIN_SRC bash
+sudo cryptsetup luksFormat /dev/sdb1  # Create encrypted volume
+sudo cryptsetup luksOpen /dev/sdb1 myvolume  # Open (mount)
+sudo mkfs.ext4 /dev/mapper/myvolume  # Format
+sudo mount /dev/mapper/myvolume /mnt/data
+sudo cryptsetup luksClose myvolume    # Close (unmount)
+#+END_SRC
+
+Key management:
+
+#+BEGIN_SRC bash
+cryptsetup luksAddKey /dev/sdb1      # Add key
+cryptsetup luksRemoveKey /dev/sdb1   # Remove key
+cryptsetup luksDump /dev/sdb1        # Show info
+#+END_SRC
+
+** Q: How do I work with different filesystems?
+
+Common filesystems:
+
+*ext4* (default):
+
+#+BEGIN_SRC bash
+mkfs.ext4 /dev/sda1                # Create
+tune2fs -l /dev/sda1               # Get properties
+e2fsck -f /dev/sda1                # Repair (unmounted)
+#+END_SRC
+
+*XFS* (high performance):
+
+#+BEGIN_SRC bash
+mkfs.xfs /dev/sda1
+xfs_info /dev/sda1
+xfs_repair /dev/sda1               # Repair (unmounted)
+#+END_SRC
+
+*Btrfs* (modern):
+
+#+BEGIN_SRC bash
+mkfs.btrfs /dev/sda1
+btrfs filesystem show              # Show info
+btrfs subvolume create /mnt/snap   # Snapshot
+#+END_SRC
+
+** Q: What is the difference between hard and soft links?
+
+- *Hard link* — Direct reference to inode, same file, same size
+  - ~ln file hardlink~
+  - Survives original deletion if link exists
+  - Cannot link across filesystems
+
+- *Soft link (symlink)* — Reference to path, separate inode, shows target
+  - ~ln -s file symlink~
+  - Breaks if original deleted
+  - Can link across filesystems
+
+Check: ~ls -li~ shows inode; symlinks show target with ~->~ and start with =l=
+
+** Q: What is /proc filesystem?
+
+Virtual filesystem providing kernel/process information:
+
+#+BEGIN_SRC bash
+/proc/cpuinfo                       # CPU information
+/proc/meminfo                       # Memory information
+/proc/uptime                        # System uptime
+/proc/loadavg                       # Load average
+/proc/[PID]/                        # Process-specific info
+/proc/[PID]/cmdline                 # Process command line
+/proc/[PID]/status                  # Process status
+/proc/[PID]/maps                    # Memory map
+/proc/[PID]/fd/                     # File descriptors
+/proc/mounts                        # Mounted filesystems
+/proc/filesystems                   # Supported filesystems
+/proc/net/tcp                       # TCP connections
+#+END_SRC
+
+** Q: What is an inode and why is it important?
+
+Inode (index node) stores file metadata:
+
+- File size
+- Owner UID and GID
+- Permissions (mode)
+- Timestamps (atime, mtime, ctime)
+- Link count (hard links)
+- Block pointers (data location on disk)
+- File type
+
+View inode information:
+
+#+BEGIN_SRC bash
+ls -i file                          # Show inode number
+stat file                           # Detailed inode info
+#+END_SRC
+
+Inode exhaustion:
+
+#+BEGIN_SRC bash
+df -i                               # Inode usage
+find . -type f | wc -l              # Count files
+#+END_SRC
+
+-----
+
+* Resources and Tips
+
+** Must-Know Utilities
+
+- *sed* — Stream editor for transformations
+- *awk* — Text processing language
+- *grep* — Pattern matching
+- *find* — File searching with complex criteria
+- *xargs* — Build and execute commands
+- *rsync* — Efficient file synchronization
+- *tar* — Archive manager
+- *gpg* — Encryption and signing
+- *curl/wget* — HTTP clients
+- *git* — Version control
+
+** Recommended Learning Path
+
+1. Start with basic commands and file system navigation
+2. Learn user and permission management
+3. Master text processing tools
+4. Learn package and process management
+5. Study system administration concepts
+6. Explore networking and security
+7. Study kernel and performance optimization
+8. Learn LVM and RAID management
+9. Practice troubleshooting and debugging
+10. Master advanced filesystems and encryption
+
+** Common Pitfalls to Avoid
+
+- Never edit configuration files without backup
+- Use ~sudo~ carefully; it can damage your system
+- Always test commands in a safe environment first
+- Don't run unfamiliar commands without reading documentation
+- Keep your system and packages updated
+- Use strong passwords and SSH keys
+- Regularly back up important data
+- Monitor system logs for issues
+- Understand file permissions before making changes
+- Check command syntax before execution
+
+-----
+
+*This Q&A guide covers Linux OS concepts from beginner to advanced level. Keep exploring and practicing to deepen your Linux knowledge!*
