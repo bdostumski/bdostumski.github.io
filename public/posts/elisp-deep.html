@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Emacs Lisp Deep Internals</title>
+<meta name="description" content="Deep internals guide covering GNU Emacs architecture, Elisp interpreter internals, buffers, redisplay engine, bytecode VM, garbage collection, completion system, package internals, process management, and editor architecture." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Emacs Lisp Deep Internals</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org56d7ecd" class="outline-2">
+<h2 id="org56d7ecd">Emacs Lisp Deep Internals (Advanced Architecture Guide)</h2>
+<div class="outline-text-2" id="text-org56d7ecd">
+<p>
+This guide focuses on understanding how GNU Emacs works internally.
+</p>
+
+<p>
+Topics include:
+</p>
+
+<ul class="org-ul">
+<li>Emacs architecture</li>
+<li>Lisp interpreter internals</li>
+<li>Bytecode VM</li>
+<li>Redisplay engine</li>
+<li>Garbage collector</li>
+<li>Buffers and windows</li>
+<li>Minibuffer and completion</li>
+<li>Process subsystem</li>
+<li>Package loading internals</li>
+<li>Native compilation architecture</li>
+</ul>
+
+<p>
+Goal:
+</p>
+
+<p>
+Understand Emacs at implementation level.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org2b860d4" class="outline-2">
+<h2 id="org2b860d4">Lisp Interpreter Internals</h2>
+<div class="outline-text-2" id="text-org2b860d4">
+</div>
+<div id="outline-container-org9e88a4a" class="outline-3">
+<h3 id="org9e88a4a">Q: How does Emacs evaluate Lisp code?</h3>
+<div class="outline-text-3" id="text-org9e88a4a">
+<p>
+Evaluation starts in the C function:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="font-weight: bold;">Feval</span>()
+</pre>
+</div>
+
+<p>
+Located in:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">src/eval.c
+</pre>
+</div>
+
+<p>
+The evaluator:
+</p>
+
+<ol class="org-ol">
+<li>Reads Lisp object</li>
+<li>Determines object type</li>
+<li>Resolves symbol</li>
+<li>Evaluates function</li>
+<li>Returns Lisp object</li>
+</ol>
+
+<p>
+Evaluation pipeline:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">Reader &#8594; Parser &#8594; Evaluator &#8594; Return Value
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org818e5c6" class="outline-3">
+<h3 id="org818e5c6">Q: What is a Lisp Object internally?</h3>
+<div class="outline-text-3" id="text-org818e5c6">
+<p>
+Everything in Emacs is represented as:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c">Lisp_Object
+</pre>
+</div>
+
+<p>
+Defined in:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">src/lisp.h
+</pre>
+</div>
+
+<p>
+Stores:
+</p>
+
+<ul class="org-ul">
+<li>integers</li>
+<li>symbols</li>
+<li>strings</li>
+<li>cons cells</li>
+<li>vectors</li>
+<li>buffers</li>
+<li>windows</li>
+<li>processes</li>
+</ul>
+
+<p>
+Internally tagged with type information.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org8255efd" class="outline-3">
+<h3 id="org8255efd">Q: How are symbols stored internally?</h3>
+<div class="outline-text-3" id="text-org8255efd">
+<p>
+A symbol contains:
+</p>
+
+<ul class="org-ul">
+<li>value cell</li>
+<li>function cell</li>
+<li>property list</li>
+<li>symbol name</li>
+</ul>
+
+<p>
+Internally:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="font-weight: bold;">struct</span> <span style="font-weight: bold; text-decoration: underline;">Lisp_Symbol</span>
+</pre>
+</div>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> x 10)
+</pre>
+</div>
+
+<p>
+Modifies symbol value cell.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org05ab1c1" class="outline-3">
+<h3 id="org05ab1c1">Q: What happens when a function is called?</h3>
+<div class="outline-text-3" id="text-org05ab1c1">
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(+ 1 2)
+</pre>
+</div>
+
+<p>
+Internal process:
+</p>
+
+<ol class="org-ol">
+<li>resolve symbol +</li>
+<li>locate function cell</li>
+<li>evaluate arguments</li>
+<li>dispatch builtin or bytecode</li>
+<li>return result</li>
+</ol>
+
+<p>
+C entry point:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="font-weight: bold;">funcall_subr</span>()
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org6732d9c" class="outline-2">
+<h2 id="org6732d9c">Memory Management</h2>
+<div class="outline-text-2" id="text-org6732d9c">
+</div>
+<div id="outline-container-orgf5f80f4" class="outline-3">
+<h3 id="orgf5f80f4">Q: How does garbage collection work?</h3>
+<div class="outline-text-3" id="text-orgf5f80f4">
+<p>
+Emacs uses mark-and-sweep garbage collection.
+</p>
+
+<p>
+Phases:
+</p>
+
+<ol class="org-ol">
+<li>mark reachable objects</li>
+<li>sweep unused objects</li>
+<li>reclaim memory</li>
+</ol>
+
+<p>
+Controlled by:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">gc-cons-threshold
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org02585aa" class="outline-3">
+<h3 id="org02585aa">Q: What triggers garbage collection?</h3>
+<div class="outline-text-3" id="text-org02585aa">
+<p>
+GC occurs when allocated memory exceeds threshold.
+</p>
+
+<p>
+Check statistics:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(garbage-collect)
+</pre>
+</div>
+
+<p>
+Returns allocation information.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org56fdab4" class="outline-3">
+<h3 id="org56fdab4">Q: Why does excessive consing slow Emacs?</h3>
+<div class="outline-text-3" id="text-org56fdab4">
+<p>
+Consing creates temporary objects.
+</p>
+
+<p>
+Example bad pattern:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> x (append x '(1)))
+</pre>
+</div>
+
+<p>
+Better:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">push</span> 1 x)
+</pre>
+</div>
+
+<p>
+Excessive consing causes frequent GC cycles.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd4fe211" class="outline-2">
+<h2 id="orgd4fe211">Bytecode Virtual Machine</h2>
+<div class="outline-text-2" id="text-orgd4fe211">
+</div>
+<div id="outline-container-org71f8ba5" class="outline-3">
+<h3 id="org71f8ba5">Q: How does byte compilation work?</h3>
+<div class="outline-text-3" id="text-org71f8ba5">
+<p>
+Compiler:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(byte-compile-file <span style="font-style: italic;">"file.el"</span>)
+</pre>
+</div>
+
+<p>
+Produces:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">file.elc
+</pre>
+</div>
+
+<p>
+Compiler stages:
+</p>
+
+<ol class="org-ol">
+<li>parse forms</li>
+<li>generate bytecode</li>
+<li>optimize constants</li>
+<li>write bytecode file</li>
+</ol>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orga0ae80c" class="outline-3">
+<h3 id="orga0ae80c">Q: What is inside .elc files?</h3>
+<div class="outline-text-3" id="text-orga0ae80c">
+<p>
+Contains:
+</p>
+
+<ul class="org-ul">
+<li>constants</li>
+<li>bytecode instructions</li>
+<li>function definitions</li>
+</ul>
+
+<p>
+Executed by bytecode VM.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org960581d" class="outline-3">
+<h3 id="org960581d">Q: How does bytecode execution work?</h3>
+<div class="outline-text-3" id="text-org960581d">
+<p>
+Bytecode executed by:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="font-weight: bold;">exec_byte_code</span>()
+</pre>
+</div>
+
+<p>
+Located in:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">src/bytecode.c
+</pre>
+</div>
+
+<p>
+VM executes stack-based instructions.
+</p>
+
+<p>
+Example instructions:
+</p>
+
+<ul class="org-ul">
+<li>constant</li>
+<li>call</li>
+<li>jump</li>
+<li>return</li>
+<li>branch</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgdba4cd7" class="outline-3">
+<h3 id="orgdba4cd7">Q: What is native compilation?</h3>
+<div class="outline-text-3" id="text-orgdba4cd7">
+<p>
+Modern Emacs supports native compilation.
+</p>
+
+<p>
+Produces:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">.eln
+</pre>
+</div>
+
+<p>
+Pipeline:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">Elisp &#8594; Bytecode &#8594; GCC JIT &#8594; Native Machine Code
+</pre>
+</div>
+
+<p>
+Benefits:
+</p>
+
+<ul class="org-ul">
+<li>faster execution</li>
+<li>lower interpreter overhead</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgae813a0" class="outline-2">
+<h2 id="orgae813a0">Buffer Internals</h2>
+<div class="outline-text-2" id="text-orgae813a0">
+</div>
+<div id="outline-container-orgcf1e93f" class="outline-3">
+<h3 id="orgcf1e93f">Q: What is a buffer internally?</h3>
+<div class="outline-text-3" id="text-orgcf1e93f">
+<p>
+Internally:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="font-weight: bold;">struct</span> <span style="font-weight: bold; text-decoration: underline;">buffer</span>
+</pre>
+</div>
+
+<p>
+Located:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">src/buffer.h
+</pre>
+</div>
+
+<p>
+Stores:
+</p>
+
+<ul class="org-ul">
+<li>text data</li>
+<li>markers</li>
+<li>local variables</li>
+<li>syntax table</li>
+<li>undo history</li>
+<li>point position</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org1740a6e" class="outline-3">
+<h3 id="org1740a6e">Q: How is buffer text stored?</h3>
+<div class="outline-text-3" id="text-org1740a6e">
+<p>
+Emacs uses a <b>gap buffer</b>.
+</p>
+
+<p>
+Structure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">TEXT | GAP | TEXT
+</pre>
+</div>
+
+<p>
+Insertion occurs at gap.
+</p>
+
+<p>
+Advantages:
+</p>
+
+<ul class="org-ul">
+<li>fast insertion near cursor</li>
+<li>low memory movement</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org459cba9" class="outline-3">
+<h3 id="org459cba9">Q: Why does moving point matter?</h3>
+<div class="outline-text-3" id="text-org459cba9">
+<p>
+Moving point may require moving gap.
+</p>
+
+<p>
+Large gap movement:
+</p>
+
+<ul class="org-ul">
+<li>copies memory</li>
+<li>slows editing</li>
+</ul>
+
+<p>
+This affects performance.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org994c235" class="outline-2">
+<h2 id="org994c235">Redisplay Engine</h2>
+<div class="outline-text-2" id="text-org994c235">
+</div>
+<div id="outline-container-orgf183e41" class="outline-3">
+<h3 id="orgf183e41">Q: What is the redisplay engine?</h3>
+<div class="outline-text-3" id="text-orgf183e41">
+<p>
+Responsible for drawing editor contents.
+</p>
+
+<p>
+Main C file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">src/xdisp.c
+</pre>
+</div>
+
+<p>
+Handles:
+</p>
+
+<ul class="org-ul">
+<li>cursor rendering</li>
+<li>line wrapping</li>
+<li>syntax highlighting</li>
+<li>overlays</li>
+<li>text properties</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org016a74e" class="outline-3">
+<h3 id="org016a74e">Q: Why is redisplay expensive?</h3>
+<div class="outline-text-3" id="text-org016a74e">
+<p>
+Redisplay recalculates:
+</p>
+
+<ul class="org-ul">
+<li>visible lines</li>
+<li>faces</li>
+<li>overlays</li>
+<li>line numbers</li>
+<li>truncation</li>
+</ul>
+
+<p>
+Excessive redisplay causes lag.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgb61ff39" class="outline-3">
+<h3 id="orgb61ff39">Q: How do packages accidentally slow redisplay?</h3>
+<div class="outline-text-3" id="text-orgb61ff39">
+<p>
+Common causes:
+</p>
+
+<ul class="org-ul">
+<li>too many overlays</li>
+<li>expensive hooks</li>
+<li>font-lock complexity</li>
+<li>frequent buffer modifications</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb18b3a3" class="outline-2">
+<h2 id="orgb18b3a3">Window System</h2>
+<div class="outline-text-2" id="text-orgb18b3a3">
+</div>
+<div id="outline-container-org43a53c8" class="outline-3">
+<h3 id="org43a53c8">Q: Difference between frame and window internally?</h3>
+<div class="outline-text-3" id="text-org43a53c8">
+<p>
+Frame:
+</p>
+
+<p>
+GUI window.
+</p>
+
+<p>
+Window:
+</p>
+
+<p>
+Viewport showing buffer.
+</p>
+
+<p>
+Internal structs:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="font-weight: bold;">struct</span> <span style="font-weight: bold; text-decoration: underline;">frame</span>
+<span style="font-weight: bold;">struct</span> window
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org470c372" class="outline-3">
+<h3 id="org470c372">Q: How does window splitting work?</h3>
+<div class="outline-text-3" id="text-org470c372">
+<p>
+Window tree created internally.
+</p>
+
+<p>
+Each node stores:
+</p>
+
+<ul class="org-ul">
+<li>parent</li>
+<li>child</li>
+<li>buffer</li>
+<li>geometry</li>
+</ul>
+
+<p>
+Functions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(split-window)
+(delete-window)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbf9f211" class="outline-2">
+<h2 id="orgbf9f211">Minibuffer Architecture</h2>
+<div class="outline-text-2" id="text-orgbf9f211">
+</div>
+<div id="outline-container-org11235f7" class="outline-3">
+<h3 id="org11235f7">Q: How does minibuffer work internally?</h3>
+<div class="outline-text-3" id="text-org11235f7">
+<p>
+Minibuffer is a normal buffer.
+</p>
+
+<p>
+Used for:
+</p>
+
+<ul class="org-ul">
+<li>M-x</li>
+<li>file completion</li>
+<li>prompts</li>
+<li>interactive commands</li>
+</ul>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(read-string <span style="font-style: italic;">"Name: "</span>)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgd41ae93" class="outline-3">
+<h3 id="orgd41ae93">Q: How does completion work?</h3>
+<div class="outline-text-3" id="text-orgd41ae93">
+<p>
+Completion pipeline:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">Input &#8594; Completion Table &#8594; Candidate Filtering &#8594; UI Renderer
+</pre>
+</div>
+
+<p>
+Core functions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">completing-read
+try-completion
+all-completions
+</pre>
+</div>
+
+<p>
+Packages extending completion:
+</p>
+
+<ul class="org-ul">
+<li>Vertico</li>
+<li>Consult</li>
+<li>Corfu</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orga77db7c" class="outline-2">
+<h2 id="orga77db7c">Font Lock Architecture</h2>
+<div class="outline-text-2" id="text-orga77db7c">
+</div>
+<div id="outline-container-org4b1626f" class="outline-3">
+<h3 id="org4b1626f">Q: How does syntax highlighting work?</h3>
+<div class="outline-text-3" id="text-org4b1626f">
+<p>
+Implemented using:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">font-lock-mode
+</pre>
+</div>
+
+<p>
+Pipeline:
+</p>
+
+<ol class="org-ol">
+<li>regex search</li>
+<li>match patterns</li>
+<li>apply text properties</li>
+<li>redisplay</li>
+</ol>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgb761ace" class="outline-3">
+<h3 id="orgb761ace">Q: Why can syntax highlighting become slow?</h3>
+<div class="outline-text-3" id="text-orgb761ace">
+<p>
+Reasons:
+</p>
+
+<ul class="org-ul">
+<li>expensive regex</li>
+<li>large files</li>
+<li>repeated scans</li>
+<li>too many overlays</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org79ffbf9" class="outline-2">
+<h2 id="org79ffbf9">Package System Internals</h2>
+<div class="outline-text-2" id="text-org79ffbf9">
+</div>
+<div id="outline-container-orge26481f" class="outline-3">
+<h3 id="orge26481f">Q: How does require work?</h3>
+<div class="outline-text-3" id="text-orge26481f">
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">json</span>)
+</pre>
+</div>
+
+<p>
+Process:
+</p>
+
+<ol class="org-ol">
+<li>search load-path</li>
+<li>locate file</li>
+<li>evaluate file</li>
+<li>call provide</li>
+<li>register loaded feature</li>
+</ol>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org5c468a0" class="outline-3">
+<h3 id="org5c468a0">Q: What is load-path?</h3>
+<div class="outline-text-3" id="text-org5c468a0">
+<p>
+List of directories searched for packages.
+</p>
+
+<p>
+Inspect:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">load-path
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org92fd1c1" class="outline-3">
+<h3 id="org92fd1c1">Q: What does provide do internally?</h3>
+<div class="outline-text-3" id="text-org92fd1c1">
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">provide</span> '<span style="font-weight: bold; text-decoration: underline;">mypackage</span>)
+</pre>
+</div>
+
+<p>
+Registers feature in:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">features
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd7caec8" class="outline-2">
+<h2 id="orgd7caec8">Process System</h2>
+<div class="outline-text-2" id="text-orgd7caec8">
+</div>
+<div id="outline-container-org62d6909" class="outline-3">
+<h3 id="org62d6909">Q: How does make-process work?</h3>
+<div class="outline-text-3" id="text-org62d6909">
+<p>
+Creates asynchronous process.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-process ...)
+</pre>
+</div>
+
+<p>
+Internally:
+</p>
+
+<ul class="org-ul">
+<li>spawn process</li>
+<li>connect pipes</li>
+<li>register process object</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org4e165a0" class="outline-3">
+<h3 id="org4e165a0">Q: What are process filters?</h3>
+<div class="outline-text-3" id="text-org4e165a0">
+<p>
+Process filters handle output.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-process
+ <span style="font-weight: bold;">:filter</span> ...)
+</pre>
+</div>
+
+<p>
+Called when new process output arrives.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgf71296c" class="outline-3">
+<h3 id="orgf71296c">Q: What are process sentinels?</h3>
+<div class="outline-text-3" id="text-orgf71296c">
+<p>
+Sentinel handles state changes.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-process
+ <span style="font-weight: bold;">:sentinel</span> ...)
+</pre>
+</div>
+
+<p>
+Runs when process:
+</p>
+
+<ul class="org-ul">
+<li>exits</li>
+<li>fails</li>
+<li>stops</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcccd64e" class="outline-2">
+<h2 id="orgcccd64e">Hook System</h2>
+<div class="outline-text-2" id="text-orgcccd64e">
+</div>
+<div id="outline-container-org6dccb7e" class="outline-3">
+<h3 id="org6dccb7e">Q: How do hooks work internally?</h3>
+<div class="outline-text-3" id="text-org6dccb7e">
+<p>
+Hooks store function lists.
+</p>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(add-hook ...)
+</pre>
+</div>
+
+<p>
+Internally:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">hook-variable &#8594; list of functions
+</pre>
+</div>
+
+<p>
+Execution:
+</p>
+
+<p>
+Functions called sequentially.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org3b7ad5e" class="outline-3">
+<h3 id="org3b7ad5e">Q: Why can hooks cause performance issues?</h3>
+<div class="outline-text-3" id="text-org3b7ad5e">
+<p>
+Bad hooks:
+</p>
+
+<ul class="org-ul">
+<li>expensive computations</li>
+<li>repeated execution</li>
+<li>synchronous I/O</li>
+</ul>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(after-change-functions)
+</pre>
+</div>
+
+<p>
+Runs very frequently.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org8a01b66" class="outline-2">
+<h2 id="org8a01b66">Package Performance</h2>
+<div class="outline-text-2" id="text-org8a01b66">
+</div>
+<div id="outline-container-org447bbf4" class="outline-3">
+<h3 id="org447bbf4">Q: Why do badly written packages slow Emacs?</h3>
+<div class="outline-text-3" id="text-org447bbf4">
+<p>
+Common mistakes:
+</p>
+
+<ul class="org-ul">
+<li>repeated regex scans</li>
+<li>too many overlays</li>
+<li>synchronous shell-command</li>
+<li>excessive consing</li>
+<li>unnecessary redisplay</li>
+<li>blocking network calls</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org6a5649d" class="outline-3">
+<h3 id="org6a5649d">Q: How do you profile Emacs?</h3>
+<div class="outline-text-3" id="text-org6a5649d">
+<p>
+Use built-in profiler.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(profiler-start 'cpu)
+(profiler-report)
+</pre>
+</div>
+
+<p>
+Benchmark:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">benchmark-run</span> ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org9fe8cfc" class="outline-2">
+<h2 id="org9fe8cfc">Native Compilation Architecture</h2>
+<div class="outline-text-2" id="text-org9fe8cfc">
+</div>
+<div id="outline-container-orgcb14a09" class="outline-3">
+<h3 id="orgcb14a09">Q: How does native compilation work internally?</h3>
+<div class="outline-text-3" id="text-orgcb14a09">
+<p>
+Pipeline:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">.el file
+&#8595;
+byte compiler
+&#8595;
+libgccjit
+&#8595;
+machine code
+&#8595;
+.eln file
+</pre>
+</div>
+
+<p>
+Compiler backend:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">comp.el
+</pre>
+</div>
+
+<p>
+Uses GCC JIT.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdfc7545" class="outline-2">
+<h2 id="orgdfc7545">Architecture Study Roadmap</h2>
+<div class="outline-text-2" id="text-orgdfc7545">
+</div>
+<div id="outline-container-org6cbfe32" class="outline-3">
+<h3 id="org6cbfe32">Q: Which Emacs source files should advanced developers study?</h3>
+<div class="outline-text-3" id="text-org6cbfe32">
+<p>
+Start here:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">src/eval.c
+src/lisp.h
+src/buffer.c
+src/buffer.h
+src/xdisp.c
+src/bytecode.c
+src/window.c
+src/process.c
+src/minibuf.c
+lisp/simple.el
+lisp/subr.el
+lisp/files.el
+lisp/startup.el
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orge8a7770" class="outline-3">
+<h3 id="orge8a7770">Q: Which packages should advanced developers study?</h3>
+<div class="outline-text-3" id="text-orge8a7770">
+<p>
+Study codebases:
+</p>
+
+<ul class="org-ul">
+<li>GNU Emacs</li>
+<li>Org Mode</li>
+<li>Magit</li>
+<li>Vertico</li>
+<li>Consult</li>
+<li>Corfu</li>
+</ul>
+
+<p>
+Focus on:
+</p>
+
+<ul class="org-ul">
+<li>architecture</li>
+<li>async programming</li>
+<li>completion systems</li>
+<li>package design</li>
+<li>performance optimization</li>
+</ul>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

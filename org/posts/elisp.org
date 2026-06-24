@@ -1,0 +1,882 @@
+#+TITLE: Emacs Lisp
+#+DATE: 2026-06-24
+#+TAGS: Programming
+#+DESCRIPTION: A comprehensive Emacs Lisp guide covering Elisp fundamentals, Emacs internals, package development, macros, debugging, performance optimization, asynchronous programming, and advanced editor extension development.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Emacs Lisp Q&A (Beginner to Advanced)
+
+A comprehensive question-and-answer guide for Emacs Lisp.
+
+Designed for:
+
+- Learning Emacs Lisp from scratch
+- Understanding Emacs internals
+- Building packages and extensions
+- Becoming an advanced Emacs developer
+
+Study progressively from fundamentals to advanced package development.
+
+-----
+
+* Beginner
+
+** Q: What is Emacs Lisp (Elisp)?
+
+Emacs Lisp is the Lisp dialect used by GNU Emacs.
+
+Almost all of Emacs itself is written in Elisp.
+
+It allows you to:
+
+- Configure Emacs
+- Extend editor functionality
+- Create packages
+- Automate repetitive tasks
+
+-----
+
+** Q: Why learn Elisp?
+
+Learning Elisp allows you to:
+
+- Understand how Emacs works internally
+- Build custom commands
+- Create major modes and minor modes
+- Automate workflows
+- Build complete editor extensions
+
+-----
+
+** Q: What are S-expressions?
+
+Everything in Lisp is an expression.
+
+Types:
+
+- Atoms
+- Lists
+
+#+BEGIN_SRC emacs-lisp
+42
+"hello"
+(+ 1 2)
+(message "Hello")
+#+END_SRC
+
+-----
+
+** Q: How does evaluation work?
+
+Expressions are evaluated immediately.
+
+#+BEGIN_SRC emacs-lisp
+(+ 1 2)
+;; => 3
+#+END_SRC
+
+Quoted expressions are treated as data.
+
+#+BEGIN_SRC emacs-lisp
+'(+ 1 2)
+;; => (+ 1 2)
+#+END_SRC
+
+-----
+
+** Q: What is quoting?
+
+Quote prevents evaluation.
+
+#+BEGIN_SRC emacs-lisp
+(setq x 10)
+
+x
+;; => 10
+
+'x
+;; => x
+#+END_SRC
+
+-----
+
+** Q: What are symbols?
+
+Symbols store:
+
+- value
+- function definition
+- property list
+
+#+BEGIN_SRC emacs-lisp
+(symbolp 'car)
+#+END_SRC
+
+-----
+
+** Q: How do variables work?
+
+Global:
+
+#+BEGIN_SRC emacs-lisp
+(setq x 10)
+#+END_SRC
+
+Local:
+
+#+BEGIN_SRC emacs-lisp
+(let ((x 5))
+  (+ x 1))
+#+END_SRC
+
+Constants:
+
+#+BEGIN_SRC emacs-lisp
+(defconst pi 3.14)
+#+END_SRC
+
+Declared variables:
+
+#+BEGIN_SRC emacs-lisp
+(defvar debug-mode nil)
+#+END_SRC
+
+-----
+
+** Q: How do functions work?
+
+#+BEGIN_SRC emacs-lisp
+(defun square (x)
+  (* x x))
+#+END_SRC
+
+Call:
+
+#+BEGIN_SRC emacs-lisp
+(square 5)
+#+END_SRC
+
+-----
+
+** Q: What is an interactive function?
+
+Interactive functions can be executed with M-x.
+
+#+BEGIN_SRC emacs-lisp
+(defun hello ()
+  (interactive)
+  (message "Hello"))
+#+END_SRC
+
+-----
+
+** Q: How does interactive input work?
+
+Prompt user input.
+
+#+BEGIN_SRC emacs-lisp
+(defun greet (name)
+  (interactive "sName: ")
+  (message "Hello %s" name))
+#+END_SRC
+
+Common specifiers:
+
+- s → string
+- n → number
+- f → file
+- b → buffer
+- r → region
+
+-----
+
+** Q: How do conditionals work?
+
+#+BEGIN_SRC emacs-lisp
+(if (> 5 2)
+    "yes"
+  "no")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(cond
+ ((= x 1) "one")
+ ((= x 2) "two")
+ (t "other"))
+#+END_SRC
+
+-----
+
+** Q: What are nil and t?
+
+~nil~
+
+- false
+- empty list
+
+~t~
+
+- true
+
+Everything except nil is truthy.
+
+-----
+
+** Q: How do lists work?
+
+#+BEGIN_SRC emacs-lisp
+(setq nums '(1 2 3))
+
+(car nums)
+(cdr nums)
+(cons 0 nums)
+(length nums)
+#+END_SRC
+
+-----
+
+** Q: How do loops work?
+
+#+BEGIN_SRC emacs-lisp
+(dolist (x '(1 2 3))
+  (print x))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(dotimes (i 5)
+  (print i))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(while condition
+ ...)
+#+END_SRC
+
+-----
+
+* Intermediate
+
+** Q: What are buffers?
+
+Buffers are text containers.
+
+Examples:
+
+- files
+- temporary buffers
+- internal buffers
+
+#+BEGIN_SRC emacs-lisp
+(current-buffer)
+(buffer-name)
+#+END_SRC
+
+-----
+
+** Q: How does with-current-buffer work?
+
+Execute code inside another buffer.
+
+#+BEGIN_SRC emacs-lisp
+(with-current-buffer "*scratch*"
+  (insert "Hello"))
+#+END_SRC
+
+Useful for:
+
+- temporary buffers
+- package development
+- asynchronous processes
+
+-----
+
+** Q: What is save-excursion?
+
+Preserves point and cursor location.
+
+#+BEGIN_SRC emacs-lisp
+(save-excursion
+  (goto-char (point-min)))
+#+END_SRC
+
+-----
+
+** Q: What are point, mark, and region?
+
+- point → cursor position
+- mark → secondary position
+- region → selected text
+
+#+BEGIN_SRC emacs-lisp
+(point)
+(mark)
+(region-beginning)
+(region-end)
+#+END_SRC
+
+-----
+
+** Q: How do keymaps work?
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key
+ (kbd "C-c h")
+ #'hello)
+#+END_SRC
+
+-----
+
+** Q: What are hooks?
+
+Hooks execute functions when events occur.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook
+ 'prog-mode-hook
+ #'display-line-numbers-mode)
+#+END_SRC
+
+-----
+
+** Q: What is defcustom?
+
+User configurable variables.
+
+#+BEGIN_SRC emacs-lisp
+(defcustom my-option t
+  "Option."
+  :type 'boolean)
+#+END_SRC
+
+-----
+
+** Q: What is buffer-local state?
+
+#+BEGIN_SRC emacs-lisp
+(setq-local fill-column 100)
+#+END_SRC
+
+Each buffer can hold different values.
+
+-----
+
+** Q: How does error handling work?
+
+#+BEGIN_SRC emacs-lisp
+(condition-case err
+    (/ 1 0)
+  (arith-error
+   (message "error")))
+#+END_SRC
+
+-----
+
+** Q: How do files work?
+
+Read:
+
+#+BEGIN_SRC emacs-lisp
+(insert-file-contents "file.txt")
+#+END_SRC
+
+Write:
+
+#+BEGIN_SRC emacs-lisp
+(with-temp-file "out.txt"
+  (insert "hello"))
+#+END_SRC
+
+-----
+
+** Q: What are alists, plists, and hash tables?
+
+Alist:
+
+#+BEGIN_SRC emacs-lisp
+((name . "Bob"))
+#+END_SRC
+
+Plist:
+
+#+BEGIN_SRC emacs-lisp
+(:name "Bob")
+#+END_SRC
+
+Hash table:
+
+#+BEGIN_SRC emacs-lisp
+(make-hash-table)
+#+END_SRC
+
+-----
+
+* Advanced
+
+** Q: What are lambda functions?
+
+#+BEGIN_SRC emacs-lisp
+(lambda (x)
+  (* x x))
+#+END_SRC
+
+Anonymous functions.
+
+-----
+
+** Q: What are closures?
+
+#+BEGIN_SRC emacs-lisp
+(let ((x 10))
+  (lambda ()
+    x))
+#+END_SRC
+
+Closures capture variables.
+
+-----
+
+** Q: What is lexical binding?
+
+Enable modern lexical scope.
+
+#+BEGIN_SRC emacs-lisp
+;;; -*- lexical-binding: t; -*-
+#+END_SRC
+
+Required for closures.
+
+-----
+
+** Q: What are macros?
+
+Macros generate code.
+
+#+BEGIN_SRC emacs-lisp
+(defmacro my-when (cond &rest body)
+  `(if ,cond
+       (progn ,@body)))
+#+END_SRC
+
+-----
+
+** Q: How do macros differ from functions?
+
+Functions evaluate arguments.
+
+Macros receive raw code.
+
+#+BEGIN_SRC emacs-lisp
+(macroexpand-1 ...)
+#+END_SRC
+
+-----
+
+** Q: What is backquote syntax?
+
+#+BEGIN_SRC emacs-lisp
+`(...)
+,x
+,@list
+#+END_SRC
+
+-----
+
+** Q: How do major modes work?
+
+#+BEGIN_SRC emacs-lisp
+(define-derived-mode
+ my-mode
+ text-mode
+ "MyMode")
+#+END_SRC
+
+-----
+
+** Q: How do minor modes work?
+
+#+BEGIN_SRC emacs-lisp
+(define-minor-mode
+ my-mode
+ "Toggle mode")
+#+END_SRC
+
+-----
+
+** Q: What are syntax tables?
+
+Syntax tables define parsing behavior.
+
+They control:
+
+- comments
+- strings
+- symbols
+- words
+
+#+BEGIN_SRC emacs-lisp
+(with-syntax-table ...)
+#+END_SRC
+
+-----
+
+** Q: How do regular expressions work?
+
+Search:
+
+#+BEGIN_SRC emacs-lisp
+(re-search-forward "[0-9]+")
+#+END_SRC
+
+Replace:
+
+#+BEGIN_SRC emacs-lisp
+(replace-match "number")
+#+END_SRC
+
+Used heavily in text manipulation.
+
+-----
+
+** Q: What are windows and frames?
+
+Frame:
+
+Entire Emacs window.
+
+Window:
+
+Buffer pane.
+
+#+BEGIN_SRC emacs-lisp
+(selected-frame)
+(selected-window)
+#+END_SRC
+
+-----
+
+** Q: What are markers?
+
+#+BEGIN_SRC emacs-lisp
+(copy-marker (point))
+#+END_SRC
+
+Markers follow buffer changes.
+
+-----
+
+* Expert
+
+** Q: What are overlays?
+
+Temporary visual decorations.
+
+#+BEGIN_SRC emacs-lisp
+(make-overlay ...)
+#+END_SRC
+
+-----
+
+** Q: What are text properties?
+
+Metadata attached directly to text.
+
+#+BEGIN_SRC emacs-lisp
+(propertize
+ "Warning"
+ 'face 'warning)
+#+END_SRC
+
+-----
+
+** Q: Hooks vs Advice?
+
+Hooks:
+
+#+BEGIN_SRC emacs-lisp
+(add-hook ...)
+#+END_SRC
+
+Advice:
+
+#+BEGIN_SRC emacs-lisp
+(advice-add ...)
+#+END_SRC
+
+Prefer hooks when possible.
+
+-----
+
+** Q: What is advice-add?
+
+Modify existing function behavior.
+
+#+BEGIN_SRC emacs-lisp
+(advice-add
+ 'find-file
+ :before
+ #'my-function)
+#+END_SRC
+
+-----
+
+** Q: How do asynchronous processes work?
+
+#+BEGIN_SRC emacs-lisp
+(make-process ...)
+#+END_SRC
+
+Non-blocking execution.
+
+-----
+
+** Q: How do process sentinels work?
+
+#+BEGIN_SRC emacs-lisp
+(make-process
+ :sentinel ...)
+#+END_SRC
+
+Sentinel runs when process state changes.
+
+-----
+
+** Q: How do timers work?
+
+#+BEGIN_SRC emacs-lisp
+(run-at-time ...)
+(run-with-idle-timer ...)
+#+END_SRC
+
+-----
+
+** Q: How do shell commands work?
+
+#+BEGIN_SRC emacs-lisp
+(call-process ...)
+(shell-command ...)
+#+END_SRC
+
+Prefer ~call-process~ for security.
+
+-----
+
+** Q: How do HTTP requests work?
+
+#+BEGIN_SRC emacs-lisp
+(url-retrieve ...)
+#+END_SRC
+
+Built-in HTTP client.
+
+-----
+
+** Q: How do JSON APIs work?
+
+#+BEGIN_SRC emacs-lisp
+(json-parse-string ...)
+#+END_SRC
+
+-----
+
+** Q: How does testing work?
+
+ERT testing framework.
+
+#+BEGIN_SRC emacs-lisp
+(require 'ert)
+
+(ert-deftest my-test ()
+ ...)
+#+END_SRC
+
+-----
+
+** Q: What is byte compilation?
+
+#+BEGIN_SRC emacs-lisp
+(byte-compile-file "my.el")
+#+END_SRC
+
+Benefits:
+
+- faster loading
+- compiler warnings
+
+-----
+
+** Q: What is native compilation?
+
+Produces:
+
+- .eln files
+- faster execution
+
+-----
+
+** Q: How do you debug Elisp?
+
+Useful tools:
+
+- debug-on-error
+- edebug-defun
+- debug-on-entry
+- trace-function
+- check-parens
+- macroexpand-1
+
+Example:
+
+#+BEGIN_SRC emacs-lisp
+(setq debug-on-error t)
+#+END_SRC
+
+-----
+
+** Q: Performance optimization?
+
+Avoid:
+
+- append in loops
+- repeated regex scans
+- unnecessary allocations
+
+Prefer:
+
+#+BEGIN_SRC emacs-lisp
+(push item list)
+(nreverse list)
+#+END_SRC
+
+-----
+
+** Q: Common beginner mistakes?
+
+Common mistakes:
+
+- forgetting interactive
+- forgetting lexical-binding
+- using setq instead of let
+- using shell-command unsafely
+- misunderstanding quote
+- modifying buffers without save-excursion
+
+-----
+
+* Package Development
+
+** Q: Why use provide and require?
+
+#+BEGIN_SRC emacs-lisp
+(provide 'mypackage)
+(require 'mypackage)
+#+END_SRC
+
+-----
+
+** Q: How do package dependencies work?
+
+#+BEGIN_SRC emacs-lisp
+;; Package-Requires:
+;; ((emacs "29.1")
+;;  (dash "2.19"))
+#+END_SRC
+
+-----
+
+** Q: How should package structure look?
+
+#+BEGIN_SRC emacs-lisp
+;;; my.el --- package -*- lexical-binding:t -*-
+
+;;; Commentary:
+
+;;; Code:
+
+(provide 'my)
+;;; my.el ends here
+#+END_SRC
+
+-----
+
+** Q: How do you check package quality?
+
+Tools:
+
+- checkdoc
+- package-lint
+- byte compilation
+
+-----
+
+* Master Level
+
+** Q: What is EIEIO?
+
+Object system for Emacs Lisp.
+
+-----
+
+** Q: What is cl-lib?
+
+Common Lisp extensions.
+
+Useful:
+
+- cl-loop
+- cl-defstruct
+- cl-defmethod
+- cl-reduce
+
+-----
+
+** Q: What are generators?
+
+#+BEGIN_SRC emacs-lisp
+(require 'generator)
+#+END_SRC
+
+Functions:
+
+- iter-defun
+- iter-yield
+
+-----
+
+** Q: What is garbage collection tuning?
+
+#+BEGIN_SRC emacs-lisp
+gc-cons-threshold
+#+END_SRC
+
+Controls GC frequency.
+
+-----
+
+** Q: How do you become advanced at Elisp?
+
+Study source code from:
+
+- GNU Emacs
+- Org Mode
+- Magit
+- Projectile
+- Vertico
+- Consult
+- Corfu
+
+Build:
+
+- major modes
+- minor modes
+- package managers
+- syntax highlighters
+- completion frameworks
+- LSP integrations
+- IDE extensions
+
+-----
+
+#+INCLUDE: "../footer.org"

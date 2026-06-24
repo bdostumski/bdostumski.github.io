@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Emacs Lisp</title>
+<meta name="description" content="A comprehensive Emacs Lisp guide covering Elisp fundamentals, Emacs internals, package development, macros, debugging, performance optimization, asynchronous programming, and advanced editor extension development." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Emacs Lisp</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org805ed97" class="outline-2">
+<h2 id="org805ed97">Emacs Lisp Q&amp;A (Beginner to Advanced)</h2>
+<div class="outline-text-2" id="text-org805ed97">
+<p>
+A comprehensive question-and-answer guide for Emacs Lisp.
+</p>
+
+<p>
+Designed for:
+</p>
+
+<ul class="org-ul">
+<li>Learning Emacs Lisp from scratch</li>
+<li>Understanding Emacs internals</li>
+<li>Building packages and extensions</li>
+<li>Becoming an advanced Emacs developer</li>
+</ul>
+
+<p>
+Study progressively from fundamentals to advanced package development.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org6f80353" class="outline-2">
+<h2 id="org6f80353">Beginner</h2>
+<div class="outline-text-2" id="text-org6f80353">
+</div>
+<div id="outline-container-org9b95b50" class="outline-3">
+<h3 id="org9b95b50">Q: What is Emacs Lisp (Elisp)?</h3>
+<div class="outline-text-3" id="text-org9b95b50">
+<p>
+Emacs Lisp is the Lisp dialect used by GNU Emacs.
+</p>
+
+<p>
+Almost all of Emacs itself is written in Elisp.
+</p>
+
+<p>
+It allows you to:
+</p>
+
+<ul class="org-ul">
+<li>Configure Emacs</li>
+<li>Extend editor functionality</li>
+<li>Create packages</li>
+<li>Automate repetitive tasks</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org750a09d" class="outline-3">
+<h3 id="org750a09d">Q: Why learn Elisp?</h3>
+<div class="outline-text-3" id="text-org750a09d">
+<p>
+Learning Elisp allows you to:
+</p>
+
+<ul class="org-ul">
+<li>Understand how Emacs works internally</li>
+<li>Build custom commands</li>
+<li>Create major modes and minor modes</li>
+<li>Automate workflows</li>
+<li>Build complete editor extensions</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgbd274a3" class="outline-3">
+<h3 id="orgbd274a3">Q: What are S-expressions?</h3>
+<div class="outline-text-3" id="text-orgbd274a3">
+<p>
+Everything in Lisp is an expression.
+</p>
+
+<p>
+Types:
+</p>
+
+<ul class="org-ul">
+<li>Atoms</li>
+<li>Lists</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">42
+<span style="font-style: italic;">"hello"</span>
+(+ 1 2)
+(message <span style="font-style: italic;">"Hello"</span>)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org0e45a94" class="outline-3">
+<h3 id="org0e45a94">Q: How does evaluation work?</h3>
+<div class="outline-text-3" id="text-org0e45a94">
+<p>
+Expressions are evaluated immediately.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(+ 1 2)
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; 3</span>
+</pre>
+</div>
+
+<p>
+Quoted expressions are treated as data.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">'(+ 1 2)
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; (+ 1 2)</span>
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org5ec2282" class="outline-3">
+<h3 id="org5ec2282">Q: What is quoting?</h3>
+<div class="outline-text-3" id="text-org5ec2282">
+<p>
+Quote prevents evaluation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> x 10)
+
+x
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; 10
+</span>
+'x
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; x</span>
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgdeafe2e" class="outline-3">
+<h3 id="orgdeafe2e">Q: What are symbols?</h3>
+<div class="outline-text-3" id="text-orgdeafe2e">
+<p>
+Symbols store:
+</p>
+
+<ul class="org-ul">
+<li>value</li>
+<li>function definition</li>
+<li>property list</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(symbolp 'car)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org5ab9030" class="outline-3">
+<h3 id="org5ab9030">Q: How do variables work?</h3>
+<div class="outline-text-3" id="text-org5ab9030">
+<p>
+Global:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> x 10)
+</pre>
+</div>
+
+<p>
+Local:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">let</span> ((x 5))
+  (+ x 1))
+</pre>
+</div>
+
+<p>
+Constants:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defconst</span> <span style="font-weight: bold; font-style: italic;">pi</span> 3.14)
+</pre>
+</div>
+
+<p>
+Declared variables:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defvar</span> <span style="font-weight: bold; font-style: italic;">debug-mode</span> nil)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org3f39493" class="outline-3">
+<h3 id="org3f39493">Q: How do functions work?</h3>
+<div class="outline-text-3" id="text-org3f39493">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">square</span> (x)
+  (* x x))
+</pre>
+</div>
+
+<p>
+Call:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(square 5)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org8c54ccb" class="outline-3">
+<h3 id="org8c54ccb">Q: What is an interactive function?</h3>
+<div class="outline-text-3" id="text-org8c54ccb">
+<p>
+Interactive functions can be executed with M-x.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">hello</span> ()
+  (<span style="font-weight: bold;">interactive</span>)
+  (message <span style="font-style: italic;">"Hello"</span>))
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org6c493b0" class="outline-3">
+<h3 id="org6c493b0">Q: How does interactive input work?</h3>
+<div class="outline-text-3" id="text-org6c493b0">
+<p>
+Prompt user input.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">greet</span> (name)
+  (<span style="font-weight: bold;">interactive</span> <span style="font-style: italic;">"sName: "</span>)
+  (message <span style="font-style: italic;">"Hello %s"</span> name))
+</pre>
+</div>
+
+<p>
+Common specifiers:
+</p>
+
+<ul class="org-ul">
+<li>s → string</li>
+<li>n → number</li>
+<li>f → file</li>
+<li>b → buffer</li>
+<li>r → region</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org26aefdc" class="outline-3">
+<h3 id="org26aefdc">Q: How do conditionals work?</h3>
+<div class="outline-text-3" id="text-org26aefdc">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">if</span> (&gt; 5 2)
+    <span style="font-style: italic;">"yes"</span>
+  <span style="font-style: italic;">"no"</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">cond</span>
+ ((= x 1) <span style="font-style: italic;">"one"</span>)
+ ((= x 2) <span style="font-style: italic;">"two"</span>)
+ (t <span style="font-style: italic;">"other"</span>))
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org31ac8a6" class="outline-3">
+<h3 id="org31ac8a6">Q: What are nil and t?</h3>
+<div class="outline-text-3" id="text-org31ac8a6">
+<p>
+<code>nil</code>
+</p>
+
+<ul class="org-ul">
+<li>false</li>
+<li>empty list</li>
+</ul>
+
+<p>
+<code>t</code>
+</p>
+
+<ul class="org-ul">
+<li>true</li>
+</ul>
+
+<p>
+Everything except nil is truthy.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgbc804ee" class="outline-3">
+<h3 id="orgbc804ee">Q: How do lists work?</h3>
+<div class="outline-text-3" id="text-orgbc804ee">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> nums '(1 2 3))
+
+(car nums)
+(cdr nums)
+(cons 0 nums)
+(length nums)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgc1ed76f" class="outline-3">
+<h3 id="orgc1ed76f">Q: How do loops work?</h3>
+<div class="outline-text-3" id="text-orgc1ed76f">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">dolist</span> (x '(1 2 3))
+  (print x))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">dotimes</span> (i 5)
+  (print i))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">while</span> condition
+ ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf1b1071" class="outline-2">
+<h2 id="orgf1b1071">Intermediate</h2>
+<div class="outline-text-2" id="text-orgf1b1071">
+</div>
+<div id="outline-container-org2f29446" class="outline-3">
+<h3 id="org2f29446">Q: What are buffers?</h3>
+<div class="outline-text-3" id="text-org2f29446">
+<p>
+Buffers are text containers.
+</p>
+
+<p>
+Examples:
+</p>
+
+<ul class="org-ul">
+<li>files</li>
+<li>temporary buffers</li>
+<li>internal buffers</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(current-buffer)
+(buffer-name)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org35ac562" class="outline-3">
+<h3 id="org35ac562">Q: How does with-current-buffer work?</h3>
+<div class="outline-text-3" id="text-org35ac562">
+<p>
+Execute code inside another buffer.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-current-buffer</span> <span style="font-style: italic;">"*scratch*"</span>
+  (insert <span style="font-style: italic;">"Hello"</span>))
+</pre>
+</div>
+
+<p>
+Useful for:
+</p>
+
+<ul class="org-ul">
+<li>temporary buffers</li>
+<li>package development</li>
+<li>asynchronous processes</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org580e131" class="outline-3">
+<h3 id="org580e131">Q: What is save-excursion?</h3>
+<div class="outline-text-3" id="text-org580e131">
+<p>
+Preserves point and cursor location.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">save-excursion</span>
+  (goto-char (point-min)))
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org60af9d6" class="outline-3">
+<h3 id="org60af9d6">Q: What are point, mark, and region?</h3>
+<div class="outline-text-3" id="text-org60af9d6">
+<ul class="org-ul">
+<li>point → cursor position</li>
+<li>mark → secondary position</li>
+<li>region → selected text</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(point)
+(mark)
+(region-beginning)
+(region-end)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org3501ea1" class="outline-3">
+<h3 id="org3501ea1">Q: How do keymaps work?</h3>
+<div class="outline-text-3" id="text-org3501ea1">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(global-set-key
+ (kbd <span style="font-style: italic;">"C-c h"</span>)
+ #'hello)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org59d328e" class="outline-3">
+<h3 id="org59d328e">Q: What are hooks?</h3>
+<div class="outline-text-3" id="text-org59d328e">
+<p>
+Hooks execute functions when events occur.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(add-hook
+ 'prog-mode-hook
+ #'display-line-numbers-mode)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgec13c3e" class="outline-3">
+<h3 id="orgec13c3e">Q: What is defcustom?</h3>
+<div class="outline-text-3" id="text-orgec13c3e">
+<p>
+User configurable variables.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defcustom</span> <span style="font-weight: bold; font-style: italic;">my-option</span> t
+  <span style="font-style: italic;">"Option."</span>
+  <span style="font-weight: bold;">:type</span> 'boolean)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org48f7656" class="outline-3">
+<h3 id="org48f7656">Q: What is buffer-local state?</h3>
+<div class="outline-text-3" id="text-org48f7656">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq-local</span> fill-column 100)
+</pre>
+</div>
+
+<p>
+Each buffer can hold different values.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org4d7dae9" class="outline-3">
+<h3 id="org4d7dae9">Q: How does error handling work?</h3>
+<div class="outline-text-3" id="text-org4d7dae9">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">condition-case</span> err
+    (/ 1 0)
+  (arith-error
+   (message <span style="font-style: italic;">"error"</span>)))
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org76f83c3" class="outline-3">
+<h3 id="org76f83c3">Q: How do files work?</h3>
+<div class="outline-text-3" id="text-org76f83c3">
+<p>
+Read:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(insert-file-contents <span style="font-style: italic;">"file.txt"</span>)
+</pre>
+</div>
+
+<p>
+Write:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-temp-file</span> <span style="font-style: italic;">"out.txt"</span>
+  (insert <span style="font-style: italic;">"hello"</span>))
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orga03079b" class="outline-3">
+<h3 id="orga03079b">Q: What are alists, plists, and hash tables?</h3>
+<div class="outline-text-3" id="text-orga03079b">
+<p>
+Alist:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">((name . <span style="font-style: italic;">"Bob"</span>))
+</pre>
+</div>
+
+<p>
+Plist:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">:name</span> <span style="font-style: italic;">"Bob"</span>)
+</pre>
+</div>
+
+<p>
+Hash table:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-hash-table)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org825185a" class="outline-2">
+<h2 id="org825185a">Advanced</h2>
+<div class="outline-text-2" id="text-org825185a">
+</div>
+<div id="outline-container-orgbbd668a" class="outline-3">
+<h3 id="orgbbd668a">Q: What are lambda functions?</h3>
+<div class="outline-text-3" id="text-orgbbd668a">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">lambda</span> (x)
+  (* x x))
+</pre>
+</div>
+
+<p>
+Anonymous functions.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgc4c7a2b" class="outline-3">
+<h3 id="orgc4c7a2b">Q: What are closures?</h3>
+<div class="outline-text-3" id="text-orgc4c7a2b">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">let</span> ((x 10))
+  (<span style="font-weight: bold;">lambda</span> ()
+    x))
+</pre>
+</div>
+
+<p>
+Closures capture variables.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org974cf82" class="outline-3">
+<h3 id="org974cf82">Q: What is lexical binding?</h3>
+<div class="outline-text-3" id="text-org974cf82">
+<p>
+Enable modern lexical scope.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">-*- lexical-binding: t; -*-</span>
+</pre>
+</div>
+
+<p>
+Required for closures.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgb7de2fd" class="outline-3">
+<h3 id="orgb7de2fd">Q: What are macros?</h3>
+<div class="outline-text-3" id="text-orgb7de2fd">
+<p>
+Macros generate code.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defmacro</span> <span style="font-weight: bold;">my-when</span> (cond <span style="font-weight: bold; text-decoration: underline;">&amp;rest</span> body)
+  `(<span style="font-weight: bold;">if</span> ,cond
+       (<span style="font-weight: bold;">progn</span> ,@body)))
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgf6e82bd" class="outline-3">
+<h3 id="orgf6e82bd">Q: How do macros differ from functions?</h3>
+<div class="outline-text-3" id="text-orgf6e82bd">
+<p>
+Functions evaluate arguments.
+</p>
+
+<p>
+Macros receive raw code.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(macroexpand-1 ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgbff87bd" class="outline-3">
+<h3 id="orgbff87bd">Q: What is backquote syntax?</h3>
+<div class="outline-text-3" id="text-orgbff87bd">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">`(...)
+,x
+,@list
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org1c82f07" class="outline-3">
+<h3 id="org1c82f07">Q: How do major modes work?</h3>
+<div class="outline-text-3" id="text-org1c82f07">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">define-derived-mode</span>
+ my-mode
+ text-mode
+ <span style="font-style: italic;">"MyMode"</span>)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org54687a9" class="outline-3">
+<h3 id="org54687a9">Q: How do minor modes work?</h3>
+<div class="outline-text-3" id="text-org54687a9">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">define-minor-mode</span>
+ my-mode
+ <span style="font-style: italic;">"Toggle mode"</span>)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org0a538eb" class="outline-3">
+<h3 id="org0a538eb">Q: What are syntax tables?</h3>
+<div class="outline-text-3" id="text-org0a538eb">
+<p>
+Syntax tables define parsing behavior.
+</p>
+
+<p>
+They control:
+</p>
+
+<ul class="org-ul">
+<li>comments</li>
+<li>strings</li>
+<li>symbols</li>
+<li>words</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-syntax-table</span> ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org4b23e5e" class="outline-3">
+<h3 id="org4b23e5e">Q: How do regular expressions work?</h3>
+<div class="outline-text-3" id="text-org4b23e5e">
+<p>
+Search:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(re-search-forward <span style="font-style: italic;">"[0-9]+"</span>)
+</pre>
+</div>
+
+<p>
+Replace:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(replace-match <span style="font-style: italic;">"number"</span>)
+</pre>
+</div>
+
+<p>
+Used heavily in text manipulation.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orge61dc61" class="outline-3">
+<h3 id="orge61dc61">Q: What are windows and frames?</h3>
+<div class="outline-text-3" id="text-orge61dc61">
+<p>
+Frame:
+</p>
+
+<p>
+Entire Emacs window.
+</p>
+
+<p>
+Window:
+</p>
+
+<p>
+Buffer pane.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(selected-frame)
+(selected-window)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org23bede9" class="outline-3">
+<h3 id="org23bede9">Q: What are markers?</h3>
+<div class="outline-text-3" id="text-org23bede9">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(copy-marker (point))
+</pre>
+</div>
+
+<p>
+Markers follow buffer changes.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org18aafd1" class="outline-2">
+<h2 id="org18aafd1">Expert</h2>
+<div class="outline-text-2" id="text-org18aafd1">
+</div>
+<div id="outline-container-org8a9b74f" class="outline-3">
+<h3 id="org8a9b74f">Q: What are overlays?</h3>
+<div class="outline-text-3" id="text-org8a9b74f">
+<p>
+Temporary visual decorations.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-overlay ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org8cb9638" class="outline-3">
+<h3 id="org8cb9638">Q: What are text properties?</h3>
+<div class="outline-text-3" id="text-org8cb9638">
+<p>
+Metadata attached directly to text.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(propertize
+ <span style="font-style: italic;">"Warning"</span>
+ 'face 'warning)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org7789ea1" class="outline-3">
+<h3 id="org7789ea1">Q: Hooks vs Advice?</h3>
+<div class="outline-text-3" id="text-org7789ea1">
+<p>
+Hooks:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(add-hook ...)
+</pre>
+</div>
+
+<p>
+Advice:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(advice-add ...)
+</pre>
+</div>
+
+<p>
+Prefer hooks when possible.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org2e9031c" class="outline-3">
+<h3 id="org2e9031c">Q: What is advice-add?</h3>
+<div class="outline-text-3" id="text-org2e9031c">
+<p>
+Modify existing function behavior.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(advice-add
+ 'find-file
+ <span style="font-weight: bold;">:before</span>
+ #'my-function)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org4dca42d" class="outline-3">
+<h3 id="org4dca42d">Q: How do asynchronous processes work?</h3>
+<div class="outline-text-3" id="text-org4dca42d">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-process ...)
+</pre>
+</div>
+
+<p>
+Non-blocking execution.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org1d6677a" class="outline-3">
+<h3 id="org1d6677a">Q: How do process sentinels work?</h3>
+<div class="outline-text-3" id="text-org1d6677a">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(make-process
+ <span style="font-weight: bold;">:sentinel</span> ...)
+</pre>
+</div>
+
+<p>
+Sentinel runs when process state changes.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orge2eec09" class="outline-3">
+<h3 id="orge2eec09">Q: How do timers work?</h3>
+<div class="outline-text-3" id="text-orge2eec09">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(run-at-time ...)
+(run-with-idle-timer ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgbc9ad41" class="outline-3">
+<h3 id="orgbc9ad41">Q: How do shell commands work?</h3>
+<div class="outline-text-3" id="text-orgbc9ad41">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(call-process ...)
+(shell-command ...)
+</pre>
+</div>
+
+<p>
+Prefer <code>call-process</code> for security.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org1f4e094" class="outline-3">
+<h3 id="org1f4e094">Q: How do HTTP requests work?</h3>
+<div class="outline-text-3" id="text-org1f4e094">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(url-retrieve ...)
+</pre>
+</div>
+
+<p>
+Built-in HTTP client.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org5725e39" class="outline-3">
+<h3 id="org5725e39">Q: How do JSON APIs work?</h3>
+<div class="outline-text-3" id="text-org5725e39">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(json-parse-string ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org9b324c0" class="outline-3">
+<h3 id="org9b324c0">Q: How does testing work?</h3>
+<div class="outline-text-3" id="text-org9b324c0">
+<p>
+ERT testing framework.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">ert</span>)
+
+(<span style="font-weight: bold;">ert-deftest</span> <span style="font-weight: bold;">my-test</span> ()
+ ...)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org3d5f187" class="outline-3">
+<h3 id="org3d5f187">Q: What is byte compilation?</h3>
+<div class="outline-text-3" id="text-org3d5f187">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(byte-compile-file <span style="font-style: italic;">"my.el"</span>)
+</pre>
+</div>
+
+<p>
+Benefits:
+</p>
+
+<ul class="org-ul">
+<li>faster loading</li>
+<li>compiler warnings</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org0bb5305" class="outline-3">
+<h3 id="org0bb5305">Q: What is native compilation?</h3>
+<div class="outline-text-3" id="text-org0bb5305">
+<p>
+Produces:
+</p>
+
+<ul class="org-ul">
+<li>.eln files</li>
+<li>faster execution</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgd0466a5" class="outline-3">
+<h3 id="orgd0466a5">Q: How do you debug Elisp?</h3>
+<div class="outline-text-3" id="text-orgd0466a5">
+<p>
+Useful tools:
+</p>
+
+<ul class="org-ul">
+<li>debug-on-error</li>
+<li>edebug-defun</li>
+<li>debug-on-entry</li>
+<li>trace-function</li>
+<li>check-parens</li>
+<li>macroexpand-1</li>
+</ul>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> debug-on-error t)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgc18c095" class="outline-3">
+<h3 id="orgc18c095">Q: Performance optimization?</h3>
+<div class="outline-text-3" id="text-orgc18c095">
+<p>
+Avoid:
+</p>
+
+<ul class="org-ul">
+<li>append in loops</li>
+<li>repeated regex scans</li>
+<li>unnecessary allocations</li>
+</ul>
+
+<p>
+Prefer:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">push</span> item list)
+(nreverse list)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org1e68749" class="outline-3">
+<h3 id="org1e68749">Q: Common beginner mistakes?</h3>
+<div class="outline-text-3" id="text-org1e68749">
+<p>
+Common mistakes:
+</p>
+
+<ul class="org-ul">
+<li>forgetting interactive</li>
+<li>forgetting lexical-binding</li>
+<li>using setq instead of let</li>
+<li>using shell-command unsafely</li>
+<li>misunderstanding quote</li>
+<li>modifying buffers without save-excursion</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org5066510" class="outline-2">
+<h2 id="org5066510">Package Development</h2>
+<div class="outline-text-2" id="text-org5066510">
+</div>
+<div id="outline-container-orgc44b2ed" class="outline-3">
+<h3 id="orgc44b2ed">Q: Why use provide and require?</h3>
+<div class="outline-text-3" id="text-orgc44b2ed">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">provide</span> '<span style="font-weight: bold; text-decoration: underline;">mypackage</span>)
+(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">mypackage</span>)
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org10e8dcb" class="outline-3">
+<h3 id="org10e8dcb">Q: How do package dependencies work?</h3>
+<div class="outline-text-3" id="text-org10e8dcb">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Package-Requires:
+</span><span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">((emacs "29.1")
+</span><span style="font-weight: bold; font-style: italic;">;;  </span><span style="font-weight: bold; font-style: italic;">(dash "2.19"))</span>
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org31579e3" class="outline-3">
+<h3 id="org31579e3">Q: How should package structure look?</h3>
+<div class="outline-text-3" id="text-org31579e3">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">my.el --- package -*- lexical-binding:t -*-
+</span>
+<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">Commentary:
+</span>
+<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">Code:
+</span>
+(<span style="font-weight: bold;">provide</span> '<span style="font-weight: bold; text-decoration: underline;">my</span>)
+<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">my.el ends here</span>
+</pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org169ee4c" class="outline-3">
+<h3 id="org169ee4c">Q: How do you check package quality?</h3>
+<div class="outline-text-3" id="text-org169ee4c">
+<p>
+Tools:
+</p>
+
+<ul class="org-ul">
+<li>checkdoc</li>
+<li>package-lint</li>
+<li>byte compilation</li>
+</ul>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org8e1c955" class="outline-2">
+<h2 id="org8e1c955">Master Level</h2>
+<div class="outline-text-2" id="text-org8e1c955">
+</div>
+<div id="outline-container-orgf25be08" class="outline-3">
+<h3 id="orgf25be08">Q: What is EIEIO?</h3>
+<div class="outline-text-3" id="text-orgf25be08">
+<p>
+Object system for Emacs Lisp.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgc22af11" class="outline-3">
+<h3 id="orgc22af11">Q: What is cl-lib?</h3>
+<div class="outline-text-3" id="text-orgc22af11">
+<p>
+Common Lisp extensions.
+</p>
+
+<p>
+Useful:
+</p>
+
+<ul class="org-ul">
+<li>cl-loop</li>
+<li>cl-defstruct</li>
+<li>cl-defmethod</li>
+<li>cl-reduce</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org4fe94c1" class="outline-3">
+<h3 id="org4fe94c1">Q: What are generators?</h3>
+<div class="outline-text-3" id="text-org4fe94c1">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">generator</span>)
+</pre>
+</div>
+
+<p>
+Functions:
+</p>
+
+<ul class="org-ul">
+<li>iter-defun</li>
+<li>iter-yield</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgd2be34c" class="outline-3">
+<h3 id="orgd2be34c">Q: What is garbage collection tuning?</h3>
+<div class="outline-text-3" id="text-orgd2be34c">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">gc-cons-threshold
+</pre>
+</div>
+
+<p>
+Controls GC frequency.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgac6bece" class="outline-3">
+<h3 id="orgac6bece">Q: How do you become advanced at Elisp?</h3>
+<div class="outline-text-3" id="text-orgac6bece">
+<p>
+Study source code from:
+</p>
+
+<ul class="org-ul">
+<li>GNU Emacs</li>
+<li>Org Mode</li>
+<li>Magit</li>
+<li>Projectile</li>
+<li>Vertico</li>
+<li>Consult</li>
+<li>Corfu</li>
+</ul>
+
+<p>
+Build:
+</p>
+
+<ul class="org-ul">
+<li>major modes</li>
+<li>minor modes</li>
+<li>package managers</li>
+<li>syntax highlighters</li>
+<li>completion frameworks</li>
+<li>LSP integrations</li>
+<li>IDE extensions</li>
+</ul>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
