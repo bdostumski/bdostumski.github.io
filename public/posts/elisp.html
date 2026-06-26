@@ -23,9 +23,9 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-orgd29cdd4" class="outline-2">
-<h2 id="orgd29cdd4">Emacs Lisp Q&amp;A (Beginner to Advanced)</h2>
-<div class="outline-text-2" id="text-orgd29cdd4">
+<div id="outline-container-orgd9b8d45" class="outline-2">
+<h2 id="orgd9b8d45">Emacs Lisp Q&amp;A (Beginner to Advanced)</h2>
+<div class="outline-text-2" id="text-orgd9b8d45">
 <p>
 A comprehensive question-and-answer guide for Emacs Lisp.
 </p>
@@ -52,1262 +52,1613 @@ Study progressively from fundamentals to advanced package development.
 <hr>
 </div>
 </div>
-<div id="outline-container-orge95ec6b" class="outline-2">
-<h2 id="orge95ec6b">Beginner</h2>
-<div class="outline-text-2" id="text-orge95ec6b">
+<div id="outline-container-orgd352b6b" class="outline-2">
+<h2 id="orgd352b6b">Beginner — Fundamentals</h2>
+<div class="outline-text-2" id="text-orgd352b6b">
 </div>
-<div id="outline-container-org2880049" class="outline-3">
-<h3 id="org2880049">Q: What is Emacs Lisp (Elisp)?</h3>
-<div class="outline-text-3" id="text-org2880049">
+<div id="outline-container-org5032f5d" class="outline-3">
+<h3 id="org5032f5d">Q1: What is Emacs Lisp?</h3>
+<div class="outline-text-3" id="text-org5032f5d">
 <p>
-Emacs Lisp is the Lisp dialect used by GNU Emacs.
+A dialect of Lisp that serves as the extension language of Emacs.
+The Emacs editor is largely written in it, and you use it to configure and extend Emacs.
+It is a dynamically-typed, primarily dynamically-scoped (historically) Lisp
+with deep integration into the editor (buffers, windows, text properties).
 </p>
-
-<p>
-Almost all of Emacs itself is written in Elisp.
-</p>
-
-<p>
-It allows you to:
-</p>
-
+</div>
+</div>
+<div id="outline-container-org3d4eb9c" class="outline-3">
+<h3 id="org3d4eb9c">Q2: How do I evaluate an Elisp expression interactively?</h3>
+<div class="outline-text-3" id="text-org3d4eb9c">
 <ul class="org-ul">
-<li>Configure Emacs</li>
-<li>Extend editor functionality</li>
-<li>Create packages</li>
-<li>Automate repetitive tasks</li>
+<li><code>C-x C-e</code> evaluates the expression <b>before point</b> (<code>eval-last-sexp</code>).</li>
+<li><code>M-x eval-expression</code> (<code>M-:</code>) prompts for an expression in the minibuffer.</li>
+<li><code>M-x eval-buffer</code> / <code>eval-region</code> evaluate larger chunks.</li>
+<li><code>ielm</code> opens an interactive Elisp REPL.</li>
 </ul>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org7274859" class="outline-3">
-<h3 id="org7274859">Q: Why learn Elisp?</h3>
-<div class="outline-text-3" id="text-org7274859">
+<div id="outline-container-orgeab953e" class="outline-3">
+<h3 id="orgeab953e">Q3: What is the difference between a "form" and an "expression"?</h3>
+<div class="outline-text-3" id="text-orgeab953e">
 <p>
-Learning Elisp allows you to:
+They are used almost interchangeably. A <b>form</b> is any Lisp object meant to be evaluated.
+Self-evaluating forms (numbers, strings, keywords), symbol forms
+(variables), and list forms (function/macro/special-form calls) are the categories.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org28998ca" class="outline-3">
+<h3 id="org28998ca">Q4: How do you write a comment in Elisp?</h3>
+<div class="outline-text-3" id="text-org28998ca">
+<p>
+With a semicolon <code>;</code>. Conventions:
+</p>
 <ul class="org-ul">
-<li>Understand how Emacs works internally</li>
-<li>Build custom commands</li>
-<li>Create major modes and minor modes</li>
-<li>Automate workflows</li>
-<li>Build complete editor extensions</li>
+<li><code>;</code> inline comment after code.</li>
+<li><code>;;</code> comment aligned to the code's indentation.</li>
+<li><code>;;;</code> top-level/section comment.</li>
+<li><code>;;;;</code> heading.</li>
 </ul>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-orgfe2731a" class="outline-3">
-<h3 id="orgfe2731a">Q: What are S-expressions?</h3>
-<div class="outline-text-3" id="text-orgfe2731a">
+<div id="outline-container-org737dc06" class="outline-3">
+<h3 id="org737dc06">Q5: What are the basic data types?</h3>
+<div class="outline-text-3" id="text-org737dc06">
 <p>
-Everything in Lisp is an expression.
+Integers, floats, symbols, strings, characters (which are integers), cons cells/lists,
+vectors, hash tables, and more specialized types like markers, buffers, and overlays.
 </p>
-
-<p>
-Types:
-</p>
-
-<ul class="org-ul">
-<li>Atoms</li>
-<li>Lists</li>
-</ul>
-
+</div>
+</div>
+<div id="outline-container-org8dabaed" class="outline-3">
+<h3 id="org8dabaed">Q6: How do I define a variable?</h3>
+<div class="outline-text-3" id="text-org8dabaed">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">42
-<span style="font-style: italic;">"hello"</span>
-(+ 1 2)
-(message <span style="font-style: italic;">"Hello"</span>)
+<pre class="src src-elisp">(<span style="font-weight: bold;">defvar</span> <span style="font-weight: bold; font-style: italic;">my-var</span> 10 <span style="font-style: italic;">"A docstring."</span>)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">only sets if currently unbound
+</span>(<span style="font-weight: bold;">defconst</span> <span style="font-weight: bold; font-style: italic;">my-pi</span> 3.14159 <span style="font-style: italic;">"Pi."</span>)      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">intended as a constant
+</span>(<span style="font-weight: bold;">setq</span> my-var 20)                    <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">assignment</span>
 </pre>
 </div>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org3423682" class="outline-3">
-<h3 id="org3423682">Q: How does evaluation work?</h3>
-<div class="outline-text-3" id="text-org3423682">
+<div id="outline-container-org6ecb2fc" class="outline-3">
+<h3 id="org6ecb2fc">Q7: What is the difference between <code>defvar</code> and <code>setq</code>?</h3>
+<div class="outline-text-3" id="text-org6ecb2fc">
 <p>
-Expressions are evaluated immediately.
+<code>defvar</code> <b>declares</b> a special (dynamic) variable and assigns a default only if
+it is not already bound. <code>setq</code> simply assigns a value to an existing binding.
+Use <code>defvar</code> for global configuration variables so re-evaluating a file doesn't clobber a user's value.
+</p>
+</div>
+</div>
+<div id="outline-container-org1555378" class="outline-3">
+<h3 id="org1555378">Q8: How do I define a function?</h3>
+<div class="outline-text-3" id="text-org1555378">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my-add</span> (a b)
+  <span style="font-style: italic;">"Return the sum of A and B."</span>
+  (+ a b))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3a365e4" class="outline-3">
+<h3 id="org3a365e4">Q9: What makes a function a "command"?</h3>
+<div class="outline-text-3" id="text-org3a365e4">
+<p>
+Adding <code>(interactive ...)</code> as its first form.
+Commands can be invoked via <code>M-x</code> and bound to keys.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(+ 1 2)
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; 3</span>
-</pre>
-</div>
-
-<p>
-Quoted expressions are treated as data.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">'(+ 1 2)
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; (+ 1 2)</span>
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgcce78be" class="outline-3">
-<h3 id="orgcce78be">Q: What is quoting?</h3>
-<div class="outline-text-3" id="text-orgcce78be">
-<p>
-Quote prevents evaluation.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> x 10)
-
-x
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; 10
-</span>
-'x
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">=&gt; x</span>
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgeaf7d0f" class="outline-3">
-<h3 id="orgeaf7d0f">Q: What are symbols?</h3>
-<div class="outline-text-3" id="text-orgeaf7d0f">
-<p>
-Symbols store:
-</p>
-
-<ul class="org-ul">
-<li>value</li>
-<li>function definition</li>
-<li>property list</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(symbolp 'car)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org9507938" class="outline-3">
-<h3 id="org9507938">Q: How do variables work?</h3>
-<div class="outline-text-3" id="text-org9507938">
-<p>
-Global:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> x 10)
-</pre>
-</div>
-
-<p>
-Local:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">let</span> ((x 5))
-  (+ x 1))
-</pre>
-</div>
-
-<p>
-Constants:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defconst</span> <span style="font-weight: bold; font-style: italic;">pi</span> 3.14)
-</pre>
-</div>
-
-<p>
-Declared variables:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defvar</span> <span style="font-weight: bold; font-style: italic;">debug-mode</span> nil)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org484b565" class="outline-3">
-<h3 id="org484b565">Q: How do functions work?</h3>
-<div class="outline-text-3" id="text-org484b565">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">square</span> (x)
-  (* x x))
-</pre>
-</div>
-
-<p>
-Call:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(square 5)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org0b75de6" class="outline-3">
-<h3 id="org0b75de6">Q: What is an interactive function?</h3>
-<div class="outline-text-3" id="text-org0b75de6">
-<p>
-Interactive functions can be executed with M-x.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">hello</span> ()
+<pre class="src src-elisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my-greet</span> ()
   (<span style="font-weight: bold;">interactive</span>)
-  (message <span style="font-style: italic;">"Hello"</span>))
+  (message <span style="font-style: italic;">"Hello!"</span>))
 </pre>
 </div>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org3563523" class="outline-3">
-<h3 id="org3563523">Q: How does interactive input work?</h3>
-<div class="outline-text-3" id="text-org3563523">
+<div id="outline-container-orgae2a70d" class="outline-3">
+<h3 id="orgae2a70d">Q10: What does <code>message</code> do?</h3>
+<div class="outline-text-3" id="text-orgae2a70d">
 <p>
-Prompt user input.
+Displays a formatted string in the echo area and logs it to the <code>*Messages*</code> buffer.
+Uses <code>format</code>-style directives: <code>%s</code>, <code>%d</code>, <code>%S</code>, etc.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org6c0ac9f" class="outline-3">
+<h3 id="org6c0ac9f">Q11: What is <code>nil</code> and <code>t</code>?</h3>
+<div class="outline-text-3" id="text-org6c0ac9f">
+<p>
+<code>nil</code> is the canonical false value and also the empty list <code>()</code>.
+<code>t</code> is the canonical true value.
+Everything other than <code>nil</code> is truthy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgded5db7" class="outline-3">
+<h3 id="orgded5db7">Q12: Is the empty list the same as nil?</h3>
+<div class="outline-text-3" id="text-orgded5db7">
+<p>
+Yes. <code>()</code> and <code>nil</code> are identical objects in Elisp.
+</p>
+</div>
+</div>
+<div id="outline-container-org4120df9" class="outline-3">
+<h3 id="org4120df9">Q13: How do I create a list?</h3>
+<div class="outline-text-3" id="text-org4120df9">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">greet</span> (name)
-  (<span style="font-weight: bold;">interactive</span> <span style="font-style: italic;">"sName: "</span>)
-  (message <span style="font-style: italic;">"Hello %s"</span> name))
+<pre class="src src-elisp">(list 1 2 3)        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 2 3)
+</span>'(1 2 3)            <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">quoted literal
+</span>(cons 1 '(2 3))     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 2 3)</span>
 </pre>
 </div>
-
+</div>
+</div>
+<div id="outline-container-orgcf02671" class="outline-3">
+<h3 id="orgcf02671">Q14: What is the difference between <code>quote</code> and <code>list</code>?</h3>
+<div class="outline-text-3" id="text-orgcf02671">
 <p>
-Common specifiers:
+<code>(list 1 (+ 1 1))</code> evaluates its arguments → <code>(1 2)</code>.
+<code>'(1 (+ 1 1))</code> does not evaluate → <code>(1 (+ 1 1))</code>. <code>'x</code> is shorthand for <code>(quote x)</code>.
 </p>
-
+</div>
+</div>
+<div id="outline-container-org9165681" class="outline-3">
+<h3 id="org9165681">Q15: What are <code>car</code> and <code>cdr</code>?</h3>
+<div class="outline-text-3" id="text-org9165681">
+<p>
+<code>car</code> returns the first element of a cons cell; <code>cdr</code> returns the rest.
+For a list <code>(1 2 3)</code>: <code>(car list)</code> → 1, <code>(cdr list)</code> → <code>(2 3)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org5cc2eef" class="outline-3">
+<h3 id="org5cc2eef">Q16: How do I get the Nth element of a list?</h3>
+<div class="outline-text-3" id="text-org5cc2eef">
+<div class="org-src-container">
+<pre class="src src-elisp">(nth 2 '(a b c d))    <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; c  (zero-based)
+</span>(nthcdr 2 '(a b c d)) <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (c d)
+</span>(elt '(a b c) 1)      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; b  (works on sequences)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3e271b2" class="outline-3">
+<h3 id="org3e271b2">Q17: How do I add an element to the front of a list?</h3>
+<div class="outline-text-3" id="text-org3e271b2">
+<div class="org-src-container">
+<pre class="src src-elisp">(cons 0 '(1 2 3))     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (0 1 2 3)
+</span>(<span style="font-weight: bold;">push</span> 0 my-list)      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">destructively updates the variable</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org642350b" class="outline-3">
+<h3 id="org642350b">Q18: How do I check equality?</h3>
+<div class="outline-text-3" id="text-org642350b">
 <ul class="org-ul">
-<li>s → string</li>
-<li>n → number</li>
-<li>f → file</li>
-<li>b → buffer</li>
-<li>r → region</li>
+<li><code>eq</code> — identity (same object); good for symbols, small integers.</li>
+<li><code>eql</code> — like <code>eq</code> but also compares numbers of the same type.</li>
+<li><code>equal</code> — structural equality (lists, strings).</li>
+<li><code>=</code>  — numeric equality (numbers only).</li>
+<li><code>string=</code> — string equality.</li>
 </ul>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org8ba37c5" class="outline-3">
-<h3 id="org8ba37c5">Q: How do conditionals work?</h3>
-<div class="outline-text-3" id="text-org8ba37c5">
+<div id="outline-container-org8d36256" class="outline-3">
+<h3 id="org8d36256">Q19: How do I write an if statement?</h3>
+<div class="outline-text-3" id="text-org8d36256">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">if</span> (&gt; 5 2)
-    <span style="font-style: italic;">"yes"</span>
-  <span style="font-style: italic;">"no"</span>)
+<pre class="src src-elisp">(<span style="font-weight: bold;">if</span> (&gt; x 0)
+    (message <span style="font-style: italic;">"positive"</span>)     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">then (single form)
+</span>  (message <span style="font-style: italic;">"non-positive"</span>))  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">else (any number of forms)</span>
 </pre>
 </div>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">cond</span>
- ((= x 1) <span style="font-style: italic;">"one"</span>)
- ((= x 2) <span style="font-style: italic;">"two"</span>)
- (t <span style="font-style: italic;">"other"</span>))
-</pre>
-</div>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org20997a3" class="outline-3">
-<h3 id="org20997a3">Q: What are nil and t?</h3>
-<div class="outline-text-3" id="text-org20997a3">
+<div id="outline-container-orgfe94d04" class="outline-3">
+<h3 id="orgfe94d04">Q20: What is <code>when</code> and <code>unless</code>?</h3>
+<div class="outline-text-3" id="text-orgfe94d04">
 <p>
-<code>nil</code>
+<code>when</code> runs its body if the condition is non-nil (no else).
+<code>unless</code> runs its body if the condition is nil. Both allow multiple body forms without <code>progn</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfa3e78b" class="outline-3">
+<h3 id="orgfa3e78b">Q21: What is <code>progn</code>?</h3>
+<div class="outline-text-3" id="text-orgfa3e78b">
+<p>
+Evaluates several forms in sequence and returns the value of the last.
+Useful where a single form is expected but you need several.
+</p>
+</div>
+</div>
+<div id="outline-container-org99abd7b" class="outline-3">
+<h3 id="org99abd7b">Q22: How does <code>cond</code> work?</h3>
+<div class="outline-text-3" id="text-org99abd7b">
+<p>
+A multi-branch conditional:
 </p>
 
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">cond</span>
+((&lt; x 0) <span style="font-style: italic;">"negative"</span>)
+((= x 0) <span style="font-style: italic;">"zero"</span>)
+(t       <span style="font-style: italic;">"positive"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6508ec0" class="outline-3">
+<h3 id="org6508ec0">Q23: What is <code>let</code> vs <code>let*</code>?</h3>
+<div class="outline-text-3" id="text-org6508ec0">
+<p>
+<code>let</code> binds all variables in parallel (initializers can't see each other).
+<code>let*</code> binds sequentially so later bindings can reference earlier ones.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">let*</span> ((a 1) (b (+ a 1))) b)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 2  (let would error: a unbound)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7a98993" class="outline-3">
+<h3 id="org7a98993">Q24: How do I loop over a list?</h3>
+<div class="outline-text-3" id="text-org7a98993">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">dolist</span> (item '(1 2 3))
+  (message <span style="font-style: italic;">"%d"</span> item))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga35f91f" class="outline-3">
+<h3 id="orga35f91f">Q25: How do I loop N times?</h3>
+<div class="outline-text-3" id="text-orga35f91f">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">dotimes</span> (i 5)
+  (message <span style="font-style: italic;">"%d"</span> i))   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">i goes 0..4</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org79d5308" class="outline-3">
+<h3 id="org79d5308">Q26: How do I write a while loop?</h3>
+<div class="outline-text-3" id="text-org79d5308">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">let</span> ((i 0))
+  (<span style="font-weight: bold;">while</span> (&lt; i 5)
+    (message <span style="font-style: italic;">"%d"</span> i)
+    (<span style="font-weight: bold;">setq</span> i (1+ i))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org229515c" class="outline-3">
+<h3 id="org229515c">Q27: How do I format a string?</h3>
+<div class="outline-text-3" id="text-org229515c">
+<div class="org-src-container">
+<pre class="src src-elisp">(format <span style="font-style: italic;">"Name: %s, Age: %d"</span> <span style="font-style: italic;">"Bob"</span> 42)
+</pre>
+</div>
+
+<p>
+<code>format-message</code> additionally translates quote characters for messages.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeed88d4" class="outline-3">
+<h3 id="orgeed88d4">Q28: What is the difference between <code>%s</code> and <code>%S</code> in format?</h3>
+<div class="outline-text-3" id="text-orgeed88d4">
+<p>
+<code>%s</code> uses <code>princ</code>-style (human-readable, no quotes on strings).
+<code>%S</code> uses <code>prin1</code>-style (a readable, re-parseable representation with quotes/escapes).
+</p>
+</div>
+</div>
+<div id="outline-container-org273cfef" class="outline-3">
+<h3 id="org273cfef">Q29: How do I concatenate strings?</h3>
+<div class="outline-text-3" id="text-org273cfef">
+<div class="org-src-container">
+<pre class="src src-elisp">(concat <span style="font-style: italic;">"foo"</span> <span style="font-style: italic;">"-"</span> <span style="font-style: italic;">"bar"</span>)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; "foo-bar"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5fd9ecb" class="outline-3">
+<h3 id="org5fd9ecb">Q30: How do I read documentation for a function or variable?</h3>
+<div class="outline-text-3" id="text-org5fd9ecb">
 <ul class="org-ul">
-<li>false</li>
-<li>empty list</li>
+<li><code>C-h f</code> (<code>describe-function</code>)</li>
+<li><code>C-h v</code> (<code>describe-variable</code>)</li>
+<li><code>C-h k</code> (<code>describe-key</code>)</li>
+<li><code>C-h o</code> (<code>describe-symbol</code>) — function or variable.</li>
 </ul>
-
+</div>
+</div>
+<div id="outline-container-org60b9c0c" class="outline-3">
+<h3 id="org60b9c0c">Q31: What is a symbol?</h3>
+<div class="outline-text-3" id="text-org60b9c0c">
 <p>
-<code>t</code>
+A first-class named object with four cells: name, value (variable binding), function (function binding), and property list.
+Symbols are interned in <code>obarray</code> so identical names refer to the same object.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf96ca52" class="outline-3">
+<h3 id="orgf96ca52">Q32: What is the difference between a symbol's value cell and function cell?</h3>
+<div class="outline-text-3" id="text-orgf96ca52">
+<p>
+A symbol can simultaneously name a variable and a function.
+<code>(foo)</code> uses the function cell; <code>foo</code> as a value uses the value cell. This is why Elisp is a "Lisp-2".
+</p>
+</div>
+</div>
+<div id="outline-container-org69cfa3d" class="outline-3">
+<h3 id="org69cfa3d">Q33: How do I get/set a symbol's value programmatically?</h3>
+<div class="outline-text-3" id="text-org69cfa3d">
+<div class="org-src-container">
+<pre class="src src-elisp">(symbol-value 'my-var)
+(set 'my-var 5)            <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">like setq but evaluates the symbol arg
+</span>(symbol-function 'my-fn)
+(fset 'my-fn (<span style="font-weight: bold;">lambda</span> () 1))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org24dfe07" class="outline-3">
+<h3 id="org24dfe07">Q34: What is a keyword symbol?</h3>
+<div class="outline-text-3" id="text-org24dfe07">
+<p>
+A symbol starting with <code>:</code> (e.g. <code>:foo</code>). It is self-evaluating and used as a constant marker, frequently in plists and keyword arguments.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbdb9f2d" class="outline-3">
+<h3 id="orgbdb9f2d">Q35: How do I convert between strings, symbols, and numbers?</h3>
+<div class="outline-text-3" id="text-orgbdb9f2d">
+<div class="org-src-container">
+<pre class="src src-elisp">(intern <span style="font-style: italic;">"foo"</span>)          <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">string -&gt; symbol
+</span>(symbol-name 'foo)      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">symbol -&gt; string
+</span>(number-to-string 42)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">-&gt; "42"
+</span>(string-to-number <span style="font-style: italic;">"42"</span>) <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">-&gt; 42</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdf48705" class="outline-2">
+<h2 id="orgdf48705">Beginner/Intermediate — Working with Emacs</h2>
+<div class="outline-text-2" id="text-orgdf48705">
+</div>
+<div id="outline-container-orga79af49" class="outline-3">
+<h3 id="orga79af49">Q36: What is the "current buffer"?</h3>
+<div class="outline-text-3" id="text-orga79af49">
+<p>
+The buffer that Elisp functions operate on by default. Most editing functions implicitly act on it. <code>current-buffer</code> returns it.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda76e81" class="outline-3">
+<h3 id="orgda76e81">Q37: What is "point"?</h3>
+<div class="outline-text-3" id="text-orgda76e81">
+<p>
+The location of the cursor / insertion position in a buffer, between two characters.
+<code>(point)</code> returns its integer position; <code>point-min</code> and <code>point-max</code> give the buffer boundaries.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c3c7cb" class="outline-3">
+<h3 id="org5c3c7cb">Q38: How do I move point?</h3>
+<div class="outline-text-3" id="text-org5c3c7cb">
+<div class="org-src-container">
+<pre class="src src-elisp">(goto-char (point-min))
+(forward-char 5)
+(forward-line 2)
+(beginning-of-line)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7c5e47b" class="outline-3">
+<h3 id="org7c5e47b">Q39: How do I insert text at point?</h3>
+<div class="outline-text-3" id="text-org7c5e47b">
+<div class="org-src-container">
+<pre class="src src-elisp">(insert <span style="font-style: italic;">"Hello, world"</span>)
+(insert-char ?* 3)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">inserts ***</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6715731" class="outline-3">
+<h3 id="org6715731">Q40: How do I read text from the buffer?</h3>
+<div class="outline-text-3" id="text-org6715731">
+<div class="org-src-container">
+<pre class="src src-elisp">(buffer-string)                       <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">whole buffer
+</span>(buffer-substring start end)          <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">with properties
+</span>(buffer-substring-no-properties s e)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">plain text
+</span>(thing-at-point 'word)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9f61aaa" class="outline-3">
+<h3 id="org9f61aaa">Q41: What is <code>save-excursion</code>?</h3>
+<div class="outline-text-3" id="text-org9f61aaa">
+<p>
+A macro that saves point (and the current buffer) and restores them after its
+body runs — even on non-local exit. Use it when you move point temporarily.
 </p>
 
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">save-excursion</span>
+  (goto-char (point-min))
+  (insert <span style="font-style: italic;">"header\n"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org899dc1f" class="outline-3">
+<h3 id="org899dc1f">Q42: What is <code>save-restriction</code>?</h3>
+<div class="outline-text-3" id="text-org899dc1f">
+<p>
+Saves and restores the buffer's narrowing state (the visible region set by <code>narrow-to-region</code> / <code>widen</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-orgb93a460" class="outline-3">
+<h3 id="orgb93a460">Q43: How do I switch the buffer Elisp operates on?</h3>
+<div class="outline-text-3" id="text-orgb93a460">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">with-current-buffer</span> <span style="font-style: italic;">"*scratch*"</span>
+  (insert <span style="font-style: italic;">"hi"</span>))
+(set-buffer buf)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">lower-level, no automatic restore</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgea33442" class="outline-3">
+<h3 id="orgea33442">Q44: How do I create a new buffer?</h3>
+<div class="outline-text-3" id="text-orgea33442">
+<div class="org-src-container">
+<pre class="src src-elisp">(get-buffer-create <span style="font-style: italic;">"*my-buffer*"</span>)
+(generate-new-buffer <span style="font-style: italic;">"*my-buffer*"</span>)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">guarantees a fresh, uniquely-named one</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga232249" class="outline-3">
+<h3 id="orga232249">Q45: What is the difference between <code>switch-to-buffer</code> and <code>set-buffer</code>?</h3>
+<div class="outline-text-3" id="text-orga232249">
+<p>
+<code>switch-to-buffer</code> makes a buffer visible in the selected window (interactive,
+display-oriented). <code>set-buffer</code> only changes the current buffer for Elisp; it
+does not change what is displayed and is not preserved after the command.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f7ef4d" class="outline-3">
+<h3 id="org3f7ef4d">Q46: How do I read a file into a string?</h3>
+<div class="outline-text-3" id="text-org3f7ef4d">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">with-temp-buffer</span>
+  (insert-file-contents <span style="font-style: italic;">"/path/to/file"</span>)
+  (buffer-string))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2d65b80" class="outline-3">
+<h3 id="org2d65b80">Q47: How do I write a string to a file?</h3>
+<div class="outline-text-3" id="text-org2d65b80">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">with-temp-file</span> <span style="font-style: italic;">"/path/to/file"</span>
+  (insert <span style="font-style: italic;">"content"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org83b17c9" class="outline-3">
+<h3 id="org83b17c9">Q48: What is <code>with-temp-buffer</code>?</h3>
+<div class="outline-text-3" id="text-org83b17c9">
+<p>
+Creates a temporary buffer, makes it current for the body, and kills it afterward.
+Ideal for text processing that shouldn't touch user buffers.
+</p>
+</div>
+</div>
+<div id="outline-container-org735e3fe" class="outline-3">
+<h3 id="org735e3fe">Q49: How do I bind a key globally?</h3>
+<div class="outline-text-3" id="text-org735e3fe">
+<div class="org-src-container">
+<pre class="src src-elisp">(global-set-key (kbd <span style="font-style: italic;">"C-c g"</span>) #'my-greet)
+(keymap-global-set <span style="font-style: italic;">"C-c g"</span> #'my-greet)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">modern API (Emacs 29+)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org088d627" class="outline-3">
+<h3 id="org088d627">Q50: How do I bind a key in a specific mode?</h3>
+<div class="outline-text-3" id="text-org088d627">
+<div class="org-src-container">
+<pre class="src src-elisp">(define-key emacs-lisp-mode-map (kbd <span style="font-style: italic;">"C-c r"</span>) #'my-run)
+(keymap-set emacs-lisp-mode-map <span style="font-style: italic;">"C-c r"</span> #'my-run)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">Emacs 29+</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd22787c" class="outline-3">
+<h3 id="orgd22787c">Q51: What is <code>kbd</code> and why use it?</h3>
+<div class="outline-text-3" id="text-orgd22787c">
+<p>
+<code>kbd</code> converts a human-readable key description (<code>"C-c C-x"</code>) into the internal
+key sequence representation. It's portable and clearer than raw string/vector forms.
+</p>
+</div>
+</div>
+<div id="outline-container-org09159c8" class="outline-3">
+<h3 id="org09159c8">Q52: How do I prompt the user for input?</h3>
+<div class="outline-text-3" id="text-org09159c8">
+<div class="org-src-container">
+<pre class="src src-elisp">(read-string <span style="font-style: italic;">"Name: "</span>)
+(read-number <span style="font-style: italic;">"Count: "</span>)
+(completing-read <span style="font-style: italic;">"Choose: "</span> '(<span style="font-style: italic;">"a"</span> <span style="font-style: italic;">"b"</span> <span style="font-style: italic;">"c"</span>))
+(yes-or-no-p <span style="font-style: italic;">"Continue? "</span>)
+(y-or-n-p <span style="font-style: italic;">"Continue? "</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org82158e6" class="outline-3">
+<h3 id="org82158e6">Q53: What is the <code>interactive</code> spec code "p" vs "P"?</h3>
+<div class="outline-text-3" id="text-org82158e6">
+<p>
+<code>p</code> passes the numeric prefix argument as a number. <code>P</code> passes the <b>raw</b> prefix
+argument (e.g. <code>nil</code>, <code>(4)</code>, a number). Many codes exist: <code>s</code> string, <code>n</code>
+number, <code>r</code> region, <code>b</code> buffer name, etc.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcff1127" class="outline-3">
+<h3 id="orgcff1127">Q54: How do I get the region's text?</h3>
+<div class="outline-text-3" id="text-orgcff1127">
+<div class="org-src-container">
+<pre class="src src-elisp">(buffer-substring-no-properties (region-beginning) (region-end))
+</pre>
+</div>
+
+<p>
+For commands, declare <code>(interactive "r")</code> to receive start and end.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf5faa55" class="outline-3">
+<h3 id="orgf5faa55">Q55: How do I run code only after Emacs starts up?</h3>
+<div class="outline-text-3" id="text-orgf5faa55">
+<p>
+Use <code>after-init-hook</code> or <code>emacs-startup-hook</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(add-hook 'emacs-startup-hook #'my-startup-fn)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgada3a07" class="outline-2">
+<h2 id="orgada3a07">Intermediate — Functions, Scope, Data</h2>
+<div class="outline-text-2" id="text-orgada3a07">
+</div>
+<div id="outline-container-org7926cc9" class="outline-3">
+<h3 id="org7926cc9">Q56: What is a lambda?</h3>
+<div class="outline-text-3" id="text-org7926cc9">
+<p>
+An anonymous function:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">lambda</span> (x) (* x x))
+(funcall (<span style="font-weight: bold;">lambda</span> (x) (* x x)) 5)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 25</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org01f547e" class="outline-3">
+<h3 id="org01f547e">Q57: What is the <code>#'</code> reader macro?</h3>
+<div class="outline-text-3" id="text-org01f547e">
+<p>
+<code>#'foo</code> is shorthand for <code>(function foo)</code>. It quotes a function, and for
+lambdas it signals to the byte-compiler that the form is a function (enabling compilation of the lambda).
+</p>
+</div>
+</div>
+<div id="outline-container-org2aac248" class="outline-3">
+<h3 id="org2aac248">Q58: What is the difference between <code>funcall</code> and <code>apply</code>?</h3>
+<div class="outline-text-3" id="text-org2aac248">
+<p>
+<code>funcall</code> calls a function with individual arguments. <code>apply</code> calls it with the
+last argument being a list that is spread into the remaining arguments.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(funcall #'+ 1 2 3)        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 6
+</span>(apply #'+ 1 2 '(3 4))     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 10</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org89d8ac2" class="outline-3">
+<h3 id="org89d8ac2">Q59: How do optional and rest arguments work?</h3>
+<div class="outline-text-3" id="text-org89d8ac2">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">f</span> (a <span style="font-weight: bold; text-decoration: underline;">&amp;optional</span> b <span style="font-weight: bold; text-decoration: underline;">&amp;rest</span> c)
+  (list a b c))
+(f 1)        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 nil nil)
+</span>(f 1 2 3 4)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 2 (3 4))</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8c39a25" class="outline-3">
+<h3 id="org8c39a25">Q60: What is dynamic scope vs lexical scope?</h3>
+<div class="outline-text-3" id="text-org8c39a25">
+<p>
+Dynamic scope: a variable's binding is visible to all code called during the
+binding's extent. Lexical scope: a variable is visible only within the textual
+region where it's defined. Modern Elisp files should enable lexical binding.
+</p>
+</div>
+</div>
+<div id="outline-container-orga347ffa" class="outline-3">
+<h3 id="orga347ffa">Q61: How do I enable lexical binding?</h3>
+<div class="outline-text-3" id="text-orga347ffa">
+<p>
+Put this as the first line of the file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">-*- lexical-binding: t; -*-</span>
+</pre>
+</div>
+
+<p>
+It is the default in Emacs 30+ for new files but should be declared explicitly.
+</p>
+</div>
+</div>
+<div id="outline-container-orga88dcbe" class="outline-3">
+<h3 id="orga88dcbe">Q62: Why does lexical binding matter for closures?</h3>
+<div class="outline-text-3" id="text-orga88dcbe">
+<p>
+Only with lexical binding do lambdas capture their surrounding variables to form true closures.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">make-adder</span> (n)
+  (<span style="font-weight: bold;">lambda</span> (x) (+ x n)))   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">n captured lexically
+</span>(funcall (make-adder 3) 10)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 13</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org53650ef" class="outline-3">
+<h3 id="org53650ef">Q63: What still uses dynamic scope?</h3>
+<div class="outline-text-3" id="text-org53650ef">
+<p>
+Variables declared with <code>defvar=/=defconst</code> (special variables) remain dynamically scoped even under lexical binding.
+This is intentional — it's how <code>let</code>-rebinding of configuration variables works.
+</p>
+</div>
+</div>
+<div id="outline-container-org4058294" class="outline-3">
+<h3 id="org4058294">Q64: What is a property list (plist)?</h3>
+<div class="outline-text-3" id="text-org4058294">
+<p>
+A flat list of alternating keys and values:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">setq</span> pl '(<span style="font-weight: bold;">:name</span> <span style="font-style: italic;">"Bob"</span> <span style="font-weight: bold;">:age</span> 42))
+(plist-get pl <span style="font-weight: bold;">:name</span>)             <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; "Bob"
+</span>(plist-put pl <span style="font-weight: bold;">:age</span> 43)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org860066e" class="outline-3">
+<h3 id="org860066e">Q65: What is an association list (alist)?</h3>
+<div class="outline-text-3" id="text-org860066e">
+<p>
+A list of cons cells (key . value):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">setq</span> al '((a . 1) (b . 2)))
+(assq 'a al)        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (a . 1)
+</span>(alist-get 'b al)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 2
+</span>(cdr (assoc <span style="font-style: italic;">"k"</span> al))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga42b881" class="outline-3">
+<h3 id="orga42b881">Q66: When should I use a hash table instead of an alist?</h3>
+<div class="outline-text-3" id="text-orga42b881">
+<p>
+For large collections or frequent lookups — hash tables give O(1) access vs alists' O(n).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">let</span> ((h (make-hash-table <span style="font-weight: bold;">:test</span> 'equal)))
+  (puthash <span style="font-style: italic;">"k"</span> 1 h)
+  (gethash <span style="font-style: italic;">"k"</span> h))     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 1</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org96b5443" class="outline-3">
+<h3 id="org96b5443">Q67: What <code>:test</code> options exist for hash tables?</h3>
+<div class="outline-text-3" id="text-org96b5443">
+<p>
+<code>eq</code>, <code>eql</code>, <code>equal</code> (built-in), and you can define custom ones with <code>define-hash-table-test</code>.
+Use <code>equal</code> for string keys.
+</p>
+</div>
+</div>
+<div id="outline-container-org488d651" class="outline-3">
+<h3 id="org488d651">Q68: How do I iterate a hash table?</h3>
+<div class="outline-text-3" id="text-org488d651">
+<div class="org-src-container">
+<pre class="src src-elisp">(maphash (<span style="font-weight: bold;">lambda</span> (k v) (message <span style="font-style: italic;">"%s=%s"</span> k v)) h)
+</pre>
+</div>
+
+<p>
+Or <code>(hash-table-keys h)</code> / <code>(hash-table-values h)</code> from <code>subr-x=/=map</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orged007ce" class="outline-3">
+<h3 id="orged007ce">Q69: What is <code>mapcar</code> vs <code>mapc</code> vs <code>mapcan</code>?</h3>
+<div class="outline-text-3" id="text-orged007ce">
 <ul class="org-ul">
-<li>true</li>
+<li><code>mapcar</code> — applies fn to each element, returns a new list of results.</li>
+<li><code>mapc</code> — applies fn for side effects, returns the input list.</li>
+<li><code>mapcan</code> — like mapcar but destructively concatenates the (list) results.</li>
 </ul>
+</div>
+</div>
+<div id="outline-container-org5987ed7" class="outline-3">
+<h3 id="org5987ed7">Q70: How do I filter a list?</h3>
+<div class="outline-text-3" id="text-org5987ed7">
+<div class="org-src-container">
+<pre class="src src-elisp">(seq-filter #'cl-evenp '(1 2 3 4))   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (2 4)
+</span>(cl-remove-if-not #'cl-evenp '(1 2 3 4))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org23d22da" class="outline-3">
+<h3 id="org23d22da">Q71: How do I reduce/fold a list?</h3>
+<div class="outline-text-3" id="text-org23d22da">
+<div class="org-src-container">
+<pre class="src src-elisp">(seq-reduce #'+ '(1 2 3 4) 0)        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 10
+</span>(cl-reduce #'+ '(1 2 3 4))           <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 10</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge9595fe" class="outline-3">
+<h3 id="orge9595fe">Q72: What is the <code>seq</code> library?</h3>
+<div class="outline-text-3" id="text-orge9595fe">
+<p>
+A generic sequence-manipulation library (<code>seq.el</code>) that works uniformly across
+lists, vectors, and strings: <code>seq-map</code>, <code>seq-filter</code>, <code>seq-find</code>, <code>seq-reduce</code>,
+<code>seq-do</code>, <code>seq-uniq</code>, etc.
+</p>
+</div>
+</div>
+<div id="outline-container-org23e0d89" class="outline-3">
+<h3 id="org23e0d89">Q73: What is <code>dash.el</code>?</h3>
+<div class="outline-text-3" id="text-org23e0d89">
+<p>
+A popular third-party functional library providing <code>-map</code>, <code>-filter</code>,
+<code>-reduce</code>, threading macros <code>-&gt;</code> / <code>--&gt;</code>, etc. Many prefer built-in <code>seq</code> now,
+but dash remains common in the wild.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbbe5245" class="outline-3">
+<h3 id="orgbbe5245">Q74: How do I sort a list?</h3>
+<div class="outline-text-3" id="text-orgbbe5245">
+<div class="org-src-container">
+<pre class="src src-elisp">(sort '(3 1 2) #'&lt;)            <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 2 3)
+</span>(sort my-list <span style="font-weight: bold;">:key</span> #'car <span style="font-weight: bold;">:lessp</span> #'&lt;) <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">Emacs 30+ keyword form</span>
+</pre>
+</div>
 
 <p>
-Everything except nil is truthy.
+Note: <code>sort</code> may be destructive; copy first if you need the original.
 </p>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org04d41b7" class="outline-3">
-<h3 id="org04d41b7">Q: How do lists work?</h3>
-<div class="outline-text-3" id="text-org04d41b7">
+<div id="outline-container-org6c15faf" class="outline-3">
+<h3 id="org6c15faf">Q75: How do I reverse a list?</h3>
+<div class="outline-text-3" id="text-org6c15faf">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> nums '(1 2 3))
-
-(car nums)
-(cdr nums)
-(cons 0 nums)
-(length nums)
+<pre class="src src-elisp">(reverse '(1 2 3))    <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (3 2 1) non-destructive
+</span>(nreverse my-list)    <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">destructive, faster</span>
 </pre>
 </div>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org34925f6" class="outline-3">
-<h3 id="org34925f6">Q: How do loops work?</h3>
-<div class="outline-text-3" id="text-org34925f6">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">dolist</span> (x '(1 2 3))
-  (print x))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">dotimes</span> (i 5)
-  (print i))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">while</span> condition
- ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-</div>
-<div id="outline-container-org16081b7" class="outline-2">
-<h2 id="org16081b7">Intermediate</h2>
-<div class="outline-text-2" id="text-org16081b7">
-</div>
-<div id="outline-container-org58b6bc1" class="outline-3">
-<h3 id="org58b6bc1">Q: What are buffers?</h3>
-<div class="outline-text-3" id="text-org58b6bc1">
+<div id="outline-container-orga9913f9" class="outline-3">
+<h3 id="orga9913f9">Q76: What is the difference between destructive and non-destructive functions?</h3>
+<div class="outline-text-3" id="text-orga9913f9">
 <p>
-Buffers are text containers.
+Destructive functions (<code>nreverse</code>, <code>nconc</code>, <code>setcar</code>, <code>delete</code>) modify their arguments' structure in place;
+non-destructive ones (<code>reverse</code>, <code>append</code>, <code>remove</code>) return fresh copies.
+Destructive variants are faster but risk aliasing bugs.
 </p>
+</div>
+</div>
+<div id="outline-container-orgf5bada1" class="outline-3">
+<h3 id="orgf5bada1">Q77: How do I copy a list or sequence?</h3>
+<div class="outline-text-3" id="text-orgf5bada1">
+<div class="org-src-container">
+<pre class="src src-elisp">(copy-sequence lst)     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">shallow copy
+</span>(copy-tree lst)         <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">deep copy of the cons structure</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7c857dd" class="outline-3">
+<h3 id="org7c857dd">Q78: What is <code>cl-lib</code>?</h3>
+<div class="outline-text-3" id="text-org7c857dd">
+<p>
+The Common Lisp compatibility library shipped with Emacs.
+It provides <code>cl-loop</code>, <code>cl-defun</code>, <code>cl-destructuring-bind</code>, <code>cl-case</code>,
+generic sequence functions, structures (<code>cl-defstruct</code>), and more.
+Always <code>(require 'cl-lib)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc0a586f" class="outline-3">
+<h3 id="orgc0a586f">Q79: How do I do a <code>case</code> / switch?</h3>
+<div class="outline-text-3" id="text-orgc0a586f">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">cl-case</span> x
+  (1 <span style="font-style: italic;">"one"</span>)
+  ((2 3) <span style="font-style: italic;">"two or three"</span>)
+  (t <span style="font-style: italic;">"other"</span>))
+</pre>
+</div>
 
 <p>
-Examples:
+<code>pcase</code> is the more powerful, idiomatic modern choice.
+</p>
+</div>
+</div>
+<div id="outline-container-org94ba93e" class="outline-3">
+<h3 id="org94ba93e">Q80: What is <code>pcase</code>?</h3>
+<div class="outline-text-3" id="text-org94ba93e">
+<p>
+A pattern-matching <code>case</code>. It destructures and matches by structure, type, predicate, etc.
 </p>
 
+<div class="org-src-container">
+<pre class="src src-elisp">
+(<span style="font-weight: bold;">pcase</span> value
+
+  ((pred stringp) <span style="font-style: italic;">"a string"</span>)
+
+  (`(,a . ,b) (format <span style="font-style: italic;">"cons %s %s"</span> a b))
+
+  ((<span style="font-weight: bold;">or</span> 1 2 3) <span style="font-style: italic;">"small number"</span>)
+
+  (_ <span style="font-style: italic;">"anything else"</span>))
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9e2a408" class="outline-3">
+<h3 id="org9e2a408">Q81: How do I destructure a list?</h3>
+<div class="outline-text-3" id="text-org9e2a408">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">cl-destructuring-bind</span> (a b <span style="font-weight: bold; text-decoration: underline;">&amp;optional</span> c) '(1 2)
+  (list a b c))            <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 2 nil)
+</span>(<span style="font-weight: bold;">pcase-let</span> ((`(,x ,y) '(1 2))) (+ x y))  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; 3
+</span>(<span style="font-weight: bold;">seq-let</span> (a b) '(1 2 3) (list a b))      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 2)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbb74f2f" class="outline-2">
+<h2 id="orgbb74f2f">Intermediate — Macros, Errors, Control Flow</h2>
+<div class="outline-text-2" id="text-orgbb74f2f">
+</div>
+<div id="outline-container-orgb40f0ef" class="outline-3">
+<h3 id="orgb40f0ef">Q82: What is a macro?</h3>
+<div class="outline-text-3" id="text-orgb40f0ef">
+<p>
+A function that runs at <b>expansion time</b>, receiving unevaluated code and returning new code to be evaluated.
+Macros let you extend the language syntax and control evaluation.
+</p>
+</div>
+</div>
+<div id="outline-container-org77ec2cd" class="outline-3">
+<h3 id="org77ec2cd">Q83: How do I define a macro?</h3>
+<div class="outline-text-3" id="text-org77ec2cd">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defmacro</span> <span style="font-weight: bold;">my-unless</span> (cond <span style="font-weight: bold; text-decoration: underline;">&amp;rest</span> body)
+  `(<span style="font-weight: bold;">if</span> ,cond nil (<span style="font-weight: bold;">progn</span> ,@body)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org31c4a33" class="outline-3">
+<h3 id="org31c4a33">Q84: What is the backquote (<code>`</code>), comma (<code>,</code>), and <code>,@</code>?</h3>
+<div class="outline-text-3" id="text-org31c4a33">
 <ul class="org-ul">
-<li>files</li>
-<li>temporary buffers</li>
-<li>internal buffers</li>
+<li>Backquote starts a template where most things are literal.</li>
+<li><code>,</code> unquotes — evaluates and inserts the value.</li>
+<li><code>,@</code> splices a list's elements into the surrounding list.</li>
 </ul>
-
+</div>
+</div>
+<div id="outline-container-org0e36ca5" class="outline-3">
+<h3 id="org0e36ca5">Q85: How do I see what a macro expands to?</h3>
+<div class="outline-text-3" id="text-org0e36ca5">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(current-buffer)
-(buffer-name)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org1e9a4a6" class="outline-3">
-<h3 id="org1e9a4a6">Q: How does with-current-buffer work?</h3>
-<div class="outline-text-3" id="text-org1e9a4a6">
-<p>
-Execute code inside another buffer.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-current-buffer</span> <span style="font-style: italic;">"*scratch*"</span>
-  (insert <span style="font-style: italic;">"Hello"</span>))
+<pre class="src src-elisp">(macroexpand '(my-unless t (foo)))
+(macroexpand-1 ...)     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">one level
+</span>(macroexpand-all ...)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">fully</span>
 </pre>
 </div>
 
 <p>
-Useful for:
+<code>M-x emacs-lisp-macroexpand</code> or <code>pp-macroexpand-last-sexp</code> for interactive use.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcec568d" class="outline-3">
+<h3 id="orgcec568d">Q86: What is variable capture / hygiene in macros?</h3>
+<div class="outline-text-3" id="text-orgcec568d">
+<p>
+When a macro introduces a binding whose name collides with user code, causing bugs.
+Avoid it by generating unique symbols with <code>gensym=/=cl-gensym</code> or <code>make-symbol</code>.
 </p>
 
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defmacro</span> <span style="font-weight: bold;">my-swap</span> (a b)
+  (<span style="font-weight: bold;">let</span> ((tmp (gensym)))
+    `(<span style="font-weight: bold;">let</span> ((,tmp ,a)) (<span style="font-weight: bold;">setf</span> ,a ,b) (<span style="font-weight: bold;">setf</span> ,b ,tmp))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge4afede" class="outline-3">
+<h3 id="orge4afede">Q87: When should I use a macro vs a function?</h3>
+<div class="outline-text-3" id="text-orge4afede">
+<p>
+Use a function by default. Use a macro only when you must control evaluation
+(delay/repeat/skip arguments), introduce binding forms, or generate code at
+compile time. Macros don't compose like functions (can't <code>funcall</code> them).
+</p>
+</div>
+</div>
+<div id="outline-container-org7780d98" class="outline-3">
+<h3 id="org7780d98">Q88: How do I signal an error?</h3>
+<div class="outline-text-3" id="text-org7780d98">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">error</span> <span style="font-style: italic;">"Bad value: %s"</span> x)
+(<span style="font-weight: bold;">user-error</span> <span style="font-style: italic;">"Please select a region"</span>)  <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">for user mistakes, no debugger
+</span>(<span style="font-weight: bold;">signal</span> 'wrong-type-argument (list 'stringp x))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb41bd77" class="outline-3">
+<h3 id="orgb41bd77">Q89: How do I catch errors?</h3>
+<div class="outline-text-3" id="text-orgb41bd77">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">condition-case</span> err
+    (risky-operation)
+  (file-missing (message <span style="font-style: italic;">"No file: %s"</span> err))
+  (<span style="font-weight: bold;">error</span> (message <span style="font-style: italic;">"Failed: %s"</span> (error-message-string err))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org12ac291" class="outline-3">
+<h3 id="org12ac291">Q90: What is <code>unwind-protect</code>?</h3>
+<div class="outline-text-3" id="text-org12ac291">
+<p>
+Guarantees cleanup forms run whether or not the protected body exits normally or via error/non-local exit — like <code>try/finally</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">unwind-protect</span>
+    (do-something)
+  (cleanup))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org66421ac" class="outline-3">
+<h3 id="org66421ac">Q91: What is <code>ignore-errors</code> and <code>with-demoted-errors</code>?</h3>
+<div class="outline-text-3" id="text-org66421ac">
+<p>
+<code>ignore-errors</code> evaluates body and returns nil on any error.
+<code>with-demoted-errors</code> turns errors into messages (useful in hooks/init so one failure doesn't abort everything).
+</p>
+</div>
+</div>
+<div id="outline-container-org40ccc89" class="outline-3">
+<h3 id="org40ccc89">Q92: What are <code>catch</code> and <code>throw</code>?</h3>
+<div class="outline-text-3" id="text-org40ccc89">
+<p>
+A non-local exit mechanism by tag:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">catch</span> '<span style="font-weight: bold; text-decoration: underline;">found</span>
+  (<span style="font-weight: bold;">dolist</span> (x list)
+    (<span style="font-weight: bold;">when</span> (match-p x) (<span style="font-weight: bold;">throw</span> '<span style="font-weight: bold; text-decoration: underline;">found</span> x))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbfd2446" class="outline-3">
+<h3 id="orgbfd2446">Q93: What is <code>cl-block</code> / <code>cl-return</code>?</h3>
+<div class="outline-text-3" id="text-orgbfd2446">
+<p>
+A lexical exit construct from <code>cl-lib</code>. <code>cl-return-from</code> exits a named block;
+<code>cl-defun</code> establishes an implicit block named after the function.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcec4b2a" class="outline-3">
+<h3 id="orgcec4b2a">Q94: How do I define a custom error type?</h3>
+<div class="outline-text-3" id="text-orgcec4b2a">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">define-error</span> '<span style="font-weight: bold; font-style: italic;">my-error</span> <span style="font-style: italic;">"My custom error"</span> 'error)
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">then: (signal 'my-error (list "details"))</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf576852" class="outline-3">
+<h3 id="orgf576852">Q95: What is <code>cl-loop</code>?</h3>
+<div class="outline-text-3" id="text-orgf576852">
+<p>
+A very powerful iteration macro from cl-lib:
+</p>
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">cl-loop</span> for i from 1 to 5
+         when (cl-oddp i)
+         collect (* i i))     <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (1 9 25)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org9b28a8e" class="outline-2">
+<h2 id="org9b28a8e">Intermediate/Advanced — Buffers, Text, Regexp</h2>
+<div class="outline-text-2" id="text-org9b28a8e">
+</div>
+<div id="outline-container-org648cb7f" class="outline-3">
+<h3 id="org648cb7f">Q96: How do I search forward for a regexp?</h3>
+<div class="outline-text-3" id="text-org648cb7f">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">when</span> (re-search-forward <span style="font-style: italic;">"foo</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">(</span><span style="font-style: italic;">bar</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">)</span><span style="font-style: italic;">?"</span> nil t)
+  (match-string 0))
+</pre>
+</div>
+
+<p>
+The third arg <code>t</code> means "return nil instead of erroring on failure."
+</p>
+</div>
+</div>
+<div id="outline-container-org8d0b659" class="outline-3">
+<h3 id="org8d0b659">Q97: Why are backslashes doubled in Elisp regexps?</h3>
+<div class="outline-text-3" id="text-org8d0b659">
+<p>
+Because the regexp is written as a string, and string syntax also uses
+backslash escapes. So a regexp group <code>\(...\)</code> must be written <code>\\(...\\)</code> in the string literal. <code>rx</code> avoids this.
+</p>
+</div>
+</div>
+<div id="outline-container-org795355d" class="outline-3">
+<h3 id="org795355d">Q98: What is <code>rx</code>?</h3>
+<div class="outline-text-3" id="text-org795355d">
+<p>
+A macro that builds regexps from readable s-expressions, eliminating backslash soup:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">rx</span> bol (group (+ digit)) <span style="font-style: italic;">"-"</span> (group (+ alpha)) eol)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf862a37" class="outline-3">
+<h3 id="orgf862a37">Q99: How do I get the matched text after a search?</h3>
+<div class="outline-text-3" id="text-orgf862a37">
+<div class="org-src-container">
+<pre class="src src-elisp">(match-string 0)               <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">whole match (from buffer)
+</span>(match-string 1)               <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">first group
+</span>(match-string-no-properties 1)
+(match-beginning 1) (match-end 1)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge80e232" class="outline-3">
+<h3 id="orge80e232">Q100: How do I replace text matching a regexp programmatically?</h3>
+<div class="outline-text-3" id="text-orge80e232">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">while</span> (re-search-forward <span style="font-style: italic;">"foo"</span> nil t)
+  (replace-match <span style="font-style: italic;">"bar"</span>))
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">or on strings:
+</span>(replace-regexp-in-string <span style="font-style: italic;">"foo"</span> <span style="font-style: italic;">"bar"</span> <span style="font-style: italic;">"foofoo"</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf8d0d4a" class="outline-3">
+<h3 id="orgf8d0d4a">Q101: What is the difference between <code>looking-at</code> and <code>re-search-forward</code>?</h3>
+<div class="outline-text-3" id="text-orgf8d0d4a">
+<p>
+<code>looking-at</code> tests whether text <b>starting at point</b> matches a regexp without
+moving point. <code>re-search-forward</code> scans forward and moves point past the match.
+</p>
+</div>
+</div>
+<div id="outline-container-org47874e9" class="outline-3">
+<h3 id="org47874e9">Q102: How do I narrow the buffer?</h3>
+<div class="outline-text-3" id="text-org47874e9">
+<div class="org-src-container">
+<pre class="src src-elisp">(narrow-to-region start end)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">restrict visible/operable text
+</span>(widen)                        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">restore</span>
+</pre>
+</div>
+<p>
+Wrap in <code>save-restriction</code> when narrowing temporarily.
+</p>
+</div>
+</div>
+<div id="outline-container-org92ebf4d" class="outline-3">
+<h3 id="org92ebf4d">Q103: What are markers?</h3>
+<div class="outline-text-3" id="text-org92ebf4d">
+<p>
+Objects that point to a position in a buffer and <b>move automatically</b> as text
+is inserted/deleted, unlike plain integer positions. Use them when you need a
+position to stay valid across edits.
+</p>
+</div>
+</div>
+<div id="outline-container-orge3a78fc" class="outline-3">
+<h3 id="orge3a78fc">Q104: What are text properties?</h3>
+<div class="outline-text-3" id="text-orge3a78fc">
+<p>
+Attributes attached to characters in a buffer/string (e.g. <code>face</code>, <code>read-only</code>, custom keys). They travel with the text.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(put-text-property start end 'face 'bold)
+(propertize <span style="font-style: italic;">"hi"</span> 'face 'warning)
+(get-text-property pos 'face)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3f30d2d" class="outline-3">
+<h3 id="org3f30d2d">Q105: What is the difference between text properties and overlays?</h3>
+<div class="outline-text-3" id="text-org3f30d2d">
+<p>
+Text properties are part of the buffer text (copied/saved with it). Overlays
+are separate objects layered over a region, independent of the text, ideal for
+transient highlighting (e.g. search, flycheck). Overlays can be slower in large
+numbers.
+</p>
+</div>
+</div>
+<div id="outline-container-org6ac61da" class="outline-3">
+<h3 id="org6ac61da">Q106: How do I create an overlay?</h3>
+<div class="outline-text-3" id="text-org6ac61da">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">let</span> ((ov (make-overlay start end)))
+  (overlay-put ov 'face 'highlight))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8021243" class="outline-3">
+<h3 id="org8021243">Q107: How do I delete a region of text?</h3>
+<div class="outline-text-3" id="text-org8021243">
+<div class="org-src-container">
+<pre class="src src-elisp">(delete-region start end)
+(delete-char 1)        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">at point
+</span>(kill-region s e)      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">deletes and saves to kill ring</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf6e37eb" class="outline-3">
+<h3 id="orgf6e37eb">Q108: How do I process a buffer line by line?</h3>
+<div class="outline-text-3" id="text-orgf6e37eb">
+<div class="org-src-container">
+<pre class="src src-elisp">(goto-char (point-min))
+(<span style="font-weight: bold;">while</span> (not (eobp))
+  (<span style="font-weight: bold;">let</span> ((line (buffer-substring-no-properties
+               (line-beginning-position) (line-end-position))))
+    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">process line
+</span>    (forward-line 1)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb44aa6d" class="outline-3">
+<h3 id="orgb44aa6d">Q109: What do <code>bobp</code> and <code>eobp</code> mean?</h3>
+<div class="outline-text-3" id="text-orgb44aa6d">
+<p>
+<code>bobp</code> → point is at beginning of buffer; <code>eobp</code> → point is at end of buffer.
+Also <code>bolp</code> / <code>eolp</code> for line beginning/end.
+</p>
+</div>
+</div>
+<div id="outline-container-org67d61d2" class="outline-3">
+<h3 id="org67d61d2">Q110: How do I make a buffer read-only temporarily during code?</h3>
+<div class="outline-text-3" id="text-org67d61d2">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">let</span> ((inhibit-read-only t))
+  (insert <span style="font-style: italic;">"text"</span>))      <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">bypass read-only for the body</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb411e96" class="outline-2">
+<h2 id="orgb411e96">Advanced — Modes, Hooks, Customization</h2>
+<div class="outline-text-2" id="text-orgb411e96">
+</div>
+<div id="outline-container-org9c2a31f" class="outline-3">
+<h3 id="org9c2a31f">Q111: What is a major mode?</h3>
+<div class="outline-text-3" id="text-org9c2a31f">
+<p>
+A mode that defines the primary behavior of a buffer (syntax, keymap,
+font-locking, indentation). Each buffer has exactly one major mode. Defined
+with <code>define-derived-mode</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org776a1b2" class="outline-3">
+<h3 id="org776a1b2">Q112: What is a minor mode?</h3>
+<div class="outline-text-3" id="text-org776a1b2">
+<p>
+A toggleable feature that augments behavior independently of the major mode
+(e.g. <code>flyspell-mode</code>). Many minor modes can be active at once. Defined with
+<code>define-minor-mode</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec892ad" class="outline-3">
+<h3 id="orgec892ad">Q113: How do I define a minor mode?</h3>
+<div class="outline-text-3" id="text-orgec892ad">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">define-minor-mode</span> <span style="font-weight: bold;">my-mode</span>
+  <span style="font-style: italic;">"Toggle My mode."</span>
+  <span style="font-weight: bold;">:init-value</span> nil
+  <span style="font-weight: bold;">:lighter</span> <span style="font-style: italic;">" My"</span>
+  <span style="font-weight: bold;">:keymap</span> (make-sparse-keymap)
+  (<span style="font-weight: bold;">if</span> my-mode
+      (message <span style="font-style: italic;">"enabled"</span>)
+    (message <span style="font-style: italic;">"disabled"</span>)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2cdcdae" class="outline-3">
+<h3 id="org2cdcdae">Q114: How do I define a derived major mode?</h3>
+<div class="outline-text-3" id="text-org2cdcdae">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">define-derived-mode</span> <span style="font-weight: bold;">my-mode</span> prog-mode <span style="font-style: italic;">"MyLang"</span>
+  <span style="font-style: italic;">"Major mode for MyLang."</span>
+  (<span style="font-weight: bold;">setq-local</span> comment-start <span style="font-style: italic;">"# "</span>)
+  (<span style="font-weight: bold;">setq-local</span> font-lock-defaults '(my-keywords)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org06a2e2e" class="outline-3">
+<h3 id="org06a2e2e">Q115: What is a hook?</h3>
+<div class="outline-text-3" id="text-org06a2e2e">
+<p>
+A variable holding a list of functions run at a defined point (e.g.
+<code>prog-mode-hook</code>, <code>before-save-hook</code>). Add functions with <code>add-hook</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org67fd899" class="outline-3">
+<h3 id="org67fd899">Q116: How do I add a function to a hook?</h3>
+<div class="outline-text-3" id="text-org67fd899">
+<div class="org-src-container">
+<pre class="src src-elisp">(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'my-fn 90)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">depth/append control
+</span>(remove-hook 'prog-mode-hook #'my-fn)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org612133e" class="outline-3">
+<h3 id="org612133e">Q117: Why use <code>#'</code> when adding to a hook?</h3>
+<div class="outline-text-3" id="text-org612133e">
+<p>
+It makes the intent (a function reference) explicit and lets the byte-compiler
+warn if the function is undefined. Plain symbols work too, but lambdas in hooks
+are hard to remove and should generally be avoided.
+</p>
+</div>
+</div>
+<div id="outline-container-org3bcb607" class="outline-3">
+<h3 id="org3bcb607">Q118: What is <code>setq-local</code> vs <code>setq-default</code>?</h3>
+<div class="outline-text-3" id="text-org3bcb607">
+<p>
+<code>setq-local</code> sets a buffer-local value. <code>setq-default</code> sets the default value
+that buffers without a local binding see. <code>make-local-variable</code> /
+<code>make-variable-buffer-local</code> control buffer-locality.
+</p>
+</div>
+</div>
+<div id="outline-container-org4227d69" class="outline-3">
+<h3 id="org4227d69">Q119: What is a buffer-local variable?</h3>
+<div class="outline-text-3" id="text-org4227d69">
+<p>
+A variable whose value can differ per buffer. Mode code commonly uses
+<code>setq-local</code> to configure per-buffer behavior without affecting other buffers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb780fd" class="outline-3">
+<h3 id="orgbb780fd">Q120: What is <code>defcustom</code>?</h3>
+<div class="outline-text-3" id="text-orgbb780fd">
+<p>
+Declares a user-customizable variable integrated with the Customize UI,
+including a type, group, and docstring.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defcustom</span> <span style="font-weight: bold; font-style: italic;">my-width</span> 80
+  <span style="font-style: italic;">"Preferred width."</span>
+  <span style="font-weight: bold;">:type</span> 'integer
+  <span style="font-weight: bold;">:group</span> 'my-group)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga5dd06e" class="outline-3">
+<h3 id="orga5dd06e">Q121: What is <code>defgroup</code> and <code>defface</code>?</h3>
+<div class="outline-text-3" id="text-orga5dd06e">
+<p>
+<code>defgroup</code> declares a customization group to organize options. <code>defface</code>
+declares a customizable face (font/color set) used for text display.
+</p>
+</div>
+</div>
+<div id="outline-container-org3806120" class="outline-3">
+<h3 id="org3806120">Q122: How do I make a variable safe as a file-local variable?</h3>
+<div class="outline-text-3" id="text-org3806120">
+<p>
+Set its <code>safe-local-variable</code> property with a predicate, or use the
+<code>:safe</code> keyword in <code>defcustom</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">defcustom</span> <span style="font-weight: bold; font-style: italic;">my-opt</span> 1 <span style="font-style: italic;">"..."</span> <span style="font-weight: bold;">:type</span> 'integer <span style="font-weight: bold;">:safe</span> #'integerp)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6e78783" class="outline-3">
+<h3 id="org6e78783">Q123: What is <code>add-to-list</code> and how does it differ from <code>push</code>?</h3>
+<div class="outline-text-3" id="text-org6e78783">
+<p>
+<code>add-to-list</code> adds an element only if not already present (using <code>equal</code> by
+default) and evaluates its arguments; it's meant for list-valued variables.
+<code>push</code> always prepends and is a generalized-variable macro. For <code>defcustom</code>
+lists, prefer setting via Customize or <code>add-to-list</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org64fb19c" class="outline-3">
+<h3 id="org64fb19c">Q124: What is <code>use-package</code>?</h3>
+<div class="outline-text-3" id="text-org64fb19c">
+<p>
+A macro (built into Emacs 29+) for declarative, organized package configuration
+— deferring loading, binding keys, setting variables, and adding hooks in one tidy form.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">use-package</span> magit
+  <span style="font-weight: bold;">:bind</span> (<span style="font-style: italic;">"C-x g"</span> . magit-status)
+  <span style="font-weight: bold;">:config</span> (<span style="font-weight: bold;">setq</span> magit-diff-refine-hunk t))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb38bab6" class="outline-3">
+<h3 id="orgb38bab6">Q125: How does autoloading work?</h3>
+<div class="outline-text-3" id="text-orgb38bab6">
+<p>
+An autoload registers a function name so that calling it loads the defining
+file on demand. Created via the <code>;;;###autoload</code> magic comment and generated
+autoload files, or <code>autoload</code> directly. It speeds startup by deferring loads.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3b3afd8" class="outline-2">
+<h2 id="org3b3afd8">Advanced — Performance, Compilation, Async</h2>
+<div class="outline-text-2" id="text-org3b3afd8">
+</div>
+<div id="outline-container-orgb7abb9b" class="outline-3">
+<h3 id="orgb7abb9b">Q126: What is byte-compilation?</h3>
+<div class="outline-text-3" id="text-orgb7abb9b">
+<p>
+Compiling <code>.el</code> to <code>.elc</code> bytecode for faster loading/execution and earlier
+warnings. <code>byte-compile-file</code>, <code>M-x byte-recompile-directory</code>. Warnings catch
+undefined functions, unused vars, etc.
+</p>
+</div>
+</div>
+<div id="outline-container-org3760e3d" class="outline-3">
+<h3 id="org3760e3d">Q127: What is native compilation?</h3>
+<div class="outline-text-3" id="text-org3760e3d">
+<p>
+Emacs 28+ can compile Elisp to native machine code via libgccjit
+(<code>native-comp</code>), giving significant speedups. <code>.eln</code> files are produced and
+cached. Triggered automatically (<code>native-comp-jit-compilation</code>) or via
+<code>native-compile</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org511b9b7" class="outline-3">
+<h3 id="org511b9b7">Q128: How do I benchmark Elisp code?</h3>
+<div class="outline-text-3" id="text-org511b9b7">
+<div class="org-src-container">
+<pre class="src src-elisp">(<span style="font-weight: bold;">benchmark-run</span> 1000 (my-function))   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">=&gt; (total-time gc-count gc-time)
+</span>(benchmark-elapse (my-function))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3890d70" class="outline-3">
+<h3 id="org3890d70">Q129: How do I profile Elisp?</h3>
+<div class="outline-text-3" id="text-org3890d70">
+<p>
+Use the built-in profiler:
+</p>
+<div class="org-src-container">
+<pre class="src src-elisp">(profiler-start 'cpu)
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">... do work ...
+</span>(profiler-report)
+(profiler-stop)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org46a7220" class="outline-3">
+<h3 id="org46a7220">Q130: Why can lists be slow, and what's the alternative?</h3>
+<div class="outline-text-3" id="text-org46a7220">
+<p>
+<code>nth=/=length</code> on long lists are O(n). For random access use vectors; for
+keyed lookup use hash tables. Building a list with repeated <code>append</code> is O(n<sup>2</sup>);
+prefer <code>push</code> + <code>nreverse</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org3b5bf5b" class="outline-3">
+<h3 id="org3b5bf5b">Q131: What is the purpose of <code>nreverse</code> after <code>push</code> in loops?</h3>
+<div class="outline-text-3" id="text-org3b5bf5b">
+<p>
+<code>push</code> prepends (O(1)), building the list in reverse. <code>nreverse</code> flips it to
+the intended order at the end — an idiomatic, efficient way to accumulate a
+list.
+</p>
+</div>
+</div>
+<div id="outline-container-org9628304" class="outline-3">
+<h3 id="org9628304">Q132: How do I avoid garbage and speed up tight loops?</h3>
+<div class="outline-text-3" id="text-org9628304">
+<p>
+Use lexical binding, prefer built-in primitives, avoid consing in loops,
+preallocate vectors, use <code>cl-loop</code> with <code>collect</code>, and byte/native compile.
+Raise <code>gc-cons-threshold</code> temporarily for bulk work.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e51e5c" class="outline-3">
+<h3 id="org3e51e5c">Q133: Is Elisp single-threaded?</h3>
+<div class="outline-text-3" id="text-org3e51e5c">
+<p>
+Effectively yes for Lisp execution. Emacs 26+ has cooperative threads
+(<code>make-thread</code>) but they don't run truly in parallel — they yield at blocking
+points. Long computations still block the UI.
+</p>
+</div>
+</div>
+<div id="outline-container-org585e752" class="outline-3">
+<h3 id="org585e752">Q134: How do I run things asynchronously without blocking Emacs?</h3>
+<div class="outline-text-3" id="text-org585e752">
 <ul class="org-ul">
-<li>temporary buffers</li>
-<li>package development</li>
-<li>asynchronous processes</li>
+<li><code>run-with-timer</code> / <code>run-with-idle-timer</code> for deferred work.</li>
+<li>Process-based async via <code>make-process</code> / <code>start-process</code> with filters and
+sentinels.</li>
+<li><code>url-retrieve</code> for async HTTP; libraries like <code>async.el</code> for subprocess Lisp.</li>
 </ul>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org664706a" class="outline-3">
-<h3 id="org664706a">Q: What is save-excursion?</h3>
-<div class="outline-text-3" id="text-org664706a">
+<div id="outline-container-orgae78fdc" class="outline-3">
+<h3 id="orgae78fdc">Q135: What is a process filter and sentinel?</h3>
+<div class="outline-text-3" id="text-orgae78fdc">
 <p>
-Preserves point and cursor location.
+A <b>filter</b> function receives output chunks from an asynchronous process. A
+<b>sentinel</b> is called when the process changes state (e.g. exits). Together they
+let you handle subprocess I/O without blocking.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">save-excursion</span>
-  (goto-char (point-min)))
+<pre class="src src-elisp">(make-process <span style="font-weight: bold;">:name</span> <span style="font-style: italic;">"ls"</span> <span style="font-weight: bold;">:command</span> '(<span style="font-style: italic;">"ls"</span>)
+              <span style="font-weight: bold;">:filter</span> (<span style="font-weight: bold;">lambda</span> (proc out) (message <span style="font-style: italic;">"%s"</span> out))
+              <span style="font-weight: bold;">:sentinel</span> (<span style="font-weight: bold;">lambda</span> (proc ev) (message <span style="font-style: italic;">"done: %s"</span> ev)))
 </pre>
 </div>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org0c3eefd" class="outline-3">
-<h3 id="org0c3eefd">Q: What are point, mark, and region?</h3>
-<div class="outline-text-3" id="text-org0c3eefd">
-<ul class="org-ul">
-<li>point → cursor position</li>
-<li>mark → secondary position</li>
-<li>region → selected text</li>
-</ul>
-
+<div id="outline-container-org7796f0a" class="outline-3">
+<h3 id="org7796f0a">Q136: How do I run a shell command and get its output?</h3>
+<div class="outline-text-3" id="text-org7796f0a">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(point)
-(mark)
-(region-beginning)
-(region-end)
+<pre class="src src-elisp">(shell-command-to-string <span style="font-style: italic;">"echo hi"</span>)
+(call-process <span style="font-style: italic;">"ls"</span> nil t nil <span style="font-style: italic;">"-l"</span>)   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">synchronous, into current buffer</span>
 </pre>
 </div>
-
-<hr>
 </div>
 </div>
-<div id="outline-container-org33f54a2" class="outline-3">
-<h3 id="org33f54a2">Q: How do keymaps work?</h3>
-<div class="outline-text-3" id="text-org33f54a2">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(global-set-key
- (kbd <span style="font-style: italic;">"C-c h"</span>)
- #'hello)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org2a4502a" class="outline-3">
-<h3 id="org2a4502a">Q: What are hooks?</h3>
-<div class="outline-text-3" id="text-org2a4502a">
+<div id="outline-container-org027b49b" class="outline-3">
+<h3 id="org027b49b">Q137: What is a timer?</h3>
+<div class="outline-text-3" id="text-org027b49b">
 <p>
-Hooks execute functions when events occur.
+A scheduled callback. <code>run-with-timer</code> fires after a delay (optionally
+repeating); <code>run-with-idle-timer</code> fires when Emacs has been idle for a period.
+Cancel with <code>cancel-timer</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c8e0dd" class="outline-3">
+<h3 id="org0c8e0dd">Q138: What is debouncing and how do I implement it in Elisp?</h3>
+<div class="outline-text-3" id="text-org0c8e0dd">
+<p>
+Delaying an action until input settles. Implement by canceling a pending timer
+and rescheduling on each event:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">(add-hook
- 'prog-mode-hook
- #'display-line-numbers-mode)
+<pre class="src src-elisp">(<span style="font-weight: bold;">defvar</span> <span style="font-weight: bold; font-style: italic;">my--timer</span> nil)
+(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my-debounced</span> ()
+  (<span style="font-weight: bold;">when</span> my--timer (cancel-timer my--timer))
+  (<span style="font-weight: bold;">setq</span> my--timer (run-with-idle-timer 0.5 nil #'my-do-work)))
 </pre>
 </div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgc0b806c" class="outline-3">
-<h3 id="orgc0b806c">Q: What is defcustom?</h3>
-<div class="outline-text-3" id="text-orgc0b806c">
-<p>
-User configurable variables.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defcustom</span> <span style="font-weight: bold; font-style: italic;">my-option</span> t
-  <span style="font-style: italic;">"Option."</span>
-  <span style="font-weight: bold;">:type</span> 'boolean)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgdfc7a30" class="outline-3">
-<h3 id="orgdfc7a30">Q: What is buffer-local state?</h3>
-<div class="outline-text-3" id="text-orgdfc7a30">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq-local</span> fill-column 100)
-</pre>
-</div>
-
-<p>
-Each buffer can hold different values.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgf62609c" class="outline-3">
-<h3 id="orgf62609c">Q: How does error handling work?</h3>
-<div class="outline-text-3" id="text-orgf62609c">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">condition-case</span> err
-    (/ 1 0)
-  (arith-error
-   (message <span style="font-style: italic;">"error"</span>)))
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orga0f40b5" class="outline-3">
-<h3 id="orga0f40b5">Q: How do files work?</h3>
-<div class="outline-text-3" id="text-orga0f40b5">
-<p>
-Read:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(insert-file-contents <span style="font-style: italic;">"file.txt"</span>)
-</pre>
-</div>
-
-<p>
-Write:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-temp-file</span> <span style="font-style: italic;">"out.txt"</span>
-  (insert <span style="font-style: italic;">"hello"</span>))
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org320559f" class="outline-3">
-<h3 id="org320559f">Q: What are alists, plists, and hash tables?</h3>
-<div class="outline-text-3" id="text-org320559f">
-<p>
-Alist:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">((name . <span style="font-style: italic;">"Bob"</span>))
-</pre>
-</div>
-
-<p>
-Plist:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">:name</span> <span style="font-style: italic;">"Bob"</span>)
-</pre>
-</div>
-
-<p>
-Hash table:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(make-hash-table)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-</div>
-<div id="outline-container-org997eab3" class="outline-2">
-<h2 id="org997eab3">Advanced</h2>
-<div class="outline-text-2" id="text-org997eab3">
-</div>
-<div id="outline-container-org42cb4a6" class="outline-3">
-<h3 id="org42cb4a6">Q: What are lambda functions?</h3>
-<div class="outline-text-3" id="text-org42cb4a6">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">lambda</span> (x)
-  (* x x))
-</pre>
-</div>
-
-<p>
-Anonymous functions.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org49d9e0c" class="outline-3">
-<h3 id="org49d9e0c">Q: What are closures?</h3>
-<div class="outline-text-3" id="text-org49d9e0c">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">let</span> ((x 10))
-  (<span style="font-weight: bold;">lambda</span> ()
-    x))
-</pre>
-</div>
-
-<p>
-Closures capture variables.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orge29f74a" class="outline-3">
-<h3 id="orge29f74a">Q: What is lexical binding?</h3>
-<div class="outline-text-3" id="text-orge29f74a">
-<p>
-Enable modern lexical scope.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">-*- lexical-binding: t; -*-</span>
-</pre>
-</div>
-
-<p>
-Required for closures.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org56f341f" class="outline-3">
-<h3 id="org56f341f">Q: What are macros?</h3>
-<div class="outline-text-3" id="text-org56f341f">
-<p>
-Macros generate code.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">defmacro</span> <span style="font-weight: bold;">my-when</span> (cond <span style="font-weight: bold; text-decoration: underline;">&amp;rest</span> body)
-  `(<span style="font-weight: bold;">if</span> ,cond
-       (<span style="font-weight: bold;">progn</span> ,@body)))
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orga3a0d39" class="outline-3">
-<h3 id="orga3a0d39">Q: How do macros differ from functions?</h3>
-<div class="outline-text-3" id="text-orga3a0d39">
-<p>
-Functions evaluate arguments.
-</p>
-
-<p>
-Macros receive raw code.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(macroexpand-1 ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org4468d1f" class="outline-3">
-<h3 id="org4468d1f">Q: What is backquote syntax?</h3>
-<div class="outline-text-3" id="text-org4468d1f">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">`(...)
-,x
-,@list
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org9d16b64" class="outline-3">
-<h3 id="org9d16b64">Q: How do major modes work?</h3>
-<div class="outline-text-3" id="text-org9d16b64">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">define-derived-mode</span>
- my-mode
- text-mode
- <span style="font-style: italic;">"MyMode"</span>)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org487fbeb" class="outline-3">
-<h3 id="org487fbeb">Q: How do minor modes work?</h3>
-<div class="outline-text-3" id="text-org487fbeb">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">define-minor-mode</span>
- my-mode
- <span style="font-style: italic;">"Toggle mode"</span>)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org585cd24" class="outline-3">
-<h3 id="org585cd24">Q: What are syntax tables?</h3>
-<div class="outline-text-3" id="text-org585cd24">
-<p>
-Syntax tables define parsing behavior.
-</p>
-
-<p>
-They control:
-</p>
-
-<ul class="org-ul">
-<li>comments</li>
-<li>strings</li>
-<li>symbols</li>
-<li>words</li>
-</ul>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-syntax-table</span> ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgc88f30c" class="outline-3">
-<h3 id="orgc88f30c">Q: How do regular expressions work?</h3>
-<div class="outline-text-3" id="text-orgc88f30c">
-<p>
-Search:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(re-search-forward <span style="font-style: italic;">"[0-9]+"</span>)
-</pre>
-</div>
-
-<p>
-Replace:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(replace-match <span style="font-style: italic;">"number"</span>)
-</pre>
-</div>
-
-<p>
-Used heavily in text manipulation.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org1f18afa" class="outline-3">
-<h3 id="org1f18afa">Q: What are windows and frames?</h3>
-<div class="outline-text-3" id="text-org1f18afa">
-<p>
-Frame:
-</p>
-
-<p>
-Entire Emacs window.
-</p>
-
-<p>
-Window:
-</p>
-
-<p>
-Buffer pane.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(selected-frame)
-(selected-window)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org88f8a72" class="outline-3">
-<h3 id="org88f8a72">Q: What are markers?</h3>
-<div class="outline-text-3" id="text-org88f8a72">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(copy-marker (point))
-</pre>
-</div>
-
-<p>
-Markers follow buffer changes.
-</p>
-
-<hr>
-</div>
-</div>
-</div>
-<div id="outline-container-org58e15dc" class="outline-2">
-<h2 id="org58e15dc">Expert</h2>
-<div class="outline-text-2" id="text-org58e15dc">
-</div>
-<div id="outline-container-org86a7ccb" class="outline-3">
-<h3 id="org86a7ccb">Q: What are overlays?</h3>
-<div class="outline-text-3" id="text-org86a7ccb">
-<p>
-Temporary visual decorations.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(make-overlay ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org79ce94b" class="outline-3">
-<h3 id="org79ce94b">Q: What are text properties?</h3>
-<div class="outline-text-3" id="text-org79ce94b">
-<p>
-Metadata attached directly to text.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(propertize
- <span style="font-style: italic;">"Warning"</span>
- 'face 'warning)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orga83ab5e" class="outline-3">
-<h3 id="orga83ab5e">Q: Hooks vs Advice?</h3>
-<div class="outline-text-3" id="text-orga83ab5e">
-<p>
-Hooks:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(add-hook ...)
-</pre>
-</div>
-
-<p>
-Advice:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(advice-add ...)
-</pre>
-</div>
-
-<p>
-Prefer hooks when possible.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org47575cb" class="outline-3">
-<h3 id="org47575cb">Q: What is advice-add?</h3>
-<div class="outline-text-3" id="text-org47575cb">
-<p>
-Modify existing function behavior.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(advice-add
- 'find-file
- <span style="font-weight: bold;">:before</span>
- #'my-function)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgfd7a90c" class="outline-3">
-<h3 id="orgfd7a90c">Q: How do asynchronous processes work?</h3>
-<div class="outline-text-3" id="text-orgfd7a90c">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(make-process ...)
-</pre>
-</div>
-
-<p>
-Non-blocking execution.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org87e966c" class="outline-3">
-<h3 id="org87e966c">Q: How do process sentinels work?</h3>
-<div class="outline-text-3" id="text-org87e966c">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(make-process
- <span style="font-weight: bold;">:sentinel</span> ...)
-</pre>
-</div>
-
-<p>
-Sentinel runs when process state changes.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org854dc52" class="outline-3">
-<h3 id="org854dc52">Q: How do timers work?</h3>
-<div class="outline-text-3" id="text-org854dc52">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(run-at-time ...)
-(run-with-idle-timer ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org8c9e88c" class="outline-3">
-<h3 id="org8c9e88c">Q: How do shell commands work?</h3>
-<div class="outline-text-3" id="text-org8c9e88c">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(call-process ...)
-(shell-command ...)
-</pre>
-</div>
-
-<p>
-Prefer <code>call-process</code> for security.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgb5506f2" class="outline-3">
-<h3 id="orgb5506f2">Q: How do HTTP requests work?</h3>
-<div class="outline-text-3" id="text-orgb5506f2">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(url-retrieve ...)
-</pre>
-</div>
-
-<p>
-Built-in HTTP client.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org4527754" class="outline-3">
-<h3 id="org4527754">Q: How do JSON APIs work?</h3>
-<div class="outline-text-3" id="text-org4527754">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(json-parse-string ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgd1a0b6f" class="outline-3">
-<h3 id="orgd1a0b6f">Q: How does testing work?</h3>
-<div class="outline-text-3" id="text-orgd1a0b6f">
-<p>
-ERT testing framework.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">ert</span>)
-
-(<span style="font-weight: bold;">ert-deftest</span> <span style="font-weight: bold;">my-test</span> ()
- ...)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgcd8a419" class="outline-3">
-<h3 id="orgcd8a419">Q: What is byte compilation?</h3>
-<div class="outline-text-3" id="text-orgcd8a419">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(byte-compile-file <span style="font-style: italic;">"my.el"</span>)
-</pre>
-</div>
-
-<p>
-Benefits:
-</p>
-
-<ul class="org-ul">
-<li>faster loading</li>
-<li>compiler warnings</li>
-</ul>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org83bd59a" class="outline-3">
-<h3 id="org83bd59a">Q: What is native compilation?</h3>
-<div class="outline-text-3" id="text-org83bd59a">
-<p>
-Produces:
-</p>
-
-<ul class="org-ul">
-<li>.eln files</li>
-<li>faster execution</li>
-</ul>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org13b3d8a" class="outline-3">
-<h3 id="org13b3d8a">Q: How do you debug Elisp?</h3>
-<div class="outline-text-3" id="text-org13b3d8a">
-<p>
-Useful tools:
-</p>
-
-<ul class="org-ul">
-<li>debug-on-error</li>
-<li>edebug-defun</li>
-<li>debug-on-entry</li>
-<li>trace-function</li>
-<li>check-parens</li>
-<li>macroexpand-1</li>
-</ul>
-
-<p>
-Example:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">setq</span> debug-on-error t)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgff6cb88" class="outline-3">
-<h3 id="orgff6cb88">Q: Performance optimization?</h3>
-<div class="outline-text-3" id="text-orgff6cb88">
-<p>
-Avoid:
-</p>
-
-<ul class="org-ul">
-<li>append in loops</li>
-<li>repeated regex scans</li>
-<li>unnecessary allocations</li>
-</ul>
-
-<p>
-Prefer:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">push</span> item list)
-(nreverse list)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org1d8ff0e" class="outline-3">
-<h3 id="org1d8ff0e">Q: Common beginner mistakes?</h3>
-<div class="outline-text-3" id="text-org1d8ff0e">
-<p>
-Common mistakes:
-</p>
-
-<ul class="org-ul">
-<li>forgetting interactive</li>
-<li>forgetting lexical-binding</li>
-<li>using setq instead of let</li>
-<li>using shell-command unsafely</li>
-<li>misunderstanding quote</li>
-<li>modifying buffers without save-excursion</li>
-</ul>
-
-<hr>
-</div>
-</div>
-</div>
-<div id="outline-container-org1ce9b11" class="outline-2">
-<h2 id="org1ce9b11">Package Development</h2>
-<div class="outline-text-2" id="text-org1ce9b11">
-</div>
-<div id="outline-container-org1a89bb9" class="outline-3">
-<h3 id="org1a89bb9">Q: Why use provide and require?</h3>
-<div class="outline-text-3" id="text-org1a89bb9">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">provide</span> '<span style="font-weight: bold; text-decoration: underline;">mypackage</span>)
-(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">mypackage</span>)
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org87f0c58" class="outline-3">
-<h3 id="org87f0c58">Q: How do package dependencies work?</h3>
-<div class="outline-text-3" id="text-org87f0c58">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Package-Requires:
-</span><span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">((emacs "29.1")
-</span><span style="font-weight: bold; font-style: italic;">;;  </span><span style="font-weight: bold; font-style: italic;">(dash "2.19"))</span>
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orgd8b8412" class="outline-3">
-<h3 id="orgd8b8412">Q: How should package structure look?</h3>
-<div class="outline-text-3" id="text-orgd8b8412">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">my.el --- package -*- lexical-binding:t -*-
-</span>
-<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">Commentary:
-</span>
-<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">Code:
-</span>
-(<span style="font-weight: bold;">provide</span> '<span style="font-weight: bold; text-decoration: underline;">my</span>)
-<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">my.el ends here</span>
-</pre>
-</div>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org34d64fd" class="outline-3">
-<h3 id="org34d64fd">Q: How do you check package quality?</h3>
-<div class="outline-text-3" id="text-org34d64fd">
-<p>
-Tools:
-</p>
-
-<ul class="org-ul">
-<li>checkdoc</li>
-<li>package-lint</li>
-<li>byte compilation</li>
-</ul>
-
-<hr>
-</div>
-</div>
-</div>
-<div id="outline-container-orgdf57143" class="outline-2">
-<h2 id="orgdf57143">Master Level</h2>
-<div class="outline-text-2" id="text-orgdf57143">
-</div>
-<div id="outline-container-orgac91662" class="outline-3">
-<h3 id="orgac91662">Q: What is EIEIO?</h3>
-<div class="outline-text-3" id="text-orgac91662">
-<p>
-Object system for Emacs Lisp.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orge66c74f" class="outline-3">
-<h3 id="orge66c74f">Q: What is cl-lib?</h3>
-<div class="outline-text-3" id="text-orge66c74f">
-<p>
-Common Lisp extensions.
-</p>
-
-<p>
-Useful:
-</p>
-
-<ul class="org-ul">
-<li>cl-loop</li>
-<li>cl-defstruct</li>
-<li>cl-defmethod</li>
-<li>cl-reduce</li>
-</ul>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org43a58a4" class="outline-3">
-<h3 id="org43a58a4">Q: What are generators?</h3>
-<div class="outline-text-3" id="text-org43a58a4">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">generator</span>)
-</pre>
-</div>
-
-<p>
-Functions:
-</p>
-
-<ul class="org-ul">
-<li>iter-defun</li>
-<li>iter-yield</li>
-</ul>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-orge4230db" class="outline-3">
-<h3 id="orge4230db">Q: What is garbage collection tuning?</h3>
-<div class="outline-text-3" id="text-orge4230db">
-<div class="org-src-container">
-<pre class="src src-emacs-lisp">gc-cons-threshold
-</pre>
-</div>
-
-<p>
-Controls GC frequency.
-</p>
-
-<hr>
-</div>
-</div>
-<div id="outline-container-org8009eec" class="outline-3">
-<h3 id="org8009eec">Q: How do you become advanced at Elisp?</h3>
-<div class="outline-text-3" id="text-org8009eec">
-<p>
-Study source code from:
-</p>
-
-<ul class="org-ul">
-<li>GNU Emacs</li>
-<li>Org Mode</li>
-<li>Magit</li>
-<li>Projectile</li>
-<li>Vertico</li>
-<li>Consult</li>
-<li>Corfu</li>
-</ul>
-
-<p>
-Build:
-</p>
-
-<ul class="org-ul">
-<li>major modes</li>
-<li>minor modes</li>
-<li>package managers</li>
-<li>syntax highlighters</li>
-<li>completion frameworks</li>
-<li>LSP integrations</li>
-<li>IDE extensions</li>
-</ul>
 
 <hr>
 

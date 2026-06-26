@@ -24,860 +24,912 @@ Study progressively from fundamentals to advanced package development.
 
 -----
 
-* Beginner
+* Beginner — Fundamentals
 
-** Q: What is Emacs Lisp (Elisp)?
+** Q1: What is Emacs Lisp?
+A dialect of Lisp that serves as the extension language of Emacs.
+The Emacs editor is largely written in it, and you use it to configure and extend Emacs.
+It is a dynamically-typed, primarily dynamically-scoped (historically) Lisp
+with deep integration into the editor (buffers, windows, text properties).
 
-Emacs Lisp is the Lisp dialect used by GNU Emacs.
+** Q2: How do I evaluate an Elisp expression interactively?
+ - =C-x C-e= evaluates the expression *before point* (=eval-last-sexp=).
+ - =M-x eval-expression= (=M-:=) prompts for an expression in the minibuffer.
+ - =M-x eval-buffer= / =eval-region= evaluate larger chunks.
+ - =ielm= opens an interactive Elisp REPL.
 
-Almost all of Emacs itself is written in Elisp.
+** Q3: What is the difference between a "form" and an "expression"?
+They are used almost interchangeably. A *form* is any Lisp object meant to be evaluated.
+Self-evaluating forms (numbers, strings, keywords), symbol forms
+(variables), and list forms (function/macro/special-form calls) are the categories.
 
-It allows you to:
+** Q4: How do you write a comment in Elisp?
+With a semicolon =;=. Conventions:
+ - =;= inline comment after code.
+ - =;;= comment aligned to the code's indentation.
+ - =;;;= top-level/section comment.
+ - =;;;;= heading.
 
-- Configure Emacs
-- Extend editor functionality
-- Create packages
-- Automate repetitive tasks
+** Q5: What are the basic data types?
+Integers, floats, symbols, strings, characters (which are integers), cons cells/lists,
+vectors, hash tables, and more specialized types like markers, buffers, and overlays.
 
------
+** Q6: How do I define a variable?
+#+begin_src elisp
+(defvar my-var 10 "A docstring.")   ; only sets if currently unbound
+(defconst my-pi 3.14159 "Pi.")      ; intended as a constant
+(setq my-var 20)                    ; assignment
+#+end_src
 
-** Q: Why learn Elisp?
+** Q7: What is the difference between =defvar= and =setq=?
+=defvar= *declares* a special (dynamic) variable and assigns a default only if
+it is not already bound. =setq= simply assigns a value to an existing binding.
+Use =defvar= for global configuration variables so re-evaluating a file doesn't clobber a user's value.
 
-Learning Elisp allows you to:
+** Q8: How do I define a function?
+#+begin_src elisp
+(defun my-add (a b)
+  "Return the sum of A and B."
+  (+ a b))
+#+end_src
 
-- Understand how Emacs works internally
-- Build custom commands
-- Create major modes and minor modes
-- Automate workflows
-- Build complete editor extensions
+** Q9: What makes a function a "command"?
+Adding =(interactive ...)= as its first form.
+Commands can be invoked via =M-x= and bound to keys.
 
------
-
-** Q: What are S-expressions?
-
-Everything in Lisp is an expression.
-
-Types:
-
-- Atoms
-- Lists
-
-#+BEGIN_SRC emacs-lisp
-42
-"hello"
-(+ 1 2)
-(message "Hello")
-#+END_SRC
-
------
-
-** Q: How does evaluation work?
-
-Expressions are evaluated immediately.
-
-#+BEGIN_SRC emacs-lisp
-(+ 1 2)
-;; => 3
-#+END_SRC
-
-Quoted expressions are treated as data.
-
-#+BEGIN_SRC emacs-lisp
-'(+ 1 2)
-;; => (+ 1 2)
-#+END_SRC
-
------
-
-** Q: What is quoting?
-
-Quote prevents evaluation.
-
-#+BEGIN_SRC emacs-lisp
-(setq x 10)
-
-x
-;; => 10
-
-'x
-;; => x
-#+END_SRC
-
------
-
-** Q: What are symbols?
-
-Symbols store:
-
-- value
-- function definition
-- property list
-
-#+BEGIN_SRC emacs-lisp
-(symbolp 'car)
-#+END_SRC
-
------
-
-** Q: How do variables work?
-
-Global:
-
-#+BEGIN_SRC emacs-lisp
-(setq x 10)
-#+END_SRC
-
-Local:
-
-#+BEGIN_SRC emacs-lisp
-(let ((x 5))
-  (+ x 1))
-#+END_SRC
-
-Constants:
-
-#+BEGIN_SRC emacs-lisp
-(defconst pi 3.14)
-#+END_SRC
-
-Declared variables:
-
-#+BEGIN_SRC emacs-lisp
-(defvar debug-mode nil)
-#+END_SRC
-
------
-
-** Q: How do functions work?
-
-#+BEGIN_SRC emacs-lisp
-(defun square (x)
-  (* x x))
-#+END_SRC
-
-Call:
-
-#+BEGIN_SRC emacs-lisp
-(square 5)
-#+END_SRC
-
------
-
-** Q: What is an interactive function?
-
-Interactive functions can be executed with M-x.
-
-#+BEGIN_SRC emacs-lisp
-(defun hello ()
+#+begin_src elisp
+(defun my-greet ()
   (interactive)
-  (message "Hello"))
-#+END_SRC
+  (message "Hello!"))
+#+end_src
 
------
+** Q10: What does =message= do?
+Displays a formatted string in the echo area and logs it to the =*Messages*= buffer.
+Uses =format=-style directives: =%s=, =%d=, =%S=, etc.
 
-** Q: How does interactive input work?
+** Q11: What is =nil= and =t=?
+=nil= is the canonical false value and also the empty list =()=.
+=t= is the canonical true value.
+Everything other than =nil= is truthy.
 
-Prompt user input.
+** Q12: Is the empty list the same as nil?
+Yes. =()= and =nil= are identical objects in Elisp.
 
-#+BEGIN_SRC emacs-lisp
-(defun greet (name)
-  (interactive "sName: ")
-  (message "Hello %s" name))
-#+END_SRC
+** Q13: How do I create a list?
+#+begin_src elisp
+(list 1 2 3)        ; => (1 2 3)
+'(1 2 3)            ; quoted literal
+(cons 1 '(2 3))     ; => (1 2 3)
+#+end_src
 
-Common specifiers:
+** Q14: What is the difference between =quote= and =list=?
+=(list 1 (+ 1 1))= evaluates its arguments → =(1 2)=.
+='(1 (+ 1 1))= does not evaluate → =(1 (+ 1 1))=. ='x= is shorthand for =(quote x)=.
 
-- s → string
-- n → number
-- f → file
-- b → buffer
-- r → region
+** Q15: What are =car= and =cdr=?
+=car= returns the first element of a cons cell; =cdr= returns the rest.
+For a list =(1 2 3)=: =(car list)= → 1, =(cdr list)= → =(2 3)=.
 
------
+** Q16: How do I get the Nth element of a list?
+#+begin_src elisp
+(nth 2 '(a b c d))    ; => c  (zero-based)
+(nthcdr 2 '(a b c d)) ; => (c d)
+(elt '(a b c) 1)      ; => b  (works on sequences)
+#+end_src
 
-** Q: How do conditionals work?
+** Q17: How do I add an element to the front of a list?
+#+begin_src elisp
+(cons 0 '(1 2 3))     ; => (0 1 2 3)
+(push 0 my-list)      ; destructively updates the variable
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-(if (> 5 2)
-    "yes"
-  "no")
-#+END_SRC
+** Q18: How do I check equality?
+ - =eq= — identity (same object); good for symbols, small integers.
+ - =eql= — like =eq= but also compares numbers of the same type.
+ - =equal= — structural equality (lists, strings).
+ - ===  — numeric equality (numbers only).
+ - =string== — string equality.
 
-#+BEGIN_SRC emacs-lisp
+** Q19: How do I write an if statement?
+#+begin_src elisp
+(if (> x 0)
+    (message "positive")     ; then (single form)
+  (message "non-positive"))  ; else (any number of forms)
+#+end_src
+
+** Q20: What is =when= and =unless=?
+=when= runs its body if the condition is non-nil (no else).
+=unless= runs its body if the condition is nil. Both allow multiple body forms without =progn=.
+
+** Q21: What is =progn=?
+Evaluates several forms in sequence and returns the value of the last.
+Useful where a single form is expected but you need several.
+
+** Q22: How does =cond= work?
+A multi-branch conditional:
+
+#+begin_src elisp
 (cond
- ((= x 1) "one")
- ((= x 2) "two")
- (t "other"))
-#+END_SRC
+((< x 0) "negative")
+((= x 0) "zero")
+(t       "positive"))
+#+end_src
 
------
+** Q23: What is =let= vs =let*=?
+=let= binds all variables in parallel (initializers can't see each other).
+=let*= binds sequentially so later bindings can reference earlier ones.
 
-** Q: What are nil and t?
+#+begin_src elisp
+(let* ((a 1) (b (+ a 1))) b)  ; => 2  (let would error: a unbound)
+#+end_src
 
-~nil~
+** Q24: How do I loop over a list?
+#+begin_src elisp
+(dolist (item '(1 2 3))
+  (message "%d" item))
+#+end_src
 
-- false
-- empty list
-
-~t~
-
-- true
-
-Everything except nil is truthy.
-
------
-
-** Q: How do lists work?
-
-#+BEGIN_SRC emacs-lisp
-(setq nums '(1 2 3))
-
-(car nums)
-(cdr nums)
-(cons 0 nums)
-(length nums)
-#+END_SRC
-
------
-
-** Q: How do loops work?
-
-#+BEGIN_SRC emacs-lisp
-(dolist (x '(1 2 3))
-  (print x))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
+** Q25: How do I loop N times?
+#+begin_src elisp
 (dotimes (i 5)
-  (print i))
-#+END_SRC
+  (message "%d" i))   ; i goes 0..4
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-(while condition
- ...)
-#+END_SRC
+** Q26: How do I write a while loop?
+#+begin_src elisp
+(let ((i 0))
+  (while (< i 5)
+    (message "%d" i)
+    (setq i (1+ i))))
+#+end_src
 
------
+** Q27: How do I format a string?
+#+begin_src elisp
+(format "Name: %s, Age: %d" "Bob" 42)
+#+end_src
 
-* Intermediate
+=format-message= additionally translates quote characters for messages.
 
-** Q: What are buffers?
+** Q28: What is the difference between =%s= and =%S= in format?
+=%s= uses =princ=-style (human-readable, no quotes on strings).
+=%S= uses =prin1=-style (a readable, re-parseable representation with quotes/escapes).
 
-Buffers are text containers.
+** Q29: How do I concatenate strings?
+#+begin_src elisp
+(concat "foo" "-" "bar")   ; => "foo-bar"
+#+end_src
 
-Examples:
+** Q30: How do I read documentation for a function or variable?
+- =C-h f= (=describe-function=)
+- =C-h v= (=describe-variable=)
+- =C-h k= (=describe-key=)
+- =C-h o= (=describe-symbol=) — function or variable.
 
-- files
-- temporary buffers
-- internal buffers
+** Q31: What is a symbol?
+A first-class named object with four cells: name, value (variable binding), function (function binding), and property list.
+Symbols are interned in =obarray= so identical names refer to the same object.
 
-#+BEGIN_SRC emacs-lisp
-(current-buffer)
-(buffer-name)
-#+END_SRC
+** Q32: What is the difference between a symbol's value cell and function cell?
+A symbol can simultaneously name a variable and a function.
+=(foo)= uses the function cell; =foo= as a value uses the value cell. This is why Elisp is a "Lisp-2".
 
------
+** Q33: How do I get/set a symbol's value programmatically?
+#+begin_src elisp
+(symbol-value 'my-var)
+(set 'my-var 5)            ; like setq but evaluates the symbol arg
+(symbol-function 'my-fn)
+(fset 'my-fn (lambda () 1))
+#+end_src
 
-** Q: How does with-current-buffer work?
+** Q34: What is a keyword symbol?
+A symbol starting with =:= (e.g. =:foo=). It is self-evaluating and used as a constant marker, frequently in plists and keyword arguments.
 
-Execute code inside another buffer.
+** Q35: How do I convert between strings, symbols, and numbers?
+#+begin_src elisp
+(intern "foo")          ; string -> symbol
+(symbol-name 'foo)      ; symbol -> string
+(number-to-string 42)   ; -> "42"
+(string-to-number "42") ; -> 42
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-(with-current-buffer "*scratch*"
-  (insert "Hello"))
-#+END_SRC
+* Beginner/Intermediate — Working with Emacs
+** Q36: What is the "current buffer"?
+The buffer that Elisp functions operate on by default. Most editing functions implicitly act on it. =current-buffer= returns it.
 
-Useful for:
+** Q37: What is "point"?
+The location of the cursor / insertion position in a buffer, between two characters.
+=(point)= returns its integer position; =point-min= and =point-max= give the buffer boundaries.
 
-- temporary buffers
-- package development
-- asynchronous processes
+** Q38: How do I move point?
+#+begin_src elisp
+(goto-char (point-min))
+(forward-char 5)
+(forward-line 2)
+(beginning-of-line)
+#+end_src
 
------
+** Q39: How do I insert text at point?
+#+begin_src elisp
+(insert "Hello, world")
+(insert-char ?* 3)   ; inserts ***
+#+end_src
 
-** Q: What is save-excursion?
+** Q40: How do I read text from the buffer?
+#+begin_src elisp
+(buffer-string)                       ; whole buffer
+(buffer-substring start end)          ; with properties
+(buffer-substring-no-properties s e)  ; plain text
+(thing-at-point 'word)
+#+end_src
 
-Preserves point and cursor location.
+** Q41: What is =save-excursion=?
+A macro that saves point (and the current buffer) and restores them after its
+body runs — even on non-local exit. Use it when you move point temporarily.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src elisp
 (save-excursion
-  (goto-char (point-min)))
-#+END_SRC
+  (goto-char (point-min))
+  (insert "header\n"))
+#+end_src
 
------
+** Q42: What is =save-restriction=?
+Saves and restores the buffer's narrowing state (the visible region set by =narrow-to-region= / =widen=).
 
-** Q: What are point, mark, and region?
+** Q43: How do I switch the buffer Elisp operates on?
+#+begin_src elisp
+(with-current-buffer "*scratch*"
+  (insert "hi"))
+(set-buffer buf)   ; lower-level, no automatic restore
+#+end_src
 
-- point → cursor position
-- mark → secondary position
-- region → selected text
+** Q44: How do I create a new buffer?
+#+begin_src elisp
+(get-buffer-create "*my-buffer*")
+(generate-new-buffer "*my-buffer*")  ; guarantees a fresh, uniquely-named one
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-(point)
-(mark)
-(region-beginning)
-(region-end)
-#+END_SRC
+** Q45: What is the difference between =switch-to-buffer= and =set-buffer=?
+=switch-to-buffer= makes a buffer visible in the selected window (interactive,
+display-oriented). =set-buffer= only changes the current buffer for Elisp; it
+does not change what is displayed and is not preserved after the command.
 
------
+** Q46: How do I read a file into a string?
+#+begin_src elisp
+(with-temp-buffer
+  (insert-file-contents "/path/to/file")
+  (buffer-string))
+#+end_src
 
-** Q: How do keymaps work?
+** Q47: How do I write a string to a file?
+#+begin_src elisp
+(with-temp-file "/path/to/file"
+  (insert "content"))
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-(global-set-key
- (kbd "C-c h")
- #'hello)
-#+END_SRC
+** Q48: What is =with-temp-buffer=?
+Creates a temporary buffer, makes it current for the body, and kills it afterward.
+Ideal for text processing that shouldn't touch user buffers.
 
------
+** Q49: How do I bind a key globally?
+#+begin_src elisp
+(global-set-key (kbd "C-c g") #'my-greet)
+(keymap-global-set "C-c g" #'my-greet)  ; modern API (Emacs 29+)
+#+end_src
 
-** Q: What are hooks?
+** Q50: How do I bind a key in a specific mode?
+#+begin_src elisp
+(define-key emacs-lisp-mode-map (kbd "C-c r") #'my-run)
+(keymap-set emacs-lisp-mode-map "C-c r" #'my-run)  ; Emacs 29+
+#+end_src
 
-Hooks execute functions when events occur.
+** Q51: What is =kbd= and why use it?
+=kbd= converts a human-readable key description (="C-c C-x"=) into the internal
+key sequence representation. It's portable and clearer than raw string/vector forms.
 
-#+BEGIN_SRC emacs-lisp
-(add-hook
- 'prog-mode-hook
- #'display-line-numbers-mode)
-#+END_SRC
+** Q52: How do I prompt the user for input?
+#+begin_src elisp
+(read-string "Name: ")
+(read-number "Count: ")
+(completing-read "Choose: " '("a" "b" "c"))
+(yes-or-no-p "Continue? ")
+(y-or-n-p "Continue? ")
+#+end_src
 
------
+** Q53: What is the =interactive= spec code "p" vs "P"?
+=p= passes the numeric prefix argument as a number. =P= passes the *raw* prefix
+argument (e.g. =nil=, =(4)=, a number). Many codes exist: =s= string, =n=
+number, =r= region, =b= buffer name, etc.
 
-** Q: What is defcustom?
+** Q54: How do I get the region's text?
+#+begin_src elisp
+(buffer-substring-no-properties (region-beginning) (region-end))
+#+end_src
 
-User configurable variables.
+For commands, declare =(interactive "r")= to receive start and end.
 
-#+BEGIN_SRC emacs-lisp
-(defcustom my-option t
-  "Option."
-  :type 'boolean)
-#+END_SRC
+** Q55: How do I run code only after Emacs starts up?
+Use =after-init-hook= or =emacs-startup-hook=:
 
------
+#+begin_src elisp
+(add-hook 'emacs-startup-hook #'my-startup-fn)
+#+end_src
 
-** Q: What is buffer-local state?
+* Intermediate — Functions, Scope, Data
 
-#+BEGIN_SRC emacs-lisp
-(setq-local fill-column 100)
-#+END_SRC
+** Q56: What is a lambda?
+An anonymous function:
 
-Each buffer can hold different values.
+#+begin_src elisp
+(lambda (x) (* x x))
+(funcall (lambda (x) (* x x)) 5)  ; => 25
+#+end_src
 
------
+** Q57: What is the =#'= reader macro?
+=#'foo= is shorthand for =(function foo)=. It quotes a function, and for
+lambdas it signals to the byte-compiler that the form is a function (enabling compilation of the lambda).
 
-** Q: How does error handling work?
+** Q58: What is the difference between =funcall= and =apply=?
+=funcall= calls a function with individual arguments. =apply= calls it with the
+last argument being a list that is spread into the remaining arguments.
 
-#+BEGIN_SRC emacs-lisp
-(condition-case err
-    (/ 1 0)
-  (arith-error
-   (message "error")))
-#+END_SRC
+#+begin_src elisp
+(funcall #'+ 1 2 3)        ; => 6
+(apply #'+ 1 2 '(3 4))     ; => 10
+#+end_src
 
------
+** Q59: How do optional and rest arguments work?
+#+begin_src elisp
+(defun f (a &optional b &rest c)
+  (list a b c))
+(f 1)        ; => (1 nil nil)
+(f 1 2 3 4)  ; => (1 2 (3 4))
+#+end_src
 
-** Q: How do files work?
+** Q60: What is dynamic scope vs lexical scope?
+Dynamic scope: a variable's binding is visible to all code called during the
+binding's extent. Lexical scope: a variable is visible only within the textual
+region where it's defined. Modern Elisp files should enable lexical binding.
 
-Read:
+** Q61: How do I enable lexical binding?
+Put this as the first line of the file:
 
-#+BEGIN_SRC emacs-lisp
-(insert-file-contents "file.txt")
-#+END_SRC
-
-Write:
-
-#+BEGIN_SRC emacs-lisp
-(with-temp-file "out.txt"
-  (insert "hello"))
-#+END_SRC
-
------
-
-** Q: What are alists, plists, and hash tables?
-
-Alist:
-
-#+BEGIN_SRC emacs-lisp
-((name . "Bob"))
-#+END_SRC
-
-Plist:
-
-#+BEGIN_SRC emacs-lisp
-(:name "Bob")
-#+END_SRC
-
-Hash table:
-
-#+BEGIN_SRC emacs-lisp
-(make-hash-table)
-#+END_SRC
-
------
-
-* Advanced
-
-** Q: What are lambda functions?
-
-#+BEGIN_SRC emacs-lisp
-(lambda (x)
-  (* x x))
-#+END_SRC
-
-Anonymous functions.
-
------
-
-** Q: What are closures?
-
-#+BEGIN_SRC emacs-lisp
-(let ((x 10))
-  (lambda ()
-    x))
-#+END_SRC
-
-Closures capture variables.
-
------
-
-** Q: What is lexical binding?
-
-Enable modern lexical scope.
-
-#+BEGIN_SRC emacs-lisp
+#+begin_src elisp
 ;;; -*- lexical-binding: t; -*-
-#+END_SRC
+#+end_src
+
+It is the default in Emacs 30+ for new files but should be declared explicitly.
+
+** Q62: Why does lexical binding matter for closures?
+Only with lexical binding do lambdas capture their surrounding variables to form true closures.
+
+#+begin_src elisp
+(defun make-adder (n)
+  (lambda (x) (+ x n)))   ; n captured lexically
+(funcall (make-adder 3) 10)  ; => 13
+#+end_src
+
+** Q63: What still uses dynamic scope?
+Variables declared with =defvar=/=defconst= (special variables) remain dynamically scoped even under lexical binding.
+This is intentional — it's how =let=-rebinding of configuration variables works.
+
+** Q64: What is a property list (plist)?
+A flat list of alternating keys and values:
+
+#+begin_src elisp
+(setq pl '(:name "Bob" :age 42))
+(plist-get pl :name)             ; => "Bob"
+(plist-put pl :age 43)
+#+end_src
+
+** Q65: What is an association list (alist)?
+A list of cons cells (key . value):
+
+#+begin_src elisp
+(setq al '((a . 1) (b . 2)))
+(assq 'a al)        ; => (a . 1)
+(alist-get 'b al)   ; => 2
+(cdr (assoc "k" al))
+#+end_src
+
+** Q66: When should I use a hash table instead of an alist?
+For large collections or frequent lookups — hash tables give O(1) access vs alists' O(n).
+
+#+begin_src elisp
+(let ((h (make-hash-table :test 'equal)))
+  (puthash "k" 1 h)
+  (gethash "k" h))     ; => 1
+#+end_src
 
-Required for closures.
+** Q67: What =:test= options exist for hash tables?
+=eq=, =eql=, =equal= (built-in), and you can define custom ones with =define-hash-table-test=.
+Use =equal= for string keys.
+
+** Q68: How do I iterate a hash table?
+#+begin_src elisp
+(maphash (lambda (k v) (message "%s=%s" k v)) h)
+#+end_src
+
+Or =(hash-table-keys h)= / =(hash-table-values h)= from =subr-x=/=map=.
+
+** Q69: What is =mapcar= vs =mapc= vs =mapcan=?
+ - =mapcar= — applies fn to each element, returns a new list of results.
+ - =mapc= — applies fn for side effects, returns the input list.
+ - =mapcan= — like mapcar but destructively concatenates the (list) results.
+
+** Q70: How do I filter a list?
+#+begin_src elisp
+(seq-filter #'cl-evenp '(1 2 3 4))   ; => (2 4)
+(cl-remove-if-not #'cl-evenp '(1 2 3 4))
+#+end_src
+
+** Q71: How do I reduce/fold a list?
+#+begin_src elisp
+(seq-reduce #'+ '(1 2 3 4) 0)        ; => 10
+(cl-reduce #'+ '(1 2 3 4))           ; => 10
+#+end_src
+
+** Q72: What is the =seq= library?
+A generic sequence-manipulation library (=seq.el=) that works uniformly across
+lists, vectors, and strings: =seq-map=, =seq-filter=, =seq-find=, =seq-reduce=,
+=seq-do=, =seq-uniq=, etc.
+
+** Q73: What is =dash.el=?
+A popular third-party functional library providing =-map=, =-filter=,
+=-reduce=, threading macros =->= / =-->=, etc. Many prefer built-in =seq= now,
+but dash remains common in the wild.
+
+** Q74: How do I sort a list?
+#+begin_src elisp
+(sort '(3 1 2) #'<)            ; => (1 2 3)
+(sort my-list :key #'car :lessp #'<) ; Emacs 30+ keyword form
+#+end_src
+
+Note: =sort= may be destructive; copy first if you need the original.
+
+** Q75: How do I reverse a list?
+#+begin_src elisp
+(reverse '(1 2 3))    ; => (3 2 1) non-destructive
+(nreverse my-list)    ; destructive, faster
+#+end_src
+
+** Q76: What is the difference between destructive and non-destructive functions?
+Destructive functions (=nreverse=, =nconc=, =setcar=, =delete=) modify their arguments' structure in place;
+non-destructive ones (=reverse=, =append=, =remove=) return fresh copies.
+Destructive variants are faster but risk aliasing bugs.
 
------
+** Q77: How do I copy a list or sequence?
 
-** Q: What are macros?
+#+begin_src elisp
+(copy-sequence lst)     ; shallow copy
+(copy-tree lst)         ; deep copy of the cons structure
+#+end_src
 
-Macros generate code.
+** Q78: What is =cl-lib=?
+The Common Lisp compatibility library shipped with Emacs.
+It provides =cl-loop=, =cl-defun=, =cl-destructuring-bind=, =cl-case=,
+generic sequence functions, structures (=cl-defstruct=), and more.
+Always =(require 'cl-lib)=.
+
+** Q79: How do I do a =case= / switch?
+#+begin_src elisp
+(cl-case x
+  (1 "one")
+  ((2 3) "two or three")
+  (t "other"))
+#+end_src
+
+=pcase= is the more powerful, idiomatic modern choice.
 
-#+BEGIN_SRC emacs-lisp
-(defmacro my-when (cond &rest body)
-  `(if ,cond
-       (progn ,@body)))
-#+END_SRC
-
------
-
-** Q: How do macros differ from functions?
-
-Functions evaluate arguments.
-
-Macros receive raw code.
-
-#+BEGIN_SRC emacs-lisp
-(macroexpand-1 ...)
-#+END_SRC
-
------
-
-** Q: What is backquote syntax?
-
-#+BEGIN_SRC emacs-lisp
-`(...)
-,x
-,@list
-#+END_SRC
-
------
-
-** Q: How do major modes work?
-
-#+BEGIN_SRC emacs-lisp
-(define-derived-mode
- my-mode
- text-mode
- "MyMode")
-#+END_SRC
-
------
-
-** Q: How do minor modes work?
-
-#+BEGIN_SRC emacs-lisp
-(define-minor-mode
- my-mode
- "Toggle mode")
-#+END_SRC
-
------
-
-** Q: What are syntax tables?
-
-Syntax tables define parsing behavior.
-
-They control:
-
-- comments
-- strings
-- symbols
-- words
-
-#+BEGIN_SRC emacs-lisp
-(with-syntax-table ...)
-#+END_SRC
-
------
-
-** Q: How do regular expressions work?
-
-Search:
-
-#+BEGIN_SRC emacs-lisp
-(re-search-forward "[0-9]+")
-#+END_SRC
-
-Replace:
-
-#+BEGIN_SRC emacs-lisp
-(replace-match "number")
-#+END_SRC
-
-Used heavily in text manipulation.
-
------
-
-** Q: What are windows and frames?
-
-Frame:
-
-Entire Emacs window.
-
-Window:
-
-Buffer pane.
-
-#+BEGIN_SRC emacs-lisp
-(selected-frame)
-(selected-window)
-#+END_SRC
-
------
-
-** Q: What are markers?
-
-#+BEGIN_SRC emacs-lisp
-(copy-marker (point))
-#+END_SRC
-
-Markers follow buffer changes.
-
------
-
-* Expert
-
-** Q: What are overlays?
-
-Temporary visual decorations.
-
-#+BEGIN_SRC emacs-lisp
-(make-overlay ...)
-#+END_SRC
-
------
-
-** Q: What are text properties?
-
-Metadata attached directly to text.
-
-#+BEGIN_SRC emacs-lisp
-(propertize
- "Warning"
- 'face 'warning)
-#+END_SRC
-
------
-
-** Q: Hooks vs Advice?
-
-Hooks:
-
-#+BEGIN_SRC emacs-lisp
-(add-hook ...)
-#+END_SRC
-
-Advice:
-
-#+BEGIN_SRC emacs-lisp
-(advice-add ...)
-#+END_SRC
-
-Prefer hooks when possible.
-
------
-
-** Q: What is advice-add?
-
-Modify existing function behavior.
-
-#+BEGIN_SRC emacs-lisp
-(advice-add
- 'find-file
- :before
- #'my-function)
-#+END_SRC
-
------
-
-** Q: How do asynchronous processes work?
-
-#+BEGIN_SRC emacs-lisp
-(make-process ...)
-#+END_SRC
-
-Non-blocking execution.
-
------
-
-** Q: How do process sentinels work?
-
-#+BEGIN_SRC emacs-lisp
-(make-process
- :sentinel ...)
-#+END_SRC
-
-Sentinel runs when process state changes.
-
------
-
-** Q: How do timers work?
-
-#+BEGIN_SRC emacs-lisp
-(run-at-time ...)
-(run-with-idle-timer ...)
-#+END_SRC
-
------
-
-** Q: How do shell commands work?
-
-#+BEGIN_SRC emacs-lisp
-(call-process ...)
-(shell-command ...)
-#+END_SRC
-
-Prefer ~call-process~ for security.
-
------
-
-** Q: How do HTTP requests work?
-
-#+BEGIN_SRC emacs-lisp
-(url-retrieve ...)
-#+END_SRC
-
-Built-in HTTP client.
-
------
-
-** Q: How do JSON APIs work?
-
-#+BEGIN_SRC emacs-lisp
-(json-parse-string ...)
-#+END_SRC
-
------
-
-** Q: How does testing work?
-
-ERT testing framework.
-
-#+BEGIN_SRC emacs-lisp
-(require 'ert)
-
-(ert-deftest my-test ()
- ...)
-#+END_SRC
-
------
-
-** Q: What is byte compilation?
-
-#+BEGIN_SRC emacs-lisp
-(byte-compile-file "my.el")
-#+END_SRC
-
-Benefits:
-
-- faster loading
-- compiler warnings
-
------
-
-** Q: What is native compilation?
-
-Produces:
-
-- .eln files
-- faster execution
-
------
-
-** Q: How do you debug Elisp?
-
-Useful tools:
-
-- debug-on-error
-- edebug-defun
-- debug-on-entry
-- trace-function
-- check-parens
-- macroexpand-1
-
-Example:
-
-#+BEGIN_SRC emacs-lisp
-(setq debug-on-error t)
-#+END_SRC
-
------
-
-** Q: Performance optimization?
-
-Avoid:
-
-- append in loops
-- repeated regex scans
-- unnecessary allocations
-
-Prefer:
-
-#+BEGIN_SRC emacs-lisp
-(push item list)
-(nreverse list)
-#+END_SRC
-
------
-
-** Q: Common beginner mistakes?
-
-Common mistakes:
-
-- forgetting interactive
-- forgetting lexical-binding
-- using setq instead of let
-- using shell-command unsafely
-- misunderstanding quote
-- modifying buffers without save-excursion
-
------
-
-* Package Development
-
-** Q: Why use provide and require?
-
-#+BEGIN_SRC emacs-lisp
-(provide 'mypackage)
-(require 'mypackage)
-#+END_SRC
-
------
-
-** Q: How do package dependencies work?
-
-#+BEGIN_SRC emacs-lisp
-;; Package-Requires:
-;; ((emacs "29.1")
-;;  (dash "2.19"))
-#+END_SRC
-
------
-
-** Q: How should package structure look?
-
-#+BEGIN_SRC emacs-lisp
-;;; my.el --- package -*- lexical-binding:t -*-
-
-;;; Commentary:
-
-;;; Code:
-
-(provide 'my)
-;;; my.el ends here
-#+END_SRC
-
------
-
-** Q: How do you check package quality?
-
-Tools:
-
-- checkdoc
-- package-lint
-- byte compilation
-
------
-
-* Master Level
-
-** Q: What is EIEIO?
-
-Object system for Emacs Lisp.
-
------
-
-** Q: What is cl-lib?
-
-Common Lisp extensions.
-
-Useful:
-
-- cl-loop
-- cl-defstruct
-- cl-defmethod
-- cl-reduce
-
------
-
-** Q: What are generators?
-
-#+BEGIN_SRC emacs-lisp
-(require 'generator)
-#+END_SRC
-
-Functions:
-
-- iter-defun
-- iter-yield
-
------
-
-** Q: What is garbage collection tuning?
-
-#+BEGIN_SRC emacs-lisp
-gc-cons-threshold
-#+END_SRC
-
-Controls GC frequency.
-
------
-
-** Q: How do you become advanced at Elisp?
-
-Study source code from:
-
-- GNU Emacs
-- Org Mode
-- Magit
-- Projectile
-- Vertico
-- Consult
-- Corfu
-
-Build:
-
-- major modes
-- minor modes
-- package managers
-- syntax highlighters
-- completion frameworks
-- LSP integrations
-- IDE extensions
+** Q80: What is =pcase=?
+A pattern-matching =case=. It destructures and matches by structure, type, predicate, etc.
+
+#+begin_src elisp
+
+(pcase value
+
+  ((pred stringp) "a string")
+
+  (`(,a . ,b) (format "cons %s %s" a b))
+
+  ((or 1 2 3) "small number")
+
+  (_ "anything else"))
+
+#+end_src
+
+** Q81: How do I destructure a list?
+#+begin_src elisp
+(cl-destructuring-bind (a b &optional c) '(1 2)
+  (list a b c))            ; => (1 2 nil)
+(pcase-let ((`(,x ,y) '(1 2))) (+ x y))  ; => 3
+(seq-let (a b) '(1 2 3) (list a b))      ; => (1 2)
+#+end_src
+
+* Intermediate — Macros, Errors, Control Flow
+** Q82: What is a macro?
+A function that runs at *expansion time*, receiving unevaluated code and returning new code to be evaluated.
+Macros let you extend the language syntax and control evaluation.
+
+** Q83: How do I define a macro?
+
+#+begin_src elisp
+(defmacro my-unless (cond &rest body)
+  `(if ,cond nil (progn ,@body)))
+#+end_src
+
+** Q84: What is the backquote (=`=), comma (=,=), and =,@=?
+ - Backquote starts a template where most things are literal.
+ - =,= unquotes — evaluates and inserts the value.
+ - =,@= splices a list's elements into the surrounding list.
+
+** Q85: How do I see what a macro expands to?
+
+#+begin_src elisp
+(macroexpand '(my-unless t (foo)))
+(macroexpand-1 ...)     ; one level
+(macroexpand-all ...)   ; fully
+#+end_src
+
+=M-x emacs-lisp-macroexpand= or =pp-macroexpand-last-sexp= for interactive use.
+
+** Q86: What is variable capture / hygiene in macros?
+When a macro introduces a binding whose name collides with user code, causing bugs.
+Avoid it by generating unique symbols with =gensym=/=cl-gensym= or =make-symbol=.
+
+#+begin_src elisp
+(defmacro my-swap (a b)
+  (let ((tmp (gensym)))
+    `(let ((,tmp ,a)) (setf ,a ,b) (setf ,b ,tmp))))
+#+end_src
+
+** Q87: When should I use a macro vs a function?
+Use a function by default. Use a macro only when you must control evaluation
+(delay/repeat/skip arguments), introduce binding forms, or generate code at
+compile time. Macros don't compose like functions (can't =funcall= them).
+
+** Q88: How do I signal an error?
+#+begin_src elisp
+(error "Bad value: %s" x)
+(user-error "Please select a region")  ; for user mistakes, no debugger
+(signal 'wrong-type-argument (list 'stringp x))
+#+end_src
+
+** Q89: How do I catch errors?
+#+begin_src elisp
+(condition-case err
+    (risky-operation)
+  (file-missing (message "No file: %s" err))
+  (error (message "Failed: %s" (error-message-string err))))
+#+end_src
+
+** Q90: What is =unwind-protect=?
+Guarantees cleanup forms run whether or not the protected body exits normally or via error/non-local exit — like =try/finally=.
+
+#+begin_src elisp
+(unwind-protect
+    (do-something)
+  (cleanup))
+#+end_src
+
+** Q91: What is =ignore-errors= and =with-demoted-errors=?
+=ignore-errors= evaluates body and returns nil on any error.
+=with-demoted-errors= turns errors into messages (useful in hooks/init so one failure doesn't abort everything).
+
+** Q92: What are =catch= and =throw=?
+A non-local exit mechanism by tag:
+
+#+begin_src elisp
+(catch 'found
+  (dolist (x list)
+    (when (match-p x) (throw 'found x))))
+#+end_src
+
+** Q93: What is =cl-block= / =cl-return=?
+A lexical exit construct from =cl-lib=. =cl-return-from= exits a named block;
+=cl-defun= establishes an implicit block named after the function.
+
+** Q94: How do I define a custom error type?
+#+begin_src elisp
+(define-error 'my-error "My custom error" 'error)
+;; then: (signal 'my-error (list "details"))
+#+end_src
+
+** Q95: What is =cl-loop=?
+A very powerful iteration macro from cl-lib:
+#+begin_src elisp
+(cl-loop for i from 1 to 5
+         when (cl-oddp i)
+         collect (* i i))     ; => (1 9 25)
+#+end_src
+
+* Intermediate/Advanced — Buffers, Text, Regexp
+** Q96: How do I search forward for a regexp?
+#+begin_src elisp
+(when (re-search-forward "foo\\(bar\\)?" nil t)
+  (match-string 0))
+#+end_src
+
+The third arg =t= means "return nil instead of erroring on failure."
+
+** Q97: Why are backslashes doubled in Elisp regexps?
+Because the regexp is written as a string, and string syntax also uses
+backslash escapes. So a regexp group =\(...\)= must be written =\\(...\\)= in the string literal. =rx= avoids this.
+
+** Q98: What is =rx=?
+A macro that builds regexps from readable s-expressions, eliminating backslash soup:
+
+#+begin_src elisp
+(rx bol (group (+ digit)) "-" (group (+ alpha)) eol)
+#+end_src
+
+** Q99: How do I get the matched text after a search?
+#+begin_src elisp
+(match-string 0)               ; whole match (from buffer)
+(match-string 1)               ; first group
+(match-string-no-properties 1)
+(match-beginning 1) (match-end 1)
+#+end_src
+
+** Q100: How do I replace text matching a regexp programmatically?
+#+begin_src elisp
+(while (re-search-forward "foo" nil t)
+  (replace-match "bar"))
+;; or on strings:
+(replace-regexp-in-string "foo" "bar" "foofoo")
+#+end_src
+
+** Q101: What is the difference between =looking-at= and =re-search-forward=?
+=looking-at= tests whether text *starting at point* matches a regexp without
+moving point. =re-search-forward= scans forward and moves point past the match.
+
+** Q102: How do I narrow the buffer?
+#+begin_src elisp
+(narrow-to-region start end)   ; restrict visible/operable text
+(widen)                        ; restore
+#+end_src
+Wrap in =save-restriction= when narrowing temporarily.
+
+** Q103: What are markers?
+Objects that point to a position in a buffer and *move automatically* as text
+is inserted/deleted, unlike plain integer positions. Use them when you need a
+position to stay valid across edits.
+
+** Q104: What are text properties?
+Attributes attached to characters in a buffer/string (e.g. =face=, =read-only=, custom keys). They travel with the text.
+
+#+begin_src elisp
+(put-text-property start end 'face 'bold)
+(propertize "hi" 'face 'warning)
+(get-text-property pos 'face)
+#+end_src
+
+
+** Q105: What is the difference between text properties and overlays?
+Text properties are part of the buffer text (copied/saved with it). Overlays
+are separate objects layered over a region, independent of the text, ideal for
+transient highlighting (e.g. search, flycheck). Overlays can be slower in large
+numbers.
+
+** Q106: How do I create an overlay?
+#+begin_src elisp
+(let ((ov (make-overlay start end)))
+  (overlay-put ov 'face 'highlight))
+#+end_src
+ 
+** Q107: How do I delete a region of text?
+#+begin_src elisp
+(delete-region start end)
+(delete-char 1)        ; at point
+(kill-region s e)      ; deletes and saves to kill ring
+#+end_src
+
+** Q108: How do I process a buffer line by line?
+#+begin_src elisp
+(goto-char (point-min))
+(while (not (eobp))
+  (let ((line (buffer-substring-no-properties
+               (line-beginning-position) (line-end-position))))
+    ;; process line
+    (forward-line 1)))
+#+end_src
+ 
+** Q109: What do =bobp= and =eobp= mean?
+=bobp= → point is at beginning of buffer; =eobp= → point is at end of buffer.
+Also =bolp= / =eolp= for line beginning/end.
+
+** Q110: How do I make a buffer read-only temporarily during code?
+#+begin_src elisp
+(let ((inhibit-read-only t))
+  (insert "text"))      ; bypass read-only for the body
+#+end_src
+
+* Advanced — Modes, Hooks, Customization
+
+** Q111: What is a major mode?
+A mode that defines the primary behavior of a buffer (syntax, keymap,
+font-locking, indentation). Each buffer has exactly one major mode. Defined
+with =define-derived-mode=.
+
+** Q112: What is a minor mode?
+A toggleable feature that augments behavior independently of the major mode
+(e.g. =flyspell-mode=). Many minor modes can be active at once. Defined with
+=define-minor-mode=.
+
+** Q113: How do I define a minor mode?
+#+begin_src elisp
+(define-minor-mode my-mode
+  "Toggle My mode."
+  :init-value nil
+  :lighter " My"
+  :keymap (make-sparse-keymap)
+  (if my-mode
+      (message "enabled")
+    (message "disabled")))
+#+end_src
+
+** Q114: How do I define a derived major mode?
+#+begin_src elisp
+(define-derived-mode my-mode prog-mode "MyLang"
+  "Major mode for MyLang."
+  (setq-local comment-start "# ")
+  (setq-local font-lock-defaults '(my-keywords)))
+#+end_src
+
+** Q115: What is a hook?
+A variable holding a list of functions run at a defined point (e.g.
+=prog-mode-hook=, =before-save-hook=). Add functions with =add-hook=.
+
+** Q116: How do I add a function to a hook?
+#+begin_src elisp
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'my-fn 90)   ; depth/append control
+(remove-hook 'prog-mode-hook #'my-fn)
+#+end_src
+
+** Q117: Why use =#'= when adding to a hook?
+It makes the intent (a function reference) explicit and lets the byte-compiler
+warn if the function is undefined. Plain symbols work too, but lambdas in hooks
+are hard to remove and should generally be avoided.
+
+** Q118: What is =setq-local= vs =setq-default=?
+=setq-local= sets a buffer-local value. =setq-default= sets the default value
+that buffers without a local binding see. =make-local-variable= /
+=make-variable-buffer-local= control buffer-locality.
+
+** Q119: What is a buffer-local variable?
+A variable whose value can differ per buffer. Mode code commonly uses
+=setq-local= to configure per-buffer behavior without affecting other buffers.
+
+** Q120: What is =defcustom=?
+Declares a user-customizable variable integrated with the Customize UI,
+including a type, group, and docstring.
+
+#+begin_src elisp
+(defcustom my-width 80
+  "Preferred width."
+  :type 'integer
+  :group 'my-group)
+#+end_src
+
+** Q121: What is =defgroup= and =defface=?
+=defgroup= declares a customization group to organize options. =defface=
+declares a customizable face (font/color set) used for text display.
+
+** Q122: How do I make a variable safe as a file-local variable?
+Set its =safe-local-variable= property with a predicate, or use the
+=:safe= keyword in =defcustom=:
+#+begin_src elisp
+(defcustom my-opt 1 "..." :type 'integer :safe #'integerp)
+#+end_src
+
+** Q123: What is =add-to-list= and how does it differ from =push=?
+=add-to-list= adds an element only if not already present (using =equal= by
+default) and evaluates its arguments; it's meant for list-valued variables.
+=push= always prepends and is a generalized-variable macro. For =defcustom=
+lists, prefer setting via Customize or =add-to-list=.
+
+** Q124: What is =use-package=?
+A macro (built into Emacs 29+) for declarative, organized package configuration
+— deferring loading, binding keys, setting variables, and adding hooks in one tidy form.
+
+#+begin_src elisp
+(use-package magit
+  :bind ("C-x g" . magit-status)
+  :config (setq magit-diff-refine-hunk t))
+#+end_src
+
+** Q125: How does autoloading work?
+An autoload registers a function name so that calling it loads the defining
+file on demand. Created via the =;;;###autoload= magic comment and generated
+autoload files, or =autoload= directly. It speeds startup by deferring loads.
+
+* Advanced — Performance, Compilation, Async
+** Q126: What is byte-compilation?
+Compiling =.el= to =.elc= bytecode for faster loading/execution and earlier
+warnings. =byte-compile-file=, =M-x byte-recompile-directory=. Warnings catch
+undefined functions, unused vars, etc.
+
+** Q127: What is native compilation?
+Emacs 28+ can compile Elisp to native machine code via libgccjit
+(=native-comp=), giving significant speedups. =.eln= files are produced and
+cached. Triggered automatically (=native-comp-jit-compilation=) or via
+=native-compile=.
+
+** Q128: How do I benchmark Elisp code?
+#+begin_src elisp
+(benchmark-run 1000 (my-function))   ; => (total-time gc-count gc-time)
+(benchmark-elapse (my-function))
+#+end_src
+
+** Q129: How do I profile Elisp?
+Use the built-in profiler:
+#+begin_src elisp
+(profiler-start 'cpu)
+;; ... do work ...
+(profiler-report)
+(profiler-stop)
+#+end_src
+
+** Q130: Why can lists be slow, and what's the alternative?
+=nth=/=length= on long lists are O(n). For random access use vectors; for
+keyed lookup use hash tables. Building a list with repeated =append= is O(n^2);
+prefer =push= + =nreverse=.
+
+** Q131: What is the purpose of =nreverse= after =push= in loops?
+=push= prepends (O(1)), building the list in reverse. =nreverse= flips it to
+the intended order at the end — an idiomatic, efficient way to accumulate a
+list.
+
+** Q132: How do I avoid garbage and speed up tight loops?
+Use lexical binding, prefer built-in primitives, avoid consing in loops,
+preallocate vectors, use =cl-loop= with =collect=, and byte/native compile.
+Raise =gc-cons-threshold= temporarily for bulk work.
+
+** Q133: Is Elisp single-threaded?
+Effectively yes for Lisp execution. Emacs 26+ has cooperative threads
+(=make-thread=) but they don't run truly in parallel — they yield at blocking
+points. Long computations still block the UI.
+
+ 
+
+** Q134: How do I run things asynchronously without blocking Emacs?
+ - =run-with-timer= / =run-with-idle-timer= for deferred work.
+ - Process-based async via =make-process= / =start-process= with filters and
+   sentinels.
+ - =url-retrieve= for async HTTP; libraries like =async.el= for subprocess Lisp.
+
+** Q135: What is a process filter and sentinel?
+A *filter* function receives output chunks from an asynchronous process. A
+*sentinel* is called when the process changes state (e.g. exits). Together they
+let you handle subprocess I/O without blocking.
+
+#+begin_src elisp
+(make-process :name "ls" :command '("ls")
+              :filter (lambda (proc out) (message "%s" out))
+              :sentinel (lambda (proc ev) (message "done: %s" ev)))
+#+end_src
+
+** Q136: How do I run a shell command and get its output?
+#+begin_src elisp
+(shell-command-to-string "echo hi")
+(call-process "ls" nil t nil "-l")   ; synchronous, into current buffer
+#+end_src
+
+** Q137: What is a timer?
+A scheduled callback. =run-with-timer= fires after a delay (optionally
+repeating); =run-with-idle-timer= fires when Emacs has been idle for a period.
+Cancel with =cancel-timer=.
+
+** Q138: What is debouncing and how do I implement it in Elisp?
+Delaying an action until input settles. Implement by canceling a pending timer
+and rescheduling on each event:
+
+#+begin_src elisp
+(defvar my--timer nil)
+(defun my-debounced ()
+  (when my--timer (cancel-timer my--timer))
+  (setq my--timer (run-with-idle-timer 0.5 nil #'my-do-work)))
+#+end_src
 
 -----
 
