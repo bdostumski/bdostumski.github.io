@@ -1,0 +1,800 @@
+#+TITLE: Doom Emacs
+#+DATE: 2026-06-26
+#+TAGS: Emacs
+#+DESCRIPTION: A comprehensive Doom Emacs guide from beginner to advanced.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Introduction & Concepts
+** What is Doom Emacs?
+Doom Emacs is a configuration framework (a "distribution") for GNU Emacs that
+preconfigures Emacs to behave like a modern, Vim-style editor. It ships with
+sane defaults, fast startup, a module system, and tight integration of
+=evil-mode= (Vim emulation).
+
+** How is Doom different from vanilla Emacs?
+Vanilla Emacs is a blank slate; you write all configuration yourself. Doom gives
+you a curated, opinionated, performance-focused setup with a declarative module
+system, a leader-key based keybinding scheme, and a CLI (=doom=) to manage it.
+
+** How does Doom differ from Spacemacs?
+Both are Vim-friendly distributions. Doom prioritizes startup speed and minimal,
+explicit configuration; Spacemacs is heavier, more abstracted ("layers"), and
+generally slower to start. Doom favors readable Emacs Lisp over heavy macros.
+
+** Is Doom Emacs a fork of Emacs?
+No. It is configuration layered on top of stock GNU Emacs. You still install
+Emacs separately; Doom configures it.
+
+** What are Doom's main design goals?
+Speed (fast startup via lazy loading and native compilation), a clean module
+system, good defaults, and discoverability through =which-key= and the leader key.
+
+** What Emacs version does Doom require?
+A recent stable Emacs (Emacs 27.1 minimum historically; current Doom targets
+Emacs 28/29/30). Emacs 29+ with native compilation (=libgccjit=) is recommended.
+
+** What is "native compilation" and why does it matter?
+Native compilation (=gccjit=) compiles Emacs Lisp to native machine code,
+significantly improving runtime performance. Emacs built =--with-native-compilation=
+lets Doom and packages run faster after an initial compile.
+
+* Installation & First Run
+** What are the prerequisites for installing Doom?
+Git, Emacs (28+ recommended), ripgrep (=rg=), and =fd= (find alternative). Optional
+but recommended: a Nerd Font / patched font for icons, and language tools (LSP
+servers, =shellcheck=, etc.).
+
+** How do I install Doom Emacs?
+Clone Doom into your Emacs config dir and run the installer:
+
+#+begin_src sh
+git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
+~/.config/emacs/bin/doom install
+#+end_src
+
+** Where does Doom live on disk?
+Two locations: the Doom core/runtime in =~/.config/emacs= (or =~/.emacs.d=), and your
+personal config in =~/.config/doom= (or =~/.doom.d=).
+
+** On Windows, where does Doom install?
+Typically =%USERPROFILE%\.config\emacs= for the core and =%USERPROFILE%\.doom.d= or =%USERPROFILE%\.config\doom= for your config.
+Install Emacs (e.g. via the official Windows build or scoop), plus =git=, =ripgrep=, and =fd= on the PATH.
+
+** What is the recommended way to run Emacs as a server?
+Start the Emacs daemon (=emacs --daemon=) and connect with =emacsclient=. This makes new frames open near-instantly since Emacs is already loaded.
+
+** How do I add Doom's bin directory to my PATH?
+Add =~/.config/emacs/bin= (or =~/.emacs.d/bin=) to your shell PATH so you can call =doom= from anywhere.
+
+** What does =doom install= do?
+It clones/installs all packages for your enabled modules, generates environment files, compiles, and runs =doom sync= for the first time.
+
+** What is =doom sync= and when must I run it?
+=doom sync= reconciles your config (=init.el=, =packages.el=) with installed packages.
+Run it whenever you edit =init.el= or =packages.el= (enable/disable modules or add packages).
+
+** What does =doom doctor= do?
+It diagnoses your installation: missing dependencies, broken fonts, misconfigured servers, byte-compile warnings. Run it first when something is wrong.
+
+** What does =doom upgrade= do?
+It pulls the latest Doom core, updates all packages to pinned versions, and syncs. It is the standard way to update Doom.
+
+** How do I roll back a bad upgrade?
+Use git in =~/.config/emacs= to checkout the previous commit, then run =doom sync=.
+Doom pins package versions, so a checkout restores the prior known-good state.
+
+* The doom CLI
+** What are the most important =doom= CLI commands?
+=doom sync=, =doom upgrade=, =doom doctor=, =doom install=, =doom build= (=doom sync -b=), =doom purge=, =doom env=, =doom compile=.
+
+** What does =doom env= do?
+It captures your shell environment into an env file that Emacs loads, so GUI Emacs
+inherits your PATH and variables. Re-run after changing your shell environment.
+
+** What does =doom purge= do?
+It removes orphaned/unused packages and old build artifacts to reclaim disk space.
+
+** What does =doom build= (or =doom sync -b=) do?
+It byte-compiles (and native-compiles) installed packages, improving performance.
+
+** How do I update only packages, not Doom core?
+=doom upgrade= updates both; to update packages alone, edit pins in =packages.el= or
+use =doom sync -u= (update) depending on Doom version. Generally =doom upgrade= is
+the supported path.
+
+** What does =doom sync -u= do?
+The =-u= flag updates packages to their latest allowed versions during sync.
+
+* Configuration Files
+** What are the three main config files?
+=init.el= (enable/disable modules), =packages.el= (declare extra/override packages), and =config.el= (your personal Emacs Lisp configuration).
+
+** What goes in =init.el=?
+The =doom!= block listing enabled modules and their flags. You toggle features here, not write logic. After editing, run =doom sync=.
+
+** What goes in =config.el=?
+All your personal customization: settings, keybindings, package config, hooks, and Emacs Lisp. It is loaded at startup.
+
+** What goes in =packages.el=?
+Package declarations: =(package! foo)= to install extra packages, =(package! bar :disable t)= to disable, or pinning/recipe overrides. Run =doom sync= after edits.
+
+** Where is the Doom config directory by default?
+=~/.config/doom= on XDG systems, or =~/.doom.d= (legacy). Doom checks both.
+
+** How do I find my Doom directory programmatically?
+The variable =doom-user-dir= holds your private config path; =doom-emacs-dir= holds the core path.
+
+** What is =custom.el= and should I use it?
+Emacs writes =M-x customize= settings to a custom file. Doom isolates this; prefer
+configuring in =config.el= with =setq=/=after!= over the Customize UI for reproducibility.
+
+** How do I reload my config without restarting?
+=SPC h r r= (=doom/reload=) reloads, but a full restart is more reliable after big changes.
+For pure elisp edits, =M-x eval-buffer= or =SPC m e b= in =config.el=.
+
+* The doom! Block & Modules
+** What is the module system?
+Doom groups functionality into modules organized as =:category module=, e.g.
+=:lang python=, =:tools magit=, =:editor evil=. You enable them in the =doom!= block.
+
+** How do I enable a module?
+Uncomment or add it in =init.el='s =doom!= block, then run =doom sync= and restart.
+
+** What are module "flags"?
+Flags refine a module's behavior, written with =+=: e.g. =(python +lsp +pyright)= or
+=(org +pretty +roam2)=. They toggle optional features within a module.
+
+** What are the module categories?
+=:input :completion :ui :editor :emacs :term :checkers :tools :os :lang :email :app :config=.
+
+** How do I discover available modules and flags?
+Browse =~/.config/emacs/modules=, read =SPC h d m= (Doom module docs), or check the
+Doom documentation. Each module has a README describing flags.
+
+** What is the =:completion= category for?
+Completion frameworks: e.g. =vertico= (minibuffer completion), =corfu= or =company=
+(in-buffer completion), =helm=/=ivy= (older). Pick one minibuffer + one in-buffer.
+
+** What does =(:editor evil +everywhere)= do?
+Enables Vim emulation (=evil-mode=); the =+everywhere= flag extends Vim keybindings
+into more Emacs interfaces (dired, magit, etc.).
+
+** What does the =:config default= module provide?
+Doom's sensible default settings and keybindings; =(default +bindings +smartparens)=
+adds the standard leader-key bindings and smartparens.
+
+** How do I disable a feature I don't want?
+Remove its module/flag from =init.el= and =doom sync=, or in =packages.el= add =(package! x :disable t)=.
+
+** What happens if two completion modules conflict?
+Doom will warn (run =doom doctor=). Enable only one minibuffer completion system and one in-buffer completion system.
+
+* Evil Mode & Editing
+** What is evil-mode?
+Evil is the Vim emulation layer. Doom enables it by default so you edit with modal
+(normal/insert/visual) Vim keybindings.
+
+** What are the Vim modes available?
+Normal, Insert, Visual (char/line/block), Replace, Operator-pending, Motion, and Emacs state (=C-z= toggles Emacs state).
+
+** How do I switch to Emacs (non-modal) state temporarily?
+Press =C-z= to toggle =evil-emacs-state=, restoring native Emacs keybindings.
+
+** How do I exit insert mode?
+Press =ESC=, or =C-g=, or the configured =jk= escape sequence if enabled (=evil-escape=).
+
+** What is =evil-escape=?
+A package letting you exit insert/visual mode by typing a quick two-key sequence
+(default often =jk= or =fd=), avoiding reaching for =ESC=.
+
+** How do I do a global search-and-replace in a file?
+=:%s/old/new/g= (evil ex command), like in Vim. Add =c= for confirmation:
+=:%s/old/new/gc=.
+
+** How do I select and operate on text objects?
+Use Vim text objects: =ciw= (change inner word), =di"= (delete inside quotes),
+=ya(= (yank around parens), etc. Doom adds extra objects via =evil-textobj-*=.
+
+** What does =gd= do?
+=gd= jumps to definition (go-to-definition), wired to LSP/xref/tags depending on
+the language.
+
+** What does =gc= do?
+=gc= is the comment operator (from =evil-commentary= / =evil-nerd-commenter=): =gcc=
+comments a line, =gc= + motion comments a region.
+
+** How do I increment/decrement a number under the cursor?
+=C-a= increments, =C-x= decrements (evil-numbers / Doom binding). Note =C-x= is rebound from the Emacs prefix in normal state.
+
+** How do I record and replay macros?
+=q= followed by a register (e.g. =qa=) records into register =a=; =q= stops; =@a= plays; =@@= repeats the last macro — standard Vim.
+
+** How do I use marks and jumps?
+=m{a-z}= sets a mark, ='{a-z}= jumps to it; =C-o= / =C-i= move backward/forward in the jump list.
+
+* The Leader Key & Keybindings
+** What is the leader key?
+=SPC= (space) in normal/visual state is the Doom leader key, prefix for almost all
+commands. In insert/Emacs state the leader is =M-SPC= or =C-c= depending on config.
+
+** What is the localleader key?
+=SPC m= (or =,= in normal state) is the localleader — mode-specific commands for the current major mode (e.g. org, python).
+
+** How do I discover keybindings interactively?
+Press =SPC= and wait: =which-key= shows a popup of available next keys. This is the primary discovery mechanism.
+
+** What does =SPC f f= do?
+Find file (=find-file=) — opens the file browser/minibuffer to open a file.
+
+** What does =SPC .= do?
+=find-file= starting at the current directory (quick file open).
+
+** What does =SPC b b= do?
+Switch buffer — lists open buffers to switch between.
+
+** What does =SPC p p= do?
+Switch project (Projectile) — lists known projects to open.
+
+** What does =SPC :=  do?
+=M-x= equivalent — execute an Emacs command by name (=execute-extended-command=).
+
+** What does =SPC ;= do?
+=eval-expression= — evaluate an Emacs Lisp expression in the minibuffer.
+
+** What does =SPC h= prefix cover?
+Help: =SPC h f= describe function, =SPC h v= describe variable, =SPC h k= describe key,
+=SPC h d= Doom-specific help (docs, modules, news).
+
+** How do I search for an action when I don't know the key?
+=SPC :=  (M-x) and type a fuzzy command name, or =SPC h b b= to search all bindings.
+
+** How do I define my own keybinding in config.el?
+Use Doom's =map!= macro:
+
+#+begin_src emacs-lisp
+(map! :leader
+      :desc "Format buffer" "c f" #'+format/buffer)
+#+end_src
+
+** How do I bind a key only in a specific mode?
+#+begin_src emacs-lisp
+(map! :map python-mode-map
+      :n "gh" #'lsp-describe-thing-at-point)
+#+end_src
+
+=:n= scopes to normal state; =:map= scopes to a keymap.
+
+** What do the state prefixes (:n :i :v :g) mean in map!?
+=:n= normal, =:i= insert, =:v= visual, =:m= motion, =:e= emacs, =:g= global (all/no state), =:o= operator.
+They scope the binding to evil states.
+
+** How do I unbind a key?
+Bind it to =nil=:
+
+#+begin_src emacs-lisp
+(map! :n "C-a" nil)
+#+end_src
+
+* Buffers, Windows & Workspaces
+** What is the difference between a buffer, window, and frame?
+A buffer holds content (a file or output); a window is a viewport showing a
+buffer; a frame is an OS-level window containing windows.
+
+** How do I split windows?
+=SPC w v= vertical split, =SPC w s= horizontal split, =SPC w d= close window. Or evil: =C-w v=, =C-w s=, =C-w c=.
+
+** How do I navigate between windows?
+=SPC w h/j/k/l= or =C-w h/j/k/l= to move by direction; =SPC w w= to cycle.
+
+** How do I kill a buffer?
+=SPC b k= (=kill-buffer=) or =SPC b d=. =SPC b K= kills all other buffers.
+
+** What are Doom workspaces?
+Workspaces (via =persp-mode= / =:ui workspaces=) are named, isolated sets of buffers
+and window layouts — like tabs/sessions. Switch with =SPC TAB=.
+
+** How do I create and switch workspaces?
+=SPC TAB n= new, =SPC TAB [= / =SPC TAB ]= previous/next, =SPC TAB 1..9= by number,
+=SPC TAB .= switch by name.
+
+** How are workspaces tied to projects?
+Opening a project with =SPC p p= can spawn a new workspace, isolating its buffers from other projects.
+
+** How do I save and restore sessions?
+=SPC q s= save session, =SPC q l= restore last session. Workspaces persist layout and buffers.
+
+** What does =SPC `= do?
+Switch to the last (alternate) buffer — quick toggle between two buffers.
+
+* Files, Projects & Search
+** What is Projectile?
+Projectile is project management: it detects project roots (=.git=, etc.) and gives
+project-scoped commands for finding files, searching, and running commands.
+
+** How do I find a file within the current project?
+=SPC SPC= (=projectile-find-file=) or =SPC p f=.
+
+** How do I search text across a project?
+=SPC s p= (=+default/search-project=) runs ripgrep across the project. =SPC s b= searches the current buffer.
+
+** What backs project search?
+=ripgrep= (=rg=) for content search and =fd= for filename search; both must be installed and on PATH.
+
+** What is =consult= / =consult-ripgrep=?
+With Vertico-based completion, =consult= provides live, previewable search commands
+like =consult-ripgrep= for incremental project-wide search.
+
+** How do I open a recently used file?
+=SPC f r= (recent files) lists files from history.
+
+** How do I open dired (file manager)?
+=SPC f d= or =SPC d= opens =dired= for the current directory; navigate with evil keys.
+
+** What is the Doom dashboard?
+The startup screen showing recent files, projects, and bookmarks. =SPC b H= or visiting =*doom*= returns to it.
+
+** How do I jump to a bookmark?
+=SPC RET= (=bookmark-jump=); set with =SPC f b= or =bookmark-set=.
+
+** How do I rename or delete the current file?
+=SPC f R= rename/move, =SPC f D= delete current file.
+
+** How do I copy the current file's path?
+=SPC f y= copies the file path to the kill ring (yank).
+
+* Completion (Minibuffer & In-buffer)
+** What is Vertico?
+A lightweight vertical minibuffer completion UI (the modern Doom default in the
+=:completion vertico= module), replacing Ivy/Helm.
+
+** What is Orderless?
+A completion style allowing space-separated, order-independent fuzzy matching of candidates. It pairs with Vertico.
+
+** What is Marginalia?
+A package adding rich annotations (docs, file sizes, keybindings) beside minibuffer candidates.
+
+** What is Embark?
+=embark= provides context actions on the candidate at point (like a right-click menu) — act on files, buffers, symbols from the minibuffer. Often =SPC a= or =C-;=.
+
+** What is the difference between company and corfu?
+Both are in-buffer (at-point) completion popups. =company= is the older, mature
+choice; =corfu= is the newer, lighter, =completion-at-point=-native alternative.
+
+** How do I trigger in-buffer completion manually?
+=C-SPC= or =TAB= (config dependent) invokes company/corfu; with LSP it shows symbol completions.
+
+** How do I navigate completion candidates?
+=C-n= / =C-p= (or arrow keys) move; =RET= or =TAB= accepts; =C-g= cancels.
+
+** What is snippet completion (YASnippet)?
+=yasnippet= expands abbreviations into templates with fields you tab through. Doom's
+=:editor snippets= module enables it; =SPC i s= inserts a snippet.
+
+** How do I add my own snippets?
+=SPC i S= (or =yas-new-snippet=) and save into =~/.config/doom/snippets/<mode>/=.
+
+* Org Mode
+** What is Org mode?
+A powerful Emacs major mode for notes, outlining, task management, agendas,
+literate programming, and document authoring in plain text.
+
+** How do I enable extra Org features in Doom?
+Add flags in =init.el=: =(org +pretty +roam2 +journal +dragndrop)= etc., then =doom sync=.
+
+** What is =org-directory= and how do I set it?
+The base folder for org files/agenda. Set early in =config.el=:
+
+#+begin_src emacs-lisp
+(setq org-directory "~/org/")
+#+end_src
+
+Set it before Org loads for agenda to pick it up.
+
+** How do I create a TODO item?
+Type a headline and prefix with =TODO=, or =SPC m t= to cycle TODO state on a headline. =S-LEFT/RIGHT= cycles keywords.
+
+** How do I schedule or set a deadline?
+=SPC m d s= schedule, =SPC m d d= deadline (or =org-schedule= / =org-deadline=). Adds a timestamp the agenda reads.
+
+** How do I view the agenda?
+=SPC o A= (or =org-agenda=) opens the agenda dispatcher; choose a view (day/week, TODO list).
+
+** What is org-capture?
+A quick note/task capture system. =SPC X= or =SPC n n= triggers a capture template to file notes into predefined locations.
+
+** How do I define capture templates?
+Set =org-capture-templates= in =config.el= via =after! org=:
+
+#+begin_src emacs-lisp
+(after! org
+  (add-to-list 'org-capture-templates
+    '("t" "Todo" entry (file+headline "inbox.org" "Tasks")
+      "* TODO %?\n  %U")))
+#+end_src
+
+** What are org babel source blocks?
+=#+begin_src lang ... #+end_src= blocks you can execute in-buffer with =C-c C-c=,
+enabling literate programming. Enable languages via =org-babel-load-languages=.
+
+** What is org-roam?
+A Zettelkasten-style note system (=+roam2= flag) for linked, networked notes with
+backlinks. =SPC n r f= find/create a note, =SPC n r i= insert a link.
+
+** What is org-export?
+Exporting org documents to HTML, PDF (via LaTeX), Markdown, etc., via the export
+dispatcher =SPC m e= (=org-export-dispatch=).
+
+** How do I tangle code from an org file?
+=org-babel-tangle= (=SPC m b t=) extracts source blocks into separate files — useful for literate config.
+
+** How do I make org look prettier?
+The =+pretty= flag enables =org-modern= / superstar bullets, prettified entities, and better headings.
+
+* Git (Magit)
+** What is Magit?
+Magit is the premier Git porcelain for Emacs — a full-featured, fast Git interface
+driven by single keystrokes. Enabled via =:tools magit=.
+
+** How do I open Magit status?
+=SPC g g= (=magit-status=) opens the status buffer for the current repo.
+
+** How do I stage and unstage changes in Magit?
+In the status buffer, move to a file/hunk and press =s= to stage, =u= to unstage.
+=S= stages all.
+
+** How do I commit in Magit?
+Press =c c= to start a commit, write the message, then =C-c C-c= to finalize.
+
+** How do I push and pull?
+=P= opens the push transient, =F= the pull transient; choose remote/branch via the menu.
+
+** How do I view a diff of a file's history?
+=SPC g f l= file log, or in Magit =l l= for the log; press =RET= on a commit to view its diff.
+
+** What is a Magit transient?
+The popup menu (Magit/Transient) listing available options and switches for an
+action (push, log, rebase). You toggle flags then trigger.
+
+** How do I do an interactive rebase?
+=r i= in the log/status, select the base commit; reorder/squash/edit in the rebase
+buffer, then =C-c C-c=.
+
+** How do I resolve merge conflicts?
+Use =smerge-mode= (auto-enabled) — keybindings under =SPC g= or =C-c ^= to keep
+upper/lower/both; Magit shows conflicted files in status.
+
+** What is git-gutter / diff-hl in Doom?
+The =:ui vc-gutter= module shows added/changed/removed line indicators in the
+fringe. =SPC g [= / =SPC g ]= jump between hunks.
+
+** What is git-timemachine?
+=SPC g t= steps through a file's historical revisions one commit at a time to see
+how it changed.
+
+** How do I blame a file?
+=SPC g B= (=magit-blame=) annotates each line with its last-changing commit/author.
+
+* Programming & LSP
+** What is LSP and how does Doom use it?
+LSP (Language Server Protocol) provides IDE features (completion, diagnostics,
+go-to-def) via external servers. Doom integrates via the =:tools lsp= module
+(=lsp-mode= or =eglot=).
+
+** How do I enable LSP for a language?
+Add the =+lsp= flag to the language module, e.g. =(python +lsp)=, enable =:tools lsp=,
+install the language server, then =doom sync=.
+
+** What is the difference between lsp-mode and eglot?
+Both are LSP clients. =lsp-mode= is feature-rich and heavier; =eglot= (=+eglot= flag)
+is minimal and built into Emacs 29+. Choose one in the =:tools lsp= module.
+
+** How do I jump to a definition / find references?
+=gd= go to definition, =gD= or =SPC c D= find references, =K= or =SPC c k= show docs at
+point.
+
+** How do I rename a symbol project-wide?
+=SPC c r= (=lsp-rename= / =eglot-rename=) renames the symbol and updates references.
+
+** How do I see and navigate errors/diagnostics?
+=:checkers syntax= (Flycheck/Flymake) shows diagnostics; =SPC c x= lists errors,
+=] e= / =[ e= jump to next/previous.
+
+** What is Flycheck vs Flymake?
+Both are on-the-fly syntax checkers. =flycheck= is the long-standing third-party
+option; =flymake= is built-in and used by eglot. The =:checkers syntax= module
+configures one.
+
+** How do I format a buffer?
+=SPC c f= (=+format/buffer=) via the =:editor format= module, using formatters like
+=prettier=, =black=, =gofmt= per language.
+
+** How do I run code or a REPL?
+Many lang modules add a REPL under =SPC m r= or =SPC o r= (e.g. Python =SPC m r r=).
+=:tools eval= enables =SPC c e= to eval regions.
+
+** How do I comment code?
+=gcc= a line, =gc= + motion a region (evil), or =SPC c c= region.
+
+** How do I fold code?
+=za= toggle fold, =zR= open all, =zM= close all (evil-vimish-fold / origami / built-in
+=hideshow=). LSP can provide semantic folding.
+
+** How do I add a language to Doom?
+Enable its =:lang= module in =init.el= (e.g. =rust=, =go=, =java=), add flags like =+lsp=,
+install toolchain + language server, =doom sync=, restart.
+
+** What is Tree-sitter and does Doom use it?
+Tree-sitter provides fast, accurate syntax parsing. Emacs 29+ has built-in
+tree-sitter modes; Doom modules increasingly support =+tree-sitter= flags for better
+highlighting and structural editing.
+
+** How do I debug code in Doom?
+The =:tools debugger= module enables =dap-mode= (with lsp) or =realgud=. =SPC c d=
+starts a debug session; set breakpoints and step through.
+
+* UI, Themes & Fonts
+** How do I change the theme?
+Set =doom-theme= in =config.el=:
+
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-one)
+#+end_src
+
+Browse themes live with =SPC h t= (=load-theme=).
+
+** Where do themes come from?
+The =doom-themes= package bundles many themes (=doom-one=, =doom-dracula=,
+=doom-gruvbox=, etc.). You can also load any Emacs theme.
+
+** How do I set the font?
+Set =doom-font= (and optionally =doom-variable-pitch-font=, =doom-big-font=) in =config.el=:
+
+#+begin_src emacs-lisp
+(setq doom-font (font-spec :family "JetBrains Mono" :size 14))
+#+end_src
+
+** Why don't icons show up?
+You need a Nerd Font / icon font installed. Run =M-x nerd-icons-install-fonts= (or
+=all-the-icons-install-fonts= on older Doom) and restart.
+
+** What is the modeline and can I customize it?
+The modeline (status bar) is =doom-modeline=. Configure via =after! doom-modeline= and
+=setq doom-modeline-*= variables (e.g. height, icons, buffer name style).
+
+** How do I enable line numbers?
+=display-line-numbers-type= controls it:
+
+#+begin_src emacs-lisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+=t= absolute, ='relative= relative, ='visual=, or =nil= off.
+
+** How do I increase/decrease font size on the fly?
+=SPC = += or =C-+= / =C--= adjust =text-scale=; =SPC t b= toggles =doom-big-font= (zen/present mode).
+
+** What is zen / writeroom mode?
+The =:ui zen= module centers text and removes distractions for writing. Toggle with
+=SPC t z=.
+
+** How do I toggle a sidebar file tree?
+The =:ui treemacs= module gives a project tree. =SPC o p= toggles =treemacs=; navigate
+with evil keys.
+
+** How do I change the splash/dashboard image?
+Set =+doom-dashboard-banner-file= and =+doom-dashboard-banner-dir= in =config.el= to
+point at a custom image.
+
+* Terminals & External Tools
+** What terminal options does Doom have?
+=:term vterm= (fast, libvterm-based, recommended), =:term eshell= (elisp shell),
+=:term shell= and =:term term=. =vterm= needs compilation of a native module.
+
+** How do I open a terminal?
+=SPC o t= opens a terminal in the current window; =SPC o T= in a popup. With vterm,
+=SPC o t= or =M-x +vterm/here=.
+
+** What is eshell?
+An Emacs-implemented shell mixing shell syntax with Emacs Lisp; portable across
+OSes and integrated with Emacs buffers. =SPC o e= opens it.
+
+** How do I run an async shell command?
+=M-x async-shell-command= or =SPC :=  then the command; output goes to a buffer
+without blocking Emacs.
+
+** How does Doom integrate with the system clipboard?
+On GUI Emacs clipboard works out of the box; on terminal Emacs you may need
+=xclip= / =wl-clipboard= (Linux) or =clipetty=. Evil yank/paste sync with the system
+clipboard depending on config.
+
+* Performance & Maintenance
+** Why is my Emacs startup slow?
+Run =doom doctor= and =M-x doom/profile-startup= (or =esup=). Common causes: unpinned
+heavy packages, expensive =config.el= code not deferred, missing native compilation.
+
+** How do I profile startup time?
+=emacs --eval '(message "%s" (emacs-init-time))'= or use the =benchmark-init= /
+=esup= package. Doom shows init time on the dashboard.
+
+** What is lazy loading / deferring in Doom?
+Doom defers package loading until needed. Use =after!= and =use-package!= with
+=:defer= so your config doesn't load everything at startup.
+
+** What is the =after!= macro?
+Runs code only after a package/feature loads, avoiding eager loading:
+
+#+begin_src emacs-lisp
+(after! python
+  (setq python-indent-offset 4))
+#+end_src
+
+** What is the =use-package!= macro?
+Doom's wrapper over =use-package= for configuring packages with =:hook=, =:config=,
+=:defer=, etc., in =config.el=.
+
+** How do I keep Doom healthy over time?
+Periodically run =doom upgrade=, =doom doctor=, =doom purge=, and =doom sync= after config
+changes. Pin packages if you need stability.
+
+** How do I clear Doom's caches?
+=doom clean= / =doom purge= removes build artifacts and elc files; delete
+=~/.config/emacs/.local/cache= for a deeper reset, then =doom sync=.
+
+** Why did a package break after upgrade?
+A package update introduced an incompatible change. Pin the working version in
+=packages.el= with =(package! foo :pin "COMMITHASH")= and =doom sync=.
+
+* Advanced Customization
+** How do I install a package not in any module?
+In =packages.el=:
+
+#+begin_src emacs-lisp
+(package! some-package)
+#+end_src
+
+Then =doom sync=, and configure it in =config.el= with =use-package!=.
+
+** How do I install a package from a Git repo (recipe)?
+#+begin_src emacs-lisp
+(package! my-pkg
+  :recipe (:host github :repo "user/repo" :files ("*.el")))
+#+end_src
+
+** How do I pin a package to a specific commit?
+#+begin_src emacs-lisp
+(package! magit :pin "abc1234...")
+#+end_src
+
+Pinning ensures reproducible builds across =doom upgrade=.
+
+** How do I disable a package a module installs?
+#+begin_src emacs-lisp
+(package! the-package :disable t)
+#+end_src
+
+** How do I override a Doom module's behavior?
+Use =after!= to re-set variables, =add-hook!=/=remove-hook!= to change hooks, or
+=advice-add= to wrap functions. Avoid editing core module files directly.
+
+** What is =add-hook!= (Doom's macro)?
+A more ergonomic hook adder supporting multiple modes/functions:
+
+#+begin_src emacs-lisp
+(add-hook! 'python-mode-hook #'rainbow-mode)
+#+end_src
+
+** What is =setq-hook!=?
+Sets buffer-local variables via a hook:
+
+#+begin_src emacs-lisp
+(setq-hook! 'python-mode-hook tab-width 4)
+#+end_src
+
+** How do I create a custom module?
+Create =~/.config/doom/modules/<category>/<module>/= with =config.el=, =packages.el=,
+=init.el=, add =(:category module)= to your =doom!= block, and =doom sync=.
+
+** How do I define a custom interactive command?
+#+begin_src emacs-lisp
+(defun my/insert-date ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d")))
+(map! :leader :desc "Insert date" "i D" #'my/insert-date)
+#+end_src
+
+** How do I run code only on the first frame / for daemon?
+Use =add-hook 'server-after-make-frame-hook= or Doom's
+=after-init-hook=/=doom-after-init-hook= for daemon-safe setup (e.g. fonts, themes).
+
+** How do I customize which-key delay and appearance?
+#+begin_src emacs-lisp
+(after! which-key
+  (setq which-key-idle-delay 0.3))
+#+end_src
+
+** How do I make a popup window behave differently?
+Doom's =set-popup-rule!= controls popup placement/size:
+
+#+begin_src emacs-lisp
+(set-popup-rule! "^\\*compilation" :side 'bottom :size 0.3)
+#+end_src
+ 
+** How do I add a file template?
+Doom uses =:editor file-templates=; add entries to =+file-templates-alist= or place
+yasnippet templates so new files autopopulate.
+
+** How do I conditionally load config per OS?
+Use feature checks:
+
+#+begin_src emacs-lisp
+(when IS-WINDOWS (setq ...))
+(when IS-MAC (setq mac-command-modifier 'meta))
+#+end_src
+
+Doom defines =IS-WINDOWS=, =IS-MAC=, =IS-LINUX=.
+
+* Help, Discoverability & Learning
+** How do I read documentation for a function?
+=SPC h f= (=describe-function=), then its name; the help buffer links to source.
+
+** How do I see what a key does?
+=SPC h k= then press the key (=describe-key=) shows the bound command and docs.
+
+** How do I see all keybindings active in a buffer?
+=SPC h b b= searches bindings, or =M-x describe-bindings= lists them all.
+
+** How do I access Doom's own documentation?
+=SPC h d= prefix: =SPC h d d= docs index, =SPC h d m= module docs, =SPC h d n= Doom news,
+=SPC h d h= help search.
+
+** How do I report a Doom bug properly?
+Run =doom doctor=, gather the output, and open an issue on the doomemacs GitHub with
+your Emacs version, OS, and a minimal reproduction.
+ 
+** What is the fastest way to learn evil/Vim motions?
+Run =M-x evil-tutor= (if installed) or =vimtutor=; practice text objects and operators
+daily. =SPC h= and which-key reinforce keybindings.
+
+** Where can I find example Doom configs?
+The doomemacs GitHub wiki, the official documentation, and many users publish their
+=~/.doom.d= dotfiles on GitHub for reference.
+
+* Troubleshooting
+** Doom won't start after I edited config — what now?
+Start Emacs with =emacs --debug-init= to see the backtrace, or temporarily move the
+offending file. Fix the elisp error, then restart.
+
+** A keybinding I set doesn't work — why?
+Likely an evil-state or keymap mismatch. Check the state prefix in =map!= (=:n= vs
+=:i=) and that the target keymap is loaded (wrap in =after!= if needed).
+
+** Why does =doom sync= fail to download a package?
+Network/proxy issues or a bad recipe. Check connectivity, the recipe spelling in
+=packages.el=, and run =doom sync -u= or =doom doctor= for details.
+
+** Icons/fonts look wrong in the terminal — why?
+Terminal Emacs can't render GUI fonts/icons fully; use GUI Emacs or a terminal +
+Nerd Font, and ensure =nerd-icons= fonts are installed.
+
+** My LSP isn't activating — what should I check?
+Confirm the language server is installed and on PATH, the =+lsp= flag is set,
+=:tools lsp= is enabled, and check =M-x lsp-doctor= / =*lsp-log*= buffer.
+
+** Changes to init.el aren't taking effect — why?
+You must run =doom sync= after editing =init.el= or =packages.el=, then restart Emacs.
+=config.el= changes only need a reload/restart.
+
+** How do I fully reset Doom to a clean state?
+Back up =~/.config/doom=, delete =~/.config/emacs/.local=, run =doom sync= (and possibly
+=doom install=) to rebuild from scratch.
+
+** Emacs is frozen — how do I recover?
+=C-g= cancels the current command; =C-g C-g= more forcefully. If truly hung, the
+daemon may need =emacsclient -e '(top-level)'= or a process kill as a last resort.
+
+-----
+
+#+INCLUDE: "../footer.org"
