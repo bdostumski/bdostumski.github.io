@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NoSQL</title>
+<meta name="description" content="A comprehensive Emacs Lisp guide covering Elisp fundamentals, Emacs internals, package development, macros, debugging, performance optimization, asynchronous programming, and advanced editor extension development." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">NoSQL</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-orga188063" class="outline-2">
+<h2 id="orga188063">NoSQL Q&amp;A (Beginner to Advanced)</h2>
+</div>
+
+<div id="outline-container-orgafb800a" class="outline-2">
+<h2 id="orgafb800a">Fundamentals</h2>
+<div class="outline-text-2" id="text-orgafb800a">
+</div>
+<div id="outline-container-org0069cd5" class="outline-3">
+<h3 id="org0069cd5">Q1. What is NoSQL?</h3>
+<div class="outline-text-3" id="text-org0069cd5">
+<p>
+"NoSQL" ("Not Only SQL") is a broad family of non-relational databases designed
+for large-scale, flexible-schema, and distributed workloads. They relax some
+relational guarantees (joins, fixed schema, strong consistency) in exchange for
+scalability, flexibility, and availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org7908581" class="outline-3">
+<h3 id="org7908581">Q2. What are the main categories of NoSQL databases?</h3>
+<div class="outline-text-3" id="text-org7908581">
+<ul class="org-ul">
+<li><b>Document</b> stores: MongoDB, Couchbase</li>
+<li><b>Key-Value</b> stores: Redis, DynamoDB, Riak</li>
+<li><b>Wide-Column</b> (column-family) stores: Cassandra, HBase, ScyllaDB</li>
+<li><b>Graph</b> databases: Neo4j, JanusGraph, Amazon Neptune</li>
+<li>(Sometimes added: search engines like Elasticsearch, time-series like InfluxDB)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3e6d3aa" class="outline-3">
+<h3 id="org3e6d3aa">Q3. How does NoSQL differ from relational (SQL) databases?</h3>
+<div class="outline-text-3" id="text-org3e6d3aa">
+<p>
+Relational DBs use fixed schemas, tables/rows, SQL, joins, and strong ACID
+guarantees. NoSQL typically uses flexible schemas, varied data models, horizontal
+scaling, denormalization over joins, and often eventual consistency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbe4d2cf" class="outline-3">
+<h3 id="orgbe4d2cf">Q4. When should you choose NoSQL over a relational database?</h3>
+<div class="outline-text-3" id="text-orgbe4d2cf">
+<p>
+When you need horizontal scale, high write throughput, flexible/evolving schemas,
+large unstructured data, low-latency key lookups, or specific models (graph,
+time-series). Avoid it when you need complex multi-entity transactions, ad-hoc
+joins, and strong relational integrity.
+</p>
+</div>
+</div>
+<div id="outline-container-org3791733" class="outline-3">
+<h3 id="org3791733">Q5. What is a document database?</h3>
+<div class="outline-text-3" id="text-org3791733">
+<p>
+A store where records are self-contained documents (usually JSON/BSON), each
+holding nested fields and arrays. Documents in a collection need not share the same structure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgddd8764" class="outline-3">
+<h3 id="orgddd8764">Q6. What is a key-value store?</h3>
+<div class="outline-text-3" id="text-orgddd8764">
+<p>
+The simplest NoSQL model: data is stored as a dictionary of unique keys mapped to
+opaque values. Extremely fast for get/put by key; limited query capability beyond the key.
+</p>
+</div>
+</div>
+<div id="outline-container-org15ca94c" class="outline-3">
+<h3 id="org15ca94c">Q7. What is a wide-column (column-family) store?</h3>
+<div class="outline-text-3" id="text-org15ca94c">
+<p>
+A model storing data in rows identified by a key, where each row can have many
+columns grouped into column families. Optimized for huge datasets and high write
+throughput (e.g., Cassandra, HBase).
+</p>
+</div>
+</div>
+<div id="outline-container-org1d12183" class="outline-3">
+<h3 id="org1d12183">Q8. What is a graph database?</h3>
+<div class="outline-text-3" id="text-org1d12183">
+<p>
+A database that models data as nodes (entities) and edges (relationships) with
+properties, optimized for traversing connections (social networks, recommendation
+engines, fraud detection).
+</p>
+</div>
+</div>
+<div id="outline-container-orgc0d8297" class="outline-3">
+<h3 id="orgc0d8297">Q9. What is schema-on-read vs schema-on-write?</h3>
+<div class="outline-text-3" id="text-orgc0d8297">
+<p>
+<b>Schema-on-write</b> (relational) validates structure at insert time.
+<b>Schema-on-read</b> (many NoSQL) stores data flexibly and interprets structure when
+read, pushing schema responsibility to the application.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e6daec" class="outline-3">
+<h3 id="org6e6daec">Q10. What is denormalization and why is it common in NoSQL?</h3>
+<div class="outline-text-3" id="text-org6e6daec">
+<p>
+Denormalization stores related data together (duplicated) to avoid joins, so a
+single read returns everything needed. NoSQL favors it because joins are limited
+or absent and read performance/scale is prioritized.
+</p>
+</div>
+</div>
+<div id="outline-container-orge29a35e" class="outline-3">
+<h3 id="orge29a35e">Q11. What is the CAP theorem?</h3>
+<div class="outline-text-3" id="text-orge29a35e">
+<p>
+In a distributed system you can guarantee at most two of: <b>Consistency</b>,
+<b>Availability</b>, <b>Partition tolerance</b>. Since network partitions are unavoidable,
+real systems trade Consistency vs Availability during a partition (CP vs AP).
+</p>
+</div>
+</div>
+<div id="outline-container-orgf5e5141" class="outline-3">
+<h3 id="orgf5e5141">Q12. Give examples of CP and AP systems.</h3>
+<div class="outline-text-3" id="text-orgf5e5141">
+<p>
+CP (consistency over availability): HBase, MongoDB (default), Redis (single
+node), Zookeeper. AP (availability over consistency): Cassandra, DynamoDB,
+Riak, CouchDB. Note many are tunable.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd90b592" class="outline-3">
+<h3 id="orgd90b592">Q13. What is the BASE model?</h3>
+<div class="outline-text-3" id="text-orgd90b592">
+<p>
+An alternative to ACID for distributed systems: <b>Basically Available</b>, <b>Soft
+state</b>, <b>Eventual consistency</b>. It prioritizes availability and accepts temporary
+inconsistency that converges over time.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb986791" class="outline-3">
+<h3 id="orgb986791">Q14. What is eventual consistency?</h3>
+<div class="outline-text-3" id="text-orgb986791">
+<p>
+A consistency model where, given no new updates, all replicas eventually converge
+to the same value. Reads may temporarily return stale data.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdb5a2d1" class="outline-3">
+<h3 id="orgdb5a2d1">Q15. What is strong consistency?</h3>
+<div class="outline-text-3" id="text-orgdb5a2d1">
+<p>
+A guarantee that any read returns the most recent committed write. Requires
+coordination across replicas, typically costing latency or availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org4768797" class="outline-3">
+<h3 id="org4768797">Q16. What is horizontal vs vertical scaling?</h3>
+<div class="outline-text-3" id="text-org4768797">
+<p>
+<b>Vertical</b> scaling adds resources (CPU/RAM) to one machine. <b>Horizontal</b> scaling
+adds more machines and distributes data/load — the NoSQL strength via sharding
+and replication.
+</p>
+</div>
+</div>
+<div id="outline-container-org2919b69" class="outline-3">
+<h3 id="org2919b69">Q17. What is sharding (partitioning)?</h3>
+<div class="outline-text-3" id="text-org2919b69">
+<p>
+Splitting a dataset across multiple nodes by a partition/shard key, so each node
+holds a subset. Enables horizontal scale and parallelism.
+</p>
+</div>
+</div>
+<div id="outline-container-org648139e" class="outline-3">
+<h3 id="org648139e">Q18. What is replication?</h3>
+<div class="outline-text-3" id="text-org648139e">
+<p>
+Maintaining copies of data on multiple nodes for fault tolerance, availability,
+and read scaling. Replicas can be synchronous or asynchronous.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda2bc01" class="outline-3">
+<h3 id="orgda2bc01">Q19. What is the difference between sharding and replication?</h3>
+<div class="outline-text-3" id="text-orgda2bc01">
+<p>
+Sharding splits <b>different</b> data across nodes (scale + capacity). Replication
+copies the <b>same</b> data across nodes (availability + durability). Most systems use
+both together.
+</p>
+</div>
+</div>
+<div id="outline-container-org15c59c1" class="outline-3">
+<h3 id="org15c59c1">Q20. Do NoSQL databases support transactions?</h3>
+<div class="outline-text-3" id="text-org15c59c1">
+<p>
+Increasingly yes. Many support atomic single-document/single-key operations
+natively; several now offer multi-document/multi-key ACID transactions (MongoDB
+4.0+, DynamoDB transactions, FaunaDB), usually with scaling trade-offs.
+</p>
+</div>
+</div>
+<div id="outline-container-org7a823e1" class="outline-3">
+<h3 id="org7a823e1">Q21. What is a collection / table / keyspace?</h3>
+<div class="outline-text-3" id="text-org7a823e1">
+<p>
+A logical grouping of records: a <b>collection</b> (MongoDB documents), a <b>table</b>
+(DynamoDB/Cassandra), within a <b>keyspace</b> (Cassandra) or <b>database</b> (MongoDB).
+</p>
+</div>
+</div>
+<div id="outline-container-org166fd89" class="outline-3">
+<h3 id="org166fd89">Q22. What is a primary key in NoSQL?</h3>
+<div class="outline-text-3" id="text-org166fd89">
+<p>
+A unique identifier for a record. In key-value/document stores it's a single key;
+in wide-column stores it's often composite (partition key + clustering/sort key).
+</p>
+</div>
+</div>
+<div id="outline-container-orgbeef40c" class="outline-3">
+<h3 id="orgbeef40c">Q23. What is a partition key vs a sort/clustering key?</h3>
+<div class="outline-text-3" id="text-orgbeef40c">
+<p>
+The <b>partition key</b> determines which node/partition stores the row. The
+<b>sort/clustering key</b> orders rows within a partition, enabling range queries
+inside it.
+</p>
+</div>
+</div>
+<div id="outline-container-orga98631a" class="outline-3">
+<h3 id="orga98631a">Q24. What is a TTL (time to live)?</h3>
+<div class="outline-text-3" id="text-orga98631a">
+<p>
+A per-record expiration: the database automatically deletes the item after the
+specified time. Common in Redis, Cassandra, and DynamoDB for caches and
+ephemeral data.
+</p>
+</div>
+</div>
+<div id="outline-container-org40f9cdc" class="outline-3">
+<h3 id="org40f9cdc">Q25. What is BSON?</h3>
+<div class="outline-text-3" id="text-org40f9cdc">
+<p>
+Binary JSON — MongoDB's binary-encoded serialization of JSON-like documents,
+adding types (ObjectId, Date, Decimal128, binary) and enabling efficient
+traversal and storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org3d6880c" class="outline-3">
+<h3 id="org3d6880c">Q26. What is an ObjectId in MongoDB?</h3>
+<div class="outline-text-3" id="text-org3d6880c">
+<p>
+A 12-byte unique identifier MongoDB generates for the <code>_id</code> field by default. It
+encodes a timestamp, machine/process info, and a counter, making it roughly
+sortable by creation time.
+</p>
+</div>
+</div>
+<div id="outline-container-org456c462" class="outline-3">
+<h3 id="org456c462">Q27. What does "polyglot persistence" mean?</h3>
+<div class="outline-text-3" id="text-org456c462">
+<p>
+Using multiple data storage technologies within one system, choosing the best
+store per use case (e.g., Redis for caching, MongoDB for catalog, Neo4j for
+recommendations).
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd0cec6" class="outline-3">
+<h3 id="orgdd0cec6">Q28. What is a secondary index?</h3>
+<div class="outline-text-3" id="text-orgdd0cec6">
+<p>
+An index on a non-primary attribute to support queries by fields other than the
+primary key. Adds query flexibility at the cost of storage and write overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-orgac7e332" class="outline-3">
+<h3 id="orgac7e332">Q29. What are the trade-offs of NoSQL?</h3>
+<div class="outline-text-3" id="text-orgac7e332">
+<p>
+Pros: scale, flexibility, performance, availability. Cons: weaker consistency,
+limited joins/ad-hoc queries, data duplication, eventual consistency complexity,
+and query patterns must be designed upfront.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c7474b" class="outline-3">
+<h3 id="org1c7474b">Q30. Is NoSQL "schemaless"?</h3>
+<div class="outline-text-3" id="text-org1c7474b">
+<p>
+Not truly — it's <b>flexible schema</b>. The database doesn't enforce structure, but
+applications still rely on an implicit schema. Many engines now support optional
+schema validation.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb4f1c47" class="outline-2">
+<h2 id="orgb4f1c47">Data Modeling</h2>
+<div class="outline-text-2" id="text-orgb4f1c47">
+</div>
+<div id="outline-container-orgf7b78c4" class="outline-3">
+<h3 id="orgf7b78c4">Q31. How does NoSQL data modeling differ from relational modeling?</h3>
+<div class="outline-text-3" id="text-orgf7b78c4">
+<p>
+Relational modeling normalizes around entities and relationships first. NoSQL
+modeling starts from <b>access patterns</b> (queries) and designs data to serve them
+efficiently, often denormalizing and duplicating.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce04d51" class="outline-3">
+<h3 id="orgce04d51">Q32. What is "query-driven" data modeling?</h3>
+<div class="outline-text-3" id="text-orgce04d51">
+<p>
+Designing your schema based on how data will be read/written rather than its
+logical structure. You enumerate access patterns first, then model data so each
+pattern is a single efficient operation.
+</p>
+</div>
+</div>
+<div id="outline-container-org2de6343" class="outline-3">
+<h3 id="org2de6343">Q33. What is embedding vs referencing in document databases?</h3>
+<div class="outline-text-3" id="text-org2de6343">
+<p>
+<b>Embedding</b> nests related data inside a parent document (one read, atomic
+updates). <b>Referencing</b> stores related data in separate documents linked by id
+(like a foreign key), requiring multiple reads or lookups.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd0eb7a9" class="outline-3">
+<h3 id="orgd0eb7a9">Q34. When should you embed vs reference?</h3>
+<div class="outline-text-3" id="text-orgd0eb7a9">
+<p>
+Embed for "contains"/one-to-few relationships, data read together, and bounded
+size. Reference for many-to-many, unbounded/large growth, frequently-changing
+shared data, or when the sub-entity is queried independently.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c4cdef" class="outline-3">
+<h3 id="org1c4cdef">Q35. What is the document size limit in MongoDB?</h3>
+<div class="outline-text-3" id="text-org1c4cdef">
+<p>
+16 MB per BSON document. Larger binary content should use GridFS or external
+object storage; this limit discourages unbounded array growth.
+</p>
+</div>
+</div>
+<div id="outline-container-org973f7fe" class="outline-3">
+<h3 id="org973f7fe">Q36. How do you model one-to-many in a document store?</h3>
+<div class="outline-text-3" id="text-org973f7fe">
+<ul class="org-ul">
+<li>Few children: embed an array in the parent.</li>
+<li>Many children: reference parent id from each child document.</li>
+<li>Huge/unbounded: separate collection with parent reference + pagination.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org4ff0613" class="outline-3">
+<h3 id="org4ff0613">Q37. How do you model many-to-many in NoSQL?</h3>
+<div class="outline-text-3" id="text-org4ff0613">
+<p>
+Either embed arrays of references on both sides, maintain a separate "join"
+collection/table, or duplicate data per access pattern. The right choice depends
+on which side you query and update most.
+</p>
+</div>
+</div>
+<div id="outline-container-org3402a36" class="outline-3">
+<h3 id="org3402a36">Q38. What is the "outlier pattern"?</h3>
+<div class="outline-text-3" id="text-org3402a36">
+<p>
+A modeling technique where most documents follow one shape but rare large ones
+("outliers") are handled differently (e.g., overflow into linked documents) to
+avoid degrading the common case.
+</p>
+</div>
+</div>
+<div id="outline-container-org80087f2" class="outline-3">
+<h3 id="org80087f2">Q39. What is the "bucket pattern"?</h3>
+<div class="outline-text-3" id="text-org80087f2">
+<p>
+Grouping many small time-series/event records into a single document/row "bucket"
+(e.g., per hour) to reduce document count and index overhead. Common for IoT and metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb36f767" class="outline-3">
+<h3 id="orgb36f767">Q40. What is the "subset pattern"?</h3>
+<div class="outline-text-3" id="text-orgb36f767">
+<p>
+Storing a frequently-accessed subset of a large array in the main document (e.g.,
+last 10 reviews) and the full set elsewhere, to keep hot documents small and fast.
+</p>
+</div>
+</div>
+<div id="outline-container-org9758d93" class="outline-3">
+<h3 id="org9758d93">Q41. What is the "computed pattern"?</h3>
+<div class="outline-text-3" id="text-org9758d93">
+<p>
+Pre-calculating and storing derived values (sums, averages, counts) on write
+rather than computing them on every read — trading write cost for fast reads.
+</p>
+</div>
+</div>
+<div id="outline-container-org39fcb9f" class="outline-3">
+<h3 id="org39fcb9f">Q42. What is the "extended reference pattern"?</h3>
+<div class="outline-text-3" id="text-org39fcb9f">
+<p>
+Duplicating a few frequently-needed fields from a referenced document into the
+referencing one (e.g., storing customer name in an order) to avoid an extra lookup.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb67770c" class="outline-3">
+<h3 id="orgb67770c">Q43. What is the "schema versioning pattern"?</h3>
+<div class="outline-text-3" id="text-orgb67770c">
+<p>
+Adding a <code>schema_version</code> field to documents so the application can handle
+multiple shapes during gradual migrations without downtime.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdcc5868" class="outline-3">
+<h3 id="orgdcc5868">Q44. How do you handle schema migration in a schemaless DB?</h3>
+<div class="outline-text-3" id="text-orgdcc5868">
+<p>
+Strategies: lazy migration (transform on read/write), background batch migration,
+or dual-write during transition. Use a version field and keep app code tolerant
+of multiple versions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb846e6c" class="outline-3">
+<h3 id="orgb846e6c">Q45. What is a composite/compound key and when is it used?</h3>
+<div class="outline-text-3" id="text-orgb846e6c">
+<p>
+A key made of multiple components (e.g., partition key + sort key). Used in
+wide-column and key-value stores to colocate related items and enable range
+queries within a partition.
+</p>
+</div>
+</div>
+<div id="outline-container-org642ef1a" class="outline-3">
+<h3 id="org642ef1a">Q46. How do you choose a good partition key?</h3>
+<div class="outline-text-3" id="text-org642ef1a">
+<p>
+Pick one with high cardinality and even access distribution to spread load
+uniformly, while still grouping data that's queried together. Avoid keys that
+concentrate traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orga87c3e2" class="outline-3">
+<h3 id="orga87c3e2">Q47. What is a "hot partition" / "hot key"?</h3>
+<div class="outline-text-3" id="text-orga87c3e2">
+<p>
+A partition or key receiving disproportionate traffic, creating a bottleneck on
+one node. Caused by low-cardinality or skewed keys (e.g., partitioning by a
+constant or by "today's date").
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8adc49" class="outline-3">
+<h3 id="orgc8adc49">Q48. How do you mitigate hot partitions?</h3>
+<div class="outline-text-3" id="text-orgc8adc49">
+<p>
+Add randomness/sharding suffixes to keys (write sharding), choose
+higher-cardinality keys, distribute time-based data across buckets, or cache hot reads.
+</p>
+</div>
+</div>
+<div id="outline-container-org5e066d8" class="outline-3">
+<h3 id="org5e066d8">Q49. Why is duplication acceptable in NoSQL?</h3>
+<div class="outline-text-3" id="text-org5e066d8">
+<p>
+Storage is cheap relative to compute and latency; duplicating data to serve reads
+in a single operation avoids expensive joins/lookups. The trade-off is keeping
+duplicates in sync on write.
+</p>
+</div>
+</div>
+<div id="outline-container-orga06e2e5" class="outline-3">
+<h3 id="orga06e2e5">Q50. How do you keep duplicated data consistent?</h3>
+<div class="outline-text-3" id="text-orga06e2e5">
+<p>
+Update all copies in application logic, use background reconciliation jobs,
+change-data-capture/streams to propagate changes, or accept eventual consistency
+where staleness is tolerable.
+</p>
+</div>
+</div>
+<div id="outline-container-org169843e" class="outline-3">
+<h3 id="org169843e">Q51. What is single-table design in DynamoDB?</h3>
+<div class="outline-text-3" id="text-org169843e">
+<p>
+Storing multiple entity types in one table, using generic partition/sort keys and
+overloaded attributes so related items colocate and many access patterns are
+served by few queries. Powerful but complex.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d649ab" class="outline-3">
+<h3 id="org7d649ab">Q52. What are the trade-offs of single-table design?</h3>
+<div class="outline-text-3" id="text-org7d649ab">
+<p>
+Pros: fewer requests, colocated data, cost efficiency. Cons: steep learning
+curve, opaque key design, hard to evolve access patterns, and difficult ad-hoc analytics.
+</p>
+</div>
+</div>
+<div id="outline-container-org30ff63a" class="outline-3">
+<h3 id="org30ff63a">Q53. How do you model a tree/hierarchy in a graph DB vs document DB?</h3>
+<div class="outline-text-3" id="text-org30ff63a">
+<p>
+Graph DB: natural — nodes with parent/child edges, traverse directly. Document
+DB: store an array of ancestors, a materialized path string, or parent
+references; choose based on read vs write patterns.
+</p>
+</div>
+</div>
+<div id="outline-container-org5efedde" class="outline-3">
+<h3 id="org5efedde">Q54. What is the materialized path pattern?</h3>
+<div class="outline-text-3" id="text-org5efedde">
+<p>
+Storing the full path to a node as a string (e.g., <code>/root/a/b</code>) so subtree queries
+become prefix matches. Cheap reads, but moves require updating descendants.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4481e0" class="outline-3">
+<h3 id="orgd4481e0">Q55. How do you model time-series data in NoSQL?</h3>
+<div class="outline-text-3" id="text-orgd4481e0">
+<p>
+Use bucketing (group by time window), a time-based clustering key for range scans
+(Cassandra), TTLs for retention, and pre-aggregation (computed pattern) for
+dashboards. Dedicated TSDBs (InfluxDB) optimize this further.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org9b8b03b" class="outline-2">
+<h2 id="org9b8b03b">Document Databases (MongoDB-focused)</h2>
+<div class="outline-text-2" id="text-org9b8b03b">
+</div>
+<div id="outline-container-org6e77ee3" class="outline-3">
+<h3 id="org6e77ee3">Q56. How do you insert a document in MongoDB?</h3>
+<div class="outline-text-3" id="text-org6e77ee3">
+<div class="org-src-container">
+<pre class="src src-js">db.users.insertOne({ name: <span style="font-style: italic;">"Ada"</span>, age: 36, roles: [<span style="font-style: italic;">"admin"</span>] });
+db.users.insertMany([{ name: <span style="font-style: italic;">"Alan"</span> }, { name: <span style="font-style: italic;">"Grace"</span> }]);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org04cc6c7" class="outline-3">
+<h3 id="org04cc6c7">Q57. How do you query documents in MongoDB?</h3>
+<div class="outline-text-3" id="text-org04cc6c7">
+<div class="org-src-container">
+<pre class="src src-js">db.users.find({ age: { $gte: 30 } });
+db.users.findOne({ name: <span style="font-style: italic;">"Ada"</span> });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org41653fe" class="outline-3">
+<h3 id="org41653fe">Q58. What are common query operators in MongoDB?</h3>
+<div class="outline-text-3" id="text-org41653fe">
+<p>
+Comparison: <code>$eq</code>, <code>$ne</code>, <code>$gt</code>, <code>$gte</code>, <code>$lt</code>, <code>$lte</code>, <code>$in</code>, <code>$nin</code>.
+Logical: <code>$and</code>, <code>$or</code>, <code>$not</code>, <code>$nor</code>.
+Element: <code>$exists</code>, <code>$type</code>.
+Array: <code>$all</code>, <code>$elemMatch</code>, <code>$size</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org79dc7b3" class="outline-3">
+<h3 id="org79dc7b3">Q59. How do you update a document?</h3>
+<div class="outline-text-3" id="text-org79dc7b3">
+<div class="org-src-container">
+<pre class="src src-js">db.users.updateOne({ name: <span style="font-style: italic;">"Ada"</span> }, { $set: { age: 37 } });
+db.users.updateMany({ active: <span style="font-weight: bold; text-decoration: underline;">false</span> }, { $set: { archived: <span style="font-weight: bold; text-decoration: underline;">true</span> } });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org282ab2f" class="outline-3">
+<h3 id="org282ab2f">Q60. What are common update operators?</h3>
+<div class="outline-text-3" id="text-org282ab2f">
+<p>
+<code>$set</code>, <code>$unset</code>, <code>$inc</code>, <code>$mul</code>, <code>$rename</code>, <code>$min</code>, <code>$max</code>, <code>$push</code>, <code>$pull</code>, <code>$addToSet</code>, <code>$pop</code>, <code>$currentDate</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org5f74058" class="outline-3">
+<h3 id="org5f74058">Q61. How do you delete documents?</h3>
+<div class="outline-text-3" id="text-org5f74058">
+<div class="org-src-container">
+<pre class="src src-js">db.users.deleteOne({ name: <span style="font-style: italic;">"Ada"</span> });
+db.users.deleteMany({ archived: <span style="font-weight: bold; text-decoration: underline;">true</span> });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaa58343" class="outline-3">
+<h3 id="orgaa58343">Q62. What is an upsert?</h3>
+<div class="outline-text-3" id="text-orgaa58343">
+<p>
+An update that inserts the document if no match exists:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.counters.updateOne({ _id: <span style="font-style: italic;">"page"</span> }, { $inc: { views: 1 } }, { upsert: <span style="font-weight: bold; text-decoration: underline;">true</span> });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf90f7d1" class="outline-3">
+<h3 id="orgf90f7d1">Q63. How do you query nested/embedded fields?</h3>
+<div class="outline-text-3" id="text-orgf90f7d1">
+<p>
+Use dot notation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.users.find({ <span style="font-style: italic;">"address.city"</span>: <span style="font-style: italic;">"Sofia"</span> });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdb25428" class="outline-3">
+<h3 id="orgdb25428">Q64. How do you query arrays?</h3>
+<div class="outline-text-3" id="text-orgdb25428">
+<div class="org-src-container">
+<pre class="src src-js">db.posts.find({ tags: <span style="font-style: italic;">"mongodb"</span> });                       <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">array contains value
+</span>db.posts.find({ tags: { $all: [<span style="font-style: italic;">"db"</span>, <span style="font-style: italic;">"nosql"</span>] } });       <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">contains all
+</span>db.orders.find({ items: { $elemMatch: { qty: { $gt: 5 } } } }); <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">element match</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org57ce4bc" class="outline-3">
+<h3 id="org57ce4bc">Q65. How do you project specific fields?</h3>
+<div class="outline-text-3" id="text-org57ce4bc">
+<div class="org-src-container">
+<pre class="src src-js">db.users.find({}, { name: 1, email: 1, _id: 0 });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5d9aa2c" class="outline-3">
+<h3 id="org5d9aa2c">Q66. What is the aggregation pipeline?</h3>
+<div class="outline-text-3" id="text-org5d9aa2c">
+<p>
+A framework that processes documents through a sequence of stages (<code>$match</code>,
+<code>$group</code>, <code>$sort</code>, <code>$project</code>, <code>$lookup</code>, etc.), each transforming the stream —
+analogous to SQL GROUP BY/joins/transforms.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb4a14e3" class="outline-3">
+<h3 id="orgb4a14e3">Q67. Give an aggregation example.</h3>
+<div class="outline-text-3" id="text-orgb4a14e3">
+<div class="org-src-container">
+<pre class="src src-js">db.orders.aggregate([
+  { $match: { status: <span style="font-style: italic;">"paid"</span> } },
+  { $group: { _id: <span style="font-style: italic;">"$customerId"</span>, total: { $sum: <span style="font-style: italic;">"$amount"</span> } } },
+  { $sort: { total: -1 } },
+  { $limit: 10 }
+]);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc2568fe" class="outline-3">
+<h3 id="orgc2568fe">Q68. What does the $lookup stage do?</h3>
+<div class="outline-text-3" id="text-orgc2568fe">
+<p>
+Performs a left outer join to another collection:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.orders.aggregate([
+  { $lookup: { from: <span style="font-style: italic;">"customers"</span>, localField: <span style="font-style: italic;">"custId"</span>,
+               foreignField: <span style="font-style: italic;">"_id"</span>, as: <span style="font-style: italic;">"customer"</span> } }
+]);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8d4d1e8" class="outline-3">
+<h3 id="org8d4d1e8">Q69. What is the difference between $match early vs late?</h3>
+<div class="outline-text-3" id="text-org8d4d1e8">
+<p>
+Place <code>$match</code> as early as possible so the pipeline filters before expensive
+stages and can use indexes — reducing documents flowing downstream.
+</p>
+</div>
+</div>
+<div id="outline-container-org0da7ce8" class="outline-3">
+<h3 id="org0da7ce8">Q70. What does $unwind do?</h3>
+<div class="outline-text-3" id="text-org0da7ce8">
+<p>
+Deconstructs an array field, outputting one document per array element — used
+before grouping or joining on array contents.
+</p>
+</div>
+</div>
+<div id="outline-container-org84ab102" class="outline-3">
+<h3 id="org84ab102">Q71. What is the difference between find() and aggregate()?</h3>
+<div class="outline-text-3" id="text-org84ab102">
+<p>
+<code>find()</code> retrieves/filters documents with simple projections. <code>aggregate()</code>
+performs multi-stage transformations, grouping, joins, and computed fields. Use
+aggregate for analytics/reshaping.
+</p>
+</div>
+</div>
+<div id="outline-container-org65e0004" class="outline-3">
+<h3 id="org65e0004">Q72. How do you create an index in MongoDB?</h3>
+<div class="outline-text-3" id="text-org65e0004">
+<div class="org-src-container">
+<pre class="src src-js">db.users.createIndex({ email: 1 }, { unique: <span style="font-weight: bold; text-decoration: underline;">true</span> });
+db.posts.createIndex({ author: 1, createdAt: -1 });  <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">compound</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1facb74" class="outline-3">
+<h3 id="org1facb74">Q73. What is a compound index, and does field order matter?</h3>
+<div class="outline-text-3" id="text-org1facb74">
+<p>
+An index on multiple fields. Order matters via the prefix rule: an index on
+<code>{a:1, b:1}</code> serves queries on <code>a</code> or <code>a+b</code>, but not <code>b</code> alone. Order also affects
+sort support.
+</p>
+</div>
+</div>
+<div id="outline-container-org066d312" class="outline-3">
+<h3 id="org066d312">Q74. What is a covered query?</h3>
+<div class="outline-text-3" id="text-org066d312">
+<p>
+A query answered entirely from an index without reading documents (all queried
+and returned fields are in the index). Very fast — no document fetch.
+</p>
+</div>
+</div>
+<div id="outline-container-org904b5a8" class="outline-3">
+<h3 id="org904b5a8">Q75. How do you analyze query performance in MongoDB?</h3>
+<div class="outline-text-3" id="text-org904b5a8">
+<p>
+Use <code>explain("executionStats")</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.users.find({ email: a@b.com }).explain(<span style="font-style: italic;">"executionStats"</span>);
+</pre>
+</div>
+
+<p>
+Look for <code>IXSCAN</code> (index) vs <code>COLLSCAN</code> (full scan) and docs examined vs returned.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdb08500" class="outline-3">
+<h3 id="orgdb08500">Q76. What are multikey indexes?</h3>
+<div class="outline-text-3" id="text-orgdb08500">
+<p>
+Indexes on array fields — MongoDB creates an index entry per array element,
+enabling queries on array contents. A document can be in many index entries.
+</p>
+</div>
+</div>
+<div id="outline-container-org87be1f6" class="outline-3">
+<h3 id="org87be1f6">Q77. What is a TTL index?</h3>
+<div class="outline-text-3" id="text-org87be1f6">
+<p>
+An index that auto-deletes documents after a time based on a date field:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.sessions.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 });
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3271991" class="outline-3">
+<h3 id="org3271991">Q78. What is a text index, and how is full-text search done?</h3>
+<div class="outline-text-3" id="text-org3271991">
+<p>
+A text index tokenizes string fields for search:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js">db.articles.createIndex({ body: <span style="font-style: italic;">"text"</span> });
+db.articles.find({ $text: { $search: <span style="font-style: italic;">"nosql database"</span> } });
+</pre>
+</div>
+
+<p>
+For richer search, use Elasticsearch or Atlas Search.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf19665d" class="outline-3">
+<h3 id="orgf19665d">Q79. What is a partial / sparse index?</h3>
+<div class="outline-text-3" id="text-orgf19665d">
+<p>
+A <b>sparse</b> index only indexes documents that contain the field. A <b>partial</b> index
+indexes documents matching a filter expression — smaller indexes for targeted queries.
+</p>
+</div>
+</div>
+<div id="outline-container-org37b39d9" class="outline-3">
+<h3 id="org37b39d9">Q80. How does MongoDB handle transactions?</h3>
+<div class="outline-text-3" id="text-org37b39d9">
+<p>
+Single-document writes are always atomic. Since 4.0 (replica sets) / 4.2
+(sharded), multi-document ACID transactions are supported via sessions, but they
+add overhead — prefer single-document atomicity where possible.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ba37ae" class="outline-3">
+<h3 id="org7ba37ae">Q81. What are read and write concerns in MongoDB?</h3>
+<div class="outline-text-3" id="text-org7ba37ae">
+<p>
+<b>Write concern</b> (<code>w</code>, <code>j</code>) controls how many nodes must acknowledge a write and
+whether it's journaled. <b>Read concern</b> (<code>local</code>, <code>majority</code>, <code>linearizable</code>)
+controls the consistency/recency of data read.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec6f649" class="outline-3">
+<h3 id="orgec6f649">Q82. What is read preference?</h3>
+<div class="outline-text-3" id="text-orgec6f649">
+<p>
+A setting that routes reads to <code>primary</code>, <code>secondary</code>, <code>primaryPreferred</code>, etc.,
+trading consistency for read scaling/locality. Reading from secondaries can return stale data.
+</p>
+</div>
+</div>
+<div id="outline-container-org230f512" class="outline-3">
+<h3 id="org230f512">Q83. What is the WiredTiger storage engine?</h3>
+<div class="outline-text-3" id="text-org230f512">
+<p>
+MongoDB's default storage engine providing document-level concurrency control,
+compression, and MVCC-based snapshots for consistent reads.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c12b22" class="outline-3">
+<h3 id="org5c12b22">Q84. What is GridFS?</h3>
+<div class="outline-text-3" id="text-org5c12b22">
+<p>
+A MongoDB convention for storing files larger than 16 MB by splitting them into
+chunks across two collections (<code>fs.files</code>, <code>fs.chunks</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-org8470a57" class="outline-3">
+<h3 id="org8470a57">Q85. How does MongoDB sharding work?</h3>
+<div class="outline-text-3" id="text-org8470a57">
+<p>
+Data is partitioned across shards by a shard key. <code>mongos</code> routers direct queries;
+config servers store metadata. The balancer migrates chunks to keep distribution even.
+</p>
+</div>
+</div>
+<div id="outline-container-org5934168" class="outline-3">
+<h3 id="org5934168">Q86. What is a change stream?</h3>
+<div class="outline-text-3" id="text-org5934168">
+<p>
+A real-time feed of data changes (inserts/updates/deletes) on a collection or
+database, built on the oplog — used for event-driven architectures and cache invalidation.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7cde2ca" class="outline-2">
+<h2 id="org7cde2ca">Key-Value &amp; Caching (Redis-focused)</h2>
+<div class="outline-text-2" id="text-org7cde2ca">
+</div>
+<div id="outline-container-org38a37c0" class="outline-3">
+<h3 id="org38a37c0">Q87. What is Redis?</h3>
+<div class="outline-text-3" id="text-org38a37c0">
+<p>
+An in-memory key-value data store supporting rich data structures, used as a
+cache, message broker, session store, and primary database (with persistence).
+Extremely low latency.
+</p>
+</div>
+</div>
+<div id="outline-container-org5cc7da0" class="outline-3">
+<h3 id="org5cc7da0">Q88. What data structures does Redis support?</h3>
+<div class="outline-text-3" id="text-org5cc7da0">
+<p>
+Strings, Lists, Sets, Sorted Sets (ZSet), Hashes, Bitmaps, HyperLogLog, Streams,
+Geospatial indexes, and (with modules) JSON, search, time-series, bloom filters.
+</p>
+</div>
+</div>
+<div id="outline-container-org15fb202" class="outline-3">
+<h3 id="org15fb202">Q89. What are basic Redis string commands?</h3>
+<div class="outline-text-3" id="text-org15fb202">
+<div class="org-src-container">
+<pre class="src src-text">SET key value
+GET key
+INCR counter
+SETEX key 60 value      # expire in 60s
+MSET k1 v1 k2 v2
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7f14674" class="outline-3">
+<h3 id="org7f14674">Q90. How does Redis handle expiration/TTL?</h3>
+<div class="outline-text-3" id="text-org7f14674">
+<p>
+<code>EXPIRE key seconds</code> or <code>SET key val EX seconds</code>. Keys are removed lazily (on
+access) and via periodic active sampling. <code>TTL key</code> returns remaining time.
+</p>
+</div>
+</div>
+<div id="outline-container-org40fc645" class="outline-3">
+<h3 id="org40fc645">Q91. What are Redis eviction policies?</h3>
+<div class="outline-text-3" id="text-org40fc645">
+<p>
+When memory is full, Redis evicts per <code>maxmemory-policy</code>: <code>noeviction</code>, <code>allkeys-lru</code>,
+<code>allkeys-lfu</code>, <code>volatile-lru</code>, <code>volatile-lfu</code>, <code>volatile-ttl</code>, <code>allkeys-random</code>, <code>volatile-random</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd7bef63" class="outline-3">
+<h3 id="orgd7bef63">Q92. What is the difference between LRU and LFU eviction?</h3>
+<div class="outline-text-3" id="text-orgd7bef63">
+<p>
+<b>LRU</b> evicts least-recently-used keys (time-based). <b>LFU</b> evicts
+least-frequently-used keys (access-count-based) — better when some keys are
+consistently hot regardless of recency.
+</p>
+</div>
+</div>
+<div id="outline-container-orga2f0edf" class="outline-3">
+<h3 id="orga2f0edf">Q93. How does Redis persist data?</h3>
+<div class="outline-text-3" id="text-orga2f0edf">
+<p>
+<b>RDB</b> takes point-in-time snapshots (compact, faster restart, possible data loss).
+<b>AOF</b> logs every write (more durable, larger, slower). They can be combined.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad988d4" class="outline-3">
+<h3 id="orgad988d4">Q94. What is a Redis Sorted Set and a use case?</h3>
+<div class="outline-text-3" id="text-orgad988d4">
+<p>
+A set of unique members each with a score, kept ordered by score. Use cases:
+leaderboards, priority queues, rate limiting, time-ordered feeds.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text">ZADD leaderboard 100 "ada"
+ZREVRANGE leaderboard 0 9 WITHSCORES
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcaa62f6" class="outline-3">
+<h3 id="orgcaa62f6">Q95. What is Redis Pub/Sub?</h3>
+<div class="outline-text-3" id="text-orgcaa62f6">
+<p>
+A messaging pattern where publishers send messages to channels and subscribers
+receive them in real time. Fire-and-forget (no persistence); use Streams for
+durable messaging.
+</p>
+</div>
+</div>
+<div id="outline-container-org07099fa" class="outline-3">
+<h3 id="org07099fa">Q96. What are Redis Streams?</h3>
+<div class="outline-text-3" id="text-org07099fa">
+<p>
+An append-only log data structure for durable, ordered messaging with consumer
+groups, IDs, and acknowledgments — like a lightweight Kafka inside Redis.
+</p>
+</div>
+</div>
+<div id="outline-container-orga56ba1e" class="outline-3">
+<h3 id="orga56ba1e">Q97. How do you implement caching patterns with Redis?</h3>
+<div class="outline-text-3" id="text-orga56ba1e">
+<p>
+<b>Cache-aside</b> (lazy): app checks cache, on miss loads from DB and populates.
+<b>Write-through</b>: write to cache and DB together. <b>Write-behind</b>: write to cache,
+async flush to DB. <b>Read-through</b>: cache library loads on miss.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e9d90f" class="outline-3">
+<h3 id="org1e9d90f">Q98. What is the thundering herd / cache stampede problem?</h3>
+<div class="outline-text-3" id="text-org1e9d90f">
+<p>
+When a popular key expires, many requests simultaneously miss and hit the DB.
+Mitigations: locking/single-flight, staggered TTLs, probabilistic early
+expiration, or background refresh.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb6f66cb" class="outline-3">
+<h3 id="orgb6f66cb">Q99. How do you implement a distributed lock with Redis?</h3>
+<div class="outline-text-3" id="text-orgb6f66cb">
+<p>
+<code>SET key token NX PX 30000</code> acquires a lock atomically with expiry; release by
+checking the token and deleting (via Lua for atomicity). The Redlock algorithm
+extends this across multiple nodes.
+</p>
+</div>
+</div>
+<div id="outline-container-org36094d7" class="outline-3">
+<h3 id="org36094d7">Q100. What is Redis Cluster?</h3>
+<div class="outline-text-3" id="text-org36094d7">
+<p>
+Redis's native sharding: data is split across 16384 hash slots distributed over
+master nodes, each with replicas. Clients are redirected to the node owning a key's slot.
+</p>
+</div>
+</div>
+<div id="outline-container-org90bd86f" class="outline-3">
+<h3 id="org90bd86f">Q101. Is Redis single-threaded?</h3>
+<div class="outline-text-3" id="text-org90bd86f">
+<p>
+The core command execution is single-threaded (avoiding locks), which is why
+atomic operations are simple. Modern Redis uses threads for I/O and background
+tasks, but command processing is effectively serialized.
+</p>
+</div>
+</div>
+<div id="outline-container-org76cdd6f" class="outline-3">
+<h3 id="org76cdd6f">Q102. What is DynamoDB?</h3>
+<div class="outline-text-3" id="text-org76cdd6f">
+<p>
+AWS's fully managed key-value/document NoSQL service offering single-digit
+millisecond latency, automatic scaling, and a serverless operational model with
+tunable capacity.
+</p>
+</div>
+</div>
+<div id="outline-container-org563f45f" class="outline-3">
+<h3 id="org563f45f">Q103. What are partition key and sort key in DynamoDB?</h3>
+<div class="outline-text-3" id="text-org563f45f">
+<p>
+The <b>partition key</b> (hash key) determines item placement; alone it must be unique.
+With a <b>sort key</b>, the pair must be unique and items sharing a partition key are
+stored sorted, enabling range queries.
+</p>
+</div>
+</div>
+<div id="outline-container-org1cf8338" class="outline-3">
+<h3 id="org1cf8338">Q104. What is the difference between Query and Scan in DynamoDB?</h3>
+<div class="outline-text-3" id="text-org1cf8338">
+<p>
+<b>Query</b> efficiently retrieves items by partition key (and optional sort-key
+condition) using indexes. <b>Scan</b> reads the entire table and filters — slow and
+costly; avoid in production paths.
+</p>
+</div>
+</div>
+<div id="outline-container-org29fc582" class="outline-3">
+<h3 id="org29fc582">Q105. What are GSIs and LSIs in DynamoDB?</h3>
+<div class="outline-text-3" id="text-org29fc582">
+<p>
+<b>Global Secondary Index</b>: different partition/sort key, separate throughput,
+eventually consistent. <b>Local Secondary Index</b>: same partition key, alternate
+sort key, supports strong consistency, must be created at table creation.
+</p>
+</div>
+</div>
+<div id="outline-container-org061c716" class="outline-3">
+<h3 id="org061c716">Q106. What consistency options does DynamoDB offer?</h3>
+<div class="outline-text-3" id="text-org061c716">
+<p>
+Reads can be <b>eventually consistent</b> (default, cheaper) or <b>strongly consistent</b>
+(on demand, costs more, not available on GSIs). Writes are always durable across AZs.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org4f040bf" class="outline-2">
+<h2 id="org4f040bf">Wide-Column Stores (Cassandra-focused)</h2>
+<div class="outline-text-2" id="text-org4f040bf">
+</div>
+<div id="outline-container-orgb9ac52b" class="outline-3">
+<h3 id="orgb9ac52b">Q107. What is Apache Cassandra?</h3>
+<div class="outline-text-3" id="text-orgb9ac52b">
+<p>
+A distributed, masterless (peer-to-peer) wide-column NoSQL database designed for
+high availability, linear horizontal scalability, and high write throughput with
+no single point of failure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbfdeedb" class="outline-3">
+<h3 id="orgbfdeedb">Q108. What is the data model in Cassandra?</h3>
+<div class="outline-text-3" id="text-orgbfdeedb">
+<p>
+A keyspace contains tables; each table has a primary key composed of a partition
+key (placement) and optional clustering columns (ordering within a partition).
+Rows are sparse — columns can vary.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaa2ac4d" class="outline-3">
+<h3 id="orgaa2ac4d">Q109. What is CQL?</h3>
+<div class="outline-text-3" id="text-orgaa2ac4d">
+<p>
+Cassandra Query Language — a SQL-like language for Cassandra. It looks relational
+but disallows arbitrary joins/aggregations and requires queries aligned to the
+partition key.
+</p>
+</div>
+</div>
+<div id="outline-container-org74d27cd" class="outline-3">
+<h3 id="org74d27cd">Q110. Why must you "model around your queries" in Cassandra?</h3>
+<div class="outline-text-3" id="text-org74d27cd">
+<p>
+Cassandra only retrieves data efficiently by partition key. You design one table
+per query pattern (often duplicating data) because there are no efficient joins or
+ad-hoc filters across partitions.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e69e03" class="outline-3">
+<h3 id="org6e69e03">Q111. How does Cassandra distribute data?</h3>
+<div class="outline-text-3" id="text-org6e69e03">
+<p>
+By consistent hashing of the partition key onto a token ring. Each node owns
+token ranges; virtual nodes (vnodes) improve balance and rebalancing.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ca45f0" class="outline-3">
+<h3 id="org1ca45f0">Q112. What is the replication factor?</h3>
+<div class="outline-text-3" id="text-org1ca45f0">
+<p>
+The number of copies of each partition stored across the cluster (e.g., RF=3).
+Configured per keyspace; higher RF improves availability/durability at storage cost.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdcfc838" class="outline-3">
+<h3 id="orgdcfc838">Q113. What is tunable consistency in Cassandra?</h3>
+<div class="outline-text-3" id="text-orgdcfc838">
+<p>
+Per-query consistency levels (<code>ONE</code>, <code>QUORUM</code>, <code>LOCAL_QUORUM</code>, <code>ALL</code>, etc.).
+If read CL + write CL &gt; RF, you get strong consistency;
+lower levels trade consistency for latency/availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org827cc28" class="outline-3">
+<h3 id="org827cc28">Q114. What does QUORUM mean?</h3>
+<div class="outline-text-3" id="text-org827cc28">
+<p>
+A majority of replicas: <code>floor(RF/2) + 1</code>. <code>QUORUM</code> reads/writes across all DCs;
+<code>LOCAL_QUORUM</code> within the local datacenter (lower latency, common in multi-DC deployments).
+</p>
+</div>
+</div>
+<div id="outline-container-orgf1e5bed" class="outline-3">
+<h3 id="orgf1e5bed">Q115. What is a write path in Cassandra?</h3>
+<div class="outline-text-3" id="text-orgf1e5bed">
+<p>
+A write goes to the commit log (durability) and a memtable (in-memory). Memtables
+flush to immutable SSTables on disk. No read-before-write, enabling fast writes.
+</p>
+</div>
+</div>
+<div id="outline-container-org4701c51" class="outline-3">
+<h3 id="org4701c51">Q116. What is compaction?</h3>
+<div class="outline-text-3" id="text-org4701c51">
+<p>
+The background process that merges SSTables, discarding obsolete/tombstoned data
+to reclaim space and improve read performance. Strategies: STCS, LCS, TWCS
+(time-window, for time-series).
+</p>
+</div>
+</div>
+<div id="outline-container-orgf5e9603" class="outline-3">
+<h3 id="orgf5e9603">Q117. What is a tombstone?</h3>
+<div class="outline-text-3" id="text-orgf5e9603">
+<p>
+A marker for deleted data. Cassandra doesn't delete in place; it writes a
+tombstone, and data is purged during compaction after <code>gc_grace_seconds</code>. Too
+many tombstones degrade reads.
+</p>
+</div>
+</div>
+<div id="outline-container-org719150b" class="outline-3">
+<h3 id="org719150b">Q118. Why are deletes problematic in Cassandra?</h3>
+<div class="outline-text-3" id="text-org719150b">
+<p>
+Deletes create tombstones that linger until compaction. Heavy delete/update
+churn (especially queue-like patterns) causes tombstone buildup, slowing range
+reads and risking query failures.
+</p>
+</div>
+</div>
+<div id="outline-container-org9a3f3d9" class="outline-3">
+<h3 id="org9a3f3d9">Q119. What is read repair?</h3>
+<div class="outline-text-3" id="text-org9a3f3d9">
+<p>
+A mechanism that detects and fixes inconsistencies among replicas during reads by
+comparing data and pushing the latest version to stale replicas.
+</p>
+</div>
+</div>
+<div id="outline-container-org3ae4ad0" class="outline-3">
+<h3 id="org3ae4ad0">Q120. What is hinted handoff?</h3>
+<div class="outline-text-3" id="text-org3ae4ad0">
+<p>
+When a replica is down during a write, a coordinator stores a "hint" and replays
+it when the node returns, improving availability and convergence.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf69a7a9" class="outline-3">
+<h3 id="orgf69a7a9">Q121. What is a "last write wins" conflict resolution?</h3>
+<div class="outline-text-3" id="text-orgf69a7a9">
+<p>
+Cassandra resolves conflicting writes using cell timestamps — the write with the
+latest timestamp wins. This can silently lose data under clock skew or concurrent
+updates.
+</p>
+</div>
+</div>
+<div id="outline-container-org5467319" class="outline-3">
+<h3 id="org5467319">Q122. What is the difference between HBase and Cassandra?</h3>
+<div class="outline-text-3" id="text-org5467319">
+<p>
+HBase is CP, master-based, built on HDFS, strongly consistent, good for
+random read/write on Hadoop data. Cassandra is AP, masterless, tunable
+consistency, better for multi-DC availability and write-heavy workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-orga5c02f1" class="outline-3">
+<h3 id="orga5c02f1">Q123. What is a column family vs a super column?</h3>
+<div class="outline-text-3" id="text-orga5c02f1">
+<p>
+A <b>column family</b> groups related columns under a row key. <b>Super columns</b>
+(legacy) nest columns within columns; they're deprecated in favor of composite
+keys and collections.
+</p>
+</div>
+</div>
+<div id="outline-container-org9edf479" class="outline-3">
+<h3 id="org9edf479">Q124. What collection types does Cassandra support?</h3>
+<div class="outline-text-3" id="text-org9edf479">
+<p>
+<code>set</code>, <code>list</code>, <code>map</code>, and user-defined types (UDTs). Useful for small bounded
+collections; large collections hurt performance and should be modeled as
+separate rows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb3fe575" class="outline-3">
+<h3 id="orgb3fe575">Q125. What is a materialized view in Cassandra?</h3>
+<div class="outline-text-3" id="text-orgb3fe575">
+<p>
+A server-maintained table that automatically duplicates a base table with a
+different primary key to support another query pattern. Use cautiously — they have
+known consistency edge cases.
+</p>
+</div>
+</div>
+<div id="outline-container-org52b5511" class="outline-3">
+<h3 id="org52b5511">Q126. What are secondary indexes' limitations in Cassandra?</h3>
+<div class="outline-text-3" id="text-org52b5511">
+<p>
+They work per-node and can require scatter-gather across the cluster for
+high-cardinality or non-partition-restricted queries, often performing poorly.
+Prefer denormalized query tables or SASI/SAI indexes.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org77be06a" class="outline-2">
+<h2 id="org77be06a">Graph Databases (Neo4j-focused)</h2>
+<div class="outline-text-2" id="text-org77be06a">
+</div>
+<div id="outline-container-org757da2b" class="outline-3">
+<h3 id="org757da2b">Q127. What is a property graph model?</h3>
+<div class="outline-text-3" id="text-org757da2b">
+<p>
+A model of <b>nodes</b> and <b>relationships</b>, both of which can carry <b>properties</b> (key-value pairs) and <b>labels*/*types</b>.
+Relationships are directed and first-class, with their own properties.
+</p>
+</div>
+</div>
+<div id="outline-container-org9739658" class="outline-3">
+<h3 id="org9739658">Q128. What is Cypher?</h3>
+<div class="outline-text-3" id="text-org9739658">
+<p>
+Neo4j's declarative graph query language using ASCII-art patterns to match nodes and relationships:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cypher">MATCH (a:Person)-[:FRIEND]-&gt;(b:Person) WHERE a.name = 'Ada' RETURN b.name;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcaf4ddd" class="outline-3">
+<h3 id="orgcaf4ddd">Q129. How do you create nodes and relationships in Cypher?</h3>
+<div class="outline-text-3" id="text-orgcaf4ddd">
+<div class="org-src-container">
+<pre class="src src-cypher">CREATE (a:Person {name: 'Ada'})
+CREATE (b:Person {name: 'Alan'})
+CREATE (a)-[:FRIEND {since: 2020}]-&gt;(b);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org80b9bf5" class="outline-3">
+<h3 id="org80b9bf5">Q130. What problems are graph databases best for?</h3>
+<div class="outline-text-3" id="text-org80b9bf5">
+<p>
+Highly connected data and relationship-centric queries: social networks,
+recommendations, fraud detection, network/IT topology, knowledge graphs, and
+shortest-path problems.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d0b22b" class="outline-3">
+<h3 id="org5d0b22b">Q131. Why are graph DBs faster than relational for deep traversals?</h3>
+<div class="outline-text-3" id="text-org5d0b22b">
+<p>
+They use "index-free adjacency": each node directly references its neighbors, so
+traversing relationships is O(1) per hop, avoiding the costly repeated joins
+relational DBs need for multi-hop queries.
+</p>
+</div>
+</div>
+<div id="outline-container-org8d8a85c" class="outline-3">
+<h3 id="org8d8a85c">Q132. What is index-free adjacency?</h3>
+<div class="outline-text-3" id="text-org8d8a85c">
+<p>
+A storage approach where nodes store direct pointers to adjacent nodes/edges, so
+relationship traversal doesn't require index lookups — the core graph-DB
+performance advantage.
+</p>
+</div>
+</div>
+<div id="outline-container-org2793ba1" class="outline-3">
+<h3 id="org2793ba1">Q133. How do you find shortest paths in Cypher?</h3>
+<div class="outline-text-3" id="text-org2793ba1">
+<div class="org-src-container">
+<pre class="src src-cypher">
+MATCH p = shortestPath((a:Person {name:'Ada'})-[:KNOWS*]-(b:Person {name:'Grace'}))
+RETURN p;
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge1bfe8f" class="outline-3">
+<h3 id="orge1bfe8f">Q134. What is a variable-length / multi-hop traversal?</h3>
+<div class="outline-text-3" id="text-orge1bfe8f">
+<p>
+A pattern matching a range of relationship hops, e.g., <code>[:KNOWS*1..3]</code> matches
+friends up to 3 degrees away — concise traversal that's awkward in SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-org64e7c54" class="outline-3">
+<h3 id="org64e7c54">Q135. What is the difference between a property graph and RDF/triple store?</h3>
+<div class="outline-text-3" id="text-org64e7c54">
+<p>
+Property graphs attach properties to nodes/edges and use labels. RDF models data
+as subject-predicate-object <b>triples</b> with global URIs, queried via SPARQL —
+favored for linked/semantic web data.
+</p>
+</div>
+</div>
+<div id="outline-container-org82bba9e" class="outline-3">
+<h3 id="org82bba9e">Q136. What is MERGE in Cypher?</h3>
+<div class="outline-text-3" id="text-org82bba9e">
+<p>
+A get-or-create operation: matches an existing pattern or creates it if absent,
+useful for idempotent upserts and avoiding duplicate nodes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb6aaa5e" class="outline-3">
+<h3 id="orgb6aaa5e">Q137. How are graph databases typically scaled?</h3>
+<div class="outline-text-3" id="text-orgb6aaa5e">
+<p>
+Harder to shard than other models due to traversals crossing partitions. Options:
+read replicas, caching, careful partitioning (e.g., by community), or
+distributed graph engines (JanusGraph, Neptune, TigerGraph).
+</p>
+</div>
+</div>
+<div id="outline-container-orgabf48da" class="outline-3">
+<h3 id="orgabf48da">Q138. What is a common graph use case: recommendations?</h3>
+<div class="outline-text-3" id="text-orgabf48da">
+<p>
+"People who bought X also bought Y" via traversing purchase relationships, or
+collaborative filtering through shared-connection patterns — natural and fast in a graph.
+</p>
+</div>
+</div>
+<div id="outline-container-org626c6a9" class="outline-3">
+<h3 id="org626c6a9">Q139. What does ACID look like in Neo4j?</h3>
+<div class="outline-text-3" id="text-org626c6a9">
+<p>
+Neo4j (in its core/clustered forms) provides full ACID transactions, unusual
+among NoSQL — making it suitable when relationship integrity must be strong.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfca6f4b" class="outline-3">
+<h3 id="orgfca6f4b">Q140. What is a graph projection / GDS library?</h3>
+<div class="outline-text-3" id="text-orgfca6f4b">
+<p>
+Neo4j's Graph Data Science library runs algorithms (PageRank, community
+detection, centrality, similarity) on in-memory graph projections for analytics
+and ML feature generation.
+</p>
+</div>
+</div>
+<div id="outline-container-org6561d51" class="outline-3">
+<h3 id="org6561d51">Q141. When should you NOT use a graph database?</h3>
+<div class="outline-text-3" id="text-org6561d51">
+<p>
+For simple key-value lookups, bulk aggregations/analytics over flat data, or
+write-heavy non-relational workloads — other models scale and perform better there.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb568a8a" class="outline-2">
+<h2 id="orgb568a8a">Consistency, Distribution &amp; Internals</h2>
+<div class="outline-text-2" id="text-orgb568a8a">
+</div>
+<div id="outline-container-org7e53ecc" class="outline-3">
+<h3 id="org7e53ecc">Q142. What is quorum-based consistency?</h3>
+<div class="outline-text-3" id="text-org7e53ecc">
+<p>
+Requiring acknowledgment from a quorum (majority) of replicas for reads/writes.
+With <code>R + W &gt; N</code>, read and write quorums overlap, guaranteeing the latest write is seen.
+</p>
+</div>
+</div>
+<div id="outline-container-org42cfd1d" class="outline-3">
+<h3 id="org42cfd1d">Q143. What is the R + W &gt; N formula?</h3>
+<div class="outline-text-3" id="text-org42cfd1d">
+<p>
+With N replicas, requiring W write-acks and R read-replicas where R + W &gt; N
+ensures overlap and strong consistency. Tune R/W to trade latency vs consistency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbeb7626" class="outline-3">
+<h3 id="orgbeb7626">Q144. What is a vector clock?</h3>
+<div class="outline-text-3" id="text-orgbeb7626">
+<p>
+A data structure tracking causal ordering of events across nodes (a counter per node).
+Used (e.g., in Dynamo/Riak) to detect concurrent updates and conflicts that need resolution.
+</p>
+</div>
+</div>
+<div id="outline-container-org8beb644" class="outline-3">
+<h3 id="org8beb644">Q145. What is a conflict and how is it resolved?</h3>
+<div class="outline-text-3" id="text-org8beb644">
+<p>
+When concurrent writes produce divergent replica states. Resolution strategies:
+last-write-wins (timestamps), vector-clock sibling reconciliation, app-level merge logic, or CRDTs.
+</p>
+</div>
+</div>
+<div id="outline-container-org3602e2c" class="outline-3">
+<h3 id="org3602e2c">Q146. What are CRDTs?</h3>
+<div class="outline-text-3" id="text-org3602e2c">
+<p>
+Conflict-free Replicated Data Types — data structures (counters, sets, maps)
+mathematically designed to merge concurrent updates deterministically without
+coordination, guaranteeing convergence. Used in Riak, Redis (active-active), Azure Cosmos DB.
+</p>
+</div>
+</div>
+<div id="outline-container-org76787d9" class="outline-3">
+<h3 id="org76787d9">Q147. What is the Dynamo paper's influence?</h3>
+<div class="outline-text-3" id="text-org76787d9">
+<p>
+Amazon's 2007 Dynamo paper introduced consistent hashing, vector clocks, quorums,
+hinted handoff, and gossip — foundational to Cassandra, Riak, and DynamoDB.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ac1575" class="outline-3">
+<h3 id="org2ac1575">Q148. What is consistent hashing?</h3>
+<div class="outline-text-3" id="text-org2ac1575">
+<p>
+A hashing scheme mapping keys and nodes onto a ring so that adding/removing a node
+only remaps a small fraction of keys (≈1/N), minimizing data movement on cluster changes.
+</p>
+</div>
+</div>
+<div id="outline-container-orge318267" class="outline-3">
+<h3 id="orge318267">Q149. What are virtual nodes (vnodes)?</h3>
+<div class="outline-text-3" id="text-orge318267">
+<p>
+Splitting each physical node into many token ranges on the ring, improving load
+balance and making rebalancing smoother when nodes join/leave.
+</p>
+</div>
+</div>
+<div id="outline-container-org03abd12" class="outline-3">
+<h3 id="org03abd12">Q150. What is a gossip protocol?</h3>
+<div class="outline-text-3" id="text-org03abd12">
+<p>
+A decentralized protocol where nodes periodically exchange state with random
+peers, propagating membership and health info across the cluster without a central coordinator.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf6f78f1" class="outline-3">
+<h3 id="orgf6f78f1">Q151. What is a Merkle tree and its role?</h3>
+<div class="outline-text-3" id="text-orgf6f78f1">
+<p>
+A hash tree summarizing data ranges so replicas can efficiently compare and
+identify differences with minimal data transfer — used for anti-entropy repair in Cassandra/Dynamo.
+</p>
+</div>
+</div>
+<div id="outline-container-org43d5020" class="outline-3">
+<h3 id="org43d5020">Q152. What is anti-entropy repair?</h3>
+<div class="outline-text-3" id="text-org43d5020">
+<p>
+A background process comparing replicas (via Merkle trees) and reconciling
+differences to ensure replicas converge, complementing read repair and hinted handoff.
+</p>
+</div>
+</div>
+<div id="outline-container-orga076fb1" class="outline-3">
+<h3 id="orga076fb1">Q153. What is read-your-own-writes consistency?</h3>
+<div class="outline-text-3" id="text-orga076fb1">
+<p>
+A session guarantee that a client always sees its own prior writes, even under
+eventual consistency — often achieved by routing the client to the same
+replica/primary or via sticky sessions.
+</p>
+</div>
+</div>
+<div id="outline-container-org12f6518" class="outline-3">
+<h3 id="org12f6518">Q154. What is monotonic read consistency?</h3>
+<div class="outline-text-3" id="text-org12f6518">
+<p>
+A guarantee that once a client reads a value, subsequent reads never return older
+values — preventing "going back in time" across replicas.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe027e0" class="outline-3">
+<h3 id="orgfe027e0">Q155. What is causal consistency?</h3>
+<div class="outline-text-3" id="text-orgfe027e0">
+<p>
+A model preserving cause-effect ordering: operations causally related are seen in
+order by all nodes, while concurrent operations may be seen in any order. Stronger
+than eventual, weaker than strong.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce12225" class="outline-3">
+<h3 id="orgce12225">Q156. What is the PACELC theorem?</h3>
+<div class="outline-text-3" id="text-orgce12225">
+<p>
+An extension of CAP: if there is a Partition, trade Availability vs Consistency (A/C);
+Else (normal operation) trade Latency vs Consistency (L/C). It captures the latency cost of consistency even without partitions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc36e570" class="outline-3">
+<h3 id="orgc36e570">Q157. What is a write-ahead log (WAL) / commit log?</h3>
+<div class="outline-text-3" id="text-orgc36e570">
+<p>
+A durable append-only log of changes written before applying them to main
+storage, enabling crash recovery. Used in Cassandra (commit log), HBase (WAL),
+and many engines.
+</p>
+</div>
+</div>
+<div id="outline-container-org86b3535" class="outline-3">
+<h3 id="org86b3535">Q158. What is an LSM tree?</h3>
+<div class="outline-text-3" id="text-org86b3535">
+<p>
+Log-Structured Merge tree — buffers writes in memory (memtable), flushes sorted
+immutable files (SSTables) to disk, and merges them via compaction. Optimizes
+write throughput; used by Cassandra, HBase, RocksDB, LevelDB.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb53b21f" class="outline-3">
+<h3 id="orgb53b21f">Q159. How does an LSM tree differ from a B-tree?</h3>
+<div class="outline-text-3" id="text-orgb53b21f">
+<p>
+B-trees update in place (read-optimized, good for random reads, more write
+amplification on random writes). LSM trees append/merge (write-optimized, need
+compaction, reads may check multiple SSTables + bloom filters).
+</p>
+</div>
+</div>
+<div id="outline-container-orgc67242a" class="outline-3">
+<h3 id="orgc67242a">Q160. What is a bloom filter and its role in NoSQL?</h3>
+<div class="outline-text-3" id="text-orgc67242a">
+<p>
+A space-efficient probabilistic structure answering "is this key possibly present?" with no false negatives.
+NoSQL stores use it to skip SSTables that can't contain a key, speeding reads.
+</p>
+</div>
+</div>
+<div id="outline-container-org3c1616e" class="outline-3">
+<h3 id="org3c1616e">Q161. What is write amplification?</h3>
+<div class="outline-text-3" id="text-org3c1616e">
+<p>
+The ratio of physical bytes written to logical bytes written. LSM compaction
+rewrites data multiple times, increasing write amplification — a key tuning concern on SSDs.
+</p>
+</div>
+</div>
+<div id="outline-container-org1cdf6e1" class="outline-3">
+<h3 id="org1cdf6e1">Q162. What is read amplification?</h3>
+<div class="outline-text-3" id="text-org1cdf6e1">
+<p>
+Extra reads needed to satisfy a query (e.g., checking multiple SSTables + indexes
+</p>
+
+<ul class="org-ul">
+<li>bloom filters in an LSM store). Mitigated by compaction strategy and bloom filters.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0ca6966" class="outline-3">
+<h3 id="org0ca6966">Q163. What is space amplification?</h3>
+<div class="outline-text-3" id="text-org0ca6966">
+<p>
+Extra disk used beyond the logical data size (obsolete versions, tombstones
+awaiting compaction). LSM stores trade space amplification for write performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e14d5d" class="outline-3">
+<h3 id="org2e14d5d">Q164. What is the difference between synchronous and asynchronous replication?</h3>
+<div class="outline-text-3" id="text-org2e14d5d">
+<p>
+<b>Synchronous</b>: write acknowledged only after replicas confirm (stronger
+consistency, higher latency). <b>Asynchronous</b>: primary acks immediately, replicates
+in background (lower latency, risk of data loss on failure).
+</p>
+</div>
+</div>
+<div id="outline-container-orgcf7304b" class="outline-3">
+<h3 id="orgcf7304b">Q165. What is a split-brain scenario?</h3>
+<div class="outline-text-3" id="text-orgcf7304b">
+<p>
+When a network partition causes two sides to each believe they're the
+master/leader, accepting conflicting writes. Prevented via quorum/fencing and
+leader election with majority.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc52fed6" class="outline-3">
+<h3 id="orgc52fed6">Q166. What is leader election and where is it used?</h3>
+<div class="outline-text-3" id="text-orgc52fed6">
+<p>
+A process to choose a single coordinator among nodes (via consensus like Raft or Paxos).
+Used by MongoDB replica sets, Kafka controllers, and Zookeeper-coordinated systems.
+</p>
+</div>
+</div>
+<div id="outline-container-org6fe9b10" class="outline-3">
+<h3 id="org6fe9b10">Q167. What is the difference between Raft and Paxos?</h3>
+<div class="outline-text-3" id="text-org6fe9b10">
+<p>
+Both are consensus algorithms for agreeing on a value/log across nodes despite
+failures. Raft is designed for understandability (clear leader, log replication);
+Paxos is older and notoriously harder to implement.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org1970060" class="outline-2">
+<h2 id="org1970060">Operations, Security &amp; Advanced</h2>
+<div class="outline-text-2" id="text-org1970060">
+</div>
+<div id="outline-container-orgace71ba" class="outline-3">
+<h3 id="orgace71ba">Q168. How do you back up NoSQL databases?</h3>
+<div class="outline-text-3" id="text-orgace71ba">
+<p>
+Snapshots (Cassandra <code>nodetool snapshot</code>, MongoDB filesystem/mongodump),
+continuous/PITR (DynamoDB PITR, MongoDB oplog-based), or managed-service backups.
+Test restores regularly.
+</p>
+</div>
+</div>
+<div id="outline-container-org2fbcb2c" class="outline-3">
+<h3 id="org2fbcb2c">Q169. What is mongodump/mongorestore vs filesystem snapshot?</h3>
+<div class="outline-text-3" id="text-org2fbcb2c">
+<p>
+<code>mongodump</code> exports BSON logically (portable, slower, larger). Filesystem/volume
+snapshots are faster for large datasets and support consistent point-in-time
+backups (with journaling) but are storage-specific.
+</p>
+</div>
+</div>
+<div id="outline-container-org75ec8dc" class="outline-3">
+<h3 id="org75ec8dc">Q170. How do you monitor a NoSQL cluster?</h3>
+<div class="outline-text-3" id="text-org75ec8dc">
+<p>
+Track latency (p99), throughput, error rates, replication lag, disk/memory usage,
+compaction/GC, hot partitions, and node health — via Prometheus/Grafana, native
+tools (<code>nodetool</code>), or managed dashboards.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd55f3b1" class="outline-3">
+<h3 id="orgd55f3b1">Q171. What is replication lag and why does it matter?</h3>
+<div class="outline-text-3" id="text-orgd55f3b1">
+<p>
+The delay before a write propagates to replicas. High lag means stale reads from
+secondaries and risk of data loss on failover — monitor and bound it.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ad2b19" class="outline-3">
+<h3 id="org2ad2b19">Q172. How do you secure a NoSQL database?</h3>
+<div class="outline-text-3" id="text-org2ad2b19">
+<p>
+Enable authentication/authorization (RBAC), TLS in transit, encryption at rest,
+network isolation (VPC/firewall), least-privilege accounts, audit logging, and
+disable default open binds (a common breach cause).
+</p>
+</div>
+</div>
+<div id="outline-container-org1fb6a91" class="outline-3">
+<h3 id="org1fb6a91">Q173. What is the "NoSQL injection" risk?</h3>
+<div class="outline-text-3" id="text-org1fb6a91">
+<p>
+Injecting malicious operators/queries (e.g., MongoDB <code>$where</code>, <code>$ne</code>, or
+JSON/object injection) when user input is passed unsanitized into queries.
+Mitigate with parameterization, input validation, and avoiding =$where=/eval.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc429f0" class="outline-3">
+<h3 id="orgdc429f0">Q174. How do you handle large-scale data migration in NoSQL?</h3>
+<div class="outline-text-3" id="text-orgdc429f0">
+<p>
+Dual-write to old and new schemas, backfill historically in batches, verify with
+reconciliation, then cut over reads. Use change streams/CDC and version fields to
+migrate without downtime.
+</p>
+</div>
+</div>
+<div id="outline-container-org9226379" class="outline-3">
+<h3 id="org9226379">Q175. What is change data capture (CDC) in NoSQL?</h3>
+<div class="outline-text-3" id="text-org9226379">
+<p>
+Streaming row/document-level changes out of the database (MongoDB change streams,
+DynamoDB Streams, Debezium, Cassandra CDC) to power search indexes, caches, data
+lakes, and event-driven services.
+</p>
+</div>
+</div>
+<div id="outline-container-orga78dbee" class="outline-3">
+<h3 id="orga78dbee">Q176. How do you integrate NoSQL with search engines?</h3>
+<div class="outline-text-3" id="text-orga78dbee">
+<p>
+Stream changes via CDC into Elasticsearch/OpenSearch for full-text and analytical
+queries the primary store handles poorly, keeping the index eventually consistent
+with the source of truth.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeafdec5" class="outline-3">
+<h3 id="orgeafdec5">Q177. What is a Lambda vs Kappa architecture?</h3>
+<div class="outline-text-3" id="text-orgeafdec5">
+<p>
+<b>Lambda</b>: separate batch and speed layers merged at query time. <b>Kappa</b>: a single
+stream-processing pipeline reprocessed as needed. Both use NoSQL/streaming stores
+for serving and ingest.
+</p>
+</div>
+</div>
+<div id="outline-container-orge030fc4" class="outline-3">
+<h3 id="orge030fc4">Q178. What is data locality in distributed NoSQL?</h3>
+<div class="outline-text-3" id="text-orge030fc4">
+<p>
+Placing data (and computation) close to where it's accessed — within a partition,
+node, datacenter, or region — to minimize cross-network latency. Multi-region
+configs use <code>LOCAL_QUORUM</code> and geo-partitioning.
+</p>
+</div>
+</div>
+<div id="outline-container-org08d8441" class="outline-3">
+<h3 id="org08d8441">Q179. How do multi-region/global NoSQL deployments work?</h3>
+<div class="outline-text-3" id="text-org08d8441">
+<p>
+Data is replicated across regions (active-passive or active-active). Active-active
+(DynamoDB Global Tables, Cosmos DB, Cassandra multi-DC) needs conflict resolution
+(LWW/CRDTs) and accepts eventual cross-region consistency.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e7b66f" class="outline-3">
+<h3 id="org1e7b66f">Q180. What is the difference between OLTP and OLAP needs in NoSQL?</h3>
+<div class="outline-text-3" id="text-org1e7b66f">
+<p>
+Most NoSQL stores target OLTP (fast point/partition operations). Analytical (OLAP)
+queries are offloaded to columnar/warehouse systems (BigQuery, Redshift, Spark) or
+search engines via ETL/CDC.
+</p>
+</div>
+</div>
+<div id="outline-container-org8d567ce" class="outline-3">
+<h3 id="org8d567ce">Q181. What is idempotency and why does it matter for NoSQL writes?</h3>
+<div class="outline-text-3" id="text-org8d567ce">
+<p>
+An idempotent operation produces the same result if applied multiple times. With
+at-least-once delivery and retries common in distributed systems, idempotent
+writes (e.g., set by id, conditional writes) prevent duplicates/double-counting.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3472ce" class="outline-3">
+<h3 id="orgd3472ce">Q182. What are conditional writes / optimistic concurrency in NoSQL?</h3>
+<div class="outline-text-3" id="text-orgd3472ce">
+<p>
+Writes that succeed only if a condition holds (e.g., DynamoDB <code>ConditionExpression</code>,
+a version attribute, or MongoDB <code>findAndModify</code> on a version). Used to implement
+optimistic locking without blocking.
+</p>
+</div>
+</div>
+<div id="outline-container-org1f1e0d7" class="outline-3">
+<h3 id="org1f1e0d7">Q183. How do you implement counters at scale?</h3>
+<div class="outline-text-3" id="text-org1f1e0d7">
+<p>
+Atomic increments (Redis <code>INCR</code>, DynamoDB <code>ADD</code>, Cassandra counter columns). For
+extreme write rates, shard counters across keys and sum on read to avoid hot keys.
+</p>
+</div>
+</div>
+<div id="outline-container-org5077d5e" class="outline-3">
+<h3 id="org5077d5e">Q184. What is the dual-write problem?</h3>
+<div class="outline-text-3" id="text-org5077d5e">
+<p>
+Writing to two systems (e.g., DB + cache or DB + search) without atomicity, risking
+inconsistency if one write fails. Solve with the outbox pattern + CDC rather than
+naive dual writes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcb1b757" class="outline-3">
+<h3 id="orgcb1b757">Q185. What is the outbox pattern?</h3>
+<div class="outline-text-3" id="text-orgcb1b757">
+<p>
+Writing events to an "outbox" table/collection in the same transaction as the data
+change, then a separate process publishes them — guaranteeing the event and the
+state change are consistent (no lost or phantom events).
+</p>
+</div>
+</div>
+<div id="outline-container-org90793c4" class="outline-3">
+<h3 id="org90793c4">Q186. What is eventual consistency's impact on application design?</h3>
+<div class="outline-text-3" id="text-org90793c4">
+<p>
+Apps must tolerate stale reads, design idempotent operations, handle conflicts,
+avoid read-after-write assumptions (or use session consistency), and surface
+"pending" states to users where appropriate.
+</p>
+</div>
+</div>
+<div id="outline-container-org99e020e" class="outline-3">
+<h3 id="org99e020e">Q187. How do you choose between document, key-value, column, and graph stores?</h3>
+<div class="outline-text-3" id="text-org99e020e">
+<p>
+Map to access patterns: rich nested records/flexible queries → document; simple
+fast lookups/cache → key-value; massive write-heavy time-series/known-query →
+wide-column; relationship traversal → graph.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d1a97f" class="outline-3">
+<h3 id="org5d1a97f">Q188. What is a "polystore" / multi-model database?</h3>
+<div class="outline-text-3" id="text-org5d1a97f">
+<p>
+A database supporting multiple models in one engine (e.g., Cosmos DB, ArangoDB,
+Couchbase, OrientDB), reducing operational overhead of running several specialized stores.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0e7511" class="outline-3">
+<h3 id="orgf0e7511">Q189. What are common anti-patterns in NoSQL?</h3>
+<div class="outline-text-3" id="text-orgf0e7511">
+<p>
+Treating NoSQL like SQL (normalizing everything, joining in app code), unbounded
+array/partition growth, low-cardinality partition keys, scanning instead of
+querying, ignoring access patterns, and using eventual consistency where strong is required.
+</p>
+</div>
+</div>
+<div id="outline-container-org8de5d57" class="outline-3">
+<h3 id="org8de5d57">Q190. How do you test and benchmark NoSQL systems?</h3>
+<div class="outline-text-3" id="text-org8de5d57">
+<p>
+Use realistic workloads and tools like YCSB (Yahoo! Cloud Serving Benchmark),
+measure p99 latency and throughput under concurrency, test failure/partition
+scenarios, and validate consistency behavior — not just averages.
+</p>
+</div>
+</div>
+<div id="outline-container-org59e5bfb" class="outline-3">
+<h3 id="org59e5bfb">Q191. What is the future direction of NoSQL ("NewSQL" and convergence)?</h3>
+<div class="outline-text-3" id="text-org59e5bfb">
+<p>
+The line is blurring: NewSQL systems (CockroachDB, Spanner, YugabyteDB, TiDB)
+offer SQL + horizontal scale + distributed ACID, while NoSQL stores add
+transactions, SQL-like languages, and stronger consistency — converging on "distributed SQL".
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
