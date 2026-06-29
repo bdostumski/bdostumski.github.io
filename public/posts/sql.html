@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SQL</title>
+<meta name="description" content="A comprehensive Emacs Lisp guide covering Elisp fundamentals, Emacs internals, package development, macros, debugging, performance optimization, asynchronous programming, and advanced editor extension development." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">SQL</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org219b04f" class="outline-2">
+<h2 id="org219b04f">SQL Q&amp;A (Beginner to Advanced)</h2>
+</div>
+
+<div id="outline-container-orgb2e0cd1" class="outline-2">
+<h2 id="orgb2e0cd1">Fundamentals</h2>
+<div class="outline-text-2" id="text-orgb2e0cd1">
+</div>
+<div id="outline-container-orga51796e" class="outline-3">
+<h3 id="orga51796e">Q1. What is SQL?</h3>
+<div class="outline-text-3" id="text-orga51796e">
+<p>
+SQL (Structured Query Language) is the standard language for managing and
+querying data in relational database management systems (RDBMS). It is
+declarative — you describe <i>what</i> you want, not <i>how</i> to fetch it.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf972aa" class="outline-3">
+<h3 id="orgbf972aa">Q2. What are the main categories of SQL statements?</h3>
+<div class="outline-text-3" id="text-orgbf972aa">
+<ul class="org-ul">
+<li><b>DDL</b> (Data Definition Language): <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code></li>
+<li><b>DML</b> (Data Manipulation Language): <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code></li>
+<li><b>DCL</b> (Data Control Language): <code>GRANT</code>, <code>REVOKE</code></li>
+<li><b>TCL</b> (Transaction Control Language): <code>COMMIT</code>, <code>ROLLBACK</code>, <code>SAVEPOINT</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd30b5f2" class="outline-3">
+<h3 id="orgd30b5f2">Q3. What is a relational database?</h3>
+<div class="outline-text-3" id="text-orgd30b5f2">
+<p>
+A database that organizes data into tables (relations) made of rows and columns, where relationships between tables are expressed via keys.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc068dfa" class="outline-3">
+<h3 id="orgc068dfa">Q4. What is a table, row, and column?</h3>
+<div class="outline-text-3" id="text-orgc068dfa">
+<p>
+A <b>table</b> is a collection of related data. A <b>row</b> (tuple/record) is a single entry.
+A <b>column</b> (attribute/field) defines a data type and meaning for a value in each row.
+</p>
+</div>
+</div>
+<div id="outline-container-org1a08ad7" class="outline-3">
+<h3 id="org1a08ad7">Q5. Write a basic SELECT statement.</h3>
+<div class="outline-text-3" id="text-org1a08ad7">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> first_name, last_name <span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org29df0de" class="outline-3">
+<h3 id="org29df0de">Q6. How do you select all columns from a table?</h3>
+<div class="outline-text-3" id="text-org29df0de">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+
+<p>
+Avoid <code>SELECT *</code> in production code — it hurts performance and breaks when the schema changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org29b01fd" class="outline-3">
+<h3 id="org29b01fd">Q7. What is the difference between WHERE and HAVING?</h3>
+<div class="outline-text-3" id="text-org29b01fd">
+<p>
+<code>WHERE</code> filters rows <i>before</i> grouping/aggregation. <code>HAVING</code> filters <i>after</i> <code>GROUP BY</code>, allowing conditions on aggregate functions.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e7ace5" class="outline-3">
+<h3 id="org0e7ace5">Q8. What is the logical order of execution of a SELECT query?</h3>
+<div class="outline-text-3" id="text-org0e7ace5">
+<p>
+<code>FROM</code> → <code>JOIN</code> → <code>WHERE</code> → <code>GROUP BY</code> → <code>HAVING</code> → <code>SELECT</code> → <code>DISTINCT</code> → <code>ORDER BY</code> → <code>LIMIT/OFFSET</code>. (Written order differs from execution order.)
+</p>
+</div>
+</div>
+<div id="outline-container-orgbec8ac8" class="outline-3">
+<h3 id="orgbec8ac8">Q9. What is NULL in SQL?</h3>
+<div class="outline-text-3" id="text-orgbec8ac8">
+<p>
+<code>NULL</code> represents a missing or unknown value. It is not equal to 0 or an empty string, and any comparison with <code>NULL</code> using <code>=</code> yields <code>UNKNOWN</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org26ab487" class="outline-3">
+<h3 id="org26ab487">Q10. How do you test for NULL?</h3>
+<div class="outline-text-3" id="text-org26ab487">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> manager_id <span style="font-weight: bold;">IS</span> <span style="font-weight: bold;">NULL</span>;
+<span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> manager_id <span style="font-weight: bold;">IS</span> <span style="font-weight: bold;">NOT</span> <span style="font-weight: bold;">NULL</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org04fb646" class="outline-3">
+<h3 id="org04fb646">Q11. What is the difference between DELETE, TRUNCATE, and DROP?</h3>
+<div class="outline-text-3" id="text-org04fb646">
+<ul class="org-ul">
+<li><code>DELETE</code> removes rows (DML, can have <code>WHERE</code>, logged, can rollback).</li>
+<li><code>TRUNCATE</code> removes all rows fast (DDL, resets identity, usually can't filter, minimal logging).</li>
+<li><code>DROP</code> removes the entire table/object structure.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org5ac192a" class="outline-3">
+<h3 id="org5ac192a">Q12. What is the difference between CHAR and VARCHAR?</h3>
+<div class="outline-text-3" id="text-org5ac192a">
+<p>
+<code>CHAR(n)</code> is fixed length, padded with spaces. <code>VARCHAR(n)</code> is variable length, storing only the actual characters plus length info.
+</p>
+</div>
+</div>
+<div id="outline-container-org07a3d05" class="outline-3">
+<h3 id="org07a3d05">Q13. How do you insert a row?</h3>
+<div class="outline-text-3" id="text-org07a3d05">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">INSERT</span> <span style="font-weight: bold;">INTO</span> employees (first_name, last_name, salary)
+<span style="font-weight: bold;">VALUES</span> (<span style="font-style: italic;">'Ada'</span>, <span style="font-style: italic;">'Lovelace'</span>, 90000);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org61eeae9" class="outline-3">
+<h3 id="org61eeae9">Q14. How do you insert multiple rows at once?</h3>
+<div class="outline-text-3" id="text-org61eeae9">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">INSERT</span> <span style="font-weight: bold;">INTO</span> employees (first_name, salary) <span style="font-weight: bold;">VALUES</span>
+  (<span style="font-style: italic;">'Ada'</span>, 90000),
+  (<span style="font-style: italic;">'Alan'</span>, 85000),
+  (<span style="font-style: italic;">'Grace'</span>, 95000);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org60955ed" class="outline-3">
+<h3 id="org60955ed">Q15. How do you update existing data?</h3>
+<div class="outline-text-3" id="text-org60955ed">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">UPDATE</span> employees <span style="font-weight: bold;">SET</span> salary = salary * 1.10 <span style="font-weight: bold;">WHERE</span> department_id = 3;
+</pre>
+</div>
+
+<p>
+Always include a <code>WHERE</code> clause unless you intend to update every row.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf6450e9" class="outline-3">
+<h3 id="orgf6450e9">Q16. How do you delete rows?</h3>
+<div class="outline-text-3" id="text-orgf6450e9">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">DELETE</span> <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> termination_date <span style="font-weight: bold;">IS</span> <span style="font-weight: bold;">NOT</span> <span style="font-weight: bold;">NULL</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6ebd93f" class="outline-3">
+<h3 id="org6ebd93f">Q17. What is a primary key?</h3>
+<div class="outline-text-3" id="text-org6ebd93f">
+<p>
+A column or set of columns that uniquely identifies each row.
+It cannot contain <code>NULL</code> and must be unique.
+A table has at most one primary key.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcbb0be9" class="outline-3">
+<h3 id="orgcbb0be9">Q18. What is a foreign key?</h3>
+<div class="outline-text-3" id="text-orgcbb0be9">
+<p>
+A column (or columns) that references the primary key of another table, enforcing referential integrity between the two tables.
+</p>
+</div>
+</div>
+<div id="outline-container-org55b5a29" class="outline-3">
+<h3 id="org55b5a29">Q19. What is a composite key?</h3>
+<div class="outline-text-3" id="text-org55b5a29">
+<p>
+A primary or unique key made up of more than one column.
+</p>
+</div>
+</div>
+<div id="outline-container-orge440387" class="outline-3">
+<h3 id="orge440387">Q20. What is a candidate key vs. a surrogate key?</h3>
+<div class="outline-text-3" id="text-orge440387">
+<p>
+A <b>candidate key</b> is any column set that could uniquely identify a row (natural key).
+A <b>surrogate key</b> is an artificial identifier (e.g., auto-increment id) with no business meaning.
+</p>
+</div>
+</div>
+<div id="outline-container-org7cb603f" class="outline-3">
+<h3 id="org7cb603f">Q21. What is the difference between DISTINCT and GROUP BY?</h3>
+<div class="outline-text-3" id="text-org7cb603f">
+<p>
+<code>DISTINCT</code> removes duplicate rows from the result set. <code>GROUP BY</code> groups rows to apply aggregate functions.
+<code>GROUP BY</code> without aggregates behaves similarly to <code>DISTINCT</code> but is more flexible.
+</p>
+</div>
+</div>
+<div id="outline-container-org4193084" class="outline-3">
+<h3 id="org4193084">Q22. How do you rename a column in the output?</h3>
+<div class="outline-text-3" id="text-org4193084">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> salary <span style="font-weight: bold;">AS</span> monthly_salary, salary * 12 <span style="font-weight: bold;">AS</span> annual_salary <span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org23f21b0" class="outline-3">
+<h3 id="org23f21b0">Q23. How do you concatenate strings?</h3>
+<div class="outline-text-3" id="text-org23f21b0">
+<ul class="org-ul">
+<li>ANSI/PostgreSQL/Oracle: <code>first_name || ' ' || last_name</code></li>
+<li>SQL Server: <code>first_name + ' ' + last_name</code> or <code>CONCAT(...)</code></li>
+<li>MySQL: <code>CONCAT(first_name, ' ', last_name)</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgbdcc9bf" class="outline-3">
+<h3 id="orgbdcc9bf">Q24. What is the difference between = and LIKE?</h3>
+<div class="outline-text-3" id="text-orgbdcc9bf">
+<p>
+<code>=</code> matches exact values. <code>LIKE</code> matches patterns using wildcards <code>%</code> (any sequence) and <code>_</code> (single character).
+</p>
+</div>
+</div>
+<div id="outline-container-orgea98d78" class="outline-3">
+<h3 id="orgea98d78">Q25. How do you filter with a pattern?</h3>
+<div class="outline-text-3" id="text-orgea98d78">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> last_name <span style="font-weight: bold;">LIKE</span> <span style="font-style: italic;">'S%'</span>;   <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">starts with S
+</span><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> email <span style="font-weight: bold;">LIKE</span> <span style="font-style: italic;">'%@gmail.com'</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0f9bda8" class="outline-3">
+<h3 id="org0f9bda8">Q26. What is the IN operator?</h3>
+<div class="outline-text-3" id="text-org0f9bda8">
+<p>
+A shorthand for multiple OR conditions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> department_id <span style="font-weight: bold;">IN</span> (1, 2, 5);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf29a135" class="outline-3">
+<h3 id="orgf29a135">Q27. What is the BETWEEN operator?</h3>
+<div class="outline-text-3" id="text-orgf29a135">
+<p>
+Inclusive range filter:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> salary <span style="font-weight: bold;">BETWEEN</span> 50000 <span style="font-weight: bold;">AND</span> 80000;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf72343d" class="outline-3">
+<h3 id="orgf72343d">Q28. How do you sort results?</h3>
+<div class="outline-text-3" id="text-orgf72343d">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary <span style="font-weight: bold;">DESC</span>, last_name <span style="font-weight: bold;">ASC</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7a076dd" class="outline-3">
+<h3 id="org7a076dd">Q29. How do you limit the number of rows returned?</h3>
+<div class="outline-text-3" id="text-org7a076dd">
+<ul class="org-ul">
+<li>PostgreSQL/MySQL: <code>LIMIT 10</code></li>
+<li>SQL Server: <code>SELECT TOP 10 ...</code> or <code>OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY</code></li>
+<li>Oracle 12c+: <code>FETCH FIRST 10 ROWS ONLY</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7e3d9eb" class="outline-3">
+<h3 id="org7e3d9eb">Q30. What is a comment in SQL?</h3>
+<div class="outline-text-3" id="text-org7e3d9eb">
+<div class="org-src-container">
+<pre class="src src-sql">
+<span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">single line comment
+</span>
+<span style="font-weight: bold; font-style: italic;">/* multi
+   line comment */</span>
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc0b7a5a" class="outline-2">
+<h2 id="orgc0b7a5a">Filtering, Sorting &amp; Functions</h2>
+<div class="outline-text-2" id="text-orgc0b7a5a">
+</div>
+<div id="outline-container-org888c40f" class="outline-3">
+<h3 id="org888c40f">Q31. What are the common comparison operators?</h3>
+<div class="outline-text-3" id="text-org888c40f">
+<p>
+<code>=</code>, <code>&lt;&gt;</code> (or <code>!=</code>), <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org17ba74b" class="outline-3">
+<h3 id="org17ba74b">Q32. What is the difference between AND and OR precedence?</h3>
+<div class="outline-text-3" id="text-org17ba74b">
+<p>
+<code>AND</code> binds tighter than <code>OR</code>. Use parentheses to make intent explicit:
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">WHERE</span> department_id = 1 <span style="font-weight: bold;">AND</span> (salary &gt; 50000 <span style="font-weight: bold;">OR</span> bonus &gt; 5000)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc0d4091" class="outline-3">
+<h3 id="orgc0d4091">Q33. How do you handle NULLs in calculations?</h3>
+<div class="outline-text-3" id="text-orgc0d4091">
+<p>
+Use <code>COALESCE</code> to substitute a default:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">COALESCE</span>(bonus, 0) + salary <span style="font-weight: bold;">AS</span> total_comp <span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org57b9131" class="outline-3">
+<h3 id="org57b9131">Q34. What is the difference between COALESCE and ISNULL/NVL?</h3>
+<div class="outline-text-3" id="text-org57b9131">
+<p>
+<code>COALESCE</code> is ANSI standard and accepts many arguments, returning the first
+non-null. <code>ISNULL</code> (SQL Server) and <code>NVL</code> (Oracle) take exactly two arguments.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf83cabb" class="outline-3">
+<h3 id="orgf83cabb">Q35. What does NULLIF do?</h3>
+<div class="outline-text-3" id="text-orgf83cabb">
+<p>
+Returns <code>NULL</code> if the two arguments are equal; otherwise returns the first.
+Useful to avoid divide-by-zero:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> total / <span style="font-weight: bold;">NULLIF</span>(<span style="font-weight: bold;">count</span>, 0) <span style="font-weight: bold;">FROM</span> stats;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf5c7786" class="outline-3">
+<h3 id="orgf5c7786">Q36. What is a CASE expression?</h3>
+<div class="outline-text-3" id="text-orgf5c7786">
+<p>
+Conditional logic in queries:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>,
+  <span style="font-weight: bold;">CASE</span> <span style="font-weight: bold;">WHEN</span> salary &gt; 100000 <span style="font-weight: bold;">THEN</span> <span style="font-style: italic;">'High'</span>
+       <span style="font-weight: bold;">WHEN</span> salary &gt; 50000  <span style="font-weight: bold;">THEN</span> <span style="font-style: italic;">'Mid'</span>
+       <span style="font-weight: bold;">ELSE</span> <span style="font-style: italic;">'Low'</span> <span style="font-weight: bold;">END</span> <span style="font-weight: bold;">AS</span> band
+<span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6e2091a" class="outline-3">
+<h3 id="org6e2091a">Q37. What's the difference between simple and searched CASE?</h3>
+<div class="outline-text-3" id="text-org6e2091a">
+<p>
+Simple <code>CASE expr WHEN value THEN ...</code> compares one expression to values.
+Searched <code>CASE WHEN condition THEN ...</code> evaluates arbitrary boolean conditions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb8db25f" class="outline-3">
+<h3 id="orgb8db25f">Q38. Common string functions?</h3>
+<div class="outline-text-3" id="text-orgb8db25f">
+<p>
+<code>UPPER</code>, <code>LOWER</code>, <code>LENGTH=/=LEN</code>, <code>SUBSTRING</code>, <code>TRIM</code>, <code>LTRIM</code>, <code>RTRIM</code>, <code>REPLACE</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>POSITION=/=CHARINDEX</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc62846" class="outline-3">
+<h3 id="orgdc62846">Q39. How do you extract part of a string?</h3>
+<div class="outline-text-3" id="text-orgdc62846">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">SUBSTRING</span>(phone <span style="font-weight: bold;">FROM</span> 1 <span style="font-weight: bold;">FOR</span> 3) <span style="font-weight: bold;">FROM</span> contacts;  <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">ANSI
+</span><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">SUBSTRING</span>(phone, 1, 3) <span style="font-weight: bold;">FROM</span> contacts;          <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">common dialect form</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4daac68" class="outline-3">
+<h3 id="org4daac68">Q40. Common numeric functions?</h3>
+<div class="outline-text-3" id="text-org4daac68">
+<p>
+<code>ABS</code>, <code>ROUND</code>, <code>CEIL=/=CEILING</code>, <code>FLOOR</code>, <code>MOD</code>, <code>POWER</code>, <code>SQRT</code>, <code>TRUNC</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orga897989" class="outline-3">
+<h3 id="orga897989">Q41. How do you round to two decimals?</h3>
+<div class="outline-text-3" id="text-orga897989">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> ROUND(price, 2) <span style="font-weight: bold;">FROM</span> products;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf235974" class="outline-3">
+<h3 id="orgf235974">Q42. How do you get the current date/time?</h3>
+<div class="outline-text-3" id="text-orgf235974">
+<ul class="org-ul">
+<li>PostgreSQL: <code>CURRENT_DATE</code>, <code>CURRENT_TIMESTAMP</code>, <code>NOW()</code></li>
+<li>MySQL: <code>CURDATE()</code>, <code>NOW()</code></li>
+<li>SQL Server: <code>GETDATE()</code>, <code>SYSDATETIME()</code></li>
+<li>Oracle: <code>SYSDATE</code>, <code>CURRENT_TIMESTAMP</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd1ac43f" class="outline-3">
+<h3 id="orgd1ac43f">Q43. How do you compute the difference between two dates?</h3>
+<div class="outline-text-3" id="text-orgd1ac43f">
+<ul class="org-ul">
+<li>PostgreSQL: <code>end_date - start_date</code> (returns days/interval)</li>
+<li>MySQL: <code>DATEDIFF(end_date, start_date)</code></li>
+<li>SQL Server: <code>DATEDIFF(DAY, start_date, end_date)</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3c41796" class="outline-3">
+<h3 id="org3c41796">Q44. How do you extract the year from a date?</h3>
+<div class="outline-text-3" id="text-org3c41796">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">EXTRACT</span>(<span style="font-weight: bold;">YEAR</span> <span style="font-weight: bold;">FROM</span> hire_date) <span style="font-weight: bold;">FROM</span> employees;  <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">ANSI/PostgreSQL
+</span><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">YEAR</span>(hire_date) <span style="font-weight: bold;">FROM</span> employees;                <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">MySQL/SQL Server</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgddd2168" class="outline-3">
+<h3 id="orgddd2168">Q45. How do you add days/months to a date?</h3>
+<div class="outline-text-3" id="text-orgddd2168">
+<ul class="org-ul">
+<li>PostgreSQL: <code>hire_date + INTERVAL '30 days'</code></li>
+<li>MySQL: <code>DATE_ADD(hire_date, INTERVAL 30 DAY)</code></li>
+<li>SQL Server: <code>DATEADD(DAY, 30, hire_date)</code></li>
+<li>Oracle: <code>hire_date + 30</code> or <code>ADD_MONTHS(hire_date, 1)</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org720728a" class="outline-3">
+<h3 id="org720728a">Q46. How do you cast/convert data types?</h3>
+<div class="outline-text-3" id="text-org720728a">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">CAST</span>(salary <span style="font-weight: bold;">AS</span> <span style="font-weight: bold; text-decoration: underline;">VARCHAR</span>(20)) <span style="font-weight: bold;">FROM</span> employees;       <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">ANSI
+</span><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">CAST</span>(<span style="font-style: italic;">'2024-01-01'</span> <span style="font-weight: bold;">AS</span> <span style="font-weight: bold; text-decoration: underline;">DATE</span>);
+<span style="font-weight: bold;">SELECT</span> salary::TEXT <span style="font-weight: bold;">FROM</span> employees;                       <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">PostgreSQL shorthand</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5a2a05b" class="outline-3">
+<h3 id="org5a2a05b">Q47. What is the difference between ORDER BY column and ORDER BY position?</h3>
+<div class="outline-text-3" id="text-org5a2a05b">
+<p>
+You can order by output column position number (<code>ORDER BY 2</code>), but it's fragile — prefer column names or aliases for readability.
+</p>
+</div>
+</div>
+<div id="outline-container-org7eea0f2" class="outline-3">
+<h3 id="org7eea0f2">Q48. How do NULLs sort?</h3>
+<div class="outline-text-3" id="text-org7eea0f2">
+<p>
+By default, PostgreSQL/Oracle sort NULLs last in <code>ASC</code> (configurable with <code>NULLS FIRST/LAST</code>);
+MySQL/SQL Server sort NULLs first in <code>ASC</code>. Use explicit <code>NULLS FIRST=/=NULLS LAST</code> where supported.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd38b905" class="outline-3">
+<h3 id="orgd38b905">Q49. How do you implement pagination?</h3>
+<div class="outline-text-3" id="text-orgd38b905">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> products <span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> id <span style="font-weight: bold;">LIMIT</span> 20 OFFSET 40;  <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">page 3, 20 per page</span>
+</pre>
+</div>
+
+<p>
+For large offsets, prefer keyset pagination (<code>WHERE id &gt; :last_id</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc00b03" class="outline-3">
+<h3 id="orgbc00b03">Q50. What is the EXISTS operator?</h3>
+<div class="outline-text-3" id="text-orgbc00b03">
+<p>
+Returns true if a subquery returns any rows. Often faster than <code>IN</code> for correlated checks:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> customers c
+<span style="font-weight: bold;">WHERE</span> <span style="font-weight: bold;">EXISTS</span> (<span style="font-weight: bold;">SELECT</span> 1 <span style="font-weight: bold;">FROM</span> orders o <span style="font-weight: bold;">WHERE</span> o.customer_id = c.id);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0ce5ac4" class="outline-3">
+<h3 id="org0ce5ac4">Q51. How do you filter case-insensitively?</h3>
+<div class="outline-text-3" id="text-org0ce5ac4">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> <span style="font-weight: bold;">LOWER</span>(last_name) = <span style="font-style: italic;">'smith'</span>;
+<span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> last_name ILIKE <span style="font-style: italic;">'smith'</span>;  <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">PostgreSQL</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf3e1f81" class="outline-3">
+<h3 id="orgf3e1f81">Q52. What does the ANY/SOME and ALL keyword do?</h3>
+<div class="outline-text-3" id="text-orgf3e1f81">
+<p>
+Compare a value against a set:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> products <span style="font-weight: bold;">WHERE</span> price &gt; <span style="font-weight: bold;">ALL</span> (<span style="font-weight: bold;">SELECT</span> price <span style="font-weight: bold;">FROM</span> clearance);
+<span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> products <span style="font-weight: bold;">WHERE</span> price &gt; <span style="font-weight: bold;">ANY</span> (<span style="font-weight: bold;">SELECT</span> price <span style="font-weight: bold;">FROM</span> clearance);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgecedbe7" class="outline-3">
+<h3 id="orgecedbe7">Q53. How do you escape a wildcard in LIKE?</h3>
+<div class="outline-text-3" id="text-orgecedbe7">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> files <span style="font-weight: bold;">WHERE</span> <span style="font-weight: bold;">name</span> <span style="font-weight: bold;">LIKE</span> <span style="font-style: italic;">'100\%'</span> <span style="font-weight: bold;">ESCAPE</span> <span style="font-style: italic;">'\'</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org14d67e0" class="outline-3">
+<h3 id="org14d67e0">Q54. What is the difference between COUNT(*), COUNT(column), and COUNT(DISTINCT column)?</h3>
+<div class="outline-text-3" id="text-org14d67e0">
+<p>
+<code>COUNT(*)</code> counts all rows.
+<code>COUNT(column)</code> counts non-null values.
+<code>COUNT(DISTINCT column)</code> counts unique non-null values.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcb5e02f" class="outline-3">
+<h3 id="orgcb5e02f">Q55. How do you concatenate multiple rows into one string?</h3>
+<div class="outline-text-3" id="text-orgcb5e02f">
+<ul class="org-ul">
+<li>PostgreSQL: <code>STRING_AGG(name, ', ')</code></li>
+<li>MySQL: <code>GROUP_CONCAT(name SEPARATOR ', ')</code></li>
+<li>SQL Server: <code>STRING_AGG(name, ', ')</code></li>
+<li>Oracle: <code>LISTAGG(name, ', ') WITHIN GROUP (ORDER BY name)</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org46f0460" class="outline-2">
+<h2 id="org46f0460">Joins</h2>
+<div class="outline-text-2" id="text-org46f0460">
+</div>
+<div id="outline-container-org7fccf0c" class="outline-3">
+<h3 id="org7fccf0c">Q56. What is a JOIN?</h3>
+<div class="outline-text-3" id="text-org7fccf0c">
+<p>
+A JOIN combines rows from two or more tables based on a related column.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e85893" class="outline-3">
+<h3 id="org3e85893">Q57. What is an INNER JOIN?</h3>
+<div class="outline-text-3" id="text-org3e85893">
+<p>
+Returns only rows where the join condition matches in both tables:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> e.<span style="font-weight: bold;">name</span>, d.<span style="font-weight: bold;">name</span>
+<span style="font-weight: bold;">FROM</span> employees e
+<span style="font-weight: bold;">INNER</span> <span style="font-weight: bold;">JOIN</span> departments d <span style="font-weight: bold;">ON</span> e.department_id = d.id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7933ac7" class="outline-3">
+<h3 id="org7933ac7">Q58. What is a LEFT (OUTER) JOIN?</h3>
+<div class="outline-text-3" id="text-org7933ac7">
+<p>
+Returns all rows from the left table and matching rows from the right; unmatched right-side columns are <code>NULL</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org55f6403" class="outline-3">
+<h3 id="org55f6403">Q59. What is a RIGHT JOIN?</h3>
+<div class="outline-text-3" id="text-org55f6403">
+<p>
+The mirror of LEFT JOIN — all rows from the right table, matched or not.
+</p>
+</div>
+</div>
+<div id="outline-container-org8e1dee0" class="outline-3">
+<h3 id="org8e1dee0">Q60. What is a FULL OUTER JOIN?</h3>
+<div class="outline-text-3" id="text-org8e1dee0">
+<p>
+Returns all rows from both tables, with <code>NULL</code> where there's no match on either
+side. (MySQL lacks it natively; emulate with <code>LEFT JOIN UNION RIGHT JOIN</code>.)
+</p>
+</div>
+</div>
+<div id="outline-container-org3d424bb" class="outline-3">
+<h3 id="org3d424bb">Q61. What is a CROSS JOIN?</h3>
+<div class="outline-text-3" id="text-org3d424bb">
+<p>
+Produces the Cartesian product — every row of A combined with every row of B.
+</p>
+</div>
+</div>
+<div id="outline-container-orga881234" class="outline-3">
+<h3 id="orga881234">Q62. What is a self join?</h3>
+<div class="outline-text-3" id="text-orga881234">
+<p>
+A table joined to itself, typically to compare rows or model hierarchies:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> e.<span style="font-weight: bold;">name</span> <span style="font-weight: bold;">AS</span> employee, <span style="font-weight: bold;">m</span>.<span style="font-weight: bold;">name</span> <span style="font-weight: bold;">AS</span> manager
+<span style="font-weight: bold;">FROM</span> employees e
+<span style="font-weight: bold;">LEFT</span> <span style="font-weight: bold;">JOIN</span> employees <span style="font-weight: bold;">m</span> <span style="font-weight: bold;">ON</span> e.manager_id = <span style="font-weight: bold;">m</span>.id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org052bac6" class="outline-3">
+<h3 id="org052bac6">Q63. What is the difference between an equi-join and a non-equi join?</h3>
+<div class="outline-text-3" id="text-org052bac6">
+<p>
+An equi-join uses <code>=</code> in the condition. A non-equi join uses other operators
+(<code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code>), e.g., joining to a salary-band range table.
+</p>
+</div>
+</div>
+<div id="outline-container-org9cf85f0" class="outline-3">
+<h3 id="org9cf85f0">Q64. How do you join more than two tables?</h3>
+<div class="outline-text-3" id="text-org9cf85f0">
+<p>
+Chain JOIN clauses:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> o.id, c.<span style="font-weight: bold;">name</span>, p.title
+<span style="font-weight: bold;">FROM</span> orders o
+<span style="font-weight: bold;">JOIN</span> customers c <span style="font-weight: bold;">ON</span> o.customer_id = c.id
+<span style="font-weight: bold;">JOIN</span> order_items oi <span style="font-weight: bold;">ON</span> oi.order_id = o.id
+<span style="font-weight: bold;">JOIN</span> products p <span style="font-weight: bold;">ON</span> oi.product_id = p.id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga9b58c0" class="outline-3">
+<h3 id="orga9b58c0">Q65. What's the difference between ON and WHERE in an outer join?</h3>
+<div class="outline-text-3" id="text-orga9b58c0">
+<p>
+A condition in <code>ON</code> of a LEFT JOIN filters which right rows match (preserving all left rows).
+The same condition in <code>WHERE</code> filters the final result and can turn the outer join into an inner join.
+</p>
+</div>
+</div>
+<div id="outline-container-org53c4b60" class="outline-3">
+<h3 id="org53c4b60">Q66. What is USING in a join?</h3>
+<div class="outline-text-3" id="text-org53c4b60">
+<p>
+A shorthand when the join columns share the same name:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">JOIN</span> departments <span style="font-weight: bold;">USING</span> (department_id);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2ad50e4" class="outline-3">
+<h3 id="org2ad50e4">Q67. What is a natural join?</h3>
+<div class="outline-text-3" id="text-org2ad50e4">
+<p>
+Automatically joins on all columns with the same name in both tables.
+Avoid it — it's implicit and fragile to schema changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org437c39c" class="outline-3">
+<h3 id="org437c39c">Q68. How do you find rows in table A with no match in table B?</h3>
+<div class="outline-text-3" id="text-org437c39c">
+<p>
+Anti-join via LEFT JOIN + IS NULL:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> c.* <span style="font-weight: bold;">FROM</span> customers c
+<span style="font-weight: bold;">LEFT</span> <span style="font-weight: bold;">JOIN</span> orders o <span style="font-weight: bold;">ON</span> o.customer_id = c.id
+<span style="font-weight: bold;">WHERE</span> o.id <span style="font-weight: bold;">IS</span> <span style="font-weight: bold;">NULL</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc1cc739" class="outline-3">
+<h3 id="orgc1cc739">Q69. Why might a JOIN return more rows than expected?</h3>
+<div class="outline-text-3" id="text-orgc1cc739">
+<p>
+A one-to-many or many-to-many relationship multiplies rows. Duplicate keys on the
+joined side fan out the result. Use <code>DISTINCT</code> or aggregate appropriately.
+</p>
+</div>
+</div>
+<div id="outline-container-org73a33fb" class="outline-3">
+<h3 id="org73a33fb">Q70. What is the difference between explicit and implicit join syntax?</h3>
+<div class="outline-text-3" id="text-org73a33fb">
+<p>
+Explicit uses <code>JOIN ... ON</code>. Implicit lists tables in <code>FROM</code> with conditions in
+<code>WHERE</code> (<code>FROM a, b WHERE a.id = b.a_id</code>). Prefer explicit — it's clearer and
+avoids accidental cross joins.
+</p>
+</div>
+</div>
+<div id="outline-container-org2894c52" class="outline-3">
+<h3 id="org2894c52">Q71. How do you join on multiple columns?</h3>
+<div class="outline-text-3" id="text-org2894c52">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">JOIN</span> <span style="font-weight: bold;">ON</span> a.region = b.region <span style="font-weight: bold;">AND</span> a.<span style="font-weight: bold;">year</span> = b.<span style="font-weight: bold;">year</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7c4d760" class="outline-3">
+<h3 id="org7c4d760">Q72. Can you join a table to a subquery?</h3>
+<div class="outline-text-3" id="text-org7c4d760">
+<p>
+Yes — a derived table:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> e.<span style="font-weight: bold;">name</span>, t.total
+<span style="font-weight: bold;">FROM</span> employees e
+<span style="font-weight: bold;">JOIN</span> (<span style="font-weight: bold;">SELECT</span> employee_id, <span style="font-weight: bold;">SUM</span>(amount) total <span style="font-weight: bold;">FROM</span> sales <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> employee_id) t
+  <span style="font-weight: bold;">ON</span> t.employee_id = e.id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3c5d983" class="outline-3">
+<h3 id="org3c5d983">Q73. What is a lateral join?</h3>
+<div class="outline-text-3" id="text-org3c5d983">
+<p>
+A <code>LATERAL</code> (PostgreSQL) / <code>CROSS APPLY</code> / <code>OUTER APPLY</code> (SQL Server) lets a
+subquery reference columns from preceding tables in the FROM clause — useful for top-N-per-group.
+</p>
+</div>
+</div>
+<div id="outline-container-org06c2c3f" class="outline-3">
+<h3 id="org06c2c3f">Q74. How do you get the top N rows per group using a join?</h3>
+<div class="outline-text-3" id="text-org06c2c3f">
+<p>
+Use <code>LATERAL=/=APPLY</code> or a window function (see Q132). Example with LATERAL:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> d.<span style="font-weight: bold;">name</span>, top.<span style="font-weight: bold;">name</span>, top.salary
+<span style="font-weight: bold;">FROM</span> departments d
+<span style="font-weight: bold;">CROSS</span> <span style="font-weight: bold;">JOIN</span> <span style="font-weight: bold;">LATERAL</span> (
+  <span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>, salary <span style="font-weight: bold;">FROM</span> employees e
+  <span style="font-weight: bold;">WHERE</span> e.department_id = d.id <span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary <span style="font-weight: bold;">DESC</span> <span style="font-weight: bold;">LIMIT</span> 3
+) top;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9fecfe9" class="outline-3">
+<h3 id="org9fecfe9">Q75. What performance considerations apply to joins?</h3>
+<div class="outline-text-3" id="text-org9fecfe9">
+<p>
+Ensure join columns are indexed, join on the smallest necessary result set,
+prefer inner joins when semantics allow, and watch for unintended row multiplication.
+The optimizer chooses join algorithms (nested loop, hash, merge) based on statistics.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2928c97" class="outline-2">
+<h2 id="org2928c97">Aggregation &amp; Grouping</h2>
+<div class="outline-text-2" id="text-org2928c97">
+</div>
+<div id="outline-container-orgcc275a1" class="outline-3">
+<h3 id="orgcc275a1">Q76. What are aggregate functions?</h3>
+<div class="outline-text-3" id="text-orgcc275a1">
+<p>
+Functions that compute a single value over a set of rows: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orge286dc9" class="outline-3">
+<h3 id="orge286dc9">Q77. How does GROUP BY work?</h3>
+<div class="outline-text-3" id="text-orge286dc9">
+<p>
+It collapses rows sharing the same grouping-column values into one row per group, over which aggregates are computed:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> department_id, <span style="font-weight: bold;">AVG</span>(salary)
+<span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> department_id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org95ad334" class="outline-3">
+<h3 id="org95ad334">Q78. Can you select a non-aggregated column not in GROUP BY?</h3>
+<div class="outline-text-3" id="text-org95ad334">
+<p>
+No (in standard SQL and most engines) — every selected column must be aggregated or appear in <code>GROUP BY</code>.
+MySQL historically allowed it with surprising results (<code>ONLY_FULL_GROUP_BY</code> now blocks it).
+</p>
+</div>
+</div>
+<div id="outline-container-org0a6528a" class="outline-3">
+<h3 id="org0a6528a">Q79. How do you filter groups?</h3>
+<div class="outline-text-3" id="text-org0a6528a">
+<p>
+With <code>HAVING</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> department_id, <span style="font-weight: bold;">COUNT</span>(*) <span style="font-weight: bold;">AS</span> cnt
+<span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> department_id
+<span style="font-weight: bold;">HAVING</span> <span style="font-weight: bold;">COUNT</span>(*) &gt; 5;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf159b3d" class="outline-3">
+<h3 id="orgf159b3d">Q80. How do AVG/SUM treat NULLs?</h3>
+<div class="outline-text-3" id="text-orgf159b3d">
+<p>
+They ignore NULLs. <code>AVG</code> divides by the count of non-null values, which may differ from total row count.
+</p>
+</div>
+</div>
+<div id="outline-container-org77f0505" class="outline-3">
+<h3 id="org77f0505">Q81. What is GROUP BY with multiple columns?</h3>
+<div class="outline-text-3" id="text-org77f0505">
+<p>
+Creates a group for each unique combination of those column values:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> department_id, job_title, <span style="font-weight: bold;">COUNT</span>(*)
+<span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> department_id, job_title;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0df2b89" class="outline-3">
+<h3 id="org0df2b89">Q82. What are GROUPING SETS, ROLLUP, and CUBE?</h3>
+<div class="outline-text-3" id="text-org0df2b89">
+<p>
+Extensions to compute multiple grouping levels in one query.
+<code>ROLLUP</code> produces subtotals + grand total along a hierarchy;
+<code>CUBE</code> produces all combinations;
+<code>GROUPING SETS</code> lets you list exactly which groupings you want.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> region, product, <span style="font-weight: bold;">SUM</span>(sales)
+<span style="font-weight: bold;">FROM</span> orders <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> <span style="font-weight: bold;">ROLLUP</span> (region, product);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8b5a072" class="outline-3">
+<h3 id="org8b5a072">Q83. What does the GROUPING() function do?</h3>
+<div class="outline-text-3" id="text-org8b5a072">
+<p>
+Returns 1 if the column is aggregated (a subtotal/grand-total row from
+ROLLUP/CUBE) and 0 otherwise — useful for labeling subtotal rows.
+</p>
+</div>
+</div>
+<div id="outline-container-org493f2ad" class="outline-3">
+<h3 id="org493f2ad">Q84. How do you count rows per group and the percentage of total?</h3>
+<div class="outline-text-3" id="text-org493f2ad">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> department_id,
+       <span style="font-weight: bold;">COUNT</span>(*) <span style="font-weight: bold;">AS</span> cnt,
+       <span style="font-weight: bold;">COUNT</span>(*) * 100.0 / <span style="font-weight: bold;">SUM</span>(<span style="font-weight: bold;">COUNT</span>(*)) OVER () <span style="font-weight: bold;">AS</span> pct
+<span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> department_id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8e2740e" class="outline-3">
+<h3 id="org8e2740e">Q85. What is the difference between WHERE and HAVING performance-wise?</h3>
+<div class="outline-text-3" id="text-org8e2740e">
+<p>
+<code>WHERE</code> reduces rows before aggregation (cheaper).
+Push conditions into <code>WHERE</code> whenever they don't depend on aggregates.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdaff1a4" class="outline-3">
+<h3 id="orgdaff1a4">Q86. How do you find duplicates?</h3>
+<div class="outline-text-3" id="text-orgdaff1a4">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> email, <span style="font-weight: bold;">COUNT</span>(*) <span style="font-weight: bold;">FROM</span> users
+<span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> email <span style="font-weight: bold;">HAVING</span> <span style="font-weight: bold;">COUNT</span>(*) &gt; 1;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc9dd542" class="outline-3">
+<h3 id="orgc9dd542">Q87. How do you compute conditional aggregates?</h3>
+<div class="outline-text-3" id="text-orgc9dd542">
+<p>
+Use CASE inside the aggregate:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span>
+  <span style="font-weight: bold;">SUM</span>(<span style="font-weight: bold;">CASE</span> <span style="font-weight: bold;">WHEN</span> status = <span style="font-style: italic;">'paid'</span> <span style="font-weight: bold;">THEN</span> amount <span style="font-weight: bold;">ELSE</span> 0 <span style="font-weight: bold;">END</span>) <span style="font-weight: bold;">AS</span> paid_total,
+  <span style="font-weight: bold;">COUNT</span>(<span style="font-weight: bold;">CASE</span> <span style="font-weight: bold;">WHEN</span> status = <span style="font-style: italic;">'open'</span> <span style="font-weight: bold;">THEN</span> 1 <span style="font-weight: bold;">END</span>) <span style="font-weight: bold;">AS</span> open_count
+<span style="font-weight: bold;">FROM</span> invoices;
+</pre>
+</div>
+
+<p>
+PostgreSQL supports <code>COUNT(*) FILTER (WHERE status = 'open')</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org3efeb2f" class="outline-3">
+<h3 id="org3efeb2f">Q88. How do you compute a median?</h3>
+<div class="outline-text-3" id="text-org3efeb2f">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> PERCENTILE_CONT(0.5) WITHIN <span style="font-weight: bold;">GROUP</span> (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary) <span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6bdb608" class="outline-3">
+<h3 id="org6bdb608">Q89. What is the difference between MIN/MAX and ORDER BY &#x2026; LIMIT 1?</h3>
+<div class="outline-text-3" id="text-org6bdb608">
+<p>
+<code>MIN=/=MAX</code> return a single aggregate value; <code>ORDER BY ... LIMIT 1</code> returns the full row.
+To get the whole row of the max value, use <code>ORDER BY ... LIMIT 1</code> or a window function.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd05daae" class="outline-3">
+<h3 id="orgd05daae">Q90. Can you nest aggregate functions?</h3>
+<div class="outline-text-3" id="text-orgd05daae">
+<p>
+Not directly (e.g., <code>MAX(AVG(x))</code> requires a subquery or window).
+You compute the inner aggregate in a grouped subquery, then aggregate the result.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge286390" class="outline-2">
+<h2 id="orge286390">Subqueries &amp; Set Operations</h2>
+<div class="outline-text-2" id="text-orge286390">
+</div>
+<div id="outline-container-org845102e" class="outline-3">
+<h3 id="org845102e">Q91. What is a subquery?</h3>
+<div class="outline-text-3" id="text-org845102e">
+<p>
+A query nested inside another query, used in <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, or <code>HAVING</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org30460c0" class="outline-3">
+<h3 id="org30460c0">Q92. What is the difference between a correlated and non-correlated subquery?</h3>
+<div class="outline-text-3" id="text-org30460c0">
+<p>
+A <b>non-correlated</b> subquery runs once independently.
+A <b>correlated</b> subquery references the outer query and runs (logically) per outer row.
+</p>
+</div>
+</div>
+<div id="outline-container-org50bc815" class="outline-3">
+<h3 id="org50bc815">Q93. Give an example of a scalar subquery.</h3>
+<div class="outline-text-3" id="text-org50bc815">
+<p>
+Returns a single value:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>, salary,
+  (<span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">AVG</span>(salary) <span style="font-weight: bold;">FROM</span> employees) <span style="font-weight: bold;">AS</span> avg_salary
+<span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf55e4a0" class="outline-3">
+<h3 id="orgf55e4a0">Q94. How do you use a subquery in WHERE?</h3>
+<div class="outline-text-3" id="text-orgf55e4a0">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees
+<span style="font-weight: bold;">WHERE</span> salary &gt; (<span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">AVG</span>(salary) <span style="font-weight: bold;">FROM</span> employees);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9277b7b" class="outline-3">
+<h3 id="org9277b7b">Q95. What is a derived table?</h3>
+<div class="outline-text-3" id="text-org9277b7b">
+<p>
+A subquery in the FROM clause treated as a temporary table; it must have an alias.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea2b5f4" class="outline-3">
+<h3 id="orgea2b5f4">Q96. What is the difference between IN and EXISTS performance?</h3>
+<div class="outline-text-3" id="text-orgea2b5f4">
+<p>
+<code>EXISTS</code> can short-circuit on the first match and often performs better for
+correlated checks and large inner sets. <code>IN</code> may be better for small, static
+lists. Modern optimizers frequently treat them similarly. Beware <code>NOT IN</code> with
+NULLs (see Q97).
+</p>
+</div>
+</div>
+<div id="outline-container-org5680a63" class="outline-3">
+<h3 id="org5680a63">Q97. What's the danger of NOT IN with NULLs?</h3>
+<div class="outline-text-3" id="text-org5680a63">
+<p>
+If the subquery returns any <code>NULL</code>, <code>NOT IN</code> yields no rows because the comparison becomes <code>UNKNOWN</code>.
+Prefer <code>NOT EXISTS</code> or filter out NULLs.
+</p>
+</div>
+</div>
+<div id="outline-container-org1bc8fa6" class="outline-3">
+<h3 id="org1bc8fa6">Q98. What is UNION vs UNION ALL?</h3>
+<div class="outline-text-3" id="text-org1bc8fa6">
+<p>
+<code>UNION</code> combines result sets and removes duplicates (sorts/hashes — more expensive).
+<code>UNION ALL</code> keeps all rows including duplicates and is faster.
+Use <code>UNION ALL</code> unless you need dedup.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc25f459" class="outline-3">
+<h3 id="orgc25f459">Q99. What are the rules for set operations?</h3>
+<div class="outline-text-3" id="text-orgc25f459">
+<p>
+Each query must have the same number of columns with compatible data types in the same order. Column names come from the first query.
+</p>
+</div>
+</div>
+<div id="outline-container-org302a963" class="outline-3">
+<h3 id="org302a963">Q100. What is INTERSECT?</h3>
+<div class="outline-text-3" id="text-org302a963">
+<p>
+Returns rows present in both result sets. (MySQL added it in 8.0.31; older versions emulate via joins.)
+</p>
+</div>
+</div>
+<div id="outline-container-orgffa13a3" class="outline-3">
+<h3 id="orgffa13a3">Q101. What is EXCEPT / MINUS?</h3>
+<div class="outline-text-3" id="text-orgffa13a3">
+<p>
+Returns rows in the first set not in the second. <code>EXCEPT</code> (ANSI/PostgreSQL/SQL Server), <code>MINUS</code> (Oracle).
+</p>
+</div>
+</div>
+<div id="outline-container-org17abca4" class="outline-3">
+<h3 id="org17abca4">Q102. How do you replace a value with a default using a subquery?</h3>
+<div class="outline-text-3" id="text-org17abca4">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>, <span style="font-weight: bold;">COALESCE</span>((<span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">MAX</span>(amount) <span style="font-weight: bold;">FROM</span> orders o <span style="font-weight: bold;">WHERE</span> o.cust_id = c.id), 0) <span style="font-weight: bold;">FROM</span> customers c;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1b5c418" class="outline-3">
+<h3 id="org1b5c418">Q103. Can a subquery return multiple columns?</h3>
+<div class="outline-text-3" id="text-org1b5c418">
+<p>
+Yes, in row-value comparisons or in the FROM clause. In a scalar context it must return one column and at most one row.
+</p>
+</div>
+</div>
+<div id="outline-container-orge19c366" class="outline-3">
+<h3 id="orge19c366">Q104. How do you find the second-highest salary?</h3>
+<div class="outline-text-3" id="text-orge19c366">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">MAX</span>(salary) <span style="font-weight: bold;">FROM</span> employees
+<span style="font-weight: bold;">WHERE</span> salary &lt; (<span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">MAX</span>(salary) <span style="font-weight: bold;">FROM</span> employees);
+</pre>
+</div>
+
+<p>
+Or with window functions / <code>OFFSET 1 LIMIT 1</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org800b4bf" class="outline-3">
+<h3 id="org800b4bf">Q105. What is a semi-join and anti-join?</h3>
+<div class="outline-text-3" id="text-org800b4bf">
+<p>
+A <b>semi-join</b> returns rows from the left table that have a match on the right
+(logically <code>EXISTS=/=IN</code>). An <b>anti-join</b> returns left rows with no match (<code>NOT EXISTS=/=NOT IN</code>).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga722ad8" class="outline-2">
+<h2 id="orga722ad8">DDL, Constraints &amp; Schema Design</h2>
+<div class="outline-text-2" id="text-orga722ad8">
+</div>
+<div id="outline-container-org6b4aafc" class="outline-3">
+<h3 id="org6b4aafc">Q106. How do you create a table?</h3>
+<div class="outline-text-3" id="text-org6b4aafc">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">CREATE</span> <span style="font-weight: bold;">TABLE</span> <span style="font-weight: bold;">employees</span> (
+  id          <span style="font-weight: bold; text-decoration: underline;">INT</span> <span style="font-weight: bold;">PRIMARY</span> <span style="font-weight: bold;">KEY</span>,
+  first_name  <span style="font-weight: bold; text-decoration: underline;">VARCHAR</span>(50) <span style="font-weight: bold;">NOT</span> <span style="font-weight: bold;">NULL</span>,
+  salary      <span style="font-weight: bold; text-decoration: underline;">NUMERIC</span>(10,2) <span style="font-weight: bold;">DEFAULT</span> 0,
+  dept_id     <span style="font-weight: bold; text-decoration: underline;">INT</span> <span style="font-weight: bold;">REFERENCES</span> departments(id)
+);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1bd6081" class="outline-3">
+<h3 id="org1bd6081">Q107. What are the main constraint types?</h3>
+<div class="outline-text-3" id="text-org1bd6081">
+<p>
+<code>PRIMARY KEY</code>, <code>FOREIGN KEY</code>, <code>UNIQUE</code>, <code>NOT NULL</code>, <code>CHECK</code>, <code>DEFAULT</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org6fffdda" class="outline-3">
+<h3 id="org6fffdda">Q108. What does a CHECK constraint do?</h3>
+<div class="outline-text-3" id="text-org6fffdda">
+<p>
+Enforces a boolean condition on column values:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql">salary <span style="font-weight: bold; text-decoration: underline;">NUMERIC</span> <span style="font-weight: bold;">CHECK</span> (salary &gt;= 0)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8befd58" class="outline-3">
+<h3 id="org8befd58">Q109. What is a UNIQUE constraint, and how does it differ from a primary key?</h3>
+<div class="outline-text-3" id="text-org8befd58">
+<p>
+<code>UNIQUE</code> ensures values are distinct but allows one (or, by ANSI rules, multiple)
+NULLs and you can have several per table. A primary key disallows NULLs and
+there's only one per table.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d21aa2" class="outline-3">
+<h3 id="org2d21aa2">Q110. How do you add a column to an existing table?</h3>
+<div class="outline-text-3" id="text-org2d21aa2">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">ALTER</span> <span style="font-weight: bold;">TABLE</span> <span style="font-weight: bold;">employees</span> <span style="font-weight: bold;">ADD</span> <span style="font-weight: bold;">COLUMN</span> email <span style="font-weight: bold; text-decoration: underline;">VARCHAR</span>(255);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org87988e3" class="outline-3">
+<h3 id="org87988e3">Q111. How do you drop a column?</h3>
+<div class="outline-text-3" id="text-org87988e3">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">ALTER</span> <span style="font-weight: bold;">TABLE</span> <span style="font-weight: bold;">employees</span> <span style="font-weight: bold;">DROP</span> <span style="font-weight: bold;">COLUMN</span> email;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org36c60b5" class="outline-3">
+<h3 id="org36c60b5">Q112. How do you add a foreign key after creation?</h3>
+<div class="outline-text-3" id="text-org36c60b5">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">ALTER</span> <span style="font-weight: bold;">TABLE</span> <span style="font-weight: bold;">employees</span>
+<span style="font-weight: bold;">ADD</span> <span style="font-weight: bold;">CONSTRAINT</span> fk_dept <span style="font-weight: bold;">FOREIGN</span> <span style="font-weight: bold;">KEY</span> (dept_id) <span style="font-weight: bold;">REFERENCES</span> departments(id);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4256df8" class="outline-3">
+<h3 id="org4256df8">Q113. What are referential actions ON DELETE / ON UPDATE?</h3>
+<div class="outline-text-3" id="text-org4256df8">
+<p>
+<code>CASCADE</code>, <code>SET NULL</code>, <code>SET DEFAULT</code>, <code>RESTRICT</code>, <code>NO ACTION</code> — define what happens
+to child rows when a referenced parent row is deleted/updated.
+</p>
+</div>
+</div>
+<div id="outline-container-org357e768" class="outline-3">
+<h3 id="org357e768">Q114. What is an auto-increment / identity column?</h3>
+<div class="outline-text-3" id="text-org357e768">
+<p>
+A column that auto-generates sequential values:
+<code>SERIAL=/=GENERATED ... AS IDENTITY</code> (PostgreSQL),
+<code>AUTO_INCREMENT</code> (MySQL),
+<code>IDENTITY</code> (SQL Server), sequences (Oracle).
+</p>
+</div>
+</div>
+<div id="outline-container-org23e2a44" class="outline-3">
+<h3 id="org23e2a44">Q115. What is normalization?</h3>
+<div class="outline-text-3" id="text-org23e2a44">
+<p>
+The process of organizing data to reduce redundancy and improve integrity by decomposing tables and defining relationships.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea7f69e" class="outline-3">
+<h3 id="orgea7f69e">Q116. Explain 1NF, 2NF, 3NF.</h3>
+<div class="outline-text-3" id="text-orgea7f69e">
+<ul class="org-ul">
+<li><b>1NF</b>: atomic values, no repeating groups.</li>
+<li><b>2NF</b>: 1NF + no partial dependency (non-key columns depend on the whole
+composite key).</li>
+<li><b>3NF</b>: 2NF + no transitive dependency (non-key columns depend only on the key).</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgfb99f4b" class="outline-3">
+<h3 id="orgfb99f4b">Q117. What is BCNF?</h3>
+<div class="outline-text-3" id="text-orgfb99f4b">
+<p>
+Boyce-Codd Normal Form — a stricter 3NF where every determinant is a candidate key.
+</p>
+</div>
+</div>
+<div id="outline-container-org2eb8d2e" class="outline-3">
+<h3 id="org2eb8d2e">Q118. What is denormalization and when is it used?</h3>
+<div class="outline-text-3" id="text-org2eb8d2e">
+<p>
+Intentionally introducing redundancy to improve read performance (e.g., reporting/analytics),
+at the cost of update complexity and potential anomalies.
+</p>
+</div>
+</div>
+<div id="outline-container-orge00fde8" class="outline-3">
+<h3 id="orge00fde8">Q119. What is a view?</h3>
+<div class="outline-text-3" id="text-orge00fde8">
+<p>
+A stored named query that behaves like a virtual table:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">CREATE</span> <span style="font-weight: bold;">VIEW</span> <span style="font-weight: bold;">active_employees</span> <span style="font-weight: bold;">AS</span>
+<span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> status = <span style="font-style: italic;">'active'</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org653d3bf" class="outline-3">
+<h3 id="org653d3bf">Q120. What is a materialized view?</h3>
+<div class="outline-text-3" id="text-org653d3bf">
+<p>
+A view whose results are physically stored and periodically refreshed — faster
+reads, but data can be stale. Supported in PostgreSQL/Oracle; SQL Server uses
+indexed views.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb83d6ab" class="outline-3">
+<h3 id="orgb83d6ab">Q121. Can you update through a view?</h3>
+<div class="outline-text-3" id="text-orgb83d6ab">
+<p>
+Sometimes — simple views over a single table without aggregation/DISTINCT/joins
+are often updatable. Complex views are read-only unless you define <code>INSTEAD OF</code> triggers.
+</p>
+</div>
+</div>
+<div id="outline-container-org4143cd5" class="outline-3">
+<h3 id="org4143cd5">Q122. What is a temporary table?</h3>
+<div class="outline-text-3" id="text-org4143cd5">
+<p>
+A table that exists only for the session/transaction, useful for staging
+intermediate results: <code>CREATE TEMP TABLE ...</code> (PostgreSQL), <code>#temp</code> (SQL Server).
+</p>
+</div>
+</div>
+<div id="outline-container-orgffcd29a" class="outline-3">
+<h3 id="orgffcd29a">Q123. What is a sequence?</h3>
+<div class="outline-text-3" id="text-orgffcd29a">
+<p>
+A database object that generates a sequence of unique numbers, often used for surrogate keys:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">CREATE</span> <span style="font-weight: bold;">SEQUENCE</span> <span style="font-weight: bold;">order_seq</span> <span style="font-weight: bold;">START</span> 1 INCREMENT 1;
+<span style="font-weight: bold;">SELECT</span> NEXTVAL(<span style="font-style: italic;">'order_seq'</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf527715" class="outline-3">
+<h3 id="orgf527715">Q124. What data types should you use for money?</h3>
+<div class="outline-text-3" id="text-orgf527715">
+<p>
+Use exact numeric types (<code>NUMERIC=/=DECIMAL</code>), never floating point
+(<code>FLOAT=/=REAL</code>), to avoid rounding errors.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc961108" class="outline-3">
+<h3 id="orgc961108">Q125. What is a partitioned table?</h3>
+<div class="outline-text-3" id="text-orgc961108">
+<p>
+A logically single table split into physical partitions (by range, list, or hash)
+to improve manageability and query performance on very large datasets.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org6766046" class="outline-2">
+<h2 id="org6766046">Window Functions &amp; CTEs</h2>
+<div class="outline-text-2" id="text-org6766046">
+</div>
+<div id="outline-container-orgdb28fbc" class="outline-3">
+<h3 id="orgdb28fbc">Q126. What is a window function?</h3>
+<div class="outline-text-3" id="text-orgdb28fbc">
+<p>
+A function that computes a value across a set of rows ("window") related to the current row, without collapsing rows like <code>GROUP BY</code> does.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf074c73" class="outline-3">
+<h3 id="orgf074c73">Q127. What is the basic syntax of a window function?</h3>
+<div class="outline-text-3" id="text-orgf074c73">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>, department_id,
+  <span style="font-weight: bold;">AVG</span>(salary) OVER (PARTITION <span style="font-weight: bold;">BY</span> department_id) <span style="font-weight: bold;">AS</span> dept_avg
+<span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org426a8c3" class="outline-3">
+<h3 id="org426a8c3">Q128. What is the difference between PARTITION BY and GROUP BY?</h3>
+<div class="outline-text-3" id="text-org426a8c3">
+<p>
+<code>GROUP BY</code> reduces rows to one per group. <code>PARTITION BY</code> keeps all rows but resets the window's calculation per partition.
+</p>
+</div>
+</div>
+<div id="outline-container-orge718982" class="outline-3">
+<h3 id="orge718982">Q129. What are ROW<sub>NUMBER</sub>, RANK, and DENSE<sub>RANK</sub>?</h3>
+<div class="outline-text-3" id="text-orge718982">
+<ul class="org-ul">
+<li><code>ROW_NUMBER()</code>: unique sequential number, no ties handling.</li>
+<li><code>RANK()</code>: ties get the same rank, leaving gaps.</li>
+<li><code>DENSE_RANK()</code>: ties get the same rank, no gaps.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>, salary,
+  ROW_NUMBER() OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary <span style="font-weight: bold;">DESC</span>) <span style="font-weight: bold;">AS</span> rn,
+  RANK()       OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary <span style="font-weight: bold;">DESC</span>) <span style="font-weight: bold;">AS</span> rnk,
+  DENSE_RANK() OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary <span style="font-weight: bold;">DESC</span>) <span style="font-weight: bold;">AS</span> drnk
+<span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org757d888" class="outline-3">
+<h3 id="org757d888">Q130. What are LAG and LEAD?</h3>
+<div class="outline-text-3" id="text-org757d888">
+<p>
+Access a prior or following row's value without a self-join:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">month</span>, revenue,
+  LAG(revenue) OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> <span style="font-weight: bold;">month</span>) <span style="font-weight: bold;">AS</span> prev_month,
+  revenue - LAG(revenue) OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> <span style="font-weight: bold;">month</span>) <span style="font-weight: bold;">AS</span> delta
+<span style="font-weight: bold;">FROM</span> monthly_sales;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5203612" class="outline-3">
+<h3 id="org5203612">Q131. What are FIRST<sub>VALUE</sub>, LAST<sub>VALUE</sub>, and NTH<sub>VALUE</sub>?</h3>
+<div class="outline-text-3" id="text-org5203612">
+<p>
+Return the first/last/nth value in the window frame. Watch the frame clause —
+<code>LAST_VALUE</code> often needs <code>ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</code> to behave intuitively.
+</p>
+</div>
+</div>
+<div id="outline-container-org8109f76" class="outline-3">
+<h3 id="org8109f76">Q132. How do you select the top N rows per group?</h3>
+<div class="outline-text-3" id="text-org8109f76">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> (
+  <span style="font-weight: bold;">SELECT</span> *, ROW_NUMBER() OVER (PARTITION <span style="font-weight: bold;">BY</span> dept_id <span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary <span style="font-weight: bold;">DESC</span>) <span style="font-weight: bold;">AS</span> rn
+  <span style="font-weight: bold;">FROM</span> employees
+) t <span style="font-weight: bold;">WHERE</span> rn &lt;= 3;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgca476b8" class="outline-3">
+<h3 id="orgca476b8">Q133. What is a window frame (ROWS vs RANGE)?</h3>
+<div class="outline-text-3" id="text-orgca476b8">
+<p>
+The frame defines which rows around the current row are included. <code>ROWS</code> counts
+physical rows; <code>RANGE</code> includes rows with equal ordering values (logical range).
+E.g., <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> for a 3-row moving average.
+</p>
+</div>
+</div>
+<div id="outline-container-org0925ec4" class="outline-3">
+<h3 id="org0925ec4">Q134. How do you compute a running total?</h3>
+<div class="outline-text-3" id="text-org0925ec4">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> order_date, amount,
+  <span style="font-weight: bold;">SUM</span>(amount) OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> order_date
+                    <span style="font-weight: bold;">ROWS</span> <span style="font-weight: bold;">BETWEEN</span> UNBOUNDED PRECEDING <span style="font-weight: bold;">AND</span> <span style="font-weight: bold;">CURRENT</span> <span style="font-weight: bold; text-decoration: underline;">ROW</span>) <span style="font-weight: bold;">AS</span> running_total
+<span style="font-weight: bold;">FROM</span> orders;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgab9f8af" class="outline-3">
+<h3 id="orgab9f8af">Q135. How do you compute a moving average?</h3>
+<div class="outline-text-3" id="text-orgab9f8af">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">day</span>, <span style="font-weight: bold;">value</span>,
+  <span style="font-weight: bold;">AVG</span>(<span style="font-weight: bold;">value</span>) OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> <span style="font-weight: bold;">day</span> <span style="font-weight: bold;">ROWS</span> <span style="font-weight: bold;">BETWEEN</span> 6 PRECEDING <span style="font-weight: bold;">AND</span> <span style="font-weight: bold;">CURRENT</span> <span style="font-weight: bold; text-decoration: underline;">ROW</span>) <span style="font-weight: bold;">AS</span> ma7
+<span style="font-weight: bold;">FROM</span> metrics;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgfc19f7e" class="outline-3">
+<h3 id="orgfc19f7e">Q136. What is NTILE?</h3>
+<div class="outline-text-3" id="text-orgfc19f7e">
+<p>
+Divides rows into N roughly equal buckets — useful for quartiles/percentiles:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">name</span>, NTILE(4) OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> salary) <span style="font-weight: bold;">AS</span> quartile <span style="font-weight: bold;">FROM</span> employees;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga97a0f5" class="outline-3">
+<h3 id="orga97a0f5">Q137. Can you use window functions in WHERE?</h3>
+<div class="outline-text-3" id="text-orga97a0f5">
+<p>
+No — windows are computed after WHERE. Wrap the query in a subquery/CTE and filter on the window column in the outer query.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ab390e" class="outline-3">
+<h3 id="org8ab390e">Q138. What is a CTE (Common Table Expression)?</h3>
+<div class="outline-text-3" id="text-org8ab390e">
+<p>
+A named temporary result set defined with <code>WITH</code>, improving readability and
+enabling recursion:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">WITH</span> high_earners <span style="font-weight: bold;">AS</span> (
+  <span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> salary &gt; 100000
+)
+<span style="font-weight: bold;">SELECT</span> department_id, <span style="font-weight: bold;">COUNT</span>(*) <span style="font-weight: bold;">FROM</span> high_earners <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> department_id;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org57574b2" class="outline-3">
+<h3 id="org57574b2">Q139. What is the difference between a CTE and a subquery?</h3>
+<div class="outline-text-3" id="text-org57574b2">
+<p>
+Functionally similar; CTEs are named, can be referenced multiple times, and
+support recursion. They're often clearer for complex queries. (Materialization
+behavior varies by engine.)
+</p>
+</div>
+</div>
+<div id="outline-container-orga4c09e2" class="outline-3">
+<h3 id="orga4c09e2">Q140. What is a recursive CTE?</h3>
+<div class="outline-text-3" id="text-orga4c09e2">
+<p>
+A CTE that references itself, used for hierarchies and graph traversal:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">WITH</span> <span style="font-weight: bold;">RECURSIVE</span> org <span style="font-weight: bold;">AS</span> (
+  <span style="font-weight: bold;">SELECT</span> id, <span style="font-weight: bold;">name</span>, manager_id, 1 <span style="font-weight: bold;">AS</span> lvl <span style="font-weight: bold;">FROM</span> employees <span style="font-weight: bold;">WHERE</span> manager_id <span style="font-weight: bold;">IS</span> <span style="font-weight: bold;">NULL</span>
+  <span style="font-weight: bold;">UNION</span> <span style="font-weight: bold;">ALL</span>
+  <span style="font-weight: bold;">SELECT</span> e.id, e.<span style="font-weight: bold;">name</span>, e.manager_id, o.lvl + 1
+  <span style="font-weight: bold;">FROM</span> employees e <span style="font-weight: bold;">JOIN</span> org o <span style="font-weight: bold;">ON</span> e.manager_id = o.id
+)
+<span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> org;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf159a7d" class="outline-3">
+<h3 id="orgf159a7d">Q141. What can go wrong with recursive CTEs?</h3>
+<div class="outline-text-3" id="text-orgf159a7d">
+<p>
+Infinite loops if the data has cycles. Many engines provide cycle detection (<code>CYCLE</code> clause in PostgreSQL)
+or you can track visited nodes; always ensure the recursion terminates.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb203c3d" class="outline-3">
+<h3 id="orgb203c3d">Q142. Can you define multiple CTEs in one query?</h3>
+<div class="outline-text-3" id="text-orgb203c3d">
+<p>
+Yes, comma-separated:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">WITH</span> a <span style="font-weight: bold;">AS</span> (...), b <span style="font-weight: bold;">AS</span> (...) <span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> a <span style="font-weight: bold;">JOIN</span> b <span style="font-weight: bold;">ON</span> ...;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org324f1c1" class="outline-3">
+<h3 id="org324f1c1">Q143. Are CTEs always materialized?</h3>
+<div class="outline-text-3" id="text-org324f1c1">
+<p>
+Not necessarily. PostgreSQL pre-12 always materialized; 12+ may inline
+non-recursive CTEs. You can force with <code>MATERIALIZED=/=NOT MATERIALIZED</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcce8014" class="outline-3">
+<h3 id="orgcce8014">Q144. How do you deduplicate keeping the latest row per key?</h3>
+<div class="outline-text-3" id="text-orgcce8014">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">WITH</span> ranked <span style="font-weight: bold;">AS</span> (
+  <span style="font-weight: bold;">SELECT</span> *, ROW_NUMBER() OVER (PARTITION <span style="font-weight: bold;">BY</span> email <span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> updated_at <span style="font-weight: bold;">DESC</span>) rn <span style="font-weight: bold;">FROM</span> users
+  )
+<span style="font-weight: bold;">DELETE</span> <span style="font-weight: bold;">FROM</span> users <span style="font-weight: bold;">WHERE</span> id <span style="font-weight: bold;">IN</span> (<span style="font-weight: bold;">SELECT</span> id <span style="font-weight: bold;">FROM</span> ranked <span style="font-weight: bold;">WHERE</span> rn &gt; 1);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd74f1fd" class="outline-3">
+<h3 id="orgd74f1fd">Q145. What is PERCENT<sub>RANK</sub> and CUME<sub>DIST</sub>?</h3>
+<div class="outline-text-3" id="text-orgd74f1fd">
+<p>
+<code>PERCENT_RANK()</code> gives relative rank between 0 and 1. <code>CUME_DIST()</code> gives
+cumulative distribution — the fraction of rows ≤ the current row's value.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org06b5132" class="outline-2">
+<h2 id="org06b5132">Transactions &amp; Concurrency</h2>
+<div class="outline-text-2" id="text-org06b5132">
+</div>
+<div id="outline-container-orgf7d68ad" class="outline-3">
+<h3 id="orgf7d68ad">Q146. What is a transaction?</h3>
+<div class="outline-text-3" id="text-orgf7d68ad">
+<p>
+A unit of work that is executed atomically — all operations succeed (<code>COMMIT</code>) or none take effect (<code>ROLLBACK</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-org18e31aa" class="outline-3">
+<h3 id="org18e31aa">Q147. What are the ACID properties?</h3>
+<div class="outline-text-3" id="text-org18e31aa">
+<ul class="org-ul">
+<li><b>Atomicity</b>: all-or-nothing.</li>
+<li><b>Consistency</b>: transitions leave the DB in a valid state.</li>
+<li><b>Isolation</b>: concurrent transactions don't interfere visibly.</li>
+<li><b>Durability</b>: committed changes survive crashes.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd9097af" class="outline-3">
+<h3 id="orgd9097af">Q148. How do you write a transaction?</h3>
+<div class="outline-text-3" id="text-orgd9097af">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">BEGIN</span>;
+<span style="font-weight: bold;">UPDATE</span> accounts <span style="font-weight: bold;">SET</span> balance = balance - 100 <span style="font-weight: bold;">WHERE</span> id = 1;
+<span style="font-weight: bold;">UPDATE</span> accounts <span style="font-weight: bold;">SET</span> balance = balance + 100 <span style="font-weight: bold;">WHERE</span> id = 2;
+<span style="font-weight: bold;">COMMIT</span>;  <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">or ROLLBACK on error</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5f45030" class="outline-3">
+<h3 id="org5f45030">Q149. What is a savepoint?</h3>
+<div class="outline-text-3" id="text-org5f45030">
+<p>
+A marker within a transaction you can roll back to without aborting the whole transaction:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SAVEPOINT</span> sp1;
+<span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">...
+</span><span style="font-weight: bold;">ROLLBACK</span> <span style="font-weight: bold;">TO</span> sp1;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org49d35ed" class="outline-3">
+<h3 id="org49d35ed">Q150. What are the SQL isolation levels?</h3>
+<div class="outline-text-3" id="text-org49d35ed">
+<p>
+From weakest to strongest: <code>READ UNCOMMITTED</code>, <code>READ COMMITTED</code>, <code>REPEATABLE READ</code>, <code>SERIALIZABLE</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org86857fb" class="outline-3">
+<h3 id="org86857fb">Q151. What concurrency anomalies do isolation levels prevent?</h3>
+<div class="outline-text-3" id="text-org86857fb">
+<ul class="org-ul">
+<li><b>Dirty read</b>: reading uncommitted data — prevented at READ COMMITTED+.</li>
+<li><b>Non-repeatable read</b>: a row changes between reads — prevented at REPEATABLE READ+.</li>
+<li><b>Phantom read</b>: new rows appear in a range between reads — prevented at SERIALIZABLE.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge0c0657" class="outline-3">
+<h3 id="orge0c0657">Q152. What is the default isolation level?</h3>
+<div class="outline-text-3" id="text-orge0c0657">
+<p>
+PostgreSQL/Oracle/SQL Server default to <code>READ COMMITTED</code>; MySQL (InnoDB) defaults to <code>REPEATABLE READ</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org5eb79d7" class="outline-3">
+<h3 id="org5eb79d7">Q153. What is optimistic vs pessimistic locking?</h3>
+<div class="outline-text-3" id="text-org5eb79d7">
+<p>
+<b>Pessimistic</b> locks rows up front (<code>SELECT ... FOR UPDATE</code>). <b>Optimistic</b> assumes
+no conflict and checks a version/timestamp column at write time, retrying on mismatch.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf768940" class="outline-3">
+<h3 id="orgf768940">Q154. What is SELECT &#x2026; FOR UPDATE?</h3>
+<div class="outline-text-3" id="text-orgf768940">
+<p>
+Locks the selected rows so other transactions can't modify them until the current
+transaction ends — used to safely read-then-update.
+</p>
+</div>
+</div>
+<div id="outline-container-org0393d12" class="outline-3">
+<h3 id="org0393d12">Q155. What is a deadlock?</h3>
+<div class="outline-text-3" id="text-org0393d12">
+<p>
+Two transactions each hold a lock the other needs, blocking forever. The DB
+detects it and aborts one (the "victim"). Mitigate by acquiring locks in a
+consistent order and keeping transactions short.
+</p>
+</div>
+</div>
+<div id="outline-container-org884b2c5" class="outline-3">
+<h3 id="org884b2c5">Q156. What is MVCC?</h3>
+<div class="outline-text-3" id="text-org884b2c5">
+<p>
+Multi-Version Concurrency Control — readers see a consistent snapshot without
+blocking writers (and vice versa) by keeping multiple row versions. Used by
+PostgreSQL, Oracle, MySQL InnoDB.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce9ac49" class="outline-3">
+<h3 id="orgce9ac49">Q157. What is the difference between a shared and exclusive lock?</h3>
+<div class="outline-text-3" id="text-orgce9ac49">
+<p>
+A <b>shared (read)</b> lock allows other shared locks but blocks writes. An <b>exclusive
+(write)</b> lock blocks all other locks.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda7b797" class="outline-3">
+<h3 id="orgda7b797">Q158. What happens if you don't commit?</h3>
+<div class="outline-text-3" id="text-orgda7b797">
+<p>
+Changes remain in the transaction's scope and are invisible to others; an open
+transaction can hold locks and bloat undo/WAL. On disconnect, most engines roll
+back uncommitted work.
+</p>
+</div>
+</div>
+<div id="outline-container-org81f1c1b" class="outline-3">
+<h3 id="org81f1c1b">Q159. What is autocommit?</h3>
+<div class="outline-text-3" id="text-org81f1c1b">
+<p>
+A mode where each statement is its own transaction, committed immediately. Most
+clients enable it by default; disable it to batch statements into one transaction.
+</p>
+</div>
+</div>
+<div id="outline-container-orga519d57" class="outline-3">
+<h3 id="orga519d57">Q160. How do you handle a serialization failure?</h3>
+<div class="outline-text-3" id="text-orga519d57">
+<p>
+Under =SERIALIZABLE=/optimistic schemes, conflicting transactions get a
+serialization error; the application should catch it and retry the transaction.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org1eaab01" class="outline-2">
+<h2 id="org1eaab01">Indexing &amp; Performance</h2>
+<div class="outline-text-2" id="text-org1eaab01">
+</div>
+<div id="outline-container-org37f346f" class="outline-3">
+<h3 id="org37f346f">Q161. What is an index?</h3>
+<div class="outline-text-3" id="text-org37f346f">
+<p>
+A data structure (usually a B-tree) that speeds up row lookup at the cost of extra
+storage and slower writes.
+</p>
+</div>
+</div>
+<div id="outline-container-org02209c3" class="outline-3">
+<h3 id="org02209c3">Q162. What is the difference between a clustered and non-clustered index?</h3>
+<div class="outline-text-3" id="text-org02209c3">
+<p>
+A <b>clustered</b> index determines the physical row order (the table <i>is</i> the index;
+one per table). A <b>non-clustered</b> index is a separate structure pointing to rows.
+(SQL Server terminology; PostgreSQL heap tables differ.)
+</p>
+</div>
+</div>
+<div id="outline-container-org8e8c904" class="outline-3">
+<h3 id="org8e8c904">Q163. When does an index help vs. hurt?</h3>
+<div class="outline-text-3" id="text-org8e8c904">
+<p>
+Helps selective lookups, joins, ORDER BY, and range scans. Hurts
+INSERT/UPDATE/DELETE performance and consumes space. Over-indexing degrades writes.
+</p>
+</div>
+</div>
+<div id="outline-container-org6861216" class="outline-3">
+<h3 id="org6861216">Q164. What is a composite index, and does column order matter?</h3>
+<div class="outline-text-3" id="text-org6861216">
+<p>
+An index on multiple columns. Order matters: an index on <code>(a, b)</code> supports
+filtering on <code>a</code> or <code>a, b</code> but not <code>b</code> alone (left-most prefix rule).
+</p>
+</div>
+</div>
+<div id="outline-container-orgcef94f7" class="outline-3">
+<h3 id="orgcef94f7">Q165. What is a covering index?</h3>
+<div class="outline-text-3" id="text-orgcef94f7">
+<p>
+An index that contains all columns a query needs, so the engine answers from the
+index without touching the table ("index-only scan"). SQL Server uses <code>INCLUDE</code>
+columns.
+</p>
+</div>
+</div>
+<div id="outline-container-org056a23f" class="outline-3">
+<h3 id="org056a23f">Q166. Why might an index not be used?</h3>
+<div class="outline-text-3" id="text-org056a23f">
+<p>
+Low selectivity, functions wrapping the column (<code>WHERE UPPER(name)=...</code>), implicit
+type conversions, leading wildcard <code>LIKE '%x'</code>, stale statistics, or the optimizer
+estimating a scan is cheaper.
+</p>
+</div>
+</div>
+<div id="outline-container-org18ad563" class="outline-3">
+<h3 id="org18ad563">Q167. What is a query execution plan?</h3>
+<div class="outline-text-3" id="text-org18ad563">
+<p>
+The optimizer's chosen strategy to run a query (scans, joins, order). View it with
+<code>EXPLAIN=/=EXPLAIN ANALYZE</code> (PostgreSQL/MySQL) or <code>SET SHOWPLAN</code> execution plan (SQL Server).
+</p>
+</div>
+</div>
+<div id="outline-container-org826e97b" class="outline-3">
+<h3 id="org826e97b">Q168. What's the difference between an index seek and an index scan?</h3>
+<div class="outline-text-3" id="text-org826e97b">
+<p>
+A <b>seek</b> navigates directly to qualifying rows (efficient, selective).
+A <b>scan</b> reads the whole index/table. Seeks are generally preferable for selective queries.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc3ee9b" class="outline-3">
+<h3 id="orgfc3ee9b">Q169. What is a partial/filtered index?</h3>
+<div class="outline-text-3" id="text-orgfc3ee9b">
+<p>
+An index over a subset of rows defined by a predicate, smaller and faster for targeted queries:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">CREATE</span> INDEX idx_active <span style="font-weight: bold;">ON</span> orders (created_at) <span style="font-weight: bold;">WHERE</span> status = <span style="font-style: italic;">'active'</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgab45259" class="outline-3">
+<h3 id="orgab45259">Q170. What is a functional/expression index?</h3>
+<div class="outline-text-3" id="text-orgab45259">
+<p>
+An index on an expression, enabling index use for that expression:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">CREATE</span> INDEX idx_lower_email <span style="font-weight: bold;">ON</span> users (<span style="font-weight: bold;">LOWER</span>(email));
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org05b0ed4" class="outline-3">
+<h3 id="org05b0ed4">Q171. How do statistics affect query performance?</h3>
+<div class="outline-text-3" id="text-org05b0ed4">
+<p>
+The optimizer uses table/column statistics (row counts, value distribution) to
+estimate costs. Stale stats lead to bad plans; refresh with <code>ANALYZE=/=UPDATE STATISTICS</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdb74207" class="outline-3">
+<h3 id="orgdb74207">Q172. What are common causes of slow queries?</h3>
+<div class="outline-text-3" id="text-orgdb74207">
+<p>
+Missing indexes, <code>SELECT *</code>, non-sargable predicates, large unfiltered scans, N+1
+query patterns, bad join order, parameter sniffing, lock contention, and
+insufficient memory causing spills to disk.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf2b2498" class="outline-3">
+<h3 id="orgf2b2498">Q173. What is "sargable"?</h3>
+<div class="outline-text-3" id="text-orgf2b2498">
+<p>
+Search ARGument ABLE — a predicate that can use an index (e.g., <code>col = :v</code> or <code>col &gt; :v</code>).
+Wrapping the column in a function or doing arithmetic on it usually makes it non-sargable.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf4f9de4" class="outline-3">
+<h3 id="orgf4f9de4">Q174. How do you optimize pagination on large tables?</h3>
+<div class="outline-text-3" id="text-orgf4f9de4">
+<p>
+Use keyset (seek) pagination instead of large <code>OFFSET</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> * <span style="font-weight: bold;">FROM</span> orders <span style="font-weight: bold;">WHERE</span> id &gt; :last_seen_id <span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> id <span style="font-weight: bold;">LIMIT</span> 20;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9003cca" class="outline-3">
+<h3 id="org9003cca">Q175. What is index fragmentation and how do you address it?</h3>
+<div class="outline-text-3" id="text-org9003cca">
+<p>
+Over time, page splits and deletes leave indexes fragmented, hurting scans.
+Rebuild or reorganize indexes (<code>REINDEX</code>, <code>ALTER INDEX ... REBUILD</code>) and tune fill factor.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0f9af2f" class="outline-2">
+<h2 id="org0f9af2f">Advanced &amp; Real-World</h2>
+<div class="outline-text-2" id="text-org0f9af2f">
+</div>
+<div id="outline-container-org07cc2c1" class="outline-3">
+<h3 id="org07cc2c1">Q176. What is an UPSERT and how do you do it?</h3>
+<div class="outline-text-3" id="text-org07cc2c1">
+<p>
+Insert-or-update on conflict:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql">
+<span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">PostgreSQL
+</span><span style="font-weight: bold;">INSERT</span> <span style="font-weight: bold;">INTO</span> inventory (sku, qty) <span style="font-weight: bold;">VALUES</span> (<span style="font-style: italic;">'A1'</span>, 10)
+<span style="font-weight: bold;">ON</span> CONFLICT (sku) DO <span style="font-weight: bold;">UPDATE</span> <span style="font-weight: bold;">SET</span> qty = inventory.qty + EXCLUDED.qty;
+
+<span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">MySQL
+</span><span style="font-weight: bold;">INSERT</span> <span style="font-weight: bold;">INTO</span> inventory (sku, qty) <span style="font-weight: bold;">VALUES</span> (<span style="font-style: italic;">'A1'</span>, 10)
+<span style="font-weight: bold;">ON</span> DUPLICATE <span style="font-weight: bold;">KEY</span> <span style="font-weight: bold;">UPDATE</span> qty = qty + <span style="font-weight: bold;">VALUES</span>(qty);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org31d56c6" class="outline-3">
+<h3 id="org31d56c6">Q177. What is the MERGE statement?</h3>
+<div class="outline-text-3" id="text-org31d56c6">
+<p>
+A single statement to insert/update/delete a target based on a source — standard
+SQL, supported by SQL Server/Oracle/PostgreSQL 15+:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql">MERGE <span style="font-weight: bold;">INTO</span> target t <span style="font-weight: bold;">USING</span> <span style="font-weight: bold;">source</span> s <span style="font-weight: bold;">ON</span> t.id = s.id
+<span style="font-weight: bold;">WHEN</span> MATCHED <span style="font-weight: bold;">THEN</span> <span style="font-weight: bold;">UPDATE</span> <span style="font-weight: bold;">SET</span> t.val = s.val
+<span style="font-weight: bold;">WHEN</span> <span style="font-weight: bold;">NOT</span> MATCHED <span style="font-weight: bold;">THEN</span> <span style="font-weight: bold;">INSERT</span> (id, val) <span style="font-weight: bold;">VALUES</span> (s.id, s.val);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org25aa323" class="outline-3">
+<h3 id="org25aa323">Q178. How do you pivot rows into columns?</h3>
+<div class="outline-text-3" id="text-org25aa323">
+<p>
+Conditional aggregation or <code>PIVOT</code> (SQL Server/Oracle):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span>
+  <span style="font-weight: bold;">SUM</span>(<span style="font-weight: bold;">CASE</span> <span style="font-weight: bold;">WHEN</span> quarter=<span style="font-style: italic;">'Q1'</span> <span style="font-weight: bold;">THEN</span> sales <span style="font-weight: bold;">END</span>) <span style="font-weight: bold;">AS</span> q1,
+  <span style="font-weight: bold;">SUM</span>(<span style="font-weight: bold;">CASE</span> <span style="font-weight: bold;">WHEN</span> quarter=<span style="font-style: italic;">'Q2'</span> <span style="font-weight: bold;">THEN</span> sales <span style="font-weight: bold;">END</span>) <span style="font-weight: bold;">AS</span> q2
+<span style="font-weight: bold;">FROM</span> revenue <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> region;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaffc45f" class="outline-3">
+<h3 id="orgaffc45f">Q179. How do you unpivot columns into rows?</h3>
+<div class="outline-text-3" id="text-orgaffc45f">
+<p>
+<code>UNPIVOT</code> (SQL Server/Oracle) or <code>UNION ALL</code> / <code>CROSS JOIN LATERAL (VALUES ...)</code> in PostgreSQL.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4f5e65" class="outline-3">
+<h3 id="orgd4f5e65">Q180. What is a stored procedure?</h3>
+<div class="outline-text-3" id="text-orgd4f5e65">
+<p>
+A precompiled set of SQL statements stored in the database, callable by name,
+supporting parameters and control flow — useful for encapsulating business logic
+and reducing round-trips.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c4b735" class="outline-3">
+<h3 id="org9c4b735">Q181. What is the difference between a function and a stored procedure?</h3>
+<div class="outline-text-3" id="text-org9c4b735">
+<p>
+Functions return a value and can be used in queries (usually no side effects);
+procedures perform actions (DML, transactions) and are invoked with <code>CALL=/=EXEC</code>,
+often without returning a usable value in a SELECT.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d35365" class="outline-3">
+<h3 id="org1d35365">Q182. What is a trigger?</h3>
+<div class="outline-text-3" id="text-org1d35365">
+<p>
+Code that automatically executes in response to <code>INSERT=/=UPDATE=/=DELETE</code> events
+on a table — used for auditing, validation, or maintaining derived data. Use
+sparingly; they hide logic and can hurt performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org2fb06d4" class="outline-3">
+<h3 id="org2fb06d4">Q183. How do you store and query JSON?</h3>
+<div class="outline-text-3" id="text-org2fb06d4">
+<p>
+Modern engines have JSON types: PostgreSQL <code>jsonb</code>, MySQL <code>JSON</code>, SQL Server JSON functions.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">data</span>-&gt;&gt;<span style="font-style: italic;">'name'</span> <span style="font-weight: bold;">FROM</span> events <span style="font-weight: bold;">WHERE</span> <span style="font-weight: bold;">data</span>-&gt;&gt;<span style="font-style: italic;">'type'</span> = <span style="font-style: italic;">'click'</span>;  <span style="font-weight: bold; font-style: italic;">-- </span><span style="font-weight: bold; font-style: italic;">PostgreSQL</span>
+</pre>
+</div>
+
+<p>
+Index <code>jsonb</code> with GIN indexes for containment queries.
+</p>
+</div>
+</div>
+<div id="outline-container-org40e2c36" class="outline-3">
+<h3 id="org40e2c36">Q184. How do you handle hierarchical data?</h3>
+<div class="outline-text-3" id="text-org40e2c36">
+<p>
+Options: adjacency list (<code>parent_id</code> + recursive CTE), nested sets, materialized path, or closure tables — each trades read vs. write complexity.
+</p>
+</div>
+</div>
+<div id="outline-container-orga121a0e" class="outline-3">
+<h3 id="orga121a0e">Q185. What is a window frame "RANGE BETWEEN INTERVAL" used for?</h3>
+<div class="outline-text-3" id="text-orga121a0e">
+<p>
+Time-based windows, e.g., a 7-day rolling sum based on dates rather than row counts:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SUM</span>(amount) OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> ts RANGE <span style="font-weight: bold;">BETWEEN</span> <span style="font-weight: bold; text-decoration: underline;">INTERVAL</span> <span style="font-style: italic;">'7 days'</span> PRECEDING <span style="font-weight: bold;">AND</span> <span style="font-weight: bold;">CURRENT</span> <span style="font-weight: bold; text-decoration: underline;">ROW</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge844476" class="outline-3">
+<h3 id="orge844476">Q186. How do you detect and remove gaps/islands in sequences?</h3>
+<div class="outline-text-3" id="text-orge844476">
+<p>
+The "gaps and islands" pattern uses <code>ROW_NUMBER()</code> differences to group
+consecutive runs:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="font-weight: bold;">SELECT</span> <span style="font-weight: bold;">MIN</span>(d), <span style="font-weight: bold;">MAX</span>(d) <span style="font-weight: bold;">FROM</span> (
+  <span style="font-weight: bold;">SELECT</span> d, d - (ROW_NUMBER() OVER (<span style="font-weight: bold;">ORDER</span> <span style="font-weight: bold;">BY</span> d)) * <span style="font-weight: bold; text-decoration: underline;">INTERVAL</span> <span style="font-style: italic;">'1 day'</span> <span style="font-weight: bold;">AS</span> grp
+  <span style="font-weight: bold;">FROM</span> activity
+) t <span style="font-weight: bold;">GROUP</span> <span style="font-weight: bold;">BY</span> grp;
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org559d845" class="outline-3">
+<h3 id="org559d845">Q187. What is the difference between logical and physical data independence?</h3>
+<div class="outline-text-3" id="text-org559d845">
+<p>
+<b>Logical</b> independence: schema (logical) changes don't break applications (via
+views). <b>Physical</b> independence: storage/index changes don't affect the logical
+schema.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc4a916e" class="outline-3">
+<h3 id="orgc4a916e">Q188. How do you safely run a large UPDATE/DELETE?</h3>
+<div class="outline-text-3" id="text-orgc4a916e">
+<p>
+Batch it (e.g., <code>DELETE ... WHERE id IN (SELECT id ... LIMIT 10000)</code> in a loop) to
+limit lock duration and transaction log growth, commit between batches, and run
+during low-traffic windows.
+</p>
+</div>
+</div>
+<div id="outline-container-org83da609" class="outline-3">
+<h3 id="org83da609">Q189. What are common SQL anti-patterns?</h3>
+<div class="outline-text-3" id="text-org83da609">
+<p>
+<code>SELECT *</code>, implicit joins, N+1 queries, scalar functions in WHERE on indexed
+columns, storing comma-separated lists instead of relations (EAV/jaywalking),
+missing foreign keys, and overusing triggers/cursors.
+</p>
+</div>
+</div>
+<div id="outline-container-org18a5277" class="outline-3">
+<h3 id="org18a5277">Q190. How do you prevent SQL injection?</h3>
+<div class="outline-text-3" id="text-org18a5277">
+<p>
+Use parameterized queries / prepared statements — never concatenate user input
+into SQL. Apply least-privilege DB accounts, validate input, and use ORMs/query
+builders that parameterize by default.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
