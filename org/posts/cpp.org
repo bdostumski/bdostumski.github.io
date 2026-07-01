@@ -12,9 +12,12 @@
 ** Beginner Level
 
 *** Q1: What is C++?
- C++ is a general-purpose programming language that supports procedural, object-oriented, and generic programming, with direct hardware control and high performance.
+ C++ is a powerful, general-purpose programming language used in systems software, games, embedded devices, high-performance servers, and many large applications.  
+ It supports multiple styles of programming—procedural, object-oriented, and generic—so you can write both low-level efficient code and high-level abstractions.
 
 *** Q2: What does a minimal C++ program look like?
+ Every C++ program starts from the ~main~ function.  
+ A minimal example prints text and returns ~0~ to indicate success.
 
 #+begin_src cpp
 #include <iostream>
@@ -26,103 +29,117 @@ int main() {
 #+end_src
 
 *** Q3: What is the difference between C and C++?
- C++ adds classes, templates, RAII, exceptions, overloading, namespaces, and richer standard libraries on top of C-like low-level capabilities.
+ C focuses on procedural programming and stays close to hardware.  
+ C++ keeps that power and adds classes, templates, RAII, stronger type features, and a larger standard library for safer, more expressive code.
 
 *** Q4: What is a namespace?
- A namespace groups identifiers to avoid name collisions.
+ A namespace organizes code and prevents name collisions by grouping related identifiers under a named scope.
+
 #+begin_src cpp
-namespace math { int add(int a, int b) { return a + b; } }
+namespace math {
+  int add(int a, int b) { return a + b; }
+}
 #+end_src
 
 *** Q5: Why avoid ~using namespace std;~ in headers?
- It pollutes global namespace and can cause symbol conflicts for users of the header.
+ Putting it in a header affects every file that includes that header.  
+ This pollutes the global namespace and increases the chance of symbol conflicts.
 
 *** Q6: What is ~std::cout~?
- Standard output stream object from ~<iostream>~.
+ ~std::cout~ is the standard output stream used to print formatted output to the console.
 
 *** Q7: What is ~std::cin~?
- Standard input stream object for formatted input.
+ ~std::cin~ is the standard input stream used to read formatted input from the user or another input source.
 
 *** Q8: What is a variable declaration?
- Defining a named object with a type, e.g., ~int x = 5;~.
+ A declaration introduces a variable name and type, and may also initialize it.
+
+#+begin_src cpp
+int x = 5;
+#+end_src
 
 *** Q9: What are common built-in types in C++?
- ~bool, char, int, float, double, void~ plus signed/unsigned and width variants.
+ Common fundamental types include ~bool~, ~char~, ~int~, ~float~, ~double~, and ~void~, plus signed/unsigned and fixed-width integer variants.
 
 *** Q10: What is ~auto~ in C++?
- Type deduction keyword where compiler infers type from initializer.
+ ~auto~ lets the compiler deduce a variable’s type from its initializer, reducing verbosity and keeping code consistent.
+
 #+begin_src cpp
 auto x = 42;      // int
 auto y = 3.14;    // double
 #+end_src
 
 *** Q11: What is the difference between = and == ?
-
-- ~=~ assigns
-- ~==~ compares equality
+- ~=~ assigns a value to a variable
+- ~==~ compares two values for equality
 
 *** Q12: What are references?
- Aliases to existing objects, typically safer than raw pointers for mandatory binding.
+ A reference is an alias to an existing object.  
+ It must be initialized when declared and normally cannot be rebound to another object later.
+
 #+begin_src cpp
 int x = 10;
 int& r = x;
 #+end_src
 
 *** Q13: Difference between pointer and reference?
-
-- Pointer can be null/reseated
-- Reference must bind to valid object and cannot be reseated after initialization
+- Pointer: can be null, can be reseated, needs dereference syntax
+- Reference: must refer to a valid object, cannot usually be reseated, simpler syntax
 
 *** Q14: What is const?
- Qualifier preventing modification through that name/reference/pointer view.
+ ~const~ marks data as read-only through that particular name/view, helping prevent accidental modification.
 
 *** Q15: What is ~const int*~ vs ~int* const~?
-
-- ~const int* p~: pointer to const int
-- ~int* const p~: const pointer to int
+- ~const int* p~: pointer to const int (cannot modify pointed value through ~p~)
+- ~int* const p~: const pointer to int (cannot change pointer target)
 
 *** Q16: What is a function prototype?
- Declaration of function signature before use.
+ A function prototype declares a function’s signature before use, enabling type checking by the compiler.
 
 *** Q17: What is function overloading?
- Same function name with different parameter lists.
+ Overloading allows multiple functions with the same name but different parameter lists.
+
 #+begin_src cpp
 int f(int);
 double f(double);
 #+end_src
 
-*** Q18: What is default argument?
- Parameter default value used if caller omits argument.
+*** Q18: What is a default argument?
+ A default argument provides a fallback value when a caller omits that parameter.
+
 #+begin_src cpp
 void log(int level = 1);
 #+end_src
 
 *** Q19: What is an inline function?
- Suggests inlining and allows multiple identical definitions across translation units.
+ ~inline~ allows multiple identical definitions across translation units (often in headers) and may enable inlining optimization.
 
 *** Q20: What is a class?
- User-defined type bundling data and behavior with access control.
+ A class is a user-defined type that bundles state (data) and behavior (methods), with controlled access to internals.
 
 *** Q21: Difference between class and struct in C++?
- Default access is ~private~ for class, ~public~ for struct.
+ They are nearly identical in capability; the key default differs:
+- ~class~ defaults to ~private~
+- ~struct~ defaults to ~public~
 
 *** Q22: What are access specifiers?
- ~public~, ~private~, ~protected~ control member visibility.
+ ~public~, ~private~, and ~protected~ control who can access class members.
 
 *** Q23: What is encapsulation?
- Hiding implementation details and exposing stable public interface.
+ Encapsulation means exposing a clear public interface while hiding implementation details.
 
 *** Q24: What is a constructor?
- Special member that initializes objects.
+ A constructor initializes an object at creation time.
 
 *** Q25: What is a destructor?
- Special member called when object lifetime ends, for cleanup.
+ A destructor runs automatically when object lifetime ends, commonly to release resources.
 
 *** Q26: Can constructors be overloaded?
- Yes, multiple constructors with different parameter lists are common.
+ Yes. Different constructor signatures support multiple ways to initialize objects.
 
-*** Q27: What is initializer list in constructor?
- Preferred member initialization syntax before constructor body.
+*** Q27: What is an initializer list in a constructor?
+ It initializes members directly before entering constructor body, which is often required or more efficient.
+
 #+begin_src cpp
 struct S {
   int x;
@@ -131,591 +148,613 @@ struct S {
 #+end_src
 
 *** Q28: Why prefer initialization over assignment in constructor body?
- Direct initialization avoids extra work and is required for const/reference members.
+ Direct initialization avoids extra work and is required for ~const~ and reference members.
 
 *** Q29: What is RAII?
- Resource Acquisition Is Initialization: bind resource lifetime to object lifetime.
+ RAII (Resource Acquisition Is Initialization) ties resource lifetime (memory, files, locks) to object lifetime.
 
 *** Q30: Why is RAII important?
- Prevents leaks and ensures exception-safe cleanup automatically.
+ It guarantees cleanup automatically, reduces leaks, and improves exception safety.
 
-*** Q31: What is ~new~ and ~delete~?
- Dynamic allocation/deallocation operators; prefer smart pointers/containers in modern C++.
+*** Q31: What are ~new~ and ~delete~?
+ Operators for manual dynamic memory allocation/deallocation.  
+ In modern C++, smart pointers and containers are preferred.
 
 *** Q32: Why avoid raw ~new/delete~ in application code?
- Error-prone ownership management; use ~std::unique_ptr~, ~std::vector~, etc.
+ Manual ownership is error-prone (leaks, double-free, lifetime bugs).  
+ Prefer ~std::unique_ptr~, ~std::shared_ptr~, ~std::vector~, etc.
 
 *** Q33: What is ~nullptr~?
- Type-safe null pointer literal introduced in C++11.
+ ~nullptr~ is the dedicated null pointer literal (C++11+), safer than integer-like null macros.
 
 *** Q34: Difference between ~NULL~ and ~nullptr~?
- ~nullptr~ has dedicated null pointer type; avoids overload ambiguity.
+ ~nullptr~ has a proper null-pointer type and avoids overload ambiguity; ~NULL~ is often just ~0~ or ~0L~.
 
 *** Q35: What is an array?
- Fixed-size contiguous collection of same type.
+ An array is a fixed-size contiguous block of elements of one type.
 
-*** Q36: Why prefer ~std::array~ over raw array for fixed size?
- Value semantics, size awareness, iterators, STL compatibility.
+*** Q36: Why prefer ~std::array~ over raw arrays for fixed size?
+ ~std::array~ provides STL compatibility, size awareness, and value semantics while staying fixed-size.
 
 *** Q37: Why prefer ~std::vector~ for dynamic arrays?
- Automatic memory management, resizing, contiguous storage, rich API.
+ ~std::vector~ automatically manages memory, resizes dynamically, and stores elements contiguously.
 
 *** Q38: What is a string in C++?
- ~std::string~ is dynamic, owning text container; easier/safer than C strings.
+ ~std::string~ is an owning, dynamic text type that is safer and easier than raw C-style strings.
 
-*** Q39: What is range-based for loop?
+*** Q39: What is a range-based for loop?
+ It offers clean, readable iteration over container elements.
 
 #+begin_src cpp
 for (const auto& v : vec) { /* ... */ }
 #+end_src
 
-*** Q40: What is type inference benefit?
- Reduces verbosity and keeps declarations aligned with initializer types.
+*** Q40: What is the benefit of type inference?
+ It reduces repetitive type spelling and keeps declarations aligned with initializer types.
 
 ** Intermediate Level
 
-*** Q41: What is copy constructor?
- Constructor initializing object from another same-type object.
+*** Q41: What is a copy constructor?
+ It constructs a new object from another object of the same type.
 
-*** Q42: What is copy assignment operator?
- Assigns one existing object from another same-type object.
+*** Q42: What is a copy assignment operator?
+ It copies one existing object’s state into another existing object.
 
-*** Q43: What is move constructor?
- Transfers resources from temporary/rvalue object.
+*** Q43: What is a move constructor?
+ It transfers resources from a temporary/rvalue into a newly created object.
 
-*** Q44: What is move assignment operator?
- Transfers resources into already existing object from rvalue.
+*** Q44: What is a move assignment operator?
+ It transfers resources from an rvalue into an already existing object.
 
 *** Q45: What is Rule of Three?
- If class defines destructor/copy ctor/copy assign, likely needs all three.
+ If a class defines destructor, copy constructor, or copy assignment, it usually needs all three.
 
 *** Q46: What is Rule of Five?
- Rule of Three extended with move ctor and move assign.
+ Rule of Three plus move constructor and move assignment for modern C++ resource-aware types.
 
 *** Q47: What is Rule of Zero?
- Prefer designing classes needing no custom special members (delegate ownership to RAII members).
+ Design types so compiler-generated special members are enough by using RAII members.
 
-*** Q48: What is ~= default~?
- Ask compiler to generate default implementation of special member.
+*** Q48: What does ~= default~ mean?
+ It requests the compiler-generated default implementation explicitly.
 
-*** Q49: What is ~= delete~?
- Explicitly forbid a function/special member.
+*** Q49: What does ~= delete~ mean?
+ It forbids a function, preventing invalid usage at compile time.
+
 #+begin_src cpp
 MyType(const MyType&) = delete;
 #+end_src
 
 *** Q50: What is lvalue vs rvalue?
- Lvalue has identity/location; rvalue is temporary/value-like expression.
+- Lvalue: has identity/location (can usually appear on left side of assignment)
+- Rvalue: temporary/value expression (typically short-lived)
 
 *** Q51: What is ~std::move~?
- Cast to rvalue enabling move semantics; does not move by itself.
+ ~std::move~ casts to an rvalue expression so move operations become eligible.  
+ It does not move data by itself.
 
 *** Q52: What is moved-from state?
- Valid but unspecified state after move unless otherwise documented.
+ A moved-from object remains valid but its value/content is usually unspecified unless documented.
 
 *** Q53: What is perfect forwarding?
- Preserving value category through templates via forwarding references + ~std::forward~.
+ It preserves value category (lvalue/rvalue) through template forwarding with ~std::forward~.
 
-*** Q54: What is forwarding reference?
- ~T&&~ in deduced template context, can bind lvalue/rvalue.
+*** Q54: What is a forwarding reference?
+ ~T&&~ in a deduced template context; it can bind to both lvalues and rvalues.
 
 *** Q55: What are exceptions?
- Error handling mechanism with ~throw~, ~try~, ~catch~.
+ Exceptions are a structured error propagation system using ~throw~, ~try~, and ~catch~.
 
-*** Q56: When avoid exceptions?
- In low-latency/hard real-time/no-exception codebases; depends on project policy.
+*** Q56: When should exceptions be avoided?
+ In codebases with strict low-latency/real-time constraints or policies that prohibit exceptions.
 
 *** Q57: What is stack unwinding?
- Destructor calls for in-scope objects when exception propagates.
+ During exception propagation, local objects are destroyed automatically in reverse construction order.
 
-*** Q58: Why destructors should not throw?
- Throwing during unwinding can terminate program.
+*** Q58: Why should destructors not throw?
+ Throwing during unwinding may cause ~std::terminate~, ending the program abruptly.
 
 *** Q59: What does ~noexcept~ mean?
- Function guarantees not to throw (or program terminates on violation).
+ It states that a function is not expected to throw; violating it may terminate the program.
 
 *** Q60: Why mark move operations ~noexcept~?
- Enables containers to use move during reallocation for performance/safety.
+ Containers can then use moves during reallocation, improving both performance and safety.
 
-*** Q61: What is template?
- Compile-time generic blueprint for functions/classes.
+*** Q61: What is a template?
+ A template is a generic blueprint for functions or classes resolved at compile time.
 
-*** Q62: What is function template?
+*** Q62: What is a function template?
 
 #+begin_src cpp
 template<typename T>
 T add(T a, T b) { return a + b; }
 #+end_src
 
-*** Q63: What is class template?
- Generic class parameterized by types/values.
+*** Q63: What is a class template?
+ A class parameterized by types/values to create reusable generic components.
 
 *** Q64: What is template specialization?
- Custom implementation for specific template arguments.
+ A customized implementation for specific template arguments.
 
 *** Q65: What is partial specialization?
- Specialized template for subset/pattern of parameters (class templates only).
+ Specializing a class template for a subset/pattern of template parameters.
 
 *** Q66: What are non-type template parameters?
- Template parameters that are values (e.g., ~int N~, pointer, auto in newer standards).
+ Template parameters that are values (e.g., integers, pointers, ~auto~ NTTPs in newer standards).
 
-*** Q67: What is constexpr?
- Enables compile-time evaluation when possible.
+*** Q67: What is ~constexpr~?
+ ~constexpr~ enables compile-time evaluation when expression context and inputs allow.
 
-*** Q68: Difference between const and constexpr?
-
-- ~const~: immutable object
-- ~constexpr~: constant expression capable (if context permits)
+*** Q68: Difference between ~const~ and ~constexpr~?
+- ~const~: value is read-only
+- ~constexpr~: value/function can participate in constant-expression contexts
 
 *** Q69: What is ~if constexpr~?
- Compile-time conditional branch in templates.
+ A compile-time conditional, useful for selecting valid template branches.
 
-*** Q70: What is static_assert?
- Compile-time assertion with diagnostic message.
+*** Q70: What is ~static_assert~?
+ A compile-time assertion with a readable error message when condition fails.
 
 *** Q71: What is STL?
- Standard Template Library components: containers, iterators, algorithms, functors.
+ STL is the core generic library toolkit: containers, iterators, algorithms, and utilities.
 
 *** Q72: Common STL containers?
- ~vector, deque, list, map, unordered_map, set, unordered_set, array, string~.
+ ~vector~, ~deque~, ~list~, ~map~, ~unordered_map~, ~set~, ~unordered_set~, ~array~, ~string~.
 
-*** Q73: How choose ~map~ vs ~unordered_map~?
-
-- ~map~: ordered, tree, O(log n)
-- ~unordered_map~: hash table, average O(1), no ordering
+*** Q73: How to choose ~map~ vs ~unordered_map~?
+- ~map~: ordered keys, predictable iteration, O(log n)
+- ~unordered_map~: hash table, average O(1), no key ordering
 
 *** Q74: What are iterators?
- Generalized pointers for traversing container elements.
+ Iterators are generalized traversal objects used to access container elements.
 
-*** Q75: Difference between begin/end and cbegin/cend?
- ~cbegin/cend~ return const iterators.
+*** Q75: Difference between ~begin/end~ and ~cbegin/cend~?
+ ~cbegin/cend~ return const iterators, preventing element modification via iterator.
 
-*** Q76: What are algorithms in <algorithm>?
- Reusable generic operations like ~sort~, ~find~, ~transform~, ~copy~.
+*** Q76: What are algorithms in ~<algorithm>~?
+ Reusable operations like ~sort~, ~find~, ~transform~, ~copy~, ~count_if~, etc.
 
 *** Q77: Why prefer algorithms over handwritten loops?
- Clarity, correctness, composability, and often optimized implementations.
+ They are expressive, less error-prone, composable, and often optimized.
 
-*** Q78: What is lambda expression?
- Anonymous function object.
+*** Q78: What is a lambda expression?
+ A lambda is an inline anonymous function object.
+
 #+begin_src cpp
 auto sq = [](int x){ return x * x; };
 #+end_src
 
 *** Q79: What is lambda capture?
- How lambda accesses outer variables (~[=]~, ~[&]~, explicit captures).
+ Capture list defines how outer variables are used inside lambda: by value, by reference, or explicit per-variable capture.
 
-*** Q80: What is mutable lambda?
- Allows modification of by-value captures inside lambda body.
+*** Q80: What is a mutable lambda?
+ It allows modification of by-value captured variables inside the lambda body.
 
 *** Q81: What is ~std::function~?
- Type-erased callable wrapper for functions/lambdas/bind targets.
+ A type-erased callable wrapper for storing any compatible callable target.
 
-*** Q82: Cost of std::function?
- Type erasure may allocate and add indirection; templates/auto may be cheaper in hot paths.
+*** Q82: What is the cost of ~std::function~?
+ It may add indirection and potential allocations.  
+ For hot paths, templates/auto callables can be cheaper.
 
 *** Q83: What is ~std::bind~?
- Binds callable arguments; lambdas are usually clearer modern alternative.
+ ~std::bind~ creates adapted callables by binding arguments; lambdas are usually clearer in modern code.
 
-*** Q84: What is enum class?
- Scoped, strongly typed enum preventing implicit integer conversions.
+*** Q84: What is ~enum class~?
+ A scoped, strongly typed enum that avoids implicit conversions and name pollution.
 
-*** Q85: Why use enum class over enum?
- Better type safety and namespace hygiene.
+*** Q85: Why use ~enum class~ over ~enum~?
+ Better type safety, clearer intent, and reduced accidental misuse.
 
-*** Q86: What is friend in C++?
- Grants selected functions/classes access to private/protected members.
+*** Q86: What is ~friend~ in C++?
+ ~friend~ grants selected external functions/classes access to private/protected members.
 
 *** Q87: What is operator overloading?
- Defining behavior of operators for user-defined types.
+ Defining custom behavior for operators on user-defined types.
 
 *** Q88: Which operators should be overloaded carefully?
- ~&&~, ~||~, comma, ~&~, conversion operators—can surprise readers.
+ Operators such as ~&&~, ~||~, comma, address-of, and implicit conversion operators can be surprising if misused.
 
 *** Q89: Why overload ~<<~ for printing?
- Integrates type with stream output idioms.
+ It integrates custom types naturally with stream-based output.
+
 #+begin_src cpp
 std::ostream& operator<<(std::ostream& os, const T& t);
 #+end_src
 
-*** Q90: What is explicit constructor?
- Prevents unintended implicit conversions.
+*** Q90: What is an explicit constructor?
+ It prevents unintended implicit conversions from constructor argument types.
 
-*** Q91: What is conversion operator?
- Member enabling conversion to another type (prefer explicit where possible).
+*** Q91: What is a conversion operator?
+ A member function that converts an object to another type; should often be ~explicit~.
 
 *** Q92: What is object slicing?
- Copying derived object into base object by value, losing derived parts.
+ Copying a derived object by value into a base object drops derived-specific data/behavior.
 
-*** Q93: How avoid slicing?
- Use references/pointers (often smart pointers) to polymorphic base.
+*** Q93: How to avoid slicing?
+ Use references or pointers (preferably smart pointers) for polymorphic objects.
 
 *** Q94: What is inheritance?
- Deriving new class from existing base class.
+ Inheritance creates a derived class that reuses/extents behavior of a base class.
 
 *** Q95: What is polymorphism?
- Same interface, different behavior by concrete dynamic type.
+ Polymorphism allows one interface to represent different concrete behaviors.
 
-*** Q96: What is virtual function?
- Function dispatched at runtime based on dynamic type.
+*** Q96: What is a virtual function?
+ A virtual function is dispatched at runtime based on the object’s dynamic type.
 
 *** Q97: Why virtual destructor in polymorphic base?
- Ensures correct derived cleanup when deleting via base pointer.
+ It ensures proper derived cleanup when deleting through a base-class pointer.
 
-*** Q98: What does override mean?
- Compile-time check that function overrides base virtual.
+*** Q98: What does ~override~ mean?
+ ~override~ asks compiler to verify that the function actually overrides a base virtual function.
+
 #+begin_src cpp
 void foo() override;
 #+end_src
 
-*** Q99: What does final mean?
- Prevent further overriding (method) or inheritance (class).
+*** Q99: What does ~final~ mean?
+ It blocks further overriding (for methods) or inheritance (for classes).
 
-*** Q100: What is abstract class?
- Class with at least one pure virtual function; cannot be instantiated.
-
+*** Q100: What is an abstract class?
+ A class with at least one pure virtual function.  
+ It defines an interface and cannot be instantiated directly.
+ 
 ** Advanced Level
 
 *** Q101: What is multiple inheritance?
- Class inheriting from more than one base class.
+ Multiple inheritance means a class derives from more than one base class.  
+ It is useful when a type naturally combines behaviors from separate interfaces, but it must be designed carefully to avoid ambiguity.
 
-*** Q102: What is diamond problem?
- Ambiguity/duplication when two bases share common ancestor.
+*** Q102: What is the diamond problem?
+ The diamond problem appears when two base classes inherit from the same ancestor, and a derived class inherits from both.  
+ Without special handling, the derived class may end up with duplicate base subobjects and ambiguous member access.
 
 *** Q103: What is virtual inheritance?
- Shares single base subobject in diamond hierarchies.
+ Virtual inheritance ensures only one shared instance of a common base exists in diamond-shaped hierarchies.  
+ It solves duplication and ambiguity caused by multiple inheritance.
 
-*** Q104: When use composition over inheritance?
- Prefer composition for flexibility and weaker coupling unless true “is-a” relation exists.
+*** Q104: When should composition be preferred over inheritance?
+ Prefer composition when you want flexibility, loose coupling, and easier maintenance.  
+ Use inheritance mainly when there is a true and stable “is-a” relationship.
 
-*** Q105: What is pImpl idiom?
- Pointer to implementation to hide details and reduce rebuild dependencies.
+*** Q105: What is the pImpl idiom?
+ pImpl (Pointer to Implementation) separates interface from implementation details by storing implementation in a private pointer.  
+ This hides internal dependencies and reduces header exposure.
 
-*** Q106: Benefits of pImpl?
- ABI stability, faster incremental builds, encapsulation.
+*** Q106: What are the benefits of pImpl?
+ Main benefits are ABI stability, faster incremental builds, and cleaner encapsulation.  
+ It also helps reduce recompilation impact when implementation changes.
 
-*** Q107: What is one-definition rule (ODR)?
- Entities needing single consistent definition across program; violations are undefined behavior.
+*** Q107: What is the One Definition Rule (ODR)?
+ ODR requires certain entities (like classes, inline functions, templates) to have one consistent definition across the program.  
+ Violating ODR leads to undefined behavior and very hard-to-debug issues.
 
-*** Q108: What is translation unit in C++?
- Source file after preprocessing.
+*** Q108: What is a translation unit in C++?
+ A translation unit is a source file after preprocessing (after includes/macros are expanded).  
+ Each translation unit is compiled separately before linking.
 
-*** Q109: What is linkage (internal/external)?
- Symbol visibility across translation units and linker scope.
+*** Q109: What is linkage (internal vs external)?
+ Linkage defines whether a symbol is visible across translation units.  
+ Internal linkage limits visibility to one translation unit; external linkage allows cross-file linking.
 
 *** Q110: What is static storage duration?
- Object exists for entire program lifetime.
+ Objects with static storage duration exist for the entire lifetime of the program.  
+ They are created before main (or on first use for local statics) and destroyed at program shutdown.
 
 *** Q111: What is thread storage duration?
- Per-thread object lifetime using ~thread_local~.
+ Thread storage duration means each thread gets its own instance of a variable, usually with ~thread_local~.  
+ The variable lives as long as the thread lives.
 
 *** Q112: What is dynamic storage duration?
- Lifetime managed manually/indirectly via allocators/new/delete.
+ Dynamic storage duration refers to objects created at runtime (e.g., ~new~, allocators, smart pointers).  
+ Their lifetime is controlled explicitly or by owning objects.
 
-*** Q113: What is initialization order fiasco?
- Cross-TU static initialization order is unspecified and can break dependencies.
+*** Q113: What is the static initialization order fiasco?
+ It is the risk that globals in different translation units initialize in unspecified order.  
+ If one global depends on another not yet initialized, behavior can fail unpredictably.
 
-*** Q114: How mitigate static init order issues?
- Use function-local statics (construct-on-first-use) and dependency inversion.
+*** Q114: How do you mitigate static initialization order issues?
+ Use function-local statics (“construct on first use”), dependency injection, and avoid cross-global dependencies.  
+ These techniques make initialization order explicit and safer.
 
 *** Q115: Are function-local statics thread-safe?
- Since C++11, initialization is thread-safe.
+ Yes. Since C++11, initialization of function-local statics is guaranteed to be thread-safe.
 
-*** Q116: What is undefined behavior in C++?
- Behavior not defined by standard; compiler may assume it never happens.
+*** Q116: What is undefined behavior (UB) in C++?
+ UB is behavior the C++ standard does not define.  
+ If UB occurs, the compiler may assume it never happens, causing arbitrary results.
 
 *** Q117: Common UB examples in C++?
- Out-of-bounds access, use-after-free, data races, signed overflow, invalid casts.
+ Typical examples: out-of-bounds access, use-after-free, data races, signed overflow, invalid pointer casts.  
+ Even if code “seems to work,” UB can break under optimization or platform changes.
 
 *** Q118: What is implementation-defined behavior?
- Compiler/platform must document chosen behavior (e.g., type sizes).
+ Behavior where the compiler/platform must choose a rule and document it.  
+ Example: exact sizes of some integer types on a given target.
 
 *** Q119: What is unspecified behavior?
- Multiple valid outcomes without requirement to document which chosen each time.
+ Behavior where multiple outcomes are allowed and no single outcome must be documented for every run.  
+ The program stays valid, but exact result may vary.
 
 *** Q120: What are strict aliasing rules?
- Accessing object via incompatible type can trigger UB and optimizer miscompilations.
+ Strict aliasing limits accessing an object through unrelated types.  
+ Breaking these rules can produce UB and surprising optimizer miscompilations.
 
 *** Q121: What is alignment?
- Memory boundary requirements for objects/types.
+ Alignment is a type’s required memory boundary (e.g., 4-byte or 8-byte boundary).  
+ Proper alignment is important for correctness and performance.
 
-*** Q122: What is alignas?
- Specify stronger alignment requirements.
+*** Q122: What is ~alignas~?
+ ~alignas~ requests a specific alignment for a type or object.
+
 #+begin_src cpp
 struct alignas(64) CacheLineData { int x; };
 #+end_src
 
-*** Q123: What is constexpr function?
- Function usable in compile-time contexts when given constant-expression inputs.
+*** Q123: What is a constexpr function?
+ A ~constexpr~ function can be evaluated at compile time when called with constant-expression inputs.  
+ It can also run at runtime when compile-time evaluation is not required.
 
-*** Q124: What is consteval?
- Immediate function that must be evaluated at compile time.
+*** Q124: What is ~consteval~?
+ A ~consteval~ function must always be evaluated at compile time.  
+ If compile-time evaluation is not possible, compilation fails.
 
-*** Q125: What is constinit?
- Ensures static/thread storage variable is constant-initialized.
+*** Q125: What is ~constinit~?
+ ~constinit~ ensures a static/thread variable is initialized at compile time (constant initialization), preventing dynamic init surprises.
 
 *** Q126: What are concepts (C++20)?
- Constraints on template parameters improving diagnostics and intent.
+ Concepts are template constraints that express required properties of template arguments.  
+ They improve readability and compiler diagnostics.
 
-*** Q127: Why concepts help large codebases?
- Earlier errors, clearer interfaces, better template readability.
+*** Q127: Why do concepts help large codebases?
+ They produce earlier and clearer errors, make template APIs self-documenting, and reduce cryptic substitution failures.
 
-*** Q128: What is requires clause?
- Syntax to constrain templates with concept checks.
+*** Q128: What is a requires clause?
+ A ~requires~ clause attaches constraints to templates/functions so they participate only when requirements are met.
 
 *** Q129: What is SFINAE?
- Substitution failure is not an error; classic template constraint mechanism pre-concepts.
+ SFINAE means “Substitution Failure Is Not An Error.”  
+ In older template style, invalid substitutions remove candidates instead of hard-failing compilation.
 
 *** Q130: What is CRTP?
- Curiously Recurring Template Pattern for static polymorphism.
+ CRTP (Curiously Recurring Template Pattern) is when a class template takes the derived class as a parameter.  
+ It enables static polymorphism and compile-time customization.
 
 *** Q131: Static vs dynamic polymorphism?
-
-- Static: compile-time (templates/CRTP), often zero-overhead
-- Dynamic: runtime virtual dispatch
+- Static polymorphism: resolved at compile time (templates/CRTP), often zero-overhead
+- Dynamic polymorphism: resolved at runtime via virtual dispatch
 
 *** Q132: What is type erasure?
- Hide concrete type behind uniform interface (e.g., std::function, any-like wrappers).
+ Type erasure hides concrete types behind a common interface (e.g., ~std::function~).  
+ It improves flexibility at some runtime cost.
 
-*** Q133: What is std::any?
- Type-safe container for single dynamically typed value.
+*** Q133: What is ~std::any~?
+ ~std::any~ stores one value of any copyable type with type-safe retrieval via ~std::any_cast~.
 
-*** Q134: What is std::variant?
- Tagged union of known alternative types.
+*** Q134: What is ~std::variant~?
+ ~std::variant~ is a type-safe tagged union storing exactly one value from a fixed set of types.
 
-*** Q135: What is std::optional?
- Wrapper representing optional presence/absence of value.
+*** Q135: What is ~std::optional~?
+ ~std::optional<T>~ represents either “a ~T~ value” or “no value,” without using pointers or magic sentinels.
 
-*** Q136: Why use optional instead of sentinel?
- Explicit semantics and type safety.
+*** Q136: Why use optional instead of sentinel values?
+ It makes absence explicit in the type system, improving correctness and readability.
 
-*** Q137: What is std::span?
- Non-owning view over contiguous sequence (pointer + length).
+*** Q137: What is ~std::span~?
+ ~std::span~ is a lightweight non-owning view over contiguous memory (pointer + length).  
+ It is useful for passing arrays/vectors safely without copying.
 
-*** Q138: What is string_view?
- Non-owning read-only view into character sequence.
+*** Q138: What is ~std::string_view~?
+ ~std::string_view~ is a non-owning read-only view into character data.  
+ It avoids allocation and copying for many APIs.
 
-*** Q139: Pitfall with string_view?
- Dangling views if underlying string/buffer lifetime ends.
+*** Q139: What is a common pitfall with ~string_view~?
+ Lifetime issues: if the original string/buffer dies or changes, the view may dangle and become invalid.
 
-*** Q140: What is ranges library?
- Composable lazy views and algorithms with cleaner pipeline style.
+*** Q140: What is the ranges library?
+ C++ ranges provide composable views and algorithms with pipeline-style syntax, often clearer and lazier than manual loops.
 
-*** Q141: What is coroutine (C++20)?
- Language support for suspend/resume computations (async generators/tasks).
+*** Q141: What is a coroutine (C++20)?
+ Coroutines are language-level suspend/resume functions for async workflows, generators, and cooperative tasks.
 
 *** Q142: Are coroutines threads?
- No. They are control-flow abstraction; scheduling/execution model is library-defined.
+ No. Coroutines are control-flow constructs; scheduling/execution (threaded or not) depends on library/runtime design.
 
-*** Q143: What is move-only type?
- Type supporting move but not copy (e.g., unique_ptr).
+*** Q143: What is a move-only type?
+ A move-only type supports move operations but not copy operations (example: ~std::unique_ptr~).
 
-*** Q144: Why unique_ptr is move-only?
- Enforces unique ownership.
+*** Q144: Why is ~unique_ptr~ move-only?
+ To enforce exclusive ownership so exactly one owner controls resource lifetime.
 
-*** Q145: What is shared_ptr?
- Reference-counted shared ownership smart pointer.
+*** Q145: What is ~shared_ptr~?
+ ~std::shared_ptr~ provides shared ownership via reference counting.  
+ The managed object is destroyed when the last owner is gone.
 
-*** Q146: What is weak_ptr?
- Non-owning observer of shared_ptr-managed object; breaks cycles.
+*** Q146: What is ~weak_ptr~?
+ ~std::weak_ptr~ observes an object managed by ~shared_ptr~ without extending its lifetime.
 
-*** Q147: What is shared_ptr cycle?
- Mutual shared_ptr references prevent destruction (leak-like lifetime).
+*** Q147: What is a ~shared_ptr~ cycle?
+ A cycle happens when objects hold shared ownership of each other; reference counts never reach zero, so destruction never occurs.
 
-*** Q148: How break shared_ptr cycles?
- Use ~std::weak_ptr~ for one direction in cyclic graph.
+*** Q148: How do you break ~shared_ptr~ cycles?
+ Use ~std::weak_ptr~ in at least one direction of cyclic relationships.
 
-*** Q149: Why use make_unique/make_shared?
- Exception safety and efficiency (single allocation for make_shared).
+*** Q149: Why use ~make_unique~ / ~make_shared~?
+ They are safer and cleaner. ~make_shared~ can be more efficient due to single allocation for control block + object.
 
-*** Q150: What is custom deleter?
- Callable controlling cleanup behavior for smart pointers.
+*** Q150: What is a custom deleter?
+ A custom deleter is a callable that defines how a smart pointer releases its resource.
 
 ** Expert Level
 
-*** Q151: What is exception safety guarantee levels?
-
-- Basic: invariants preserved, no leaks
-- Strong: commit-or-rollback
-- Nothrow: operation never throws
+*** Q151: What are exception safety guarantee levels?
+- Basic guarantee: program remains valid; no leaks; invariants preserved
+- Strong guarantee: operation is transactional (commit-or-rollback)
+- Nothrow guarantee: operation never throws exceptions
 
 *** Q152: What is copy-and-swap idiom?
- Assignment via copy temp then swap for strong guarantee and reuse logic.
+ It implements assignment by copying into a temporary and swapping.  
+ This centralizes logic and often provides strong exception safety.
 
-*** Q153: What is allocator in STL?
- Policy object controlling memory allocation for containers.
+*** Q153: What is an allocator in STL?
+ An allocator controls how container memory is allocated/deallocated.  
+ It is a policy customization point for memory behavior.
 
-*** Q154: Why custom allocators?
- Specialized performance/memory behavior for domain workloads.
+*** Q154: Why use custom allocators?
+ For domain-specific performance, reduced fragmentation, custom pools, and memory tracking/constraints.
 
-*** Q155: What is PMR (polymorphic memory resource)?
- Runtime-pluggable allocation model in ~<memory_resource>~.
+*** Q155: What is PMR (Polymorphic Memory Resource)?
+ PMR (~<memory_resource>~) provides runtime-selectable allocation strategies without changing container element types.
 
 *** Q156: What is cache-friendly data layout?
- Organizing data for spatial/temporal locality to reduce cache misses.
+ It means arranging data to improve locality so CPU caches are used effectively, reducing stalls and misses.
 
-*** Q157: What is false sharing in C++ multithreading?
- Threads writing distinct vars on same cache line causing coherence contention.
+*** Q157: What is false sharing in multithreading?
+ False sharing occurs when different threads write unrelated variables on the same cache line, causing heavy coherence traffic.
 
-*** Q158: How reduce false sharing?
- Padding/alignment and per-thread sharding.
+*** Q158: How can false sharing be reduced?
+ Use padding/alignment, separate hot writable fields, and shard per-thread data.
 
-*** Q159: What is memory model in C++?
- Formal rules for atomic operations, ordering, and visibility between threads.
+*** Q159: What is the C++ memory model?
+ It defines rules for atomic operations, synchronization, visibility, and ordering between threads.
 
 *** Q160: What are atomic memory orders?
- ~relaxed, consume (deprecated practice), acquire, release, acq_rel, seq_cst~.
+ ~relaxed~, ~acquire~, ~release~, ~acq_rel~, ~seq_cst~ (and ~consume~, rarely used in practice).  
+ They trade off ordering guarantees vs performance.
 
 *** Q161: When use relaxed atomics?
- For atomicity without synchronization ordering requirements.
+ When only atomicity is needed and no cross-thread ordering/synchronization is required.
 
-*** Q162: Why is seq_cst easiest to reason about?
- Provides single global order for seq_cst operations.
+*** Q162: Why is ~seq_cst~ easiest to reason about?
+ It provides a single global order for sequentially consistent operations, making mental models simpler.
 
-*** Q163: What is data race in C++?
- Unsynchronized conflicting accesses where at least one is write and non-atomic => UB.
+*** Q163: What is a data race in C++?
+ Conflicting unsynchronized accesses to the same memory location (at least one write, non-atomic) cause UB.
 
-*** Q164: Is volatile for thread sync?
- No. Use atomics/mutexes/condition variables.
+*** Q164: Is ~volatile~ for thread synchronization?
+ No. ~volatile~ is not a synchronization primitive. Use atomics, mutexes, and condition variables.
 
-*** Q165: What is mutex?
- Primitive providing mutual exclusion for critical sections.
+*** Q165: What is a mutex?
+ A mutex enforces mutual exclusion so only one thread enters a critical section at a time.
 
-*** Q166: What is lock_guard?
- RAII wrapper that locks in ctor and unlocks in dtor.
+*** Q166: What is ~lock_guard~?
+ ~std::lock_guard~ is an RAII lock wrapper: locks on construction, unlocks on destruction.
 
-*** Q167: What is unique_lock?
- Flexible lock wrapper supporting defer, unlock/relock, condition_variable integration.
+*** Q167: What is ~unique_lock~?
+ ~std::unique_lock~ is a flexible lock wrapper supporting deferred locking, manual unlock/relock, and condition-variable waits.
 
 *** Q168: What is deadlock?
- Threads wait forever due to cyclic lock dependencies.
+ Deadlock is when threads wait on each other indefinitely due to cyclic lock dependencies.
 
-*** Q169: Deadlock prevention basics?
- Consistent lock ordering, std::scoped_lock, minimizing lock nesting.
+*** Q169: Basic deadlock prevention strategies?
+ Keep consistent lock ordering, reduce lock nesting, and use helpers like ~std::scoped_lock~ for multi-lock acquisition.
 
-*** Q170: What is condition_variable?
- Blocking wait/notify primitive for condition-based thread coordination.
+*** Q170: What is ~condition_variable~?
+ A synchronization primitive that blocks threads until notified and a condition becomes true.
 
-*** Q171: Why wait with predicate?
- Handles spurious wakeups safely.
+*** Q171: Why wait with a predicate?
+ Predicates protect against spurious wakeups and re-check correctness on wake.
+
 #+begin_src cpp
 cv.wait(lock, [&]{ return ready; });
 #+end_src
 
-*** Q172: What is future/promise?
- Mechanism for asynchronous result delivery and synchronization.
+*** Q172: What are ~future~ and ~promise~?
+ They provide asynchronous result passing: producer sets result in ~promise~, consumer gets it through ~future~.
 
-*** Q173: What is std::async caveat?
- Launch policy matters; may run deferred unless ~std::launch::async~ requested.
+*** Q173: What is a ~std::async~ caveat?
+ Launch policy matters. Without explicit ~std::launch::async~, execution may be deferred until ~get()/wait()~.
 
-*** Q174: What is lock-free programming challenge?
- Correctness complexity (ABA, memory reclamation, ordering bugs).
+*** Q174: What is the challenge in lock-free programming?
+ Correctness is very hard: memory ordering, ABA, reclamation, and subtle race bugs make design complex.
 
-*** Q175: What is ABA problem?
- Compare-exchange sees same value again though state changed in between.
+*** Q175: What is the ABA problem?
+ A CAS check sees value A again and assumes nothing changed, even though state changed A→B→A in between.
 
-*** Q176: What is hazard pointer/epoch reclamation?
- Techniques for safe memory reclamation in lock-free structures.
+*** Q176: What are hazard pointers / epoch reclamation?
+ They are strategies for safe memory reclamation in lock-free structures, preventing reclamation while data may still be observed.
 
-*** Q177: What is modules in C++20?
- Alternative to textual includes for faster, cleaner dependency boundaries.
+*** Q177: What are modules in C++20?
+ Modules are a modern alternative to textual headers, improving compile scalability and dependency hygiene.
 
 *** Q178: Benefits of modules over headers?
- Faster builds, better isolation, reduced macro leakage.
+ Faster builds, better encapsulation, and less macro/definition leakage across boundaries.
 
-*** Q179: What is build system’s role for C++?
- Manage compilation units, dependencies, flags, linking, test orchestration.
+*** Q179: What is the role of a build system in C++?
+ It manages compilation units, dependencies, flags, linking, and test/build orchestration across environments.
 
-*** Q180: Why compile with high warnings?
- Catch bugs early and enforce code quality consistency.
+*** Q180: Why compile with high warning levels?
+ Warnings catch bugs early, enforce consistency, and improve long-term code quality.
 
-*** Q181: Useful warning set baseline?
- ~-Wall -Wextra -Wpedantic~ plus project-specific additions.
+*** Q181: Useful baseline warning flags?
+ A common baseline is ~-Wall -Wextra -Wpedantic~ plus stricter project-specific flags.
 
 *** Q182: Why test with multiple compilers?
- Different diagnostics and optimizer behaviors reveal different bugs.
+ Different compilers expose different warnings, optimizations, and edge-case behavior, revealing hidden portability bugs.
 
-*** Q183: What is sanitizer suite for C++?
-
-- ASan: memory errors
-- UBSan: undefined behavior
-- TSan: data races
-- MSan: uninitialized reads (toolchain support dependent)
+*** Q183: What is the sanitizer suite for C++?
+- ASan: memory safety errors
+- UBSan: undefined behavior checks
+- TSan: data race detection
+- MSan: uninitialized read detection (where supported)
 
 *** Q184: Why use fuzzing in C++?
- Finds edge-case crashes/logic flaws in parser and API boundaries.
+ Fuzzing finds rare edge-case crashes and logic bugs by generating many unexpected inputs automatically.
 
-*** Q185: What is benchmark trap?
- Microbenchmarks may mislead if not representative/well-isolated.
+*** Q185: What is a benchmarking trap?
+ Microbenchmarks can mislead when they do not represent real workloads or ignore compiler/runtime effects.
 
-*** Q186: What is profile-guided optimization?
- Use runtime profiles to optimize branch/layout/inlining decisions.
+*** Q186: What is Profile-Guided Optimization (PGO)?
+ PGO uses real execution profiles to guide optimization decisions like inlining and branch layout.
 
-*** Q187: What is link-time optimization?
- Whole-program optimization during link for better inlining/devirtualization.
+*** Q187: What is Link-Time Optimization (LTO)?
+ LTO enables whole-program optimization at link stage, improving inlining and cross-module optimization opportunities.
 
 *** Q188: What is devirtualization?
- Compiler optimization replacing virtual dispatch with direct call when type known.
+ Devirtualization replaces virtual calls with direct calls when the compiler can prove concrete type, reducing dispatch overhead.
 
 *** Q189: What is ABI compatibility concern in libraries?
- Changing class layout/signatures/symbols can break binary clients.
+ Changing exported layouts/signatures/symbols can break already-compiled client binaries.
 
-*** Q190: How maintain ABI stability?
- pImpl, symbol versioning, careful exported interfaces, semantic versioning discipline.
+*** Q190: How to maintain ABI stability?
+ Use pImpl, minimize exposed details, manage symbol versions carefully, and apply strict semantic versioning discipline.
 
 *** Q191: Why avoid exposing STL types in stable ABI boundaries?
- Implementation and ABI may vary across compilers/standard library versions.
+ ABI details can differ across compilers/standard library implementations, risking binary incompatibility.
 
 *** Q192: What is strong typedef pattern?
- Distinct wrapper types to avoid mixing semantically different primitives.
+ Strong typedef wraps primitive types in distinct types to prevent semantic mix-ups (e.g., ~UserId~ vs ~OrderId~).
 
 *** Q193: What is value semantics?
- Objects behave like values (copyable/movable, independent ownership).
+ Value-semantics objects own their state and behave like independent values when copied/moved.
 
 *** Q194: Why prefer value semantics by default?
- Simpler reasoning, fewer aliasing/lifetime bugs.
+ It simplifies reasoning, reduces aliasing/lifetime errors, and often improves API clarity.
 
 *** Q195: What is “zero-cost abstraction” in C++?
- High-level abstraction that compiles to cost comparable to hand-written low-level code.
+ Abstractions should not impose runtime cost beyond what equivalent hand-written low-level code would pay.
 
-*** Q196: What is guideline for modern C++ API design?
- Clear ownership, const-correctness, minimal raw pointers, expressive types, narrow interfaces.
+*** Q196: What is a modern C++ API design guideline?
+ Make ownership explicit, keep interfaces small, use const-correctness, avoid raw owning pointers, and choose expressive types.
 
-*** Q197: Should you expose raw pointers in interfaces?
- Use for non-owning nullable observation when semantically correct; document lifetime rules.
+*** Q197: Should raw pointers be exposed in interfaces?
+ Yes for non-owning/nullable observation when semantically right, but ownership and lifetime rules must be clearly documented.
 
 *** Q198: What distinguishes expert C++ code from average code?
- Correctness under complexity, explicit lifetimes/ownership, measurable performance, maintainable abstractions.
+ Expert code stays correct under complexity, expresses ownership/lifetimes clearly, performs measurably, and remains maintainable.
 
-*** Q199: What is practical migration path from legacy C++?
- Introduce RAII/smart pointers, modern containers, safer APIs, tests/sanitizers, incremental refactors.
+*** Q199: What is a practical migration path from legacy C++?
+ Modernize incrementally: introduce RAII, smart pointers, safer containers/APIs, add tests/sanitizers, then refactor in small verified steps.
 
-*** Q200: What is expert workflow for C++ development?
-
-1. Define contracts and invariants
-2. Prefer simple/clear design first
-3. Enforce warnings/static analysis
-4. Test + fuzz + sanitizers
+*** Q200: What is an expert workflow for C++ development?
+1. Define clear contracts and invariants
+2. Build the simplest correct design first
+3. Enable strict warnings and static checks
+4. Add tests, fuzzing, and sanitizers
 5. Profile before optimizing
-6. Review for lifetime/concurrency/UB risks
-7. Document API and performance assumptions
-
-* Bonus Practice Prompts
-
-*** Prompt 1
-Refactor a raw-pointer owning class to Rule-of-Zero style using ~std::vector~ or ~std::unique_ptr~.
-
-*** Prompt 2
-Write a generic ~minmax~ utility using templates and concepts (or SFINAE fallback).
-
-*** Prompt 3
-Design a thread-safe bounded queue with ~mutex~ + ~condition_variable~.
-
-*** Prompt 4
-Implement a polymorphic plugin interface and discuss ABI-safe boundaries.
-
-*** Prompt 5
-Compare ~std::map~ vs ~std::unordered_map~ performance with a benchmark and explain caveats.
+6. Review for UB, lifetime, and concurrency risks
+7. Document assumptions and performance boundaries
 
 -----
 
