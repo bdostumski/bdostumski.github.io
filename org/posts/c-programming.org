@@ -1,0 +1,837 @@
+#+TITLE: C
+#+DATE: 2026-07-01
+#+TAGS: Programming
+#+DESCRIPTION: A comprehensive C guide covering fundamentals, memory model, pointers, systems programming practices, undefined behavior, tooling, concurrency, performance, portability, and expert-level engineering workflows.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* C Programming Q&A (Beginner - Expert)
+
+** Beginner Level
+
+*** Q1: What is C?
+ C is a general-purpose, procedural programming language created by Dennis Ritchie. It is widely used for system programming, embedded software, and performance-critical applications.
+
+*** Q2: What does a minimal C program look like?
+
+#+begin_src c
+#include <stdio.h>
+
+int main(void) {
+    printf("Hello, world!\n");
+    return 0;
+}
+#+end_src
+
+*** Q3: What is the role of #include <stdio.h>?
+ It includes declarations for standard input/output functions like ~printf~ and ~scanf~.
+
+*** Q4: What is the difference between declaration and definition?
+
+- Declaration: tells the compiler a name and type (e.g., ~int x;~, ~int add(int, int);~)
+- Definition: allocates storage or provides implementation (e.g., ~int x = 3;~, full function body)
+
+*** Q5: Common basic C data types?
+
+- ~char~ (character / small integer)
+- ~int~ (integer)
+- ~float~ (single precision)
+- ~double~ (double precision)
+- Modifiers: ~short~, ~long~, ~signed~, ~unsigned~
+
+*** Q6: How do if/else and loops work in C?
+
+#+begin_src c
+if (x > 0) { ... } else { ... }
+
+for (int i = 0; i < n; i++) { ... }
+while (cond) { ... }
+do { ... } while (cond);
+#+end_src
+
+*** Q7: What is the difference between = and == ?
+
+- ~=~ : assignment
+- ~==~ : equality comparison
+
+*** Q8: What are arrays in C?
+ Arrays store contiguous elements of the same type.
+#+begin_src c
+int a[5] = {1,2,3,4,5};
+#+end_src
+Index starts at 0.
+
+*** Q9: What is a string in C?
+ A C string is a ~char~ array ending with the null terminator ~'\0'~.
+#+begin_src c
+char s[] = "cat";  // {'c','a','t','\0'}
+#+end_src
+
+*** Q10: What is a function prototype?
+ It declares a function before use, enabling type checking.
+#+begin_src c
+int max(int a, int b);
+#+end_src
+
+*** Q11: What is ~sizeof~ and when is it evaluated?
+ ~sizeof~ returns the size (in bytes) of a type or expression result type. It is usually compile-time for non-VLA types.
+#+begin_src c
+sizeof(int);      // e.g., 4
+sizeof x;         // size of type of x
+#+end_src
+
+*** Q12: Why use ~sizeof *ptr~ instead of ~sizeof(type)~ in allocations?
+ It avoids repeating type names and prevents mismatch bugs when type changes.
+#+begin_src c
+int *p = malloc(n * sizeof *p);
+#+end_src
+
+*** Q13: What is ~NULL~ in C?
+ A null pointer constant used to represent “points to no object/function”.
+
+*** Q14: Why check return value of ~malloc~?
+ Allocation can fail; dereferencing NULL is undefined behavior.
+#+begin_src c
+int *p = malloc(n * sizeof *p);
+if (!p) { /* handle failure */ }
+#+end_src
+
+*** Q15: What does ~calloc~ do differently from ~malloc~?
+ ~calloc(count, size)~ allocates and zero-initializes bytes.
+
+*** Q16: When should ~realloc~ be used carefully?
+ On failure it returns NULL and original block remains valid; assign to temp first.
+#+begin_src c
+int *tmp = realloc(p, new_n * sizeof *p);
+if (tmp) p = tmp; else { /* keep old p */ }
+#+end_src
+
+*** Q17: Is ~free(NULL)~ safe?
+ Yes. It is a no-op.
+
+*** Q18: Why is double-free dangerous?
+ Freeing same pointer twice is UB and may corrupt allocator metadata.
+
+*** Q19: What is an uninitialized variable?
+ A variable with indeterminate value (for automatic storage) if not explicitly initialized.
+
+*** Q20: Difference between local and global variables?
+
+- Local: block scope, usually automatic storage
+- Global: file scope, static storage duration
+
+*** Q21: What does ~static~ mean for local variables?
+ Local scope, but static storage duration (retains value across calls).
+
+*** Q22: What does ~static~ mean for functions/global variables?
+ Internal linkage: symbol visible only within current translation unit.
+
+*** Q23: What does ~extern~ do?
+ Declares an object/function defined in another translation unit.
+
+*** Q24: What is a header guard?
+ Preprocessor pattern preventing multiple inclusion.
+#+begin_src c
+#ifndef MY_H
+#define MY_H
+/* declarations */
+#endif
+#+end_src
+
+*** Q25: What is ~#pragma once~?
+ Common non-standard (widely supported) include-once directive; simpler than guards.
+
+*** Q26: What is the purpose of ~return 0;~ in ~main~?
+ Indicates successful process termination to OS conventionally.
+
+*** Q27: What is ~argc~ and ~argv~?
+ Command-line argument count and vector in ~main(int argc, char **argv)~.
+
+*** Q28: How do you parse integer input from strings safely?
+ Prefer ~strtol~ over ~atoi~ for error checking.
+#+begin_src c
+char *end;
+long v = strtol(s, &end, 10);
+#+end_src
+
+*** Q29: Why avoid ~gets~?
+ It cannot enforce buffer bounds; removed from modern standards.
+
+*** Q30: Difference between ~scanf~ and ~fgets~ for user input?
+ ~fgets~ is safer for line-based input with explicit max length.
+
+*** Q31: What is buffer overflow?
+ Writing beyond allocated object bounds; often exploitable.
+
+*** Q32: Why prefer ~snprintf~ over ~sprintf~?
+ ~snprintf~ bounds output by buffer size.
+
+*** Q33: What does ~'\n'~ do in output?
+ Newline character; on line-buffered streams it may trigger flush.
+
+*** Q34: What are escape sequences in strings/chars?
+ Special sequences like ~\n~, ~\t~, ~\\~, ~\"~, ~\0~.
+
+*** Q35: What is the difference between character literal and string literal?
+
+- ~'A'~: int-valued character constant
+- ~"A"~: string literal array with trailing ~'\0'~
+
+*** Q36: Can you modify a string literal?
+ No. Attempting to write through pointer to literal is UB.
+
+*** Q37: Why is ~const char *s = "abc";~ preferred?
+ Expresses immutability; avoids accidental writes to literal storage.
+
+*** Q38: What is an enum used for?
+ Named integral constants for readability and constrained value sets.
+#+begin_src c
+enum Color { RED, GREEN, BLUE };
+#+end_src
+
+*** Q39: Why use ~size_t~ for sizes/indices?
+ Unsigned type designed to represent object sizes.
+
+*** Q40: What is ~ptrdiff_t~?
+ Signed type for difference between two pointers to same array object.
+
+*** Q41: What does casting do?
+ Explicitly converts a value to another type; can lose info if narrowing.
+
+*** Q42: Why is implicit conversion risky?
+ Silent sign/width changes can cause bugs (especially mixed signed/unsigned).
+
+*** Q43: What is integer promotion?
+ Small integer types are promoted (often to int) in expressions.
+
+*** Q44: Why compare signed and unsigned carefully?
+ Signed may convert to unsigned, causing surprising results.
+#+begin_src c
+int a = -1;
+unsigned b = 1;
+if (a < b) { /* may be false unexpectedly */ }
+#+end_src
+
+*** Q45: What are bitwise operators for?
+ Bit manipulation: ~&~, ~|~, ~^~, ~~~, ~<<~, ~>>~.
+
+*** Q46: Difference between logical and bitwise operators?
+
+- Logical: ~&&~, ~||~, ~!~ (truth values, short-circuit)
+- Bitwise: operates per-bit on integer representations
+
+*** Q47: What is short-circuit evaluation?
+ In ~&&~ and ~||~, RHS is evaluated only if needed.
+
+*** Q48: What is operator precedence?
+ Rules determining expression grouping without parentheses.
+
+*** Q49: Why use parentheses even when precedence is known?
+ Improves readability and reduces maintenance mistakes.
+
+*** Q50: What is a ternary operator?
+ Conditional expression: ~cond ? a : b~.
+
+** Intermediate Level
+
+*** Q51: What is a pointer?
+ A pointer stores a memory address.
+#+begin_src c
+int x = 10;
+int *p = &x;   // p points to x
+#+end_src
+
+*** Q52: Difference between * and & with pointers?
+
+- ~&x~ gives address of ~x~
+- ~*p~ dereferences pointer ~p~ (accesses value at address)
+
+*** Q53: What is pointer arithmetic?
+ Adding/subtracting integers to pointers moves by element size.
+#+begin_src c
+int a[3] = {10,20,30};
+int *p = a;    // points to a[0]
+p++;           // now points to a[1]
+#+end_src
+
+*** Q54: Array name vs pointer — are they the same?
+ Related but not identical.
+- Array name often decays to pointer to first element.
+- But array itself is not a modifiable pointer variable.
+
+*** Q55: What is pointer to pointer?
+ Pointer that stores address of another pointer.
+#+begin_src c
+int x = 1; int *p = &x; int **pp = &p;
+#+end_src
+
+*** Q56: Why pass pointer-to-pointer to functions?
+ To let function modify caller’s pointer (e.g., allocate or relink node).
+
+*** Q57: How are 2D arrays represented in C?
+ Contiguous rows for true arrays (e.g., ~int a[R][C]~).
+
+*** Q58: Difference between ~int **~ and ~int (*)[C]~?
+ Different memory/layout assumptions; not interchangeable.
+
+*** Q59: What are VLAs (variable length arrays)?
+ Stack arrays with runtime size (optional in newer standards; compiler-dependent support).
+
+*** Q60: Are VLAs recommended in portable code?
+ Often avoided for portability/safety; use dynamic allocation when needed.
+
+*** Q61: What is dynamic memory allocation?
+ Allocating memory at runtime using ~malloc~, ~calloc~, ~realloc~, and releasing via ~free~.
+#+begin_src c
+int *p = malloc(10 * sizeof *p);
+if (p == NULL) { /* handle error */ }
+free(p);
+#+end_src
+
+*** Q62: What causes memory leaks?
+ Forgetting to ~free~ dynamically allocated memory, or losing the pointer to it.
+
+*** Q63: What are dangling pointers?
+ Pointers that refer to freed/out-of-scope memory.
+Good practice:
+#+begin_src c
+free(p);
+p = NULL;
+#+end_src
+
+*** Q64: What is flexible array member?
+ Last struct member with empty brackets for trailing variable data.
+#+begin_src c
+struct Buf { size_t n; char data[]; };
+#+end_src
+
+*** Q65: How allocate struct with flexible array?
+
+#+begin_src c
+size_t n = 100;
+struct Buf *b = malloc(sizeof *b + n);
+#+end_src
+
+*** Q66: What is ~memcpy~ vs ~memmove~?
+
+- ~memcpy~: no overlap allowed
+- ~memmove~: overlap-safe
+
+*** Q67: What does ~memcmp~ return?
+ <0, 0, >0 lexicographic comparison over bytes.
+
+*** Q68: Why can ~strncpy~ be problematic?
+ May not NUL-terminate if source too long; may fill trailing bytes unnecessarily.
+
+*** Q69: Safer string copy pattern?
+
+#+begin_src c
+snprintf(dst, dst_sz, "%s", src);
+#+end_src
+
+*** Q70: What is ~errno~?
+ Thread-local error indicator set by many library/syscalls on failure.
+
+*** Q71: Should you reset ~errno = 0~ before some calls?
+ Yes for functions like ~strtol~ where 0 may be valid result and errno disambiguates.
+
+*** Q72: How to print human-readable errno?
+ ~strerror(errno)~ (or thread-safe variants platform-specifically).
+
+*** Q73: What is EOF?
+ End-of-file indicator, typically ~-1~, used by many stdio functions.
+
+*** Q74: Why store ~fgetc~ return in ~int~, not ~char~?
+ Need to represent all unsigned char values plus EOF.
+
+*** Q75: Difference between text and binary file modes?
+ Text mode may transform newlines/EOF conventions on some platforms.
+
+*** Q76: How do you open a file safely?
+
+#+begin_src c
+FILE *fp = fopen(path, "rb");
+if (!fp) { /* handle */ }
+#+end_src
+
+*** Q77: Why always check I/O return values?
+ Partial reads/writes and failures are common in real systems.
+
+*** Q78: What does ~fflush~ do?
+ Flushes buffered output stream to underlying file/device.
+
+*** Q79: Is ~fflush(stdin)~ valid?
+ Undefined behavior in standard C.
+
+*** Q80: What are command-line parsing best practices in C?
+ Validate counts/ranges, reject malformed input, show clear usage/help.
+
+*** Q81: What is defensive programming in C?
+ Validate assumptions, check errors, enforce invariants, fail safely.
+
+*** Q82: What are API preconditions and postconditions?
+ Preconditions must hold before call; postconditions guaranteed after successful call.
+
+*** Q83: Why separate interface (.h) and implementation (.c)?
+ Encapsulation, compile-time dependency control, cleaner modularity.
+
+*** Q84: What should headers contain?
+ Declarations, types, macros needed by users—not private internals.
+
+*** Q85: Should function definitions be in headers?
+ Usually no, except ~static inline~ or templates-like macro utilities.
+
+*** Q86: Why avoid exposing struct internals in public headers?
+ Preserves ABI flexibility and encapsulation (opaque pointer pattern).
+
+*** Q87: What is opaque pointer (handle) pattern?
+
+- In header: ~typedef struct Foo Foo;~
+- Implementation defines struct fields privately.
+
+*** Q88: What is callback context pointer (~void *ctx~)?
+ User data passed through callback to avoid globals.
+
+*** Q89: How to design callback signatures robustly?
+ Explicit argument types, const-correctness, documented ownership/lifetime.
+
+*** Q90: What is ownership in API design?
+ Who allocates/frees memory and when; must be explicit in docs/names.
+
+*** Q91: Naming convention for ownership transfer?
+ Patterns like ~create/destroy~, ~dup/free~, ~take/give~ can help clarity.
+
+*** Q92: What is idempotent cleanup?
+ Cleanup safe to call repeatedly without harmful effects.
+
+*** Q93: Why set pointer to NULL after free?
+ Reduces accidental reuse/double-free in same scope.
+
+*** Q94: What is sentinel value?
+ Special marker indicating termination/error (e.g., NULL, -1).
+
+*** Q95: What is magic number and why avoid it?
+ Unnamed literal constants; replace with named constants/enums.
+
+*** Q96: What is a struct?
+ A user-defined type grouping related fields.
+#+begin_src c
+struct Point { int x; int y; };
+struct Point p = {3, 4};
+#+end_src
+
+*** Q97: What is typedef used for?
+ To create type aliases for readability.
+#+begin_src c
+typedef unsigned long ulong;
+typedef struct Point Point;
+#+end_src
+
+*** Q98: What is the difference between pass-by-value and using pointers in functions?
+ C is pass-by-value only. To modify caller data, pass pointers.
+
+*** Q99: What is translation unit in C?
+ Source file after preprocessing (includes/macros expanded).
+
+*** Q100: What are phases of building C program?
+ Preprocess → Compile → Assemble → Link.
+
+** Advanced Level
+
+*** Q101: What is undefined behavior (UB)?
+ Program behavior the C standard does not define (e.g., out-of-bounds access, signed overflow, use-after-free). UB can produce unpredictable results.
+
+*** Q102: What is implementation-defined behavior?
+ Behavior where implementation must choose and document one option (e.g., size of ~int~, endianness details).
+
+*** Q103: What is strict aliasing?
+ Compiler optimization rule: accessing an object through an incompatible type (except allowed cases) is UB. Violations can break optimized code.
+
+*** Q104: What is the volatile qualifier?
+ It tells compiler accesses can change outside normal flow (e.g., memory-mapped I/O, signal-shared variables). It prevents certain optimizations on reads/writes.
+
+*** Q105: Is volatile enough for thread synchronization?
+ No. ~volatile~ is not a synchronization primitive. Use C11 atomics (~stdatomic.h~) or proper threading primitives.
+
+*** Q106: What is const correctness?
+ Applying ~const~ to express immutability contracts and catch accidental writes at compile time.
+#+begin_src c
+void print_arr(const int *a, size_t n);
+#+end_src
+
+*** Q107: Explain storage durations in C.
+
+- Automatic: block scope locals (lifetime: block execution)
+- Static: globals/static locals (entire program)
+- Thread storage (C11): per-thread lifetime
+- Allocated: dynamic via ~malloc/free~
+
+*** Q108: What is the difference between stack and heap?
+
+- Stack: automatic storage, managed by call frames
+- Heap: dynamic storage, manually managed
+(Exact implementation is platform-specific.)
+
+*** Q109: What are function pointers used for?
+ Callbacks, dispatch tables, strategy patterns.
+#+begin_src c
+int add(int a, int b) { return a+b; }
+int (*op)(int,int) = add;
+int r = op(2,3);
+#+end_src
+
+*** Q110: What are common secure coding pitfalls in C?
+
+- Buffer overflows (~gets~, unsafe ~strcpy~ usage)
+- Format-string vulnerabilities
+- Integer overflow/underflow
+- Use-after-free/double-free
+- Missing bounds checks
+
+*** Q111: What is one-definition expectation in C practice?
+ Each object/function should have one definition with consistent declarations across units.
+
+*** Q112: What happens with conflicting declarations?
+ May produce diagnostics or UB depending on mismatch and usage.
+
+*** Q113: What is tentative definition?
+ File-scope definition without initializer (e.g., ~int x;~) that may become definition with zero init.
+
+*** Q114: What is internal vs external linkage?
+
+- Internal: symbol visible only in current translation unit (~static~)
+- External: visible to linker across units
+
+*** Q115: What is inline semantics nuance in C?
+ C inline rules differ from C++; linkage/emission behavior can surprise—follow one consistent pattern.
+
+*** Q116: What is strict prototype?
+ Function declaration with explicit parameters (e.g., ~int f(void);~) rather than old-style unspecified params.
+
+*** Q117: Why avoid old-style function declarations?
+ Weak type checking and compatibility pitfalls.
+
+*** Q118: What is effective type?
+ Rules governing type by which object stored bytes may be accessed; related to aliasing UB.
+
+*** Q119: Is type-punning through union always portable?
+ Subtle and not universally safe for all cases; prefer ~memcpy~ for strict portability.
+
+*** Q120: Why is reading uninitialized memory UB?
+ Value is indeterminate; behavior not reliably defined (except specific unsigned char cases).
+
+*** Q121: What is trap representation?
+ Bit pattern that may not represent valid value for a type on some implementations.
+
+*** Q122: Why can ~memcmp~ on structs be misleading?
+ Padding bytes may be indeterminate; semantic equality may differ from raw-byte equality.
+
+*** Q123: What is object lifetime?
+ Time period when object exists and can be validly accessed.
+
+*** Q124: Can pointer remain valid after ~realloc~?
+ Only returned pointer is valid on success; old pointer invalidated.
+
+*** Q125: What is provenance concept (informal)?
+ Compiler may track where pointer originates; invalid arithmetic/casts can break assumptions.
+
+*** Q126: Why is out-of-bounds pointer arithmetic dangerous?
+ Only one-past-end pointer allowed (not dereferenceable); beyond that is UB.
+
+*** Q127: Is signed right shift portable?
+ Behavior for negative values is implementation-defined.
+
+*** Q128: Is left-shifting into sign bit safe?
+ Often UB for signed types; use unsigned for bit operations.
+
+*** Q129: What is sequence before/after terminology (modern)?
+ C uses “sequenced before/after” relations for evaluation ordering constraints.
+
+*** Q130: Example of unsequenced modification UB?
+
+#+begin_src c
+i = i++ + f(i);   // UB
+#+end_src
+
+*** Q131: What is atomic type in C11?
+ Types from ~stdatomic.h~ supporting lock-free/atomic operations where available.
+
+*** Q132: What is ~atomic_init~ used for?
+ Initializes atomic objects (especially non-static storage).
+
+*** Q133: When use ~memory_order_relaxed~?
+ For atomicity without ordering constraints (e.g., counters not used for synchronization).
+
+*** Q134: What do acquire/release guarantee?
+ Release on writer + acquire on reader creates happens-before for synchronized data.
+
+*** Q135: Why default to ~memory_order_seq_cst~ initially?
+ Simpler reasoning; strongest ordering (often adequate unless profiling proves need).
+
+*** Q136: What is data race in C11?
+ Conflicting non-atomic accesses from multiple threads without synchronization; UB.
+
+*** Q137: Is ~volatile sig_atomic_t~ for signal handlers?
+ Common minimal type for async signal communication (limited operations).
+
+*** Q138: Can ~printf~ be called from signal handler?
+ Generally unsafe (not async-signal-safe).
+
+*** Q139: What is reentrancy?
+ Function can be safely interrupted/recalled before previous invocation completes.
+
+*** Q140: What is thread safety?
+ Correct behavior under concurrent calls from multiple threads.
+
+*** Q141: Difference between static and dynamic linking?
+
+- Static: code copied into executable
+- Dynamic: shared library loaded at runtime
+
+*** Q142: What is ABI?
+ Binary contract: calling conventions, type layout, symbol naming/linking rules.
+
+*** Q143: Why care about struct layout for ABI?
+ Changing member order/types/padding can break binary compatibility.
+
+*** Q144: What is symbol visibility?
+ Controls exported symbols from shared objects (can reduce collisions/startup cost).
+
+*** Q145: What compiler warnings are most useful early?
+ ~-Wall -Wextra -Wpedantic -Wconversion -Wshadow~ (tune per project).
+
+*** Q146: Why use multiple compilers in CI?
+ Different diagnostics/optimizers catch different classes of bugs.
+
+*** Q147: What are optimization levels (~-O0/-O2/-O3/-Os~)?
+ Trade debugability, speed, and size with increasingly aggressive transforms.
+
+*** Q148: Why test with and without optimization?
+ UB bugs may only appear under optimization.
+
+*** Q149: What is LTO (Link Time Optimization)?
+ Whole-program optimization across object files during link step.
+
+*** Q150: What is PGO (Profile-Guided Optimization)?
+ Compiler uses runtime profile data to optimize hot paths.
+
+** Expert Level
+
+*** Q151: What are sequence points / evaluation order concerns?
+ Order of subexpression evaluation is often unspecified. Expressions like ~i = i++ + 1~ invoke UB. Write side-effect-safe expressions.
+
+*** Q152: What is the memory model in C11?
+ C11 introduces atomics with memory orders:
+- ~memory_order_relaxed~
+- ~memory_order_acquire~
+- ~memory_order_release~
+- ~memory_order_acq_rel~
+- ~memory_order_seq_cst~
+Used to reason about inter-thread visibility and ordering.
+
+*** Q153: Why can signed integer overflow be dangerous?
+ Signed overflow is UB, so compilers may optimize assuming it never happens. This can invalidate naive overflow checks.
+
+*** Q154: What is alignment and why does it matter?
+ Types may require specific memory alignment. Misaligned access may be slow or invalid on some architectures. Use ~_Alignof~, ~alignas~ (C11) where needed.
+
+*** Q155: What is padding in structs?
+ Extra bytes inserted for alignment between members or at end. This affects ~sizeof~ and binary layout.
+
+*** Q156: How do you write portable C across compilers/platforms?
+
+- Prefer standard C features
+- Use fixed-width integer types (~stdint.h~)
+- Avoid UB and non-standard extensions unless guarded
+- Isolate platform-specific code
+- Compile with strict warnings and sanitizers
+
+*** Q157: What are sanitizers and why use them?
+
+- AddressSanitizer (ASan): memory errors
+- UndefinedBehaviorSanitizer (UBSan): UB checks
+- ThreadSanitizer (TSan): data races
+They find bugs early during testing.
+
+*** Q158: What is the purpose of the preprocessor beyond includes?
+
+- Macros (~#define~)
+- Conditional compilation (~#if~, ~#ifdef~)
+- Token/string operations (~##~, ~#~)
+Use carefully: prefer ~static inline~ and enums when possible for type safety.
+
+*** Q159: What is link-time behavior every expert should know?
+
+- External vs internal linkage
+- One-definition constraints in C translation units
+- Role of ~static~, ~extern~
+- Symbol resolution across object files and libraries
+
+*** Q160: What is a robust expert workflow for C development?
+
+1. Compile with strict warnings (~ -Wall -Wextra -Wpedantic -Werror ~ as appropriate)
+2. Use static analysis tools
+3. Run unit/integration tests
+4. Run sanitizers/fuzzing
+5. Review for UB, lifetime, and concurrency hazards
+6. Document invariants and API contracts
+
+*** Q161: What is branch prediction and why it matters?
+ CPUs speculate branches; unpredictable branches can stall pipelines and hurt performance.
+
+*** Q162: Should you micro-optimize prematurely in C?
+ No. Measure first with profiler; optimize verified hotspots.
+
+*** Q163: What is cache locality?
+ Performance benefit from accessing nearby memory; contiguous layouts often faster.
+
+*** Q164: Array of structs vs struct of arrays?
+ AoS simpler for per-object ops; SoA better for vectorized/column-style access patterns.
+
+*** Q165: What is false sharing?
+ Threads modify different data on same cache line causing heavy coherence traffic.
+
+*** Q166: How reduce false sharing?
+ Align/pad frequently written per-thread data to separate cache lines.
+
+*** Q167: What is memory pool allocator?
+ Custom allocator for fixed-size or patterned allocations, reducing fragmentation/overhead.
+
+*** Q168: Trade-off of custom allocators?
+ Better speed/control vs complexity and debugging burden.
+
+*** Q169: What is zero-copy I/O concept?
+ Minimize data copying between buffers/kernel/user space for throughput gains.
+
+*** Q170: Why beware of undefined signed overflow in checksum math?
+ Compiler may optimize under no-overflow assumption; use unsigned/wider types.
+
+*** Q171: What is saturating arithmetic and when useful?
+ Clamp on overflow; useful in DSP/image domains (usually manual in C).
+
+*** Q172: How to check multiplication overflow safely?
+
+#+begin_src c
+if (a != 0 && b > SIZE_MAX / a) { /* overflow */ }
+#+end_src
+
+*** Q173: Why validate size computations before allocation?
+ Prevent integer overflow leading to undersized allocations and buffer overruns.
+
+*** Q174: What is hardened build baseline for C?
+ Warnings-as-errors (selectively), stack protections, fortify, PIE/RELRO/NX (platform/toolchain-specific).
+
+*** Q175: What is fuzz testing?
+ Automated random/mutational input generation to find crashes and logic flaws.
+
+*** Q176: Why combine fuzzing with sanitizers?
+ Sanitizers turn silent memory/UB issues into actionable crash reports.
+
+*** Q177: What is minimization in fuzzing?
+ Reducing failing input to smallest reproducer for debugging clarity.
+
+*** Q178: What is regression test?
+ Test added after bug fix to prevent recurrence.
+
+*** Q179: What is golden-file testing?
+ Compare output to approved reference files (use carefully with stable formats).
+
+*** Q180: What is deterministic build?
+ Same source+toolchain+inputs produce identical binary outputs.
+
+*** Q181: Why pin toolchain versions in CI?
+ Reproducibility and stable diagnostics/performance comparisons.
+
+*** Q182: What is cross-compilation?
+ Building binaries for target architecture different from host build machine.
+
+*** Q183: Portable endianness handling best practice?
+ Use explicit byte-order conversion helpers and serialization routines.
+
+*** Q184: Why avoid writing raw structs directly to disk/network?
+ Padding, alignment, endianness, and ABI differences break portability.
+
+*** Q185: What is stable wire format?
+ Explicit, versioned serialization format independent of in-memory layout.
+
+*** Q186: How design forward-compatible binary format?
+ Include versioning, length fields, reserved/optional sections.
+
+*** Q187: What is feature-test macro usage?
+ Enable platform/library APIs intentionally (e.g., POSIX levels) with controlled portability.
+
+*** Q188: Why document undefined/implementation-defined assumptions?
+ Makes portability audits and maintenance significantly easier.
+
+*** Q189: What is contract-based comment style for C APIs?
+ Document inputs, ownership, thread-safety, errors, side effects, lifetime.
+
+*** Q190: How should C libraries expose errors?
+ Clear status codes + optional detail channel (errno-like/thread-local/out-param).
+
+*** Q191: What is fail-fast vs fail-safe trade-off?
+ Fail-fast aids debugging; fail-safe aims resilient runtime behavior. Choose per context.
+
+*** Q192: How prevent API misuse at compile time?
+ Use strong typedef patterns, const correctness, opaque handles, and restrictive signatures.
+
+*** Q193: What is “strict weak ordering” relevance in C sorting callbacks?
+ Comparator must be consistent/transitive; violations yield undefined sort behavior.
+
+*** Q194: Why can ~qsort~ comparator overflow bug happen?
+
+#+begin_src c
+return *(int*)a - *(int*)b; // can overflow
+#+end_src
+Use comparisons returning -1/0/1 safely.
+
+*** Q195: Safer ~qsort~ comparator pattern?
+
+#+begin_src c
+int cmp_int(const void *pa, const void *pb) {
+    int a = *(const int*)pa, b = *(const int*)pb;
+    return (a > b) - (a < b);
+}
+#+end_src
+
+*** Q196: What is C23 in practical terms for teams today?
+ Latest standard improvements (compiler support varies). Adopt incrementally with compatibility checks.
+
+*** Q197: Should production code rely immediately on newest standard features?
+ Only if toolchain matrix supports them; otherwise guard with feature checks.
+
+*** Q198: What is migration strategy between C standards?
+ Raise warnings, remove UB-prone idioms, add tests, then enable newer standard mode gradually.
+
+*** Q199: What is an expert code review checklist for C?
+ Bounds, lifetime/ownership, UB risks, integer math, concurrency, API contracts, error paths, portability.
+
+*** Q200: What distinguishes expert C code from merely working C code?
+ Predictable behavior under optimization, clear contracts, robust errors, portability, testability, and security-conscious design.
+
+* Bonus Practice Prompts
+
+*** Prompt 1
+Explain why this code is wrong and fix it:
+#+begin_src c
+char *p = malloc(4);
+strcpy(p, "blue");
+#+end_src
+
+*** Prompt 2
+Write a safe function to copy a string into a fixed-size buffer.
+
+*** Prompt 3
+Implement a generic callback-based iterator over an integer array.
+
+*** Prompt 4
+Refactor a macro into a ~static inline~ function and explain trade-offs.
+
+*** Prompt 5
+Demonstrate lock-free counter increment with C11 atomics and explain chosen memory order.
+
+-----
+
+#+INCLUDE: "../footer.org"
