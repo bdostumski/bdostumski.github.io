@@ -1,0 +1,737 @@
+#+TITLE: Lisp
+#+DATE: 2026-07-02
+#+TAGS: Programming
+#+DESCRIPTION: A comprehensive C++ guide covering language fundamentals, OOP, templates, modern C++ idioms, memory management, concurrency, performance, tooling, and expert engineering practices.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+#+TITLE: Lisp Q&A — Beginner to Expert
+#+AUTHOR: ChatGPT
+#+OPTIONS: toc:2 num:t
+#+STARTUP: overview
+
+* Lisp Q&A (Beginner - Advanced)
+
+* Beginner (1–50)
+
+** 1) What is Lisp?
+ Lisp is a family of programming languages known for simple syntax, symbolic processing, and code-as-data.
+
+*Example:*
+#+begin_src lisp
+(+ 1 2 3) ; => 6
+#+end_src
+
+** 2) Why is Lisp syntax full of parentheses?
+Parentheses represent lists, which are the core data structure and syntax form in Lisp.
+
+** 3) What does “code is data” mean in Lisp?
+Lisp code is written as lists, and lists are regular data you can manipulate programmatically.
+
+** 4) What is an s-expression?
+An s-expression (symbolic expression) is either an atom (number, symbol, string) or a list.
+
+** 5) What is a symbol?
+A symbol is an identifier, like ~x~, ~my-function~, or ~+~.
+
+** 6) How do I run Lisp code?
+Use a REPL (Read-Eval-Print Loop), such as SBCL REPL, where you type expressions and get immediate results.
+
+** 7) What is the REPL?
+An interactive environment that reads input, evaluates it, prints output, and loops.
+
+** 8) What are atoms?
+Basic non-list values: numbers, strings, symbols, characters, etc.
+
+** 9) What is a list?
+An ordered sequence, written in parentheses.
+ 
+*Example:*
+#+begin_src lisp
+'(1 2 3) ; a literal list
+#+end_src
+
+** 10) Why quote with apostrophe (~'~)?
+Quote prevents evaluation and treats expression as literal data.
+
+*Example:*
+#+begin_src lisp
+'( + 1 2 ) ; list containing symbols and numbers
+#+end_src
+
+** 11) What happens without quote?
+Lisp tries to evaluate it as code.
+
+*Example:*
+#+begin_src lisp
+(+ 1 2) ; => 3
+#+end_src
+
+** 12) What is ~nil~?
+~nil~ means false and also the empty list in Common Lisp.
+
+** 13) What is ~t~?
+~t~ is the canonical true value.
+
+** 14) How do I define a variable?
+Use ~let~ for local bindings or ~defparameter/~defvar for globals.
+
+*Example:*
+#+begin_src lisp
+(let ((x 10)) (+ x 5)) ; => 15
+#+end_src
+
+** 15) Difference between ~defparameter~ and ~defvar~?
+~defparameter~ always assigns; ~defvar~ assigns only if variable is unbound.
+
+** 16) How do I define a function?
+Use ~defun~.
+
+*Example:*
+#+begin_src lisp
+(defun square (x) (* x x))
+(square 4) ; => 16
+#+end_src
+
+** 17) What is function application syntax?
+~(function arg1 arg2 ...)~.
+
+** 18) Are operators like ~+~ functions?
+Yes, in Common Lisp arithmetic operators are functions.
+
+** 19) How do conditionals work?
+Use ~if~, ~cond~, or ~when/~unless.
+
+*Example:*
+#+begin_src lisp
+(if (> 5 3) "yes" "no") ; => "yes"
+#+end_src
+
+** 20) What is ~cond~?
+Multi-branch conditional with test-result clauses.
+
+*Example:*
+#+begin_src lisp
+(cond ((< x 0) :negative)
+      ((= x 0) :zero)
+      (t :positive))
+#+end_src
+
+** 21) What is lexical scope?
+Variables are visible where they are textually defined (and nested inside).
+
+** 22) What is dynamic scope?
+Variable resolution based on call chain (special variables in Common Lisp).
+
+** 23) What are special variables?
+Dynamically scoped variables, usually named with stars: ~*print-base*~.
+
+** 24) What is ~setq~?
+Assigns to an existing variable.
+
+*Example:*
+#+begin_src lisp
+(let ((x 1))
+  (setq x 9)
+  x) ; => 9
+#+end_src
+
+** 25) What is ~setf~?
+Generalized assignment to many “places” (variables, array slots, object fields).
+
+*Example:*
+#+begin_src lisp
+(setf (car my-list) 42)
+#+end_src
+
+** 26) What are ~car~ and ~cdr~?
+~car~ returns first element; ~cdr~ returns rest of list.
+
+*Example:*
+#+begin_src lisp
+(car '(a b c)) ; => A
+(cdr '(a b c)) ; => (B C)
+#+end_src
+
+** 27) What is ~cons~?
+Constructs a new cons cell from head and tail.
+
+*Example:*
+#+begin_src lisp
+(cons 'a '(b c)) ; => (A B C)
+#+end_src
+
+** 28) What is a cons cell?
+A pair of pointers: first part and rest part; lists are chains of cons cells.
+
+** 29) How do I check types?
+Use predicates like ~numberp~, ~symbolp~, ~listp~, ~stringp~.
+
+** 30) What are predicates?
+Functions returning truth values, often ending in ~p~.
+
+** 31) How do I loop?
+Use ~loop~, ~dolist~, ~dotimes~, recursion, or mapping functions.
+
+** 32) What is ~dolist~?
+Iterates over list elements.
+
+*Example:*
+#+begin_src lisp
+(dolist (x '(1 2 3))
+  (format t "~A " x))
+#+end_src
+
+** 33) What is ~dotimes~?
+Repeats a fixed number of times.
+ 
+*Example:*
+#+begin_src lisp
+(dotimes (i 3) (print i))
+#+end_src
+
+** 34) What is recursion?
+Function calling itself with smaller input until a base case.
+
+** 35) Example of recursion?
+*Example:*
+#+begin_src lisp
+(defun fact (n)
+  (if (<= n 1) 1 (* n (fact (- n 1)))))
+#+end_src
+
+** 36) What is tail recursion?
+Recursive call is final operation; can be optimized in some Lisps (not guaranteed in Common Lisp).
+
+** 37) How do I print output?
+Use ~format~.
+
+*Example:*
+#+begin_src lisp
+(format t "Hello, ~A!~%" "Lisp")
+#+end_src
+
+** 38) Difference between ~print~, ~princ~, and ~prin1~?
+~print~ adds newline and escapes; ~prin1~ readable representation; ~princ~ user-friendly display.
+
+** 39) How do I make strings?
+Use double quotes: ~"hello"~.
+
+** 40) How do I concatenate strings?
+Use ~concatenate~.
+ 
+*Example:*
+#+begin_src lisp
+(concatenate 'string "Hello, " "world")
+#+end_src
+
+** 41) How do I compare numbers?
+Use ~=~, ~<~, ~>~, ~<=~, ~>=~.
+
+** 42) How do I compare symbols/objects?
+Use ~eq~, ~eql~, ~equal~, or ~equalp~ depending on semantics.
+
+** 43) Difference: ~eq~, ~eql~, ~equal~, ~equalp~?
+Increasingly deep/permissive equality checks; ~equalp~ is most lenient.
+
+** 44) What is a keyword?
+A self-evaluating symbol in ~KEYWORD~ package, written like ~:name~.
+
+** 45) What is a property list (plist)?
+Flat key-value list: ~(:name "Ana" :age 30)~.
+
+** 46) How do I access plist values?
+Use ~getf~.
+
+*Example:*
+#+begin_src lisp
+(getf '(:name "Ana" :age 30) :age) ; => 30
+#+end_src
+
+** 47) What is an association list (alist)?
+List of key-value pairs, each pair typically a cons cell.
+
+** 48) What is ~lambda~?
+Anonymous function expression.
+
+*Example:*
+#+begin_src lisp
+(funcall (lambda (x) (+ x 10)) 5) ; => 15
+#+end_src
+
+** 49) What does ~funcall~ do?
+Calls a function object with arguments.
+
+** 50) What does ~apply~ do?
+Calls a function with argument list where last arg is a list.
+
+*Example:*
+#+begin_src lisp
+(apply #'+ '(1 2 3 4)) ; => 10
+#+end_src
+
+* Intermediate (51–100)
+
+** 51) What is a package in Common Lisp?
+Namespace for symbols to avoid naming conflicts.
+
+** 52) How do I define a package?
+With ~defpackage~, then ~in-package~.
+
+** 53) What is ~:use~ in packages?
+Imports external symbols from other packages (commonly ~:cl~).
+
+** 54) What is shadowing?
+Creating a local symbol with same name as imported one.
+
+** 55) How do I write modules/files?
+Organize code into packages/files and load with ASDF systems.
+
+** 56) What is ASDF?
+Build/load system for Common Lisp projects.
+
+** 57) What is Quicklisp?
+Package manager/distribution for Common Lisp libraries.
+
+** 58) What are multiple return values?
+A function can return several values, not just one.
+
+*Example:*
+#+begin_src lisp
+(floor 7 3) ; => 2, 1
+#+end_src
+
+** 59) How do I capture multiple values?
+Use ~multiple-value-bind~.
+
+*Example:*
+#+begin_src lisp
+(multiple-value-bind (q r) (floor 7 3)
+  (list q r)) ; => (2 1)
+#+end_src
+
+** 60) What is ~values~?
+Explicitly returns multiple values.
+
+** 61) What is destructuring?
+Binding parts of structured data (lists) to variables.
+
+** 62) Example of destructuring in args?
+*Example:*
+#+begin_src lisp
+(defun sum-pair ((a b)) (+ a b)) ; implementation-dependent style
+#+end_src
+
+(Usually use destructuring-bind explicitly.)
+
+** 63) What is ~destructuring-bind~?
+Binds variables to list structure.
+
+*Example:*
+#+begin_src lisp
+(destructuring-bind (a b &optional c) '(1 2 3)
+  (+ a b c))
+#+end_src
+
+** 64) What are optional arguments?
+~&optional~ parameters may be omitted.
+
+** 65) What are rest arguments?
+~&rest~ gathers remaining args into a list.
+
+** 66) What are keyword arguments?
+~&key~ named args like ~:verbose t~.
+
+** 67) What is ~&aux~?
+Declares local auxiliary variables in parameter list.
+
+** 68) What is ~mapcar~?
+Applies function to each list element, returns list.
+
+*Example:*
+#+begin_src lisp
+(mapcar #'1+ '(1 2 3)) ; => (2 3 4)
+#+end_src
+
+** 69) Difference: ~mapcar~ vs ~dolist~?
+~mapcar~ builds result list; ~dolist~ is usually for side effects.
+
+** 70) What is ~reduce~?
+Combines sequence elements with binary function.
+
+*Example:*
+#+begin_src lisp
+(reduce #'+ '(1 2 3 4)) ; => 10
+#+end_src
+
+** 71) What is ~remove-if~?
+Returns sequence removing elements matching predicate.
+
+** 72) What is ~find-if~?
+Returns first element satisfying predicate.
+
+** 73) What is ~sort~?
+Destructively sorts sequence.
+
+*Example:*
+#+begin_src lisp
+(sort (copy-list '(3 1 2)) #'<) ; => (1 2 3)
+#+end_src
+
+** 74) Why copy before ~sort~?
+~sort~ may mutate original sequence.
+
+** 75) What is hash table?
+Key-value structure with fast average lookup.
+
+** 76) How to create hash table?
+*Example:*
+#+begin_src lisp
+(defparameter *h* (make-hash-table :test 'equal))
+(setf (gethash "name" *h*) "Lisp")
+#+end_src
+
+** 77) What does ~gethash~ return?
+Value and a boolean for presence.
+
+** 78) What are arrays/vectors?
+Indexed sequences; vectors are 1D arrays.
+
+** 79) How to make vector?
+*Example:*
+#+begin_src lisp
+(make-array 3 :initial-contents '(10 20 30))
+#+end_src
+
+** 80) What is adjustable array?
+Array that can change size with ~adjust-array~.
+
+** 81) What are fill pointers?
+Logical length for vectors supporting efficient append-like behavior.
+
+** 82) What is a structure (~defstruct~)?
+Lightweight user-defined record type.
+
+** 83) Example ~defstruct~?
+*Example:*
+#+begin_src lisp
+(defstruct person name age)
+(make-person :name "Ana" :age 30)
+#+end_src
+
+** 84) What is CLOS?
+Common Lisp Object System: classes, generic functions, methods, multimethod dispatch.
+
+** 85) Class vs structure?
+Classes are more dynamic/extensible; structures are lightweight/faster for simple records.
+
+** 86) What is ~defclass~?
+Defines a class.
+
+** 87) What is ~defmethod~?
+Defines method on generic function based on parameter specializers.
+
+** 88) What is multimethod dispatch?
+Method selection based on types of multiple arguments.
+
+** 89) What is method combination?
+Combining ~:before~, primary, ~:after~, ~:around~ methods.
+
+** 90) What is ~slot-value~?
+Accesses object slot dynamically (less encapsulated than accessors).
+
+** 91) What are accessors?
+Functions generated for slot read/write access.
+
+** 92) What are conditions in Lisp?
+Lisp error/signaling system with restarts and handlers.
+
+** 93) Difference exception vs condition system?
+Lisp allows recovery strategies (restarts), not only unwind-and-abort.
+
+** 94) What is ~handler-case~?
+Handles signaled conditions similarly to try/catch.
+
+** 95) What is ~ignore-errors~?
+Catches errors and returns nil + condition.
+
+** 96) What is a restart?
+Named recovery action that can continue execution from error context.
+
+** 97) What is ~unwind-protect~?
+Ensures cleanup code runs even on non-local exits.
+
+** 98) What are declarations?
+Hints to compiler (types, optimization qualities).
+
+** 99) What is ~proclaim~/~declaim~?
+Global declarations affecting compilation/runtime behavior.
+
+** 100) How to optimize performance?
+Add type declarations, reduce consing, profile, and tune algorithms/data structures.
+
+* Advanced (101–150)
+
+** 101) What is a macro?
+A compile-time code transformer from input forms to output forms.
+
+** 102) Why use macros?
+Create new syntactic abstractions and eliminate boilerplate elegantly.
+
+** 103) Macro vs function?
+Functions evaluate arguments first; macros receive raw forms.
+
+** 104) How to define macro?
+*Example:*
+#+begin_src lisp
+(defmacro when-not (test &body body)
+  `(if (not ,test) (progn ,@body)))
+#+end_src
+
+** 105) What is backquote (~`~)?
+Template syntax for building lists with selective evaluation.
+
+** 106) What do comma (~,~) and comma-at (~,@~) do?
+~,~ inserts value; ~,@~ splices list elements.
+
+** 107) What is macro expansion?
+Resulting code after macro transforms input.
+
+*Example:*
+#+begin_src lisp
+(macroexpand-1 '(when-not x (print "hi")))
+#+end_src
+
+** 108) What is macro hygiene?
+Avoiding accidental variable capture/name collisions in macro-generated code.
+
+** 109) How avoid variable capture?
+Use ~gensym~ for unique temporary symbols.
+
+** 110) What is symbol capture?
+Macro-introduced symbol accidentally binds/conflicts with user symbol.
+
+** 111) What are compiler macros?
+Optional source transformations for function calls to optimize compiled code.
+
+** 112) What is reader macro?
+Extends read syntax (at read-time), e.g., quote shorthand.
+
+** 113) Why are reader macros powerful/dangerous?
+Can improve DSL syntax but reduce readability/tool compatibility.
+
+** 114) What is eval?
+Evaluates Lisp form at runtime in dynamic environment contexts.
+
+** 115) Why avoid excessive ~eval~?
+Harder reasoning, security/performance/debugging costs.
+
+** 116) What is closure?
+Function capturing lexical variables from defining environment.
+
+*Example:*
+#+begin_src lisp
+(defun make-counter ()
+  (let ((n 0))
+    (lambda () (incf n))))
+#+end_src
+
+** 117) What is lexical environment?
+Bindings visible where function/macro is defined.
+
+** 118) What is dynamic environment?
+Runtime context for special variables, handlers, restarts.
+
+** 119) What is continuation (conceptually)?
+“Rest of computation” from a point; explicit first-class continuations are not standard CL.
+
+** 120) What is non-local exit?
+Control transfer out of current context (~throw~, ~return-from~, errors).
+
+** 121) What are ~catch~ and ~throw~?
+Tagged non-local control transfer constructs.
+
+** 122) What is block/return-from?
+Named lexical exit points.
+
+** 123) What is ~tagbody/go~?
+Low-level goto-like flow constructs.
+
+** 124) What is MOP?
+Metaobject Protocol for customizing CLOS behavior (implementation-dependent).
+
+** 125) What is method dispatch cost?
+Runtime overhead of selecting applicable method(s); often acceptable, sometimes optimizable.
+
+** 126) What is generic function redefinition impact?
+Can update behavior interactively in running image.
+
+** 127) What is image-based development?
+Long-lived Lisp process where definitions are incrementally reloaded.
+
+** 128) What are fasl files?
+Compiled Lisp binary artifacts loaded faster than source.
+
+** 129) compile-file vs load?
+~compile-file~ produces fasl; ~load~ loads source or fasl.
+
+** 130) What is separate compilation?
+Compiling modules independently with clear package interfaces.
+
+** 131) What is foreign function interface (FFI)?
+Mechanism to call C/native libraries from Lisp.
+
+** 132) Common FFI caveats?
+Memory ownership, ABI compatibility, struct layout, threading boundaries.
+
+** 133) What is bignum support?
+ Arbitrary-precision integers built into Common Lisp numeric tower.
+
+** 134) What is numeric tower?
+ Hierarchy: integers, rationals, reals, complex numbers.
+
+** 135) Why are ratios useful?
+ Exact rational arithmetic avoids floating-point rounding where possible.
+
+** 136) How does coercion work?
+ Use ~coerce~ or numeric contagion rules in operations.
+
+** 137) What are readtables?
+ Reader syntax configuration tables.
+
+** 138) What is pretty printing?
+ Structured formatted output via printer control and pprint facilities.
+
+** 139) What is introspection in Lisp?
+ Querying runtime metadata: function definitions, classes, packages, etc.
+
+** 140) What is reflection?
+ Inspecting/modifying program structure/behavior at runtime.
+
+** 141) What is disassemble?
+ Inspect compiled machine code for functions (implementation-dependent detail).
+
+** 142) What is profiling?
+ Measuring time/allocation hot spots for optimization.
+
+** 143) What is allocation pressure (consing)?
+ Frequent temporary object creation causing GC overhead.
+
+** 144) How reduce consing?
+ Reuse structures, destructive ops carefully, better algorithms, declarations.
+
+** 145) What is garbage collection tuning?
+ Adjust implementation-specific GC parameters for workload.
+
+** 146) What is weak hash table?
+ Entries can disappear when keys/values are no longer strongly referenced.
+
+** 147) What is memoization idiom?
+ Cache function results (often hash table keyed by args).
+
+** 148) What is DSL in Lisp?
+ Domain-specific language built naturally with macros and reader extensions.
+
+** 149) What is staging (compile-time/runtime split)?
+ Deciding what computations happen during macro expansion vs runtime.
+
+** 150) What is “Lisp style”?
+ Data-driven design, small composable functions, macros for abstractions, interactive development.
+
+* Expert (151–180)
+
+** 151) How do I design robust macros for large systems?
+ Keep macro surface minimal, expand into simple primitives, document expansion contracts, and test macroexpansions.
+
+** 152) When should I *not* use a macro?
+ If a function (or higher-order function) is enough; prefer simpler runtime abstractions first.
+
+** 153) How do I version macro APIs safely?
+ Preserve old expansion behavior when possible; provide compatibility layers and deprecation phases.
+
+** 154) What is phase separation risk in macros?
+ Confusing compile-time and runtime dependencies can break builds/load order.
+
+** 155) How to manage compile-time side effects?
+ Avoid unless necessary; isolate with ~eval-when~ and clear module boundaries.
+
+** 156) What is ~eval-when~ for?
+ Controls when forms are evaluated: compile-toplevel, load-toplevel, execute.
+
+** 157) How can declarations backfire?
+ Incorrect type/safety claims may cause undefined behavior or hard-to-debug bugs.
+
+** 158) What optimization policy is common?
+ During development: high debug/safety; production hotspots: higher speed with validated assumptions.
+
+** 159) How do I benchmark Lisp correctly?
+ Warm up, avoid measuring compilation, isolate GC effects, run multiple trials, report variance.
+
+** 160) How to reason about GC pauses?
+ Track allocation rate, object lifetimes, heap sizing, and generation behavior of implementation.
+
+** 161) How do I design stable package APIs?
+ Export minimal symbols, keep internals private, provide clear compatibility guarantees.
+
+** 162) How do I avoid package conflicts in ecosystems?
+ Use explicit imports, qualified symbols, and avoid overly generic exported names.
+
+** 163) What is protocol-oriented design in CLOS?
+ Define generic operations and behavioral contracts rather than rigid class trees.
+
+** 164) CLOS vs algebraic data types (tradeoff)?
+ CLOS excels in open extension; ADTs excel in closed exhaustive pattern handling.
+
+** 165) How to structure large Common Lisp systems?
+ Layered ASDF systems, strict package boundaries, integration tests, and development image scripts.
+
+** 166) How to reload code safely in live systems?
+ Minimize global mutable state, version migrations for object slots, and controlled restart workflows.
+
+** 167) What are class redefinition pitfalls?
+ Existing instances require updates; slot changes may need migration logic.
+
+** 168) How to implement plugin architectures?
+ Use generic functions, registries, packages, and capability-based protocols.
+
+** 169) How to build debuggable DSLs?
+ Preserve source locations where possible, keep expansions readable, provide macroexpand tooling.
+
+** 170) Reader macros in production: yes or no?
+ Use sparingly; prefer plain macros unless syntax gain clearly outweighs tooling/readability costs.
+
+** 171) How to integrate Lisp with polyglot systems?
+ Define clear service boundaries (RPC/HTTP/message bus), stable schemas, and observability hooks.
+
+** 172) How do restarts improve resilience?
+ They enable interactive or programmatic recovery strategies without full failure teardown.
+
+** 173) How to design condition hierarchies?
+ Create specific condition types for actionable handling; avoid overly generic error signaling.
+
+** 174) How to audit for undefined behavior risks?
+ Review declarations, type assumptions, destructive updates, and implementation-specific dependencies.
+
+** 175) Portability across CL implementations?
+ Stick to ANSI CL + portability libs; isolate implementation-specific code paths.
+
+** 176) What is the role of test strategy in macro-heavy codebases?
+ Test at three levels: expansion shape, runtime behavior, and integration semantics.
+
+** 177) How to document metaprogramming-heavy systems?
+ Document both user-facing forms and generated runtime contracts/invariants.
+
+** 178) What is a good performance workflow for expert Lisp?
+ Profile first, optimize hottest 5%, verify with benchmarks, re-check correctness invariants.
+
+** 179) What distinguishes expert Lisp developers?
+ Strong macro discipline, runtime insight, architectural clarity, and pragmatic simplicity.
+
+** 180) Final mastery advice?
+ Build real systems, read great Lisp code, inspect expansions, and iterate interactively with rigor.
+
+-----
+
+#+INCLUDE: "../footer.org"
