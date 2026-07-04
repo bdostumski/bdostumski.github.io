@@ -1,0 +1,630 @@
+#+TITLE: Emacs
+#+DATE: 2026-07-04
+#+TAGS: Emacs
+#+DESCRIPTION: A comprehensive Doom Emacs guide from beginner to advanced.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Emacs Q&A (Beginner to Advanced)
+
+A comprehansive question-and-answer for Emacs.
+
+[[https://www.gnu.org/software/emacs/documentation.html][Emacs Documenation]]
+
+-----
+
+* Beginner Level (1–50)
+
+** Q1: What is Emacs in one sentence?
+Emacs is an extensible, customizable text editor platform that can be turned into a full computing environment.
+
+** Q2: Why do people call Emacs a “lisp machine”?
+Because much of Emacs behavior is written in Emacs Lisp, and users can evaluate Lisp code live to change editor behavior.
+
+** Q3: What are the two main language layers in Emacs architecture?
+C (core runtime, primitives, redisplay internals) and Emacs Lisp (high-level features, user customization, packages).
+
+** Q4: What is Emacs Lisp used for in practice?
+Defining commands, modes, keymaps, UI behavior, integrations, and user configuration.
+
+** Q5: What is a “buffer”?
+A mutable in-memory text object; most editing happens inside buffers.
+
+** Q6: Is every buffer tied to a file?
+No. Some buffers visit files, others are temporary or special (e.g., *Messages*, *scratch*).
+
+** Q7: What is a “window” in Emacs terms?
+A viewport onto a buffer inside a frame, not an OS top-level window.
+
+** Q8: What is a “frame” in Emacs?
+A top-level Emacs GUI window (or terminal screen context) containing one or more Emacs windows.
+
+** Q9: Can multiple windows show the same buffer?
+Yes, and each window can have its own point position and view state.
+
+** Q10: What is “point”?
+The current cursor location in a buffer.
+
+** Q11: What is “mark”?
+A saved position used with point to define an active region.
+
+** Q12: What is the “region”?
+The text between point and mark.
+
+** Q13: What are “major modes”?
+Mutually exclusive primary editing modes for buffer type/semantics (e.g., emacs-lisp-mode, python-mode).
+
+** Q14: What are “minor modes”?
+Optional toggles that add behaviors and can be enabled together (e.g., flyspell-mode, company-mode).
+
+** Q15: What is a command in Emacs?
+An interactive function callable via M-x, keybindings, or menus.
+
+** Q16: What makes a Lisp function interactive?
+An `(interactive ...)` form.
+
+** Q17: What is a keymap?
+A data structure mapping key sequences to commands.
+
+** Q18: What is the role of global-map?
+It stores default keybindings available unless overridden by more specific maps.
+
+** Q19: Why do local keymaps matter?
+Major/minor modes use local maps to provide context-specific bindings.
+
+** Q20: What does M-x do architecturally?
+It reads a command name, resolves symbol/function, then invokes it interactively.
+
+** Q21: What is the minibuffer?
+A special area/buffer used for prompting and user input.
+
+** Q22: What is completion in Emacs?
+A subsystem that proposes and narrows candidates for minibuffer inputs or in-buffer actions.
+
+** Q23: What is `*scratch*` for?
+A default buffer for trying Emacs Lisp or temporary text.
+
+** Q24: What is `*Messages*`?
+A log buffer where Emacs prints status and message output.
+
+** Q25: What is kill ring?
+A history of yanked/cut text entries, not just one clipboard slot.
+
+** Q26: Difference between kill and delete?
+Kill saves removed text in kill ring; delete removes without saving there.
+
+** Q27: What is undo architecture conceptually?
+Buffer-local change history represented as undo records.
+
+** Q28: What is a hook?
+A variable containing functions run at specific lifecycle events.
+
+** Q29: Example of a common hook?
+`after-init-hook`, `find-file-hook`, `prog-mode-hook`.
+
+** Q30: What is load-path?
+A list of directories Emacs searches to find Lisp libraries.
+
+** Q31: What does `require` do?
+Loads a feature if not already loaded, ensuring dependency availability.
+
+** Q32: What does `provide` do?
+Declares that a library implements a named feature.
+
+** Q33: What is autoload?
+A lazy-loading mechanism that defers loading full code until function is first called.
+
+** Q34: Why is autoload important?
+Faster startup and lower memory use at launch.
+
+** Q35: What is init file?
+User startup configuration file (e.g., init.el) loaded during initialization.
+
+** Q36: What is customization system (`customize`)?
+A declarative UI/API for setting user options with metadata and persistence.
+
+** Q37: What is a variable with `defcustom`?
+A user-facing customizable variable integrated with Customize UI.
+
+** Q38: What is a variable with `defvar`?
+A general variable declaration, typically not full customize metadata.
+
+** Q39: What does “buffer-local variable” mean?
+Its value can differ per buffer instead of being global.
+
+** Q40: What is narrowing?
+Restricting visible/editable portion of a buffer to a region.
+
+** Q41: What is widening?
+Removing narrowing restrictions to access full buffer.
+
+** Q42: What is point motion abstraction?
+Commands move by chars/words/sexps/lines using syntax and parsing rules.
+
+** Q43: What is syntax table?
+Mode-specific character-class metadata used for parsing words, comments, strings, etc.
+
+** Q44: What is font-lock?
+Emacs’s syntax highlighting framework.
+
+** Q45: What is indentation engine?
+Mode logic that computes correct indentation for current line/context.
+
+** Q46: What is a process in Emacs?
+An external subprocess object Emacs can communicate with asynchronously or synchronously.
+
+** Q47: Why are asynchronous processes important?
+They keep UI responsive while tools run (linters, language servers, shells).
+
+** Q48: What is TRAMP conceptually?
+A transparent remote file editing layer integrated with normal file APIs.
+
+** Q49: Why can Emacs edit remote files “as if local”?
+File operations are abstracted; handlers route paths like `/ssh:user@host:/path`.
+
+** Q50: What is the big architectural theme of Emacs?
+A small C core exposing primitives to a highly programmable Lisp runtime.
+
+* Intermediate Level (51–110)
+
+** Q51: What are primitives in Emacs?
+Low-level built-ins (mostly C-implemented) callable from Lisp for performance/core operations.
+
+** Q52: Why not implement everything in Lisp?
+Core performance-critical operations and runtime internals are more efficient/safe in C.
+
+** Q53: What is `command-loop`?
+The main event loop: read input → resolve command → execute → redisplay.
+
+** Q54: What is redisplay?
+Engine that computes and paints what windows should show after state changes.
+
+** Q55: Why is redisplay separate from command execution?
+Decoupling allows batching edits and efficient screen updates.
+
+** Q56: What is gap buffer?
+Core text representation with a “gap” near point to make local insertions/deletions efficient.
+
+** Q57: Why is gap movement costly?
+Moving point far may require moving the gap and memory blocks.
+
+** Q58: How does Emacs keep editing fast anyway?
+Most edits are local; gap stays near recent edit area, amortizing costs.
+
+** Q59: What is marker?
+A position object that tracks text changes as buffer is edited.
+
+** Q60: Difference between integer position and marker?
+Integer is static snapshot; marker adjusts as insertions/deletions occur around it.
+
+** Q61: What is overlay?
+Text range object carrying display/behavior properties separate from buffer text.
+
+** Q62: What is text property?
+Metadata attached directly to characters in buffer text.
+
+** Q63: Overlay vs text property?
+Overlays are separate movable objects with priority; text properties are embedded in text.
+
+** Q64: What is syntax-propertize?
+Mechanism to assign syntax properties dynamically for accurate parsing/highlighting.
+
+** Q65: What are jit-lock and lazy fontification?
+On-demand highlighting of visible/nearby regions to improve responsiveness.
+
+** Q66: What is `post-command-hook`?
+Functions run after each interactive command—powerful but potentially expensive.
+
+** Q67: Why should heavy work avoid `post-command-hook`?
+It runs very frequently and can introduce UI lag.
+
+** Q68: What is idle timer?
+Timer firing when Emacs is idle, useful for deferred expensive tasks.
+
+** Q69: What is `save-excursion`?
+Macro that preserves point/mark/current buffer while executing body.
+
+** Q70: What is dynamic scoping history in Emacs Lisp?
+Traditionally dynamic scope; modern code often enables lexical binding for safer closures.
+
+** Q71: What does `lexical-binding: t` do?
+Enables lexical scope in file, improving predictability and closure behavior.
+
+** Q72: Why lexical binding matters architecturally?
+It supports robust abstraction patterns and fewer accidental variable captures.
+
+** Q73: What is byte-compilation?
+Translating Lisp source into bytecode for faster loading/execution.
+
+** Q74: What runs bytecode?
+Emacs bytecode interpreter (virtual machine in C).
+
+** Q75: What is native-compilation (when available)?
+Compiling Lisp to native machine code (via libgccjit), improving runtime performance.
+
+** Q76: Does native-comp replace bytecode entirely?
+It augments pipeline; bytecode remains fundamental compatibility path.
+
+** Q77: What is package.el?
+Built-in package manager for installing/upgrading Lisp packages from archives.
+
+** Q78: What is a package archive?
+Repository index/source for installable packages (e.g., GNU ELPA, MELPA).
+
+** Q79: Why does package autoload generation matter?
+It enables lazy loading and discoverable commands without loading full package.
+
+** Q80: What is feature namespace collision risk?
+Two libraries providing same feature/symbol names can conflict.
+
+** Q81: How does Emacs mitigate naming collisions?
+Community convention: package-specific symbol prefixes (e.g., `magit-...`).
+
+** Q82: What is advice system?
+Mechanism to wrap/alter behavior of existing functions (`advice-add`).
+
+** Q83: Why is advice powerful and risky?
+Enables non-invasive extension, but can create hidden control flow and debugging complexity.
+
+** Q84: What is `condition-case`?
+Error handling construct to catch and process Lisp errors.
+
+** Q85: What is `unwind-protect`?
+Ensures cleanup forms run even if error/nonlocal exit occurs.
+
+** Q86: What is nonlocal exit in Emacs Lisp?
+Control transfer via throw/error/quit out of current call stack context.
+
+** Q87: What is `quit` (C-g) behavior architecturally?
+User interrupt signal checked at safe points; aborts ongoing operations.
+
+** Q88: What are file-name handlers?
+Pluggable handlers intercepting file operations for special path schemes (TRAMP, archives).
+
+** Q89: Why file-name handlers are central?
+They virtualize filesystem access without rewriting all file APIs.
+
+** Q90: What is buffer visiting?
+Relationship where buffer is associated with file path, modtime checks, save logic.
+
+** Q91: What is auto-save?
+Periodic crash-recovery writes to separate auto-save files.
+
+** Q92: What is lock file purpose?
+Warn/prevent conflicting edits by multiple Emacs sessions.
+
+** Q93: What is `before-save-hook`?
+Hook run prior to saving, often used for formatting/cleanup.
+
+** Q94: What is `after-save-hook`?
+Hook run after save, often used for tooling/integration tasks.
+
+** Q95: What is directory-local variables mechanism?
+Per-project configuration from `.dir-locals.el` applied by mode/path context.
+
+** Q96: Why are safe local variables checks needed?
+Prevent unsafe code execution from untrusted files/projects.
+
+** Q97: What is `normal-mode`?
+Function that re-evaluates mode and local variables for current buffer.
+
+** Q98: What is completion-at-point-functions (CAPF)?
+Hook-style API where providers supply completion candidates at cursor.
+
+** Q99: What is minibuffer completion metadata?
+Category/annotation/boundary info guiding UIs and matching behavior.
+
+** Q100: What is project abstraction in modern Emacs?
+APIs that detect project roots and provide operations (files, grep, compile) contextually.
+
+** Q101: What is xref framework?
+Generic cross-reference API (definitions/references) used by language backends.
+
+** Q102: What is compile.el role?
+Runs build commands, parses output with regex patterns, supports jump-to-error.
+
+** Q103: What is comint?
+Common interactive subprocess framework (shell/repl buffers).
+
+** Q104: What is term vs vterm conceptually?
+Different terminal emulation approaches; term is built-in Lisp/C mix, vterm uses external module/libvterm.
+
+** Q105: What is start-process vs call-process?
+`start-process` async; `call-process` synchronous blocking call.
+
+** Q106: What is sentinel in process API?
+Callback run when process state changes (exit/signal/etc.).
+
+** Q107: What is process filter?
+Callback that receives process output chunks asynchronously.
+
+** Q108: Why chunked output handling matters?
+Output may split arbitrarily; parsers must handle partial lines/tokens.
+
+** Q109: What is coding system in Emacs?
+Encoding/decoding layer for text I/O (UTF-8, etc.) and process communication.
+
+** Q110: Why encoding architecture is critical?
+Prevents mojibake/data loss across files, terminals, subprocesses, and network boundaries.
+
+* Advanced Level (111–160)
+
+** Q111: How does mode activation usually happen for files?
+Via `auto-mode-alist`, shebang/interpreter detection, and file-local hints.
+
+** Q112: What is delayed mode hook execution risk?
+Ordering issues where assumptions about initialized variables break.
+
+** Q113: How do minor mode precedence conflicts occur?
+Multiple maps/features competing on same keys or text transformations.
+
+** Q114: How is keybinding precedence resolved broadly?
+Overriding maps/emulation maps/minor mode maps/local map/global map (with nuanced layers).
+
+** Q115: What are transient maps?
+Temporary keymaps active for next command(s), used for prefix-like ephemeral states.
+
+** Q116: What are remap bindings?
+Keymap entries that remap one command symbol to another.
+
+** Q117: Why command remapping is architecturally elegant?
+Behavior can be altered semantically without rebinding all keys.
+
+** Q118: What is Edebug at architecture level?
+Instrumentation/debugger for Lisp forms, enabling stepwise evaluation introspection.
+
+** Q119: What is profiler in Emacs?
+CPU/memory sampling/profiling tools for identifying slow functions and hotspots.
+
+** Q120: Typical startup bottleneck categories?
+Excess eager loading, heavy hooks, synchronous shell calls, broad file scans.
+
+** Q121: What is early-init.el purpose?
+Configuration loaded very early, before package initialization/UI setup.
+
+** Q122: Why split early-init and init?
+Better control over startup phases and package/UI bootstrapping.
+
+** Q123: What is garbage collection (GC) role in Emacs?
+Reclaims unused Lisp objects; pause behavior affects responsiveness.
+
+** Q124: Why tuning `gc-cons-threshold` can help startup?
+Fewer collections during init can reduce startup time spikes.
+
+** Q125: Why aggressive GC threshold can hurt later?
+Larger heaps can cause rarer but longer pause times.
+
+** Q126: What is pure storage (historical context)?
+Preloaded dumped Lisp objects placed in read-only/shared memory zones.
+
+** Q127: What is pdumper/unexec conceptually?
+Mechanisms to dump a preinitialized Emacs image for faster startup.
+
+** Q128: Why dumping architecture matters?
+Shifts initialization cost from runtime startup to build/dump phase.
+
+** Q129: What is module API in Emacs?
+C dynamic modules extending Emacs with native functions loaded at runtime.
+
+** Q130: Main trade-off of dynamic modules?
+Performance/power vs portability, safety, and distribution complexity.
+
+** Q131: What is thread support status in Emacs Lisp?
+Cooperative Lisp threads exist, but many operations remain effectively serialized around core runtime constraints.
+
+** Q132: Why no full parallel speedup for many Lisp tasks?
+Shared runtime/global state and non-thread-safe assumptions limit parallel execution.
+
+** Q133: What is asynchronous design pattern in Emacs packages?
+Use subprocesses/timers/callbacks/promises-like chains instead of blocking waits.
+
+** Q134: What is jsonrpc.el used for?
+Structured async RPC communication (notably by LSP clients/servers).
+
+** Q135: How does lsp-mode/eglot fit architecture?
+Lisp clients orchestrate external language servers; Emacs handles UI/editor state.
+
+** Q136: What is overlay explosion problem?
+Too many overlays degrade performance due to redisplay/management overhead.
+
+** Q137: Preferred alternative to many overlays for static style?
+Use text properties or batched font-lock where possible.
+
+** Q138: Why large line buffers are hard on Emacs?
+Redisplay and motion/parse routines can become expensive with very long lines.
+
+** Q139: What is bidi reordering cost?
+Mixed-direction text requires additional layout computation impacting redisplay speed.
+
+** Q140: What is narrowing’s hidden pitfall for tools?
+Tools not widening may miss context, causing incorrect parsing/refactoring.
+
+** Q141: What is indirect buffer?
+Buffer sharing same text storage as base buffer but with independent narrowing/mode/view aspects.
+
+** Q142: Why indirect buffers are useful?
+Multiple focused views/workflows over one underlying text.
+
+** Q143: What is syntax-ppss cache?
+Incremental parse-state cache used for efficient syntax queries (string/comment depth).
+
+** Q144: Why invalidating parse caches carefully matters?
+Incorrect invalidation leads to wrong highlighting/indentation and subtle bugs.
+
+** Q145: What is tree-sitter integration purpose?
+Structured incremental parsing for robust syntax-aware features.
+
+** Q146: Tree-sitter vs regex font-lock high level?
+Parse-tree precision and structural awareness vs simpler pattern matching.
+
+** Q147: Why even tree-sitter needs architecture care?
+Parser updates, query costs, and integration with existing hooks/redisplay can still be expensive.
+
+** Q148: What is `with-silent-modifications`?
+Macro for changing buffer text/properties while suppressing some modification side effects.
+
+** Q149: When is `inhibit-modification-hooks` used?
+Bulk or internal updates where hooks would be noisy/expensive/inappropriate.
+
+** Q150: Why must suppression flags be used cautiously?
+They can bypass invariants expected by other components.
+
+** Q151: What is transaction-like editing pattern in Lisp?
+Save state, apply grouped changes, ensure rollback/cleanup on failure.
+
+** Q152: What is atomic change group?
+Mechanism to group edits so they can be undone as one logical operation.
+
+** Q153: Why atomic edits improve UX?
+Undo history aligns with user-intent units instead of low-level operations.
+
+** Q154: What is `save-restriction`?
+Preserves narrowing state around temporary widen/narrow operations.
+
+** Q155: What is `save-current-buffer` and `with-current-buffer`?
+Constructs to execute code in specified buffer while restoring previous context.
+
+** Q156: Why buffer context bugs are common?
+Async callbacks/hooks may run when current buffer differs from assumptions.
+
+** Q157: What is secure coding concern in Emacs config?
+Executing untrusted Lisp via local variables, eval forms, packages, or shell commands.
+
+** Q158: Why package pinning/signatures matter?
+Supply-chain integrity and reproducible dependency behavior.
+
+** Q159: What is reproducible Emacs environment approach?
+Version-lock packages, pin archives, capture init + lockfiles/Nix/containers.
+
+** Q160: Advanced architectural skill to develop first?
+Profiling-driven optimization before rewriting logic.
+
+* Expert Level (161–190)
+
+** Q161: How does `read-key-sequence` relate to command loop internals?
+It decodes raw events through input methods/maps into key sequences used for command lookup.
+
+** Q162: What are input event layers before command dispatch?
+Terminal/GUI events → input decoding → key translation maps → active keymaps → command.
+
+** Q163: Why does key translation exist?
+To normalize platform/input-method differences before semantic binding lookup.
+
+** Q164: What is role of `this-command` and `last-command`?
+They enable command chaining behaviors (repeat logic, context-sensitive operations).
+
+** Q165: Why is command identity stateful?
+UX features like repeated kills/yanks depend on prior command semantics.
+
+** Q166: How does kill coalescing work conceptually?
+Consecutive kill commands append/prepend in same kill-ring entry based on command history.
+
+** Q167: What is minibuffer recursion?
+Entering minibuffer prompts while already in minibuffer (enabled in specific flows).
+
+** Q168: Why minibuffer recursion can be tricky?
+State/UI assumptions break if code assumes single active minibuffer depth.
+
+** Q169: What is window-point?
+Per-window remembered point for a shown buffer, allowing different cursor positions per window.
+
+** Q170: Why window-start matters?
+Controls top visible buffer position; redisplay keeps it coherent during edits/scrolling.
+
+** Q171: What is selective display / invisibility architecture?
+Text can be present yet hidden via properties/overlays, affecting motion/search optionally.
+
+** Q172: Why hidden text complicates tooling?
+Commands must decide whether to operate on logical text, visible text, or both.
+
+** Q173: How are `save-match-data` and regex state related?
+Match data is global-ish dynamic state; must be preserved to avoid corrupting callers.
+
+** Q174: Why reentrancy issues appear in Emacs Lisp?
+Hooks/process filters/timers can run between assumptions, mutating shared state.
+
+** Q175: What is `accept-process-output` subtlety?
+It can dispatch process filters and indirectly run code, introducing unexpected side effects.
+
+** Q176: Why avoid blocking waits in UI thread?
+Emacs is primarily single-threaded for UI; blocking freezes interaction and redisplay.
+
+** Q177: What is canonical async safety pattern?
+Capture minimal immutable context + validate buffer liveness + guard with condition-case.
+
+** Q178: How to guard stale async callbacks?
+Check `(buffer-live-p buf)` and relevant version/tick markers before applying results.
+
+** Q179: What is buffer modification tick?
+Monotonic counter incremented on changes, useful for cache invalidation/staleness checks.
+
+** Q180: What is redisplay optimization strategy for package authors?
+Minimize churn (fewer overlays, batched updates, avoid full-buffer scans in hot paths).
+
+** Q181: What are “hot paths” in Emacs UX?
+Per-command/per-keystroke/per-redisplay code paths where tiny inefficiencies multiply.
+
+** Q182: Why should regexps be precomputed in hot paths?
+Rebuilding complex regex repeatedly increases CPU and GC pressure.
+
+** Q183: What is significance of `syntax-parse` boundaries in large modes?
+Defining incremental parse regions prevents full-buffer reparsing on small edits.
+
+** Q184: How do expert packages structure state?
+Explicit structs/plists/hash tables with clear ownership and invalidation rules.
+
+** Q185: What is common anti-pattern in expert-level package code?
+Implicit global mutable state spread across hooks and advice without lifecycle control.
+
+** Q186: What is deterministic initialization principle?
+Startup/setup should yield same state regardless of load order as much as possible.
+
+** Q187: How to reduce load-order fragility?
+Use autoloads, `with-eval-after-load`, feature checks, and narrow integration points.
+
+** Q188: What is strategy for backward compatibility across Emacs versions?
+Capability detection (`fboundp`, `boundp`, version checks) and small compatibility shims.
+
+** Q189: What defines “architecturally clean” Emacs extension?
+Clear boundaries, minimal side effects, async-safe design, profile-backed performance choices.
+
+** Q190: Expert interview one-liner on Emacs architecture?
+“Emacs is an event-driven editor VM where a C core exposes primitives to a live Lisp system that users can reprogram at runtime.”
+
+* Lightning Review (191–200)
+
+** Q191: Core runtime language?
+C.
+
+** Q192: Extension language?
+Emacs Lisp.
+
+** Q193: Text container?
+Buffer.
+
+** Q194: Viewport?
+Window.
+
+** Q195: Top-level UI container?
+Frame.
+
+** Q196: Lazy loading primitive?
+Autoload.
+
+** Q197: Dependency declaration pair?
+`provide` / `require`.
+
+** Q198: Async subprocess API entry?
+`start-process`.
+
+** Q199: Main loop idea?
+Input → command → redisplay.
+
+** Q200: Best performance habit?
+Profile first, optimize second.
+
+-----
+
+#+INCLUDE: "../footer.org"
