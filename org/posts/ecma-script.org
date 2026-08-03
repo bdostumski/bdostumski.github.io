@@ -1,0 +1,591 @@
+#+TITLE: ECMAScript JavaScript
+#+DATE: 2026-08-03
+#+TAGS: JavaScript
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Beginner (1-60)
+
+** Q001: What is ECMAScript?
+ECMAScript is the official language standard that defines how JavaScript should work.
+JavaScript engines (Chrome V8, Firefox SpiderMonkey, etc.) implement this standard.
+
+** Q002: Is ECMAScript the same as JavaScript?
+Not exactly.
+- ECMAScript = specification (rules/standard)
+- JavaScript = practical implementation of that specification in engines/environments
+
+** Q003: Why should beginners learn ECMAScript concepts?
+Because modern JavaScript syntax and behavior come from ECMAScript versions (ES5, ES6/ES2015, and later).
+
+** Q004: What does ES6 mean?
+ES6 usually refers to ECMAScript 2015, a major update introducing let/const, classes, modules, arrow functions, etc.
+
+** Q005: What is a JavaScript engine?
+A JavaScript engine parses and executes ECMAScript code.
+Examples: V8 (Chrome/Node.js), SpiderMonkey (Firefox), JavaScriptCore (Safari).
+
+** Q006: What is backward compatibility in ECMAScript?
+New language versions try not to break old code.
+That is why some historical quirks still exist.
+
+** Q007: What is strict mode?
+Strict mode (~"use strict"~) enables safer parsing and stricter error handling.
+
+** Q008: Why is strict mode useful?
+It helps catch silent mistakes (like accidental globals) and prevents unsafe patterns.
+
+** Q009: What are lexical declarations?
+~let~ and ~const~ are lexical declarations; their scope is block-based.
+
+** Q010: Difference between let and const?
+- let: can be reassigned
+- const: cannot be reassigned
+Use const by default unless value must change.
+
+** Q011: Is const value always immutable?
+No.
+~const~ prevents reassignment of the binding, but object contents can still be mutated unless frozen.
+
+** Q012: What is block scope?
+Variables declared with let/const are visible only inside the nearest ~{ ... }~ block.
+
+** Q013: What is hoisting in ECMAScript terms?
+Declarations are processed before runtime execution.
+But let/const exist in Temporal Dead Zone before initialization.
+
+** Q014: What is Temporal Dead Zone (TDZ)?
+Time between entering scope and declaration line where let/const cannot be accessed.
+
+** Q015: What is a primitive value?
+A non-object value such as string, number, bigint, boolean, undefined, null, symbol.
+
+** Q016: What is a reference type?
+Objects, arrays, functions, maps, sets, dates, etc. are reference types.
+
+** Q017: What is type coercion?
+Automatic conversion between types during operations/comparisons.
+
+** Q018: Why prefer ~===~ over ~==~?
+~===~ avoids implicit coercion and gives predictable comparisons.
+
+** Q019: What is template literal syntax?
+Backtick strings supporting interpolation and multiline text:
+~Hello ${name}~
+
+** Q020: What problem do template literals solve?
+Cleaner string building, readable multiline strings, easier interpolation than concatenation.
+
+** Q021: What are default function parameters?
+Function parameters can have fallback values when arguments are missing or undefined.
+
+** Q022: What is rest parameter?
+~...args~ gathers remaining arguments into a real array.
+
+** Q023: What is spread syntax?
+~...~ expands arrays/iterables/objects into places where multiple values are expected.
+
+** Q024: Rest vs spread?
+Same token, different roles:
+- rest collects values
+- spread expands values
+
+** Q025: What is destructuring?
+Syntax for extracting values from arrays/objects into variables.
+
+** Q026: Why is destructuring useful?
+Less boilerplate, clearer intent, easier parameter handling.
+
+** Q027: What is shorthand property syntax?
+When variable name equals property name:
+~const x = 1; const obj = { x };~
+
+** Q028: What are computed property names?
+Object keys built from expressions:
+~{ [dynamicKey]: value }~
+
+** Q029: What is optional chaining (~?.~)?
+Safe property/method access without crashing when value is null/undefined.
+
+** Q030: What is nullish coalescing (~??~)?
+Returns fallback only for null/undefined (not for 0, false, empty string).
+
+** Q031: What is logical OR (~||~) fallback pitfall?
+~||~ treats many valid values (0, "", false) as missing.
+~??~ is often safer for defaults.
+
+** Q032: What is a function declaration?
+Named function defined with ~function~, hoisted with body.
+
+** Q033: What is a function expression?
+Function assigned to variable; follows variable initialization timing.
+
+** Q034: What is an arrow function?
+Compact function syntax; lexical ~this~; no own ~arguments~.
+
+** Q035: When not to use arrow functions?
+For object methods needing dynamic ~this~, or constructors (cannot use ~new~ with arrows).
+
+** Q036: What is lexical scoping?
+Scope determined by where code is written, not where function is called.
+
+** Q037: What is closure?
+Function retaining access to outer lexical variables after outer function returns.
+
+** Q038: Why are closures important?
+Enable private state, currying, memoization, module-like encapsulation.
+
+** Q039: What is an IIFE?
+Immediately Invoked Function Expression:
+~(function(){ ... })();~
+Historically used for private scope before modules.
+
+** Q040: What is ~this~ binding rule (simple)?
+~this~ depends on call-site:
+method call, plain call, constructor call, explicit bind/call/apply.
+
+** Q041: What does ~bind~ do?
+Returns new function with fixed ~this~ (and optionally prefilled arguments).
+
+** Q042: What is an array iterator method?
+Methods like map/filter/reduce/forEach that process elements declaratively.
+
+** Q043: map vs forEach?
+- map returns new transformed array
+- forEach is for side effects and returns undefined
+
+** Q044: What does filter do?
+Returns new array of elements passing a test.
+
+** Q045: What does reduce do?
+Combines array values into one result using accumulator logic.
+
+** Q046: What is find?
+Returns first matching element or undefined.
+
+** Q047: What is some/every?
+- some: at least one element passes
+- every: all elements pass
+
+** Q048: What is includes?
+Checks whether array/string contains a value.
+
+** Q049: What is a Symbol?
+A unique primitive often used for non-colliding object keys.
+
+** Q050: Why use Symbol keys?
+Avoid accidental property name collisions, especially in shared libraries.
+
+** Q051: What is BigInt?
+Numeric type for integers beyond Number safe range.
+
+** Q052: Why not mix BigInt and Number directly?
+They are different numeric domains; explicit conversion is required.
+
+** Q053: What is Date object?
+Built-in object for date/time values and formatting/parsing operations.
+
+** Q054: What is JSON in ECMAScript context?
+Standard text format for data exchange.
+Use JSON.parse and JSON.stringify.
+
+** Q055: What is try/catch?
+Language mechanism for handling exceptions.
+
+** Q056: What does finally do?
+Runs whether error happened or not (cleanup logic).
+
+** Q057: What is throw?
+Creates/propagates an exception manually.
+
+** Q058: Why throw Error objects?
+They include message + stack trace and integrate with tooling better.
+
+** Q059: What is ~typeof~ used for?
+Runtime type inspection (with known caveats like ~typeof null === "object"~).
+
+** Q060: What is ~instanceof~?
+Checks prototype-chain relationship with constructor function/class.
+
+* Intermediate (61-130)
+
+** Q061: What is prototype in ECMAScript?
+Internal inheritance link allowing objects to inherit properties/methods.
+
+** Q062: What is prototype chain lookup?
+If property not found on object, engine checks prototype, then prototype’s prototype, etc.
+
+** Q063: What is Object.create?
+Creates a new object with specified prototype.
+
+** Q064: What is class syntax actually?
+Syntactic sugar over prototype-based inheritance with cleaner declarations.
+
+** Q065: What is constructor method in class?
+Special method executed when creating instance with ~new~.
+
+** Q066: What are class instance methods?
+Methods available on instances via class prototype.
+
+** Q067: What are static methods?
+Methods attached to class itself, not instance objects.
+
+** Q068: What are private class fields (~#x~)?
+Fields accessible only inside class body, enforced by language syntax.
+
+** Q069: What are getters and setters in classes?
+Controlled property read/write methods appearing like normal property access.
+
+** Q070: What is inheritance with ~extends~?
+Child class reuses and specializes parent class behavior.
+
+** Q071: What does ~super~ do?
+Refers to parent class constructor/methods in subclass context.
+
+** Q072: What is method overriding?
+Subclass provides its own implementation for inherited method.
+
+** Q073: What is polymorphism in JS classes?
+Different classes respond differently to same method call interface.
+
+** Q074: What is Object.freeze?
+Prevents adding/removing/changing own properties (shallow freeze).
+
+** Q075: freeze vs seal?
+- freeze: no add/remove/change
+- seal: no add/remove, but writable props may still change
+
+** Q076: What is Object.assign?
+Copies enumerable own properties from sources to target (shallow copy).
+
+** Q077: Why are spread/Object.assign shallow?
+Nested objects are still shared references.
+
+** Q078: What is deep cloning concern?
+Need explicit strategy for nested structures (e.g., structuredClone in supported environments).
+
+** Q079: What is iterable protocol?
+Object is iterable if it provides Symbol.iterator returning iterator object.
+
+** Q080: What is iterator protocol?
+Iterator object has ~next()~ returning ~{ value, done }~.
+
+** Q081: What are generators (~function*~)?
+Functions that pause/resume execution and yield values over time.
+
+** Q082: Why use generators?
+Custom iteration, lazy sequences, controlled execution flow.
+
+** Q083: What does ~yield~ do?
+Pauses generator and emits value to caller.
+
+** Q084: What is ~yield*~?
+Delegates yielding control to another iterable/generator.
+
+** Q085: What is for...of based on?
+It consumes iterable protocol (Symbol.iterator).
+
+** Q086: What is Map?
+Key-value collection preserving insertion order; keys can be any value.
+
+** Q087: Object vs Map (practical)?
+Map is better for frequent dynamic key ops and non-string keys.
+
+** Q088: What is Set?
+Collection of unique values with insertion order.
+
+** Q089: When is Set useful?
+Deduplication, membership testing, set operations patterns.
+
+** Q090: WeakMap/WeakSet concept?
+Hold weak references to objects; allow GC when no strong refs remain.
+
+** Q091: Why WeakMap keys must be objects?
+Because weak references are meaningful only for object lifecycles.
+
+** Q092: What is Promise in ECMAScript?
+Standard abstraction for future async completion/failure.
+
+** Q093: Promise constructor caution?
+Avoid wrapping promises unnecessarily ("promise constructor anti-pattern").
+
+** Q094: What is promise chaining?
+Sequential async transformations via ~.then()~ return values/promises.
+
+** Q095: How do errors propagate in chains?
+Thrown errors or rejected promises skip to nearest ~.catch()~.
+
+** Q096: What is Promise.all?
+Resolves when all promises resolve; rejects fast on first rejection.
+
+** Q097: What is Promise.allSettled?
+Waits for all to settle, returns status for each (fulfilled/rejected).
+
+** Q098: What is Promise.race?
+Settles as soon as first promise settles.
+
+** Q099: What is Promise.any?
+Resolves on first fulfilled promise; rejects only if all reject.
+
+** Q100: What is async function return value?
+Always returns a promise.
+
+** Q101: What does await accept?
+Any value; non-promise values are wrapped as resolved promise.
+
+** Q102: Top-level await means what?
+Using await directly in ES modules outside async functions.
+
+** Q103: What is microtask queue?
+Queue for promise reactions and queueMicrotask callbacks.
+
+** Q104: Why microtasks matter?
+They run before next macrotask/render turn; impacts timing behavior.
+
+** Q105: What is event loop at ECMAScript-host boundary?
+ECMAScript defines jobs/microtasks; host (browser/node) defines task scheduling details.
+
+** Q106: What is module system in ECMAScript?
+Native import/export with static structure analyzable at parse time.
+
+** Q107: Why are ESM imports static?
+Enables better tooling, tree shaking, early error detection.
+
+** Q108: What is dynamic import()?
+Loads module asynchronously at runtime and returns a promise.
+
+** Q109: Default export vs named export?
+Default: one primary export.
+Named: multiple explicit exports.
+
+** Q110: Re-export patterns?
+~export { x } from "./m.js"~ or ~export * from "./m.js"~ for module composition.
+
+** Q111: What is side-effect module?
+Module that performs actions upon import, not just exporting bindings.
+
+** Q112: Why avoid hidden side effects in modules?
+They reduce predictability and complicate testing/startup behavior.
+
+** Q113: What is temporal coupling in modules?
+Code correctness depends on import/init order.
+Avoid by explicit dependencies and initialization APIs.
+
+** Q114: What is ~use strict~ in ESM?
+ES modules are strict by default; no need to declare it.
+
+** Q115: What is tail call optimization status?
+Specified in ES2015 but not broadly implemented in mainstream engines.
+
+** Q116: What is tagged template literal?
+Function processes template parts/interpolations for custom behavior (escaping, i18n, DSLs).
+
+** Q117: What is destructuring default value behavior?
+Default used only when extracted value is ~undefined~, not null.
+
+** Q118: What is parameter destructuring?
+Destructure object/array directly in function parameters for cleaner APIs.
+
+** Q119: What is optional catch binding?
+~catch { ... }~ when error variable is unnecessary.
+
+** Q120: What is numeric separator?
+Readable numeric literals with underscores: ~1_000_000~.
+
+** Q121: What is logical assignment operator?
+Examples:
+- ||= assign if left falsy
+- &&= assign if left truthy
+- ??= assign if left nullish
+
+** Q122: What is nullish assignment (~??=~) good for?
+Initialize only when value is null/undefined while preserving false/0/"".
+
+** Q123: What is ~at()~ method?
+Access index with support for negative indexing:
+~arr.at(-1)~ gives last element.
+
+** Q124: What is ~Object.hasOwn~?
+Reliable own-property check without prototype pitfalls.
+
+** Q125: What is optional chaining with function calls?
+~obj.method?.()~ calls only if method exists and is callable.
+
+** Q126: What is short-circuit assignment pitfall?
+Right-hand expression may not run if condition not met; be mindful of side effects.
+
+** Q127: What is structuredClone?
+Built-in deep cloning for many structured data types.
+
+** Q128: What are limitations of structuredClone?
+Cannot clone functions/DOM nodes in many contexts; behavior depends on type support.
+
+** Q129: What is RegExp ~u~ flag?
+Enables proper Unicode-aware regular expression behavior.
+
+** Q130: What is RegExp ~d~ flag concept?
+Provides match indices data in supporting environments for advanced parsing/highlighting.
+
+* Advanced/Expert (131-180)
+
+** Q131: What is specification language for ECMAScript algorithms?
+The spec uses abstract operations and pseudo-algorithm steps, not executable JS directly.
+
+** Q132: What are internal slots?
+Specification-level storage associated with objects (e.g., ~[[Prototype]]~, ~[[PromiseState]]~).
+
+** Q133: What is ~[[Prototype]]~?
+Internal object link used for inheritance lookups.
+
+** Q134: Difference between ~__proto__~ and ~[[Prototype]]~?
+~[[Prototype]]~ is internal slot; ~__proto__~ is legacy accessor to observe/set it.
+
+** Q135: What are property descriptors?
+Metadata describing property behavior:
+value, writable, enumerable, configurable, get, set.
+
+** Q136: Why descriptors matter?
+They control mutability, visibility in iteration, and accessor behavior.
+
+** Q137: What is defineProperty used for?
+Precise creation/configuration of property descriptors.
+
+** Q138: What is SameValueZero equality?
+Comparison algorithm used in Map/Set/includes where NaN equals NaN.
+
+** Q139: ~==~, ~===~, and ~Object.is~ difference?
+- == loose with coercion
+- === strict but +0 and -0 equal; NaN not equal itself
+- Object.is distinguishes +0/-0 and treats NaN equal to NaN
+
+** Q140: What is Realm concept?
+A realm includes global object + intrinsic objects + environment.
+Different iframes/workers can have different realms.
+
+** Q141: Why can ~instanceof~ fail across realms?
+Constructors differ per realm, so prototype relationships may not match expected realm.
+
+** Q142: What are intrinsics in spec context?
+Built-in foundational objects/functions (Array.prototype, Promise, etc.) per realm.
+
+** Q143: What is job queue in spec?
+Queue of ECMAScript jobs (notably promise jobs) processed by host event loop integration.
+
+** Q144: What is thenable assimilation?
+Promises adopt state of returned thenables, not only native Promise instances.
+
+** Q145: Why can incorrect thenables cause issues?
+Malicious/buggy then methods can call resolve/reject unexpectedly; promise resolution has defensive semantics.
+
+** Q146: What is Promise resolution procedure?
+Formal algorithm deciding how promise settles when resolved with value/thenable/promise.
+
+** Q147: What is unhandled rejection concern?
+Rejected promises without handlers may surface global warnings/events and hide logical bugs.
+
+** Q148: What is module linking phase?
+Before execution, module dependency graph is resolved and bindings are connected.
+
+** Q149: What is module evaluation phase?
+Actual execution of module code after successful linking.
+
+** Q150: What is live binding in ESM?
+Imported bindings reflect exporter’s current value, not copied snapshot.
+
+** Q151: Why are ESM cycles tricky?
+Cyclic imports can expose partially initialized bindings.
+Design modules with clear initialization boundaries.
+
+** Q152: What is top-level await impact on module graph?
+Can pause dependent module evaluation, affecting startup order/timing.
+
+** Q153: What are agents in ECMAScript?
+Abstract model for concurrent execution units (main thread, workers) with separate job queues.
+
+** Q154: What is shared memory model in JS?
+SharedArrayBuffer allows memory shared across agents with Atomics for synchronization.
+
+** Q155: Why Atomics are needed with shared memory?
+Prevent race conditions and provide ordering/visibility guarantees.
+
+** Q156: What is data race at high level?
+Two agents access same memory concurrently with at least one write and no proper synchronization.
+
+** Q157: What is memory visibility issue?
+Without synchronization, one agent may not immediately observe another agent’s writes.
+
+** Q158: What is Atomics.wait/notify concept?
+Blocking/wakeup coordination primitives on shared typed arrays (in allowed environments).
+
+** Q159: What are well-known symbols?
+Built-in symbols customizing language behavior (Symbol.iterator, Symbol.toStringTag, etc.).
+
+** Q160: Symbol.iterator significance?
+Defines default iteration behavior for for...of and spread operations.
+
+** Q161: Symbol.toPrimitive use?
+Customizes object-to-primitive conversion logic.
+
+** Q162: Symbol.asyncIterator meaning?
+Enables asynchronous iteration consumed by for await...of.
+
+** Q163: What are async iterators?
+Iterators whose next() returns promises, useful for streaming async data.
+
+** Q164: What is for await...of?
+Loops over async iterable, awaiting each produced value.
+
+** Q165: What is pipeline from parser to execution?
+Tokenization -> parsing -> AST/internal representation -> bytecode/JIT execution (engine-specific implementation details).
+
+** Q166: Why understanding engine optimization matters?
+Code shape impacts performance (hidden classes, inline caches, deopts).
+
+** Q167: What is hidden class (conceptual)?
+Engine-internal object shape representation for optimizing property access.
+
+** Q168: How can object shape instability hurt performance?
+Frequent property add/remove/order differences can degrade optimized access paths.
+
+** Q169: What is deoptimization?
+Engine falls back from optimized machine code to slower path when assumptions break.
+
+** Q170: Common deopt triggers?
+Unexpected types, shape changes, megamorphic call sites, certain dynamic patterns.
+
+** Q171: Why avoid premature micro-optimizations?
+Maintainability first; profile real bottlenecks before low-level tuning.
+
+** Q172: What is tail risk of transpilation?
+Build output may change semantics/performance edge cases if targets/plugins misconfigured.
+
+** Q173: Why read ECMAScript proposals carefully?
+Features evolve through stages; syntax/semantics can change before standardization.
+
+** Q174: What are TC39 stages (high-level)?
+Stage 0 idea -> Stage 1 proposal -> Stage 2 draft -> Stage 3 candidate -> Stage 4 finished (standard).
+
+** Q175: How should teams adopt new ECMAScript features safely?
+Check runtime support, use linting, tests, progressive rollout, and fallback/transpile where needed.
+
+** Q176: What is semantic version risk with language features?
+Language itself is standardized, but tooling/runtime support differs by environment versions.
+
+** Q177: How do you evaluate whether to use newest syntax?
+Consider readability, team familiarity, browser/runtime matrix, and bundle/tooling impact.
+
+** Q178: What is robust error taxonomy for JS systems?
+Classify errors as validation, domain, infrastructure, timeout, auth, and unknown to improve handling.
+
+** Q179: What is resilience mindset for ECMAScript apps?
+Expect partial failures, handle retries/backoff/cancellation, and preserve user progress where possible.
+
+** Q180: What defines expert-level ECMAScript understanding?
+Knowing not only syntax, but also spec mental models:
+execution context, binding, prototype mechanics, async job ordering, module linking, and runtime trade-offs.
+
+-----
+
+#+INCLUDE: "../footer.org"

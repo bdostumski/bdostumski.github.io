@@ -1,0 +1,768 @@
+#+TITLE: Java
+#+DATE: 2026-08-03
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Beginner (1-60)
+
+** Q001: What is Java?
+Java is a high-level, object-oriented, general-purpose programming language designed to be portable, secure, and robust.
+Its core promise is: *write once, run anywhere* (WORA), meaning compiled Java bytecode can run on any system with a compatible JVM (Java Virtual Machine).
+
+** Q002: What does "write once, run anywhere" practically mean?
+When you compile Java source code (~.java~), the compiler (~javac~) produces bytecode (~.class~).
+That bytecode is not tied to one operating system or CPU architecture.
+Any platform with a compatible JVM can execute it.
+
+** Q003: What are JDK, JRE, and JVM?
+- JVM: Executes Java bytecode.
+- JRE: JVM + core libraries needed to *run* Java apps.
+- JDK: JRE + development tools (compiler, debugger, javadoc, etc.) needed to *build* Java apps.
+If you develop Java, install JDK.
+
+** Q004: How does Java code get executed?
+Flow:
+1) Write source code (~.java~)
+2) Compile with ~javac~ into bytecode (~.class~)
+3) Run with ~java~ command
+4) JVM loads classes, verifies bytecode, interprets/JIT-compiles, then executes
+
+** Q005: What is bytecode?
+Bytecode is an intermediate instruction set generated from Java source.
+It is designed for JVM execution, enabling platform portability.
+
+** Q006: What is JIT compilation?
+JIT (Just-In-Time) compiler translates hot bytecode paths into native machine code at runtime.
+This improves performance significantly compared to pure interpretation.
+
+** Q007: Is Java interpreted or compiled?
+Both.
+Java is compiled to bytecode, then interpreted/JIT-compiled by JVM at runtime.
+
+** Q008: What is a class in Java?
+A class is a blueprint for creating objects.
+It defines fields (state) and methods (behavior).
+
+** Q009: What is an object in Java?
+An object is a runtime instance of a class with its own state and behavior.
+
+** Q010: What is the ~main~ method?
+The standard entry point for standalone Java apps:
+~public static void main(String[] args)~
+JVM starts execution there (for simple app entry).
+
+** Q011: Why is Java strongly typed?
+Every variable has a declared type, and type correctness is checked at compile time (and partly runtime).
+This reduces many categories of bugs early.
+
+** Q012: What are primitive data types in Java?
+~byte, short, int, long, float, double, char, boolean~
+They are not objects; they store raw values directly.
+
+** Q013: What is the difference between primitive and reference types?
+- Primitive: stores actual value.
+- Reference: stores memory reference to object.
+Objects live on heap; references point to them.
+
+** Q014: What are wrapper classes?
+Object forms of primitives:
+~Integer, Long, Double, Boolean, Character~, etc.
+Useful for collections/generics (which require reference types).
+
+** Q015: What is autoboxing/unboxing?
+- Autoboxing: primitive -> wrapper automatically
+- Unboxing: wrapper -> primitive automatically
+Convenient but can introduce ~NullPointerException~ if wrapper is null.
+
+** Q016: What is a variable?
+A named storage location with a type and value/reference.
+
+** Q017: What is scope in Java?
+Scope is the region where a variable/member is accessible:
+- local scope
+- method parameter scope
+- instance field scope
+- class (static) scope
+
+** Q018: What is the difference between instance and static members?
+- Instance members belong to object instances.
+- Static members belong to the class itself (shared across instances).
+
+** Q019: What is method overloading?
+Multiple methods with same name but different parameter lists in same class.
+
+** Q020: What is method overriding?
+Subclass provides a new implementation of inherited method with same signature.
+
+** Q021: What is a constructor?
+A special method used to initialize new objects.
+It has same name as class and no return type.
+
+** Q022: Default constructor vs no-arg constructor?
+If you define no constructor, Java provides a default no-arg constructor.
+If you define any constructor, default is not auto-generated.
+
+** Q023: What is ~this~ keyword?
+Reference to current object.
+Used to disambiguate fields, call other constructors (~this(...)~), and pass current instance.
+
+** Q024: What is ~super~ keyword?
+Reference to parent class.
+Used to call parent constructor (~super(...)~) or parent methods/fields.
+
+** Q025: What is encapsulation?
+Bundling data and methods together and restricting direct access to internal state (usually via ~private~ fields + public methods).
+
+** Q026: Why use getters and setters?
+They provide controlled access, validation, and future flexibility without exposing internals directly.
+
+** Q027: What are access modifiers?
+- ~public~: accessible everywhere
+- ~protected~: package + subclasses
+- (default/package-private): package only
+- ~private~: class only
+
+** Q028: What is package in Java?
+A namespace to organize related classes and avoid name conflicts.
+
+** Q029: Why follow package naming conventions?
+Convention (reverse domain, e.g., ~com.example.app~) avoids collisions and improves clarity.
+
+** Q030: What is an interface?
+A contract specifying methods (and constants/default/static methods) without typical instance state.
+Classes implement interfaces.
+
+** Q031: Interface vs class (basic)?
+Class can hold state + implementation.
+Interface defines behavior contract; supports multiple implementation inheritance.
+
+** Q032: What is abstraction?
+Hiding complex implementation details and exposing essential behavior.
+
+** Q033: What is inheritance?
+Mechanism where subclass acquires fields/methods from superclass using ~extends~.
+
+** Q034: Why inheritance should be used carefully?
+Overuse leads to tight coupling and fragile hierarchies.
+Prefer composition when "is-a" relationship is weak.
+
+** Q035: What is composition?
+Building classes from other classes as fields ("has-a" relationship), often more flexible than inheritance.
+
+** Q036: What is polymorphism?
+Same interface/method call can behave differently depending on actual object type at runtime.
+
+** Q037: Compile-time vs runtime polymorphism?
+- Compile-time: overloading
+- Runtime: overriding + dynamic dispatch
+
+** Q038: What is dynamic method dispatch?
+At runtime JVM chooses overridden method based on actual object type, not reference type.
+
+** Q039: What is ~final~ keyword?
+- final variable: cannot be reassigned
+- final method: cannot be overridden
+- final class: cannot be extended
+
+** Q040: What is string in Java?
+~String~ is an immutable class representing text.
+
+** Q041: Why are Strings immutable?
+Security, thread safety, caching/interning efficiency, predictable behavior.
+
+** Q042: String vs StringBuilder vs StringBuffer?
+- String: immutable
+- StringBuilder: mutable, not synchronized (faster single-thread)
+- StringBuffer: mutable, synchronized (legacy thread-safe)
+
+** Q043: What is String pool?
+JVM optimization storing interned string literals to reuse objects and reduce memory.
+
+** Q044: ~==~ vs ~equals()~ for objects?
+- ~==~ compares references
+- ~equals()~ compares logical content (if overridden accordingly)
+
+** Q045: What is ~hashCode()~ used for?
+Supports hash-based collections (~HashMap~, ~HashSet~).
+Equal objects must have equal hash codes.
+
+** Q046: Why override ~equals()~ and ~hashCode()~ together?
+Collection correctness depends on their contract.
+Overriding one without the other breaks map/set behavior.
+
+** Q047: What is an array?
+Fixed-size indexed collection of same type elements.
+
+** Q048: What is difference between arrays and ArrayList?
+- Array: fixed size, lower-level
+- ArrayList: resizable collection with richer API
+
+** Q049: What is exception?
+An event representing an error or unusual condition disrupting normal flow.
+
+** Q050: Checked vs unchecked exceptions?
+- Checked: must be handled/declared (~IOException~)
+- Unchecked: subclasses of ~RuntimeException~, optional handling (~NullPointerException~)
+
+** Q051: What is try-catch-finally?
+- try: risky code
+- catch: handle exception
+- finally: always executes (cleanup)
+
+** Q052: What is try-with-resources?
+Automatic resource management for ~AutoCloseable~ resources (files, streams, DB connections).
+
+** Q053: What is NullPointerException?
+Thrown when dereferencing null reference.
+Common and important to prevent via validations and design.
+
+** Q054: What is Java Collections Framework?
+Standard set of interfaces/classes for data structures and algorithms (List, Set, Map, Queue, etc.).
+
+** Q055: List vs Set vs Map?
+- List: ordered, duplicates allowed
+- Set: unique elements
+- Map: key-value pairs
+
+** Q056: What is generics in Java?
+Type-parameter mechanism for compile-time type safety and reuse (e.g., ~List<String>~).
+
+** Q057: Why use generics?
+Avoid manual casting, catch type errors early, improve readability/API design.
+
+** Q058: What is enhanced for-loop?
+Simplified iteration syntax for arrays/iterables:
+~for (Type x : collection) { ... }~
+
+** Q059: What is enum?
+Type-safe set of named constants, can include fields/methods/constructors.
+
+** Q060: Why use enums instead of constants?
+Better type safety, expressiveness, and behavior encapsulation.
+
+* Intermediate (61-130)
+
+** Q061: What is Java Memory Model (high-level)?
+Defines how threads interact through memory and what visibility/order guarantees exist.
+Critical for correct concurrent programming.
+
+** Q062: What are stack and heap in JVM?
+- Stack: method frames, local variables, call flow (per thread)
+- Heap: objects/arrays shared across threads
+
+** Q063: What is garbage collection (GC)?
+Automatic memory reclamation for objects no longer reachable from GC roots.
+
+** Q064: What causes memory leaks in Java if GC exists?
+Logical leaks: objects remain reachable unintentionally (static collections, listeners, caches).
+
+** Q065: What is strong, weak, soft, phantom reference concept?
+Reference strengths influence GC behavior:
+- Strong: normal references, prevent collection
+- Weak: collectible on next GC if no strong refs
+- Soft: collectible under memory pressure
+- Phantom: post-mortem cleanup tracking
+
+** Q066: What is immutability and why is it powerful?
+Immutable objects cannot change after creation.
+Benefits: thread safety, simpler reasoning, safer sharing/caching.
+
+** Q067: How do you design immutable classes?
+- class final (or no mutating subclassing risk)
+- private final fields
+- no setters
+- defensive copies for mutable fields
+- fully initialize in constructor
+
+** Q068: What is defensive copy?
+Creating a copy of mutable input/output objects to protect encapsulation.
+
+** Q069: What is static factory method?
+Method returning instance instead of public constructor (e.g., ~of(), valueOf(), getInstance()~).
+
+** Q070: Advantages of static factory methods?
+Naming clarity, instance caching/reuse, subtype return flexibility, controlled creation logic.
+
+** Q071: What is builder pattern and why useful?
+Constructs complex objects step-by-step, especially with many optional parameters.
+
+** Q072: Why avoid telescoping constructors?
+Many constructor parameters hurt readability and cause argument-order mistakes.
+
+** Q073: What is dependency injection (DI)?
+Providing dependencies from outside class rather than creating them internally.
+Improves testability and modularity.
+
+** Q074: What is inversion of control (IoC)?
+General principle where framework/container controls object lifecycle and wiring.
+
+** Q075: What is SOLID (brief)?
+Five OO design principles:
+S, O, L, I, D for maintainable/extensible software.
+
+** Q076: Single Responsibility Principle (SRP)?
+A class should have one reason to change (one core responsibility).
+
+** Q077: Open/Closed Principle (OCP)?
+Software entities should be open for extension, closed for modification.
+
+** Q078: Liskov Substitution Principle (LSP)?
+Subtypes must be substitutable for base types without breaking correctness.
+
+** Q079: Interface Segregation Principle (ISP)?
+Prefer small, focused interfaces over fat interfaces forcing irrelevant methods.
+
+** Q080: Dependency Inversion Principle (DIP)?
+Depend on abstractions, not concretions.
+
+** Q081: What is coupling and cohesion?
+- Coupling: dependency between modules (lower is better)
+- Cohesion: how focused a module is internally (higher is better)
+
+** Q082: What is Big-O complexity?
+Approximate growth rate of algorithm runtime/memory as input size grows.
+
+** Q083: Typical collection complexities?
+Examples:
+- ArrayList get by index: O(1)
+- ArrayList insert middle: O(n)
+- HashMap average get/put: O(1)
+- TreeMap get/put: O(log n)
+
+** Q084: HashMap vs TreeMap?
+- HashMap: hash-based, unordered (fast average O(1))
+- TreeMap: red-black tree, sorted keys (O(log n))
+
+** Q085: LinkedList use cases?
+Frequent insertion/removal at ends/known node positions.
+Often slower random access than ArrayList.
+
+** Q086: What is Queue and Deque?
+- Queue: FIFO
+- Deque: double-ended queue (insert/remove both ends)
+
+** Q087: What is priority queue?
+Queue ordered by priority (natural/comparator), not insertion order.
+
+** Q088: What is Comparator?
+External strategy for custom object ordering.
+
+** Q089: Comparable vs Comparator?
+- Comparable: natural ordering inside class
+- Comparator: custom ordering outside class
+
+** Q090: What is fail-fast iterator?
+Iterator detecting concurrent structural modifications and throwing ~ConcurrentModificationException~ (best-effort).
+
+** Q091: What is concurrency in Java?
+Executing multiple tasks overlapping in time (parallel or interleaved).
+
+** Q092: Process vs thread?
+- Process: independent memory space
+- Thread: lightweight execution unit within process sharing memory
+
+** Q093: How to create thread (basic ways)?
+- Extend ~Thread~
+- Implement ~Runnable~
+- Prefer executor framework (~ExecutorService~) in real apps
+
+** Q094: Why prefer ExecutorService over raw Thread?
+Pooling, lifecycle management, task queueing, better resource control and scalability.
+
+** Q095: What is synchronization?
+Mechanism ensuring mutual exclusion and memory visibility across threads.
+
+** Q096: What does ~synchronized~ guarantee?
+- Mutual exclusion on monitor lock
+- Happens-before visibility on lock release/acquire
+
+** Q097: What is race condition?
+Incorrect behavior due to unsafely shared mutable state timing between threads.
+
+** Q098: What is deadlock?
+Two/more threads waiting indefinitely for each other’s locks/resources.
+
+** Q099: What is livelock?
+Threads keep reacting to each other but make no progress.
+
+** Q100: What is starvation?
+Thread never gets sufficient CPU/resource due to scheduling/priority unfairness.
+
+** Q101: What is volatile?
+Ensures visibility of variable updates across threads and prevents certain reorderings.
+Not a substitute for atomic compound actions.
+
+** Q102: What are atomic classes?
+Classes like ~AtomicInteger~ provide lock-free thread-safe atomic operations.
+
+** Q103: What is CAS (compare-and-set)?
+Atomic CPU-assisted primitive used for non-blocking concurrency updates.
+
+** Q104: What is ReentrantLock?
+Explicit lock with features beyond synchronized (tryLock, fair policy, interruptible lock wait).
+
+** Q105: What is ReadWriteLock?
+Allows multiple readers concurrently, but writes are exclusive.
+
+** Q106: What is ConcurrentHashMap?
+Thread-safe map optimized for concurrent access with high throughput.
+
+** Q107: What is blocking queue?
+Queue where producers/consumers can block when full/empty; useful in producer-consumer patterns.
+
+** Q108: What is Future?
+Represents pending asynchronous computation result.
+
+** Q109: What is CompletableFuture?
+Advanced async composition API for non-blocking pipelines and callbacks.
+
+** Q110: What is thread pool sizing intuition?
+Depends on workload:
+- CPU-bound: near number of cores
+- IO-bound: often larger due to waiting time
+Measure and tune empirically.
+
+** Q111: What is Java Stream API?
+Declarative processing pipeline for collections/data sources (map/filter/reduce/collect).
+
+** Q112: Stream vs collection?
+Collection stores data; Stream processes data flow (often lazily) and is typically one-time-use.
+
+** Q113: What is lazy evaluation in streams?
+Intermediate operations are deferred until terminal operation runs.
+
+** Q114: Common stream operations?
+- Intermediate: map, filter, flatMap, sorted, distinct
+- Terminal: collect, reduce, forEach, count, findFirst
+
+** Q115: What is Optional?
+Container object representing presence/absence of non-null value to model optionality explicitly.
+
+** Q116: Is Optional a field type?
+Generally discouraged for entity fields/serialization boundaries; best for return types.
+
+** Q117: What is method reference?
+Shorthand for lambda calling existing method:
+~String::trim~, ~System.out::println~
+
+** Q118: What is functional interface?
+Interface with single abstract method (SAM), target for lambdas.
+
+** Q119: Examples of built-in functional interfaces?
+~Function<T,R>, Consumer<T>, Supplier<T>, Predicate<T>, UnaryOperator<T>~
+
+** Q120: What is default method in interface?
+Method with implementation inside interface (introduced to evolve APIs compatibly).
+
+** Q121: What is static method in interface?
+Utility-like method inside interface namespace.
+
+** Q122: What is serialization in Java?
+Converting object state into byte stream for storage/transfer (native or custom formats).
+
+** Q123: Why be cautious with Java native serialization?
+Security risks, versioning complexity, brittle long-term compatibility.
+Often prefer JSON/Protobuf/etc.
+
+** Q124: What is reflection?
+Runtime inspection/manipulation of classes, methods, fields, annotations.
+
+** Q125: Reflection pros and cons?
+Pros: flexibility/framework power.
+Cons: performance overhead, reduced type safety, harder maintenance/security concerns.
+
+** Q126: What is annotation?
+Metadata attached to code elements used by compiler/tools/runtime frameworks.
+
+** Q127: What is checked exception design trade-off?
+Encourages explicit handling but can add boilerplate and API friction if overused.
+
+** Q128: What is module system (JPMS)?
+Java Platform Module System (~module-info.java~) for strong encapsulation and reliable configuration.
+
+** Q129: Why use modules?
+Better dependency boundaries, smaller runtime images, explicit exports/requirements.
+
+** Q130: What is records (modern Java)?
+Concise syntax for immutable data carriers with auto-generated ~equals/hashCode/toString~ and accessors.
+
+* Advanced/Expert (131-210)
+
+** Q131: What is happens-before relationship?
+Formal JMM rule establishing visibility/order guarantees between actions.
+If A happens-before B, effects of A are visible to B.
+
+** Q132: Common happens-before examples?
+- Program order within a thread
+- Unlock happens-before subsequent lock of same monitor
+- Write to volatile happens-before subsequent read of same variable
+- Thread start/join relationships
+
+** Q133: Why instruction reordering matters?
+Compilers/CPUs reorder instructions for optimization.
+Without proper synchronization, other threads may observe surprising states.
+
+** Q134: Why double-checked locking was historically broken?
+Before JMM fixes and proper ~volatile~, object publication could expose partially constructed state.
+Modern form requires ~volatile~ on instance field.
+
+** Q135: What is safe publication?
+Ensuring object reference and fully constructed state become visible to other threads correctly.
+
+** Q136: Safe publication techniques?
+- static initializers
+- volatile references
+- final fields + no escape during construction
+- synchronized handoff
+- concurrent collections
+
+** Q137: Why final fields have special JMM semantics?
+Properly constructed objects guarantee visibility of final field values across threads after publication.
+
+** Q138: What is false sharing?
+Independent variables on same CPU cache line causing contention and performance degradation between threads.
+
+** Q139: What is lock contention?
+Multiple threads competing for same lock, increasing wait time and reducing throughput.
+
+** Q140: Coarse-grained vs fine-grained locking?
+- Coarse: simpler, less concurrency
+- Fine: more parallelism, higher complexity/risk
+
+** Q141: What is lock striping?
+Using multiple locks for different data segments to reduce contention.
+
+** Q142: What is stamp lock (~StampedLock~)?
+Advanced lock supporting optimistic reads + read/write modes for specific high-read scenarios.
+
+** Q143: What is fork/join framework?
+Parallel execution framework using work-stealing for divide-and-conquer tasks.
+
+** Q144: When use parallel streams cautiously?
+Useful for CPU-bound large datasets with stateless operations.
+Avoid blindly in IO-bound/small-data/shared-resource-sensitive paths.
+
+** Q145: Common parallel stream pitfalls?
+- Non-thread-safe side effects
+- Poor splitting characteristics
+- Overhead > benefit
+- Contention on shared collectors
+
+** Q146: What is backpressure concept (general)?
+Mechanism to prevent fast producers from overwhelming slower consumers.
+
+** Q147: How does Java address backpressure in reactive style?
+Reactive Streams interfaces (~Publisher/Subscriber/Subscription~) define demand signaling.
+
+** Q148: What is Java NIO?
+Non-blocking IO APIs with channels, buffers, selectors for scalable IO patterns.
+
+** Q149: Blocking IO vs non-blocking IO?
+- Blocking: thread waits per operation
+- Non-blocking: operations can return immediately; multiplex events
+
+** Q150: What are selectors in NIO?
+Allow one/few threads to monitor many channels for readiness events.
+
+** Q151: What is memory-mapped file?
+File region mapped into memory space for potentially faster random access IO.
+
+** Q152: NIO ByteBuffer core concepts?
+Position, limit, capacity, mark; correct flipping/clearing is crucial.
+
+** Q153: What is class loader in JVM?
+Component loading class bytecode into runtime.
+Supports namespaces and dynamic loading.
+
+** Q154: Parent delegation model?
+Class loader asks parent first before loading class itself, ensuring core classes consistency/security.
+
+** Q155: What is classpath vs module path?
+- Classpath: traditional dependency location
+- Module path: JPMS module resolution with stronger boundaries
+
+** Q156: What is metaspace?
+Native memory area storing class metadata (replaced PermGen in Java 8).
+
+** Q157: Why can metaspace OOM happen?
+Excessive class generation/loading or classloader leaks prevent metadata reclamation.
+
+** Q158: What is classloader leak?
+References keep old classloader reachable (common in app servers/redeployments), causing memory retention.
+
+** Q159: GC generations concept?
+Young generation (new objects), old generation (long-lived), plus metadata spaces.
+Optimizes based on object lifetime patterns.
+
+** Q160: Minor GC vs major/full GC?
+- Minor: collects young gen, frequent/shorter
+- Major/Full: old gen/whole heap, less frequent/often longer pauses
+
+** Q161: What is STW pause?
+Stop-the-world pause temporarily halting application threads during certain GC phases.
+
+** Q162: Throughput vs latency GC trade-off?
+- Throughput focus: maximize work done
+- Latency focus: minimize pause times
+Collector choice depends on SLA.
+
+** Q163: High-level G1 GC idea?
+Region-based collector targeting predictable pause times with concurrent phases.
+
+** Q164: What is GC tuning principle?
+Measure first (logs/metrics), tune for specific workload goals, avoid random parameter tweaking.
+
+** Q165: What is escape analysis?
+JIT optimization determining object confinement; may allocate on stack or eliminate allocations.
+
+** Q166: What is inlining?
+JIT replaces method call with method body to reduce call overhead and enable further optimization.
+
+** Q167: What is polymorphic call site impact?
+Highly variable receiver types can reduce optimization potential (devirtualization limits).
+
+** Q168: What is deoptimization in JVM?
+Fallback from optimized machine code to interpreter when assumptions fail.
+
+** Q169: Why warm-up matters in Java benchmarks?
+JIT needs execution time to optimize.
+Early runs may not represent steady-state performance.
+
+** Q170: What is JMH and why use it?
+Java Microbenchmark Harness avoids common benchmarking mistakes (dead code elimination, warm-up issues, etc.).
+
+** Q171: Why naive ~System.nanoTime~ benchmarks are misleading?
+JIT optimizations, JVM warm-up, GC noise, constant folding, dead-code elimination can invalidate results.
+
+** Q172: What is value-based class concept?
+Classes intended as immutable identity-less values; identity-sensitive operations discouraged.
+
+** Q173: What are records best suited for?
+Transparent immutable data aggregates (DTO-like carriers).
+
+** Q174: What are sealed classes?
+Restrict which classes/interfaces can extend/implement a type.
+Improves domain modeling and exhaustive reasoning.
+
+** Q175: What is pattern matching in modern Java?
+Language support to simplify type checks/deconstruction (e.g., pattern matching for ~instanceof~, switch patterns).
+
+** Q176: Why switch expressions matter?
+They are safer/more expressive (can return values, avoid accidental fall-through with concise syntax).
+
+** Q177: What is text block in Java?
+Multiline string literal syntax improving readability for SQL/JSON/templates.
+
+** Q178: What is virtual thread (Project Loom concept)?
+Lightweight thread managed by JVM enabling large concurrency levels with simpler blocking style code.
+
+** Q179: Platform thread vs virtual thread?
+Platform threads map closer to OS threads; virtual threads are many-to-few scheduled by JVM, lower resource cost per task.
+
+** Q180: When virtual threads shine?
+High-concurrency IO-bound workloads (many waiting tasks).
+Less benefit for pure CPU-bound tasks.
+
+** Q181: Structured concurrency concept?
+Treat related concurrent tasks as a unit with managed lifecycle, cancellation, and error propagation.
+
+** Q182: What is API design by contract in Java?
+Clearly define invariants, preconditions, postconditions, exceptions, and thread-safety expectations.
+
+** Q183: What is binary compatibility?
+Ability to run previously compiled binaries against newer library versions without recompilation issues.
+
+** Q184: Source compatibility vs binary compatibility?
+Source compatibility concerns recompiling source code.
+Binary compatibility concerns existing compiled artifacts at runtime.
+
+** Q185: Why changing method signatures is risky in libraries?
+Can break both source and binary compatibility for downstream users.
+
+** Q186: What is semantic versioning mindset for Java libs?
+Communicate compatibility expectations via version numbers and change discipline.
+
+** Q187: What is shading/relocation in build systems?
+Embedding and namespace-relocating dependencies to avoid version conflicts in distribution artifacts.
+
+** Q188: What is dependency hell in Java ecosystem?
+Conflicting transitive versions causing runtime/classpath issues.
+
+** Q189: How to reduce dependency conflicts?
+Use dependency management, BOMs, convergence checks, minimal dependencies, reproducible builds.
+
+** Q190: What is BOM (Bill of Materials)?
+Centralized dependency version alignment artifact (common in Maven ecosystems).
+
+** Q191: What are annotation processors?
+Compile-time tools generating code/metadata based on annotations.
+
+** Q192: Why code generation can help?
+Reduces boilerplate, enforces patterns, improves consistency.
+But overuse can hide complexity.
+
+** Q193: What is AOT (ahead-of-time) compilation context?
+Compiling before runtime for faster startup/lower footprint trade-offs vs dynamic optimization flexibility.
+
+** Q194: What is GraalVM high-level value?
+Alternative JVM/JIT ecosystem with polyglot capabilities and native image compilation options.
+
+** Q195: Native image trade-offs?
+Faster startup/lower memory, but limited dynamic features and different optimization/runtime behavior.
+
+** Q196: What is observability in Java services?
+Ability to understand system through logs, metrics, traces, profiling, health signals.
+
+** Q197: Logging best practices?
+Structured logs, correlation IDs, leveled verbosity, no sensitive data leakage, actionable messages.
+
+** Q198: Metrics categories?
+- Counters
+- Gauges
+- Histograms/timers
+Use them to track throughput, latency, errors, saturation.
+
+** Q199: What is distributed tracing?
+Tracking request path across services to diagnose latency and failures end-to-end.
+
+** Q200: What is circuit breaker pattern in Java services?
+Stops repeated calls to failing dependency, allowing recovery and reducing cascading failures.
+
+** Q201: Retry best practices?
+Use bounded retries, exponential backoff, jitter, and idempotent operations awareness.
+
+** Q202: Timeout strategy importance?
+Without proper timeouts, threads/resources can hang, causing cascading system degradation.
+
+** Q203: Bulkhead pattern?
+Isolate resources per dependency/workload to contain failures.
+
+** Q204: What is idempotency and why critical in distributed systems?
+Operation can be repeated safely with same effect.
+Essential for retries and at-least-once delivery safety.
+
+** Q205: CAP theorem practical takeaway?
+In partition scenarios distributed systems choose trade-offs between consistency and availability.
+
+** Q206: What is eventual consistency?
+System may be temporarily inconsistent but converges over time.
+
+** Q207: What is optimistic locking?
+Detects concurrent updates via version checks instead of holding long locks.
+
+** Q208: What is pessimistic locking?
+Prevents conflicts by locking data before modification; safer but can reduce concurrency.
+
+** Q209: What is transaction isolation (high-level)?
+Controls visibility/interference between concurrent transactions (read phenomena control).
+
+** Q210: What defines expert Java engineering?
+Not only syntax mastery, but deep understanding of:
+JMM, concurrency safety, JVM internals, API design, performance measurement, failure handling, maintainability, and production observability.
+
+-----
+
+#+INCLUDE: "../footer.org"
