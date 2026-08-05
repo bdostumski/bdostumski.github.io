@@ -7,14 +7,7 @@
 
 #+INCLUDE: "../header.org"
 
-* C Programming Q&A (Beginner → Expert)
-:PROPERTIES:
-:AUTHOR: Revised for readability
-:FORMAT: Org mode
-:END:
-
-This is an expanded, cleaner, easy-to-read version of your C Q&A.
-It keeps your original structure and adds short, practical explanations.
+* C Programming
 
 ** Beginner Level
 
@@ -602,22 +595,6 @@ Each TU compiles separately, then linker resolves symbols.
 3. Assembling
 4. Linking
 
-** Quick Best-Practice Add-on (Useful Summary)
-
-- Compile with strong warnings: ~-Wall -Wextra -Wpedantic~
-- Treat warnings as errors in CI: ~-Werror~
-- Prefer ~fgets~ + explicit parse for user input
-- Check every allocation and I/O return value
-- Document ownership for every pointer-returning API
-- Keep headers minimal and stable
-- Use ~const~ aggressively for intent and safety
-- Avoid undefined behavior even if “it works on my machine”
-
-** One-line takeaway
-C gives powerful control and performance, but correctness depends on disciplined memory handling, strict input validation, and clear API contracts.
-
-* C Programming Q&A (Advanced + Expert, Expanded)
-
 ** Advanced Level
 
 *** Q101: What is undefined behavior (UB)?
@@ -1031,77 +1008,7 @@ Bounds checks, ownership/lifetime, UB hazards, integer math, concurrency, API co
 *** Q200: What distinguishes expert C code from merely working C code?
 Expert C remains correct under optimization, explicit about contracts/lifetimes, portable, secure-minded, testable, and maintainable over time.
 
-* Bonus Practice Prompts
 
-*** Prompt 1
-Explain why this code is wrong and fix it:
-#+begin_src c
-char *p = malloc(4);
-strcpy(p, "blue");
-#+end_src
-Issue: needs 5 bytes including NUL terminator; overflow occurs.
-One fix:
-#+begin_src c
-char *p = malloc(5);
-if (p) strcpy(p, "blue");
-#+end_src
-
-*** Prompt 2
-Write a safe function to copy a string into a fixed-size buffer.
-#+begin_src c
-#include <stddef.h>
-#include <string.h>
-
-int copy_cstr(char *dst, size_t dstsz, const char *src) {
-    if (!dst || !src || dstsz == 0) return -1;
-    size_t n = strlen(src);
-    if (n >= dstsz) {
-        memcpy(dst, src, dstsz - 1);
-        dst[dstsz - 1] = '\0';
-        return 1; // truncated
-    }
-    memcpy(dst, src, n + 1);
-    return 0; // full copy
-}
-#+end_src
-
-*** Prompt 3
-Implement a generic callback-based iterator over an integer array.
-#+begin_src c
-#include <stddef.h>
-
-typedef void (*int_cb)(int value, void *ctx);
-
-void for_each_int(const int *a, size_t n, int_cb cb, void *ctx) {
-    if (!a || !cb) return;
-    for (size_t i = 0; i < n; i++) cb(a[i], ctx);
-}
-#+end_src
-
-*** Prompt 4
-Refactor a macro into a static inline function and explain trade-offs.
-Macro:
-#+begin_src c
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#+end_src
-Refactor:
-#+begin_src c
-static inline int max_int(int a, int b) { return a > b ? a : b; }
-#+end_src
-Trade-off: function is type-safe and avoids double-evaluation side effects, but macro is generic unless you add overload-like wrappers.
-
-*** Prompt 5
-Demonstrate lock-free counter increment with C11 atomics and explain chosen memory order.
-#+begin_src c
-#include <stdatomic.h>
-
-atomic_ulong counter = 0;
-
-void hit(void) {
-    atomic_fetch_add_explicit(&counter, 1u, memory_order_relaxed);
-}
-#+end_src
-~memory_order_relaxed~ is appropriate when only atomicity of the counter matters, not synchronization of other data.
 
 -----
 
