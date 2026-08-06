@@ -7,11 +7,14 @@
 
 #+INCLUDE: "../header.org"
 
-* NoSQL Q&A (Beginner - Advanced)
+* NoSQL 
+
+
+-----
 
 * Top 30 Most Asked
 
-** Q1. What is NoSQL? 
+** Q1: What is NoSQL? 
 NoSQL is a family of non-relational databases optimized for horizontal scale, flexible schemas, and distributed workloads.
 - Supports multiple models: document, key-value, wide-column, graph.
 - Often favors denormalization and query-driven design.
@@ -21,7 +24,7 @@ NoSQL is a family of non-relational databases optimized for horizontal scale, fl
 *Trade-off:* flexibility/scalability vs relational guarantees/ad-hoc SQL power.  
 *Follow-up:* “Is NoSQL schemaless or schema-flexible?”
 
-** Q2. Main categories of NoSQL databases? 
+** Q2: Main categories of NoSQL databases? 
 The core categories are document, key-value, wide-column, and graph.
 - Document: MongoDB, Couchbase
 - Key-value: Redis, DynamoDB (KV+document)
@@ -30,7 +33,7 @@ The core categories are document, key-value, wide-column, and graph.
 *Use when:* choose model by dominant query pattern.  
 *Follow-up:* “How would you pick one for a recommendation engine?”
 
-** Q3. NoSQL vs SQL differences? 
+** Q3: NoSQL vs SQL differences? 
 SQL emphasizes normalized schema + joins + strong ACID; NoSQL emphasizes model flexibility and horizontal scale.
 - SQL: fixed schema, relational constraints, rich joins.
 - NoSQL: flexible structures, denormalization, distribution-first.
@@ -38,7 +41,7 @@ SQL emphasizes normalized schema + joins + strong ACID; NoSQL emphasizes model f
 *Trade-off:* relational rigor vs distribution-first performance.  
 *Follow-up:* “Can NoSQL still do transactions?”
 
-** Q4. When choose NoSQL over relational? 
+** Q4: When choose NoSQL over relational? 
 Choose NoSQL when access patterns are simple but massive-scale, schema evolves quickly, or relationship model isn’t relational-first.
 - High write throughput / low-latency key access.
 - Evolving payloads, event/time-series, graph traversals.
@@ -46,62 +49,62 @@ Choose NoSQL when access patterns are simple but massive-scale, schema evolves q
 *Avoid when:* complex cross-entity transactional workflows + heavy joins are core.  
 *Follow-up:* “Give a concrete workload where SQL is better.”
 
-** Q5. What is eventual consistency? 
+** Q5: What is eventual consistency? 
 Replicas may temporarily return stale data, but converge if no new writes occur.
 - Common in AP/tunable distributed systems.
 - Improves availability/latency.
 - Requires app tolerance for stale reads/conflicts.
 *Follow-up:* “How to provide read-your-own-writes?”
 
-** Q6. What is strong consistency? 
+** Q6: What is strong consistency? 
 Reads always return the latest committed write.
 - Requires tighter replica coordination.
 - Raises latency and can reduce availability under failure.
 *Use when:* correctness > latency/availability (e.g., critical balances).  
 *Follow-up:* “How does this relate to quorum settings?”
 
-** Q7. What is CAP theorem? 
+** Q7: What is CAP theorem? 
 During a network partition, a distributed system must choose stronger consistency or higher availability.
 - P (partition tolerance) is mandatory in real distributed systems.
 - So practical choice under partition is CP vs AP.
 - Outside partition, PACELC explains latency/consistency trade-offs.
 *Follow-up:* “Why is CAP often misunderstood in interviews?”
 
-** Q8. What is BASE? 
+** Q8: What is BASE? 
 BASE is a distributed-systems mindset prioritizing availability and eventual convergence over strict ACID everywhere.
 - Basically Available
 - Soft state
 - Eventual consistency
 *Follow-up:* “When is BASE unacceptable?”
 
-** Q9. What is sharding? 
+** Q9: What is sharding? 
 Sharding partitions data across nodes by a partition/shard key so each node stores only part of the dataset.
 - Enables horizontal scale for storage and throughput.
 - Key design determines balance and performance.
 *Risk:* hot partitions from skewed keys.  
 *Follow-up:* “How do you detect and fix hotspots?”
 
-** Q10. What is replication? 
+** Q10: What is replication? 
 Replication keeps multiple copies of data on different nodes for availability and durability.
 - Improves fault tolerance.
 - Can also scale reads.
 - Sync vs async replication affects consistency/latency.
 *Follow-up:* “What’s replication lag and why it matters?”
 
-** Q11. Sharding vs replication? 
+** Q11: Sharding vs replication? 
 Sharding scales capacity/performance; replication scales resilience and availability.
 - Sharding = different data chunks on different nodes.
 - Replication = same data copied to multiple nodes.
 - Most production systems combine both.
 *Follow-up:* “Can replication alone solve write scaling?”
 
-** Q12. Do NoSQL DBs support transactions? 
+** Q12: Do NoSQL DBs support transactions? 
 Yes—single-record atomicity is common, and many modern NoSQL systems also support multi-record ACID transactions.
 - Stronger guarantees usually increase overhead.
 - Model to keep hot paths atomic within one partition/document when possible.
 *Follow-up:* “Why avoid distributed transactions in hot paths?”
 
-** Q13. What is denormalization and why common in NoSQL? 
+** Q13: What is denormalization and why common in NoSQL? 
 Denormalization duplicates data to serve reads in fewer operations, avoiding expensive joins.
 - Query-driven modeling.
 - Faster read paths.
@@ -109,132 +112,132 @@ Denormalization duplicates data to serve reads in fewer operations, avoiding exp
 *Trade-off:* read speed vs duplication/update complexity.  
 *Follow-up:* “How keep duplicates consistent?”
 
-** Q14. Partition key vs sort/clustering key? 
+** Q14: Partition key vs sort/clustering key? 
 Partition key decides data placement; sort/clustering key orders records within that partition.
 - Enables efficient range queries per partition.
 - Core pattern in DynamoDB/Cassandra-like models.
 *Follow-up:* “What makes a good partition key?”
 
-** Q15. What is a hot partition/key? 
+** Q15: What is a hot partition/key? 
 A hot partition receives disproportionate traffic, bottlenecking one node/partition.
 - Causes latency spikes/throttling.
 - Usually due to low-cardinality or time-skewed keys.
 *Mitigation:* write sharding, better keys, bucketing, caching.  
 *Follow-up:* “How would you redesign a timestamp-only key?”
 
-** Q16. What is a document database? 
+** Q16: What is a document database? 
 A document DB stores self-contained records (usually JSON/BSON) with flexible structure.
 - Nested objects/arrays are first-class.
 - Not all documents must share identical fields.
 *Use when:* hierarchical app payloads with evolving schema.  
 *Follow-up:* “When embed vs reference?”
 
-** Q17. What is a key-value store? 
+** Q17: What is a key-value store? 
 A key-value store maps unique keys to values and is optimized for very fast key-based access.
 - Extremely low-latency gets/sets.
 - Limited secondary querying unless additional indexing features exist.
 *Use when:* cache, sessions, counters, simple lookups.  
 *Follow-up:* “When does KV stop being enough?”
 
-** Q18. What is a wide-column store? 
+** Q18: What is a wide-column store? 
 Wide-column stores organize data by partitioned rows with flexible columns, optimized for huge scale and write-heavy predictable queries.
 - Access pattern must align with primary key.
 - Great for time-series/event workloads.
 *Follow-up:* “Why ‘one table per query pattern’ in Cassandra?”
 
-** Q19. What is a graph database? 
+** Q19: What is a graph database? 
 Graph DBs model nodes and relationships directly, making multi-hop relationship traversal efficient.
 - Best for path/traversal-heavy queries.
 - Social, fraud, recommendations, knowledge graphs.
 *Follow-up:* “Why graph beats SQL on deep traversals?”
 
-** Q20. Secondary index trade-offs? 
+** Q20: Secondary index trade-offs? 
 Secondary indexes speed non-primary-key queries, but add write overhead and storage cost.
 - More indexes can hurt write throughput.
 - Index choice must reflect real query frequency.
 *Follow-up:* “How decide if an index is worth it?”
 
-** Q21. Is NoSQL really schemaless? 
+** Q21: Is NoSQL really schemaless? 
 Not truly schemaless—better described as schema-flexible.
 - DB may enforce less, but application still depends on schema expectations.
 - Versioning/validation remain important.
 *Follow-up:* “How do you run schema migrations safely?”
 
-** Q22. What is query-driven data modeling? 
+** Q22: What is query-driven data modeling? 
 Model data starting from required read/write access patterns, not from normalized entities first.
 - List top queries first.
 - Shape records so common queries are single/few operations.
 *Follow-up:* “What happens if access patterns change later?”
 
-** Q23. Embed vs reference in document DBs? [MongoDB]
+** Q23: Embed vs reference in document DBs? [MongoDB]
 Embed when data is read together and bounded; reference when relationships are large/shared/unbounded.
 - Embed: fewer reads, atomic parent updates.
 - Reference: flexible growth, independent querying.
 *Follow-up:* “How would you model comments for viral posts?”
 
-** Q24. What is TTL? 
+** Q24: What is TTL? 
 TTL auto-expires records after a configured lifetime.
 - Great for sessions, cache entries, ephemeral data.
 - Supported in Redis/DynamoDB/Cassandra/MongoDB (via TTL index) with model-specific behavior.
 *Follow-up:* “What pitfalls exist with TTL-based deletes?”
 
-** Q25. Query vs Scan in DynamoDB? [DynamoDB]
+** Q25: Query vs Scan in DynamoDB? [DynamoDB]
 Query is targeted and efficient by key; Scan reads everything and is expensive.
 - Query uses partition key (+ optional sort key/index conditions).
 - Scan should be avoided in hot production paths.
 *Follow-up:* “How redesign to replace a Scan?”
 
-** Q26. Redis use cases? [Redis]
+** Q26: Redis use cases? [Redis]
 Redis is an in-memory data store for low-latency cache, sessions, counters, pub/sub, and stream pipelines.
 - Rich structures: strings, hashes, sets, zsets, streams.
 - Commonly used as a performance layer.
 *Follow-up:* “How do you handle cache stampede?”
 
-** Q27. Cache stampede (thundering herd)? [Redis]
+** Q27: Cache stampede (thundering herd)? [Redis]
 Many clients miss the same expired hot key simultaneously and overload the backing database.
 - Mitigate with single-flight locking/request coalescing.
 - Add TTL jitter, early refresh, background warming.
 *Follow-up:* “What would you implement first and why?”
 
-** Q28. Cassandra tunable consistency? [Cassandra]
+** Q28: Cassandra tunable consistency? [Cassandra]
 Cassandra lets you choose consistency level per read/write (ONE, QUORUM, ALL, etc.) to balance latency/availability/consistency.
 - With RF=N, stronger consistency needs more acknowledgments.
 - Common practical setting in multi-DC: LOCAL_QUORUM.
 *Follow-up:* “Explain R + W > N intuition.”
 
-** Q29. What is LSM tree? 
+** Q29: What is LSM tree? 
 LSM-tree is a write-optimized storage design: write to memory, flush immutable files, compact in background.
 - Very write-friendly.
 - Compaction introduces read/write/space amplification trade-offs.
 *Follow-up:* “How does compaction strategy affect latency?”
 
-** Q30. NoSQL anti-patterns? 
+** Q30: NoSQL anti-patterns? 
 Typical anti-patterns are SQL-style normalization everywhere, bad partition keys, unbounded collections, and ignoring consistency semantics.
 - Also: heavy scans in hot paths, no schema versioning, no migration plan.
 *Follow-up:* “How would you audit an existing schema for these?”
 
 * Fundamentals
 
-** Q31. What is schema-on-read vs schema-on-write? 
+** Q31: What is schema-on-read vs schema-on-write? 
 Schema-on-write enforces structure at write time; schema-on-read interprets structure at read time.
 - SQL commonly schema-on-write.
 - Many NoSQL systems are schema-flexible (schema-on-read leaning).
 *Trade-off:* flexibility vs stronger upfront guarantees.  
 *Follow-up:* “How do you prevent data quality drift?”
 
-** Q32. Horizontal vs vertical scaling? 
+** Q32: Horizontal vs vertical scaling? 
 Vertical scaling adds resources to one node; horizontal scaling adds more nodes and distributes load.
 - NoSQL systems typically optimize for horizontal growth.
 *Follow-up:* “What challenges appear with horizontal scale?”
 
-** Q33. CP vs AP examples? 
+** Q33: CP vs AP examples? 
 CP-leaning systems prioritize consistency under partition; AP-leaning systems prioritize availability with eventual convergence.
 - CP-leaning examples: ZooKeeper, HBase, many majority-write/read configs.
 - AP-leaning examples: Cassandra/Dynamo-style defaults.
 *Note:* many systems are tunable by configuration.  
 *Follow-up:* “How does workload decide the better side?”
 
-** Q34. Collection/table/keyspace meaning? 
+** Q34: Collection/table/keyspace meaning? 
 These are logical containers, but names differ by system.
 - Collection (MongoDB)
 - Table (Cassandra, DynamoDB)
@@ -242,136 +245,136 @@ These are logical containers, but names differ by system.
 - Database (MongoDB namespace)
 *Follow-up:* “What’s the practical modeling impact?”
 
-** Q35. Primary key in NoSQL? 
+** Q35: Primary key in NoSQL? 
 Primary key uniquely identifies a record and often controls physical access path.
 - KV/document: usually one key.
 - Wide-column: often composite (partition + clustering/sort).
 *Follow-up:* “Why is key design more critical in NoSQL?”
 
-** Q36. What is BSON? [MongoDB]
+** Q36: What is BSON? [MongoDB]
 BSON is Binary JSON used by MongoDB, adding typed values and compact binary encoding.
 - Supports ObjectId, Date, Decimal128, Binary, etc.
 *Follow-up:* “Any implication for interoperability?”
 
-** Q37. What is ObjectId? [MongoDB]
+** Q37: What is ObjectId? [MongoDB]
 ObjectId is MongoDB’s default _id, a 12-byte identifier that is roughly time-sortable.
 - Includes timestamp and uniqueness components.
 *Follow-up:* “When would you avoid ObjectId?”
 
-** Q38. What is polyglot persistence? 
+** Q38: What is polyglot persistence? 
 Polyglot persistence means using multiple databases in one system, each chosen for a specific workload.
 - Example: Redis cache + MongoDB app store + Neo4j graph use case.
 *Trade-off:* better fit/perf vs higher operational complexity.  
 *Follow-up:* “How keep data consistent across stores?”
 
-** Q39. What are NoSQL trade-offs overall? 
+** Q39: What are NoSQL trade-offs overall? 
 You gain scalability/flexibility/performance patterns, but you pay in modeling complexity and consistency management.
 - Pros: scale, availability, adaptable schema, specialized models.
 - Cons: denormalization overhead, fewer joins, duplication sync.
 *Follow-up:* “What team skills are needed to succeed?”
 
-** Q40. Why access-pattern-first design matters? 
+** Q40: Why access-pattern-first design matters? 
 In NoSQL, physical layout and keys determine performance, so schema must be built from real query paths.
 - “One query = one efficient access path” goal.
 *Follow-up:* “How do you validate patterns before production?”
 
 * Data Modeling (Clear Learning Version)
 
-** Q41. One-to-many modeling in document stores? [MongoDB]
+** Q41: One-to-many modeling in document stores? [MongoDB]
 Embed for small bounded child sets; reference when child count is large/unbounded.
 - Few children -> embedded array.
 - Many/unbounded -> separate collection + parent reference + pagination.
 *Follow-up:* “How detect when embedded array becomes a problem?”
 
-** Q42. Many-to-many modeling in NoSQL? 
+** Q42: Many-to-many modeling in NoSQL? 
 Use references/edge tables/duplicated projections based on dominant query direction.
 - Arrays of refs for small sets.
 - Join/edge collection for scalable many-to-many.
 *Follow-up:* “How avoid consistency drift?”
 
-** Q43. Outlier pattern? 
+** Q43: Outlier pattern? 
 Keep common-case documents small/fast, and isolate rare oversized records into separate structure.
 - Optimizes p95/p99 for the majority.
 *Follow-up:* “How choose outlier threshold?”
 
-** Q44. Bucket pattern? 
+** Q44: Bucket pattern? 
 Group many small events into time buckets to reduce document count and index overhead.
 - Common for telemetry/time-series ingestion.
 *Follow-up:* “How select bucket width?”
 
-** Q45. Subset pattern? 
+** Q45: Subset pattern? 
 Store hot subset inline (e.g., latest 10 items) and keep full history elsewhere.
 - Fast frequent reads, bounded document size.
 *Follow-up:* “How keep subset + full history consistent?”
 
-** Q46. Computed pattern? 
+** Q46: Computed pattern? 
 Precompute aggregates on write to accelerate reads.
 - Example: maintain counters/totals instead of runtime recompute.
 *Trade-off:* write complexity for read speed.  
 *Follow-up:* “How recover from drift in computed values?”
 
-** Q47. Extended reference pattern? 
+** Q47: Extended reference pattern? 
 Copy a few frequently read fields from related entity into main record to avoid extra lookups.
 - Keep only minimal duplicated fields.
 *Follow-up:* “Which fields are safe to duplicate?”
 
-** Q48. Schema versioning pattern? 
+** Q48: Schema versioning pattern? 
 Add schema_version field so readers can handle multiple versions during migration.
 - Enables rolling upgrades/backward compatibility.
 *Follow-up:* “Lazy migrate vs batch migrate?”
 
-** Q49. Schema migration strategy in NoSQL? 
+** Q49: Schema migration strategy in NoSQL? 
 Prefer backward-compatible readers, versioned documents, then migrate lazily or in batches.
 - Options: lazy on read/write, background backfill, dual-write transition.
 *Follow-up:* “How would you validate migration correctness?”
 
-** Q50. Choosing a good partition key? 
+** Q50: Choosing a good partition key? 
 Good partition keys are high-cardinality, traffic-distributing, and aligned to primary query path.
 - Avoid skew and monotonic hotspots.
 *Follow-up:* “Give an example of a bad key and fix it.”
 
-** Q51. Mitigating hot partitions? 
+** Q51: Mitigating hot partitions? 
 Use better keying, write sharding, time bucketing, and caching to spread load.
 - Add random suffix or hashed component where acceptable.
 *Follow-up:* “How do you query after write sharding?”
 
-** Q52. Why duplication is acceptable in NoSQL? 
+** Q52: Why duplication is acceptable in NoSQL? 
 Storage is often cheaper than cross-node joins/latency; duplication optimizes query latency.
 - But consistency workflows become mandatory.
 *Follow-up:* “What consistency model makes this practical?”
 
-** Q53. Keeping duplicated data consistent? 
+** Q53: Keeping duplicated data consistent? 
 Use event-driven propagation (CDC/streams), idempotent updaters, and reconciliation jobs.
 - Avoid ad hoc dual writes.
 *Follow-up:* “How detect missed updates?”
 
-** Q54. Single-table design in DynamoDB? [DynamoDB]
+** Q54: Single-table design in DynamoDB? [DynamoDB]
 Model multiple entity types in one table using PK/SK patterns to serve known access paths efficiently.
 - Reduces round trips and improves locality.
 - Harder to model and evolve.
 *Follow-up:* “When would you reject single-table design?”
 
-** Q55. Single-table design trade-offs? [DynamoDB]
+** Q55: Single-table design trade-offs? [DynamoDB]
 Excellent performance/cost for known patterns, but steeper learning curve and less ad hoc flexibility.
 *Follow-up:* “How document and test key patterns for a team?”
 
-** Q56. Tree/hierarchy modeling: graph vs document? 
+** Q56: Tree/hierarchy modeling: graph vs document? 
 Use graph DB for deep traversal-heavy queries; document patterns (materialized path/ancestors) for simpler hierarchy access.
 *Follow-up:* “When does hierarchy depth force graph adoption?”
 
-** Q57. Materialized path pattern? 
+** Q57: Materialized path pattern? 
 Store full hierarchy path string to allow prefix subtree queries.
 - Fast subtree lookup.
 - Moving nodes requires rewriting descendant paths.
 *Follow-up:* “How reduce rewrite cost on frequent moves?”
 
-** Q58. Time-series modeling in NoSQL? 
+** Q58: Time-series modeling in NoSQL? 
 Bucket by time, key by entity+time, use TTL retention, and pre-aggregate for dashboards.
 *Follow-up:* “When choose dedicated TSDB instead?”
 
 * Document Databases (MongoDB-focused)
 
-** Q59. Insert documents [MongoDB]
+** Q59: Insert documents [MongoDB]
 Use insertOne for single docs, insertMany for bulk inserts.
 #+begin_src js
 db.users.insertOne({ name: "Ada", age: 36, roles: ["admin"] });
@@ -379,7 +382,7 @@ db.users.insertMany([{ name: "Alan" }, { name: "Grace" }]);
 #+end_src
 *Follow-up:* “Ordered vs unordered bulk insert behavior?”
 
-** Q60. Query documents [MongoDB]
+** Q60: Query documents [MongoDB]
 Use find for result sets and findOne for a single matching document.
 #+begin_src js
 db.users.find({ age: { $gte: 30 } });
@@ -387,7 +390,7 @@ db.users.findOne({ name: "Ada" });
 #+end_src
 *Follow-up:* “How ensure this query uses an index?”
 
-** Q61. Common query operators [MongoDB]
+** Q61: Common query operators [MongoDB]
 Core operators include comparison, logical, element, and array operators.
 - Comparison: =$eq=, =$ne=, =$gt=, =$gte=, =$lt=, =$lte=, =$in=, =$nin=
 - Logical: =$and=, =$or=, =$not=, =$nor=
@@ -395,7 +398,7 @@ Core operators include comparison, logical, element, and array operators.
 - Array: =$all=, =$elemMatch=, =$size=
 *Follow-up:* “When does =$elemMatch= matter?”
 
-** Q62. Update documents [MongoDB]
+** Q62: Update documents [MongoDB]
 updateOne updates first match; updateMany updates all matches.
 #+begin_src js
 db.users.updateOne({ name: "Ada" }, { $set: { age: 37 } });
@@ -403,12 +406,12 @@ db.users.updateMany({ active: false }, { $set: { archived: true } });
 #+end_src
 *Follow-up:* “How prevent accidental mass updates?”
 
-** Q63. Common update operators [MongoDB]
+** Q63: Common update operators [MongoDB]
 Frequently used operators are =$set=, =$inc=, =$unset=, and array modifiers.
 =$set=, =$unset=, =$inc=, =$mul=, =$rename=, =$min=, =$max=, =$push=, =$pull=, =$addToSet=, =$pop=, =$currentDate=
 *Follow-up:* “Difference between =$push= and =$addToSet=?”
 
-** Q64. What is upsert? [MongoDB]
+** Q64: What is upsert? [MongoDB]
 Upsert updates if matched, otherwise inserts a new document.
 #+begin_src js
 db.counters.updateOne(
@@ -419,14 +422,14 @@ db.counters.updateOne(
 #+end_src
 *Follow-up:* “How to make upserts idempotent safely?”
 
-** Q65. Query nested fields [MongoDB]
+** Q65: Query nested fields [MongoDB]
 Use dot notation for nested document paths.
 #+begin_src js
 db.users.find({ "address.city": "Sofia" });
 #+end_src
 *Follow-up:* “Indexing nested fields?”
 
-** Q66. Query arrays [MongoDB]
+** Q66: Query arrays [MongoDB]
 Arrays can be matched by value, all-values, or element criteria with =$elemMatch=.
 #+begin_src js
 db.posts.find({ tags: "mongodb" });
@@ -435,19 +438,19 @@ db.orders.find({ items: { $elemMatch: { qty: { $gt: 5 } } } });
 #+end_src
 *Follow-up:* “How do multikey indexes help here?”
 
-** Q67. Projection (select fields) [MongoDB]
+** Q67: Projection (select fields) [MongoDB]
 Projection returns only needed fields, reducing payload.
 #+begin_src js
 db.users.find({}, { name: 1, email: 1, _id: 0 });
 #+end_src
 *Follow-up:* “When can projection become a covered query?”
 
-** Q68. What is aggregation pipeline? [MongoDB]
+** Q68: What is aggregation pipeline? [MongoDB]
 A stage-based data processing flow for filtering, grouping, transforming, joining, and analytics.
 - Typical: =$match= -> =$group= -> =$project= -> =$sort=
 *Follow-up:* “Why should =$match= be early?”
 
-** Q69. Aggregation example [MongoDB]
+** Q69: Aggregation example [MongoDB]
 Group paid orders by customer and rank totals.
 #+begin_src js
 db.orders.aggregate([
@@ -459,7 +462,7 @@ db.orders.aggregate([
 #+end_src
 *Follow-up:* “What index supports this best?”
 
-** Q70. What does =$lookup= do? [MongoDB]
+** Q70: What does =$lookup= do? [MongoDB]
 =$lookup= performs a left outer join with another collection.
 #+begin_src js
 db.orders.aggregate([
@@ -475,20 +478,20 @@ db.orders.aggregate([
 #+end_src
 *Follow-up:* “When should you avoid =$lookup= at scale?”
 
-** Q71. Why place =$match= early? [MongoDB]
+** Q71: Why place =$match= early? [MongoDB]
 Early filtering shrinks downstream work and improves chance of index usage.
 *Follow-up:* “Any cases where it cannot be first?”
 
-** Q72. What does =$unwind= do? [MongoDB]
+** Q72: What does =$unwind= do? [MongoDB]
 =$unwind= expands array elements into separate pipeline documents.
 - Useful before grouping/filtering by array entries.
 *Follow-up:* “How handle documents with empty arrays?”
 
-** Q73. =find()= vs =aggregate()= [MongoDB]
+** Q73: =find()= vs =aggregate()= [MongoDB]
 =find()= is for simple filter/projection; =aggregate()= for multi-stage transforms, grouping, joins, computed fields.
 *Follow-up:* “When does a simple find outperform pipeline?”
 
-** Q74. Creating indexes [MongoDB]
+** Q74: Creating indexes [MongoDB]
 Create indexes for frequent query/sort patterns; unique for constraints.
 #+begin_src js
 db.users.createIndex({ email: 1 }, { unique: true });
@@ -496,17 +499,17 @@ db.posts.createIndex({ author: 1, createdAt: -1 });
 #+end_src
 *Follow-up:* “How many indexes are too many?”
 
-** Q75. Compound index and field order [MongoDB]
+** Q75: Compound index and field order [MongoDB]
 Compound index obeys prefix rule, so field order must match common query prefixes.
 - ={a:1,b:1}= supports =a= and =a+b= efficiently, not =b= alone.
 *Follow-up:* “How does sort direction interact with compound index?”
 
-** Q76. Covered query [MongoDB]
+** Q76: Covered query [MongoDB]
 Covered query is answered from index alone without fetching base documents.
 - Filtered + returned fields must be in index.
 *Follow-up:* “How verify coverage with explain?”
 
-** Q77. Analyze query performance [MongoDB]
+** Q77: Analyze query performance [MongoDB]
 Use explain("executionStats") to inspect plan quality and scanned docs.
 #+begin_src js
 db.users.find({ email: "a@b.com" }).explain("executionStats");
@@ -515,18 +518,18 @@ db.users.find({ email: "a@b.com" }).explain("executionStats");
 - Watch examined vs returned ratio
 *Follow-up:* “What ratio signals trouble?”
 
-** Q78. Multikey indexes [MongoDB]
+** Q78: Multikey indexes [MongoDB]
 Multikey indexes index array elements, enabling efficient array queries.
 *Follow-up:* “Any limits with multikey + compound indexes?”
 
-** Q79. TTL index [MongoDB]
+** Q79: TTL index [MongoDB]
 TTL index auto-deletes documents after expiry based on indexed date field.
 #+begin_src js
 db.sessions.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 });
 #+end_src
 *Follow-up:* “Is expiration immediate at exact second?”
 
-** Q80. Text index and full-text search [MongoDB]
+** Q80: Text index and full-text search [MongoDB]
 Text indexes support basic full-text queries; advanced relevance/features usually need Atlas Search/OpenSearch.
 #+begin_src js
 db.articles.createIndex({ body: "text" });
@@ -534,54 +537,54 @@ db.articles.find({ $text: { $search: "nosql database" } });
 #+end_src
 *Follow-up:* “When should you move to dedicated search?”
 
-** Q81. Partial vs sparse index [MongoDB]
+** Q81: Partial vs sparse index [MongoDB]
 Sparse indexes include docs with field present; partial indexes include docs matching a filter.
 - Both reduce index size/write cost for targeted workloads.
 *Follow-up:* “Which is safer for business rules?”
 
-** Q82. MongoDB transactions [MongoDB]
+** Q82: MongoDB transactions [MongoDB]
 Single-document writes are atomic by default; multi-document ACID transactions exist but add overhead.
 *Follow-up:* “How to avoid needing multi-doc tx in hot paths?”
 
-** Q83. Read concern vs write concern [MongoDB]
+** Q83: Read concern vs write concern [MongoDB]
 Write concern controls durability acknowledgments; read concern controls consistency guarantees for reads.
 - Write: =w=, =j=
 - Read: =local=, =majority=, =linearizable=
 *Follow-up:* “What’s a practical default for many apps?”
 
-** Q84. Read preference [MongoDB]
+** Q84: Read preference [MongoDB]
 Read preference selects where reads go (primary/secondary variants), trading freshness for scale/locality.
 - Secondary reads can be stale.
 *Follow-up:* “How to implement read-your-own-writes?”
 
-** Q85. WiredTiger [MongoDB]
+** Q85: WiredTiger [MongoDB]
 WiredTiger is MongoDB’s default engine with document-level concurrency, compression, and snapshot reads.
 *Follow-up:* “Why does this matter for performance?”
 
-** Q86. GridFS [MongoDB]
+** Q86: GridFS [MongoDB]
 GridFS stores files larger than 16 MB as chunks across special collections.
 - =fs.files= and =fs.chunks=
 *Follow-up:* “When prefer object storage instead?”
 
-** Q87. MongoDB sharding (high level) [MongoDB]
+** Q87: MongoDB sharding (high level) [MongoDB]
 Shard key partitions data; =mongos= routes requests; config servers store metadata; balancer redistributes chunks.
 *Follow-up:* “How choose shard key to avoid hotspots?”
 
-** Q88. Change streams [MongoDB]
+** Q88: Change streams [MongoDB]
 Change streams provide real-time insert/update/delete events from oplog for event-driven integrations.
 *Follow-up:* “At-least-once handling patterns?”
 
 * Key-Value & Caching (Redis-focused)
 
-** Q89. What is Redis? [Redis]
+** Q89: What is Redis? [Redis]
 Redis is an in-memory data store used for ultra-low-latency caching, sessions, counters, queues, and streaming.
 *Follow-up:* “What happens on restart without persistence?”
 
-** Q90. Redis data structures [Redis]
+** Q90: Redis data structures [Redis]
 Redis supports strings, hashes, lists, sets, sorted sets, streams, and more specialized structures.
 *Follow-up:* “Which structure for leaderboard and why?”
 
-** Q91. Basic Redis string commands [Redis]
+** Q91: Basic Redis string commands [Redis]
 Core commands are SET/GET/INCR with optional expirations and multi-set operations.
 #+begin_src text
 SET key value
@@ -592,27 +595,27 @@ MSET k1 v1 k2 v2
 #+end_src
 *Follow-up:* “SETEX vs SET EX?”
 
-** Q92. Redis expiration (TTL) [Redis]
+** Q92: Redis expiration (TTL) [Redis]
 TTL can be set explicitly and expires via lazy + active expiration cycles.
 - =EXPIRE key seconds=
 - =SET key value EX seconds=
 - =TTL key= to inspect remaining time
 *Follow-up:* “How does TTL jitter help?”
 
-** Q93. Redis eviction policies [Redis]
+** Q93: Redis eviction policies [Redis]
 When max memory is hit, eviction behavior depends on configured policy (LRU/LFU/random/volatile/allkeys/noeviction).
 *Follow-up:* “Which policy for cache-heavy workload?”
 
-** Q94. LRU vs LFU eviction [Redis]
+** Q94: LRU vs LFU eviction [Redis]
 LRU evicts least recently used; LFU evicts least frequently used.
 - LFU often better when long-term hotness matters.
 *Follow-up:* “Any downside of LFU?”
 
-** Q95. Redis persistence [Redis]
+** Q95: Redis persistence [Redis]
 RDB snapshots are compact/fast; AOF is more durable but heavier; many setups combine both.
 *Follow-up:* “How choose RDB/AOF strategy for recovery goals?”
 
-** Q96. Redis Sorted Set (ZSet) use case [Redis]
+** Q96: Redis Sorted Set (ZSet) use case [Redis]
 ZSet stores unique members with ordered numeric score, ideal for ranking/priority queries.
 #+begin_src text
 ZADD leaderboard 100 "ada"
@@ -620,21 +623,21 @@ ZREVRANGE leaderboard 0 9 WITHSCORES
 #+end_src
 *Follow-up:* “How implement paginated leaderboard?”
 
-** Q97. Redis Pub/Sub [Redis]
+** Q97: Redis Pub/Sub [Redis]
 Pub/Sub is real-time but not durable—offline consumers miss messages.
 - Use Streams for durable delivery.
 *Follow-up:* “When is Pub/Sub still the right choice?”
 
-** Q98. Redis Streams [Redis]
+** Q98: Redis Streams [Redis]
 Streams provide durable append-only messaging with IDs, consumer groups, and acknowledgments.
 *Follow-up:* “How handle duplicate processing?”
 
-** Q99. Caching patterns with Redis [Redis]
+** Q99: Caching patterns with Redis [Redis]
 Common patterns are cache-aside, write-through, write-behind, and read-through.
 - Most common in apps: cache-aside.
 *Follow-up:* “Which pattern minimizes stale data risk?”
 
-** Q100. Distributed lock with Redis [Redis]
+** Q100: Distributed lock with Redis [Redis]
 Use =SET lock:key token NX PX ttl= to acquire and token-verified atomic release (often Lua) to avoid releasing others’ locks.
 #+begin_src text
 SET lock:key <token> NX PX 30000
@@ -643,129 +646,129 @@ SET lock:key <token> NX PX 30000
 
 * Redis + DynamoDB
 
-** Q101. What is Redis Cluster? [Redis]
+** Q101: What is Redis Cluster? [Redis]
 Redis Cluster shards keys across 16384 hash slots distributed among primaries (with replicas for failover).
 *Follow-up:* “How do multi-key commands behave across slots?”
 
-** Q102. Is Redis single-threaded? [Redis]
+** Q102: Is Redis single-threaded? [Redis]
 Command execution is mostly single-threaded; modern Redis uses extra threads for I/O/background work.
 *Follow-up:* “Why can single-threaded command execution still be fast?”
 
-** Q103. What is DynamoDB? [DynamoDB]
+** Q103: What is DynamoDB? [DynamoDB]
 DynamoDB is AWS managed NoSQL (KV+document) with low-latency access and automatic scaling.
 *Follow-up:* “Provisioned vs on-demand mode?”
 
-** Q104. Partition key and sort key in DynamoDB [DynamoDB]
+** Q104: Partition key and sort key in DynamoDB [DynamoDB]
 Partition key controls placement; sort key orders items sharing partition key and enables range queries.
 *Follow-up:* “How model one-to-many with PK/SK?”
 
-** Q105. Query vs Scan in DynamoDB [DynamoDB]
+** Q105: Query vs Scan in DynamoDB [DynamoDB]
 Query is key-based and efficient; Scan reads full table/index and is costly.
 *Follow-up:* “How to eliminate production scans?”
 
-** Q106. GSIs vs LSIs in DynamoDB [DynamoDB]
+** Q106: GSIs vs LSIs in DynamoDB [DynamoDB]
 GSI supports alternate partition/sort keys and separate throughput; LSI shares base partition key and must be defined at table creation.
 - GSI reads are eventual.
 - LSI can be strongly consistent.
 *Follow-up:* “When choose GSI over table redesign?”
 
-** Q107. DynamoDB consistency options [DynamoDB]
+** Q107: DynamoDB consistency options [DynamoDB]
 Table/LSI reads can be eventual or strong; GSI reads are eventual.
 - Strong consistency costs more latency/throughput.
 *Follow-up:* “Where is strong read actually needed?”
 
 * Wide-Column Stores (Cassandra-focused)
 
-** Q108. What is Apache Cassandra? [Cassandra]
+** Q108: What is Apache Cassandra? [Cassandra]
 Cassandra is a masterless distributed wide-column DB built for high availability, linear scale, and write-heavy workloads.
 *Follow-up:* “Why no single point of failure?”
 
-** Q109. Cassandra data model [Cassandra]
+** Q109: Cassandra data model [Cassandra]
 Table primary key = partition key + clustering columns; partition controls placement, clustering controls in-partition order.
 *Follow-up:* “How does this affect query design?”
 
-** Q110. What is CQL? [Cassandra]
+** Q110: What is CQL? [Cassandra]
 CQL is SQL-like syntax for Cassandra, but efficient queries must align with partition key design (no arbitrary joins).
 *Follow-up:* “Why does ALLOW FILTERING get warned against?”
 
-** Q111. Why model around queries in Cassandra? [Cassandra]
+** Q111: Why model around queries in Cassandra? [Cassandra]
 Cassandra is fast when reads target known partition paths, so schema is built from access patterns first.
 *Follow-up:* “Why one table per major query pattern?”
 
-** Q112. How Cassandra distributes data [Cassandra]
+** Q112: How Cassandra distributes data [Cassandra]
 Partition keys hash to token ranges on a ring; vnodes split ownership for better balancing and recovery.
 *Follow-up:* “How do vnodes help rebalance?”
 
-** Q113. Replication factor (RF) [Cassandra]
+** Q113: Replication factor (RF) [Cassandra]
 RF is number of replicas per partition; higher RF improves resilience but increases storage/network cost.
 *Follow-up:* “Typical RF in production and why?”
 
-** Q114. Tunable consistency in Cassandra [Cassandra]
+** Q114: Tunable consistency in Cassandra [Cassandra]
 Set consistency level per operation (ONE/QUORUM/ALL/LOCAL_QUORUM) to balance consistency and latency.
 *Follow-up:* “Explain read-after-write with quorum intuition.”
 
-** Q115. What does QUORUM mean? [Cassandra]
+** Q115: What does QUORUM mean? [Cassandra]
 QUORUM is majority acknowledgments: =floor(RF/2)+1=.
 - LOCAL_QUORUM usually preferred in multi-DC for latency control.
 *Follow-up:* “QUORUM vs LOCAL_QUORUM impact?”
 
-** Q116. Cassandra write path [Cassandra]
+** Q116: Cassandra write path [Cassandra]
 Write to commit log + memtable, then flush to immutable SSTables; no read-before-write needed.
 *Follow-up:* “How does this design enable high write throughput?”
 
-** Q117. What is compaction? [Cassandra]
+** Q117: What is compaction? [Cassandra]
 Background merge of SSTables to remove obsolete data/tombstones and improve read efficiency.
 - Strategies: STCS, LCS, TWCS.
 *Follow-up:* “Which strategy fits time-series?”
 
-** Q118. What is a tombstone? [Cassandra]
+** Q118: What is a tombstone? [Cassandra]
 Tombstone is a delete marker retained until compaction after grace period.
 - Excess tombstones degrade reads.
 *Follow-up:* “How to avoid tombstone-heavy queries?”
 
-** Q119. Why deletes can be problematic in Cassandra [Cassandra]
+** Q119: Why deletes can be problematic in Cassandra [Cassandra]
 Frequent deletes create tombstone accumulation, increasing read cost until compaction.
 *Follow-up:* “Modeling alternatives to frequent deletes?”
 
-** Q120. What is read repair? [Cassandra]
+** Q120: What is read repair? [Cassandra]
 On reads, Cassandra can detect replica mismatch and repair stale replicas.
 *Follow-up:* “How does this differ from anti-entropy repair?”
 
-** Q121. What is hinted handoff? [Cassandra]
+** Q121: What is hinted handoff? [Cassandra]
 If replica is down, coordinator stores hints and replays later to aid convergence.
 *Follow-up:* “What if outage lasts too long?”
 
-** Q122. Last-write-wins in Cassandra [Cassandra]
+** Q122: Last-write-wins in Cassandra [Cassandra]
 Conflict resolution picks highest timestamp, so clock skew can cause unexpected overwrites.
 *Follow-up:* “How mitigate clock-skew risk?”
 
-** Q123. HBase vs Cassandra (high-level) 
+** Q123: HBase vs Cassandra (high-level) 
 HBase is more CP-leaning/strong-consistency in Hadoop ecosystem; Cassandra is AP-leaning/masterless with strong multi-DC resilience.
 *Follow-up:* “Which for globally distributed always-on writes?”
 
-** Q124. Column family vs super column [Cassandra]
+** Q124: Column family vs super column [Cassandra]
 Column family is standard table grouping; super columns are legacy/deprecated concept.
 *Follow-up:* “What modern pattern replaces super columns?”
 
-** Q125. Cassandra collection types [Cassandra]
+** Q125: Cassandra collection types [Cassandra]
 Supports =set=, =list=, =map=, UDT; use for small bounded collections.
 *Follow-up:* “When to model as separate rows instead?”
 
-** Q126. Materialized views in Cassandra [Cassandra]
+** Q126: Materialized views in Cassandra [Cassandra]
 Materialized views maintain alternate primary-key query shape automatically but add operational/consistency complexity.
 *Follow-up:* “Safer alternative in critical workloads?”
 
-** Q127. Limits of Cassandra secondary indexes [Cassandra]
+** Q127: Limits of Cassandra secondary indexes [Cassandra]
 Secondary indexes can trigger scatter-gather and poor scale; query-specific tables are often better.
 *Follow-up:* “When can SAI help?”
 
 * Graph Databases (Neo4j-focused)
 
-** Q128. What is property graph model? [Neo4j]
+** Q128: What is property graph model? [Neo4j]
 Data is nodes + directed relationships, both with properties, enabling direct relationship-centric queries.
 *Follow-up:* “Why is relationship first-class important?”
 
-** Q129. What is Cypher? [Neo4j]
+** Q129: What is Cypher? [Neo4j]
 Cypher is declarative graph query language using pattern matching.
 #+begin_src cypher
 MATCH (a:Person)-[:FRIEND]->(b:Person)
@@ -774,7 +777,7 @@ RETURN b.name;
 #+end_src
 *Follow-up:* “How do indexes help Cypher patterns?”
 
-** Q130. Create nodes/relationships in Cypher [Neo4j]
+** Q130: Create nodes/relationships in Cypher [Neo4j]
 Use CREATE (or MERGE) to add nodes and edges with labels/properties.
 #+begin_src cypher
 CREATE (a:Person {name: 'Ada'})
@@ -783,19 +786,19 @@ CREATE (a)-[:FRIEND {since: 2020}]->(b);
 #+end_src
 *Follow-up:* “How prevent duplicates?”
 
-** Q131. Best graph DB use cases [Neo4j]
+** Q131: Best graph DB use cases [Neo4j]
 Graph DBs excel when multi-hop relationships are core: recommendations, fraud, social, topology, knowledge graphs.
 *Follow-up:* “Where graph DB is overkill?”
 
-** Q132. Why graphs outperform relational on deep traversal [Neo4j]
+** Q132: Why graphs outperform relational on deep traversal [Neo4j]
 Graph traversal follows edges directly, while relational multi-hop needs repeated joins that grow expensive.
 *Follow-up:* “At what depth do joins become painful?”
 
-** Q133. What is index-free adjacency? [Neo4j]
+** Q133: What is index-free adjacency? [Neo4j]
  Nodes directly reference connected nodes/edges, enabling efficient hop-by-hop traversal.
 *Follow-up:* “Does this remove need for indexes entirely?”
 
-** Q134. Shortest path in Cypher [Neo4j]
+** Q134: Shortest path in Cypher [Neo4j]
 Use shortestPath over a variable-length relationship pattern.
 #+begin_src cypher
 MATCH p = shortestPath(
@@ -805,231 +808,231 @@ RETURN p;
 #+end_src
 *Follow-up:* “How constrain path to avoid explosion?”
 
-** Q135. Variable-length traversal [Neo4j]
+** Q135: Variable-length traversal [Neo4j]
 Patterns like =[:KNOWS*1..3]= traverse bounded hops.
 *Follow-up:* “Why bound hop count?”
 
-** Q136. Property graph vs RDF/triple store 
+** Q136: Property graph vs RDF/triple store 
 Property graph is traversal-centric with rich properties; RDF is triple/semantic-web model with SPARQL and URI semantics.
 *Follow-up:* “Which is better for ontology-heavy data?”
 
-** Q137. What is =MERGE= in Cypher? [Neo4j]
+** Q137: What is =MERGE= in Cypher? [Neo4j]
  =MERGE= matches existing pattern or creates it if missing—useful for idempotent upserts.
 *Follow-up:* “Any race conditions with MERGE?”
 
-** Q138. How graph DBs scale 
+** Q138: How graph DBs scale 
 Graph partitioning is difficult due to cross-partition traversals; scale via replicas, caching, locality-aware partitioning, or distributed engines.
 *Follow-up:* “How identify community boundaries for partitioning?”
 
-** Q139. Graph recommendation use case [Neo4j]
+** Q139: Graph recommendation use case [Neo4j]
 Graph traversal naturally models similarity/neighborhood patterns for recommendations.
 *Follow-up:* “How combine graph features with ML ranking?”
 
-** Q140. ACID in Neo4j [Neo4j]
+** Q140: ACID in Neo4j [Neo4j]
 Neo4j supports ACID transactions, useful when relationship integrity is business-critical.
 *Follow-up:* “What’s the performance trade-off?”
 
-** Q141. Graph projection / GDS [Neo4j]
+** Q141: Graph projection / GDS [Neo4j]
 Neo4j GDS runs in-memory graph algorithms (PageRank, community detection, similarity) for analytics/ML features.
 *Follow-up:* “When to use projected graph vs transactional graph?”
 
-** Q142. When NOT to use graph DB 
+** Q142: When NOT to use graph DB 
 Avoid graph DB for simple key lookups, flat aggregations, or ultra-write-heavy non-relational-traversal workloads.
 *Follow-up:* “What would you pick instead?”
 
 * Consistency, Distribution & Internals
 
-** Q143. Quorum-based consistency 
+** Q143: Quorum-based consistency 
 Majority-based reads/writes can provide strong visibility guarantees when quorums overlap.
 *Follow-up:* “How does overlap guarantee freshness?”
 
-** Q144. =R + W > N= formula 
+** Q144: =R + W > N= formula 
 If read and write replica sets overlap, reads are more likely to include latest committed write.
 - N: replicas, W: write acks, R: read replicas consulted.
 *Follow-up:* “Why still not perfect under clock/repair delays?”
 
-** Q145. What is a vector clock? 
+** Q145: What is a vector clock? 
 Vector clocks track causality across nodes to detect concurrent updates rather than blindly overwrite.
 *Follow-up:* “How is conflict resolved once detected?”
 
-** Q146. What is a conflict and resolution options? 
+** Q146: What is a conflict and resolution options? 
 Conflict is concurrent divergent updates; resolve via LWW, merge logic, vector-clock sibling reconciliation, or CRDTs.
 *Follow-up:* “Which strategy for user profile edits?”
 
-** Q147. What are CRDTs? 
+** Q147: What are CRDTs? 
 CRDTs are data types that converge deterministically after concurrent updates without coordination.
 *Follow-up:* “Where do CRDTs shine in practice?”
 
-** Q148. Dynamo paper influence 
+** Q148: Dynamo paper influence 
 Dynamo popularized consistent hashing, vector clocks, quorums, hinted handoff, and gossip patterns in modern distributed stores.
 *Follow-up:* “Which systems adopted these ideas?”
 
-** Q149. Consistent hashing 
+** Q149: Consistent hashing 
 Maps nodes/keys onto a ring so node changes remap only a subset of keys, easing rebalance.
 *Follow-up:* “Why add virtual nodes on top?”
 
-** Q150. What are virtual nodes (vnodes)? 
+** Q150: What are virtual nodes (vnodes)? 
 Vnodes split each physical node into many token ranges for better load balance and smoother scaling/recovery.
 *Follow-up:* “Any operational downside of too many vnodes?”
 
-** Q151. Gossip protocol 
+** Q151: Gossip protocol 
 Nodes periodically exchange cluster-state updates peer-to-peer, spreading membership/failure info without central coordinator.
 *Follow-up:* “How does gossip tolerate node failures?”
 
-** Q152. Merkle tree role 
+** Q152: Merkle tree role 
 Merkle trees hash data ranges so replicas can compare hashes and sync only differing ranges efficiently.
 *Follow-up:* “Where is this used in repair workflows?”
 
-** Q153. Anti-entropy repair 
+** Q153: Anti-entropy repair 
 Background reconciliation process repairs replica divergence to restore long-term consistency.
 *Follow-up:* “How often should repair run?”
 
-** Q154. Read-your-own-writes consistency 
+** Q154: Read-your-own-writes consistency 
 Session guarantee that a client observes its own previous writes.
 - Often implemented by session stickiness or read routing.
 *Follow-up:* “How provide this with eventual-consistent replicas?”
 
-** Q155. Monotonic reads 
+** Q155: Monotonic reads 
 Once a client sees a newer value, it should never later see an older one.
 *Follow-up:* “How to enforce across regions?”
 
-** Q156. Causal consistency 
+** Q156: Causal consistency 
 Operations with cause-effect relation are observed in order; unrelated concurrent ops may vary in order.
 *Follow-up:* “Difference vs strong consistency?”
 
-** Q157. PACELC theorem 
+** Q157: PACELC theorem 
 Beyond CAP during partitions, PACELC says in normal operation systems still trade latency vs consistency.
 *Follow-up:* “Give AP/EL or CP/EC style examples.”
 
-** Q158. WAL / commit log 
+** Q158: WAL / commit log 
 Write-ahead/commit log durably records updates before applying to main storage, enabling recovery.
 *Follow-up:* “How is commit log different from replication log?”
 
-** Q159. LSM tree 
+** Q159: LSM tree 
 LSM favors write throughput via memtable + immutable SSTables + compaction.
 *Follow-up:* “How does this impact read path?”
 
-** Q160. LSM vs B-tree 
+** Q160: LSM vs B-tree 
 B-tree favors in-place read patterns; LSM favors write-heavy workloads but needs compaction and may raise read amplification.
 *Follow-up:* “When is B-tree a better fit?”
 
-** Q161. Bloom filter in NoSQL 
+** Q161: Bloom filter in NoSQL 
 Bloom filters quickly test “definitely not present” with possible false positives, reducing unnecessary disk lookups.
 *Follow-up:* “Why no false negatives?”
 
-** Q162. Write amplification 
+** Q162: Write amplification 
 Extra physical writes beyond logical writes, often due to compaction/rewrites.
 *Follow-up:* “How monitor and reduce it?”
 
-** Q163. Read amplification 
+** Q163: Read amplification 
 Extra storage reads required for one logical read (e.g., checking multiple SSTables/indexes).
 *Follow-up:* “How compaction affects read amp?”
 
-** Q164. Space amplification 
+** Q164: Space amplification 
 Additional disk usage beyond logical dataset due to tombstones/old versions/compaction overlap.
 *Follow-up:* “How can retention policy reduce this?”
 
-** Q165. Sync vs async replication 
+** Q165: Sync vs async replication 
 Sync waits for replica acks (stronger consistency, higher latency); async acks early (lower latency, temporary data-loss/staleness window).
 *Follow-up:* “Which for cross-region writes?”
 
-** Q166. Split-brain scenario 
+** Q166: Split-brain scenario 
 Partition causes multiple nodes to act as leaders and accept conflicting writes.
 - Prevent with quorum, fencing, robust election.
 *Follow-up:* “How detect and recover safely?”
 
-** Q167. Leader election 
+** Q167: Leader election 
 Consensus protocols elect one leader/coordinator to serialize coordination tasks.
 - Common algorithms: Raft/Paxos variants.
 *Follow-up:* “What happens on leader failover?”
 
-** Q168. Raft vs Paxos 
+** Q168: Raft vs Paxos 
 Both solve consensus; Raft is generally easier to reason about, Paxos is foundational but harder to implement correctly.
 *Follow-up:* “Why does understandability matter operationally?”
 
 * Operations, Security & Advanced
 
-** Q169. Backup strategies for NoSQL 
+** Q169: Backup strategies for NoSQL 
 Use snapshots/logical dumps/PITR based on RPO/RTO, and always test restores regularly.
 *Follow-up:* “How often should restore drills run?”
 
-** Q170. =mongodump= vs filesystem snapshot [MongoDB]
+** Q170: =mongodump= vs filesystem snapshot [MongoDB]
 =mongodump= is logical/portable but slower; volume snapshots are fast for large data but infra-coupled.
 *Follow-up:* “Which for multi-terabyte clusters?”
 
-** Q171. Monitoring a NoSQL cluster 
+** Q171: Monitoring a NoSQL cluster 
 Track p95/p99 latency, throughput, errors, replication lag, resource usage, compaction/GC, and hotspot indicators.
 *Follow-up:* “Which 3 alerts would you start with?”
 
-** Q172. Replication lag 
+** Q172: Replication lag 
 Lag is delay between primary write and replica visibility, causing stale reads and failover risk window.
 *Follow-up:* “How reduce lag under burst traffic?”
 
-** Q173. Securing NoSQL systems 
+** Q173: Securing NoSQL systems 
 Enforce auth/RBAC, TLS, encryption at rest, network isolation, least privilege, audit logging, and safe defaults.
 *Follow-up:* “Most common misconfiguration in practice?”
 
-** Q174. NoSQL injection risk 
+** Q174: NoSQL injection risk 
 Unsafely embedding user input in query objects/operators can alter query logic.
 - Validate input strictly.
 - Use safe query construction.
 - Avoid dangerous script/eval features.
 *Follow-up:* “Show a vulnerable vs safe pattern.”
 
-** Q175. Large-scale migration in NoSQL 
+** Q175: Large-scale migration in NoSQL 
 Use dual-write + backfill + verification + cutover + retirement, with schema versioning and rollback plan.
 *Follow-up:* “How would you verify no data loss?”
 
-** Q176. What is CDC? 
+** Q176: What is CDC? 
 Change Data Capture streams data changes to downstream systems for search, analytics, cache sync, and event workflows.
 *Follow-up:* “How do you guarantee ordering/at-least-once handling?”
 
-** Q177. Integrating NoSQL with search engines 
+** Q177: Integrating NoSQL with search engines 
 Keep primary DB as source of truth; sync changes to search index via CDC for eventual-consistent search views.
 *Follow-up:* “How handle reindex/backfill?”
 
-** Q178. Lambda vs Kappa architecture 
+** Q178: Lambda vs Kappa architecture 
 Lambda uses separate batch + streaming paths; Kappa uses one stream pipeline and replay for recomputation.
 *Follow-up:* “Which is simpler to operate and why?”
 
-** Q179. Data locality in distributed NoSQL 
+** Q179: Data locality in distributed NoSQL 
 Keep data near compute/users (node/DC/region) to reduce latency and cross-network costs.
 *Follow-up:* “How does locality affect partition design?”
 
-** Q180. Multi-region NoSQL deployments 
+** Q180: Multi-region NoSQL deployments 
 Active-passive is simpler consistency-wise; active-active improves availability but needs conflict resolution strategy.
 *Follow-up:* “When is active-active worth complexity?”
 
-** Q181. OLTP vs OLAP in NoSQL context 
+** Q181: OLTP vs OLAP in NoSQL context 
 NoSQL primaries usually serve OLTP; OLAP is often moved to warehouses/search/columnar systems via ETL/CDC.
 *Follow-up:* “Why not run heavy analytics on primary cluster?”
 
-** Q182. Idempotency for NoSQL writes 
+** Q182: Idempotency for NoSQL writes 
 Idempotent writes produce same final state on retries, critical for distributed retries and at-least-once systems.
 *Follow-up:* “How design idempotency key?”
 
-** Q183. Conditional writes / optimistic concurrency 
+** Q183: Conditional writes / optimistic concurrency 
 Write succeeds only if current state matches expected condition (version/existence check), preventing lost updates.
 *Follow-up:* “Compare with pessimistic locking.”
 
-** Q184. Counters at scale 
+** Q184: Counters at scale 
 Use atomic increments; shard counters for extreme throughput to avoid hotspots.
 *Follow-up:* “How read sharded counter efficiently?”
 
-** Q185. Dual-write problem 
+** Q185: Dual-write problem 
 Writing to two systems independently can leave inconsistent state on partial failure.
 - Prefer outbox/CDC over naive dual writes.
 *Follow-up:* “Give failure scenario and mitigation.”
 
-** Q186. Outbox pattern 
+** Q186: Outbox pattern 
 Persist business change + outbox event atomically, then relay publishes events asynchronously.
 *Follow-up:* “How ensure relay is reliable and idempotent?”
 
-** Q187. Application impact of eventual consistency 
+** Q187: Application impact of eventual consistency 
 Apps must tolerate stale reads, retries, conflict handling, and communicate pending state clearly in UX.
 *Follow-up:* “How do you design UX for eventual consistency?”
 
-** Q188. Choosing document vs KV vs wide-column vs graph 
+** Q188: Choosing document vs KV vs wide-column vs graph 
 Choose based on dominant access pattern:
 - document: flexible nested records
 - key-value: ultra-fast key access/cache
@@ -1037,16 +1040,16 @@ Choose based on dominant access pattern:
 - graph: deep relationship traversal
 *Follow-up:* “Can one product combine multiple models?”
 
-** Q189. Polystore / multi-model DB 
+** Q189: Polystore / multi-model DB 
 One platform can support multiple models to reduce operational overhead, but may be weaker than best-of-breed specialized engines in edge cases.
 *Follow-up:* “When choose polyglot over multi-model?”
 
-** Q190. Testing and benchmarking NoSQL 
+** Q190: Testing and benchmarking NoSQL 
 Benchmark with realistic read/write mix, key distribution, concurrency, and failure scenarios; focus on p95/p99, not averages.
 - YCSB is a common baseline.
 *Follow-up:* “How avoid benchmark that lies?”
 
-** Q191. NoSQL and NewSQL convergence 
+** Q191: NoSQL and NewSQL convergence 
 Boundaries are blurring: NoSQL adds stronger transactions/querying; NewSQL adds distributed scale—both moving toward flexible distributed data platforms.
 *Follow-up:* “How would this affect technology choice in 3 years?”
 
