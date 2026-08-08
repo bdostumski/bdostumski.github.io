@@ -1,0 +1,692 @@
+#+TITLE: Java JSON (Jackson)
+#+DATE: 2026-08-09
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java JSON (Jackson)
+
+-----
+
+* JSON + Jackson Foundations
+
+** Q1: What is JSON?
+ JSON is a lightweight text format for structured data exchange.
+ It is language-agnostic and commonly used in REST APIs, messaging, and config. Jackson maps JSON to Java objects and back.
+ *{"id":1,"name":"Ana"}*
+
+** Q2: What is Jackson in Java?
+ Jackson is a popular library for JSON serialization/deserialization.
+ It provides flexible data binding, tree model, and streaming APIs used in most Java backend systems.
+ Spring Boot uses Jackson by default for JSON bodies.
+
+** Q3: Serialization vs deserialization?
+ Serialization = Java object -> JSON, deserialization = JSON -> Java object.
+ Correct schema mapping is critical for API compatibility and data integrity.
+ *UserDto* to JSON response and back from request body.
+
+** Q4: What is ObjectMapper?
+ Core Jackson class for reading/writing JSON.
+ ObjectMapper is thread-safe after configuration and should usually be reused as singleton bean.
+
+#+begin_src java
+ObjectMapper mapper = new ObjectMapper();
+String json = mapper.writeValueAsString(user);
+#+end_src
+
+** Q5: Why avoid creating ObjectMapper repeatedly?
+ Reusing is faster and consistent.
+ Recreating mapper per request increases overhead and risks inconsistent config across code paths.
+ configure one *@Bean ObjectMapper* in Spring.
+
+** Q6: What are Jackson core models?
+ Data binding, tree model, and streaming model.
+ Choose model by use case: POJO mapping for common cases, JsonNode for dynamic JSON, streaming for very large payloads.
+ *readValue* (POJO), *readTree* (JsonNode), *JsonParser* (streaming).
+
+** Q7: Why is DTO recommended for JSON contracts?
+ DTO isolates API schema from domain/entity internals.
+ Prevents accidental field leakage, lazy-loading issues, and contract breakage during refactors.
+ expose *UserResponse* instead of JPA *UserEntity*.
+
+** Q8: Can Jackson handle Java records?
+ Yes.
+ Records are great immutable DTOs for clear API contracts and reduced boilerplate.
+
+#+begin_src java
+public record UserResponse(Long id, String name) {}
+#+end_src
+
+** Q9: What does FAIL_ON_UNKNOWN_PROPERTIES do?
+ Controls behavior for unknown JSON fields during deserialization.
+ Disabling can improve forward compatibility; enabling can enforce strict schema.
+ tolerate extra fields from newer client version.
+
+** Q10: JSON null vs missing field difference?
+ null is explicit value; missing means absent key.
+ This difference matters for PATCH semantics and partial updates.
+ *{"name":null}* vs *{}*
+
+-----
+
+* ObjectMapper Basic Operations
+
+** Q11: How to convert object to JSON string?
+ *writeValueAsString*.
+ Most common serialization method in services and tests.
+
+#+begin_src java
+String json = mapper.writeValueAsString(dto);
+#+end_src
+
+** Q12: How to parse JSON string into object?
+ *readValue(json, Class)*.
+ Ensure class fields/types align with payload schema.
+
+#+begin_src java
+UserDto dto = mapper.readValue(json, UserDto.class);
+#+end_src
+
+** Q13: How to read JSON from file?
+ *readValue(File, Class)*.
+ Useful for config/bootstrap data and integration tests.
+ loading seed JSON test data.
+
+** Q14: How to write JSON to file?
+ *writeValue(File, Object)*.
+ Good for exports/log snapshots; ensure encoding and file permissions.
+ persist report data as JSON file.
+
+** Q15: How to pretty print JSON?
+ Use pretty printer.
+ Better readability for logs/debug, but avoid in high-volume production responses unless needed.
+
+#+begin_src java
+String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dto);
+#+end_src
+
+** Q16: convertValue use case?
+ Convert one object type to another using Jackson mapping.
+ Handy for DTO transformations without manual mapping in some cases.
+ Map<String,Object> -> typed DTO.
+
+** Q17: readTree use case?
+ Parse into JsonNode tree for dynamic structure access.
+ Useful when schema is partially unknown or needs selective extraction.
+ read only *payload.meta.traceId*.
+
+** Q18: treeToValue / valueToTree use case?
+ Bridge between JsonNode and POJO.
+ Useful in mixed dynamic+typed pipelines.
+ parse root as JsonNode, convert subnode to typed class.
+
+** Q19: TypeReference why needed?
+ Preserve generic type info during deserialization.
+ Java type erasure loses runtime generic details without TypeReference.
+
+#+begin_src java
+List<UserDto> users = mapper.readValue(json, new TypeReference<List<UserDto>>() {});
+#+end_src
+
+** Q20: Common beginner Jackson mistake?
+ Ignoring exceptions and schema mismatch.
+ Silent assumptions cause runtime mapping failures in production payloads.
+ field type mismatch *age:"abc"* for int field.
+
+-----
+
+* Core Annotations for Mapping Control
+
+** Q21: What does @JsonProperty do?
+ Maps Java field/property to specific JSON key.
+ Useful for naming mismatches and explicit contract declaration.
+ *firstName* <-> *"first_name"*.
+
+** Q22: What does @JsonIgnore do?
+ Excludes field from serialization/deserialization.
+ Helps hide internal/sensitive fields from API payloads.
+ ignore *internalToken*.
+
+** Q23: @JsonIgnoreProperties(ignoreUnknown = true) purpose?
+ Ignore extra JSON fields.
+ Improves compatibility when producers add new non-breaking fields.
+ older service reading newer payload safely.
+
+** Q24: What does @JsonInclude do?
+ Controls inclusion policy (e.g., non-null only).
+ Reduces payload noise and supports clean API responses.
+ *Include.NON_NULL* omits null fields.
+
+** Q25: What does @JsonFormat do?
+ Controls formatting for date/time/number fields.
+ Useful for stable, explicit representation in API contracts.
+ date pattern *yyyy-MM-dd*.
+
+** Q26: @JsonAlias use case?
+ Accept multiple input names for same field.
+ Helps migration/compatibility with legacy payload variants.
+ accept *first_name* and *firstName*.
+
+** Q27: @JsonGetter / @JsonSetter use?
+ Custom getter/setter mapping names/logic.
+ Useful when property methods need explicit JSON binding behavior.
+ computed output field via getter.
+
+** Q28: @JsonCreator purpose?
+ Defines constructor/factory for deserialization.
+ Important for immutable classes/records when custom construction needed.
+ constructor parameter mapping with @JsonProperty.
+
+** Q29: @JsonAnySetter / @JsonAnyGetter purpose?
+ Capture/emit dynamic key-value fields.
+ Useful for extensible metadata sections with unknown keys.
+ additional attributes map.
+
+** Q30: Annotation best-practice rule?
+ Keep annotations minimal and intentional.
+ Too many annotations create hidden complexity; prefer clean DTOs and centralized config where possible.
+ avoid mixing conflicting include/ignore rules.
+
+-----
+
+* Date/Time and Java 8+ Types
+
+** Q31: Why does LocalDateTime need special support?
+ Requires Java Time module.
+ Without JavaTimeModule, serialization/deserialization of java.time types may fail or be undesirable format.
+ register *JavaTimeModule*.
+
+** Q32: How to configure ObjectMapper for java.time?
+ Register JavaTimeModule and configure timestamp behavior.
+ Most APIs prefer ISO-8601 strings, not numeric timestamps.
+
+#+begin_src java
+mapper.registerModule(new JavaTimeModule());
+mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+#+end_src
+
+** Q33: Why store/transmit timestamps in UTC?
+ Avoid timezone ambiguity.
+ UTC simplifies distributed systems and cross-region consistency.
+ use Instant in persistence/audit payloads.
+
+** Q34: LocalDate vs Instant in APIs?
+ LocalDate for date-only; Instant for absolute moment.
+ Choose type matching business semantics to avoid confusion.
+ birthday = LocalDate, eventCreatedAt = Instant.
+
+** Q35: @JsonFormat on date fields when useful?
+ For strict readable date patterns.
+ Useful for compatibility with clients expecting exact format.
+ *@JsonFormat(pattern = "yyyy-MM-dd")*
+
+** Q36: Common date/time bug with Jackson?
+ Inconsistent timezone assumptions.
+ One service serializes in local zone, another expects UTC => shifted times.
+ 2-hour offset bug in Europe summer time.
+
+** Q37: Should API expose LocalDateTime directly?
+ Usually prefer Instant/OffsetDateTime for timestamps.
+ LocalDateTime lacks timezone/offset context, causing ambiguity across systems.
+ same local time interpreted differently in different regions.
+
+** Q38: How to ensure stable time serialization?
+ Standardize ObjectMapper config globally.
+ One centralized config avoids endpoint-by-endpoint drift.
+ shared Spring Boot Jackson config bean.
+
+** Q39: What about Duration/Period serialization?
+ Supported with proper module/config.
+ Ensure clients agree on representation (ISO-8601 text often best).
+ *PT15M* duration.
+
+** Q40: Date/time best-practice one-liner?
+ Use explicit types + explicit timezone policy.
+ Ambiguity is the root of most distributed time bugs.
+ UTC Instant in JSON contracts.
+
+-----
+
+* Collections, Generics, and Complex Types
+
+** Q41: Why generic collection deserialization can fail?
+ Type erasure loses runtime generic info.
+ Jackson needs TypeReference/JavaType for *List<T>*, *Map<K,V>*, etc.
+ *new TypeReference<Map<String, Object>>() {}*
+
+** Q42: How to parse List<UserDto>?
+ Use TypeReference.
+ Prevents LinkedHashMap fallback and class cast issues.
+
+#+begin_src java
+List<UserDto> list = mapper.readValue(json, new TypeReference<List<UserDto>>() {});
+#+end_src
+
+** Q43: How to parse Map<String, List<OrderDto>>?
+ TypeReference with nested generics.
+ Strong typing avoids runtime casting risks.
+ nested TypeReference definition.
+
+** Q44: Why does Jackson sometimes deserialize to LinkedHashMap?
+ Missing target type info.
+ Without explicit type, Jackson chooses generic map structures.
+ *readValue(json, List.class)* gives List<LinkedHashMap>.
+
+** Q45: JsonNode vs Map for dynamic payloads?
+ JsonNode is richer JSON-aware API.
+ Node API supports path traversal and type-safe checks better than raw map casts.
+ *node.path("meta").path("id").asText()*.
+
+** Q46: Handling polymorphic JSON types?
+ Use type metadata with care.
+ Polymorphic deserialization is powerful but has security implications if misconfigured.
+ sealed hierarchy DTO with controlled subtype mapping.
+
+** Q47: What is JavaType in Jackson?
+ Explicit runtime type descriptor.
+ Useful for advanced generic type construction via TypeFactory.
+ collectionType for List<UserDto>.
+
+** Q48: Should API payloads be deeply nested?
+ Prefer moderate depth.
+ Deep nesting complicates validation, client parsing, and backward compatibility.
+ flatten unnecessary wrapper levels.
+
+** Q49: How to parse partial fields only?
+ Use JsonNode or streaming parser.
+ Avoid full object binding when only subset needed for performance.
+ read only *id* and *status* from large payload.
+
+** Q50: Generic mapping best practice?
+ Always provide explicit target type.
+ Strong typing catches issues early and simplifies maintenance.
+ never use raw *List.class* for typed lists.
+
+-----
+
+* Error Handling and Validation
+
+** Q51: Common Jackson exceptions?
+ JsonProcessingException and subclasses.
+ Includes parse errors, invalid format, unknown type, mismatched input.
+ invalid JSON syntax throws parsing exception.
+
+** Q52: MismatchedInputException meaning?
+ JSON shape/type doesn’t match target class.
+ Typical issue when expecting object but receiving array/string.
+ field expects int but receives *"abc"*.
+
+** Q53: How to return clean API errors for JSON parse failures?
+ Global exception handler mapping to 400 Bad Request.
+ Avoid leaking stack traces; provide clear client-facing error and internal logs.
+ *@ControllerAdvice* handles HttpMessageNotReadableException.
+
+** Q54: Validation vs deserialization errors?
+ Deserialization checks structure/type; validation checks business constraints.
+ Both are needed: JSON may parse but still violate domain rules.
+ age parses as 5 but violates min age 18 rule.
+
+** Q55: Why keep error responses consistent?
+ Better client integration and debugging.
+ Standard schema (code/message/path/timestamp/correlationId) improves operability.
+ same error format for parse and validation failures.
+
+** Q56: Should unknown JSON fields always be ignored?
+ Depends on contract strictness.
+ Ignore for forward compatibility, fail for strict controlled interfaces.
+ public API tolerate extras; internal strict pipeline may reject.
+
+** Q57: How to detect invalid enum values?
+ Jackson throws mapping error unless configured otherwise.
+ You can customize handling for safer defaults or explicit rejection.
+ unknown status string triggers 400.
+
+** Q58: Can Jackson coerce types automatically?
+ Sometimes yes.
+ Coercion can be convenient but risky; strict configs reduce surprises.
+ *"1"* to int may parse, but strict mode may reject.
+
+** Q59: Why log raw bad payload cautiously?
+ Security/privacy risks.
+ Payload may contain secrets/PII; redact sensitive fields in logs.
+ mask password/token before logging.
+
+** Q60: Error-handling best-practice line?
+ Fail clearly for clients, log safely for operators.
+ Good error design improves both developer experience and incident response.
+ 400 with field-level reason + sanitized server logs.
+
+-----
+
+* Custom Serialization/Deserialization
+
+** Q61: When to write custom serializer?
+ When default JSON output is not suitable.
+ Use for domain-specific formatting, compact payloads, or legacy contract compatibility.
+ money object serialized as *"12.50 USD"*.
+
+** Q62: When to write custom deserializer?
+ When input format needs custom parsing logic.
+ Useful for non-standard formats and backward compatibility bridges.
+ parse multiple date patterns into one field.
+
+** Q63: How to register custom serializer/deserializer?
+ Via Module (SimpleModule).
+ Central registration keeps behavior consistent and testable.
+
+#+begin_src java
+SimpleModule m = new SimpleModule();
+m.addSerializer(Money.class, new MoneySerializer());
+mapper.registerModule(m);
+#+end_src
+
+** Q64: JsonSerializer role?
+ Defines how object becomes JSON.
+ You control field shape and output tokens directly.
+ write object with custom field names.
+
+** Q65: JsonDeserializer role?
+ Defines how JSON becomes object.
+ Handle flexible/legacy formats while preserving strong domain model.
+ parse *"Y"/"N"* into boolean.
+
+** Q66: Custom (de)serializers risk?
+ Added complexity and maintenance burden.
+ Keep logic minimal and well-tested to avoid hidden parsing bugs.
+ serializer/deserializer pair round-trip tests.
+
+** Q67: What is @JsonSerialize/@JsonDeserialize?
+ Per-field/class custom handler binding.
+ Useful when only specific DTO fields need custom behavior.
+ custom BigDecimal formatting on price field.
+
+** Q68: Should business logic live in deserializer?
+ Prefer minimal transformation only.
+ Keep business validation in service/validator layer for clarity and reuse.
+ parse value in deserializer, validate rules elsewhere.
+
+** Q69: How to test custom serializer/deserializer?
+ Round-trip and edge-case tests.
+ Verify valid inputs, invalid inputs, null handling, and backward compatibility.
+ object -> JSON -> object equality checks.
+
+** Q70: Custom mapping golden rule?
+ Be explicit and predictable.
+ JSON contracts should be boring and stable, not surprising.
+ fixed field names and deterministic formats.
+
+-----
+
+* Performance and Large Payload Handling
+
+** Q71: Is Jackson fast enough for most APIs?
+ Yes.
+ Jackson is highly optimized; bottlenecks are often elsewhere (I/O, DB, network).
+ response latency mostly DB-bound, not JSON-bound.
+
+** Q72: When use Jackson streaming API?
+ Very large payloads or memory-sensitive processing.
+ Streaming reads/writes incrementally, avoiding full in-memory object trees.
+ processing huge JSON array linearly.
+
+** Q73: Data binding vs streaming tradeoff?
+ Data binding easier; streaming more memory-efficient.
+ Prefer data binding for normal payloads; streaming for scale-critical paths.
+ export millions of records with generator.
+
+** Q74: What is ObjectReader/ObjectWriter benefit?
+ Reusable, preconfigured read/write objects.
+ Can improve clarity and minor performance by avoiding repeated config.
+ one ObjectWriter for pretty logs, one for compact API output.
+
+** Q75: Why avoid huge nested DTO graphs?
+ Serialization cost and complexity.
+ Large object graphs can cause heavy memory use and recursion issues.
+ bidirectional entity references causing deep trees.
+
+** Q76: How to avoid infinite recursion in JSON?
+ Use DTO separation or Jackson reference annotations.
+ Bidirectional relations (parent-child-parent) need explicit handling.
+ *@JsonManagedReference* / *@JsonBackReference*.
+
+** Q77: Should you serialize JPA entities directly?
+ Usually no.
+ Lazy loading, recursion, and accidental field exposure are common risks.
+ entity graph triggers unexpected DB queries during serialization.
+
+** Q78: Why compact JSON sometimes preferred?
+ Less bandwidth and faster transfer.
+ Pretty JSON is great for humans, compact JSON for production traffic.
+ machine-to-machine APIs use compact output.
+
+** Q79: Can Jackson handle backpressure?
+ Not by itself.
+ Backpressure is transport/reactive concern; Jackson handles parsing/serialization step.
+ reactive stream controls flow, Jackson maps chunks.
+
+** Q80: Performance best-practice line?
+ Measure first, optimize targeted hotspots only.
+ Don’t over-engineer streaming/custom handlers without profiling evidence.
+ use profiler before rewriting mapping layer.
+
+-----
+
+* Security Considerations
+
+** Q81: Why is JSON parsing security-relevant?
+ Untrusted input can trigger vulnerabilities or resource abuse.
+ Large/deep payloads, polymorphic misuse, and unsafe logging are common risk areas.
+ maliciously deep JSON causing heavy parse cost.
+
+** Q82: What is polymorphic deserialization risk?
+ Unsafe type handling can lead to gadget-based attacks.
+ Never enable permissive default typing blindly on untrusted data.
+ restrict allowed subtypes explicitly.
+
+** Q83: Is enabling default typing always safe?
+ No.
+ It can open attack vectors if arbitrary classes are deserialized.
+ avoid broad global default typing for external payloads.
+
+** Q84: How to harden Jackson input handling?
+ Limit payload size/depth and use strict DTOs.
+ Combine parser limits, validation, and controlled type mapping.
+ reject payload > max size at gateway/app layer.
+
+** Q85: Why avoid exposing internal exception details?
+ Information leakage risk.
+ Detailed stack/class info helps attackers and confuses clients.
+ return generic 400 with safe message.
+
+** Q86: Should secrets be serialized?
+ No.
+ Mark sensitive fields ignored/masked and separate internal models from API DTOs.
+ never output passwordHash/apiKey.
+
+** Q87: Input validation position with Jackson?
+ After successful deserialization.
+ Parsing ensures structural validity; validation enforces business/safety rules.
+ bean validation annotations on DTO.
+
+** Q88: Safe logging rule for JSON payloads?
+ Log minimal and redact sensitive fields.
+ Operational visibility must not violate privacy/security policies.
+ mask email/token before writing logs.
+
+** Q89: Why contract whitelisting is safer?
+ Accept only known fields/types.
+ Reduces attack surface and unexpected behavior from extra input.
+ strict DTO rather than *Map<String,Object>* for external APIs.
+
+** Q90: Security best-practice one-liner?
+ Treat all external JSON as untrusted input.
+ Parse carefully, validate strictly, and expose minimal output.
+ strict DTO + validation + sanitized errors.
+
+-----
+
+* Spring Boot + Jackson Practical
+
+** Q91: How is Jackson used in Spring Boot by default?
+ Auto-configured for request/response JSON conversion.
+ Spring’s HttpMessageConverters use ObjectMapper behind the scenes.
+ *@RequestBody* and *@ResponseBody* serialization.
+
+** Q92: How to customize global ObjectMapper in Spring?
+ Define/configure mapper bean or Jackson2ObjectMapperBuilder.
+ Centralized config ensures consistent behavior across controllers.
+ global NON_NULL + JavaTimeModule.
+
+** Q93: @JsonIgnore vs @JsonView in APIs?
+ Ignore removes field always; JsonView controls per-view exposure.
+ JsonView can support role/context-based payload shaping but adds complexity.
+ public vs internal response view.
+
+** Q94: How to return custom JSON error body in Spring?
+ Use @ControllerAdvice with exception handlers.
+ Keeps error contract consistent for parse/validation/business failures.
+ standardized *ApiError* response object.
+
+** Q95: Why avoid entity exposure in Spring controllers?
+ Contract and security risks.
+ DTO boundary prevents lazy loading surprises and field leaks.
+ map entity -> response DTO layer.
+
+** Q96: How to test Jackson behavior in Spring?
+ Unit + slice/integration tests with ObjectMapper.
+ Validate schema stability, date formats, and error handling.
+ MockMvc assert JSON path fields.
+
+** Q97: What is @JsonComponent?
+ Spring shortcut for registering custom serializers/deserializers.
+ Useful for Spring-managed custom JSON behavior.
+ custom serializer bean auto-discovered.
+
+** Q98: How to exclude null fields globally in Spring?
+ configure inclusion NON_NULL.
+ Reduces payload size/noise while keeping contract explicit.
+ *spring.jackson.default-property-inclusion=non_null*
+
+** Q99: Why keep JSON contract versioning strategy?
+ Prevent client breakage.
+ Favor additive changes; use versioning when breaking changes are needed.
+ v1 and v2 response DTOs.
+
+** Q100: Spring + Jackson golden rule?
+ Centralize config and keep DTO contracts explicit.
+ Consistency is more important than clever per-endpoint customization.
+ one mapper policy, many predictable endpoints.
+
+-----
+
+* Interview-Focused
+
+** Q101: “Why Jackson over Gson?”
+ Rich ecosystem, strong performance, broad framework support.
+ Jackson’s modules, annotations, streaming, and Spring integration make it dominant in enterprise Java.
+ JavaTime + Kotlin + XML modules available.
+
+** Q102: “How do you handle unknown fields in production APIs?”
+ Usually tolerate for forward compatibility.
+ Policy depends on contract strictness; public APIs often ignore unknowns.
+ *@JsonIgnoreProperties(ignoreUnknown = true)* for inbound DTO.
+
+** Q103: “How do you prevent JSON contract regressions?”
+ Contract tests and snapshot/schema assertions.
+ Automated tests catch accidental field rename/type/format changes.
+ API test asserting date format and field names.
+
+** Q104: “How to deserialize generic types safely?”
+ TypeReference/JavaType.
+ Avoid raw types to prevent runtime cast issues and hidden map fallback.
+ *new TypeReference<List<OrderDto>>() {}*
+
+** Q105: “How to handle date/time across microservices?”
+ Standardize on ISO-8601 + UTC policy.
+ Consistent serialization avoids timezone drift bugs between services.
+ Instant serialized with *Z*.
+
+** Q106: “How do you optimize Jackson performance?”
+ Reuse mapper, avoid unnecessary conversions, profile.
+ Streaming only for truly large payload scenarios.
+ remove object->json->object roundtrips in hot paths.
+
+** Q107: “How do you secure Jackson deserialization?”
+ Restrict types and validate inputs.
+ Avoid permissive polymorphism and enforce strict DTO boundaries.
+ no global default typing on external payloads.
+
+** Q108: “JsonNode or POJO mapping?”
+ POJO for stable schema, JsonNode for dynamic payloads.
+ Mixed approach is common: node for envelope, POJO for payload body.
+ dynamic metadata + typed business section.
+
+** Q109: “Custom serializer or annotation config?”
+ Annotation/config first; custom serializer when necessary.
+ Prefer simpler maintainable options before custom code.
+ @JsonFormat solves many date formatting needs.
+
+** Q110: “Most common Jackson production bug?”
+ Inconsistent mapper configuration across modules.
+ Centralized config and tests prevent format/drift issues.
+ one module writes timestamps, another writes ISO strings.
+
+-----
+
+* Final Mastery Checklist
+
+** Q111: Can you explain serialization/deserialization clearly?
+ If yes, foundation is strong.
+ This is core to API reliability and integration correctness.
+ request JSON -> DTO -> response JSON flow.
+
+** Q112: Can you configure ObjectMapper centrally and safely?
+ If yes, consistency improves.
+ Central policies reduce endpoint drift and production surprises.
+ one shared Spring mapper bean.
+
+** Q113: Can you handle generics without raw-type pitfalls?
+ If yes, typing maturity is strong.
+ TypeReference use prevents runtime cast and map fallback issues.
+ parse list/map nested DTOs safely.
+
+** Q114: Can you map date/time with explicit timezone policy?
+ If yes, distributed correctness improves.
+ Time ambiguity is a major integration bug source.
+ Instant UTC everywhere.
+
+** Q115: Can you design safe error handling for bad JSON?
+ If yes, client/dev experience improves.
+ Consistent 400 responses + sanitized logs are essential.
+ controller advice for parse exceptions.
+
+** Q116: Can you avoid entity exposure and use DTO contracts?
+ If yes, API stability/security improve.
+ DTO boundaries decouple persistence from external contract.
+ entity->DTO mapper layer.
+
+** Q117: Can you reason about Jackson security risks?
+ If yes, production safety improves.
+ Untrusted input + permissive typing is dangerous.
+ strict subtype control and validation.
+
+** Q118: Can you test JSON contracts effectively?
+ If yes, regressions drop.
+ Tests should lock schema, formats, and error behavior.
+ MockMvc JSON path assertions.
+
+** Q119: Can you choose between POJO/tree/streaming models properly?
+ If yes, design is practical and efficient.
+ Right model per use case avoids complexity/perf issues.
+ stream huge exports, POJO for normal API bodies.
+
+** Q120: Final principle for Jackson in backend systems?
+ Keep JSON contracts explicit, stable, and secure.
+ Jackson is powerful—use that power with consistency, validation, and clear boundaries.
+ centralized config + DTO-first API design.
+
+-----
+
+#+INCLUDE: "../footer.org"

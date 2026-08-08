@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java JSON (Jackson)</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Java JSON (Jackson)</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org366b8b6" class="outline-2">
+<h2 id="org366b8b6">Java JSON (Jackson)</h2>
+<div class="outline-text-2" id="text-org366b8b6">
+<hr>
+</div>
+</div>
+<div id="outline-container-org4a6f45b" class="outline-2">
+<h2 id="org4a6f45b">JSON + Jackson Foundations</h2>
+<div class="outline-text-2" id="text-org4a6f45b">
+</div>
+<div id="outline-container-org17bdc58" class="outline-3">
+<h3 id="org17bdc58">Q1: What is JSON?</h3>
+<div class="outline-text-3" id="text-org17bdc58">
+<p>
+JSON is a lightweight text format for structured data exchange.
+It is language-agnostic and commonly used in REST APIs, messaging, and config. Jackson maps JSON to Java objects and back.
+<b>{"id":1,"name":"Ana"}</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org1771b9b" class="outline-3">
+<h3 id="org1771b9b">Q2: What is Jackson in Java?</h3>
+<div class="outline-text-3" id="text-org1771b9b">
+<p>
+Jackson is a popular library for JSON serialization/deserialization.
+It provides flexible data binding, tree model, and streaming APIs used in most Java backend systems.
+Spring Boot uses Jackson by default for JSON bodies.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbd8b458" class="outline-3">
+<h3 id="orgbd8b458">Q3: Serialization vs deserialization?</h3>
+<div class="outline-text-3" id="text-orgbd8b458">
+<p>
+Serialization = Java object -&gt; JSON, deserialization = JSON -&gt; Java object.
+Correct schema mapping is critical for API compatibility and data integrity.
+<b>UserDto</b> to JSON response and back from request body.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c75fd5" class="outline-3">
+<h3 id="org1c75fd5">Q4: What is ObjectMapper?</h3>
+<div class="outline-text-3" id="text-org1c75fd5">
+<p>
+Core Jackson class for reading/writing JSON.
+ObjectMapper is thread-safe after configuration and should usually be reused as singleton bean.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">ObjectMapper</span> <span style="font-weight: bold; font-style: italic;">mapper</span> = <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">ObjectMapper</span>();
+<span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">json</span> = mapper.writeValueAsString(user);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2f19b2b" class="outline-3">
+<h3 id="org2f19b2b">Q5: Why avoid creating ObjectMapper repeatedly?</h3>
+<div class="outline-text-3" id="text-org2f19b2b">
+<p>
+Reusing is faster and consistent.
+Recreating mapper per request increases overhead and risks inconsistent config across code paths.
+configure one <b>@Bean ObjectMapper</b> in Spring.
+</p>
+</div>
+</div>
+<div id="outline-container-org36d2cda" class="outline-3">
+<h3 id="org36d2cda">Q6: What are Jackson core models?</h3>
+<div class="outline-text-3" id="text-org36d2cda">
+<p>
+Data binding, tree model, and streaming model.
+Choose model by use case: POJO mapping for common cases, JsonNode for dynamic JSON, streaming for very large payloads.
+<b>readValue</b> (POJO), <b>readTree</b> (JsonNode), <b>JsonParser</b> (streaming).
+</p>
+</div>
+</div>
+<div id="outline-container-orgd685d98" class="outline-3">
+<h3 id="orgd685d98">Q7: Why is DTO recommended for JSON contracts?</h3>
+<div class="outline-text-3" id="text-orgd685d98">
+<p>
+DTO isolates API schema from domain/entity internals.
+Prevents accidental field leakage, lazy-loading issues, and contract breakage during refactors.
+expose <b>UserResponse</b> instead of JPA <b>UserEntity</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orga991f78" class="outline-3">
+<h3 id="orga991f78">Q8: Can Jackson handle Java records?</h3>
+<div class="outline-text-3" id="text-orga991f78">
+<p>
+Yes.
+Records are great immutable DTOs for clear API contracts and reduced boilerplate.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">record</span> <span style="font-weight: bold;">UserResponse</span>(<span style="font-weight: bold; text-decoration: underline;">Long</span> <span style="font-weight: bold; font-style: italic;">id</span>, <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">name</span>) {}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5bafff5" class="outline-3">
+<h3 id="org5bafff5">Q9: What does FAIL<sub>ON</sub><sub>UNKNOWN</sub><sub>PROPERTIES</sub> do?</h3>
+<div class="outline-text-3" id="text-org5bafff5">
+<p>
+Controls behavior for unknown JSON fields during deserialization.
+Disabling can improve forward compatibility; enabling can enforce strict schema.
+tolerate extra fields from newer client version.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbbea758" class="outline-3">
+<h3 id="orgbbea758">Q10: JSON null vs missing field difference?</h3>
+<div class="outline-text-3" id="text-orgbbea758">
+<p>
+null is explicit value; missing means absent key.
+This difference matters for PATCH semantics and partial updates.
+<b>{"name":null}</b> vs <b>{}</b>
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd076c6e" class="outline-2">
+<h2 id="orgd076c6e">ObjectMapper Basic Operations</h2>
+<div class="outline-text-2" id="text-orgd076c6e">
+</div>
+<div id="outline-container-org962533c" class="outline-3">
+<h3 id="org962533c">Q11: How to convert object to JSON string?</h3>
+<div class="outline-text-3" id="text-org962533c">
+<p>
+<b>writeValueAsString</b>.
+Most common serialization method in services and tests.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">json</span> = mapper.writeValueAsString(dto);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd5b38d4" class="outline-3">
+<h3 id="orgd5b38d4">Q12: How to parse JSON string into object?</h3>
+<div class="outline-text-3" id="text-orgd5b38d4">
+<p>
+<b>readValue(json, Class)</b>.
+Ensure class fields/types align with payload schema.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">UserDto</span> <span style="font-weight: bold; font-style: italic;">dto</span> = mapper.readValue(json, UserDto.<span style="font-weight: bold;">class</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org348e547" class="outline-3">
+<h3 id="org348e547">Q13: How to read JSON from file?</h3>
+<div class="outline-text-3" id="text-org348e547">
+<p>
+<b>readValue(File, Class)</b>.
+Useful for config/bootstrap data and integration tests.
+loading seed JSON test data.
+</p>
+</div>
+</div>
+<div id="outline-container-org894b54b" class="outline-3">
+<h3 id="org894b54b">Q14: How to write JSON to file?</h3>
+<div class="outline-text-3" id="text-org894b54b">
+<p>
+<b>writeValue(File, Object)</b>.
+Good for exports/log snapshots; ensure encoding and file permissions.
+persist report data as JSON file.
+</p>
+</div>
+</div>
+<div id="outline-container-org3c2404e" class="outline-3">
+<h3 id="org3c2404e">Q15: How to pretty print JSON?</h3>
+<div class="outline-text-3" id="text-org3c2404e">
+<p>
+Use pretty printer.
+Better readability for logs/debug, but avoid in high-volume production responses unless needed.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">pretty</span> = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dto);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf8db76a" class="outline-3">
+<h3 id="orgf8db76a">Q16: convertValue use case?</h3>
+<div class="outline-text-3" id="text-orgf8db76a">
+<p>
+Convert one object type to another using Jackson mapping.
+Handy for DTO transformations without manual mapping in some cases.
+Map&lt;String,Object&gt; -&gt; typed DTO.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcf2158a" class="outline-3">
+<h3 id="orgcf2158a">Q17: readTree use case?</h3>
+<div class="outline-text-3" id="text-orgcf2158a">
+<p>
+Parse into JsonNode tree for dynamic structure access.
+Useful when schema is partially unknown or needs selective extraction.
+read only <b>payload.meta.traceId</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd26987" class="outline-3">
+<h3 id="orgfd26987">Q18: treeToValue / valueToTree use case?</h3>
+<div class="outline-text-3" id="text-orgfd26987">
+<p>
+Bridge between JsonNode and POJO.
+Useful in mixed dynamic+typed pipelines.
+parse root as JsonNode, convert subnode to typed class.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c15f24" class="outline-3">
+<h3 id="org4c15f24">Q19: TypeReference why needed?</h3>
+<div class="outline-text-3" id="text-org4c15f24">
+<p>
+Preserve generic type info during deserialization.
+Java type erasure loses runtime generic details without TypeReference.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">List</span>&lt;<span style="font-weight: bold; text-decoration: underline;">UserDto</span>&gt; <span style="font-weight: bold; font-style: italic;">users</span> = mapper.readValue(json, <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">TypeReference</span>&lt;<span style="font-weight: bold; text-decoration: underline;">List</span>&lt;<span style="font-weight: bold; text-decoration: underline;">UserDto</span>&gt;&gt;() {});
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbc45cfd" class="outline-3">
+<h3 id="orgbc45cfd">Q20: Common beginner Jackson mistake?</h3>
+<div class="outline-text-3" id="text-orgbc45cfd">
+<p>
+Ignoring exceptions and schema mismatch.
+Silent assumptions cause runtime mapping failures in production payloads.
+field type mismatch <b>age:"abc"</b> for int field.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org55a7ad1" class="outline-2">
+<h2 id="org55a7ad1">Core Annotations for Mapping Control</h2>
+<div class="outline-text-2" id="text-org55a7ad1">
+</div>
+<div id="outline-container-org30a4376" class="outline-3">
+<h3 id="org30a4376">Q21: What does @JsonProperty do?</h3>
+<div class="outline-text-3" id="text-org30a4376">
+<p>
+Maps Java field/property to specific JSON key.
+Useful for naming mismatches and explicit contract declaration.
+<b>firstName</b> &lt;-&gt; <b>"first<sub>name</sub>"</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ca554d" class="outline-3">
+<h3 id="org2ca554d">Q22: What does @JsonIgnore do?</h3>
+<div class="outline-text-3" id="text-org2ca554d">
+<p>
+Excludes field from serialization/deserialization.
+Helps hide internal/sensitive fields from API payloads.
+ignore <b>internalToken</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d94d7d" class="outline-3">
+<h3 id="org1d94d7d">Q23: @JsonIgnoreProperties(ignoreUnknown = true) purpose?</h3>
+<div class="outline-text-3" id="text-org1d94d7d">
+<p>
+Ignore extra JSON fields.
+Improves compatibility when producers add new non-breaking fields.
+older service reading newer payload safely.
+</p>
+</div>
+</div>
+<div id="outline-container-org9fa1950" class="outline-3">
+<h3 id="org9fa1950">Q24: What does @JsonInclude do?</h3>
+<div class="outline-text-3" id="text-org9fa1950">
+<p>
+Controls inclusion policy (e.g., non-null only).
+Reduces payload noise and supports clean API responses.
+<b>Include.NON<sub>NULL</sub></b> omits null fields.
+</p>
+</div>
+</div>
+<div id="outline-container-org6d13931" class="outline-3">
+<h3 id="org6d13931">Q25: What does @JsonFormat do?</h3>
+<div class="outline-text-3" id="text-org6d13931">
+<p>
+Controls formatting for date/time/number fields.
+Useful for stable, explicit representation in API contracts.
+date pattern <b>yyyy-MM-dd</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcd873b9" class="outline-3">
+<h3 id="orgcd873b9">Q26: @JsonAlias use case?</h3>
+<div class="outline-text-3" id="text-orgcd873b9">
+<p>
+Accept multiple input names for same field.
+Helps migration/compatibility with legacy payload variants.
+accept <b>first<sub>name</sub></b> and <b>firstName</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orga500c18" class="outline-3">
+<h3 id="orga500c18">Q27: @JsonGetter / @JsonSetter use?</h3>
+<div class="outline-text-3" id="text-orga500c18">
+<p>
+Custom getter/setter mapping names/logic.
+Useful when property methods need explicit JSON binding behavior.
+computed output field via getter.
+</p>
+</div>
+</div>
+<div id="outline-container-org08daefe" class="outline-3">
+<h3 id="org08daefe">Q28: @JsonCreator purpose?</h3>
+<div class="outline-text-3" id="text-org08daefe">
+<p>
+Defines constructor/factory for deserialization.
+Important for immutable classes/records when custom construction needed.
+constructor parameter mapping with @JsonProperty.
+</p>
+</div>
+</div>
+<div id="outline-container-orga96f856" class="outline-3">
+<h3 id="orga96f856">Q29: @JsonAnySetter / @JsonAnyGetter purpose?</h3>
+<div class="outline-text-3" id="text-orga96f856">
+<p>
+Capture/emit dynamic key-value fields.
+Useful for extensible metadata sections with unknown keys.
+additional attributes map.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e53c97" class="outline-3">
+<h3 id="org0e53c97">Q30: Annotation best-practice rule?</h3>
+<div class="outline-text-3" id="text-org0e53c97">
+<p>
+Keep annotations minimal and intentional.
+Too many annotations create hidden complexity; prefer clean DTOs and centralized config where possible.
+avoid mixing conflicting include/ignore rules.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc6f819c" class="outline-2">
+<h2 id="orgc6f819c">Date/Time and Java 8+ Types</h2>
+<div class="outline-text-2" id="text-orgc6f819c">
+</div>
+<div id="outline-container-orgd88d70d" class="outline-3">
+<h3 id="orgd88d70d">Q31: Why does LocalDateTime need special support?</h3>
+<div class="outline-text-3" id="text-orgd88d70d">
+<p>
+Requires Java Time module.
+Without JavaTimeModule, serialization/deserialization of java.time types may fail or be undesirable format.
+register <b>JavaTimeModule</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdaf8a72" class="outline-3">
+<h3 id="orgdaf8a72">Q32: How to configure ObjectMapper for java.time?</h3>
+<div class="outline-text-3" id="text-orgdaf8a72">
+<p>
+Register JavaTimeModule and configure timestamp behavior.
+Most APIs prefer ISO-8601 strings, not numeric timestamps.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">mapper.registerModule(<span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">JavaTimeModule</span>());
+mapper.disable(<span style="font-weight: bold; text-decoration: underline;">SerializationFeature</span>.WRITE_DATES_AS_TIMESTAMPS);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org138f263" class="outline-3">
+<h3 id="org138f263">Q33: Why store/transmit timestamps in UTC?</h3>
+<div class="outline-text-3" id="text-org138f263">
+<p>
+Avoid timezone ambiguity.
+UTC simplifies distributed systems and cross-region consistency.
+use Instant in persistence/audit payloads.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd0118d0" class="outline-3">
+<h3 id="orgd0118d0">Q34: LocalDate vs Instant in APIs?</h3>
+<div class="outline-text-3" id="text-orgd0118d0">
+<p>
+LocalDate for date-only; Instant for absolute moment.
+Choose type matching business semantics to avoid confusion.
+birthday = LocalDate, eventCreatedAt = Instant.
+</p>
+</div>
+</div>
+<div id="outline-container-org7aa3b42" class="outline-3">
+<h3 id="org7aa3b42">Q35: @JsonFormat on date fields when useful?</h3>
+<div class="outline-text-3" id="text-org7aa3b42">
+<p>
+For strict readable date patterns.
+Useful for compatibility with clients expecting exact format.
+<b>@JsonFormat(pattern = "yyyy-MM-dd")</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org184bd1c" class="outline-3">
+<h3 id="org184bd1c">Q36: Common date/time bug with Jackson?</h3>
+<div class="outline-text-3" id="text-org184bd1c">
+<p>
+Inconsistent timezone assumptions.
+One service serializes in local zone, another expects UTC =&gt; shifted times.
+2-hour offset bug in Europe summer time.
+</p>
+</div>
+</div>
+<div id="outline-container-org1023c02" class="outline-3">
+<h3 id="org1023c02">Q37: Should API expose LocalDateTime directly?</h3>
+<div class="outline-text-3" id="text-org1023c02">
+<p>
+Usually prefer Instant/OffsetDateTime for timestamps.
+LocalDateTime lacks timezone/offset context, causing ambiguity across systems.
+same local time interpreted differently in different regions.
+</p>
+</div>
+</div>
+<div id="outline-container-org2567e7e" class="outline-3">
+<h3 id="org2567e7e">Q38: How to ensure stable time serialization?</h3>
+<div class="outline-text-3" id="text-org2567e7e">
+<p>
+Standardize ObjectMapper config globally.
+One centralized config avoids endpoint-by-endpoint drift.
+shared Spring Boot Jackson config bean.
+</p>
+</div>
+</div>
+<div id="outline-container-org4fd1257" class="outline-3">
+<h3 id="org4fd1257">Q39: What about Duration/Period serialization?</h3>
+<div class="outline-text-3" id="text-org4fd1257">
+<p>
+Supported with proper module/config.
+Ensure clients agree on representation (ISO-8601 text often best).
+<b>PT15M</b> duration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgabf2e83" class="outline-3">
+<h3 id="orgabf2e83">Q40: Date/time best-practice one-liner?</h3>
+<div class="outline-text-3" id="text-orgabf2e83">
+<p>
+Use explicit types + explicit timezone policy.
+Ambiguity is the root of most distributed time bugs.
+UTC Instant in JSON contracts.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org28544fd" class="outline-2">
+<h2 id="org28544fd">Collections, Generics, and Complex Types</h2>
+<div class="outline-text-2" id="text-org28544fd">
+</div>
+<div id="outline-container-org3aada1c" class="outline-3">
+<h3 id="org3aada1c">Q41: Why generic collection deserialization can fail?</h3>
+<div class="outline-text-3" id="text-org3aada1c">
+<p>
+Type erasure loses runtime generic info.
+Jackson needs TypeReference/JavaType for <b>List&lt;T&gt;</b>, <b>Map&lt;K,V&gt;</b>, etc.
+<b>new TypeReference&lt;Map&lt;String, Object&gt;&gt;() {}</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org0e6c83d" class="outline-3">
+<h3 id="org0e6c83d">Q42: How to parse List&lt;UserDto&gt;?</h3>
+<div class="outline-text-3" id="text-org0e6c83d">
+<p>
+Use TypeReference.
+Prevents LinkedHashMap fallback and class cast issues.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">List</span>&lt;<span style="font-weight: bold; text-decoration: underline;">UserDto</span>&gt; <span style="font-weight: bold; font-style: italic;">list</span> = mapper.readValue(json, <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">TypeReference</span>&lt;<span style="font-weight: bold; text-decoration: underline;">List</span>&lt;<span style="font-weight: bold; text-decoration: underline;">UserDto</span>&gt;&gt;() {});
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga442155" class="outline-3">
+<h3 id="orga442155">Q43: How to parse Map&lt;String, List&lt;OrderDto&gt;&gt;?</h3>
+<div class="outline-text-3" id="text-orga442155">
+<p>
+TypeReference with nested generics.
+Strong typing avoids runtime casting risks.
+nested TypeReference definition.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc37b72b" class="outline-3">
+<h3 id="orgc37b72b">Q44: Why does Jackson sometimes deserialize to LinkedHashMap?</h3>
+<div class="outline-text-3" id="text-orgc37b72b">
+<p>
+Missing target type info.
+Without explicit type, Jackson chooses generic map structures.
+<b>readValue(json, List.class)</b> gives List&lt;LinkedHashMap&gt;.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf225163" class="outline-3">
+<h3 id="orgf225163">Q45: JsonNode vs Map for dynamic payloads?</h3>
+<div class="outline-text-3" id="text-orgf225163">
+<p>
+JsonNode is richer JSON-aware API.
+Node API supports path traversal and type-safe checks better than raw map casts.
+<b>node.path("meta").path("id").asText()</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org093eddd" class="outline-3">
+<h3 id="org093eddd">Q46: Handling polymorphic JSON types?</h3>
+<div class="outline-text-3" id="text-org093eddd">
+<p>
+Use type metadata with care.
+Polymorphic deserialization is powerful but has security implications if misconfigured.
+sealed hierarchy DTO with controlled subtype mapping.
+</p>
+</div>
+</div>
+<div id="outline-container-org4467790" class="outline-3">
+<h3 id="org4467790">Q47: What is JavaType in Jackson?</h3>
+<div class="outline-text-3" id="text-org4467790">
+<p>
+Explicit runtime type descriptor.
+Useful for advanced generic type construction via TypeFactory.
+collectionType for List&lt;UserDto&gt;.
+</p>
+</div>
+</div>
+<div id="outline-container-org868641b" class="outline-3">
+<h3 id="org868641b">Q48: Should API payloads be deeply nested?</h3>
+<div class="outline-text-3" id="text-org868641b">
+<p>
+Prefer moderate depth.
+Deep nesting complicates validation, client parsing, and backward compatibility.
+flatten unnecessary wrapper levels.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b29a0a" class="outline-3">
+<h3 id="org4b29a0a">Q49: How to parse partial fields only?</h3>
+<div class="outline-text-3" id="text-org4b29a0a">
+<p>
+Use JsonNode or streaming parser.
+Avoid full object binding when only subset needed for performance.
+read only <b>id</b> and <b>status</b> from large payload.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeac27e8" class="outline-3">
+<h3 id="orgeac27e8">Q50: Generic mapping best practice?</h3>
+<div class="outline-text-3" id="text-orgeac27e8">
+<p>
+Always provide explicit target type.
+Strong typing catches issues early and simplifies maintenance.
+never use raw <b>List.class</b> for typed lists.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd7942ff" class="outline-2">
+<h2 id="orgd7942ff">Error Handling and Validation</h2>
+<div class="outline-text-2" id="text-orgd7942ff">
+</div>
+<div id="outline-container-orgf66ca4f" class="outline-3">
+<h3 id="orgf66ca4f">Q51: Common Jackson exceptions?</h3>
+<div class="outline-text-3" id="text-orgf66ca4f">
+<p>
+JsonProcessingException and subclasses.
+Includes parse errors, invalid format, unknown type, mismatched input.
+invalid JSON syntax throws parsing exception.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd773d14" class="outline-3">
+<h3 id="orgd773d14">Q52: MismatchedInputException meaning?</h3>
+<div class="outline-text-3" id="text-orgd773d14">
+<p>
+JSON shape/type doesn’t match target class.
+Typical issue when expecting object but receiving array/string.
+field expects int but receives <b>"abc"</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd6de1ae" class="outline-3">
+<h3 id="orgd6de1ae">Q53: How to return clean API errors for JSON parse failures?</h3>
+<div class="outline-text-3" id="text-orgd6de1ae">
+<p>
+Global exception handler mapping to 400 Bad Request.
+Avoid leaking stack traces; provide clear client-facing error and internal logs.
+<b>@ControllerAdvice</b> handles HttpMessageNotReadableException.
+</p>
+</div>
+</div>
+<div id="outline-container-org77b593f" class="outline-3">
+<h3 id="org77b593f">Q54: Validation vs deserialization errors?</h3>
+<div class="outline-text-3" id="text-org77b593f">
+<p>
+Deserialization checks structure/type; validation checks business constraints.
+Both are needed: JSON may parse but still violate domain rules.
+age parses as 5 but violates min age 18 rule.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf7248fa" class="outline-3">
+<h3 id="orgf7248fa">Q55: Why keep error responses consistent?</h3>
+<div class="outline-text-3" id="text-orgf7248fa">
+<p>
+Better client integration and debugging.
+Standard schema (code/message/path/timestamp/correlationId) improves operability.
+same error format for parse and validation failures.
+</p>
+</div>
+</div>
+<div id="outline-container-org1f9e874" class="outline-3">
+<h3 id="org1f9e874">Q56: Should unknown JSON fields always be ignored?</h3>
+<div class="outline-text-3" id="text-org1f9e874">
+<p>
+Depends on contract strictness.
+Ignore for forward compatibility, fail for strict controlled interfaces.
+public API tolerate extras; internal strict pipeline may reject.
+</p>
+</div>
+</div>
+<div id="outline-container-orge34fc39" class="outline-3">
+<h3 id="orge34fc39">Q57: How to detect invalid enum values?</h3>
+<div class="outline-text-3" id="text-orge34fc39">
+<p>
+Jackson throws mapping error unless configured otherwise.
+You can customize handling for safer defaults or explicit rejection.
+unknown status string triggers 400.
+</p>
+</div>
+</div>
+<div id="outline-container-org46dde1c" class="outline-3">
+<h3 id="org46dde1c">Q58: Can Jackson coerce types automatically?</h3>
+<div class="outline-text-3" id="text-org46dde1c">
+<p>
+Sometimes yes.
+Coercion can be convenient but risky; strict configs reduce surprises.
+<b>"1"</b> to int may parse, but strict mode may reject.
+</p>
+</div>
+</div>
+<div id="outline-container-org09c109c" class="outline-3">
+<h3 id="org09c109c">Q59: Why log raw bad payload cautiously?</h3>
+<div class="outline-text-3" id="text-org09c109c">
+<p>
+Security/privacy risks.
+Payload may contain secrets/PII; redact sensitive fields in logs.
+mask password/token before logging.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb7510ff" class="outline-3">
+<h3 id="orgb7510ff">Q60: Error-handling best-practice line?</h3>
+<div class="outline-text-3" id="text-orgb7510ff">
+<p>
+Fail clearly for clients, log safely for operators.
+Good error design improves both developer experience and incident response.
+400 with field-level reason + sanitized server logs.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orge8c1ba7" class="outline-2">
+<h2 id="orge8c1ba7">Custom Serialization/Deserialization</h2>
+<div class="outline-text-2" id="text-orge8c1ba7">
+</div>
+<div id="outline-container-org241f2d9" class="outline-3">
+<h3 id="org241f2d9">Q61: When to write custom serializer?</h3>
+<div class="outline-text-3" id="text-org241f2d9">
+<p>
+When default JSON output is not suitable.
+Use for domain-specific formatting, compact payloads, or legacy contract compatibility.
+money object serialized as <b>"12.50 USD"</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgedfbd56" class="outline-3">
+<h3 id="orgedfbd56">Q62: When to write custom deserializer?</h3>
+<div class="outline-text-3" id="text-orgedfbd56">
+<p>
+When input format needs custom parsing logic.
+Useful for non-standard formats and backward compatibility bridges.
+parse multiple date patterns into one field.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaa00a2f" class="outline-3">
+<h3 id="orgaa00a2f">Q63: How to register custom serializer/deserializer?</h3>
+<div class="outline-text-3" id="text-orgaa00a2f">
+<p>
+Via Module (SimpleModule).
+Central registration keeps behavior consistent and testable.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">SimpleModule</span> <span style="font-weight: bold; font-style: italic;">m</span> = <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">SimpleModule</span>();
+m.addSerializer(Money.<span style="font-weight: bold;">class</span>, <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">MoneySerializer</span>());
+mapper.registerModule(m);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org464b9ce" class="outline-3">
+<h3 id="org464b9ce">Q64: JsonSerializer role?</h3>
+<div class="outline-text-3" id="text-org464b9ce">
+<p>
+Defines how object becomes JSON.
+You control field shape and output tokens directly.
+write object with custom field names.
+</p>
+</div>
+</div>
+<div id="outline-container-org79a7c88" class="outline-3">
+<h3 id="org79a7c88">Q65: JsonDeserializer role?</h3>
+<div class="outline-text-3" id="text-org79a7c88">
+<p>
+Defines how JSON becomes object.
+Handle flexible/legacy formats while preserving strong domain model.
+parse <b>"Y"/"N"</b> into boolean.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e40a1e" class="outline-3">
+<h3 id="org3e40a1e">Q66: Custom (de)serializers risk?</h3>
+<div class="outline-text-3" id="text-org3e40a1e">
+<p>
+Added complexity and maintenance burden.
+Keep logic minimal and well-tested to avoid hidden parsing bugs.
+serializer/deserializer pair round-trip tests.
+</p>
+</div>
+</div>
+<div id="outline-container-org6bcbcb3" class="outline-3">
+<h3 id="org6bcbcb3">Q67: What is @JsonSerialize/@JsonDeserialize?</h3>
+<div class="outline-text-3" id="text-org6bcbcb3">
+<p>
+Per-field/class custom handler binding.
+Useful when only specific DTO fields need custom behavior.
+custom BigDecimal formatting on price field.
+</p>
+</div>
+</div>
+<div id="outline-container-orged85d8e" class="outline-3">
+<h3 id="orged85d8e">Q68: Should business logic live in deserializer?</h3>
+<div class="outline-text-3" id="text-orged85d8e">
+<p>
+Prefer minimal transformation only.
+Keep business validation in service/validator layer for clarity and reuse.
+parse value in deserializer, validate rules elsewhere.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fdff17" class="outline-3">
+<h3 id="org1fdff17">Q69: How to test custom serializer/deserializer?</h3>
+<div class="outline-text-3" id="text-org1fdff17">
+<p>
+Round-trip and edge-case tests.
+Verify valid inputs, invalid inputs, null handling, and backward compatibility.
+object -&gt; JSON -&gt; object equality checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org971ecf6" class="outline-3">
+<h3 id="org971ecf6">Q70: Custom mapping golden rule?</h3>
+<div class="outline-text-3" id="text-org971ecf6">
+<p>
+Be explicit and predictable.
+JSON contracts should be boring and stable, not surprising.
+fixed field names and deterministic formats.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org41da9f3" class="outline-2">
+<h2 id="org41da9f3">Performance and Large Payload Handling</h2>
+<div class="outline-text-2" id="text-org41da9f3">
+</div>
+<div id="outline-container-orgb399a7b" class="outline-3">
+<h3 id="orgb399a7b">Q71: Is Jackson fast enough for most APIs?</h3>
+<div class="outline-text-3" id="text-orgb399a7b">
+<p>
+Yes.
+Jackson is highly optimized; bottlenecks are often elsewhere (I/O, DB, network).
+response latency mostly DB-bound, not JSON-bound.
+</p>
+</div>
+</div>
+<div id="outline-container-org819b3d4" class="outline-3">
+<h3 id="org819b3d4">Q72: When use Jackson streaming API?</h3>
+<div class="outline-text-3" id="text-org819b3d4">
+<p>
+Very large payloads or memory-sensitive processing.
+Streaming reads/writes incrementally, avoiding full in-memory object trees.
+processing huge JSON array linearly.
+</p>
+</div>
+</div>
+<div id="outline-container-org17c02ad" class="outline-3">
+<h3 id="org17c02ad">Q73: Data binding vs streaming tradeoff?</h3>
+<div class="outline-text-3" id="text-org17c02ad">
+<p>
+Data binding easier; streaming more memory-efficient.
+Prefer data binding for normal payloads; streaming for scale-critical paths.
+export millions of records with generator.
+</p>
+</div>
+</div>
+<div id="outline-container-org5816de2" class="outline-3">
+<h3 id="org5816de2">Q74: What is ObjectReader/ObjectWriter benefit?</h3>
+<div class="outline-text-3" id="text-org5816de2">
+<p>
+Reusable, preconfigured read/write objects.
+Can improve clarity and minor performance by avoiding repeated config.
+one ObjectWriter for pretty logs, one for compact API output.
+</p>
+</div>
+</div>
+<div id="outline-container-org80f0079" class="outline-3">
+<h3 id="org80f0079">Q75: Why avoid huge nested DTO graphs?</h3>
+<div class="outline-text-3" id="text-org80f0079">
+<p>
+Serialization cost and complexity.
+Large object graphs can cause heavy memory use and recursion issues.
+bidirectional entity references causing deep trees.
+</p>
+</div>
+</div>
+<div id="outline-container-orge0fafd9" class="outline-3">
+<h3 id="orge0fafd9">Q76: How to avoid infinite recursion in JSON?</h3>
+<div class="outline-text-3" id="text-orge0fafd9">
+<p>
+Use DTO separation or Jackson reference annotations.
+Bidirectional relations (parent-child-parent) need explicit handling.
+<b>@JsonManagedReference</b> / <b>@JsonBackReference</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orga38e58f" class="outline-3">
+<h3 id="orga38e58f">Q77: Should you serialize JPA entities directly?</h3>
+<div class="outline-text-3" id="text-orga38e58f">
+<p>
+Usually no.
+Lazy loading, recursion, and accidental field exposure are common risks.
+entity graph triggers unexpected DB queries during serialization.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e94b98" class="outline-3">
+<h3 id="org9e94b98">Q78: Why compact JSON sometimes preferred?</h3>
+<div class="outline-text-3" id="text-org9e94b98">
+<p>
+Less bandwidth and faster transfer.
+Pretty JSON is great for humans, compact JSON for production traffic.
+machine-to-machine APIs use compact output.
+</p>
+</div>
+</div>
+<div id="outline-container-orga08c898" class="outline-3">
+<h3 id="orga08c898">Q79: Can Jackson handle backpressure?</h3>
+<div class="outline-text-3" id="text-orga08c898">
+<p>
+Not by itself.
+Backpressure is transport/reactive concern; Jackson handles parsing/serialization step.
+reactive stream controls flow, Jackson maps chunks.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9d97f9" class="outline-3">
+<h3 id="orgf9d97f9">Q80: Performance best-practice line?</h3>
+<div class="outline-text-3" id="text-orgf9d97f9">
+<p>
+Measure first, optimize targeted hotspots only.
+Don’t over-engineer streaming/custom handlers without profiling evidence.
+use profiler before rewriting mapping layer.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org66d60df" class="outline-2">
+<h2 id="org66d60df">Security Considerations</h2>
+<div class="outline-text-2" id="text-org66d60df">
+</div>
+<div id="outline-container-orgd967d1f" class="outline-3">
+<h3 id="orgd967d1f">Q81: Why is JSON parsing security-relevant?</h3>
+<div class="outline-text-3" id="text-orgd967d1f">
+<p>
+Untrusted input can trigger vulnerabilities or resource abuse.
+Large/deep payloads, polymorphic misuse, and unsafe logging are common risk areas.
+maliciously deep JSON causing heavy parse cost.
+</p>
+</div>
+</div>
+<div id="outline-container-org25d2ef3" class="outline-3">
+<h3 id="org25d2ef3">Q82: What is polymorphic deserialization risk?</h3>
+<div class="outline-text-3" id="text-org25d2ef3">
+<p>
+Unsafe type handling can lead to gadget-based attacks.
+Never enable permissive default typing blindly on untrusted data.
+restrict allowed subtypes explicitly.
+</p>
+</div>
+</div>
+<div id="outline-container-org9614e5d" class="outline-3">
+<h3 id="org9614e5d">Q83: Is enabling default typing always safe?</h3>
+<div class="outline-text-3" id="text-org9614e5d">
+<p>
+No.
+It can open attack vectors if arbitrary classes are deserialized.
+avoid broad global default typing for external payloads.
+</p>
+</div>
+</div>
+<div id="outline-container-orga291d60" class="outline-3">
+<h3 id="orga291d60">Q84: How to harden Jackson input handling?</h3>
+<div class="outline-text-3" id="text-orga291d60">
+<p>
+Limit payload size/depth and use strict DTOs.
+Combine parser limits, validation, and controlled type mapping.
+reject payload &gt; max size at gateway/app layer.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0ab7bc" class="outline-3">
+<h3 id="orgf0ab7bc">Q85: Why avoid exposing internal exception details?</h3>
+<div class="outline-text-3" id="text-orgf0ab7bc">
+<p>
+Information leakage risk.
+Detailed stack/class info helps attackers and confuses clients.
+return generic 400 with safe message.
+</p>
+</div>
+</div>
+<div id="outline-container-org7aec1e2" class="outline-3">
+<h3 id="org7aec1e2">Q86: Should secrets be serialized?</h3>
+<div class="outline-text-3" id="text-org7aec1e2">
+<p>
+No.
+Mark sensitive fields ignored/masked and separate internal models from API DTOs.
+never output passwordHash/apiKey.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc83ff6c" class="outline-3">
+<h3 id="orgc83ff6c">Q87: Input validation position with Jackson?</h3>
+<div class="outline-text-3" id="text-orgc83ff6c">
+<p>
+After successful deserialization.
+Parsing ensures structural validity; validation enforces business/safety rules.
+bean validation annotations on DTO.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd1422b5" class="outline-3">
+<h3 id="orgd1422b5">Q88: Safe logging rule for JSON payloads?</h3>
+<div class="outline-text-3" id="text-orgd1422b5">
+<p>
+Log minimal and redact sensitive fields.
+Operational visibility must not violate privacy/security policies.
+mask email/token before writing logs.
+</p>
+</div>
+</div>
+<div id="outline-container-org386a1ca" class="outline-3">
+<h3 id="org386a1ca">Q89: Why contract whitelisting is safer?</h3>
+<div class="outline-text-3" id="text-org386a1ca">
+<p>
+Accept only known fields/types.
+Reduces attack surface and unexpected behavior from extra input.
+strict DTO rather than <b>Map&lt;String,Object&gt;</b> for external APIs.
+</p>
+</div>
+</div>
+<div id="outline-container-org57465ad" class="outline-3">
+<h3 id="org57465ad">Q90: Security best-practice one-liner?</h3>
+<div class="outline-text-3" id="text-org57465ad">
+<p>
+Treat all external JSON as untrusted input.
+Parse carefully, validate strictly, and expose minimal output.
+strict DTO + validation + sanitized errors.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbc26a54" class="outline-2">
+<h2 id="orgbc26a54">Spring Boot + Jackson Practical</h2>
+<div class="outline-text-2" id="text-orgbc26a54">
+</div>
+<div id="outline-container-org333328f" class="outline-3">
+<h3 id="org333328f">Q91: How is Jackson used in Spring Boot by default?</h3>
+<div class="outline-text-3" id="text-org333328f">
+<p>
+Auto-configured for request/response JSON conversion.
+Spring’s HttpMessageConverters use ObjectMapper behind the scenes.
+<b>@RequestBody</b> and <b>@ResponseBody</b> serialization.
+</p>
+</div>
+</div>
+<div id="outline-container-org480e0b9" class="outline-3">
+<h3 id="org480e0b9">Q92: How to customize global ObjectMapper in Spring?</h3>
+<div class="outline-text-3" id="text-org480e0b9">
+<p>
+Define/configure mapper bean or Jackson2ObjectMapperBuilder.
+Centralized config ensures consistent behavior across controllers.
+global NON<sub>NULL</sub> + JavaTimeModule.
+</p>
+</div>
+</div>
+<div id="outline-container-org30546fd" class="outline-3">
+<h3 id="org30546fd">Q93: @JsonIgnore vs @JsonView in APIs?</h3>
+<div class="outline-text-3" id="text-org30546fd">
+<p>
+Ignore removes field always; JsonView controls per-view exposure.
+JsonView can support role/context-based payload shaping but adds complexity.
+public vs internal response view.
+</p>
+</div>
+</div>
+<div id="outline-container-org482aa94" class="outline-3">
+<h3 id="org482aa94">Q94: How to return custom JSON error body in Spring?</h3>
+<div class="outline-text-3" id="text-org482aa94">
+<p>
+Use @ControllerAdvice with exception handlers.
+Keeps error contract consistent for parse/validation/business failures.
+standardized <b>ApiError</b> response object.
+</p>
+</div>
+</div>
+<div id="outline-container-org179106f" class="outline-3">
+<h3 id="org179106f">Q95: Why avoid entity exposure in Spring controllers?</h3>
+<div class="outline-text-3" id="text-org179106f">
+<p>
+Contract and security risks.
+DTO boundary prevents lazy loading surprises and field leaks.
+map entity -&gt; response DTO layer.
+</p>
+</div>
+</div>
+<div id="outline-container-org4a16886" class="outline-3">
+<h3 id="org4a16886">Q96: How to test Jackson behavior in Spring?</h3>
+<div class="outline-text-3" id="text-org4a16886">
+<p>
+Unit + slice/integration tests with ObjectMapper.
+Validate schema stability, date formats, and error handling.
+MockMvc assert JSON path fields.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fbafef" class="outline-3">
+<h3 id="org1fbafef">Q97: What is @JsonComponent?</h3>
+<div class="outline-text-3" id="text-org1fbafef">
+<p>
+Spring shortcut for registering custom serializers/deserializers.
+Useful for Spring-managed custom JSON behavior.
+custom serializer bean auto-discovered.
+</p>
+</div>
+</div>
+<div id="outline-container-org4235750" class="outline-3">
+<h3 id="org4235750">Q98: How to exclude null fields globally in Spring?</h3>
+<div class="outline-text-3" id="text-org4235750">
+<p>
+configure inclusion NON<sub>NULL</sub>.
+Reduces payload size/noise while keeping contract explicit.
+<b>spring.jackson.default-property-inclusion=non<sub>null</sub></b>
+</p>
+</div>
+</div>
+<div id="outline-container-org467e56a" class="outline-3">
+<h3 id="org467e56a">Q99: Why keep JSON contract versioning strategy?</h3>
+<div class="outline-text-3" id="text-org467e56a">
+<p>
+Prevent client breakage.
+Favor additive changes; use versioning when breaking changes are needed.
+v1 and v2 response DTOs.
+</p>
+</div>
+</div>
+<div id="outline-container-org5971a98" class="outline-3">
+<h3 id="org5971a98">Q100: Spring + Jackson golden rule?</h3>
+<div class="outline-text-3" id="text-org5971a98">
+<p>
+Centralize config and keep DTO contracts explicit.
+Consistency is more important than clever per-endpoint customization.
+one mapper policy, many predictable endpoints.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org1a9f195" class="outline-2">
+<h2 id="org1a9f195">Interview-Focused</h2>
+<div class="outline-text-2" id="text-org1a9f195">
+</div>
+<div id="outline-container-org075ebd1" class="outline-3">
+<h3 id="org075ebd1">Q101: “Why Jackson over Gson?”</h3>
+<div class="outline-text-3" id="text-org075ebd1">
+<p>
+Rich ecosystem, strong performance, broad framework support.
+Jackson’s modules, annotations, streaming, and Spring integration make it dominant in enterprise Java.
+JavaTime + Kotlin + XML modules available.
+</p>
+</div>
+</div>
+<div id="outline-container-org53731c5" class="outline-3">
+<h3 id="org53731c5">Q102: “How do you handle unknown fields in production APIs?”</h3>
+<div class="outline-text-3" id="text-org53731c5">
+<p>
+Usually tolerate for forward compatibility.
+Policy depends on contract strictness; public APIs often ignore unknowns.
+<b>@JsonIgnoreProperties(ignoreUnknown = true)</b> for inbound DTO.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcffaec7" class="outline-3">
+<h3 id="orgcffaec7">Q103: “How do you prevent JSON contract regressions?”</h3>
+<div class="outline-text-3" id="text-orgcffaec7">
+<p>
+Contract tests and snapshot/schema assertions.
+Automated tests catch accidental field rename/type/format changes.
+API test asserting date format and field names.
+</p>
+</div>
+</div>
+<div id="outline-container-org1769ff3" class="outline-3">
+<h3 id="org1769ff3">Q104: “How to deserialize generic types safely?”</h3>
+<div class="outline-text-3" id="text-org1769ff3">
+<p>
+TypeReference/JavaType.
+Avoid raw types to prevent runtime cast issues and hidden map fallback.
+<b>new TypeReference&lt;List&lt;OrderDto&gt;&gt;() {}</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org1474a39" class="outline-3">
+<h3 id="org1474a39">Q105: “How to handle date/time across microservices?”</h3>
+<div class="outline-text-3" id="text-org1474a39">
+<p>
+Standardize on ISO-8601 + UTC policy.
+Consistent serialization avoids timezone drift bugs between services.
+Instant serialized with <b>Z</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c31949" class="outline-3">
+<h3 id="org9c31949">Q106: “How do you optimize Jackson performance?”</h3>
+<div class="outline-text-3" id="text-org9c31949">
+<p>
+Reuse mapper, avoid unnecessary conversions, profile.
+Streaming only for truly large payload scenarios.
+remove object-&gt;json-&gt;object roundtrips in hot paths.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdcf7c2f" class="outline-3">
+<h3 id="orgdcf7c2f">Q107: “How do you secure Jackson deserialization?”</h3>
+<div class="outline-text-3" id="text-orgdcf7c2f">
+<p>
+Restrict types and validate inputs.
+Avoid permissive polymorphism and enforce strict DTO boundaries.
+no global default typing on external payloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org046f5c1" class="outline-3">
+<h3 id="org046f5c1">Q108: “JsonNode or POJO mapping?”</h3>
+<div class="outline-text-3" id="text-org046f5c1">
+<p>
+POJO for stable schema, JsonNode for dynamic payloads.
+Mixed approach is common: node for envelope, POJO for payload body.
+dynamic metadata + typed business section.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c40932" class="outline-3">
+<h3 id="org2c40932">Q109: “Custom serializer or annotation config?”</h3>
+<div class="outline-text-3" id="text-org2c40932">
+<p>
+Annotation/config first; custom serializer when necessary.
+Prefer simpler maintainable options before custom code.
+@JsonFormat solves many date formatting needs.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d2545e" class="outline-3">
+<h3 id="org2d2545e">Q110: “Most common Jackson production bug?”</h3>
+<div class="outline-text-3" id="text-org2d2545e">
+<p>
+Inconsistent mapper configuration across modules.
+Centralized config and tests prevent format/drift issues.
+one module writes timestamps, another writes ISO strings.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org780e2b9" class="outline-2">
+<h2 id="org780e2b9">Final Mastery Checklist</h2>
+<div class="outline-text-2" id="text-org780e2b9">
+</div>
+<div id="outline-container-org4edb8bf" class="outline-3">
+<h3 id="org4edb8bf">Q111: Can you explain serialization/deserialization clearly?</h3>
+<div class="outline-text-3" id="text-org4edb8bf">
+<p>
+If yes, foundation is strong.
+This is core to API reliability and integration correctness.
+request JSON -&gt; DTO -&gt; response JSON flow.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb52a6e1" class="outline-3">
+<h3 id="orgb52a6e1">Q112: Can you configure ObjectMapper centrally and safely?</h3>
+<div class="outline-text-3" id="text-orgb52a6e1">
+<p>
+If yes, consistency improves.
+Central policies reduce endpoint drift and production surprises.
+one shared Spring mapper bean.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc6d847a" class="outline-3">
+<h3 id="orgc6d847a">Q113: Can you handle generics without raw-type pitfalls?</h3>
+<div class="outline-text-3" id="text-orgc6d847a">
+<p>
+If yes, typing maturity is strong.
+TypeReference use prevents runtime cast and map fallback issues.
+parse list/map nested DTOs safely.
+</p>
+</div>
+</div>
+<div id="outline-container-org9cb1184" class="outline-3">
+<h3 id="org9cb1184">Q114: Can you map date/time with explicit timezone policy?</h3>
+<div class="outline-text-3" id="text-org9cb1184">
+<p>
+If yes, distributed correctness improves.
+Time ambiguity is a major integration bug source.
+Instant UTC everywhere.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b0cb16" class="outline-3">
+<h3 id="org9b0cb16">Q115: Can you design safe error handling for bad JSON?</h3>
+<div class="outline-text-3" id="text-org9b0cb16">
+<p>
+If yes, client/dev experience improves.
+Consistent 400 responses + sanitized logs are essential.
+controller advice for parse exceptions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb741e61" class="outline-3">
+<h3 id="orgb741e61">Q116: Can you avoid entity exposure and use DTO contracts?</h3>
+<div class="outline-text-3" id="text-orgb741e61">
+<p>
+If yes, API stability/security improve.
+DTO boundaries decouple persistence from external contract.
+entity-&gt;DTO mapper layer.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb961fda" class="outline-3">
+<h3 id="orgb961fda">Q117: Can you reason about Jackson security risks?</h3>
+<div class="outline-text-3" id="text-orgb961fda">
+<p>
+If yes, production safety improves.
+Untrusted input + permissive typing is dangerous.
+strict subtype control and validation.
+</p>
+</div>
+</div>
+<div id="outline-container-org282cef1" class="outline-3">
+<h3 id="org282cef1">Q118: Can you test JSON contracts effectively?</h3>
+<div class="outline-text-3" id="text-org282cef1">
+<p>
+If yes, regressions drop.
+Tests should lock schema, formats, and error behavior.
+MockMvc JSON path assertions.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fa1eaf" class="outline-3">
+<h3 id="org1fa1eaf">Q119: Can you choose between POJO/tree/streaming models properly?</h3>
+<div class="outline-text-3" id="text-org1fa1eaf">
+<p>
+If yes, design is practical and efficient.
+Right model per use case avoids complexity/perf issues.
+stream huge exports, POJO for normal API bodies.
+</p>
+</div>
+</div>
+<div id="outline-container-org9f04268" class="outline-3">
+<h3 id="org9f04268">Q120: Final principle for Jackson in backend systems?</h3>
+<div class="outline-text-3" id="text-org9f04268">
+<p>
+Keep JSON contracts explicit, stable, and secure.
+Jackson is powerful—use that power with consistency, validation, and clear boundaries.
+centralized config + DTO-first API design.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
