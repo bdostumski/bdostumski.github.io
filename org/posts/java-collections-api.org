@@ -1,0 +1,325 @@
+#+TITLE: Java Collections API
+#+DATE: 2026-08-08
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Collections API
+
+-----
+
+* Foundations
+
+** Q1: What is the Java Collections API?
+It is a framework of interfaces and classes used to store, manage, and process groups of objects efficiently.
+
+** Q2: Why do we use collections instead of arrays?
+Collections are dynamic (resize automatically), provide rich operations, and support powerful data structures like maps, sets, queues, and lists.
+
+** Q3: What package contains most collection types?
+`java.util`
+
+** Q4: What is the difference between Collection and Collections?
+A:
+- `Collection` is an interface (root for List, Set, Queue).
+- `Collections` is a utility class (sorting, searching, wrappers, etc.).
+
+** Q5: What is the difference between Collection and Map?
+A:
+- `Collection` stores individual elements.
+- `Map` stores key-value pairs and is not a subtype of Collection.
+
+* Core Interfaces Overview
+
+** Q6: What are the main collection interfaces?
+A:
+- List
+- Set
+- Queue
+- Deque
+- Map (separate hierarchy)
+
+** Q7: What is List used for?
+Ordered elements with index-based access; duplicates are allowed.
+
+** Q8: What is Set used for?
+Unique elements; duplicates are not allowed.
+
+** Q9: What is Queue used for?
+Typically FIFO processing (first in, first out), useful for task processing.
+
+** Q10: What is Deque used for?
+Double-ended queue; supports insertion/removal at both ends (FIFO or LIFO).
+
+** Q11: What is Map used for?
+Fast lookup by key; associates each key with a value.
+
+* List Implementations
+
+** Q12: What is ArrayList?
+A resizable array-backed List with fast random access and good general-purpose performance.
+
+** Q13: What is LinkedList?
+A doubly-linked list implementing List and Deque, useful for frequent insert/delete at ends.
+
+** Q14: ArrayList vs LinkedList (quick rule)?
+A:
+- Use ArrayList by default.
+- Use LinkedList mainly for frequent deque-style operations at ends.
+
+** Q15: Is Vector still recommended?
+Usually no; it is legacy synchronized List, and modern alternatives are preferred.
+
+** Q16: How does index access perform in ArrayList vs LinkedList?
+A:
+- ArrayList: fast O(1)
+- LinkedList: slow O(n)
+
+* Set Implementations
+
+** Q17: What is HashSet?
+Unordered Set backed by hash table; fast average add/remove/contains O(1).
+
+** Q18: What is LinkedHashSet?
+HashSet that preserves insertion order.
+
+** Q19: What is TreeSet?
+Sorted Set (natural order or custom comparator), operations typically O(log n).
+
+** Q20: When should I use HashSet vs TreeSet?
+A:
+- HashSet for speed and uniqueness only.
+- TreeSet when sorted order/range operations are needed.
+
+** Q21: Can Set contain null?
+A:
+- HashSet/LinkedHashSet: one null allowed.
+- TreeSet: usually null not allowed (depends on comparator, typically throws).
+
+* Map Implementations
+
+** Q22: What is HashMap?
+Unordered key-value store with fast average O(1) put/get/remove.
+
+** Q23: What is LinkedHashMap?
+HashMap with predictable iteration order (insertion order by default).
+
+** Q24: What is TreeMap?
+Sorted map by keys, with O(log n) operations.
+
+** Q25: What is Hashtable?
+Legacy synchronized map; generally replaced by HashMap/ConcurrentHashMap.
+
+** Q26: What is ConcurrentHashMap?
+Thread-safe high-performance map for concurrent environments.
+
+** Q27: Can HashMap have null key/value?
+One null key and multiple null values are allowed.
+
+** Q28: Can TreeMap have null key?
+Typically no (natural ordering/comparator usually rejects null key).
+
+* Queue / Deque Implementations
+
+** Q29: What is PriorityQueue?
+Queue ordered by priority (natural/comparator), not insertion order.
+
+** Q30: Is PriorityQueue FIFO?
+No; highest/lowest priority element is served first depending on comparator.
+
+** Q31: What is ArrayDeque?
+Fast resizable deque; often better than Stack/LinkedList for stack-queue behavior.
+
+** Q32: Why avoid Stack class?
+Stack is legacy; Deque (ArrayDeque) is the modern preferred stack implementation.
+
+* Time Complexity (Interview-Critical)
+
+** Q33: Typical ArrayList complexities?
+A:
+- get/set: O(1)
+- add at end: amortized O(1)
+- insert/remove middle: O(n)
+
+** Q34: Typical LinkedList complexities?
+A:
+- add/remove at ends: O(1)
+- get by index/search: O(n)
+
+** Q35: Typical HashMap/HashSet operations?
+Average O(1), worst-case O(n) (rare, depends on hash distribution/collisions).
+
+** Q36: Typical TreeMap/TreeSet operations?
+O(log n) for add/remove/contains/get.
+
+** Q37: Why does Big-O matter in backend systems?
+Wrong structure choices can severely hurt latency and throughput at scale.
+
+* Equality, Hashing, and Ordering
+
+** Q38: Why must equals and hashCode be consistent?
+Hash-based collections depend on both; violation causes failed lookup/removal behavior.
+
+** Q39: What happens if hashCode changes after insertion in HashSet/HashMap key?
+Object may become “lost” in collection because bucket location no longer matches.
+
+** Q40: Comparable vs Comparator?
+A:
+- Comparable: natural ordering inside class.
+- Comparator: external/custom ordering strategy.
+
+** Q41: Why should comparator be consistent with equals?
+In sorted collections, inconsistent comparator can cause logical duplicates or unexpected behavior.
+
+* Iteration and Traversal
+
+** Q42: Ways to iterate collections?
+A:
+- for-each loop
+- Iterator
+- ListIterator (for lists)
+- forEach with lambda
+- stream()
+
+** Q43: What is Iterator used for?
+Sequential traversal with safe removal via `iterator.remove()`.
+
+** Q44: What is ListIterator extra capability?
+Bidirectional traversal and element add/set operations during iteration.
+
+** Q45: Why ConcurrentModificationException occurs?
+Structural modification during fail-fast iteration outside iterator’s own methods.
+
+* Utility Methods (Collections class)
+
+** Q46: What useful methods exist in Collections utility class?
+A:
+- sort
+- reverse
+- shuffle
+- binarySearch
+- min/max
+- unmodifiable wrappers
+- synchronized wrappers
+
+** Q47: What does Collections.unmodifiableList do?
+Returns a read-only view wrapper; underlying list changes are still reflected.
+
+** Q48: How is List.of different from unmodifiableList?
+`List.of` creates truly immutable collection instance (no nulls, no structural changes).
+
+* Immutability and Defensive Coding
+
+** Q49: Why prefer immutable collections when possible?
+Fewer bugs, safer sharing, easier reasoning, better thread-safety characteristics.
+
+** Q50: What is defensive copy?
+Creating a new collection copy to protect internal state from external mutation.
+
+** Q51: Example defensive return?
+Return `List.copyOf(internalList)` instead of exposing mutable internal list directly.
+
+* Thread Safety
+
+** Q52: Are ArrayList/HashMap thread-safe?
+No, not for concurrent writes without external synchronization.
+
+** Q53: SynchronizedList vs CopyOnWriteArrayList?
+A:
+- synchronizedList: lock-based, good for balanced read/write.
+- CopyOnWriteArrayList: great for many reads/few writes.
+
+** Q54: When to use ConcurrentHashMap?
+When multiple threads read/write map concurrently and high throughput is needed.
+
+** Q55: Why not just use Hashtable everywhere?
+It is legacy and often slower/less flexible than modern concurrent collections.
+
+* Common Real-World Patterns
+
+** Q56: Fast membership checks?
+Use HashSet.
+
+** Q57: Keep insertion order + uniqueness?
+Use LinkedHashSet.
+
+** Q58: Frequency counting pattern?
+Use HashMap<T, Integer> with getOrDefault or merge.
+
+** Q59: LRU cache base structure?
+LinkedHashMap (access-order mode) + eviction policy.
+
+** Q60: Sorted leaderboard?
+TreeMap/TreeSet or PriorityQueue depending on query pattern.
+
+* Streams + Collections
+
+** Q61: How do streams relate to collections?
+Collections store data; streams process data pipelines.
+
+** Q62: Should I always replace loops with streams?
+No; use whichever is clearer and maintainable for the team.
+
+** Q63: How to collect stream result into list?
+`stream.toList()` (modern) or `collect(Collectors.toList())`.
+
+** Q64: How to group items by key?
+`Collectors.groupingBy(...)`.
+
+** Q65: How to remove duplicates via stream?
+`stream.distinct()` (uses equals/hashCode).
+
+* Pitfalls and Anti-Patterns
+
+** Q66: Pitfall: using mutable objects as HashMap keys
+If key fields in equals/hashCode change, map behavior breaks.
+
+** Q67: Pitfall: choosing LinkedList for random index access
+Causes O(n) access and poor performance.
+
+** Q68: Pitfall: overusing synchronized collections
+May cause lock contention; consider concurrent collections or design changes.
+
+** Q69: Pitfall: assuming HashMap iteration order
+HashMap order is not guaranteed.
+
+** Q70: Pitfall: modifying list in for-each remove
+Can throw ConcurrentModificationException; use iterator/removeIf.
+
+* Interview-Focused Quick Q&A
+
+** Q71: Best default list implementation?
+ArrayList.
+
+** Q72: Best default map implementation?
+HashMap.
+
+** Q73: Best set for uniqueness + speed?
+HashSet.
+
+** Q74: Best set for sorted unique data?
+TreeSet.
+
+** Q75: Best map for concurrent high-throughput access?
+ConcurrentHashMap.
+
+** Q76: Why O(1) in hash collections is “average”?
+Because collisions can degrade performance depending on hash distribution.
+
+** Q77: How many null keys in HashMap?
+One.
+
+** Q78: Does Set allow duplicates?
+No.
+
+** Q79: Is PriorityQueue sorted when iterated?
+Not fully sorted by iterator traversal; only head is guaranteed by priority rule.
+
+** Q80: What is fail-fast behavior?
+Iterator detects unexpected structural modifications and fails quickly.
+
+-----
+
+#+INCLUDE: "../footer.org"
