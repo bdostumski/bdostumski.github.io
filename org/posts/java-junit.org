@@ -1,0 +1,777 @@
+#+TITLE: Java JUnit Testing
+#+DATE: 2026-08-08
+#+TAGS: Java Testing JUnit
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java JUnit Testing
+
+-----
+
+* 1) Testing Foundations
+
+** Q1: What is JUnit?
+ JUnit is a Java testing framework for writing and running automated tests.
+ It helps verify code behavior continuously, prevents regressions, and supports fast feedback in CI/CD workflows.
+ A method that calculates tax is validated by unit tests on every commit.
+
+** Q2: What is the difference between JUnit 4 and JUnit 5?
+ JUnit 5 is modular and more extensible.
+ JUnit 5 introduces Jupiter API, better extension model, richer annotations, improved parameterized tests, and cleaner lifecycle handling.
+ `@BeforeEach` in JUnit 5 replaces `@Before` from JUnit 4.
+
+** Q3: Why are automated tests important?
+ They catch bugs early and protect existing behavior.
+ Tests reduce fear of refactoring, improve design quality, and shorten debugging cycles when changes are frequent.
+ Refactor service logic confidently because behavior is covered by tests.
+
+** Q4: What is a unit test?
+ A test for a small unit of logic in isolation.
+ Unit tests should be fast, deterministic, and independent from external systems like DB/network/files.
+ Testing discount calculation function with mock dependencies.
+
+** Q5: What is an integration test?
+ A test that validates interaction between real components.
+ Integration tests verify boundaries (DB, web, security, messaging) and catch wiring/config issues unit tests miss.
+ Repository + real test DB query behavior.
+
+** Q6: Unit vs integration in one line?
+ Unit tests logic in isolation; integration tests component collaboration.
+ You need both: unit for speed and precision, integration for real-system confidence.
+ 1000 unit tests + 50 integration tests is common.
+
+** Q7: What makes a test “good”?
+ Clear, fast, deterministic, and meaningful.
+ Good tests assert behavior (not implementation details), use readable names, and fail with helpful diagnostics.
+ `calculateTotal_shouldApplyDiscount_whenCustomerIsPremium`.
+
+** Q8: Why are flaky tests dangerous?
+ They fail randomly and destroy trust.
+ Teams start ignoring red builds when tests are unstable, which weakens quality gates.
+ Test depends on current time/network and passes only sometimes.
+
+** Q9: What is test isolation?
+ Each test should run independently from others.
+ Shared mutable state between tests causes order-dependent failures and brittle suites.
+ Avoid static mutable fixtures reused across tests.
+
+** Q10: What is regression testing?
+ Re-running tests to ensure old features still work after changes.
+ Regression suites are your safety net during refactoring and feature growth.
+ Bug fix gets a test so issue never silently returns.
+
+-----
+
+* 2) JUnit 5 Core
+
+** Q11: What does @Test do?
+ Marks a method as a test case.
+ JUnit executes methods annotated with `@Test` and reports pass/fail outcomes.
+
+#+begin_src java
+@Test
+void shouldReturnSum() { ... }
+#+end_src
+
+** Q12: What does @DisplayName do?
+ Provides readable test name in reports.
+ Improves report clarity for non-technical stakeholders and CI dashboards.
+ `@DisplayName("Premium customer gets 10% discount")`
+
+** Q13: What is @BeforeEach?
+ Runs before every test method.
+ Use it for fresh setup required per test to avoid state leakage.
+ create new service instance before each test.
+
+** Q14: What is @AfterEach?
+ Runs after every test method.
+ Useful for cleanup (temp files, static hooks, context reset).
+ clear ThreadLocal context after each test.
+
+** Q15: What is @BeforeAll?
+ Runs once before all tests in class.
+ Useful for expensive shared setup; must be static unless test instance lifecycle is per class.
+ start embedded server once.
+
+** Q16: What is @AfterAll?
+ Runs once after all tests in class.
+ Use for releasing expensive shared resources.
+ stop embedded database container.
+
+** Q17: What is @Disabled?
+ Temporarily skips a test.
+ Should be used sparingly and documented; disabled tests can hide quality risks.
+ disable flaky external dependency test with TODO reason.
+
+** Q18: What is @Tag?
+ Categorizes tests (e.g., unit, integration).
+ Allows selective execution in CI pipelines.
+ run fast unit tests on PR, full suite nightly.
+
+** Q19: What is @Nested?
+ Groups related tests in inner classes.
+ Improves readability by organizing scenarios/context hierarchically.
+ `WhenUserIsPremium` nested group.
+
+** Q20: What is @TestInstance?
+ Controls test class lifecycle (per-method/per-class).
+ Per-method is safer default; per-class can optimize expensive setup but needs care for shared state.
+ `@TestInstance(PER_CLASS)` with non-static `@BeforeAll`.
+
+-----
+
+* 3) Assertions 
+
+** Q21: What is an assertion?
+ A check that verifies expected behavior.
+ Assertions are the core of test meaning; weak assertions create false confidence.
+ `assertEquals(expected, actual)`.
+
+** Q22: assertEquals vs assertSame?
+ assertEquals checks value equality; assertSame checks reference identity.
+ Use assertSame only when object identity is truly required.
+ caching test expecting same instance.
+
+** Q23: assertTrue/assertFalse best use?
+ For boolean conditions.
+ Add descriptive messages for failure diagnostics, especially on complex predicates.
+ `assertTrue(total > 0, "Total should be positive")`
+
+** Q24: assertNull/assertNotNull use case?
+ Validate presence/absence of value.
+ Useful at API boundaries where null contract matters.
+ repository returns null when no legacy record exists.
+
+** Q25: assertThrows purpose?
+ Verifies expected exception is thrown.
+ Also allows asserting exception message/type to validate error contract.
+
+#+begin_src java
+var ex = assertThrows(IllegalArgumentException.class, () -> svc.create(null));
+assertTrue(ex.getMessage().contains("name"));
+#+end_src
+
+** Q26: assertDoesNotThrow purpose?
+ Confirms code executes without exception.
+ Use when behavior contract explicitly requires no failure.
+ parsing valid config should not throw.
+
+** Q27: assertAll purpose?
+ Groups multiple assertions and reports all failures together.
+ Great for DTO/object field verification in one test.
+ check id, name, email in one assert block.
+
+** Q28: assertTimeout vs assertTimeoutPreemptively?
+ Both enforce duration; preemptive may interrupt test thread.
+ preemptive timeout can interfere with thread-local/transaction contexts; use carefully.
+ performance guard around heavy algorithm.
+
+** Q29: Why assertion messages matter?
+ Faster diagnosis on failure.
+ Good messages reduce debugging time and improve CI signal quality.
+ include input values in failure message.
+
+** Q30: Common assertion anti-pattern?
+ Testing too little (or nothing meaningful).
+ A test that only checks non-null while core behavior is wrong gives false confidence.
+ assertNotNull(response) without checking important fields.
+
+-----
+
+* 4) Parameterized, Repeated, and Dynamic Tests
+
+** Q31: What is @ParameterizedTest?
+ Runs same test logic with multiple inputs.
+ Reduces duplication and improves coverage for edge cases systematically.
+ validate multiple invalid email formats.
+
+** Q32: @ValueSource use case?
+ Simple inline primitive/string input values.
+ Best for quick one-argument parameterized scenarios.
+ `@ValueSource(strings = {"", " ", "abc"})`
+
+** Q33: @CsvSource use case?
+ Multiple parameters per test row.
+ Good for compact table-driven tests.
+ input amount + expected tax pairs.
+
+** Q34: @MethodSource use case?
+ Complex/custom argument generation.
+ Ideal when data setup is non-trivial or reusable.
+ stream of domain objects with expected results.
+
+** Q35: @EnumSource use case?
+ Run tests across enum values.
+ Great for state-machine or role-based branch validation.
+ permissions by user role enum.
+
+** Q36: Why parameterized tests improve quality?
+ More cases with less boilerplate.
+ Encourages boundary-value thinking and reduces copy-paste test code.
+ same validator tested with many corner inputs.
+
+** Q37: What is @RepeatedTest?
+ Re-runs same test N times.
+ Useful for probabilistic/flaky behavior checks, though deterministic design is preferred.
+ run concurrency-sensitive test 50 times.
+
+** Q38: Dynamic tests in JUnit 5?
+ Tests generated at runtime via `@TestFactory`.
+ Useful for data-driven generation when cases are discovered programmatically.
+ generate tests from external rule definitions.
+
+** Q39: When to avoid dynamic tests?
+ When static tests are clearer.
+ Dynamic tests can reduce readability/discoverability if overused.
+ simple input matrix is clearer with parameterized tests.
+
+** Q40: Parameterized test pitfall?
+ Too much logic in data provider.
+ If data construction is opaque, test intent becomes hard to understand.
+ complex method source with hidden branching.
+
+-----
+
+* 5) Test Lifecycle, Fixtures, and Readability
+
+** Q41: What is a fixture?
+ Known test data/environment setup.
+ Stable fixtures make tests deterministic and intention-revealing.
+ user fixture with role=ADMIN for access tests.
+
+** Q42: Inline setup vs shared setup?
+ Prefer local clarity unless duplication is high.
+ Over-shared setup in @BeforeEach can hide what test truly needs.
+ create only required objects inside test body when simple.
+
+** Q43: Why avoid giant @BeforeEach?
+ It hides context and slows comprehension.
+ Tests should show relevant setup explicitly for readability.
+ helper builders per scenario instead of one huge global fixture.
+
+** Q44: What is test data builder pattern?
+ Fluent builder for creating test objects.
+ Reduces fixture noise and makes scenario intent explicit.
+ `UserBuilder.aUser().withRole("ADMIN").build()`.
+
+** Q45: Naming convention for test methods?
+ `method_shouldExpectedBehavior_whenCondition`.
+ Structured naming improves discoverability and report usefulness.
+ `login_shouldFail_whenPasswordIsWrong`.
+
+** Q46: Why one behavior per test?
+ Clear failures and intent.
+ Multi-behavior tests are harder to debug and maintain.
+ separate “valid email” and “invalid email” tests.
+
+** Q47: Should tests call private methods directly?
+ Usually no.
+ Test observable behavior through public API; private methods are implementation details.
+ validate final result, not internal helper call.
+
+** Q48: What is over-mocking?
+ Mocking too many internals.
+ Leads to brittle tests coupled to implementation, not behavior.
+ verifying every tiny internal method invocation.
+
+** Q49: Why keep tests deterministic?
+ Reliable CI and trust.
+ Eliminate random/time/network dependencies unless intentionally controlled.
+ inject Clock instead of using Instant.now directly.
+
+** Q50: Readability golden rule for tests?
+ Tests are documentation.
+ Future maintainers should understand scenario quickly without deep code archaeology.
+ clear Given-When-Then structure.
+
+-----
+
+* 6) Exception, Timeout, and Concurrency Testing
+
+** Q51: How to test exception type and message?
+ assertThrows + message assertions.
+ Validates not just failure but proper domain error contract.
+ reject invalid ID format with meaningful message.
+
+** Q52: Why avoid broad Exception assertions?
+ Too weak and can hide wrong failures.
+ Assert specific expected exception classes for precision.
+ IllegalArgumentException vs RuntimeException catch-all.
+
+** Q53: How to test time-sensitive logic?
+ Use injected Clock and fixed instant.
+ Avoid wall-clock dependence to prevent flaky tests.
+ `Clock.fixed(...)` for deterministic expiration checks.
+
+** Q54: Timeout test purpose?
+ Detect performance regressions/hangs.
+ Especially useful around algorithms and async code completion guarantees.
+ ensure task completes under 200ms in test env.
+
+** Q55: Testing CompletableFuture result?
+ Join/get with timeout and assert value.
+ Always guard with timeout to avoid hanging test suite.
+ `future.orTimeout(1, SECONDS).join()`
+
+** Q56: Testing concurrent code basics?
+ Verify invariants under parallel execution.
+ Use latches/barriers/repetition to increase race detection probability.
+ 100 threads increment shared counter then assert final count.
+
+** Q57: Why concurrency tests can still miss bugs?
+ Scheduling is nondeterministic.
+ Race conditions are probabilistic; combine stress tests with code review/static analysis.
+ failing once per thousand runs.
+
+** Q58: Should unit tests rely on Thread.sleep?
+ Prefer not.
+ Sleep-based timing tests are flaky and slow; use explicit synchronization.
+ CountDownLatch instead of arbitrary sleep.
+
+** Q59: Testing interruption handling?
+ Simulate interrupt and assert proper behavior.
+ Verify code preserves interrupt status or propagates cancellation correctly.
+ worker exits cleanly after interrupt.
+
+** Q60: Async test anti-pattern?
+ Fire async task without waiting/asserting completion.
+ Test may pass before async branch runs, producing false positives.
+ always await completion signal/future.
+
+-----
+
+* 7) Mockito and Test Doubles - Common with JUnit
+
+** Q61: What is a mock?
+ Test double with programmable behavior and interaction verification.
+ Mocks isolate unit under test from external dependencies.
+ mock PaymentGateway in service unit test.
+
+** Q62: Stub vs mock?
+ Stub provides canned data; mock also verifies interactions.
+ Use stubs for state assertions, mocks for collaboration behavior checks.
+ stub repository return, verify notifier called once.
+
+** Q63: When to mock?
+ External dependencies and slow/non-deterministic collaborators.
+ Don’t mock pure value objects or simple logic classes.
+ mock HTTP client, not Money class.
+
+** Q64: Why overusing verify(...) is bad?
+ Couples tests to internals.
+ Prefer result/state assertions unless interaction is the key behavior.
+ don’t verify every helper call.
+
+** Q65: Mockito @Mock and @InjectMocks purpose?
+ Create mocks and inject them into class under test.
+ Reduces boilerplate setup and keeps tests focused.
+ service with mocked repository + email sender.
+
+** Q66: MockitoExtension in JUnit 5?
+ Integrates Mockito lifecycle with JUnit Jupiter.
+ Handles mock initialization cleanly via `@ExtendWith(MockitoExtension.class)`.
+ no manual `MockitoAnnotations.openMocks`.
+
+** Q67: What is spying (spy)?
+ Partial mock wrapping real object.
+ Useful but risky; can blur unit boundaries and create brittle tests.
+ override one method while using real others.
+
+** Q68: Should you mock static methods?
+ Only when unavoidable.
+ Frequent static mocking indicates design refactor opportunity for better testability.
+ wrap static utility in injectable adapter.
+
+** Q69: Common Mockito pitfall?
+ Stubbing not used / wrong matcher usage.
+ Leads to confusing false behavior; strict stubs help detect dead stubbing.
+ method args mismatch causes unexpected null returns.
+
+** Q70: Mocking final recommendation?
+ Mock behavior boundaries, not your whole architecture.
+ Balanced testing uses real logic where cheap and mocks where expensive/unreliable.
+ mock DB gateway, keep domain logic real.
+
+-----
+
+* 8) Integration Testing with JUnit - Spring/DB/API Context
+
+** Q71: Why integration tests if unit tests pass?
+ Wiring/configuration can still fail.
+ Integration tests validate framework config, serialization, DB mappings, security filters.
+ endpoint returns 400 due to validation config issue.
+
+** Q72: What should integration tests focus on?
+ Critical flows and boundaries.
+ Test fewer but high-value scenarios: auth, persistence, transaction, API contracts.
+ create-order endpoint persists and returns expected JSON.
+
+** Q73: In-memory DB vs real DB container?
+ Real DB container is more realistic.
+ In-memory DB may differ in SQL dialect/index behavior.
+ PostgreSQL Testcontainers catches dialect-specific issues.
+
+** Q74: Why Testcontainers are valuable?
+ Reproducible real dependencies in tests.
+ Improves confidence by testing against production-like services.
+ integration test with real Postgres/Redis container.
+
+** Q75: API integration test key assertions?
+ Status, payload, headers, and side effects.
+ Validate both transport contract and persistence/business result.
+ 201 Created + Location header + row inserted.
+
+** Q76: Should integration tests be as many as unit tests?
+ Usually fewer.
+ Integration tests are slower/costlier; prioritize high-risk/high-value scenarios.
+ test pyramid balance.
+
+** Q77: What is contract testing (high-level)?
+ Validate API agreement between services.
+ Prevent producer/consumer drift in distributed systems.
+ provider response schema validated for consumer expectations.
+
+** Q78: How to keep integration tests stable?
+ Isolated test data and deterministic setup.
+ Reset DB state, avoid shared mutable environment, control time/randomness.
+ transactional rollback or per-test schema reset.
+
+** Q79: Why avoid hitting real external internet APIs in CI tests?
+ Unreliable and slow.
+ Causes flaky builds due to network/rate limits/outages.
+ use mock server/wiremock for external APIs.
+
+** Q80: Integration test naming style?
+ Scenario-focused behavior naming.
+ Names should describe business flow, not internal method names.
+ `createOrder_shouldPersistAndReturn201_whenInputValid`.
+
+-----
+
+* 9) CI/CD, Coverage, and Test Strategy
+
+** Q81: What is code coverage?
+ Percentage of code executed by tests.
+ Coverage is a signal, not quality proof; high coverage can still miss critical assertions.
+ 90% coverage with weak assertions is still risky.
+
+** Q82: Line vs branch coverage?
+ Line checks executed lines; branch checks decision paths.
+ Branch coverage better reflects conditional logic validation.
+ both true/false paths of discount rule tested.
+
+** Q83: Should we chase 100% coverage?
+ Not blindly.
+ Prioritize meaningful coverage on critical logic and risk areas.
+ payment/security logic deserves stronger coverage than trivial DTOs.
+
+** Q84: What tests should run on pull request?
+ Fast unit + key integration smoke tests.
+ Keep feedback fast while catching major regressions early.
+ full heavy suite nightly.
+
+** Q85: Why test execution time matters?
+ Slow suites reduce developer feedback speed.
+ Faster feedback loops improve productivity and code quality.
+ keep unit suite under few minutes.
+
+** Q86: Flaky test management policy?
+ Fix quickly or quarantine with clear owner.
+ Ignoring flaky tests erodes trust in entire pipeline.
+ tagged quarantined tests with follow-up issue.
+
+** Q87: What is mutation testing concept?
+ Measures whether tests detect small code changes (mutants).
+ Evaluates test strength beyond coverage metrics.
+ if mutant survives, assertions may be weak.
+
+** Q88: Why include tests in definition of done?
+ Ensures quality is part of delivery.
+ Prevents “test later” debt and reduces production defect risk.
+ feature PR requires unit tests + relevant integration test.
+
+** Q89: How do tests help refactoring?
+ They provide behavior safety net.
+ You can improve internal design confidently if tests protect external behavior.
+ service split into smaller classes without behavior change.
+
+** Q90: Testing strategy one-liner?
+ Fast unit tests, targeted integration tests, meaningful assertions.
+ Balanced strategy yields speed + confidence + maintainability.
+ test pyramid mindset.
+
+-----
+
+* 10) Advanced JUnit 5 Features and Extensions
+
+** Q91: What is @ExtendWith?
+ Registers JUnit 5 extensions.
+ Extensions add reusable behaviors like DI, mocks, temp dirs, custom lifecycle hooks.
+ MockitoExtension, SpringExtension.
+
+** Q92: ParameterResolver role?
+ Provides method parameters to tests dynamically.
+ Enables custom dependency injection into tests.
+ inject test clock/config object automatically.
+
+** Q93: Conditional test execution examples?
+ @EnabledOnOs, @DisabledOnJre, @EnabledIf...
+ Useful when behavior depends on environment constraints.
+ run path-specific tests only on Linux.
+
+** Q94: What is @TempDir?
+ JUnit-managed temporary directory injection.
+ Safe filesystem testing without manual cleanup hassles.
+ write/read temp file in isolated path.
+
+** Q95: What is assumption in JUnit?
+ Precondition check that aborts (skips) test if unmet.
+ Useful for environment-dependent tests without marking failure.
+ skip test if Docker not available locally.
+
+** Q96: When to build custom JUnit extension?
+ Repeated cross-test setup/teardown behavior.
+ Encapsulates boilerplate and enforces consistent test conventions.
+ extension to seed and clean DB data.
+
+** Q97: Why nested tests improve readability?
+ Scenario grouping by context.
+ Mirrors business rules structure: “given this context, these outcomes”.
+ nested classes for authenticated vs anonymous user.
+
+** Q98: Should tests be private methods?
+ No, JUnit 5 test methods should not be private.
+ Visibility must allow framework invocation.
+ package-private or public test methods.
+
+** Q99: Is inheritance in test classes good?
+ Use carefully.
+ Base test classes can reduce duplication but may hide setup complexity.
+ abstract integration base for shared container setup.
+
+** Q100: Advanced feature golden rule?
+ Use only if it improves clarity.
+ Fancy features should simplify tests, not impress with complexity.
+ prefer simple parameterized test over custom extension if enough.
+
+-----
+
+* 11) Common Mistakes and How to Avoid Them
+
+** Q101: Mistake: asserting implementation details
+ Tests break on harmless refactors.
+ Assert externally visible behavior, not private call sequence unless contract requires it.
+ avoid verifying internal helper call counts.
+
+** Q102: Mistake: one giant test for many behaviors
+ Hard to diagnose failures.
+ Split by behavior/scenario for precise failure signal.
+ separate tests per validation rule.
+
+** Q103: Mistake: random test data without control
+ Non-reproducible failures.
+ If randomness used, seed and log seed.
+ deterministic random with fixed seed.
+
+** Q104: Mistake: sleep-based async tests
+ Flaky and slow.
+ Use latches/futures/timeouts instead of arbitrary wait.
+ await completion signal.
+
+** Q105: Mistake: ignoring failed tests in CI
+ Destroys quality gate.
+ Red build must be actionable and owned immediately.
+ block merge until fixed.
+
+** Q106: Mistake: too many mocks
+ Brittle tests.
+ Over-mocked tests mirror implementation, not behavior outcomes.
+ use real domain objects where cheap.
+
+** Q107: Mistake: no negative-path tests
+ Errors unverified.
+ Failure behavior is part of API contract.
+ invalid input should return explicit exception/status.
+
+** Q108: Mistake: test order dependency
+ Hidden coupling between tests.
+ Each test should pass independently in any order.
+ reset static/shared state each test.
+
+** Q109: Mistake: weak assertion quality
+ False confidence.
+ Verify key fields and invariants, not just non-null.
+ assert status, amount, currency, timestamp range.
+
+** Q110: Mistake: not testing boundaries
+ Edge bugs leak to production.
+ Boundaries (0, 1, max, empty, null) catch many defects.
+ pagination with page=0 and empty results.
+
+-----
+
+* 12) Scenario-Based Practical Q&A
+
+** Q111: How to test validation service with many rules?
+ Parameterized tests for rule matrix.
+ Table-driven approach keeps tests concise and complete.
+ each row = input + expected error code.
+
+** Q112: How to test repository with DB constraints?
+ Integration test against real-like DB.
+ Validates unique keys, transactions, and SQL behavior.
+ duplicate email insert should fail predictably.
+
+** Q113: How to test REST controller quickly?
+ Slice test (web layer) + mocked service.
+ Focuses HTTP mapping/validation without full app startup.
+ request JSON -> 400 on invalid payload.
+
+** Q114: How to test full REST flow?
+ Full integration test.
+ Covers controller, service, repository, serialization, and DB together.
+ POST create -> GET fetch -> assert persisted state.
+
+** Q115: How to test retry logic?
+ Mock dependency failures then success.
+ Assert retry count, timing strategy hooks, and final outcome.
+ fail twice, succeed third call.
+
+** Q116: How to test timeout fallback behavior?
+ Simulate slow dependency and assert fallback.
+ Validate resilience contract, not just nominal path.
+ fallback response under 200ms deadline.
+
+** Q117: How to test event publishing side effect?
+ Verify message emitted with correct payload.
+ For integration, use test broker/consumer assertions.
+ order created emits OrderCreated event once.
+
+** Q118: How to test clock-dependent expiration logic?
+ Inject fixed Clock.
+ Move through time by controlled clock values.
+ token valid at t0, expired at t0+31m.
+
+** Q119: How to test concurrency-safe counter service?
+ Multi-thread increment test + final invariant.
+ Stress with synchronized start and many iterations.
+ expected final count equals threadCount*iterations.
+
+** Q120: How to test mapper correctness?
+ Assert field-by-field mapping.
+ Include null and optional-field cases to prevent silent data loss.
+ entity -> DTO retains timezone and precision.
+
+-----
+
+* 13) Interview-Focused Deep Q&A
+
+** Q121: What is the test pyramid?
+ More unit tests, fewer integration, very few end-to-end.
+ Optimizes speed and reliability while preserving system-level confidence.
+ 1000 unit, 100 integration, 10 e2e (illustrative).
+
+** Q122: How do you test legacy untestable code?
+ Characterization tests first, then incremental refactor.
+ Lock current behavior before structural changes.
+ golden-master style outputs for critical paths.
+
+** Q123: How do you decide what to test?
+ Test risk and business impact.
+ Prioritize critical logic, complex branches, and frequently changed code.
+ payment/auth > trivial getters.
+
+** Q124: How many tests are enough?
+ Enough to cover critical behaviors confidently.
+ No fixed number; quality and risk coverage matter more than count.
+ all key rules + boundary + error paths covered.
+
+** Q125: How do you reduce flaky tests?
+ Remove nondeterminism and isolate dependencies.
+ Control time/randomness/network and stabilize async coordination.
+ fixed clock + mock server + no sleep waits.
+
+** Q126: Why not mock everything?
+ Over-mocking creates brittle, low-value tests.
+ Balance realism and isolation; mock boundaries, not domain logic.
+ real calculator, mocked external API.
+
+** Q127: What is a good failing test message?
+ One that explains what failed and why it matters.
+ Include expected vs actual and scenario context.
+ “expected tax=12.50 for premium user, got 10.00”.
+
+** Q128: How do tests improve design?
+ Testability pushes modular and loosely coupled code.
+ Smaller components with clear dependencies are easier to test and maintain.
+ inject repository interface instead of static utility.
+
+** Q129: What’s the biggest JUnit best practice?
+ Keep tests readable and behavior-focused.
+ Tests are long-term documentation and safety net, not just pass/fail checks.
+ Given-When-Then naming and structure.
+
+** Q130: What’s your CI testing strategy?
+ Fast checks on PR, deeper suite on schedule/release.
+ Balances rapid developer feedback with broad regression confidence.
+ unit+smoke per PR, full integration nightly.
+
+-----
+
+* 14) Final Mastery Checklist
+
+** Q131: Can you clearly explain unit vs integration tradeoffs?
+ If yes, your testing fundamentals are solid.
+ You can design balanced suites for speed and confidence.
+ choose test type based on risk and scope.
+
+** Q132: Can you write deterministic tests without sleep hacks?
+ If yes, reliability is strong.
+ Deterministic tests are key to trusted CI pipelines.
+ latch/future + timeout patterns.
+
+** Q133: Can you test exceptions as part of API contract?
+ If yes, robustness improves.
+ Failure behavior is product behavior too.
+ invalid input returns expected error code/message.
+
+** Q134: Can you use parameterized tests effectively?
+ If yes, coverage and maintainability improve together.
+ Table-driven tests reduce duplication and missed edge cases.
+ many invalid emails in one concise test.
+
+** Q135: Can you avoid over-mocking and test behavior first?
+ If yes, test value is higher.
+ Behavior-oriented tests survive refactors better.
+ state assertions over interaction obsession.
+
+** Q136: Can you design high-value integration tests?
+ If yes, production confidence rises.
+ Focus on critical boundaries and real dependencies.
+ DB transaction + API serialization checks.
+
+** Q137: Can you keep tests readable as project grows?
+ If yes, team velocity stays healthy.
+ Naming, structure, fixtures, and helpers prevent test entropy.
+ scenario-based nested test organization.
+
+** Q138: Can you reason about coverage quality, not just percentage?
+ If yes, your strategy is mature.
+ Strong assertions + branch/risk coverage matter more than vanity metrics.
+ critical branch tests over trivial getter coverage.
+
+** Q139: Can you debug flaky tests systematically?
+ If yes, CI stability improves.
+ Identify nondeterminism source, isolate, and harden.
+ clock/random/network control checklist.
+
+** Q140: Final principle for JUnit testing?
+ Write tests that future you can trust and understand.
+ Good tests are executable documentation, regression safety net, and design feedback tool.
+ clear, deterministic, behavior-focused suite.
+
+-----
+
+#+INCLUDE: "../footer.org"
