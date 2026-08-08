@@ -1,0 +1,423 @@
+#+TITLE: Java Date/Time API
+#+DATE: 2026-08-08
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Date/Time API
+
+-----
+
+* Foundations
+
+** Q1: What is the modern Java Date/Time API?
+ A set of immutable, thread-safe classes in `java.time` for handling dates, times, timestamps, durations, and time zones.
+
+** Q2: Why was `java.time` introduced?
+ Old APIs (`Date`, `Calendar`) were mutable, confusing, and error-prone; `java.time` is cleaner and safer.
+
+** Q3: What are the biggest benefits of java.time?
+
+- immutable objects
+- thread safety
+- clear type separation
+- better timezone handling
+- ISO-8601 friendly formatting/parsing
+
+** Q4: Which Java version introduced java.time?
+ Java 8.
+
+** Q5: What is ISO-8601?
+ A standard date-time format, e.g. `2026-08-08T14:30:00Z`.
+
+* Core Types You Must Know
+
+** Q6: What is `LocalDate`?
+ Date only (year-month-day), no time, no timezone.
+
+** Q7: What is `LocalTime`?
+ Time only (hour-minute-second-nano), no date, no timezone.
+
+** Q8: What is `LocalDateTime`?
+ Date + time, but still no timezone/offset.
+
+** Q9: What is `Instant`?
+ A machine timestamp (point on UTC timeline), ideal for storage/event times.
+
+** Q10: What is `ZonedDateTime`?
+ Date-time with full timezone rules (e.g., `Europe/Warsaw`).
+
+** Q11: What is `OffsetDateTime`?
+ Date-time with numeric UTC offset (e.g., `+02:00`) but not full zone rules.
+
+** Q12: Instant vs LocalDateTime quick difference?
+
+- Instant = absolute moment.
+- LocalDateTime = human wall-clock value without timezone context.
+
+* Time Zones and Offsets
+
+** Q13: What is `ZoneId`?
+ Named region-based timezone (e.g., `America/New_York`) with DST rules.
+
+** Q14: What is `ZoneOffset`?
+ Fixed offset from UTC (e.g., `+01:00`) without DST behavior.
+
+** Q15: Why prefer ZoneId over raw offsets for user-facing time?
+ ZoneId handles daylight saving and historical timezone rule changes correctly.
+
+** Q16: What does `Z` mean in timestamps?
+ UTC (`+00:00`) zone designator.
+
+** Q17: Backend best practice for timezone storage?
+ Persist timestamps in UTC (`Instant`), convert to user zone when displaying.
+
+* Creating Date/Time Values
+
+** Q18: How to get current date?
+
+#+BEGIN_SRC java
+LocalDate today = LocalDate.now();
+#+END_SRC
+
+** Q19: How to get current UTC instant?
+
+#+BEGIN_SRC java
+Instant now = Instant.now();
+#+END_SRC
+
+** Q20: How to create specific date?
+
+#+BEGIN_SRC java
+LocalDate d = LocalDate.of(2026, 8, 8);
+#+END_SRC
+
+** Q21: How to create specific time?
+
+#+BEGIN_SRC java
+LocalTime t = LocalTime.of(14, 30, 0);
+#+END_SRC
+
+** Q22: How to create ZonedDateTime with zone?
+
+#+BEGIN_SRC java
+ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("Europe/Warsaw"));
+#+END_SRC
+
+* Parsing and Formatting
+
+** Q23: How to parse LocalDate from text?
+
+#+BEGIN_SRC java
+LocalDate d = LocalDate.parse("2026-08-08");
+#+END_SRC
+
+** Q24: How to parse Instant from ISO text?
+
+#+BEGIN_SRC java
+Instant i = Instant.parse("2026-08-08T10:15:30Z");
+#+END_SRC
+
+** Q25: What is DateTimeFormatter?
+ Formatter/parser class for custom and standard date-time patterns.
+
+** Q26: Format LocalDate with custom pattern?
+
+#+BEGIN_SRC java
+DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+String s = LocalDate.now().format(f);
+#+END_SRC
+
+** Q27: Why be careful with `mm` vs `MM`?
+
+- `MM` = month
+- `mm` = minute
+This is a very common bug source.
+
+** Q28: Common safe standard formatters?
+
+- `DateTimeFormatter.ISO_LOCAL_DATE`
+- `DateTimeFormatter.ISO_INSTANT`
+- `DateTimeFormatter.ISO_OFFSET_DATE_TIME`
+
+* Date/Time Arithmetic
+
+** Q29: How to add days to date?
+
+#+BEGIN_SRC java
+LocalDate next = date.plusDays(7);
+#+END_SRC
+
+** Q30: How to subtract months?
+
+#+BEGIN_SRC java
+LocalDate prev = date.minusMonths(1);
+#+END_SRC
+
+** Q31: How to add hours to LocalDateTime?
+
+#+BEGIN_SRC java
+LocalDateTime later = dt.plusHours(3);
+#+END_SRC
+
+** Q32: Are java.time objects mutable after plus/minus?
+ No; they are immutable and return new objects.
+
+** Q33: Why is immutability useful here?
+ Safer multi-thread use and fewer accidental state-change bugs.
+
+* Duration and Period
+
+** Q34: What is `Duration`?
+ Time-based amount (seconds/nanos), ideal for machine time differences.
+
+** Q35: What is `Period`?
+ Date-based amount (years/months/days), ideal for calendar math.
+
+** Q36: Example Duration between instants?
+
+#+BEGIN_SRC java
+Duration d = Duration.between(startInstant, endInstant);
+#+END_SRC
+
+** Q37: Example Period between dates?
+
+#+BEGIN_SRC java
+Period p = Period.between(startDate, endDate);
+#+END_SRC
+
+** Q38: Duration vs Period in one line?
+ Duration = clock time; Period = calendar date difference.
+
+* Comparing Dates and Times
+
+** Q39: How to compare two dates?
+
+- `isBefore`
+- `isAfter`
+- `isEqual`
+
+** Q40: How to compare instants safely across zones?
+ Convert both to `Instant` and compare timeline points.
+
+** Q41: Can LocalDateTime comparisons be misleading?
+ Yes, if values come from different real zones but zone info is missing.
+
+* Conversions
+
+** Q42: Convert LocalDateTime to ZonedDateTime?
+
+#+BEGIN_SRC java
+ZonedDateTime z = localDateTime.atZone(ZoneId.of("UTC"));
+#+END_SRC
+
+** Q43: Convert ZonedDateTime to Instant?
+
+#+BEGIN_SRC java
+Instant i = zonedDateTime.toInstant();
+#+END_SRC
+
+** Q44: Convert Instant to user zone?
+
+#+BEGIN_SRC java
+ZonedDateTime userTime = instant.atZone(ZoneId.of("America/New_York"));
+#+END_SRC
+
+** Q45: Convert Date (legacy) to Instant?
+
+#+BEGIN_SRC java
+Instant i = legacyDate.toInstant();
+#+END_SRC
+
+* Daylight Saving Time (DST) and Edge Cases
+
+** Q46: Why is DST tricky?
+ Some local times are skipped or repeated during transitions.
+
+** Q47: What happens in “spring forward” gap?
+ Certain local times do not exist in that zone on that date.
+
+** Q48: What happens in “fall back” overlap?
+ Some local times occur twice with different offsets.
+
+** Q49: How to handle DST correctly?
+ Use `ZonedDateTime` + `ZoneId`; avoid manual offset math.
+
+** Q50: Should backend do manual timezone arithmetic?
+ No, rely on java.time zone rules.
+
+* Useful Enums and Helpers
+
+** Q51: What is `DayOfWeek`?
+ Enum representing Monday-Sunday with useful methods.
+
+** Q52: What is `Month` enum useful for?
+ Type-safe month handling and readable code.
+
+** Q53: How to get start of day?
+
+#+BEGIN_SRC java
+LocalDateTime start = date.atStartOfDay();
+#+END_SRC
+
+** Q54: How to get end-of-day safely?
+ Prefer half-open ranges: `[startOfDay, nextStartOfDay)` to avoid nano precision issues.
+
+* Query Ranges in Backend
+
+** Q55: Recommended date range style in queries?
+ Half-open interval: `timestamp >= start AND timestamp < end`.
+
+** Q56: Why half-open intervals are better?
+ They avoid overlap and boundary precision bugs.
+
+** Q57: How to build daily UTC range from LocalDate?
+
+#+BEGIN_SRC java
+Instant from = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+Instant to = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+#+END_SRC
+
+* Serialization / JSON APIs
+
+** Q58: Which type is best to expose in APIs for exact event time?
+ `Instant` or `OffsetDateTime` in ISO-8601 format.
+
+** Q59: Why avoid raw LocalDateTime in distributed APIs?
+ It has no timezone/offset context, causing ambiguity.
+
+** Q60: Jackson module needed for java.time?
+ `JavaTimeModule`.
+
+* Validation and Business Rules
+
+** Q61: How to validate “end must be after start”?
+
+#+BEGIN_SRC java
+if (!end.isAfter(start)) throw new IllegalArgumentException("end must be after start");
+#+END_SRC
+
+** Q62: How to check if date is in future?
+
+#+BEGIN_SRC java
+boolean future = date.isAfter(LocalDate.now());
+#+END_SRC
+
+** Q63: How to calculate age roughly?
+
+#+BEGIN_SRC java
+int years = Period.between(birthDate, LocalDate.now()).getYears();
+#+END_SRC
+
+** Q64: Why is age logic sometimes complex?
+ Leap years, timezone boundaries, and legal/business definitions can vary.
+
+* Common Mistakes
+
+** Q65: Mistake: using system default timezone silently
+ Always choose explicit zone when business meaning depends on time.
+
+** Q66: Mistake: storing LocalDateTime in DB for global events
+ Store Instant/UTC instead for unambiguous timeline representation.
+
+** Q67: Mistake: custom string parsing without formatter
+ Use DateTimeFormatter with explicit pattern/locale.
+
+** Q68: Mistake: assuming every day has 24 hours
+ DST days can be 23 or 25 hours in some zones.
+
+** Q69: Mistake: mixing old and new APIs carelessly
+ Convert deliberately and keep one internal standard (prefer java.time).
+
+* Interview Quick Q&A
+
+** Q70: Most important date-time backend rule?
+ Store UTC, convert at boundaries.
+
+** Q71: Best type for audit timestamps?
+ `Instant`.
+
+** Q72: Best type for birthday?
+ `LocalDate`.
+
+** Q73: Best type for “meeting at user local time zone”?
+ `ZonedDateTime` (or LocalDateTime + ZoneId together).
+
+** Q74: Period or Duration for SLA milliseconds?
+ `Duration`.
+
+** Q75: Why java.time is thread-safe?
+ Core types are immutable.
+
+* Practical Scenarios
+
+** Q76: Scenario: user submits “2026-12-01” for birthday
+ Parse to `LocalDate`, not Instant.
+
+** Q77: Scenario: log event creation moment
+ Capture `Instant.now()`.
+
+** Q78: Scenario: show event time for Tokyo user
+ Convert stored Instant with `ZoneId.of("Asia/Tokyo")`.
+
+** Q79: Scenario: query all orders on a date in UTC DB
+ Use half-open UTC range from start-of-day to next start-of-day.
+
+** Q80: Scenario: recurring monthly billing date
+ Use `LocalDate` plus month arithmetic with business rules for month-end handling.
+
+* Mini Code Q&A
+
+** Q81: Parse and format date quickly?
+
+#+BEGIN_SRC java
+LocalDate d = LocalDate.parse("2026-08-08");
+String out = d.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+#+END_SRC
+
+** Q82: Convert Instant to OffsetDateTime UTC?
+
+#+BEGIN_SRC java
+OffsetDateTime odt = instant.atOffset(ZoneOffset.UTC);
+#+END_SRC
+
+** Q83: Check if current instant is within window?
+
+#+BEGIN_SRC java
+boolean inRange = !now.isBefore(start) && now.isBefore(end);
+#+END_SRC
+
+** Q84: Get first day of current month?
+
+#+BEGIN_SRC java
+LocalDate first = LocalDate.now().withDayOfMonth(1);
+#+END_SRC
+
+** Q85: Get last day of current month?
+
+#+BEGIN_SRC java
+LocalDate last = LocalDate.now().with(java.time.temporal.TemporalAdjusters.lastDayOfMonth());
+#+END_SRC
+
+* Testing Date/Time Logic
+
+** Q86: Why is `Clock` useful in tests?
+ It allows deterministic “current time” instead of flaky real-time dependence.
+
+** Q87: How to make time deterministic in service code?
+ Inject `Clock` and use `Instant.now(clock)`.
+
+** Q88: What should date-time tests include?
+ Boundary moments, timezone conversion, DST transitions, end-of-month/year cases.
+
+** Q89: Why avoid relying on system default zone in tests?
+ CI/dev machines may differ, causing inconsistent results.
+
+** Q90: Test for half-open intervals should verify what?
+ Start is inclusive, end is exclusive, and adjacent ranges don’t overlap.
+
+-----
+
+#+INCLUDE: "../footer.org"
