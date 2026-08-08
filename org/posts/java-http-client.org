@@ -1,0 +1,692 @@
+#+TITLE: Java HTTP Client API
+#+DATE: 2026-08-09
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java HTTP Client API (java.net.http)
+
+-----
+
+* Foundations
+
+** Q1: What is Java HTTP Client API?
+ A built-in Java API for making HTTP requests and handling responses.
+ Introduced in modern Java (standardized in Java 11), it replaces older low-level APIs with cleaner synchronous and asynchronous programming.
+ *HttpClient*, *HttpRequest*, *HttpResponse*.
+
+** Q2: Why use java.net.http instead of HttpURLConnection?
+ Cleaner API, async support, HTTP/2 support.
+ It provides modern request building, futures-based async calls, and better readability for production networking code.
+ *client.sendAsync(...)* with CompletableFuture.
+
+** Q3: Main classes to know?
+ HttpClient, HttpRequest, HttpResponse.
+ Client configures behavior, request defines outbound call, response holds status/headers/body.
+ build request once, send via client.
+
+** Q4: Is Java HTTP Client thread-safe?
+ HttpClient is designed for reuse and concurrent use.
+ Create and reuse one configured client instance for many requests.
+ singleton client bean in app service layer.
+
+** Q5: What protocols are supported?
+ HTTP/1.1 and HTTP/2.
+ HTTP/2 can reduce latency via multiplexing on one connection where supported.
+ API gateway endpoints often support HTTP/2.
+
+** Q6: What is BodyHandler?
+ Defines how response body is consumed.
+ Choose string, byte array, file, stream, or custom processing based on payload size/use.
+ *BodyHandlers.ofString()* for JSON payload.
+
+** Q7: What is BodyPublisher?
+ Defines how request body is sent.
+ Can send strings, byte arrays, files, or streams for POST/PUT/PATCH requests.
+ *BodyPublishers.ofString(json)*.
+
+** Q8: Should HttpClient be recreated per request?
+ Usually no.
+ Reuse improves connection pooling and performance consistency.
+ static final/shared client instance.
+
+** Q9: What Java version should I know for this API?
+ Java 11+.
+ API matured and is widely used in modern Java backend projects.
+ Java 21 apps commonly use it.
+
+** Q10: Basic request lifecycle?
+ Build request -> send -> inspect status/body/headers.
+ Robust code also handles timeout, retry policy, and error mapping.
+ status 2xx success, 4xx/5xx mapped to domain errors.
+
+-----
+
+* Building Requests
+
+** Q11: How to create a basic GET request?
+ Use HttpRequest builder with URI and GET.
+ Request object is immutable after build, good for predictable behavior.
+
+#+begin_src java
+HttpRequest req = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com/users"))
+    .GET()
+    .build();
+#+end_src
+
+** Q12: How to send query parameters?
+ Include them in URI.
+ Properly encode user input to avoid malformed URLs and injection-like issues.
+ */search?q=java&page=1*
+
+** Q13: How to add headers?
+ *.header(name, value)* or *.headers(...)*.
+ Use headers for auth, content negotiation, tracing, idempotency keys.
+ *Authorization: Bearer ...*
+
+** Q14: How to create POST request with JSON body?
+ POST + BodyPublisher + content-type header.
+ Always set *Content-Type: application/json* for JSON request payloads.
+
+#+begin_src java
+HttpRequest req = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com/orders"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
+#+end_src
+
+** Q15: How to do PUT/DELETE?
+ Use *.PUT(...)* and *.DELETE()*.
+ Respect API semantics: PUT often idempotent replace/update, DELETE remove resource.
+ update profile with PUT.
+
+** Q16: Can I set per-request timeout?
+ Yes, via request builder *.timeout(...)*.
+ Per-request timeout helps tune critical endpoints differently.
+ profile API 300ms, reporting API 2s.
+
+** Q17: How to set HTTP version preference?
+ Configure at client/request level.
+ Default is usually fine, but explicit version can help compatibility/performance testing.
+ *HttpClient.Version.HTTP_2*
+
+** Q18: Why set User-Agent?
+ Helps observability and provider-side diagnostics.
+ External APIs often request identifiable client metadata for support/debugging.
+ *User-Agent: my-service/1.2.0*
+
+** Q19: How to send form data?
+ Encode body and set form content type.
+ Use *application/x-www-form-urlencoded* with proper URL encoding.
+ *grant_type=client_credentials...*
+
+** Q20: Common request-building mistake?
+ Missing timeout and missing content-type.
+ Leads to hanging calls and server misinterpretation of body.
+ POST JSON without content-type header.
+
+-----
+
+* Reading Responses
+
+** Q21: What does HttpResponse contain?
+ Status code, headers, body, request metadata.
+ Always validate status and parse body according to response contract.
+ *response.statusCode()*.
+
+** Q22: How to read body as String?
+ Use *BodyHandlers.ofString()*.
+ Best for typical JSON/text payload sizes.
+
+#+begin_src java
+HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+#+end_src
+
+** Q23: How to read body as bytes?
+ Use *BodyHandlers.ofByteArray()*.
+ Good for binary payloads like files/images/protobuf.
+ file download metadata + raw bytes.
+
+** Q24: How to stream response body?
+ Use *BodyHandlers.ofInputStream()*.
+ Important for large responses to avoid loading everything into memory.
+ process big CSV stream line by line.
+
+** Q25: How to save response directly to file?
+ *BodyHandlers.ofFile(path)*.
+ Efficient for downloads and avoids extra memory copies.
+ download report zip to temp path.
+
+** Q26: Should I trust 200 only as success?
+ Usually treat all 2xx as success (based on API contract).
+ Some APIs use 201/202/204 meaningfully.
+ 204 No Content on successful delete.
+
+** Q27: How to read response headers?
+ *response.headers().firstValue("Header-Name")*.
+ Useful for rate limits, pagination links, trace IDs.
+ *X-RateLimit-Remaining*.
+
+** Q28: What if body is empty?
+ Handle gracefully, especially for 204 responses.
+ Don’t always assume JSON body exists.
+ DELETE may return no content.
+
+** Q29: Why validate content type?
+ Prevent parsing wrong payload format.
+ Some error pages return HTML; blindly JSON-parsing causes confusing failures.
+ check *Content-Type* before Jackson parse.
+
+** Q30: Response handling golden rule?
+ Check status + headers + body contract together.
+ Robust clients validate the full protocol response, not just body text.
+ 200 with malformed content-type should still be treated suspiciously.
+
+-----
+
+* Synchronous vs Asynchronous Calls
+
+** Q31: What is synchronous send?
+ Blocking call using *client.send(...)*.
+ Simpler control flow, good for straightforward logic where blocking is acceptable.
+ backend batch job step.
+
+** Q32: What is asynchronous send?
+ Non-blocking call using *client.sendAsync(...)*.
+ Returns CompletableFuture, enabling composition and parallel calls.
+ fetch profile and permissions concurrently.
+
+** Q33: send vs sendAsync choice?
+ Use send for simplicity, async for concurrency/latency optimization.
+ Async shines when multiple independent remote calls can be overlapped.
+ fan-out to 3 microservices.
+
+** Q34: How to compose async responses?
+ CompletableFuture methods (thenApply/thenCompose/thenCombine).
+ Keep chains non-blocking; avoid premature *.join()* deep in flow.
+ combine user and order futures.
+
+** Q35: allOf use case?
+ Wait for all async tasks.
+ Useful for fan-in aggregation response patterns.
+ gather data from multiple providers.
+
+** Q36: anyOf use case?
+ Complete when first task finishes.
+ Good for fastest-mirror strategies.
+ query multiple replicas and take first successful.
+
+** Q37: Async error handling options?
+ exceptionally, handle, whenComplete.
+ Choose fallback vs transformation vs side-effect logging intentionally.
+ fallback empty list on recommendation API failure.
+
+** Q38: Why avoid blocking join in async pipeline?
+ It defeats async benefits.
+ Blocking consumes threads and can increase tail latency under load.
+ call *join()* only at boundary if needed.
+
+** Q39: Cancellation in async HTTP calls?
+ CompletableFuture supports cancellation.
+ Useful when parent request times out or client disconnects.
+ cancel downstream calls on request deadline exceeded.
+
+** Q40: Async best-practice one-liner?
+ Compose non-blocking, timeout early, handle failures explicitly.
+ Async without deadlines/error strategy creates hidden reliability risks.
+ sendAsync + orTimeout + fallback.
+
+-----
+
+* Timeouts, Retries, and Resilience
+
+** Q41: Why are timeouts mandatory?
+ Prevent hanging and resource exhaustion.
+ Without timeouts, slow dependencies can consume threads and collapse service responsiveness.
+ set connect + request time budget.
+
+** Q42: Connect timeout vs request timeout?
+ Connect timeout for TCP connection setup; request timeout for full request processing.
+ Both matter for robust latency control.
+ connect 1s, request 2s.
+
+** Q43: How to set connect timeout?
+ Configure on HttpClient builder.
+ Controls how long to wait for initial connection establishment.
+
+#+begin_src java
+HttpClient client = HttpClient.newBuilder()
+    .connectTimeout(Duration.ofSeconds(1))
+    .build();
+#+end_src
+
+** Q44: How to set request timeout?
+ Configure on HttpRequest builder.
+ Enforces per-call max duration aligned to SLA.
+ *.timeout(Duration.ofMillis(500))*
+
+** Q45: Should we retry every failure?
+ No.
+ Retry only transient failures (timeouts, 5xx, network glitches) with safe/idempotent operations.
+ retry GET, be careful with POST side effects.
+
+** Q46: Exponential backoff purpose?
+ Reduce retry storm and pressure.
+ Spacing retries prevents overload amplification during incidents.
+ 100ms, 200ms, 400ms + jitter.
+
+** Q47: Why jitter in retries?
+ Avoid synchronized retry spikes.
+ Randomized delay smooths traffic bursts and improves recovery odds.
+ ±20% randomized wait.
+
+** Q48: Idempotency and retries relation?
+ Non-idempotent operations can duplicate side effects.
+ Use idempotency keys or safe API design for retried writes.
+ payment POST with idempotency-key header.
+
+** Q49: Circuit breaker relation to HTTP client?
+ Protect system from repeatedly calling failing dependency.
+ Works with timeouts/retries to improve resilience and recovery.
+ open breaker after repeated failures.
+
+** Q50: Resilience golden rule?
+ Timeouts + retries (careful) + fallback + observability.
+ Reliability is policy-driven, not just API-call syntax.
+ degrade recommendations, keep checkout alive.
+
+-----
+
+* JSON Integration (Jackson + HTTP Client)
+
+** Q51: How to send Java object as JSON request?
+ Serialize with Jackson, send as String body.
+ Keep serialization config centralized for stable contracts.
+
+#+begin_src java
+String json = mapper.writeValueAsString(dto);
+HttpRequest req = HttpRequest.newBuilder(uri)
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
+#+end_src
+
+** Q52: How to parse JSON response into DTO?
+ Read String body then *mapper.readValue*.
+ Validate status/content-type before deserialization.
+
+#+begin_src java
+UserDto dto = mapper.readValue(res.body(), UserDto.class);
+#+end_src
+
+** Q53: Should we parse JSON on non-2xx responses?
+ Depends on API error contract.
+ Many APIs return structured error JSON for 4xx/5xx; parse accordingly.
+ error body *{code,message}* mapped to ApiErrorDto.
+
+** Q54: How to handle unknown fields in response DTO?
+ Configure Jackson to ignore unknown when appropriate.
+ Improves forward compatibility with evolving APIs.
+ *@JsonIgnoreProperties(ignoreUnknown = true)*
+
+** Q55: Why validate content-type before Jackson parse?
+ Prevent wrong parser assumptions.
+ Error pages/proxies may return HTML/text unexpectedly.
+ reject non-JSON content with clear error.
+
+** Q56: Generic JSON response parsing issue?
+ Type erasure.
+ Use TypeReference for *List<T>* or generic wrappers.
+ *new TypeReference<List<UserDto>>() {}*
+
+** Q57: Should DTO and domain model be same?
+ Usually no.
+ Keep remote contract DTO separate from internal domain to avoid coupling.
+ remote *price* string mapped into domain Money type.
+
+** Q58: JSON null/missing handling importance?
+ Impacts update logic and defaults.
+ Distinguish absent vs explicit null for patch semantics.
+ missing field means unchanged, null means clear value.
+
+** Q59: Common JSON + HTTP mistake?
+ Assume success body shape without checking status.
+ Leads to parse exceptions hiding real protocol error.
+ 401 HTML parsed as JSON fails confusingly.
+
+** Q60: JSON integration best-practice one-liner?
+ Validate protocol first, then parse payload.
+ Correctness starts with status/headers, not mapper call.
+ status check -> content-type check -> readValue.
+
+-----
+
+* Authentication and Security
+
+** Q61: How to send Bearer token?
+ Authorization header.
+ Rotate tokens safely and avoid logging sensitive headers.
+ *Authorization: Bearer <token>*
+
+** Q62: Basic auth with HttpClient?
+ Use *Authorization: Basic base64(user:pass)* or Authenticator.
+ Prefer HTTPS always; basic auth credentials are only base64 encoded, not encrypted.
+ API legacy integrations.
+
+** Q63: How to enforce HTTPS-only URIs?
+ Validate URI scheme before request.
+ Prevent accidental plaintext transmission of sensitive data.
+ reject *http://* in production config.
+
+** Q64: TLS customization possible?
+ Yes, with SSLContext/SSLParameters in client builder.
+ Needed for custom trust stores, mTLS, strict cipher/protocol policies.
+ internal service with private CA.
+
+** Q65: What is mTLS in brief?
+ Mutual TLS: both client and server authenticate certificates.
+ Strong service-to-service authentication in zero-trust/internal networks.
+ payment service requires client cert.
+
+** Q66: Should redirects always be followed?
+ Depends on policy.
+ Automatic redirects can be unsafe for auth-sensitive endpoints.
+ avoid forwarding auth to unintended hosts.
+
+** Q67: Why redact logs for HTTP requests?
+ Avoid leaking secrets/PII.
+ Headers and payloads may contain tokens, passwords, personal data.
+ mask Authorization and sensitive JSON fields.
+
+** Q68: How to prevent SSRF risks in HTTP client usage?
+ Validate/whitelist outbound hosts.
+ Never call arbitrary user-provided URLs directly.
+ allow only approved domains/IP ranges.
+
+** Q69: Cookie handling in HttpClient?
+ Configurable with CookieHandler.
+ Useful for session-based integrations, but token auth is common in APIs.
+ legacy SSO flow.
+
+** Q70: Security best-practice one-liner?
+ Secure transport, strict target validation, secret-safe logging.
+ Most client-side incidents come from lax outbound controls.
+ HTTPS + allowlist + redaction.
+
+-----
+
+* Performance and Resource Management
+
+** Q71: Does HttpClient reuse connections?
+ Yes, when reused properly.
+ Reusing one client enables pooling/keep-alive benefits.
+ singleton client for app lifetime.
+
+** Q72: Why avoid creating many clients?
+ Poor pooling and extra overhead.
+ Multiple clients fragment connection reuse and increase resource churn.
+ one per service config, not one per request.
+
+** Q73: How does HTTP/2 help performance?
+ Multiplexing multiple requests over fewer connections.
+ Reduces connection overhead and can improve latency in high-call scenarios.
+ microservice making many calls to same host.
+
+** Q74: Memory risk with BodyHandlers.ofString?
+ Loads full body into memory.
+ For large payloads prefer streaming/file handlers.
+ large export should use InputStream/file handler.
+
+** Q75: Should compression be used?
+ Usually yes for text/JSON payloads.
+ Saves bandwidth; ensure server/client agree on encoding.
+ *Accept-Encoding: gzip*
+
+** Q76: How to handle high request volume safely?
+ Bound concurrency and use timeouts.
+ Prevent overwhelming downstream and your own resources.
+ semaphore limiting concurrent outbound calls.
+
+** Q77: Why measure p95/p99 for HTTP client calls?
+ Tail latency drives user experience.
+ Averages hide spikes caused by retries/timeouts/contention.
+ p99 jumps during dependency degradation.
+
+** Q78: What metrics should be recorded per dependency?
+ latency, success rate, status distribution, timeout/retry counts.
+ Observability enables fast diagnosis and capacity planning.
+ dashboard by downstream service name.
+
+** Q79: Why set maximum in-flight requests?
+ Backpressure control.
+ Unbounded concurrency leads to cascading failures.
+ bounded executor + queue strategy.
+
+** Q80: Performance golden rule?
+ Reuse client, bound work, monitor tails.
+ Throughput without control is fragile under real traffic.
+ singleton client + bulkhead + metrics.
+
+-----
+
+* Testing HTTP Client Code
+
+** Q81: Unit test HTTP client wrapper how?
+ Mock wrapper dependencies or use fake transport abstraction.
+ Avoid live network in unit tests for speed/determinism.
+ interface *HttpExecutor* mocked in service tests.
+
+** Q82: Integration test outbound HTTP logic how?
+ Use local mock server (e.g., WireMock/MockWebServer).
+ Validates real serialization, headers, status handling, retries.
+ simulate 500 then 200 for retry policy.
+
+** Q83: Should CI tests call real external APIs?
+ Usually no.
+ External instability/rate limits cause flaky builds.
+ keep real API tests as controlled smoke checks only.
+
+** Q84: How to test timeout handling?
+ Mock server delays response beyond timeout.
+ Assert expected exception/fallback and timing boundaries.
+ delayed endpoint returns timeout path.
+
+** Q85: How to test retry behavior?
+ Program server to fail first N times then succeed.
+ Assert attempt count and final outcome.
+ verify 3 calls occurred before success.
+
+** Q86: How to test auth header presence?
+ Assert request headers on mock server.
+ Ensures token propagation logic is correct.
+ recorded request includes Authorization header.
+
+** Q87: How to test JSON parsing errors?
+ Return malformed/invalid content-type payload from mock server.
+ Verify clean error mapping and diagnostics.
+ HTML response when JSON expected.
+
+** Q88: Why test idempotency behavior?
+ Prevent duplicate side effects under retry.
+ Critical for payments/orders/external write operations.
+ duplicate POST with same key processed once.
+
+** Q89: What should be asserted in HTTP integration tests?
+ Method, URL, headers, body, status handling, retries/timeouts.
+ Assert both protocol correctness and domain mapping.
+ 404 maps to NotFoundException.
+
+** Q90: Testing best-practice one-liner?
+ Deterministic mock server > live internet dependency.
+ Reliable tests enable confident refactoring and CI stability.
+ local stub with scripted responses.
+
+-----
+
+* Common Pitfalls and Better Patterns
+
+** Q91: Pitfall: ignoring non-2xx statuses
+ Causes hidden business errors.
+ Always map status ranges to domain outcomes.
+ 409 should map to conflict handling.
+
+** Q92: Pitfall: no timeout configured
+ Threads can hang indefinitely.
+ Missing deadlines is a major outage multiplier.
+ blocked request threads during partner outage.
+
+** Q93: Pitfall: blind retries on POST
+ Duplicate side effects risk.
+ Use idempotency keys or avoid automatic retries for non-idempotent operations.
+ double charge issue.
+
+** Q94: Pitfall: logging full request/response bodies
+ Security/privacy risk.
+ Redact tokens/PII and limit payload logs in production.
+ mask account numbers.
+
+** Q95: Pitfall: parsing body before checking content type
+ Wrong parser assumptions.
+ Could mis-handle HTML error pages and hide root cause.
+ JSON parser exception on proxy HTML page.
+
+** Q96: Pitfall: mixing transport and business logic
+ Hard to test/maintain.
+ Keep HTTP client wrapper separate from domain service logic.
+ adapter layer returns typed Result objects.
+
+** Q97: Pattern: dependency-specific client configuration
+ Separate settings per downstream.
+ Different dependencies need different timeout/retry/SLA policies.
+ payment strict timeout, reporting relaxed timeout.
+
+** Q98: Pattern: centralized error mapping
+ One place to map status/errors to exceptions.
+ Consistency reduces duplicated bugs.
+ 401->Unauthorized, 429->RateLimited.
+
+** Q99: Pattern: correlation/trace headers propagation
+ Forward request context IDs.
+ Critical for distributed tracing and incident debugging.
+ *traceparent*, *X-Correlation-Id*.
+
+** Q100: Pattern: defensive URI building
+ Encode and validate inputs.
+ Prevent malformed requests and security issues.
+ safe query param encoding utility.
+
+-----
+
+* Interview-Focused
+
+** Q101: “When would you use sendAsync over send?”
+ When independent calls can run concurrently.
+ Async reduces total latency in fan-out scenarios if composed properly.
+ fetch profile, orders, preferences in parallel.
+
+** Q102: “How do you design resilient HTTP clients?”
+ Timeouts, selective retries, fallback, circuit breaker, metrics.
+ Resilience is policy + observability, not just retries.
+ per-dependency strategy object.
+
+** Q103: “How do you avoid retry storms?”
+ Backoff + jitter + capped attempts.
+ Prevent synchronized pressure amplification during outages.
+ exponential backoff max 3 attempts.
+
+** Q104: “How do you handle 429 rate-limit responses?”
+ Respect Retry-After and throttle.
+ Adaptive behavior protects both client and provider relationship.
+ parse header, delay next attempt.
+
+** Q105: “How do you handle partial failures in fan-out?”
+ Return degraded response with clear semantics.
+ Keep critical path alive while optional features fallback.
+ recommendations missing, core order response still succeeds.
+
+** Q106: “How do you test timeout/retry logic properly?”
+ Use deterministic mock server scenarios.
+ Script delays/failures and assert attempts + timing behavior.
+ delayed endpoint for timeout branch.
+
+** Q107: “What are key HTTP client metrics?”
+ latency, status codes, errors, retries, timeouts.
+ Break down per dependency and per endpoint for actionable insights.
+ dashboard for payment-provider latency p99.
+
+** Q108: “How do you handle JSON schema drift?”
+ tolerant reader + contract tests.
+ Ignore non-breaking extras, fail clearly on breaking changes.
+ DTO with ignoreUnknown + CI contract checks.
+
+** Q109: “How do you secure outbound HTTP in enterprise?”
+ TLS controls, auth hygiene, host allowlist, redaction.
+ Outbound calls are an attack surface and compliance concern.
+ mTLS + strict logging policy.
+
+** Q110: “Most common production mistake with HTTP clients?”
+ Missing timeout and weak error mapping.
+ Leads to hanging threads, unclear incidents, and brittle behavior.
+ generic RuntimeException for all statuses.
+
+-----
+
+* Final Mastery Checklist
+
+** Q111: Can you build and send GET/POST/PUT/DELETE confidently?
+ If yes, core API usage is solid.
+ Request construction basics are foundation for all integrations.
+ proper headers + body + URI encoding.
+
+** Q112: Can you explain send vs sendAsync tradeoffs clearly?
+ If yes, concurrency understanding is strong.
+ Correct choice impacts latency, complexity, and scalability.
+ fan-out aggregator endpoint.
+
+** Q113: Can you design timeout/retry policy per dependency?
+ If yes, resilience maturity is good.
+ One-size-fits-all policy is a common anti-pattern.
+ payment vs analytics different SLAs.
+
+** Q114: Can you parse JSON responses safely with status/content checks?
+ If yes, correctness improves significantly.
+ Protocol validation before payload parsing prevents subtle bugs.
+ handle 204/HTML error body gracefully.
+
+** Q115: Can you prevent duplicate side effects on retries?
+ If yes, write-safety is strong.
+ Idempotency thinking is critical for financial/order systems.
+ idempotency-key strategy.
+
+** Q116: Can you test client code deterministically without real internet?
+ If yes, CI reliability is strong.
+ Mock server-based tests reduce flakiness and improve confidence.
+ scripted response scenarios.
+
+** Q117: Can you apply outbound security best practices?
+ If yes, production risk drops.
+ TLS, allowlists, and redacted logs are non-negotiable in serious systems.
+ reject non-HTTPS endpoints.
+
+** Q118: Can you observe and tune HTTP client performance?
+ If yes, operations readiness is solid.
+ Tail metrics and saturation signals guide real optimizations.
+ p99 latency + retry spike alerts.
+
+** Q119: Can you separate transport concerns from domain logic?
+ If yes, maintainability is high.
+ Clean boundaries simplify testing and future protocol changes.
+ HTTP adapter layer returns typed domain result.
+
+** Q120: Final principle for Java HTTP Client?
+ Reliable networking is about policy, not just syntax.
+ Build explicit timeouts, error handling, retries, and observability into every integration.
+ “safe by default” outbound client template.
+
+-----
+
+#+INCLUDE: "../footer.org"

@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java HTTP Client API</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Java HTTP Client API</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org64436a3" class="outline-2">
+<h2 id="org64436a3">Java HTTP Client API (java.net.http)</h2>
+<div class="outline-text-2" id="text-org64436a3">
+<hr>
+</div>
+</div>
+<div id="outline-container-org149ffc4" class="outline-2">
+<h2 id="org149ffc4">Foundations</h2>
+<div class="outline-text-2" id="text-org149ffc4">
+</div>
+<div id="outline-container-orgb2b9caf" class="outline-3">
+<h3 id="orgb2b9caf">Q1: What is Java HTTP Client API?</h3>
+<div class="outline-text-3" id="text-orgb2b9caf">
+<p>
+A built-in Java API for making HTTP requests and handling responses.
+Introduced in modern Java (standardized in Java 11), it replaces older low-level APIs with cleaner synchronous and asynchronous programming.
+<b>HttpClient</b>, <b>HttpRequest</b>, <b>HttpResponse</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d67e84" class="outline-3">
+<h3 id="org2d67e84">Q2: Why use java.net.http instead of HttpURLConnection?</h3>
+<div class="outline-text-3" id="text-org2d67e84">
+<p>
+Cleaner API, async support, HTTP/2 support.
+It provides modern request building, futures-based async calls, and better readability for production networking code.
+<b>client.sendAsync(&#x2026;)</b> with CompletableFuture.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ee43c4" class="outline-3">
+<h3 id="org9ee43c4">Q3: Main classes to know?</h3>
+<div class="outline-text-3" id="text-org9ee43c4">
+<p>
+HttpClient, HttpRequest, HttpResponse.
+Client configures behavior, request defines outbound call, response holds status/headers/body.
+build request once, send via client.
+</p>
+</div>
+</div>
+<div id="outline-container-org78cd64c" class="outline-3">
+<h3 id="org78cd64c">Q4: Is Java HTTP Client thread-safe?</h3>
+<div class="outline-text-3" id="text-org78cd64c">
+<p>
+HttpClient is designed for reuse and concurrent use.
+Create and reuse one configured client instance for many requests.
+singleton client bean in app service layer.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc2755d1" class="outline-3">
+<h3 id="orgc2755d1">Q5: What protocols are supported?</h3>
+<div class="outline-text-3" id="text-orgc2755d1">
+<p>
+HTTP/1.1 and HTTP/2.
+HTTP/2 can reduce latency via multiplexing on one connection where supported.
+API gateway endpoints often support HTTP/2.
+</p>
+</div>
+</div>
+<div id="outline-container-org39de433" class="outline-3">
+<h3 id="org39de433">Q6: What is BodyHandler?</h3>
+<div class="outline-text-3" id="text-org39de433">
+<p>
+Defines how response body is consumed.
+Choose string, byte array, file, stream, or custom processing based on payload size/use.
+<b>BodyHandlers.ofString()</b> for JSON payload.
+</p>
+</div>
+</div>
+<div id="outline-container-org5dbcc3d" class="outline-3">
+<h3 id="org5dbcc3d">Q7: What is BodyPublisher?</h3>
+<div class="outline-text-3" id="text-org5dbcc3d">
+<p>
+Defines how request body is sent.
+Can send strings, byte arrays, files, or streams for POST/PUT/PATCH requests.
+<b>BodyPublishers.ofString(json)</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org384bff9" class="outline-3">
+<h3 id="org384bff9">Q8: Should HttpClient be recreated per request?</h3>
+<div class="outline-text-3" id="text-org384bff9">
+<p>
+Usually no.
+Reuse improves connection pooling and performance consistency.
+static final/shared client instance.
+</p>
+</div>
+</div>
+<div id="outline-container-org88b0cd8" class="outline-3">
+<h3 id="org88b0cd8">Q9: What Java version should I know for this API?</h3>
+<div class="outline-text-3" id="text-org88b0cd8">
+<p>
+Java 11+.
+API matured and is widely used in modern Java backend projects.
+Java 21 apps commonly use it.
+</p>
+</div>
+</div>
+<div id="outline-container-orged4cfc7" class="outline-3">
+<h3 id="orged4cfc7">Q10: Basic request lifecycle?</h3>
+<div class="outline-text-3" id="text-orged4cfc7">
+<p>
+Build request -&gt; send -&gt; inspect status/body/headers.
+Robust code also handles timeout, retry policy, and error mapping.
+status 2xx success, 4xx/5xx mapped to domain errors.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org5526d16" class="outline-2">
+<h2 id="org5526d16">Building Requests</h2>
+<div class="outline-text-2" id="text-org5526d16">
+</div>
+<div id="outline-container-org398a8ed" class="outline-3">
+<h3 id="org398a8ed">Q11: How to create a basic GET request?</h3>
+<div class="outline-text-3" id="text-org398a8ed">
+<p>
+Use HttpRequest builder with URI and GET.
+Request object is immutable after build, good for predictable behavior.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">HttpRequest</span> <span style="font-weight: bold; font-style: italic;">req</span> = HttpRequest.newBuilder()
+    .uri(URI.create(<span style="font-style: italic;">"https://api.example.com/users"</span>))
+    .GET()
+    .build();
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org06b7c21" class="outline-3">
+<h3 id="org06b7c21">Q12: How to send query parameters?</h3>
+<div class="outline-text-3" id="text-org06b7c21">
+<p>
+Include them in URI.
+Properly encode user input to avoid malformed URLs and injection-like issues.
+<b>/search?q=java&amp;page=1</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org73e9de1" class="outline-3">
+<h3 id="org73e9de1">Q13: How to add headers?</h3>
+<div class="outline-text-3" id="text-org73e9de1">
+<p>
+<b>.header(name, value)</b> or <b>.headers(&#x2026;)</b>.
+Use headers for auth, content negotiation, tracing, idempotency keys.
+<b>Authorization: Bearer &#x2026;</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orgc873bff" class="outline-3">
+<h3 id="orgc873bff">Q14: How to create POST request with JSON body?</h3>
+<div class="outline-text-3" id="text-orgc873bff">
+<p>
+POST + BodyPublisher + content-type header.
+Always set <b>Content-Type: application/json</b> for JSON request payloads.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">HttpRequest</span> <span style="font-weight: bold; font-style: italic;">req</span> = HttpRequest.newBuilder()
+    .uri(URI.create(<span style="font-style: italic;">"https://api.example.com/orders"</span>))
+    .header(<span style="font-style: italic;">"Content-Type"</span>, <span style="font-style: italic;">"application/json"</span>)
+    .POST(<span style="font-weight: bold; text-decoration: underline;">HttpRequest</span>.BodyPublishers.ofString(json))
+    .build();
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2178a91" class="outline-3">
+<h3 id="org2178a91">Q15: How to do PUT/DELETE?</h3>
+<div class="outline-text-3" id="text-org2178a91">
+<p>
+Use <b>.PUT(&#x2026;)</b> and <b>.DELETE()</b>.
+Respect API semantics: PUT often idempotent replace/update, DELETE remove resource.
+update profile with PUT.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf60522e" class="outline-3">
+<h3 id="orgf60522e">Q16: Can I set per-request timeout?</h3>
+<div class="outline-text-3" id="text-orgf60522e">
+<p>
+Yes, via request builder <b>.timeout(&#x2026;)</b>.
+Per-request timeout helps tune critical endpoints differently.
+profile API 300ms, reporting API 2s.
+</p>
+</div>
+</div>
+<div id="outline-container-org231cbea" class="outline-3">
+<h3 id="org231cbea">Q17: How to set HTTP version preference?</h3>
+<div class="outline-text-3" id="text-org231cbea">
+<p>
+Configure at client/request level.
+Default is usually fine, but explicit version can help compatibility/performance testing.
+<b>HttpClient.Version.HTTP<sub>2</sub></b>
+</p>
+</div>
+</div>
+<div id="outline-container-org35f89af" class="outline-3">
+<h3 id="org35f89af">Q18: Why set User-Agent?</h3>
+<div class="outline-text-3" id="text-org35f89af">
+<p>
+Helps observability and provider-side diagnostics.
+External APIs often request identifiable client metadata for support/debugging.
+<b>User-Agent: my-service/1.2.0</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orgfb30058" class="outline-3">
+<h3 id="orgfb30058">Q19: How to send form data?</h3>
+<div class="outline-text-3" id="text-orgfb30058">
+<p>
+Encode body and set form content type.
+Use <b>application/x-www-form-urlencoded</b> with proper URL encoding.
+<b>grant<sub>type</sub>=client<sub>credentials</sub>&#x2026;</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org2d3765d" class="outline-3">
+<h3 id="org2d3765d">Q20: Common request-building mistake?</h3>
+<div class="outline-text-3" id="text-org2d3765d">
+<p>
+Missing timeout and missing content-type.
+Leads to hanging calls and server misinterpretation of body.
+POST JSON without content-type header.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orga828518" class="outline-2">
+<h2 id="orga828518">Reading Responses</h2>
+<div class="outline-text-2" id="text-orga828518">
+</div>
+<div id="outline-container-orgff3f0cb" class="outline-3">
+<h3 id="orgff3f0cb">Q21: What does HttpResponse contain?</h3>
+<div class="outline-text-3" id="text-orgff3f0cb">
+<p>
+Status code, headers, body, request metadata.
+Always validate status and parse body according to response contract.
+<b>response.statusCode()</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c0fd66" class="outline-3">
+<h3 id="org9c0fd66">Q22: How to read body as String?</h3>
+<div class="outline-text-3" id="text-org9c0fd66">
+<p>
+Use <b>BodyHandlers.ofString()</b>.
+Best for typical JSON/text payload sizes.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">HttpResponse</span>&lt;<span style="font-weight: bold; text-decoration: underline;">String</span>&gt; <span style="font-weight: bold; font-style: italic;">res</span> = client.send(req, <span style="font-weight: bold; text-decoration: underline;">HttpResponse</span>.BodyHandlers.ofString());
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge42b95b" class="outline-3">
+<h3 id="orge42b95b">Q23: How to read body as bytes?</h3>
+<div class="outline-text-3" id="text-orge42b95b">
+<p>
+Use <b>BodyHandlers.ofByteArray()</b>.
+Good for binary payloads like files/images/protobuf.
+file download metadata + raw bytes.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e7411a" class="outline-3">
+<h3 id="org6e7411a">Q24: How to stream response body?</h3>
+<div class="outline-text-3" id="text-org6e7411a">
+<p>
+Use <b>BodyHandlers.ofInputStream()</b>.
+Important for large responses to avoid loading everything into memory.
+process big CSV stream line by line.
+</p>
+</div>
+</div>
+<div id="outline-container-org84ec31b" class="outline-3">
+<h3 id="org84ec31b">Q25: How to save response directly to file?</h3>
+<div class="outline-text-3" id="text-org84ec31b">
+<p>
+<b>BodyHandlers.ofFile(path)</b>.
+Efficient for downloads and avoids extra memory copies.
+download report zip to temp path.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8102d3" class="outline-3">
+<h3 id="orgf8102d3">Q26: Should I trust 200 only as success?</h3>
+<div class="outline-text-3" id="text-orgf8102d3">
+<p>
+Usually treat all 2xx as success (based on API contract).
+Some APIs use 201/202/204 meaningfully.
+204 No Content on successful delete.
+</p>
+</div>
+</div>
+<div id="outline-container-orge165167" class="outline-3">
+<h3 id="orge165167">Q27: How to read response headers?</h3>
+<div class="outline-text-3" id="text-orge165167">
+<p>
+<b>response.headers().firstValue("Header-Name")</b>.
+Useful for rate limits, pagination links, trace IDs.
+<b>X-RateLimit-Remaining</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe6a2f5" class="outline-3">
+<h3 id="orgfe6a2f5">Q28: What if body is empty?</h3>
+<div class="outline-text-3" id="text-orgfe6a2f5">
+<p>
+Handle gracefully, especially for 204 responses.
+Don’t always assume JSON body exists.
+DELETE may return no content.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb02be4e" class="outline-3">
+<h3 id="orgb02be4e">Q29: Why validate content type?</h3>
+<div class="outline-text-3" id="text-orgb02be4e">
+<p>
+Prevent parsing wrong payload format.
+Some error pages return HTML; blindly JSON-parsing causes confusing failures.
+check <b>Content-Type</b> before Jackson parse.
+</p>
+</div>
+</div>
+<div id="outline-container-org69ef974" class="outline-3">
+<h3 id="org69ef974">Q30: Response handling golden rule?</h3>
+<div class="outline-text-3" id="text-org69ef974">
+<p>
+Check status + headers + body contract together.
+Robust clients validate the full protocol response, not just body text.
+200 with malformed content-type should still be treated suspiciously.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org5102ba1" class="outline-2">
+<h2 id="org5102ba1">Synchronous vs Asynchronous Calls</h2>
+<div class="outline-text-2" id="text-org5102ba1">
+</div>
+<div id="outline-container-org91f94e6" class="outline-3">
+<h3 id="org91f94e6">Q31: What is synchronous send?</h3>
+<div class="outline-text-3" id="text-org91f94e6">
+<p>
+Blocking call using <b>client.send(&#x2026;)</b>.
+Simpler control flow, good for straightforward logic where blocking is acceptable.
+backend batch job step.
+</p>
+</div>
+</div>
+<div id="outline-container-org6691e6f" class="outline-3">
+<h3 id="org6691e6f">Q32: What is asynchronous send?</h3>
+<div class="outline-text-3" id="text-org6691e6f">
+<p>
+Non-blocking call using <b>client.sendAsync(&#x2026;)</b>.
+Returns CompletableFuture, enabling composition and parallel calls.
+fetch profile and permissions concurrently.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e84e33" class="outline-3">
+<h3 id="org9e84e33">Q33: send vs sendAsync choice?</h3>
+<div class="outline-text-3" id="text-org9e84e33">
+<p>
+Use send for simplicity, async for concurrency/latency optimization.
+Async shines when multiple independent remote calls can be overlapped.
+fan-out to 3 microservices.
+</p>
+</div>
+</div>
+<div id="outline-container-org117f12b" class="outline-3">
+<h3 id="org117f12b">Q34: How to compose async responses?</h3>
+<div class="outline-text-3" id="text-org117f12b">
+<p>
+CompletableFuture methods (thenApply/thenCompose/thenCombine).
+Keep chains non-blocking; avoid premature <b>.join()</b> deep in flow.
+combine user and order futures.
+</p>
+</div>
+</div>
+<div id="outline-container-org0925f1f" class="outline-3">
+<h3 id="org0925f1f">Q35: allOf use case?</h3>
+<div class="outline-text-3" id="text-org0925f1f">
+<p>
+Wait for all async tasks.
+Useful for fan-in aggregation response patterns.
+gather data from multiple providers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgee46703" class="outline-3">
+<h3 id="orgee46703">Q36: anyOf use case?</h3>
+<div class="outline-text-3" id="text-orgee46703">
+<p>
+Complete when first task finishes.
+Good for fastest-mirror strategies.
+query multiple replicas and take first successful.
+</p>
+</div>
+</div>
+<div id="outline-container-org82e4491" class="outline-3">
+<h3 id="org82e4491">Q37: Async error handling options?</h3>
+<div class="outline-text-3" id="text-org82e4491">
+<p>
+exceptionally, handle, whenComplete.
+Choose fallback vs transformation vs side-effect logging intentionally.
+fallback empty list on recommendation API failure.
+</p>
+</div>
+</div>
+<div id="outline-container-org174f9c1" class="outline-3">
+<h3 id="org174f9c1">Q38: Why avoid blocking join in async pipeline?</h3>
+<div class="outline-text-3" id="text-org174f9c1">
+<p>
+It defeats async benefits.
+Blocking consumes threads and can increase tail latency under load.
+call <b>join()</b> only at boundary if needed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfb04759" class="outline-3">
+<h3 id="orgfb04759">Q39: Cancellation in async HTTP calls?</h3>
+<div class="outline-text-3" id="text-orgfb04759">
+<p>
+CompletableFuture supports cancellation.
+Useful when parent request times out or client disconnects.
+cancel downstream calls on request deadline exceeded.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd076935" class="outline-3">
+<h3 id="orgd076935">Q40: Async best-practice one-liner?</h3>
+<div class="outline-text-3" id="text-orgd076935">
+<p>
+Compose non-blocking, timeout early, handle failures explicitly.
+Async without deadlines/error strategy creates hidden reliability risks.
+sendAsync + orTimeout + fallback.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org5f2d17f" class="outline-2">
+<h2 id="org5f2d17f">Timeouts, Retries, and Resilience</h2>
+<div class="outline-text-2" id="text-org5f2d17f">
+</div>
+<div id="outline-container-org39f5c08" class="outline-3">
+<h3 id="org39f5c08">Q41: Why are timeouts mandatory?</h3>
+<div class="outline-text-3" id="text-org39f5c08">
+<p>
+Prevent hanging and resource exhaustion.
+Without timeouts, slow dependencies can consume threads and collapse service responsiveness.
+set connect + request time budget.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1b988b" class="outline-3">
+<h3 id="orgc1b988b">Q42: Connect timeout vs request timeout?</h3>
+<div class="outline-text-3" id="text-orgc1b988b">
+<p>
+Connect timeout for TCP connection setup; request timeout for full request processing.
+Both matter for robust latency control.
+connect 1s, request 2s.
+</p>
+</div>
+</div>
+<div id="outline-container-org892063a" class="outline-3">
+<h3 id="org892063a">Q43: How to set connect timeout?</h3>
+<div class="outline-text-3" id="text-org892063a">
+<p>
+Configure on HttpClient builder.
+Controls how long to wait for initial connection establishment.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">HttpClient</span> <span style="font-weight: bold; font-style: italic;">client</span> = HttpClient.newBuilder()
+    .connectTimeout(Duration.ofSeconds(1))
+    .build();
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf2500c2" class="outline-3">
+<h3 id="orgf2500c2">Q44: How to set request timeout?</h3>
+<div class="outline-text-3" id="text-orgf2500c2">
+<p>
+Configure on HttpRequest builder.
+Enforces per-call max duration aligned to SLA.
+<b>.timeout(Duration.ofMillis(500))</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orgc86f5f7" class="outline-3">
+<h3 id="orgc86f5f7">Q45: Should we retry every failure?</h3>
+<div class="outline-text-3" id="text-orgc86f5f7">
+<p>
+No.
+Retry only transient failures (timeouts, 5xx, network glitches) with safe/idempotent operations.
+retry GET, be careful with POST side effects.
+</p>
+</div>
+</div>
+<div id="outline-container-org633b222" class="outline-3">
+<h3 id="org633b222">Q46: Exponential backoff purpose?</h3>
+<div class="outline-text-3" id="text-org633b222">
+<p>
+Reduce retry storm and pressure.
+Spacing retries prevents overload amplification during incidents.
+100ms, 200ms, 400ms + jitter.
+</p>
+</div>
+</div>
+<div id="outline-container-org51d20a5" class="outline-3">
+<h3 id="org51d20a5">Q47: Why jitter in retries?</h3>
+<div class="outline-text-3" id="text-org51d20a5">
+<p>
+Avoid synchronized retry spikes.
+Randomized delay smooths traffic bursts and improves recovery odds.
+±20% randomized wait.
+</p>
+</div>
+</div>
+<div id="outline-container-orga64f917" class="outline-3">
+<h3 id="orga64f917">Q48: Idempotency and retries relation?</h3>
+<div class="outline-text-3" id="text-orga64f917">
+<p>
+Non-idempotent operations can duplicate side effects.
+Use idempotency keys or safe API design for retried writes.
+payment POST with idempotency-key header.
+</p>
+</div>
+</div>
+<div id="outline-container-org2fa7975" class="outline-3">
+<h3 id="org2fa7975">Q49: Circuit breaker relation to HTTP client?</h3>
+<div class="outline-text-3" id="text-org2fa7975">
+<p>
+Protect system from repeatedly calling failing dependency.
+Works with timeouts/retries to improve resilience and recovery.
+open breaker after repeated failures.
+</p>
+</div>
+</div>
+<div id="outline-container-org397cbfa" class="outline-3">
+<h3 id="org397cbfa">Q50: Resilience golden rule?</h3>
+<div class="outline-text-3" id="text-org397cbfa">
+<p>
+Timeouts + retries (careful) + fallback + observability.
+Reliability is policy-driven, not just API-call syntax.
+degrade recommendations, keep checkout alive.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc75d3d1" class="outline-2">
+<h2 id="orgc75d3d1">JSON Integration (Jackson + HTTP Client)</h2>
+<div class="outline-text-2" id="text-orgc75d3d1">
+</div>
+<div id="outline-container-org1f6b47e" class="outline-3">
+<h3 id="org1f6b47e">Q51: How to send Java object as JSON request?</h3>
+<div class="outline-text-3" id="text-org1f6b47e">
+<p>
+Serialize with Jackson, send as String body.
+Keep serialization config centralized for stable contracts.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">json</span> = mapper.writeValueAsString(dto);
+<span style="font-weight: bold; text-decoration: underline;">HttpRequest</span> <span style="font-weight: bold; font-style: italic;">req</span> = HttpRequest.newBuilder(uri)
+    .header(<span style="font-style: italic;">"Content-Type"</span>, <span style="font-style: italic;">"application/json"</span>)
+    .POST(<span style="font-weight: bold; text-decoration: underline;">HttpRequest</span>.BodyPublishers.ofString(json))
+    .build();
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge0ef69f" class="outline-3">
+<h3 id="orge0ef69f">Q52: How to parse JSON response into DTO?</h3>
+<div class="outline-text-3" id="text-orge0ef69f">
+<p>
+Read String body then <b>mapper.readValue</b>.
+Validate status/content-type before deserialization.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">UserDto</span> <span style="font-weight: bold; font-style: italic;">dto</span> = mapper.readValue(res.body(), UserDto.<span style="font-weight: bold;">class</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf33df76" class="outline-3">
+<h3 id="orgf33df76">Q53: Should we parse JSON on non-2xx responses?</h3>
+<div class="outline-text-3" id="text-orgf33df76">
+<p>
+Depends on API error contract.
+Many APIs return structured error JSON for 4xx/5xx; parse accordingly.
+error body <b>{code,message}</b> mapped to ApiErrorDto.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c539a0" class="outline-3">
+<h3 id="org4c539a0">Q54: How to handle unknown fields in response DTO?</h3>
+<div class="outline-text-3" id="text-org4c539a0">
+<p>
+Configure Jackson to ignore unknown when appropriate.
+Improves forward compatibility with evolving APIs.
+<b>@JsonIgnoreProperties(ignoreUnknown = true)</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orgd9dfc42" class="outline-3">
+<h3 id="orgd9dfc42">Q55: Why validate content-type before Jackson parse?</h3>
+<div class="outline-text-3" id="text-orgd9dfc42">
+<p>
+Prevent wrong parser assumptions.
+Error pages/proxies may return HTML/text unexpectedly.
+reject non-JSON content with clear error.
+</p>
+</div>
+</div>
+<div id="outline-container-org290f7ad" class="outline-3">
+<h3 id="org290f7ad">Q56: Generic JSON response parsing issue?</h3>
+<div class="outline-text-3" id="text-org290f7ad">
+<p>
+Type erasure.
+Use TypeReference for <b>List&lt;T&gt;</b> or generic wrappers.
+<b>new TypeReference&lt;List&lt;UserDto&gt;&gt;() {}</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org2efd366" class="outline-3">
+<h3 id="org2efd366">Q57: Should DTO and domain model be same?</h3>
+<div class="outline-text-3" id="text-org2efd366">
+<p>
+Usually no.
+Keep remote contract DTO separate from internal domain to avoid coupling.
+remote <b>price</b> string mapped into domain Money type.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c418f8" class="outline-3">
+<h3 id="org9c418f8">Q58: JSON null/missing handling importance?</h3>
+<div class="outline-text-3" id="text-org9c418f8">
+<p>
+Impacts update logic and defaults.
+Distinguish absent vs explicit null for patch semantics.
+missing field means unchanged, null means clear value.
+</p>
+</div>
+</div>
+<div id="outline-container-org2a2cd5a" class="outline-3">
+<h3 id="org2a2cd5a">Q59: Common JSON + HTTP mistake?</h3>
+<div class="outline-text-3" id="text-org2a2cd5a">
+<p>
+Assume success body shape without checking status.
+Leads to parse exceptions hiding real protocol error.
+401 HTML parsed as JSON fails confusingly.
+</p>
+</div>
+</div>
+<div id="outline-container-org68925df" class="outline-3">
+<h3 id="org68925df">Q60: JSON integration best-practice one-liner?</h3>
+<div class="outline-text-3" id="text-org68925df">
+<p>
+Validate protocol first, then parse payload.
+Correctness starts with status/headers, not mapper call.
+status check -&gt; content-type check -&gt; readValue.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org6cd0be9" class="outline-2">
+<h2 id="org6cd0be9">Authentication and Security</h2>
+<div class="outline-text-2" id="text-org6cd0be9">
+</div>
+<div id="outline-container-orga3d71f6" class="outline-3">
+<h3 id="orga3d71f6">Q61: How to send Bearer token?</h3>
+<div class="outline-text-3" id="text-orga3d71f6">
+<p>
+Authorization header.
+Rotate tokens safely and avoid logging sensitive headers.
+<b>Authorization: Bearer &lt;token&gt;</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org7eb2292" class="outline-3">
+<h3 id="org7eb2292">Q62: Basic auth with HttpClient?</h3>
+<div class="outline-text-3" id="text-org7eb2292">
+<p>
+Use <b>Authorization: Basic base64(user:pass)</b> or Authenticator.
+Prefer HTTPS always; basic auth credentials are only base64 encoded, not encrypted.
+API legacy integrations.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ec4843" class="outline-3">
+<h3 id="org7ec4843">Q63: How to enforce HTTPS-only URIs?</h3>
+<div class="outline-text-3" id="text-org7ec4843">
+<p>
+Validate URI scheme before request.
+Prevent accidental plaintext transmission of sensitive data.
+reject <b><a href="http://">http://</a></b> in production config.
+</p>
+</div>
+</div>
+<div id="outline-container-org192d2a1" class="outline-3">
+<h3 id="org192d2a1">Q64: TLS customization possible?</h3>
+<div class="outline-text-3" id="text-org192d2a1">
+<p>
+Yes, with SSLContext/SSLParameters in client builder.
+Needed for custom trust stores, mTLS, strict cipher/protocol policies.
+internal service with private CA.
+</p>
+</div>
+</div>
+<div id="outline-container-org559d2b5" class="outline-3">
+<h3 id="org559d2b5">Q65: What is mTLS in brief?</h3>
+<div class="outline-text-3" id="text-org559d2b5">
+<p>
+Mutual TLS: both client and server authenticate certificates.
+Strong service-to-service authentication in zero-trust/internal networks.
+payment service requires client cert.
+</p>
+</div>
+</div>
+<div id="outline-container-org78d65c5" class="outline-3">
+<h3 id="org78d65c5">Q66: Should redirects always be followed?</h3>
+<div class="outline-text-3" id="text-org78d65c5">
+<p>
+Depends on policy.
+Automatic redirects can be unsafe for auth-sensitive endpoints.
+avoid forwarding auth to unintended hosts.
+</p>
+</div>
+</div>
+<div id="outline-container-org26577b8" class="outline-3">
+<h3 id="org26577b8">Q67: Why redact logs for HTTP requests?</h3>
+<div class="outline-text-3" id="text-org26577b8">
+<p>
+Avoid leaking secrets/PII.
+Headers and payloads may contain tokens, passwords, personal data.
+mask Authorization and sensitive JSON fields.
+</p>
+</div>
+</div>
+<div id="outline-container-org89205c2" class="outline-3">
+<h3 id="org89205c2">Q68: How to prevent SSRF risks in HTTP client usage?</h3>
+<div class="outline-text-3" id="text-org89205c2">
+<p>
+Validate/whitelist outbound hosts.
+Never call arbitrary user-provided URLs directly.
+allow only approved domains/IP ranges.
+</p>
+</div>
+</div>
+<div id="outline-container-org6d479b5" class="outline-3">
+<h3 id="org6d479b5">Q69: Cookie handling in HttpClient?</h3>
+<div class="outline-text-3" id="text-org6d479b5">
+<p>
+Configurable with CookieHandler.
+Useful for session-based integrations, but token auth is common in APIs.
+legacy SSO flow.
+</p>
+</div>
+</div>
+<div id="outline-container-org525f684" class="outline-3">
+<h3 id="org525f684">Q70: Security best-practice one-liner?</h3>
+<div class="outline-text-3" id="text-org525f684">
+<p>
+Secure transport, strict target validation, secret-safe logging.
+Most client-side incidents come from lax outbound controls.
+HTTPS + allowlist + redaction.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org446cbd3" class="outline-2">
+<h2 id="org446cbd3">Performance and Resource Management</h2>
+<div class="outline-text-2" id="text-org446cbd3">
+</div>
+<div id="outline-container-orgd53b6e6" class="outline-3">
+<h3 id="orgd53b6e6">Q71: Does HttpClient reuse connections?</h3>
+<div class="outline-text-3" id="text-orgd53b6e6">
+<p>
+Yes, when reused properly.
+Reusing one client enables pooling/keep-alive benefits.
+singleton client for app lifetime.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf74bcf3" class="outline-3">
+<h3 id="orgf74bcf3">Q72: Why avoid creating many clients?</h3>
+<div class="outline-text-3" id="text-orgf74bcf3">
+<p>
+Poor pooling and extra overhead.
+Multiple clients fragment connection reuse and increase resource churn.
+one per service config, not one per request.
+</p>
+</div>
+</div>
+<div id="outline-container-org11f1083" class="outline-3">
+<h3 id="org11f1083">Q73: How does HTTP/2 help performance?</h3>
+<div class="outline-text-3" id="text-org11f1083">
+<p>
+Multiplexing multiple requests over fewer connections.
+Reduces connection overhead and can improve latency in high-call scenarios.
+microservice making many calls to same host.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1d4e46" class="outline-3">
+<h3 id="orgc1d4e46">Q74: Memory risk with BodyHandlers.ofString?</h3>
+<div class="outline-text-3" id="text-orgc1d4e46">
+<p>
+Loads full body into memory.
+For large payloads prefer streaming/file handlers.
+large export should use InputStream/file handler.
+</p>
+</div>
+</div>
+<div id="outline-container-org6cc1c30" class="outline-3">
+<h3 id="org6cc1c30">Q75: Should compression be used?</h3>
+<div class="outline-text-3" id="text-org6cc1c30">
+<p>
+Usually yes for text/JSON payloads.
+Saves bandwidth; ensure server/client agree on encoding.
+<b>Accept-Encoding: gzip</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org290ea0a" class="outline-3">
+<h3 id="org290ea0a">Q76: How to handle high request volume safely?</h3>
+<div class="outline-text-3" id="text-org290ea0a">
+<p>
+Bound concurrency and use timeouts.
+Prevent overwhelming downstream and your own resources.
+semaphore limiting concurrent outbound calls.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcf73bda" class="outline-3">
+<h3 id="orgcf73bda">Q77: Why measure p95/p99 for HTTP client calls?</h3>
+<div class="outline-text-3" id="text-orgcf73bda">
+<p>
+Tail latency drives user experience.
+Averages hide spikes caused by retries/timeouts/contention.
+p99 jumps during dependency degradation.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ec4fe1" class="outline-3">
+<h3 id="org8ec4fe1">Q78: What metrics should be recorded per dependency?</h3>
+<div class="outline-text-3" id="text-org8ec4fe1">
+<p>
+latency, success rate, status distribution, timeout/retry counts.
+Observability enables fast diagnosis and capacity planning.
+dashboard by downstream service name.
+</p>
+</div>
+</div>
+<div id="outline-container-orge33202e" class="outline-3">
+<h3 id="orge33202e">Q79: Why set maximum in-flight requests?</h3>
+<div class="outline-text-3" id="text-orge33202e">
+<p>
+Backpressure control.
+Unbounded concurrency leads to cascading failures.
+bounded executor + queue strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-org5100465" class="outline-3">
+<h3 id="org5100465">Q80: Performance golden rule?</h3>
+<div class="outline-text-3" id="text-org5100465">
+<p>
+Reuse client, bound work, monitor tails.
+Throughput without control is fragile under real traffic.
+singleton client + bulkhead + metrics.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org655cdbe" class="outline-2">
+<h2 id="org655cdbe">Testing HTTP Client Code</h2>
+<div class="outline-text-2" id="text-org655cdbe">
+</div>
+<div id="outline-container-orge548b82" class="outline-3">
+<h3 id="orge548b82">Q81: Unit test HTTP client wrapper how?</h3>
+<div class="outline-text-3" id="text-orge548b82">
+<p>
+Mock wrapper dependencies or use fake transport abstraction.
+Avoid live network in unit tests for speed/determinism.
+interface <b>HttpExecutor</b> mocked in service tests.
+</p>
+</div>
+</div>
+<div id="outline-container-org50b6c9f" class="outline-3">
+<h3 id="org50b6c9f">Q82: Integration test outbound HTTP logic how?</h3>
+<div class="outline-text-3" id="text-org50b6c9f">
+<p>
+Use local mock server (e.g., WireMock/MockWebServer).
+Validates real serialization, headers, status handling, retries.
+simulate 500 then 200 for retry policy.
+</p>
+</div>
+</div>
+<div id="outline-container-org0ea8518" class="outline-3">
+<h3 id="org0ea8518">Q83: Should CI tests call real external APIs?</h3>
+<div class="outline-text-3" id="text-org0ea8518">
+<p>
+Usually no.
+External instability/rate limits cause flaky builds.
+keep real API tests as controlled smoke checks only.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeeea643" class="outline-3">
+<h3 id="orgeeea643">Q84: How to test timeout handling?</h3>
+<div class="outline-text-3" id="text-orgeeea643">
+<p>
+Mock server delays response beyond timeout.
+Assert expected exception/fallback and timing boundaries.
+delayed endpoint returns timeout path.
+</p>
+</div>
+</div>
+<div id="outline-container-org32e059f" class="outline-3">
+<h3 id="org32e059f">Q85: How to test retry behavior?</h3>
+<div class="outline-text-3" id="text-org32e059f">
+<p>
+Program server to fail first N times then succeed.
+Assert attempt count and final outcome.
+verify 3 calls occurred before success.
+</p>
+</div>
+</div>
+<div id="outline-container-org18b9124" class="outline-3">
+<h3 id="org18b9124">Q86: How to test auth header presence?</h3>
+<div class="outline-text-3" id="text-org18b9124">
+<p>
+Assert request headers on mock server.
+Ensures token propagation logic is correct.
+recorded request includes Authorization header.
+</p>
+</div>
+</div>
+<div id="outline-container-org2698765" class="outline-3">
+<h3 id="org2698765">Q87: How to test JSON parsing errors?</h3>
+<div class="outline-text-3" id="text-org2698765">
+<p>
+Return malformed/invalid content-type payload from mock server.
+Verify clean error mapping and diagnostics.
+HTML response when JSON expected.
+</p>
+</div>
+</div>
+<div id="outline-container-org20efe21" class="outline-3">
+<h3 id="org20efe21">Q88: Why test idempotency behavior?</h3>
+<div class="outline-text-3" id="text-org20efe21">
+<p>
+Prevent duplicate side effects under retry.
+Critical for payments/orders/external write operations.
+duplicate POST with same key processed once.
+</p>
+</div>
+</div>
+<div id="outline-container-org887e39e" class="outline-3">
+<h3 id="org887e39e">Q89: What should be asserted in HTTP integration tests?</h3>
+<div class="outline-text-3" id="text-org887e39e">
+<p>
+Method, URL, headers, body, status handling, retries/timeouts.
+Assert both protocol correctness and domain mapping.
+404 maps to NotFoundException.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc0d5aef" class="outline-3">
+<h3 id="orgc0d5aef">Q90: Testing best-practice one-liner?</h3>
+<div class="outline-text-3" id="text-orgc0d5aef">
+<p>
+Deterministic mock server &gt; live internet dependency.
+Reliable tests enable confident refactoring and CI stability.
+local stub with scripted responses.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd8d7a1a" class="outline-2">
+<h2 id="orgd8d7a1a">Common Pitfalls and Better Patterns</h2>
+<div class="outline-text-2" id="text-orgd8d7a1a">
+</div>
+<div id="outline-container-org4042fcf" class="outline-3">
+<h3 id="org4042fcf">Q91: Pitfall: ignoring non-2xx statuses</h3>
+<div class="outline-text-3" id="text-org4042fcf">
+<p>
+Causes hidden business errors.
+Always map status ranges to domain outcomes.
+409 should map to conflict handling.
+</p>
+</div>
+</div>
+<div id="outline-container-org7cc4fef" class="outline-3">
+<h3 id="org7cc4fef">Q92: Pitfall: no timeout configured</h3>
+<div class="outline-text-3" id="text-org7cc4fef">
+<p>
+Threads can hang indefinitely.
+Missing deadlines is a major outage multiplier.
+blocked request threads during partner outage.
+</p>
+</div>
+</div>
+<div id="outline-container-org7b234cb" class="outline-3">
+<h3 id="org7b234cb">Q93: Pitfall: blind retries on POST</h3>
+<div class="outline-text-3" id="text-org7b234cb">
+<p>
+Duplicate side effects risk.
+Use idempotency keys or avoid automatic retries for non-idempotent operations.
+double charge issue.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ae814b" class="outline-3">
+<h3 id="org2ae814b">Q94: Pitfall: logging full request/response bodies</h3>
+<div class="outline-text-3" id="text-org2ae814b">
+<p>
+Security/privacy risk.
+Redact tokens/PII and limit payload logs in production.
+mask account numbers.
+</p>
+</div>
+</div>
+<div id="outline-container-org588de7d" class="outline-3">
+<h3 id="org588de7d">Q95: Pitfall: parsing body before checking content type</h3>
+<div class="outline-text-3" id="text-org588de7d">
+<p>
+Wrong parser assumptions.
+Could mis-handle HTML error pages and hide root cause.
+JSON parser exception on proxy HTML page.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d68336" class="outline-3">
+<h3 id="org7d68336">Q96: Pitfall: mixing transport and business logic</h3>
+<div class="outline-text-3" id="text-org7d68336">
+<p>
+Hard to test/maintain.
+Keep HTTP client wrapper separate from domain service logic.
+adapter layer returns typed Result objects.
+</p>
+</div>
+</div>
+<div id="outline-container-org8c8c110" class="outline-3">
+<h3 id="org8c8c110">Q97: Pattern: dependency-specific client configuration</h3>
+<div class="outline-text-3" id="text-org8c8c110">
+<p>
+Separate settings per downstream.
+Different dependencies need different timeout/retry/SLA policies.
+payment strict timeout, reporting relaxed timeout.
+</p>
+</div>
+</div>
+<div id="outline-container-org9a5f71f" class="outline-3">
+<h3 id="org9a5f71f">Q98: Pattern: centralized error mapping</h3>
+<div class="outline-text-3" id="text-org9a5f71f">
+<p>
+One place to map status/errors to exceptions.
+Consistency reduces duplicated bugs.
+401-&gt;Unauthorized, 429-&gt;RateLimited.
+</p>
+</div>
+</div>
+<div id="outline-container-org12e8385" class="outline-3">
+<h3 id="org12e8385">Q99: Pattern: correlation/trace headers propagation</h3>
+<div class="outline-text-3" id="text-org12e8385">
+<p>
+Forward request context IDs.
+Critical for distributed tracing and incident debugging.
+<b>traceparent</b>, <b>X-Correlation-Id</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org23e9d4a" class="outline-3">
+<h3 id="org23e9d4a">Q100: Pattern: defensive URI building</h3>
+<div class="outline-text-3" id="text-org23e9d4a">
+<p>
+Encode and validate inputs.
+Prevent malformed requests and security issues.
+safe query param encoding utility.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-orgab48fe7" class="outline-2">
+<h2 id="orgab48fe7">Interview-Focused</h2>
+<div class="outline-text-2" id="text-orgab48fe7">
+</div>
+<div id="outline-container-orgd54d24e" class="outline-3">
+<h3 id="orgd54d24e">Q101: “When would you use sendAsync over send?”</h3>
+<div class="outline-text-3" id="text-orgd54d24e">
+<p>
+When independent calls can run concurrently.
+Async reduces total latency in fan-out scenarios if composed properly.
+fetch profile, orders, preferences in parallel.
+</p>
+</div>
+</div>
+<div id="outline-container-org63440ca" class="outline-3">
+<h3 id="org63440ca">Q102: “How do you design resilient HTTP clients?”</h3>
+<div class="outline-text-3" id="text-org63440ca">
+<p>
+Timeouts, selective retries, fallback, circuit breaker, metrics.
+Resilience is policy + observability, not just retries.
+per-dependency strategy object.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd7f5239" class="outline-3">
+<h3 id="orgd7f5239">Q103: “How do you avoid retry storms?”</h3>
+<div class="outline-text-3" id="text-orgd7f5239">
+<p>
+Backoff + jitter + capped attempts.
+Prevent synchronized pressure amplification during outages.
+exponential backoff max 3 attempts.
+</p>
+</div>
+</div>
+<div id="outline-container-org7461fe4" class="outline-3">
+<h3 id="org7461fe4">Q104: “How do you handle 429 rate-limit responses?”</h3>
+<div class="outline-text-3" id="text-org7461fe4">
+<p>
+Respect Retry-After and throttle.
+Adaptive behavior protects both client and provider relationship.
+parse header, delay next attempt.
+</p>
+</div>
+</div>
+<div id="outline-container-orge75c4b6" class="outline-3">
+<h3 id="orge75c4b6">Q105: “How do you handle partial failures in fan-out?”</h3>
+<div class="outline-text-3" id="text-orge75c4b6">
+<p>
+Return degraded response with clear semantics.
+Keep critical path alive while optional features fallback.
+recommendations missing, core order response still succeeds.
+</p>
+</div>
+</div>
+<div id="outline-container-orgac4285c" class="outline-3">
+<h3 id="orgac4285c">Q106: “How do you test timeout/retry logic properly?”</h3>
+<div class="outline-text-3" id="text-orgac4285c">
+<p>
+Use deterministic mock server scenarios.
+Script delays/failures and assert attempts + timing behavior.
+delayed endpoint for timeout branch.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb11f87" class="outline-3">
+<h3 id="orgbb11f87">Q107: “What are key HTTP client metrics?”</h3>
+<div class="outline-text-3" id="text-orgbb11f87">
+<p>
+latency, status codes, errors, retries, timeouts.
+Break down per dependency and per endpoint for actionable insights.
+dashboard for payment-provider latency p99.
+</p>
+</div>
+</div>
+<div id="outline-container-org0ad7d7e" class="outline-3">
+<h3 id="org0ad7d7e">Q108: “How do you handle JSON schema drift?”</h3>
+<div class="outline-text-3" id="text-org0ad7d7e">
+<p>
+tolerant reader + contract tests.
+Ignore non-breaking extras, fail clearly on breaking changes.
+DTO with ignoreUnknown + CI contract checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org475c8f5" class="outline-3">
+<h3 id="org475c8f5">Q109: “How do you secure outbound HTTP in enterprise?”</h3>
+<div class="outline-text-3" id="text-org475c8f5">
+<p>
+TLS controls, auth hygiene, host allowlist, redaction.
+Outbound calls are an attack surface and compliance concern.
+mTLS + strict logging policy.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c0868d" class="outline-3">
+<h3 id="org0c0868d">Q110: “Most common production mistake with HTTP clients?”</h3>
+<div class="outline-text-3" id="text-org0c0868d">
+<p>
+Missing timeout and weak error mapping.
+Leads to hanging threads, unclear incidents, and brittle behavior.
+generic RuntimeException for all statuses.
+</p>
+
+<hr>
+</div>
+</div>
+</div>
+<div id="outline-container-org20fa5b2" class="outline-2">
+<h2 id="org20fa5b2">Final Mastery Checklist</h2>
+<div class="outline-text-2" id="text-org20fa5b2">
+</div>
+<div id="outline-container-org6a94ac3" class="outline-3">
+<h3 id="org6a94ac3">Q111: Can you build and send GET/POST/PUT/DELETE confidently?</h3>
+<div class="outline-text-3" id="text-org6a94ac3">
+<p>
+If yes, core API usage is solid.
+Request construction basics are foundation for all integrations.
+proper headers + body + URI encoding.
+</p>
+</div>
+</div>
+<div id="outline-container-org46663d8" class="outline-3">
+<h3 id="org46663d8">Q112: Can you explain send vs sendAsync tradeoffs clearly?</h3>
+<div class="outline-text-3" id="text-org46663d8">
+<p>
+If yes, concurrency understanding is strong.
+Correct choice impacts latency, complexity, and scalability.
+fan-out aggregator endpoint.
+</p>
+</div>
+</div>
+<div id="outline-container-orga716821" class="outline-3">
+<h3 id="orga716821">Q113: Can you design timeout/retry policy per dependency?</h3>
+<div class="outline-text-3" id="text-orga716821">
+<p>
+If yes, resilience maturity is good.
+One-size-fits-all policy is a common anti-pattern.
+payment vs analytics different SLAs.
+</p>
+</div>
+</div>
+<div id="outline-container-org6bfc8e1" class="outline-3">
+<h3 id="org6bfc8e1">Q114: Can you parse JSON responses safely with status/content checks?</h3>
+<div class="outline-text-3" id="text-org6bfc8e1">
+<p>
+If yes, correctness improves significantly.
+Protocol validation before payload parsing prevents subtle bugs.
+handle 204/HTML error body gracefully.
+</p>
+</div>
+</div>
+<div id="outline-container-org24edf76" class="outline-3">
+<h3 id="org24edf76">Q115: Can you prevent duplicate side effects on retries?</h3>
+<div class="outline-text-3" id="text-org24edf76">
+<p>
+If yes, write-safety is strong.
+Idempotency thinking is critical for financial/order systems.
+idempotency-key strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e48e5e" class="outline-3">
+<h3 id="org1e48e5e">Q116: Can you test client code deterministically without real internet?</h3>
+<div class="outline-text-3" id="text-org1e48e5e">
+<p>
+If yes, CI reliability is strong.
+Mock server-based tests reduce flakiness and improve confidence.
+scripted response scenarios.
+</p>
+</div>
+</div>
+<div id="outline-container-org7420452" class="outline-3">
+<h3 id="org7420452">Q117: Can you apply outbound security best practices?</h3>
+<div class="outline-text-3" id="text-org7420452">
+<p>
+If yes, production risk drops.
+TLS, allowlists, and redacted logs are non-negotiable in serious systems.
+reject non-HTTPS endpoints.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbaae7ce" class="outline-3">
+<h3 id="orgbaae7ce">Q118: Can you observe and tune HTTP client performance?</h3>
+<div class="outline-text-3" id="text-orgbaae7ce">
+<p>
+If yes, operations readiness is solid.
+Tail metrics and saturation signals guide real optimizations.
+p99 latency + retry spike alerts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgabc3e1e" class="outline-3">
+<h3 id="orgabc3e1e">Q119: Can you separate transport concerns from domain logic?</h3>
+<div class="outline-text-3" id="text-orgabc3e1e">
+<p>
+If yes, maintainability is high.
+Clean boundaries simplify testing and future protocol changes.
+HTTP adapter layer returns typed domain result.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb5a15b8" class="outline-3">
+<h3 id="orgb5a15b8">Q120: Final principle for Java HTTP Client?</h3>
+<div class="outline-text-3" id="text-orgb5a15b8">
+<p>
+Reliable networking is about policy, not just syntax.
+Build explicit timeouts, error handling, retries, and observability into every integration.
+“safe by default” outbound client template.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
