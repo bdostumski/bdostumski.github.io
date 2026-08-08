@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java Exceptions and I/O APIs</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Java Exceptions and I/O APIs</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org2d199c8" class="outline-2">
+<h2 id="org2d199c8">Java Exceptions and I/O APIs</h2>
+<div class="outline-text-2" id="text-org2d199c8">
+<hr>
+</div>
+</div>
+<div id="outline-container-org56a165c" class="outline-2">
+<h2 id="org56a165c">Exception Fundamentals</h2>
+<div class="outline-text-2" id="text-org56a165c">
+</div>
+<div id="outline-container-org180287e" class="outline-3">
+<h3 id="org180287e">Q1: What is an exception in Java?</h3>
+<div class="outline-text-3" id="text-org180287e">
+<p>
+An exception is an event that interrupts normal program flow due to an error or unexpected condition.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbe65321" class="outline-3">
+<h3 id="orgbe65321">Q2: What is the root class of exceptions and errors?</h3>
+<div class="outline-text-3" id="text-orgbe65321">
+<p>
+`Throwable`
+</p>
+</div>
+</div>
+<div id="outline-container-org078d290" class="outline-3">
+<h3 id="org078d290">Q3: Difference between Error and Exception?</h3>
+<div class="outline-text-3" id="text-org078d290">
+<ul class="org-ul">
+<li>`Error`: serious JVM/system issues (usually not handled in app logic).</li>
+<li>`Exception`: conditions application code may handle.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org500f8e8" class="outline-3">
+<h3 id="org500f8e8">Q4: What is checked exception?</h3>
+<div class="outline-text-3" id="text-org500f8e8">
+<p>
+An exception that must be handled or declared with `throws` at compile time (e.g., IOException).
+</p>
+</div>
+</div>
+<div id="outline-container-orgda8ed78" class="outline-3">
+<h3 id="orgda8ed78">Q5: What is unchecked exception?</h3>
+<div class="outline-text-3" id="text-orgda8ed78">
+<p>
+Runtime exceptions (`RuntimeException` and subclasses) not required to be declared/handled.
+</p>
+</div>
+</div>
+<div id="outline-container-org5f25325" class="outline-3">
+<h3 id="org5f25325">Q6: Common checked exception examples?</h3>
+<div class="outline-text-3" id="text-org5f25325">
+<ul class="org-ul">
+<li>IOException</li>
+<li>SQLException</li>
+<li>ClassNotFoundException</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org1c12bac" class="outline-3">
+<h3 id="org1c12bac">Q7: Common unchecked exception examples?</h3>
+<div class="outline-text-3" id="text-org1c12bac">
+<ul class="org-ul">
+<li>NullPointerException</li>
+<li>IllegalArgumentException</li>
+<li>IllegalStateException</li>
+<li>IndexOutOfBoundsException</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org58c1d26" class="outline-3">
+<h3 id="org58c1d26">Q8: What is exception propagation?</h3>
+<div class="outline-text-3" id="text-org58c1d26">
+<p>
+If a method does not handle an exception, it passes up the call stack to caller methods.
+</p>
+</div>
+</div>
+<div id="outline-container-orga7264b2" class="outline-3">
+<h3 id="orga7264b2">Q9: What does `throws` mean?</h3>
+<div class="outline-text-3" id="text-orga7264b2">
+<p>
+Method declares it may pass specific exceptions to caller.
+</p>
+</div>
+</div>
+<div id="outline-container-orga3b9558" class="outline-3">
+<h3 id="orga3b9558">Q10: What does `throw` mean?</h3>
+<div class="outline-text-3" id="text-orga3b9558">
+<p>
+Explicitly creates and throws an exception instance in code.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdd15182" class="outline-2">
+<h2 id="orgdd15182">try-catch-finally and try-with-resources</h2>
+<div class="outline-text-2" id="text-orgdd15182">
+</div>
+<div id="outline-container-orgb6f74d7" class="outline-3">
+<h3 id="orgb6f74d7">Q11: Purpose of try-catch?</h3>
+<div class="outline-text-3" id="text-orgb6f74d7">
+<p>
+Wrap risky code and handle specific failures gracefully.
+</p>
+</div>
+</div>
+<div id="outline-container-org87d128f" class="outline-3">
+<h3 id="org87d128f">Q12: Purpose of finally?</h3>
+<div class="outline-text-3" id="text-org87d128f">
+<p>
+Executes cleanup code whether exception occurs or not (except abnormal JVM termination).
+</p>
+</div>
+</div>
+<div id="outline-container-org760c11d" class="outline-3">
+<h3 id="org760c11d">Q13: Why is try-with-resources preferred for I/O?</h3>
+<div class="outline-text-3" id="text-org760c11d">
+<p>
+It automatically closes resources and prevents leaks.
+</p>
+</div>
+</div>
+<div id="outline-container-org759291c" class="outline-3">
+<h3 id="org759291c">Q14: What can be used in try-with-resources?</h3>
+<div class="outline-text-3" id="text-org759291c">
+<p>
+Objects implementing `AutoCloseable` (e.g., streams, readers, JDBC resources).
+</p>
+</div>
+</div>
+<div id="outline-container-org7be389e" class="outline-3">
+<h3 id="org7be389e">Q15: Basic try-with-resources pattern?</h3>
+<div class="outline-text-3" id="text-org7be389e">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">try</span> (<span style="font-weight: bold; text-decoration: underline;">BufferedReader</span> <span style="font-weight: bold; font-style: italic;">br</span> = Files.newBufferedReader(path)) {
+    <span style="font-weight: bold;">return</span> br.readLine();
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org35e724b" class="outline-3">
+<h3 id="org35e724b">Q16: Can you have catch with try-with-resources?</h3>
+<div class="outline-text-3" id="text-org35e724b">
+<p>
+Yes, you can combine try-with-resources with catch/finally.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd10dad8" class="outline-3">
+<h3 id="orgd10dad8">Q17: What are suppressed exceptions?</h3>
+<div class="outline-text-3" id="text-orgd10dad8">
+<p>
+Exceptions thrown during resource close are attached as suppressed when a primary exception already exists.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgff2c720" class="outline-2">
+<h2 id="orgff2c720">Designing Good Exceptions</h2>
+<div class="outline-text-2" id="text-orgff2c720">
+</div>
+<div id="outline-container-org4ea3ff2" class="outline-3">
+<h3 id="org4ea3ff2">Q18: When should I create custom exceptions?</h3>
+<div class="outline-text-3" id="text-org4ea3ff2">
+<p>
+When expressing domain-specific failure clearly improves readability and handling.
+</p>
+</div>
+</div>
+<div id="outline-container-org2f288dd" class="outline-3">
+<h3 id="org2f288dd">Q19: Custom checked or unchecked?</h3>
+<div class="outline-text-3" id="text-org2f288dd">
+<ul class="org-ul">
+<li>Checked for recoverable external situations.</li>
+<li>Unchecked for programming/domain rule violations.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org61d6331" class="outline-3">
+<h3 id="org61d6331">Q20: Good custom exception naming?</h3>
+<div class="outline-text-3" id="text-org61d6331">
+<p>
+Use specific, meaningful names like `InsufficientFundsException`, `FileStorageException`.
+</p>
+</div>
+</div>
+<div id="outline-container-org9cb3815" class="outline-3">
+<h3 id="org9cb3815">Q21: What makes a good exception message?</h3>
+<div class="outline-text-3" id="text-org9cb3815">
+<p>
+Clear context: what failed, where, and key identifiers (without leaking secrets).
+</p>
+</div>
+</div>
+<div id="outline-container-org88444a0" class="outline-3">
+<h3 id="org88444a0">Q22: Should I catch Exception everywhere?</h3>
+<div class="outline-text-3" id="text-org88444a0">
+<p>
+No; catch specific exceptions where you can meaningfully recover or translate.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf782eab" class="outline-3">
+<h3 id="orgf782eab">Q23: What is exception wrapping?</h3>
+<div class="outline-text-3" id="text-orgf782eab">
+<p>
+Throwing a higher-level exception with original cause for abstraction-friendly error handling.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaf71705" class="outline-3">
+<h3 id="orgaf71705">Q24: Why preserve cause?</h3>
+<div class="outline-text-3" id="text-orgaf71705">
+<p>
+Root cause debugging becomes much easier.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org48616cc" class="outline-2">
+<h2 id="org48616cc">Logging and Exception Handling in Backend Apps</h2>
+<div class="outline-text-2" id="text-org48616cc">
+</div>
+<div id="outline-container-org705ab1d" class="outline-3">
+<h3 id="org705ab1d">Q25: Where should exceptions be logged?</h3>
+<div class="outline-text-3" id="text-org705ab1d">
+<p>
+At meaningful boundaries (e.g., controller/service boundary), not repeatedly at every layer.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a0e8ac" class="outline-3">
+<h3 id="org6a0e8ac">Q26: Why avoid duplicate logging?</h3>
+<div class="outline-text-3" id="text-org6a0e8ac">
+<p>
+Same stack trace logged multiple times creates noise and slows incident diagnosis.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb8cbdf9" class="outline-3">
+<h3 id="orgb8cbdf9">Q27: What data should logs include?</h3>
+<div class="outline-text-3" id="text-orgb8cbdf9">
+<p>
+Error type, message, correlation/request ID, key business context, and stack trace when needed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9fb209" class="outline-3">
+<h3 id="orgf9fb209">Q28: Should sensitive data be logged?</h3>
+<div class="outline-text-3" id="text-orgf9fb209">
+<p>
+No; never log passwords, tokens, secrets, or private personal data.
+</p>
+</div>
+</div>
+<div id="outline-container-org79c9f14" class="outline-3">
+<h3 id="org79c9f14">Q29: What is global exception handling in Spring?</h3>
+<div class="outline-text-3" id="text-org79c9f14">
+<p>
+Centralized mapping via `@ControllerAdvice` to consistent HTTP error responses.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e12f05" class="outline-3">
+<h3 id="org6e12f05">Q30: Recommended REST error payload fields?</h3>
+<div class="outline-text-3" id="text-org6e12f05">
+<p>
+timestamp, status, error code, message, path, correlationId.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org411532c" class="outline-2">
+<h2 id="org411532c">Java I/O API Basics (java.io)</h2>
+<div class="outline-text-2" id="text-org411532c">
+</div>
+<div id="outline-container-org2c529c6" class="outline-3">
+<h3 id="org2c529c6">Q31: What is a stream in Java I/O?</h3>
+<div class="outline-text-3" id="text-org2c529c6">
+<p>
+A flow of data from source to destination.
+</p>
+</div>
+</div>
+<div id="outline-container-org305f9a3" class="outline-3">
+<h3 id="org305f9a3">Q32: Byte stream vs character stream?</h3>
+<div class="outline-text-3" id="text-org305f9a3">
+<ul class="org-ul">
+<li>Byte streams: binary data (`InputStream`/`OutputStream`)</li>
+<li>Character streams: text data (`Reader`/`Writer`)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgbcef48d" class="outline-3">
+<h3 id="orgbcef48d">Q33: InputStream purpose?</h3>
+<div class="outline-text-3" id="text-orgbcef48d">
+<p>
+Read bytes from file/network/memory source.
+</p>
+</div>
+</div>
+<div id="outline-container-org999c75a" class="outline-3">
+<h3 id="org999c75a">Q34: OutputStream purpose?</h3>
+<div class="outline-text-3" id="text-org999c75a">
+<p>
+Write bytes to file/network/memory target.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf7d4e79" class="outline-3">
+<h3 id="orgf7d4e79">Q35: Reader/Writer purpose?</h3>
+<div class="outline-text-3" id="text-orgf7d4e79">
+<p>
+Read/write text with character encoding awareness.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd32925a" class="outline-3">
+<h3 id="orgd32925a">Q36: What is buffering and why use it?</h3>
+<div class="outline-text-3" id="text-orgd32925a">
+<p>
+Buffering reduces system calls and improves I/O performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org35a8b7d" class="outline-3">
+<h3 id="org35a8b7d">Q37: Common buffered classes?</h3>
+<div class="outline-text-3" id="text-org35a8b7d">
+<ul class="org-ul">
+<li>BufferedInputStream / BufferedOutputStream</li>
+<li>BufferedReader / BufferedWriter</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8e1e0c9" class="outline-3">
+<h3 id="org8e1e0c9">Q38: Why specify charset for text I/O?</h3>
+<div class="outline-text-3" id="text-org8e1e0c9">
+<p>
+Prevent encoding bugs across environments (UTF-8 recommended explicitly).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org61571b8" class="outline-2">
+<h2 id="org61571b8">Modern File I/O (NIO.2 — java.nio.file)</h2>
+<div class="outline-text-2" id="text-org61571b8">
+</div>
+<div id="outline-container-orgb9e2c6e" class="outline-3">
+<h3 id="orgb9e2c6e">Q39: Why prefer NIO.2 over old File API?</h3>
+<div class="outline-text-3" id="text-orgb9e2c6e">
+<p>
+Better abstractions (`Path`, `Files`), richer operations, clearer error handling.
+</p>
+</div>
+</div>
+<div id="outline-container-org87b2afb" class="outline-3">
+<h3 id="org87b2afb">Q40: What is Path?</h3>
+<div class="outline-text-3" id="text-org87b2afb">
+<p>
+Immutable representation of a filesystem path.
+</p>
+</div>
+</div>
+<div id="outline-container-org2222c81" class="outline-3">
+<h3 id="org2222c81">Q41: How to create Path?</h3>
+<div class="outline-text-3" id="text-org2222c81">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">Path</span> <span style="font-weight: bold; font-style: italic;">p</span> = Path.of(<span style="font-style: italic;">"data"</span>, <span style="font-style: italic;">"users.txt"</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8090976" class="outline-3">
+<h3 id="org8090976">Q42: Common Files utility operations?</h3>
+<div class="outline-text-3" id="text-org8090976">
+<ul class="org-ul">
+<li>exists</li>
+<li>createDirectories</li>
+<li>readString/readAllLines</li>
+<li>writeString/write</li>
+<li>copy/move/delete</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf22d559" class="outline-3">
+<h3 id="orgf22d559">Q43: How to read whole file as string?</h3>
+<div class="outline-text-3" id="text-orgf22d559">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">content</span> = Files.readString(path);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3b5072f" class="outline-3">
+<h3 id="org3b5072f">Q44: How to write string to file?</h3>
+<div class="outline-text-3" id="text-org3b5072f">
+<div class="org-src-container">
+<pre class="src src-java">Files.writeString(<span style="font-weight: bold; text-decoration: underline;">path</span>, <span style="font-weight: bold; text-decoration: underline;">content</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgad25496" class="outline-3">
+<h3 id="orgad25496">Q45: How to append text safely?</h3>
+<div class="outline-text-3" id="text-orgad25496">
+<div class="org-src-container">
+<pre class="src src-java">Files.writeString(<span style="font-weight: bold; text-decoration: underline;">path</span>, <span style="font-weight: bold; text-decoration: underline;">line</span>, <span style="font-weight: bold; text-decoration: underline;">StandardOpenOption</span>.<span style="font-weight: bold; text-decoration: underline;">CREATE</span>, <span style="font-weight: bold; text-decoration: underline;">StandardOpenOption</span>.<span style="font-weight: bold; text-decoration: underline;">APPEND</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org722c878" class="outline-3">
+<h3 id="org722c878">Q46: How to list directory files?</h3>
+<div class="outline-text-3" id="text-org722c878">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">try</span> (<span style="font-weight: bold; text-decoration: underline;">Stream</span>&lt;<span style="font-weight: bold; text-decoration: underline;">Path</span>&gt; <span style="font-weight: bold; font-style: italic;">s</span> = Files.list(dir)) { ... }
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org445c743" class="outline-3">
+<h3 id="org445c743">Q47: How to walk directory tree?</h3>
+<div class="outline-text-3" id="text-org445c743">
+<p>
+Use `Files.walk(&#x2026;)` or `Files.walkFileTree(&#x2026;)`.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga550074" class="outline-2">
+<h2 id="orga550074">File Metadata, Copy/Move/Delete</h2>
+<div class="outline-text-2" id="text-orga550074">
+</div>
+<div id="outline-container-org4da81f5" class="outline-3">
+<h3 id="org4da81f5">Q48: How to check file existence?</h3>
+<div class="outline-text-3" id="text-org4da81f5">
+<p>
+`Files.exists(path)`
+</p>
+</div>
+</div>
+<div id="outline-container-org515880a" class="outline-3">
+<h3 id="org515880a">Q49: How to distinguish file vs directory?</h3>
+<div class="outline-text-3" id="text-org515880a">
+<ul class="org-ul">
+<li>`Files.isRegularFile(path)`</li>
+<li>`Files.isDirectory(path)`</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2d22250" class="outline-3">
+<h3 id="org2d22250">Q50: How to copy file?</h3>
+<div class="outline-text-3" id="text-org2d22250">
+<div class="org-src-container">
+<pre class="src src-java">Files.copy(<span style="font-weight: bold; text-decoration: underline;">src</span>, <span style="font-weight: bold; text-decoration: underline;">dst</span>, <span style="font-weight: bold; text-decoration: underline;">StandardCopyOption</span>.<span style="font-weight: bold; text-decoration: underline;">REPLACE_EXISTING</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8001877" class="outline-3">
+<h3 id="org8001877">Q51: How to move/rename file?</h3>
+<div class="outline-text-3" id="text-org8001877">
+<div class="org-src-container">
+<pre class="src src-java">Files.move(<span style="font-weight: bold; text-decoration: underline;">src</span>, <span style="font-weight: bold; text-decoration: underline;">dst</span>, <span style="font-weight: bold; text-decoration: underline;">StandardCopyOption</span>.<span style="font-weight: bold; text-decoration: underline;">REPLACE_EXISTING</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2398391" class="outline-3">
+<h3 id="org2398391">Q52: How to delete file?</h3>
+<div class="outline-text-3" id="text-org2398391">
+<ul class="org-ul">
+<li>`Files.delete(path)` (fails if missing)</li>
+<li>`Files.deleteIfExists(path)` (safe if missing)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga366966" class="outline-3">
+<h3 id="orga366966">Q53: How to get file size?</h3>
+<div class="outline-text-3" id="text-orga366966">
+<p>
+`Files.size(path)`
+</p>
+</div>
+</div>
+<div id="outline-container-orge9068e1" class="outline-3">
+<h3 id="orge9068e1">Q54: Why handle IOException in file operations?</h3>
+<div class="outline-text-3" id="text-orge9068e1">
+<p>
+Disk permissions, missing files, locks, full storage, and device/network errors are common.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org9f96cd6" class="outline-2">
+<h2 id="org9f96cd6">Serialization and Object I/O (Core Concepts)</h2>
+<div class="outline-text-2" id="text-org9f96cd6">
+</div>
+<div id="outline-container-org3a194d5" class="outline-3">
+<h3 id="org3a194d5">Q55: What is Java serialization?</h3>
+<div class="outline-text-3" id="text-org3a194d5">
+<p>
+Converting object state to bytes for storage/transmission and reconstructing later.
+</p>
+</div>
+</div>
+<div id="outline-container-org9a269b3" class="outline-3">
+<h3 id="org9a269b3">Q56: Which interfaces/classes are involved?</h3>
+<div class="outline-text-3" id="text-org9a269b3">
+<ul class="org-ul">
+<li>`Serializable`</li>
+<li>`ObjectOutputStream`</li>
+<li>`ObjectInputStream`</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf70e65c" class="outline-3">
+<h3 id="orgf70e65c">Q57: Why is default Java serialization often avoided in modern systems?</h3>
+<div class="outline-text-3" id="text-orgf70e65c">
+<p>
+Security, versioning fragility, and interoperability concerns; JSON/Protobuf are often preferred.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5840cc1" class="outline-2">
+<h2 id="org5840cc1">Practical Exception + I/O Patterns</h2>
+<div class="outline-text-2" id="text-org5840cc1">
+</div>
+<div id="outline-container-org570c3ba" class="outline-3">
+<h3 id="org570c3ba">Q58: Pattern: validate input path early</h3>
+<div class="outline-text-3" id="text-org570c3ba">
+<p>
+Check null/empty/illegal path before expensive file operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org96a28f3" class="outline-3">
+<h3 id="org96a28f3">Q59: Pattern: fail fast with clear message</h3>
+<div class="outline-text-3" id="text-org96a28f3">
+<p>
+Throw specific exception immediately when preconditions fail.
+</p>
+</div>
+</div>
+<div id="outline-container-org9efd3aa" class="outline-3">
+<h3 id="org9efd3aa">Q60: Pattern: translate low-level exception</h3>
+<div class="outline-text-3" id="text-org9efd3aa">
+<p>
+Convert IOException to domain-level exception at service boundary.
+</p>
+</div>
+</div>
+<div id="outline-container-org5395d1e" class="outline-3">
+<h3 id="org5395d1e">Q61: Pattern: close resources automatically</h3>
+<div class="outline-text-3" id="text-org5395d1e">
+<p>
+Always use try-with-resources for streams/readers/writers/channels.
+</p>
+</div>
+</div>
+<div id="outline-container-orgafa4da0" class="outline-3">
+<h3 id="orgafa4da0">Q62: Pattern: don’t swallow exceptions</h3>
+<div class="outline-text-3" id="text-orgafa4da0">
+<p>
+Empty catch blocks hide failures and create hard-to-debug data issues.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcf73417" class="outline-3">
+<h3 id="orgcf73417">Q63: Pattern: preserve root cause</h3>
+<div class="outline-text-3" id="text-orgcf73417">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">throw</span> <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">FileStorageException</span>(<span style="font-style: italic;">"Failed storing avatar for userId="</span> + userId, e);
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org71e925e" class="outline-2">
+<h2 id="org71e925e">Common Mistakes and How to Avoid Them</h2>
+<div class="outline-text-2" id="text-org71e925e">
+</div>
+<div id="outline-container-orgc2a95c5" class="outline-3">
+<h3 id="orgc2a95c5">Q64: Mistake: catching broad Exception</h3>
+<div class="outline-text-3" id="text-orgc2a95c5">
+<p>
+Catch specific exception types whenever possible.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd0b58c" class="outline-3">
+<h3 id="orgfd0b58c">Q65: Mistake: using platform default charset implicitly</h3>
+<div class="outline-text-3" id="text-orgfd0b58c">
+<p>
+Always pass explicit `StandardCharsets.UTF<sub>8</sub>`.
+</p>
+</div>
+</div>
+<div id="outline-container-org17ec683" class="outline-3">
+<h3 id="org17ec683">Q66: Mistake: reading huge file fully into memory</h3>
+<div class="outline-text-3" id="text-org17ec683">
+<p>
+Stream/process line-by-line for large files.
+</p>
+</div>
+</div>
+<div id="outline-container-org15e3706" class="outline-3">
+<h3 id="org15e3706">Q67: Mistake: logging and rethrowing at every layer</h3>
+<div class="outline-text-3" id="text-org15e3706">
+<p>
+Log once at boundary or where context is added.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd360bed" class="outline-3">
+<h3 id="orgd360bed">Q68: Mistake: throwing raw RuntimeException everywhere</h3>
+<div class="outline-text-3" id="text-orgd360bed">
+<p>
+Use meaningful exception types with actionable context.
+</p>
+</div>
+</div>
+<div id="outline-container-org2a367a9" class="outline-3">
+<h3 id="org2a367a9">Q69: Mistake: ignoring interrupted status</h3>
+<div class="outline-text-3" id="text-org2a367a9">
+<p>
+In thread code, restore interrupt (`Thread.currentThread().interrupt()`) when catching InterruptedException.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7421930" class="outline-2">
+<h2 id="org7421930">Backend/REST Context Questions</h2>
+<div class="outline-text-2" id="text-org7421930">
+</div>
+<div id="outline-container-org694c9ae" class="outline-3">
+<h3 id="org694c9ae">Q70: Where should validation exceptions be converted to HTTP 400?</h3>
+<div class="outline-text-3" id="text-org694c9ae">
+<p>
+In controller layer/global handler mapping client-input failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8348bf" class="outline-3">
+<h3 id="orgc8348bf">Q71: Where should unexpected server exceptions map?</h3>
+<div class="outline-text-3" id="text-orgc8348bf">
+<p>
+HTTP 500 with safe generic message to client and detailed server logs.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb6a5d6" class="outline-3">
+<h3 id="orgbb6a5d6">Q72: How to handle file upload size violations?</h3>
+<div class="outline-text-3" id="text-orgbb6a5d6">
+<p>
+Validate limits, return 413/400-style response, and log context safely.
+</p>
+</div>
+</div>
+<div id="outline-container-org92a9e07" class="outline-3">
+<h3 id="org92a9e07">Q73: Should clients see stack traces?</h3>
+<div class="outline-text-3" id="text-org92a9e07">
+<p>
+No; return sanitized errors, keep stack traces in server logs.
+</p>
+</div>
+</div>
+<div id="outline-container-org0faaeab" class="outline-3">
+<h3 id="org0faaeab">Q74: Why include correlation ID in error responses/logs?</h3>
+<div class="outline-text-3" id="text-org0faaeab">
+<p>
+Enables fast tracing across distributed systems and support tickets.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5c5067a" class="outline-2">
+<h2 id="org5c5067a">Mini Code Q&amp;A (Easy Snippets)</h2>
+<div class="outline-text-2" id="text-org5c5067a">
+</div>
+<div id="outline-container-orgc6a187a" class="outline-3">
+<h3 id="orgc6a187a">Q75: Read file line-by-line (UTF-8)?</h3>
+<div class="outline-text-3" id="text-orgc6a187a">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">try</span> (<span style="font-weight: bold; text-decoration: underline;">BufferedReader</span> <span style="font-weight: bold; font-style: italic;">br</span> = Files.newBufferedReader(path, <span style="font-weight: bold; text-decoration: underline;">StandardCharsets</span>.UTF_8)) {
+    <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">line</span>;
+    <span style="font-weight: bold;">while</span> ((line = br.readLine()) != <span style="font-weight: bold; text-decoration: underline;">null</span>) {
+        <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">process line
+</span>    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7ec0e91" class="outline-3">
+<h3 id="org7ec0e91">Q76: Write lines to file?</h3>
+<div class="outline-text-3" id="text-org7ec0e91">
+<div class="org-src-container">
+<pre class="src src-java">Files.write(<span style="font-weight: bold; text-decoration: underline;">path</span>, <span style="font-weight: bold; text-decoration: underline;">lines</span>, <span style="font-weight: bold; text-decoration: underline;">StandardCharsets</span>.<span style="font-weight: bold; text-decoration: underline;">UTF_8</span>);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org353f18e" class="outline-3">
+<h3 id="org353f18e">Q77: Create directories if missing?</h3>
+<div class="outline-text-3" id="text-org353f18e">
+<div class="org-src-container">
+<pre class="src src-java">Files.createDirectories(Path.of(<span style="font-style: italic;">"data/uploads"</span>));
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf653edf" class="outline-3">
+<h3 id="orgf653edf">Q78: Safe delete attempt?</h3>
+<div class="outline-text-3" id="text-orgf653edf">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">boolean</span> <span style="font-weight: bold; font-style: italic;">deleted</span> = Files.deleteIfExists(path);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org652a435" class="outline-3">
+<h3 id="org652a435">Q79: Throw custom exception on invalid argument?</h3>
+<div class="outline-text-3" id="text-org652a435">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">if</span> (email == <span style="font-weight: bold; text-decoration: underline;">null</span> || email.isBlank()) {
+    <span style="font-weight: bold;">throw</span> <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">IllegalArgumentException</span>(<span style="font-style: italic;">"email must not be blank"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcb177a1" class="outline-3">
+<h3 id="orgcb177a1">Q80: Wrap IOException with domain exception?</h3>
+<div class="outline-text-3" id="text-orgcb177a1">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">try</span> {
+    Files.writeString(path, payload);
+} <span style="font-weight: bold;">catch</span> (IOException e) {
+    <span style="font-weight: bold;">throw</span> <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">FileStorageException</span>(<span style="font-style: italic;">"Unable to store report"</span>, e);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org26f5ff0" class="outline-2">
+<h2 id="org26f5ff0">Interview Quick Round</h2>
+<div class="outline-text-2" id="text-org26f5ff0">
+</div>
+<div id="outline-container-orgd5fa0e1" class="outline-3">
+<h3 id="orgd5fa0e1">Q81: Why checked exceptions exist?</h3>
+<div class="outline-text-3" id="text-orgd5fa0e1">
+<p>
+To force explicit handling/awareness of recoverable external failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc770dc" class="outline-3">
+<h3 id="orgfc770dc">Q82: Why RuntimeException is still useful?</h3>
+<div class="outline-text-3" id="text-orgfc770dc">
+<p>
+For programmer errors and invariant violations where immediate propagation is appropriate.
+</p>
+</div>
+</div>
+<div id="outline-container-org77815d2" class="outline-3">
+<h3 id="org77815d2">Q83: Most important I/O performance habit?</h3>
+<div class="outline-text-3" id="text-org77815d2">
+<p>
+Use buffering and avoid unnecessary full-memory reads for large data.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe76235" class="outline-3">
+<h3 id="orgfe76235">Q84: Why NIO Path is better than File for modern code?</h3>
+<div class="outline-text-3" id="text-orgfe76235">
+<p>
+Cleaner API, better utility support, and improved composability with Files methods.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc15dc1c" class="outline-3">
+<h3 id="orgc15dc1c">Q85: Most important exception design habit?</h3>
+<div class="outline-text-3" id="text-orgc15dc1c">
+<p>
+Be specific and preserve cause while adding useful context.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0acfe5c" class="outline-2">
+<h2 id="org0acfe5c">Scenario-Based Q&amp;A</h2>
+<div class="outline-text-2" id="text-org0acfe5c">
+</div>
+<div id="outline-container-orgfb9488a" class="outline-3">
+<h3 id="orgfb9488a">Q86: Scenario: Config file missing at startup. What to do?</h3>
+<div class="outline-text-3" id="text-orgfb9488a">
+<p>
+Throw clear startup exception and fail fast with actionable message/path.
+</p>
+</div>
+</div>
+<div id="outline-container-org954a546" class="outline-3">
+<h3 id="org954a546">Q87: Scenario: Temporary network file read failure. What to do?</h3>
+<div class="outline-text-3" id="text-org954a546">
+<p>
+Catch IOException, apply retry policy if appropriate, and log attempts/context.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d7291f" class="outline-3">
+<h3 id="org2d7291f">Q88: Scenario: Invalid CSV row in batch import. What to do?</h3>
+<div class="outline-text-3" id="text-org2d7291f">
+<p>
+Record row error, continue if business allows, and produce final error summary.
+</p>
+</div>
+</div>
+<div id="outline-container-org86fa852" class="outline-3">
+<h3 id="org86fa852">Q89: Scenario: Disk full during write. What to do?</h3>
+<div class="outline-text-3" id="text-org86fa852">
+<p>
+Catch IOException, return controlled server error, alert operations, and prevent partial corruption.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd980bdc" class="outline-3">
+<h3 id="orgd980bdc">Q90: Scenario: User requests non-existing download file. What to do?</h3>
+<div class="outline-text-3" id="text-orgd980bdc">
+<p>
+Map to 404 with clear message; avoid exposing internal filesystem details.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5375c38" class="outline-2">
+<h2 id="org5375c38">Testing Exceptions and I/O</h2>
+<div class="outline-text-2" id="text-org5375c38">
+</div>
+<div id="outline-container-org0645251" class="outline-3">
+<h3 id="org0645251">Q91: How to assert exception in JUnit 5?</h3>
+<div class="outline-text-3" id="text-org0645251">
+<div class="org-src-container">
+<pre class="src src-java">assertThrows(IllegalArgumentException.<span style="font-weight: bold;">class</span>, () -&gt; service.process(<span style="font-weight: bold; text-decoration: underline;">null</span>));
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8a71702" class="outline-3">
+<h3 id="org8a71702">Q92: How to test exception message quickly?</h3>
+<div class="outline-text-3" id="text-org8a71702">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold; text-decoration: underline;">var</span> <span style="font-weight: bold; font-style: italic;">ex</span> = assertThrows(...);
+assertTrue(ex.getMessage().contains(<span style="font-style: italic;">"email"</span>));
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0652b90" class="outline-3">
+<h3 id="org0652b90">Q93: How to test file I/O safely?</h3>
+<div class="outline-text-3" id="text-org0652b90">
+<p>
+Use temp directories/files and clean up automatically.
+</p>
+</div>
+</div>
+<div id="outline-container-org3106553" class="outline-3">
+<h3 id="org3106553">Q94: Why avoid real external paths in unit tests?</h3>
+<div class="outline-text-3" id="text-org3106553">
+<p>
+They make tests environment-dependent and flaky.
+</p>
+</div>
+</div>
+<div id="outline-container-org41386ba" class="outline-3">
+<h3 id="org41386ba">Q95: What should integration tests verify for error handling?</h3>
+<div class="outline-text-3" id="text-org41386ba">
+<p>
+Correct HTTP status, error schema, and stable/loggable failure behavior.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,422 @@
+#+TITLE: Java Exceptions and I/O APIs
+#+DATE: 2026-08-08
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Exceptions and I/O APIs
+
+-----
+
+* Exception Fundamentals
+
+** Q1: What is an exception in Java?
+ An exception is an event that interrupts normal program flow due to an error or unexpected condition.
+
+** Q2: What is the root class of exceptions and errors?
+ `Throwable`
+
+** Q3: Difference between Error and Exception?
+
+- `Error`: serious JVM/system issues (usually not handled in app logic).
+- `Exception`: conditions application code may handle.
+
+** Q4: What is checked exception?
+ An exception that must be handled or declared with `throws` at compile time (e.g., IOException).
+
+** Q5: What is unchecked exception?
+ Runtime exceptions (`RuntimeException` and subclasses) not required to be declared/handled.
+
+** Q6: Common checked exception examples?
+
+- IOException
+- SQLException
+- ClassNotFoundException
+
+** Q7: Common unchecked exception examples?
+
+- NullPointerException
+- IllegalArgumentException
+- IllegalStateException
+- IndexOutOfBoundsException
+
+** Q8: What is exception propagation?
+ If a method does not handle an exception, it passes up the call stack to caller methods.
+
+** Q9: What does `throws` mean?
+ Method declares it may pass specific exceptions to caller.
+
+** Q10: What does `throw` mean?
+ Explicitly creates and throws an exception instance in code.
+
+* try-catch-finally and try-with-resources
+
+** Q11: Purpose of try-catch?
+ Wrap risky code and handle specific failures gracefully.
+
+** Q12: Purpose of finally?
+ Executes cleanup code whether exception occurs or not (except abnormal JVM termination).
+
+** Q13: Why is try-with-resources preferred for I/O?
+ It automatically closes resources and prevents leaks.
+
+** Q14: What can be used in try-with-resources?
+ Objects implementing `AutoCloseable` (e.g., streams, readers, JDBC resources).
+
+** Q15: Basic try-with-resources pattern?
+
+#+BEGIN_SRC java
+try (BufferedReader br = Files.newBufferedReader(path)) {
+    return br.readLine();
+}
+#+END_SRC
+
+** Q16: Can you have catch with try-with-resources?
+ Yes, you can combine try-with-resources with catch/finally.
+
+** Q17: What are suppressed exceptions?
+ Exceptions thrown during resource close are attached as suppressed when a primary exception already exists.
+
+* Designing Good Exceptions
+
+** Q18: When should I create custom exceptions?
+ When expressing domain-specific failure clearly improves readability and handling.
+
+** Q19: Custom checked or unchecked?
+
+- Checked for recoverable external situations.
+- Unchecked for programming/domain rule violations.
+
+** Q20: Good custom exception naming?
+ Use specific, meaningful names like `InsufficientFundsException`, `FileStorageException`.
+
+** Q21: What makes a good exception message?
+ Clear context: what failed, where, and key identifiers (without leaking secrets).
+
+** Q22: Should I catch Exception everywhere?
+ No; catch specific exceptions where you can meaningfully recover or translate.
+
+** Q23: What is exception wrapping?
+ Throwing a higher-level exception with original cause for abstraction-friendly error handling.
+
+** Q24: Why preserve cause?
+ Root cause debugging becomes much easier.
+
+* Logging and Exception Handling in Backend Apps
+
+** Q25: Where should exceptions be logged?
+ At meaningful boundaries (e.g., controller/service boundary), not repeatedly at every layer.
+
+** Q26: Why avoid duplicate logging?
+ Same stack trace logged multiple times creates noise and slows incident diagnosis.
+
+** Q27: What data should logs include?
+ Error type, message, correlation/request ID, key business context, and stack trace when needed.
+
+** Q28: Should sensitive data be logged?
+ No; never log passwords, tokens, secrets, or private personal data.
+
+** Q29: What is global exception handling in Spring?
+ Centralized mapping via `@ControllerAdvice` to consistent HTTP error responses.
+
+** Q30: Recommended REST error payload fields?
+ timestamp, status, error code, message, path, correlationId.
+
+* Java I/O API Basics (java.io)
+
+** Q31: What is a stream in Java I/O?
+ A flow of data from source to destination.
+
+** Q32: Byte stream vs character stream?
+
+- Byte streams: binary data (`InputStream`/`OutputStream`)
+- Character streams: text data (`Reader`/`Writer`)
+
+** Q33: InputStream purpose?
+ Read bytes from file/network/memory source.
+
+** Q34: OutputStream purpose?
+ Write bytes to file/network/memory target.
+
+** Q35: Reader/Writer purpose?
+ Read/write text with character encoding awareness.
+
+** Q36: What is buffering and why use it?
+ Buffering reduces system calls and improves I/O performance.
+
+** Q37: Common buffered classes?
+
+- BufferedInputStream / BufferedOutputStream
+- BufferedReader / BufferedWriter
+
+** Q38: Why specify charset for text I/O?
+ Prevent encoding bugs across environments (UTF-8 recommended explicitly).
+
+* Modern File I/O (NIO.2 — java.nio.file)
+
+** Q39: Why prefer NIO.2 over old File API?
+ Better abstractions (`Path`, `Files`), richer operations, clearer error handling.
+
+** Q40: What is Path?
+ Immutable representation of a filesystem path.
+
+** Q41: How to create Path?
+
+#+BEGIN_SRC java
+Path p = Path.of("data", "users.txt");
+#+END_SRC
+
+** Q42: Common Files utility operations?
+
+- exists
+- createDirectories
+- readString/readAllLines
+- writeString/write
+- copy/move/delete
+
+** Q43: How to read whole file as string?
+
+#+BEGIN_SRC java
+String content = Files.readString(path);
+#+END_SRC
+
+** Q44: How to write string to file?
+
+#+BEGIN_SRC java
+Files.writeString(path, content);
+#+END_SRC
+
+** Q45: How to append text safely?
+
+#+BEGIN_SRC java
+Files.writeString(path, line, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+#+END_SRC
+
+** Q46: How to list directory files?
+
+#+BEGIN_SRC java
+try (Stream<Path> s = Files.list(dir)) { ... }
+#+END_SRC
+
+** Q47: How to walk directory tree?
+ Use `Files.walk(...)` or `Files.walkFileTree(...)`.
+
+* File Metadata, Copy/Move/Delete
+
+** Q48: How to check file existence?
+ `Files.exists(path)`
+
+** Q49: How to distinguish file vs directory?
+
+- `Files.isRegularFile(path)`
+- `Files.isDirectory(path)`
+
+** Q50: How to copy file?
+
+#+BEGIN_SRC java
+Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+#+END_SRC
+
+** Q51: How to move/rename file?
+
+#+BEGIN_SRC java
+Files.move(src, dst, StandardCopyOption.REPLACE_EXISTING);
+#+END_SRC
+
+** Q52: How to delete file?
+
+- `Files.delete(path)` (fails if missing)
+- `Files.deleteIfExists(path)` (safe if missing)
+
+** Q53: How to get file size?
+ `Files.size(path)`
+
+** Q54: Why handle IOException in file operations?
+ Disk permissions, missing files, locks, full storage, and device/network errors are common.
+
+* Serialization and Object I/O (Core Concepts)
+
+** Q55: What is Java serialization?
+ Converting object state to bytes for storage/transmission and reconstructing later.
+
+** Q56: Which interfaces/classes are involved?
+
+- `Serializable`
+- `ObjectOutputStream`
+- `ObjectInputStream`
+
+** Q57: Why is default Java serialization often avoided in modern systems?
+ Security, versioning fragility, and interoperability concerns; JSON/Protobuf are often preferred.
+
+* Practical Exception + I/O Patterns
+
+** Q58: Pattern: validate input path early
+ Check null/empty/illegal path before expensive file operations.
+
+** Q59: Pattern: fail fast with clear message
+ Throw specific exception immediately when preconditions fail.
+
+** Q60: Pattern: translate low-level exception
+ Convert IOException to domain-level exception at service boundary.
+
+** Q61: Pattern: close resources automatically
+ Always use try-with-resources for streams/readers/writers/channels.
+
+** Q62: Pattern: don’t swallow exceptions
+ Empty catch blocks hide failures and create hard-to-debug data issues.
+
+** Q63: Pattern: preserve root cause
+
+#+BEGIN_SRC java
+throw new FileStorageException("Failed storing avatar for userId=" + userId, e);
+#+END_SRC
+
+* Common Mistakes and How to Avoid Them
+
+** Q64: Mistake: catching broad Exception
+ Catch specific exception types whenever possible.
+
+** Q65: Mistake: using platform default charset implicitly
+ Always pass explicit `StandardCharsets.UTF_8`.
+
+** Q66: Mistake: reading huge file fully into memory
+ Stream/process line-by-line for large files.
+
+** Q67: Mistake: logging and rethrowing at every layer
+ Log once at boundary or where context is added.
+
+** Q68: Mistake: throwing raw RuntimeException everywhere
+ Use meaningful exception types with actionable context.
+
+** Q69: Mistake: ignoring interrupted status
+ In thread code, restore interrupt (`Thread.currentThread().interrupt()`) when catching InterruptedException.
+
+* Backend/REST Context Questions
+
+** Q70: Where should validation exceptions be converted to HTTP 400?
+ In controller layer/global handler mapping client-input failures.
+
+** Q71: Where should unexpected server exceptions map?
+ HTTP 500 with safe generic message to client and detailed server logs.
+
+** Q72: How to handle file upload size violations?
+ Validate limits, return 413/400-style response, and log context safely.
+
+** Q73: Should clients see stack traces?
+ No; return sanitized errors, keep stack traces in server logs.
+
+** Q74: Why include correlation ID in error responses/logs?
+ Enables fast tracing across distributed systems and support tickets.
+
+* Mini Code Q&A (Easy Snippets)
+
+** Q75: Read file line-by-line (UTF-8)?
+
+#+BEGIN_SRC java
+try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+    String line;
+    while ((line = br.readLine()) != null) {
+        // process line
+    }
+}
+#+END_SRC
+
+** Q76: Write lines to file?
+
+#+BEGIN_SRC java
+Files.write(path, lines, StandardCharsets.UTF_8);
+#+END_SRC
+
+** Q77: Create directories if missing?
+
+#+BEGIN_SRC java
+Files.createDirectories(Path.of("data/uploads"));
+#+END_SRC
+
+** Q78: Safe delete attempt?
+
+#+BEGIN_SRC java
+boolean deleted = Files.deleteIfExists(path);
+#+END_SRC
+
+** Q79: Throw custom exception on invalid argument?
+
+#+BEGIN_SRC java
+if (email == null || email.isBlank()) {
+    throw new IllegalArgumentException("email must not be blank");
+}
+#+END_SRC
+
+** Q80: Wrap IOException with domain exception?
+
+#+BEGIN_SRC java
+try {
+    Files.writeString(path, payload);
+} catch (IOException e) {
+    throw new FileStorageException("Unable to store report", e);
+}
+#+END_SRC
+
+* Interview Quick Round
+
+** Q81: Why checked exceptions exist?
+ To force explicit handling/awareness of recoverable external failures.
+
+** Q82: Why RuntimeException is still useful?
+ For programmer errors and invariant violations where immediate propagation is appropriate.
+
+** Q83: Most important I/O performance habit?
+ Use buffering and avoid unnecessary full-memory reads for large data.
+
+** Q84: Why NIO Path is better than File for modern code?
+ Cleaner API, better utility support, and improved composability with Files methods.
+
+** Q85: Most important exception design habit?
+ Be specific and preserve cause while adding useful context.
+
+* Scenario-Based Q&A
+
+** Q86: Scenario: Config file missing at startup. What to do?
+ Throw clear startup exception and fail fast with actionable message/path.
+
+** Q87: Scenario: Temporary network file read failure. What to do?
+ Catch IOException, apply retry policy if appropriate, and log attempts/context.
+
+** Q88: Scenario: Invalid CSV row in batch import. What to do?
+ Record row error, continue if business allows, and produce final error summary.
+
+** Q89: Scenario: Disk full during write. What to do?
+ Catch IOException, return controlled server error, alert operations, and prevent partial corruption.
+
+** Q90: Scenario: User requests non-existing download file. What to do?
+ Map to 404 with clear message; avoid exposing internal filesystem details.
+
+* Testing Exceptions and I/O
+
+** Q91: How to assert exception in JUnit 5?
+
+#+BEGIN_SRC java
+assertThrows(IllegalArgumentException.class, () -> service.process(null));
+#+END_SRC
+
+** Q92: How to test exception message quickly?
+
+#+BEGIN_SRC java
+var ex = assertThrows(...);
+assertTrue(ex.getMessage().contains("email"));
+#+END_SRC
+
+** Q93: How to test file I/O safely?
+ Use temp directories/files and clean up automatically.
+
+** Q94: Why avoid real external paths in unit tests?
+ They make tests environment-dependent and flaky.
+
+** Q95: What should integration tests verify for error handling?
+ Correct HTTP status, error schema, and stable/loggable failure behavior.
+
+-----
+
+#+INCLUDE: "../footer.org"
