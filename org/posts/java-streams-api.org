@@ -1,0 +1,771 @@
+#+TITLE: Java Stream API
+#+DATE: 202608-08
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil htmlpostamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Stream API
+
+----
+
+* Junior Level
+
+** Q1: What is Java Streams API?
+  A declarative API to process data in pipelines.
+  You describe *what* transformations to apply (filter, map, collect), not loop mechanics.
+  *users.stream().filter(User::active).map(User::email).toList()*
+
+** Q2: Does a Stream store data?
+  No, it processes data from a source.
+  The source (List/array/file) owns data; stream is only a computation view.
+  *list* stores elements, *list.stream()* processes them.
+
+** Q3: Name common stream sources.
+  Collections, arrays, Stream.of, Files.lines, generators.
+  Different sources affect order, resource handling, and performance behavior.
+  *Files.lines(path)* must be closed properly.
+
+** Q4: What are intermediate operations?
+  Lazy operations returning another stream.
+  They build the pipeline (*filter*, *map*, *sorted*) but do not run until terminal op.
+  *stream.filter(...).map(...)*
+
+** Q5: What are terminal operations?
+  Operations that execute pipeline and produce final result.
+  Terminal ops trigger traversal and consume stream; stream cannot be reused after.
+  *collect*, *count*, *forEach*, *reduce*
+
+** Q6: Why are streams lazy?
+  To avoid unnecessary work.
+  Laziness enables shortcircuiting and pipeline optimization for better efficiency.
+  *anyMatch(...)* stops at first match.
+
+** Q7: Can you reuse a stream after terminal op?
+  No, stream is singleuse.
+  After terminal execution, stream is consumed/closed by design.
+  Create new stream: *list.stream()* again.
+
+** Q8: What does filter() do?
+  Keeps elements matching predicate.
+  It narrows dataset early, often improving readability and performance.
+  *.filter(u > u.age() >= 18)*
+
+** Q9: What does map() do?
+  Transforms each element to another value.
+  Use map for shape conversion, like entity > DTO or object -> field extraction.
+  *.map(User::email)*
+
+** Q10: map() vs flatMap()?
+  map = oneto-one, flatMap = one-to-many flattening.
+  Use flatMap when each element contains nested collection/stream.
+  *orders.stream().flatMap(o > o.items().stream())*
+
+** Q11: What does distinct() use internally for uniqueness?
+  *equals()* and *hashCode()*.
+  If equality contract is wrong, distinct results will be wrong too.
+  Two logically equal objects need same hash code.
+
+** Q12: What does sorted() do without comparator?
+  Sorts by natural order.
+  Works only when elements implement Comparable consistently.
+  Strings alphabetical, Integers numeric.
+
+** Q13: What does limit(n) do?
+  Keeps first n elements.
+  Useful for previews and topN after sorting.
+  *.sorted(...).limit(10)*
+
+** Q14: What does skip(n) do?
+  Skips first n elements.
+  Often combined with limit for paginationstyle slicing.
+  *.skip(page*size).limit(size)*
+
+** Q15: What does count() return?
+  Number of elements as long.
+  *long* avoids overflow risk for large streams.
+  *.filter(User::active).count()*
+
+** Q16: What does findFirst() return?
+  Optional of first element.
+  Respects encounter order; useful when deterministic first match is required.
+  *.filter(...).findFirst()*
+
+** Q17: What does findAny() return?
+  Optional of any element.
+  In parallel, may return whichever match is found first internally.
+  *.parallel().filter(...).findAny()*
+
+** Q18: anyMatch() purpose?
+  True if at least one element matches.
+  Shortcircuiting makes it efficient for existence checks.
+  *.anyMatch(u > "ADMIN".equals(u.role()))*
+
+** Q19: allMatch() purpose?
+  True if all elements match.
+  Stops early on first failing element.
+  *.allMatch(u > u.email() != null)*
+
+** Q20: noneMatch() purpose?
+  True if no elements match.
+  Good for “forbidden condition not present” checks.
+  *.noneMatch(u > u.locked())*
+
+** Q21: Why does findFirst return Optional?
+  Stream may be empty.
+  Optional forces explicit handling of “no result” instead of null ambiguity.
+  *.findFirst().orElse(defaultUser)*
+
+** Q22: How to convert stream to list (modern Java)?
+  Use *toList()*.
+  Concise and readable for common terminal collection use.
+  *.map(...).toList()*
+
+** Q23: How to collect into Set?
+  *collect(Collectors.toSet())*.
+  Useful for uniqueness, but specific set implementation is not guaranteed.
+  *.collect(Collectors.toSet())*
+
+** Q24: What does Collectors.joining do?
+  Concatenates strings with optional delimiter.
+  Cleaner and faster than manual string reduce concatenation.
+  *.collect(Collectors.joining(", "))*
+
+** Q25: What does Collectors.groupingBy do?
+  Groups elements by key into Map.
+  Foundation for reporting/aggregation in backend logic.
+  *groupingBy(User::department)*
+
+** Q26: What does Collectors.partitioningBy do?
+  Splits into two boolean buckets.
+  Best when classification is binary (true/false).
+  *partitioningBy(User::active)*
+
+** Q27: What happens if toMap gets duplicate keys?
+  Throws IllegalStateException.
+  Provide merge function when collisions are possible in real data.
+  *toMap(k, v, (a,b) > a)*
+
+** Q28: Why prefer method references?
+  Cleaner when lambda just calls existing method.
+  Improves scan readability and reduces noise.
+  *map(User::email)*
+
+** Q29: What is a pure function in stream context?
+  Deterministic, no side effects.
+  Pure functions are easier to reason about and safe for parallelism.
+  *u > u.name().trim().toLowerCase()*
+
+** Q30: Why avoid side effects in stream pipeline?
+  They reduce correctness and readability.
+  External mutation creates hidden coupling and parallel racerisk.
+  prefer *collect(toList())* over shared list mutation.
+
+** Q31: What is IntStream?
+  Primitive stream for int values.
+  Avoids boxing overhead and exposes numeric helpers directly.
+  *.mapToInt(User::age)*
+
+** Q32: mapToInt use?
+  Converts object stream to IntStream.
+  Enables efficient *sum*, *average*, *max*.
+  *users.stream().mapToInt(User::age).sum()*
+
+** Q33: Difference between forEach and collect?
+  forEach side effects; collect builds result.
+  collect is preferred for transformation pipelines.
+  *.map(...).collect(toList())*
+
+** Q34: When is loop better than stream?
+  When loop is clearer.
+  Complex branching/stateheavy logic can be easier in imperative style.
+  multierror validation with early continue paths.
+
+** Q35: Can stream handle null elements automatically?
+  Not automatically.
+  Add explicit null filtering to avoid NPE in downstream steps.
+  *.filter(Objects::nonNull)*
+
+** Q36: What does Stream.ofNullable do?
+  Empty stream for null, oneelement stream otherwise.
+  Handy for nullsafe composition in pipelines.
+  *Stream.ofNullable(value)*
+
+** Q37: What is encounter order?
+  Sourceprovided iteration order.
+  Affects semantics of *findFirst*, ordered results, and debugging expectations.
+  List has stable order; HashSet usually does not.
+
+** Q38: Does HashSet source guarantee stream order?
+  No.
+  Don’t rely on HashSet encounter order in business logic.
+  sort explicitly if order needed.
+
+** Q39: Why sorted can be expensive?
+  Typically O(n log n).
+  Sorting is stateful and often requires buffering all elements.
+  avoid full sort if only topK needed.
+
+** Q40: Why distinct can use extra memory?
+  Tracks seen values.
+  Dedup requires hash/set bookkeeping proportional to distinct count.
+  large unique set => higher memory footprint.
+
+** Q41: Is stream execution eager?
+  Terminal yes, intermediate no.
+  This split is the essence of lazy pipeline design.
+  *map/filter* do nothing until *toList/count/...*
+
+** Q42: Can we chain multiple filters?
+  Yes.
+  Multiple small predicates can improve readability over one giant condition.
+  *.filter(active).filter(hasEmail)*
+
+** Q43: What does peek() do?
+  Observes flowing elements.
+  Useful mostly for debugging, not core business behavior.
+  *.peek(System.out::println)*
+
+** Q44: Should business logic rely on peek side effects?
+  No.
+  It creates fragile behavior and unclear intent.
+  avoid mutation/logic in peek.
+
+** Q45: What happens on empty stream max()?
+  Returns Optional.empty().
+  No max value exists without elements.
+  *stream.max(...).orElse(default)*
+
+** Q46: reduce() basic purpose?
+  Combines elements to one value.
+  Use for associative aggregation like sum/min/max-style folding.
+  *.reduce(0, Integer::sum)*
+
+** Q47: Example reduce identity significance?
+  Identity is neutral base value.
+  It defines empty-stream result and supports combining correctness.
+  sum identity = 0
+
+** Q48: Why Stream API is considered functional style?
+  Encourages declarative, immutable transformations.
+  It minimizes external mutable state and highlights intent.
+  filter-map-collect pipeline
+
+** Q49: Are streams only for collections?
+  No.
+  They also work with arrays, files, generators, and custom sources.
+  *Files.lines(path)*
+
+** Q50: Oneline rule for beginners?
+  Use streams for clear transformations.
+  Prefer readable pipelines and avoid hidden side effects.
+  keep lambdas small and explicit.
+
+* Mid Level
+
+** Q51: Explain stream pipeline execution model.
+  Source -> lazy intermediate stages -> terminal execution.
+  Processing occurs when terminal op pulls elements through the chain.
+  filter/map run only at collect time.
+
+** Q52: Vertical vs horizontal processing intuition?
+  Usually vertical per element through all stages.
+  Reduces temporary collections and enables short-circuiting.
+  element1 filter->map->..., then element2.
+
+** Q53: Why shortcircuiting matters?
+  Stops early when answer is known.
+  Saves CPU on large streams and expensive predicates.
+  anyMatch/findFirst/noneMatch
+
+** Q54: Stateful vs stateless intermediate ops?
+  Stateless depends on current element; stateful needs broader context.
+  stateful ops (sorted/distinct) often require buffering.
+  map/filter vs sorted/distinct
+
+** Q55: Cost implication of stateful ops?
+  More memory and coordination.
+  They may degrade performance on large datasets if used casually.
+  full sort before limit
+
+** Q56: groupingBy + mapping use case?
+  Group then project fields.
+  Great for report-friendly shape without extra loops.
+  dept -> list of names
+
+** Q57: groupingBy + counting use case?
+  Frequency map creation.
+  Common for dashboards, metrics, and summaries.
+  role -> user count
+
+** Q58: groupingBy + reducing use case?
+  Custom aggregate per group.
+  Useful for per-group max/min/sum domain summaries.
+  dept -> highest salary
+
+** Q59: collectingAndThen purpose?
+  Post-process collected result.
+  Adds finishing step (e.g., wrap immutable, transform Optional).
+  maxBy then map to field
+
+** Q60: toUnmodifiableList vs toList?
+  Both unmodifiable in modern use.
+  *toUnmodifiableList* is explicit collector contract; *toList* is concise.
+  choose clarity style for team convention.
+
+** Q61: Why toMap needs merge strategy?
+  Duplicate keys are common.
+  Explicit merge policy prevents runtime crashes.
+  keep-first vs keep-last
+
+** Q62: Common merge strategies in toMap?
+  keep first, keep last, custom merge.
+  Strategy should match business semantics, not convenience.
+  choose higher score on collision
+
+** Q63: LinkedHashMap in collector why?
+  Preserves insertion order.
+  Useful when API output order should match input flow.
+  *toMap(..., LinkedHashMap::new)*
+
+** Q64: TreeMap in collector why?
+  Sorted keys.
+  Useful when deterministic natural/comparator key order is required.
+  alphabetical grouped report keys
+
+** Q65: Distinctby-key challenge?
+  distinct uses full object equality.
+  Key-based dedupe needs map/set strategy.
+  dedupe users by lowercase email
+
+** Q66: One clean distinctby-key workaround?
+  Collect to map keyed by field.
+  Map key enforces uniqueness and merge handles collisions.
+  *toMap(User::email, u->u, (a,b)->a)*
+
+** Q67: Why map + filter ordering matters?
+  Filter early reduces work.
+  Cheap selective filters before expensive mapping improve performance.
+  active-only before remote-enrichment mapping
+
+** Q68: When to use Optional.orElseGet over orElse?
+  When fallback is expensive.
+  *orElse* evaluates eagerly; *orElseGet* is lazy supplier.
+  default object built only when needed.
+
+** Q69: Optional.orElseThrow best practice?
+  Throw domain-relevant exception.
+  Makes failure explicit and easier to diagnose at boundaries.
+  *orElseThrow(() -> new NotFoundException(id))*
+
+** Q70: Primitive streams and performance?
+  Lower allocation, faster numeric ops.
+  Avoid boxing costs of wrapper streams in hot numeric paths.
+  mapToDouble().sum()
+
+** Q71: summaryStatistics benefit?
+  Multi-metric aggregation in one pass.
+  Efficiently collects count/min/max/sum/avg together.
+  salary stats by department pipeline
+
+** Q72: Why reduce with mutable accumulator is risky?
+  Breaks reduction contract.
+  Especially unsafe in parallel where partial results combine unpredictably.
+  mutating ArrayList inside reduce
+
+** Q73: Better alternative to mutable reduce?
+  Use collect.
+  collect is designed for mutable accumulation with combiner semantics.
+  collect(toList())
+
+** Q74: Stream + exception handling challenge?
+  Checked exceptions don’t match functional signatures.
+  Need wrapper/refactor strategy to keep pipeline readable.
+  convert checked to domain runtime with cause.
+
+** Q75: Practical checkedexception approach in streams?
+  Wrap or move risky logic out.
+  Keep stream stages simple; do I/O before/after when possible.
+  prefetch data before map stage
+
+** Q76: Why huge pipelines hurt maintainability?
+  Hard to debug and review.
+  Too many inline lambdas hide domain meaning.
+  split into named helper methods.
+
+** Q77: Refactoring strategy for long pipelines?
+  Extract method references and intermediate variables.
+  Improves testability and code review comprehension.
+  *filter(this::isEligible).map(this::toDto)*
+
+** Q78: Testing stream code key cases?
+  Empty/single/duplicates/null/order.
+  These cases catch most hidden logic assumptions.
+  assert both content and ordering when required.
+
+** Q79: Why deterministic tests matter for streams?
+  Prevent flaky behavior.
+  Especially important when order is not guaranteed by source.
+  sort result before assert if order irrelevant.
+
+** Q80: forEachOrdered use case?
+  Preserve encounter order in parallel execution.
+  Use only when output order is business-required.
+  ordered file output generation
+
+** Q81: Why parallel + ordered terminal can reduce speed?
+  Extra coordination overhead.
+  Ordering constraints reduce parallel freedom.
+  forEachOrdered vs forEach
+
+** Q82: Stream from Files.lines best practice?
+  try-with-resources.
+  File stream is closeable resource and must be released.
+  *try (var s = Files.lines(path)) { ... }*
+
+** Q83: Is stream good for DBscale aggregation?
+  Usually not primary choice.
+  Push heavy aggregation/filtering to DB engine; stream for app shaping.
+  SQL GROUP BY first, stream post-process later.
+
+** Q84: Common antipattern in backend with streams?
+  In-memory processing of huge data that DB could handle.
+  Increases memory pressure and latency.
+  fetch-all then group in app unnecessarily.
+
+** Q85: N+1 style issue with streams?
+  Per-element remote/database call in map/filter.
+  Multiplies latency and load linearly.
+  repository call inside *.map(...)*
+
+** Q86: How to avoid perelement remote calls in stream?
+  Batch and pre-index data.
+  Build lookup map once, then perform O(1) in-memory joins.
+  preload users map by id.
+
+** Q87: partitioningBy vs groupingBy(Boolean)?
+  partitioningBy is clearer for binary split.
+  Communicates intent and guarantees both true/false keys.
+  active/inactive buckets
+
+** Q88: Collector composition advantage?
+  Express complex aggregation concisely.
+  Reduces multiple passes and manual mutable glue code.
+  groupingBy + mapping + counting
+
+** Q89: flatMap practical backend use?
+  Flatten nested child lists.
+  Essential for tags/items/events extraction pipelines.
+  orders -> items -> totals
+
+** Q90: Why normalize before distinct?
+  Ensures logical uniqueness.
+  Case/space differences should not become false duplicates.
+  trim + lowercase emails before distinct
+
+** Q91: sorted + limit for top N caveat?
+  Sorts full set first.
+  Expensive for huge N; consider heap/top-K algorithm.
+  PriorityQueue bounded size K
+
+** Q92: Stream concurrency safety baseline?
+  Stateless, non-interfering functions.
+  Shared mutable state breaks correctness under concurrency.
+  avoid global counter mutation in map
+
+** Q93: What means noninterfering?
+  Don’t modify source/external shared state.
+  Interference can cause exceptions or undefined behavior.
+  changing list while streaming it
+
+** Q94: Can parallel streams improve APIcall pipelines?
+  Usually poor fit.
+  I/O-bound work is better handled with dedicated async/concurrency patterns.
+  CompletableFuture with tuned executor
+
+** Q95: Why avoid shared mutable list in forEach?
+  Race risk and hidden coupling.
+  Especially dangerous in parallel and harder to reason in reviews.
+  collect instead of external add
+
+** Q96: Better than external mutation in forEach?
+  *collect* / *toList*.
+  Keeps data flow functional and deterministic.
+  *.map(...).toList()*
+
+** Q97: How to preserve readability in complex collectors?
+  Break into steps.
+  Use named collectors/methods and explicit intermediate objects.
+  helper method for downstream collector
+
+** Q98: When to choose loop over stream in team codebase?
+  When loop is clearer for team.
+  Maintainability beats stylistic purity.
+  complex branching with multiple error paths
+
+** Q99: Stream API biggest productivity gain area?
+  Data shaping and aggregation.
+  Excellent for DTO mapping, grouping, reporting transformations.
+  department dashboards
+
+** Q100: Midlevel stream maturity indicator?
+  Correct pattern + clear tradeoff reasoning.
+  Not just syntax, but knowing when/how/why to use streams.
+  choosing DB aggregation over in-memory stream when appropriate.
+
+* Senior Level
+
+** Q101: How do you evaluate stream pipeline performance scientifically?
+  Benchmark/profile on representative workloads.
+  Use evidence (JMH/profilers), not intuition, for optimization decisions.
+  compare loop vs stream in production-like data shape.
+
+** Q102: Why microbenchmarks can mislead?
+  JIT and synthetic artifacts.
+  Warmup, dead-code elimination, and unrealistic inputs skew conclusions.
+  benchmark with realistic object graphs.
+
+** Q103: Parallel stream decision framework?
+  Validate workload fit before enabling.
+  Check data size, CPU-bound nature, purity, ordering needs, and measured gains.
+  large compute-heavy transform with stateless functions.
+
+** Q104: ForkJoin common pool risk in servers?
+  Shared resource contention.
+  Other components using same pool can affect latency unpredictably.
+  burst traffic saturates common pool threads.
+
+** Q105: Why parallel stream in request thread can be risky?
+  Can hurt service QoS.
+  Thread contention and overhead may increase tail latency under load.
+  p99 latency rises despite average improvement.
+
+** Q106: How to mitigate parallel stream pool contention?
+  Use explicit concurrency strategy.
+  Prefer dedicated executors/structured concurrency for controlled isolation.
+  CompletableFuture with bounded pool.
+
+** Q107: Associativity requirement in reduction — why critical?
+  Parallel combine order varies.
+  Non-associative operations can produce inconsistent results.
+  subtraction reduction gives different outcomes.
+
+** Q108: Identity requirement in reduce — why critical?
+  Defines neutral seed.
+  Wrong identity corrupts empty-case and partial aggregate correctness.
+  sum identity must be 0.
+
+** Q109: Example of nonassociative operation risk?
+  Floating-point subtraction.
+  Different grouping/order in parallel changes numeric outcome.
+  *(a-b)-c != a-(b-c)*
+
+** Q110: How to design custom collector safely?
+  Respect collector contracts.
+  Supplier/accumulator/combiner/finisher must be consistent and parallel-safe.
+  avoid shared mutable singleton container.
+
+** Q111: Collector characteristics UNORDERED meaning?
+  Result independent of encounter order.
+  Allows more optimization freedom in parallel processing.
+  counting frequencies regardless of order.
+
+** Q112: Collector characteristics CONCURRENT meaning?
+  Accumulation can occur concurrently.
+  Requires thread-safe accumulation strategy and compatible source usage.
+  concurrent map-based collector
+
+** Q113: Why immutability in stream outputs for APIs?
+  Prevents accidental mutation bugs.
+  Stabilizes contracts and reduces side-effect surprises downstream.
+  return unmodifiable DTO lists
+
+** Q114: Stream pipelines and domain boundaries?
+  Don’t hide invariants.
+  Critical business rules should remain explicit, not buried in dense lambdas.
+  validate policy before transformation chain
+
+** Q115: How to make streamheavy code observable?
+  Add boundary metrics/logs.
+  Observe stage-level outcomes, not noisy per-element traces.
+  count filtered-out records metric
+
+** Q116: Why perelement logging in streams is dangerous?
+  High overhead/noise.
+  Explodes log volume and obscures useful signals in incidents.
+  debug sampling instead of full logging
+
+** Q117: Strategy for failure localization in long pipelines?
+  Split and name stages.
+  Intermediate checkpoints isolate failing transformation quickly.
+  validate mapped DTO list before final grouping
+
+** Q118: How to handle partialfailure transformation requirements?
+  Model success/failure explicitly.
+  Avoid silent drops; return structured result with errors list.
+  *Result<T, Error>* style wrappers
+
+** Q119: Stream API and clean architecture?
+  Tool, not architecture.
+  Use streams inside use-cases; keep boundaries and contracts explicit.
+  service method pipeline after repository layer call
+
+** Q120: When to push logic to SQL vs Java streams?
+  Push set-heavy work to DB.
+  Databases optimize joins/aggregations; Java streams shape domain responses.
+  SQL group + stream DTO projection
+
+** Q121: How do you prevent hidden O(n²) in streams?
+  Pre-index lookups.
+  Replace repeated list contains/lookups with HashSet/HashMap.
+  build lookup set once before filter.
+
+** Q122: Example of hidden O(n²) stream antipattern?
+  listA.filter(x -> listB.contains(x)).
+  Contains on ArrayList is O(n), repeated for each element.
+  convert listB to set first.
+
+** Q123: Fix for previous antipattern?
+  Use HashSet lookup.
+  Membership becomes average O(1), reducing total complexity to O(n).
+  *Set<T> b = new HashSet<>(listB)*
+
+** Q124: Why collector choice affects memory pressure?
+  Some collectors buffer heavily.
+  grouping/sorting/distinct can retain large intermediate states.
+  large key-cardinality grouping map
+
+** Q125: Stream backpressure support?
+  Not built-in like reactive streams.
+  Java Stream is synchronous pull pipeline, not async bounded-demand protocol.
+  use Reactor/Reactive Streams for backpressure workflows.
+
+** Q126: Streams vs Reactive Streams in one line?
+  Stream = sync pull; Reactive = async push/pull with backpressure.
+  Choose based on workload model (batch transform vs async event flow).
+  Reactor Flux for live event pipeline.
+
+** Q127: Senior guideline for readability threshold?
+  If hard to explain quickly, refactor.
+  Code should be understandable by reviewer without mental gymnastics.
+  split 12-stage chain into named steps
+
+** Q128: How to enforce stream best practices across team?
+  Standards + reviews + examples.
+  Shared conventions reduce stylistic drift and bug patterns.
+  team checklist for side effects and toMap collisions
+
+** Q129: How to reason about ordering guarantees endto-end?
+  Track source + ops + terminal semantics.
+  Some ops preserve order, some don’t; parallel can change behavior.
+  List source + sorted + forEachOrdered
+
+** Q130: Distinct and equals contract governance?
+  Equality must match business identity.
+  Otherwise dedupe/group correctness silently breaks.
+  user identity by normalized email
+
+** Q131: Risks of mutable keys/fields in stream dedupe/grouping?
+  Hash/key instability.
+  Post-mutation may make elements unreachable or mis-grouped.
+  mutating key field after map insertion
+
+** Q132: How to optimize topK queries in Java memory?
+  Use bounded heap.
+  Avoid full O(n log n) sort when only K results needed.
+  PriorityQueue size K
+
+** Q133: Why avoid accidental boxing in hot stream paths?
+  Extra allocations and GC.
+  Primitive streams reduce memory churn and improve throughput.
+  mapToInt sum vs Stream<Integer> reduce
+
+** Q134: How to detect boxing overhead quickly?
+  Profile allocations.
+  Look for wrapper-object churn in numeric pipelines.
+  profiler shows Integer allocations spike
+
+** Q135: When is custom Spliterator relevant?
+  Advanced partition/traversal control.
+  Useful for specialized data sources and parallel optimization scenarios.
+  chunked binary format parser source
+
+** Q136: Why custom Spliterator is rare in business apps?
+  High complexity.
+  Maintenance cost often outweighs gains for standard workloads.
+  prefer standard sources unless proven bottleneck
+
+** Q137: API DTO mapping with streams at scale best practice?
+  Keep mappers pure and avoid remote calls.
+  Preload dependencies and perform in-memory deterministic transforms.
+  map IDs through prebuilt lookup map
+
+** Q138: How to defend against nullheavy legacy inputs in streams?
+  Normalize early.
+  Use explicit null filtering and normalization policy upfront.
+  filter non-null then trim/lowercase
+
+** Q139: Can stream pipeline replace all imperative validation?
+  No.
+  Complex validations with detailed errors may be clearer imperatively.
+  multi-rule form validation reporting all failures
+
+** Q140: How to design interviewworthy stream answers?
+  Explain correctness + complexity + tradeoffs.
+  Syntax alone is junior; reasoning depth shows seniority.
+  mention toMap collision strategy and O().
+
+** Q141: Seniorlevel answer for “Why not parallel here?”
+  Workload mismatch and measured overhead.
+  If IO-bound/small/order-sensitive, parallel harms more than helps.
+  profiling shows worse p99 latency
+
+** Q142: How to combine streams with caching effectively?
+  Cache lookup data before pipeline.
+  Avoid repeated expensive resolution per element.
+  preload map from ID -> entity
+
+** Q143: What is “semantic compression” risk in streams?
+  Too concise can hide meaning.
+  Dense chains may be clever but unreadable for maintenance.
+  nested collectors no one can explain
+
+** Q144: How to reduce semantic compression risk?
+  Name steps by intent.
+  Intermediate variables and helper methods improve domain clarity.
+  *eligibleUsers*, *normalizedEmails*
+
+** Q145: Migration strategy from loops to streams in legacy code?
+  Incremental with tests.
+  Preserve behavior first, then refactor for clarity.
+  replace one transform block at a time
+
+** Q146: How to review stream code in PR effectively?
+  Check correctness and readability.
+  Validate side effects, null handling, order assumptions, complexity, collisions.
+  ask “what happens on empty input?”
+
+** Q147: What production bug class is common with toMap?
+  Duplicate key crash.
+  Missing merge function causes runtime failure on real-world dirty data.
+  duplicate emails from imports
+
+** Q148: What production bug class is common with findFirst().get()?
+  NoSuchElementException.
+  Unsafe Optional unwrapping when stream can be empty.
+  use orElseThrow with clear message
+
+** Q149: What distinguishes senior stream usage?
+  Clear intent and measured decisions.
+  Senior code balances readability, correctness, and performance evidence.
+  chooses loop when simpler, stream when expressive
+
+** Q150: Final senior principle for Streams API?
+  Clarity first, then optimization.
+  Prefer pure, testable pipelines and optimize only with data-backed need.
+  profile before parallelizing
+
+----
+
+#+INCLUDE: "../footer.org"
