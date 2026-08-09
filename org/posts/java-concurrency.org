@@ -1,0 +1,830 @@
+#+TITLE: Java Concurrency API
+#+DATE: 2026-08-09
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Concurrency API
+
+-----
+
+* Foundations (Core Concepts)
+
+** Q1: What is concurrency in Java?
+ Concurrency is running multiple tasks in overlapping time.
+ Tasks may run truly in parallel (multiple cores) or interleaved (time-sliced on one core). In backend services, concurrency improves throughput and responsiveness when handling many requests.
+ A web server handles request A and B at the same time.
+
+** Q2: Concurrency vs parallelism?
+ Concurrency is about coordination; parallelism is about simultaneous execution.
+ You can have concurrency on a single core (interleaving), but true parallelism requires multiple cores. Good designs are usually concurrency-first, then parallelism-aware.
+ Async request handling is concurrent; CPU-heavy image processing across 8 cores is parallel.
+
+** Q3: Process vs thread?
+ Processes are isolated programs; threads are execution units inside one process.
+ Threads share heap memory, which makes communication easy but introduces race conditions if mutable state is shared incorrectly.
+ One JVM process can run many request threads.
+
+** Q4: Why is shared mutable state dangerous?
+ It can cause race conditions and inconsistent results.
+ Multiple threads reading/writing same variable without coordination can interleave unpredictably. Bugs are often rare and hard to reproduce.
+ Two threads increment the same counter and one increment is lost.
+
+** Q5: What is a race condition?
+ A bug where result depends on thread timing/interleaving.
+ If correctness changes based on scheduling order, you likely have unsynchronized shared-state access.
+ *count++* from multiple threads without synchronization.
+
+** Q6: What is thread safety?
+ Code is thread-safe if it behaves correctly under concurrent access.
+ Thread safety is achieved by immutability, confinement, synchronization, lock-free atomics, or thread-safe data structures.
+ *ConcurrentHashMap* supports safe concurrent updates.
+
+** Q7: What is atomicity?
+ Atomicity means operation happens as one indivisible step.
+ Compound operations like read-modify-write are not atomic unless protected by lock/atomic classes.
+ *AtomicInteger.incrementAndGet()* is atomic.
+
+** Q8: What is visibility in concurrency?
+ Visibility means one thread can see another thread’s writes.
+ CPU caches and reordering can hide updates unless memory visibility guarantees are used (*volatile*, locks, atomics).
+ A stop flag without volatile may never be seen as updated.
+
+** Q9: What is ordering/reordering issue?
+ JVM/CPU may reorder instructions for optimization.
+ Without happens-before guarantees, one thread may observe operations in unexpected order.
+ Thread sees object reference before constructor effects are visible.
+
+** Q10: What is Java Memory Model (JMM)?
+ The JMM defines rules for visibility, ordering, and synchronization.
+ It explains when writes by one thread become visible to others and what synchronization constructs establish happens-before.
+ *unlock* happens-before subsequent *lock* on same monitor.
+
+* Thread Basics
+
+** Q11: How do you create a thread?
+ Extend *Thread* or implement *Runnable* (preferred).
+ In real apps, direct thread creation is rare; use executors for pooling and lifecycle control.
+
+#+begin_src java
+Runnable job = () -> System.out.println("work");
+new Thread(job).start();
+#+end_src
+
+** Q12: Why prefer Runnable/Callable over extending Thread?
+ Better separation of task and execution mechanism.
+ Runnable/Callable are composable and work naturally with executors and futures.
+ Submit Callable to *ExecutorService*.
+
+** Q13: Runnable vs Callable?
+ Runnable returns nothing; Callable returns value and may throw checked exception.
+ Use Callable for tasks with result/error propagation.
+ *Callable<Integer> c = () -> 42;*
+
+** Q14: What does Thread.sleep do?
+ Pauses current thread for at least specified time.
+ Sleep does not release locks and should not be used for synchronization logic.
+ Retry backoff delay.
+
+** Q15: What is InterruptedException?
+ Signal that thread was asked to stop blocking/waiting.
+ Interruption is cooperative cancellation; catching interrupt should usually restore interrupt status.
+
+#+begin_src java
+catch (InterruptedException e) {
+  Thread.currentThread().interrupt();
+}
+#+end_src
+
+** Q16: What is thread interruption?
+ A polite cancellation mechanism.
+ Interruption sets a flag; blocking operations may throw InterruptedException. Your code should check/propagate interruption.
+ Worker loop checks *Thread.currentThread().isInterrupted()*.
+
+** Q17: What is daemon thread?
+ Background thread that doesn’t keep JVM alive.
+ Use for low-priority service tasks, not critical business operations requiring graceful completion.
+ Metrics reporter daemon.
+
+** Q18: Why is Thread.stop deprecated?
+ Unsafe termination can corrupt shared state.
+ Forced stop can break invariants by killing code mid-critical section.
+ Prefer interruption + controlled shutdown.
+
+** Q19: What is ThreadLocal?
+ Per-thread isolated variable storage.
+ Useful for context data (request id), but must be cleaned in thread pools to avoid leaks.
+ Set correlation id at request start, clear at end.
+
+** Q20: Common ThreadLocal pitfall?
+ Memory/context leak in pooled threads.
+ Threads are reused; old ThreadLocal values can bleed into next request if not removed.
+ Always call *remove()* in finally block.
+
+* Synchronization Essentials
+
+** Q21: What does synchronized do?
+ Provides mutual exclusion and visibility guarantees.
+ Entering synchronized block acquires monitor lock; exiting releases it and flushes memory changes.
+
+#+begin_src java
+synchronized(lock) { counter++; }
+#+end_src
+
+** Q22: synchronized method vs block?
+ Method locks entire method; block locks only critical section.
+ Block-level locking is usually better for minimizing lock contention.
+ lock only map update, not surrounding computations.
+
+** Q23: What is intrinsic lock (monitor)?
+ Built-in lock every Java object can use.
+ *synchronized(obj)* uses obj monitor; only one thread can hold it at a time.
+ *synchronized(this)* in instance methods.
+
+** Q24: What is happens-before with synchronized?
+ Unlock in one thread happens-before next lock on same monitor.
+ This guarantees visibility of prior writes across threads.
+ Producer writes state in synchronized block; consumer reads after locking same monitor.
+
+** Q25: What is volatile keyword?
+ Ensures visibility and ordering for variable reads/writes.
+ volatile does not provide compound-operation atomicity.
+ *volatile boolean running*.
+
+** Q26: volatile vs synchronized?
+ volatile for visibility-only; synchronized for visibility + atomic critical sections.
+ Use synchronized/locks when multiple state updates must be consistent together.
+ *count++* needs atomic primitive or lock, not just volatile.
+
+** Q27: Why is count++ not thread-safe?
+ It is read-modify-write, not atomic.
+ Two threads can read same old value and write back same incremented value.
+ lost update bug under load.
+
+** Q28: What is double-checked locking caveat?
+ Requires volatile instance field to be correct.
+ Without volatile, partially constructed object may be observed.
+ singleton initialization pattern with volatile.
+
+** Q29: What is lock contention?
+ Many threads waiting for same lock.
+ High contention reduces throughput and increases latency; narrow lock scope helps.
+ single global synchronized method in high-QPS service.
+
+** Q30: What is deadlock?
+ Threads wait forever due to circular lock dependency.
+ Prevent with lock ordering, timeout locks, and simpler locking design.
+ Thread A holds lock1 waiting lock2; Thread B holds lock2 waiting lock1.
+
+* java.util.concurrent (Executors, Futures)
+
+** Q31: Why use ExecutorService instead of new Thread repeatedly?
+ Reuses thread pools and manages lifecycle efficiently.
+ Thread creation is expensive; pools improve throughput and resource control.
+ fixed thread pool for bounded worker count.
+
+** Q32: Common ExecutorService types?
+ Fixed, cached, single-thread, scheduled pools.
+ Choose based on workload and resource constraints, not convenience defaults.
+ fixed pool for CPU tasks, scheduled pool for periodic jobs.
+
+** Q33: submit vs execute?
+ execute for Runnable (no Future), submit returns Future.
+ submit allows result retrieval and exception handling via Future.
+ *Future<Integer> f = pool.submit(callable);*
+
+** Q34: What is Future?
+ Handle to async computation result.
+ Supports cancellation, completion checks, blocking *get*.
+ *f.get(2, TimeUnit.SECONDS)* with timeout.
+
+** Q35: Future.get risk?
+ It blocks caller thread.
+ Unbounded blocking can harm request latency; use timeouts and async composition when possible.
+ avoid blocking servlet thread indefinitely.
+
+** Q36: What is CompletableFuture?
+ Rich async composition API for dependent/non-blocking flows.
+ Allows chaining, combining, exception handling without manual thread orchestration.
+ call serviceA and serviceB concurrently, then combine.
+
+** Q37: thenApply vs thenCompose?
+ thenApply maps value; thenCompose flattens nested futures.
+ Use thenCompose when function already returns CompletableFuture.
+ *future.thenCompose(this::fetchDetailsAsync)*
+
+** Q38: thenCombine use case?
+ Combine two independent async results.
+ Good for parallel data fetch and merge pattern.
+ user profile + permissions -> response DTO.
+
+** Q39: allOf vs anyOf?
+ allOf waits all; anyOf completes on first completion.
+ allOf for full fan-in, anyOf for first-response wins strategy.
+ query multiple mirrors, keep fastest answer.
+
+** Q40: CompletableFuture exception handling options?
+ exceptionally, handle, whenComplete.
+ Choose based on whether you want fallback value, transform error, or side-effect logging.
+ *.exceptionally(ex -> defaultValue)*
+
+* Locks and Synchronizers
+
+** Q41: ReentrantLock vs synchronized?
+ ReentrantLock gives more control (tryLock, fairness, interruptible lock).
+ synchronized is simpler and less error-prone; use lock when advanced features are required.
+ *tryLock(timeout)* to avoid deadlock-like waiting.
+
+** Q42: What is reentrancy?
+ Same thread can acquire same lock multiple times.
+ Prevents self-deadlock in nested calls on same lock.
+ method A (locked) calls method B (same lock) safely.
+
+** Q43: What is ReadWriteLock?
+ Separate read and write locks.
+ Improves throughput when reads are frequent and writes are rare.
+ cache metadata map with many readers.
+
+** Q44: StampedLock purpose?
+ Advanced lock with optimistic reads.
+ Can reduce contention in read-heavy scenarios but is more complex to use correctly.
+ optimistic read validate -> fallback to read lock.
+
+** Q45: What is Semaphore?
+ Controls number of concurrent permits.
+ Useful for rate-limiting access to limited resources.
+ max 20 concurrent calls to external API.
+
+** Q46: CountDownLatch use case?
+ One-time gate waiting for N tasks to finish.
+ Great for coordinating startup phases or parallel test tasks.
+ wait for 3 services to initialize.
+
+** Q47: CyclicBarrier use case?
+ Reusable barrier where threads wait for each other at checkpoints.
+ Good for phased parallel algorithms.
+ simulation step synchronization.
+
+** Q48: Phaser advantage?
+ Flexible multi-phase synchronization with dynamic party registration.
+ More adaptable than CyclicBarrier in evolving participant scenarios.
+ dynamic worker phases in batch processing.
+
+** Q49: Exchanger use case?
+ Two threads swap data objects at synchronization point.
+ Niche but useful for producer-consumer pair handoff patterns.
+ swap full/empty buffers between two threads.
+
+** Q50: What is LockSupport?
+ Low-level park/unpark thread primitive.
+ Foundation tool for custom synchronizers; rarely needed in app-level business code.
+ framework internals (queues, locks) use it.
+
+* Atomic Classes and Lock-Free Basics
+
+** Q51: What is AtomicInteger?
+ Lock-free atomic integer operations.
+ Uses CAS (compare-and-set) to update safely without synchronized in many cases.
+ request counter increment.
+
+** Q52: CAS (compare-and-set) in simple terms?
+ Update only if current value equals expected value.
+ Enables optimistic lock-free retries under contention.
+ if value still 5, set to 6; else retry.
+
+** Q53: AtomicReference use case?
+ Atomic updates for object references.
+ Useful for lock-free state swaps and immutable snapshot replacement.
+ swap configuration snapshot safely.
+
+** Q54: LongAdder vs AtomicLong?
+ LongAdder often better under very high contention.
+ LongAdder spreads updates across cells, reducing CAS hotspots.
+ high-QPS metrics counter.
+
+** Q55: Atomic classes limitations?
+ Great for single-variable atomicity, not multi-variable invariants.
+ If two fields must change consistently together, use locks or immutable aggregate replacement.
+ updating balance and version together.
+
+* Concurrent Collections
+
+** Q56: Why not use HashMap concurrently for writes?
+ It is not thread-safe.
+ Concurrent structural modifications can corrupt state or produce undefined behavior.
+ use ConcurrentHashMap instead.
+
+** Q57: ConcurrentHashMap key strength?
+ High-performance concurrent reads/writes.
+ Uses finer-grained synchronization/CAS strategies, better than global map lock.
+ per-user session cache.
+
+** Q58: CopyOnWriteArrayList use case?
+ Many reads, rare writes.
+ Writes copy whole array, so write-heavy use is expensive.
+ listener registries.
+
+** Q59: BlockingQueue purpose?
+ Thread-safe queue with blocking put/take.
+ Core building block for producer-consumer systems with backpressure behavior.
+ worker thread pool job queue.
+
+** Q60: ArrayBlockingQueue vs LinkedBlockingQueue?
+ ArrayBlockingQueue bounded fixed capacity; LinkedBlockingQueue optionally bounded linked nodes.
+ Bounded queues are safer for memory control in production.
+ bounded queue to prevent overload OOM.
+
+* Thread Pools and Tuning
+
+** Q61: Why fixed-size pools can be safer than unbounded cached pools?
+ Predictable resource usage.
+ Unbounded thread growth can collapse system under spikes.
+ fixed pool + bounded queue for controlled degradation.
+
+** Q62: CPU-bound vs I/O-bound pool sizing?
+ CPU-bound near core count; I/O-bound can be larger.
+ CPU tasks compete for cores; I/O tasks wait frequently so more threads can be useful.
+ CPU pool = N or N+1; I/O pool depends on wait ratio.
+
+** Q63: Why bounded queue in ThreadPoolExecutor?
+ Prevents infinite task accumulation.
+ Bounded queues force backpressure/rejection instead of memory blow-up.
+ queue capacity 1000 with rejection policy.
+
+** Q64: RejectedExecutionHandler role?
+ Defines behavior when pool/queue is saturated.
+ Policy choice affects resilience and user-facing failure mode.
+ CallerRunsPolicy slows producer naturally.
+
+** Q65: Why monitor pool metrics?
+ To detect saturation before incidents.
+ Active threads, queue length, task wait time indicate capacity issues.
+ alert if queue > threshold for sustained period.
+
+* CompletableFuture Patterns (Backend Practical)
+
+** Q66: Fan-out/fan-in pattern?
+ Start many async tasks, then combine results.
+ Reduces total latency when dependencies are independent.
+ fetch profile, orders, recommendations concurrently.
+
+** Q67: Timeout strategy with futures?
+ Use explicit timeout and fallback.
+ Avoids hung dependencies blocking end-user response.
+ completeOnTimeout(default, 200ms)
+
+** Q68: Fallback pattern?
+ Return degraded but valid response on failure.
+ Improves resilience and availability during partial outages.
+ recommendation service fails -> return empty recommendations.
+
+** Q69: Bulkhead idea in concurrency?
+ Isolate resources per dependency.
+ Prevent one failing dependency from consuming all threads.
+ separate executors for payment vs analytics calls.
+
+** Q70: Why avoid blocking join/get deep in async chain?
+ It defeats non-blocking composition.
+ Blocking can waste threads and increase tail latency.
+ prefer thenCompose/thenCombine until boundary.
+
+* Common Problems and Debugging
+
+** Q71: What is starvation?
+ Some threads never get CPU/lock access.
+ Unfair scheduling or lock contention can starve lower-priority tasks.
+ long-held lock blocks short tasks repeatedly.
+
+** Q72: Livelock vs deadlock?
+ Deadlock = stuck waiting; livelock = active but no progress.
+ Livelock threads keep reacting to each other endlessly.
+ both threads repeatedly back off and retry forever.
+
+** Q73: How to detect deadlock?
+ Thread dumps and monitoring tools.
+ JVM tools show blocked threads and lock ownership cycles.
+ *jstack* output deadlock section.
+
+** Q74: Why are concurrency bugs hard to reproduce?
+ Timing-dependent and nondeterministic.
+ Small scheduling differences can hide/expose bugs randomly.
+ bug appears only under production load.
+
+** Q75: Basic strategy to reduce concurrency bugs?
+ Minimize shared mutable state.
+ Prefer immutability, message passing, confined state, and simple synchronization policies.
+ immutable request context passed between methods.
+
+* Virtual Threads (Java 21+)
+
+** Q76: What are virtual threads?
+ Lightweight threads managed by JVM.
+ They make thread-per-task model scalable for high-concurrency I/O workloads.
+ thousands of blocking request handlers without huge OS-thread cost.
+
+** Q77: Virtual threads best use case?
+ I/O-bound concurrent tasks.
+ They simplify async-style code while scaling much better than platform threads for blocking I/O.
+ many DB/HTTP calls with straightforward code.
+
+** Q78: Are virtual threads always faster?
+ Not always.
+ CPU-bound workloads still limited by cores; benefits are strongest in blocking I/O-heavy systems.
+ heavy encryption loop won’t speed up from virtual threads alone.
+
+** Q79: Any caution with synchronized and virtual threads?
+ Yes, long blocking in synchronized regions can reduce scalability.
+ Pinning/locking patterns can hurt virtual-thread advantages if poorly designed.
+ avoid long I/O inside synchronized blocks.
+
+** Q80: Should virtual threads replace all executors immediately?
+ Gradual adoption is better.
+ Evaluate libraries, blocking behavior, observability, and operational patterns first.
+ migrate specific I/O-heavy modules first.
+
+* Design Best Practices
+
+** Q81: First concurrency design rule?
+ Keep shared state minimal.
+ Every shared mutable variable is a potential bug point and coordination cost.
+ prefer immutable DTO pipelines.
+
+** Q82: Why immutability helps concurrency?
+ Immutable objects are naturally thread-safe.
+ No writes means no race on object state.
+ immutable config snapshot shared across threads.
+
+** Q83: Thread confinement meaning?
+ State is used by only one thread.
+ Eliminates synchronization need for that state.
+ local variables inside request handler.
+
+** Q84: What is safe publication?
+ Making object visible to other threads with correct memory guarantees.
+ Publish through final fields, volatile refs, synchronized blocks, or concurrent collections.
+ initialize immutable object then assign to volatile field.
+
+** Q85: Why avoid over-synchronization?
+ It hurts throughput and can increase latency.
+ Locking everything serializes work; synchronize only critical sections.
+ compute outside lock, update shared state inside lock.
+
+* Interview-Focused Quick Deep Q&A
+
+** Q86: synchronized or ReentrantLock — which first?
+ synchronized first for simplicity.
+ Switch to ReentrantLock only if you need advanced features (tryLock, interruptible lock, fairness).
+ deadlock-avoidance with tryLock timeout.
+
+** Q87: AtomicInteger or synchronized counter?
+ AtomicInteger for simple counter.
+ For single numeric variable under contention, atomics are efficient and clear.
+ request count metric.
+
+** Q88: ConcurrentHashMap or Collections.synchronizedMap?
+ ConcurrentHashMap for most concurrent workloads.
+ CHM scales better due to finer concurrency control.
+ high-read/write cache map.
+
+** Q89: ExecutorService shutdown best practice?
+ graceful shutdown then forced fallback.
+ *shutdown* -> awaitTermination -> *shutdownNow* if needed, with logging.
+ app stop hook.
+
+** Q90: Why always consider timeout in concurrent calls?
+ Prevents resource exhaustion and hanging flows.
+ Timeouts are core for resilience in distributed systems.
+ fail fast on slow dependency.
+
+* Scenario-Based Practical Q&A
+
+** Q91: Scenario: shared in-memory cache updated by many threads.
+ Use ConcurrentHashMap + atomic update methods.
+ Methods like *compute*, *merge*, *putIfAbsent* reduce race-prone check-then-act logic.
+ *map.compute(key, (k,v) -> newVal)*
+
+** Q92: Scenario: limit 50 concurrent outbound API calls.
+ Use Semaphore(50).
+ Acquire permit before call, release in finally; ensures bounded concurrency.
+ protects external dependency and your own resources.
+
+** Q93: Scenario: process jobs with backpressure.
+ Use bounded BlockingQueue + worker pool.
+ Prevents unlimited buffering and stabilizes system under burst load.
+ ArrayBlockingQueue capacity 500.
+
+** Q94: Scenario: fastest response among 3 providers.
+ Use CompletableFuture.anyOf with timeout.
+ Return first successful response, cancel/ignore slower tasks.
+ mirror endpoints race strategy.
+
+** Q95: Scenario: high-contention metric increments.
+ Use LongAdder.
+ Better throughput than AtomicLong under heavy concurrent increments.
+ per-endpoint request counters.
+
+* Testing Concurrency
+
+** Q96: Why normal unit tests miss concurrency bugs?
+ They often run single-threaded and deterministic.
+ Concurrency issues require stress/interleaving scenarios to surface.
+ race appears only under parallel test harness.
+
+** Q97: How to test race-prone code?
+ Run many iterations with concurrent workers.
+ Use latches/barriers to align start and increase collision probability.
+ 100 threads increment same counter test.
+
+** Q98: Why use CountDownLatch in tests?
+ Coordinate simultaneous start/finish.
+ Improves reproducibility of contention windows.
+ wait all workers complete before assertions.
+
+** Q99: What to assert in concurrency tests?
+ Correct final state + no deadlock/timeouts.
+ Verify invariants, progress, and bounded completion time.
+ total processed count equals produced count.
+
+** Q100: Concurrency testing golden rule?
+ Test behavior, not exact scheduling order.
+ Thread scheduling is nondeterministic; assert invariants and eventual correctness.
+ set equality instead of strict order unless order guaranteed.
+
+* Advanced Topics
+
+** Q101: What is false sharing?
+ Unrelated variables on same CPU cache line causing contention.
+ High-frequency writes by different threads can invalidate each other’s cache lines.
+ padded counters reduce false sharing in extreme performance code.
+
+** Q102: Why lock striping helps?
+ Splits one hot lock into many smaller locks.
+ Reduces contention by allowing parallel access to different stripes.
+ segmented map/bucket lock model.
+
+** Q103: What is optimistic locking conceptually?
+ Assume low conflict, retry on conflict.
+ Used in CAS and versioned updates to avoid heavy locking.
+ atomic compareAndSet retry loop.
+
+** Q104: Priority inversion in brief?
+ High-priority thread waits on lock held by lower-priority thread.
+ Can cause latency spikes in priority-sensitive systems.
+ scheduler/locking interplay in realtime-like workloads.
+
+** Q105: Why avoid blocking I/O inside synchronized block?
+ Lock held too long.
+ Other threads queue behind lock, causing contention and throughput collapse.
+ network call while holding global lock.
+
+* Performance and Operational Guidance
+
+** Q106: Throughput vs latency tradeoff?
+ More concurrency can increase throughput but may hurt latency.
+ Oversubscription causes context-switch overhead and queueing delays.
+ too many worker threads increase p99 latency.
+
+** Q107: Why p99 latency matters in concurrency?
+ Tail latency reflects user pain under contention.
+ Average latency can look fine while worst-case requests are slow.
+ saturation during traffic spikes.
+
+** Q108: Key concurrency metrics to monitor?
+ active threads, queue depth, rejection rate, lock wait, task time.
+ These reveal saturation, contention, and mis-sized pools early.
+ alert on sustained queue growth.
+
+** Q109: Why bounded resources are resilience tools?
+ They contain failures.
+ Bounds (threads, queue, permits) prevent cascading collapse.
+ bulkhead executor per dependency.
+
+** Q110: Backpressure in executor systems?
+ Slow producers when consumers are saturated.
+ Rejections/caller-runs/queue limits create pressure feedback.
+ CallerRunsPolicy throttles submitter naturally.
+
+* Architecture-Level Q&A
+
+** Q111: Thread-per-request still valid?
+ Yes, especially with virtual threads.
+ Simpler programming model can scale well for blocking I/O with modern JVM capabilities.
+ straightforward servlet-like handlers on virtual threads.
+
+** Q112: Event-loop model vs thread-per-task?
+ Different tradeoffs, both valid.
+ Event loop minimizes thread count; thread-per-task simplifies imperative code.
+ reactive stack vs virtual-thread stack.
+
+** Q113: Why isolate executors per critical dependency?
+ Prevent cross-contamination.
+ One slow dependency should not starve unrelated business paths.
+ dedicated pool for payment provider calls.
+
+** Q114: What is graceful degradation in concurrency context?
+ Serve partial/fallback response under load.
+ Better to degrade non-critical features than fail whole request.
+ timeout recommendations, still return core profile.
+
+** Q115: Why cancellation support is essential?
+ Avoid wasting resources on useless work.
+ If client disconnects or deadline passes, cancel downstream tasks promptly.
+ cancel futures when parent request times out.
+
+* Security and Reliability Aspects
+
+** Q116: Concurrency and security relation?
+ Race bugs can become security bugs.
+ Timing windows may bypass checks or corrupt authorization-sensitive state.
+ check-then-act on permissions without atomicity.
+
+** Q117: Why idempotency matters with concurrent retries?
+ Prevent duplicate side effects.
+ Retried concurrent operations can create double charges/orders without idempotency keys.
+ payment request idempotency token.
+
+** Q118: Why transactional boundaries matter with concurrency?
+ Preserve consistency under parallel operations.
+ DB transactions coordinate concurrent writes safely beyond in-memory locking.
+ optimistic locking version column in JPA.
+
+** Q119: In-memory lock enough in distributed systems?
+ No.
+ JVM lock protects only one instance; cross-instance coordination needs DB/distributed primitives.
+ distributed scheduler lock via database row/version.
+
+** Q120: Retry + timeout + circuit breaker relation?
+ Core resilience trio.
+ Timeout bounds wait, retry handles transient errors, breaker prevents overload spirals.
+ outbound HTTP dependency strategy.
+
+* Code Quality and Readability
+
+** Q121: Why small critical sections?
+ Reduce lock hold time.
+ Less time inside lock means less contention and better throughput.
+ build object outside lock, publish inside lock.
+
+** Q122: Should you lock on this?
+ Usually avoid in public classes.
+ External code could lock same monitor and create hidden coupling/deadlocks.
+ use private final lock object.
+
+** Q123: Naming convention for lock objects?
+ Use clear private lock names.
+ Improves maintainability and avoids accidental lock misuse.
+ *private final Object stateLock = new Object();*
+
+** Q124: Document thread-safety contracts?
+ Yes, explicitly.
+ Callers must know if class is immutable, thread-safe, or requires external synchronization.
+ Javadoc thread-safety section.
+
+** Q125: Why prefer high-level concurrency utilities?
+ Safer and clearer.
+ Reinventing low-level synchronization is error-prone.
+ BlockingQueue over manual wait/notify.
+
+* wait/notify and Legacy Interop
+
+** Q126: What are wait/notify used for?
+ Low-level thread coordination on monitor.
+ Powerful but easy to misuse; prefer modern concurrent utilities when possible.
+ producer-consumer with shared lock condition.
+
+** Q127: Why wait must be in loop?
+ To handle spurious wakeups and re-check condition.
+ Wakeup does not guarantee condition is true.
+
+#+begin_src java
+synchronized(lock){
+  while(!ready){ lock.wait(); }
+}
+#+end_src
+
+** Q128: notify vs notifyAll?
+ notify wakes one waiter; notifyAll wakes all waiters.
+ notifyAll is safer when multiple conditions/roles exist.
+ mixed producer/consumer waiters on same monitor.
+
+** Q129: Why wait/notify code is hard?
+ Subtle ordering and condition bugs.
+ Missed signals, wrong monitor, and timing races are common.
+ notify before waiter starts waiting causes stuck thread.
+
+** Q130: Modern alternative to wait/notify?
+ BlockingQueue, Condition, Latch, Semaphore, CompletableFuture.
+ Higher-level APIs encode patterns safely and clearly.
+ queue-based producer-consumer.
+
+* Virtual Threads + Structured Concurrency Mindset
+
+** Q131: What is structured concurrency idea (conceptually)?
+ Treat related concurrent tasks as one scoped unit.
+ Improves cancellation, error propagation, and lifecycle clarity.
+ spawn child tasks for one request, cancel all on parent failure.
+
+** Q132: Why scope-based task management helps?
+ Prevents orphan/background leaks.
+ Ensures child tasks complete/cancel with request lifecycle.
+ request timeout cancels all sub-calls.
+
+** Q133: Virtual threads and blocking calls?
+ Blocking is acceptable and often simpler.
+ Virtual threads make blocking style scalable for I/O-heavy code.
+ synchronous-looking service code handling many concurrent requests.
+
+** Q134: Do virtual threads remove need for thread safety?
+ No.
+ Shared mutable state rules remain unchanged.
+ race condition still race condition on virtual threads.
+
+** Q135: Migration tip to virtual threads?
+ Start with isolated I/O paths.
+ Measure throughput/latency and observe locking hotspots before broad rollout.
+ migrate outbound HTTP module first.
+
+* Senior Interview Deep Q&A
+
+** Q136: How would you design a high-throughput request handler?
+ Bounded pools/queues, immutable data, minimal locking.
+ Add timeouts, backpressure, cancellation, and per-dependency isolation for resilience.
+ bulkhead executors + CompletableFuture fan-out with deadlines.
+
+** Q137: How do you reason about correctness under concurrency?
+ Define invariants and synchronization boundaries.
+ Identify shared state, choose visibility/atomicity mechanisms, and verify happens-before relationships.
+ invariant: balance never negative.
+
+** Q138: How do you choose between lock and lock-free?
+ Choose simplest correct approach first.
+ Lock-free can scale but increases complexity; use atomics for simple cases, locks for compound invariants.
+ AtomicLong for counter, lock for multi-field consistency.
+
+** Q139: How do you debug production thread contention?
+ Use thread dumps + metrics + profiling.
+ Correlate blocked states, lock owners, queue growth, and latency spikes.
+ frequent BLOCKED threads on single monitor.
+
+** Q140: Concurrency architecture anti-pattern to avoid?
+ Unbounded everything.
+ Unbounded threads/queues/retries cause cascading failure and OOM under stress.
+ cached pool + infinite queue + no timeout.
+
+* Final Mastery Checklist
+
+** Q141: Can you explain race condition, visibility, and atomicity clearly?
+ If yes, fundamentals are strong.
+ These three concepts explain most concurrency bugs and fix strategies.
+ lost update + stale read + non-atomic compound op.
+
+** Q142: Can you pick correct primitive for each need?
+ If yes, design maturity is good.
+ volatile, synchronized, lock, atomics, queues each solve different problems.
+ flag -> volatile, counter -> AtomicLong, workflow -> queue.
+
+** Q143: Can you design bounded resilient async flows?
+ If yes, production readiness increases.
+ bounded resources + timeouts + cancellation prevent outages from amplifying.
+ bounded executor + fallback policy.
+
+** Q144: Can you justify thread pool sizing choices?
+ If yes, performance understanding is practical.
+ Tie sizing to workload type and measured utilization, not guesses.
+ CPU-bound near cores, I/O-bound by wait ratio.
+
+** Q145: Can you identify deadlock risks in review?
+ If yes, reliability improves.
+ Look for inconsistent lock ordering and nested cross-lock calls.
+ enforce global lock order policy.
+
+** Q146: Can you explain CompletableFuture composition patterns?
+ If yes, async fluency is strong.
+ thenCompose/thenCombine/allOf enable clear, maintainable concurrency orchestration.
+ parallel profile + permissions + timeout fallback.
+
+** Q147: Can you keep concurrent code readable?
+ If yes, team velocity stays high.
+ Small critical sections, clear contracts, and high-level utilities reduce bug surface.
+ helper methods per concurrency concern.
+
+** Q148: Can you test concurrency beyond happy path?
+ If yes, confidence is real.
+ Stress, timing, cancellation, and timeout tests expose hidden races.
+ repeated parallel test harness with latches.
+
+** Q149: Can you operate concurrency safely in production?
+ If yes, SRE alignment is strong.
+ Monitor saturation metrics, tune bounds, and plan graceful degradation.
+ queue-depth alerts + autoscaling signals.
+
+** Q150: Final principle for Java Concurrency API?
+ Correctness first, then performance.
+ A fast wrong concurrent program is still wrong; build safe foundations, then optimize with evidence.
+ start simple, profile, iterate.
+
+-----
+
+#+INCLUDE: "../footer.org"
