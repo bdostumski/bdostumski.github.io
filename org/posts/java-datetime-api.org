@@ -13,10 +13,10 @@
 * Foundations
 
 ** Q1: What is the modern Java Date/Time API?
- A set of immutable, thread-safe classes in `java.time` for handling dates, times, timestamps, durations, and time zones.
+ A set of immutable, thread-safe classes in *java.time* for handling dates, times, timestamps, durations, and time zones.
 
-** Q2: Why was `java.time` introduced?
- Old APIs (`Date`, `Calendar`) were mutable, confusing, and error-prone; `java.time` is cleaner and safer.
+** Q2: Why was *java.time* introduced?
+ Old APIs (*Date*, *Calendar*) were mutable, confusing, and error-prone; *java.time* is cleaner and safer.
 
 ** Q3: What are the biggest benefits of java.time?
 
@@ -30,27 +30,27 @@
  Java 8.
 
 ** Q5: What is ISO-8601?
- A standard date-time format, e.g. `2026-08-08T14:30:00Z`.
+ A standard date-time format, e.g. *2026-08-08T14:30:00Z*.
 
 * Core Types You Must Know
 
-** Q6: What is `LocalDate`?
+** Q6: What is *LocalDate*?
  Date only (year-month-day), no time, no timezone.
 
-** Q7: What is `LocalTime`?
+** Q7: What is *LocalTime*?
  Time only (hour-minute-second-nano), no date, no timezone.
 
-** Q8: What is `LocalDateTime`?
+** Q8: What is *LocalDateTime*?
  Date + time, but still no timezone/offset.
 
-** Q9: What is `Instant`?
+** Q9: What is *Instant*?
  A machine timestamp (point on UTC timeline), ideal for storage/event times.
 
-** Q10: What is `ZonedDateTime`?
- Date-time with full timezone rules (e.g., `Europe/Warsaw`).
+** Q10: What is *ZonedDateTime*?
+ Date-time with full timezone rules (e.g., *Europe/Warsaw*).
 
-** Q11: What is `OffsetDateTime`?
- Date-time with numeric UTC offset (e.g., `+02:00`) but not full zone rules.
+** Q11: What is *OffsetDateTime*?
+ Date-time with numeric UTC offset (e.g., *+02:00*) but not full zone rules.
 
 ** Q12: Instant vs LocalDateTime quick difference?
 
@@ -59,20 +59,20 @@
 
 * Time Zones and Offsets
 
-** Q13: What is `ZoneId`?
- Named region-based timezone (e.g., `America/New_York`) with DST rules.
+** Q13: What is *ZoneId*?
+ Named region-based timezone (e.g., *America/New_York*) with DST rules.
 
-** Q14: What is `ZoneOffset`?
- Fixed offset from UTC (e.g., `+01:00`) without DST behavior.
+** Q14: What is *ZoneOffset*?
+ Fixed offset from UTC (e.g., *+01:00*) without DST behavior.
 
 ** Q15: Why prefer ZoneId over raw offsets for user-facing time?
  ZoneId handles daylight saving and historical timezone rule changes correctly.
 
-** Q16: What does `Z` mean in timestamps?
- UTC (`+00:00`) zone designator.
+** Q16: What does *Z* mean in timestamps?
+ UTC (*+00:00*) zone designator.
 
 ** Q17: Backend best practice for timezone storage?
- Persist timestamps in UTC (`Instant`), convert to user zone when displaying.
+ Persist timestamps in UTC (*Instant*), convert to user zone when displaying.
 
 * Creating Date/Time Values
 
@@ -130,17 +130,17 @@ DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 String s = LocalDate.now().format(f);
 #+END_SRC
 
-** Q27: Why be careful with `mm` vs `MM`?
+** Q27: Why be careful with *mm* vs *MM*?
 
-- `MM` = month
-- `mm` = minute
+- *MM* = month
+- *mm* = minute
 This is a very common bug source.
 
 ** Q28: Common safe standard formatters?
 
-- `DateTimeFormatter.ISO_LOCAL_DATE`
-- `DateTimeFormatter.ISO_INSTANT`
-- `DateTimeFormatter.ISO_OFFSET_DATE_TIME`
+- *DateTimeFormatter.ISO_LOCAL_DATE*
+- *DateTimeFormatter.ISO_INSTANT*
+- *DateTimeFormatter.ISO_OFFSET_DATE_TIME*
 
 * Date/Time Arithmetic
 
@@ -170,10 +170,10 @@ LocalDateTime later = dt.plusHours(3);
 
 * Duration and Period
 
-** Q34: What is `Duration`?
+** Q34: What is *Duration*?
  Time-based amount (seconds/nanos), ideal for machine time differences.
 
-** Q35: What is `Period`?
+** Q35: What is *Period*?
  Date-based amount (years/months/days), ideal for calendar math.
 
 ** Q36: Example Duration between instants?
@@ -195,12 +195,12 @@ Period p = Period.between(startDate, endDate);
 
 ** Q39: How to compare two dates?
 
-- `isBefore`
-- `isAfter`
-- `isEqual`
+- *isBefore*
+- *isAfter*
+- *isEqual*
 
 ** Q40: How to compare instants safely across zones?
- Convert both to `Instant` and compare timeline points.
+ Convert both to *Instant* and compare timeline points.
 
 ** Q41: Can LocalDateTime comparisons be misleading?
  Yes, if values come from different real zones but zone info is missing.
@@ -243,17 +243,17 @@ Instant i = legacyDate.toInstant();
  Some local times occur twice with different offsets.
 
 ** Q49: How to handle DST correctly?
- Use `ZonedDateTime` + `ZoneId`; avoid manual offset math.
+ Use *ZonedDateTime* + *ZoneId*; avoid manual offset math.
 
 ** Q50: Should backend do manual timezone arithmetic?
  No, rely on java.time zone rules.
 
 * Useful Enums and Helpers
 
-** Q51: What is `DayOfWeek`?
+** Q51: What is *DayOfWeek*?
  Enum representing Monday-Sunday with useful methods.
 
-** Q52: What is `Month` enum useful for?
+** Q52: What is *Month* enum useful for?
  Type-safe month handling and readable code.
 
 ** Q53: How to get start of day?
@@ -263,12 +263,12 @@ LocalDateTime start = date.atStartOfDay();
 #+END_SRC
 
 ** Q54: How to get end-of-day safely?
- Prefer half-open ranges: `[startOfDay, nextStartOfDay)` to avoid nano precision issues.
+ Prefer half-open ranges: *[startOfDay, nextStartOfDay)* to avoid nano precision issues.
 
 * Query Ranges in Backend
 
 ** Q55: Recommended date range style in queries?
- Half-open interval: `timestamp >= start AND timestamp < end`.
+ Half-open interval: *timestamp >= start AND timestamp < end*.
 
 ** Q56: Why half-open intervals are better?
  They avoid overlap and boundary precision bugs.
@@ -283,13 +283,13 @@ Instant to = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
 * Serialization / JSON APIs
 
 ** Q58: Which type is best to expose in APIs for exact event time?
- `Instant` or `OffsetDateTime` in ISO-8601 format.
+ *Instant* or *OffsetDateTime* in ISO-8601 format.
 
 ** Q59: Why avoid raw LocalDateTime in distributed APIs?
  It has no timezone/offset context, causing ambiguity.
 
 ** Q60: Jackson module needed for java.time?
- `JavaTimeModule`.
+ *JavaTimeModule*.
 
 * Validation and Business Rules
 
@@ -337,16 +337,16 @@ int years = Period.between(birthDate, LocalDate.now()).getYears();
  Store UTC, convert at boundaries.
 
 ** Q71: Best type for audit timestamps?
- `Instant`.
+ *Instant*.
 
 ** Q72: Best type for birthday?
- `LocalDate`.
+ *LocalDate*.
 
 ** Q73: Best type for “meeting at user local time zone”?
- `ZonedDateTime` (or LocalDateTime + ZoneId together).
+ *ZonedDateTime* (or LocalDateTime + ZoneId together).
 
 ** Q74: Period or Duration for SLA milliseconds?
- `Duration`.
+ *Duration*.
 
 ** Q75: Why java.time is thread-safe?
  Core types are immutable.
@@ -354,19 +354,19 @@ int years = Period.between(birthDate, LocalDate.now()).getYears();
 * Practical Scenarios
 
 ** Q76: Scenario: user submits “2026-12-01” for birthday
- Parse to `LocalDate`, not Instant.
+ Parse to *LocalDate*, not Instant.
 
 ** Q77: Scenario: log event creation moment
- Capture `Instant.now()`.
+ Capture *Instant.now()*.
 
 ** Q78: Scenario: show event time for Tokyo user
- Convert stored Instant with `ZoneId.of("Asia/Tokyo")`.
+ Convert stored Instant with *ZoneId.of("Asia/Tokyo")*.
 
 ** Q79: Scenario: query all orders on a date in UTC DB
  Use half-open UTC range from start-of-day to next start-of-day.
 
 ** Q80: Scenario: recurring monthly billing date
- Use `LocalDate` plus month arithmetic with business rules for month-end handling.
+ Use *LocalDate* plus month arithmetic with business rules for month-end handling.
 
 * Mini Code Q&A
 
@@ -403,11 +403,11 @@ LocalDate last = LocalDate.now().with(java.time.temporal.TemporalAdjusters.lastD
 
 * Testing Date/Time Logic
 
-** Q86: Why is `Clock` useful in tests?
+** Q86: Why is *Clock* useful in tests?
  It allows deterministic “current time” instead of flaky real-time dependence.
 
 ** Q87: How to make time deterministic in service code?
- Inject `Clock` and use `Instant.now(clock)`.
+ Inject *Clock* and use *Instant.now(clock)*.
 
 ** Q88: What should date-time tests include?
  Boundary moments, timezone conversion, DST transitions, end-of-month/year cases.
