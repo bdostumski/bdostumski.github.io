@@ -1,0 +1,547 @@
+#+title: Java JDBC API
+#+date: 2026-09-08
+#+TAGS: Java
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java JDBC API
+
+-----
+
+* Beginner
+
+** Q1: What is JDBC?
+JDBQC (Java Database Connectivity) is a standard Java API for connecting to relational databases, executing SQL, and processing results.
+
+** Q2: Why do we need JDBC?
+It provides a vendor-neutral way to access databases from Java applications.
+
+** Q3: Which package contains core JDBC interfaces?
+Most core interfaces are in =java.sql= (and additional features in =javax.sql=).
+
+** Q4: What is a JDBC driver?
+A JDBC driver is a vendor-provided implementation that allows Java applications to communicate with a specific database.
+
+** Q5: What are common JDBC interfaces?
+- =Driver=
+- =Connection=
+- =Statement=
+- =PreparedStatement=
+- =CallableStatement=
+- =ResultSet=
+- =DatabaseMetaData=
+- =ResultSetMetaData=
+
+** Q6: What is a JDBC URL?
+A connection string that tells the driver how to connect, e.g. =jdbc:postgresql://localhost:5432/appdb=.
+
+** Q7: What is =DriverManager=?
+A class that manages JDBC drivers and creates connections via =getConnection()=.
+
+** Q8: How do you open a JDBC connection?
+By calling =DriverManager.getConnection(url, user, password)= (or via a =DataSource=).
+
+** Q9: Is Class.forName(...) still required?
+Usually not for modern drivers (auto-loading works), but it may be needed in legacy setups.
+
+** Q10: What is a =Statement=?
+Used to execute static SQL without parameters.
+
+** Q11: What is a =PreparedStatement=?
+A precompiled SQL statement with placeholders (= ? =) for parameters.
+
+** Q12: Why is =PreparedStatement= preferred over =Statement=?
+Better performance for repeated execution and safer against SQL injection.
+
+** Q13: What is a =CallableStatement=?
+Used to call stored procedures/functions in the database.
+
+** Q14: What is a =ResultSet=?
+A cursor-like object representing query results row by row.
+
+** Q15: How do you iterate through a =ResultSet=?
+Use a loop with =while (rs.next()) { ... }=.
+
+** Q16: What does =executeQuery()= do?
+Executes SELECT SQL and returns a =ResultSet=.
+
+** Q17: What does =executeUpdate()= do?
+Executes INSERT/UPDATE/DELETE (and DDL in many drivers) and returns affected row count.
+
+** Q18: What does =execute()= do?
+Runs any SQL and returns =true= if first result is a =ResultSet=, otherwise =false=.
+
+** Q19: What is SQL injection?
+A security vulnerability caused by unsafe string concatenation in SQL.
+
+** Q20: How does JDBC help prevent SQL injection?
+Using =PreparedStatement= parameters instead of concatenating user input.
+
+** Q21: What is a placeholder in SQL?
+The =?= symbol in prepared SQL representing a parameter value.
+
+** Q22: How do you set an int parameter?
+Use =preparedStatement.setInt(index, value)=.
+
+** Q23: How do you set a string parameter?
+Use =preparedStatement.setString(index, value)=.
+
+** Q24: Are JDBC parameter indices 0-based or 1-based?
+They are 1-based.
+
+** Q25: How do you read a string column?
+Use =rs.getString("column_name")= or =rs.getString(columnIndex)=.
+
+** Q26: How do you read an integer column?
+Use =rs.getInt(...)=: Check =rs.wasNull()= if null handling matters.
+
+** Q27: What is =rs.wasNull()= used for?
+To determine whether the last read column value was SQL NULL.
+
+** Q28: What is try-with-resources?
+A Java construct that automatically closes resources implementing =AutoCloseable=.
+
+** Q29: Why is try-with-resources important in JDBC?
+It prevents connection/statement/result set leaks.
+
+** Q30: What closes first in try-with-resources?
+Resources close in reverse order of declaration.
+
+** Q31: Does closing Connection close Statements?
+Yes, typically associated statements are closed as well.
+
+** Q32: Does closing Statement close ResultSet?
+Yes, its current ResultSet is usually closed.
+
+** Q33: What is SQLException?
+The standard JDBC exception for database access errors.
+
+** Q34: What useful methods does SQLException provide?
+- =getMessage()=
+- =getSQLState()=
+- =getErrorCode()=
+- =getNextException()=
+
+** Q35: What is SQLState?
+A standardized 5-character error code category for SQL errors.
+
+** Q36: What is the difference between SQLState and vendor error code?
+SQLState is standardized; vendor code is database-specific.
+
+** Q37: How do you perform an INSERT in JDBC?
+Create prepared SQL, bind parameters, executeUpdate, optionally fetch generated keys.
+
+** Q38: How do you fetch generated keys?
+Create statement with =RETURN_GENERATED_KEYS= and call =getGeneratedKeys()=.
+
+** Q39: Can you run DDL with JDBC?
+Yes, e.g. CREATE/ALTER/DROP via =executeUpdate()= or =execute()=.
+
+** Q40: What is auto-commit mode?
+When true, each SQL statement is committed automatically after execution.
+
+** Q41: Is auto-commit enabled by default?
+Usually yes, for most JDBC drivers.
+
+** Q42: How do you disable auto-commit?
+Call =connection.setAutoCommit(false)=.
+
+** Q43: How do you commit a transaction?
+Call =connection.commit()=.
+
+** Q44: How do you rollback a transaction?
+Call =connection.rollback()=.
+
+** Q45: When should you rollback?
+On exceptions or business validation failures during transactional work.
+
+** Q46: What is transaction atomicity in JDBC context?
+All operations in a transaction succeed together or fail together.
+
+** Q47: What are basic transaction isolation levels in JDBC?
+- READ_UNCOMMITTED
+- READ_COMMITTED
+- REPEATABLE_READ
+- SERIALIZABLE
+
+** Q48: How do you set isolation level?
+Use =connection.setTransactionIsolation(Connection.TRANSACTION_...)=.
+
+** Q49: What is a DataSource?
+A factory for connections, often supporting pooling and external configuration.
+
+** Q50: Why prefer DataSource over DriverManager in apps?
+Better integration, pooling support, and cleaner configuration.
+
+** Q51: What is connection pooling?
+Reusing existing DB connections to avoid expensive connection creation.
+
+** Q52: What happens if you open too many connections?
+You can exhaust DB/server resources and degrade performance.
+
+** Q53: Can one Connection be shared safely across threads?
+Generally no; treat JDBC objects as not thread-safe unless documented otherwise.
+
+** Q54: What is JDBC metadata?
+Information about DB/database objects via =DatabaseMetaData= and =ResultSetMetaData=.
+
+** Q55: What is ResultSetMetaData used for?
+Inspecting returned columns dynamically (name, type, count, etc.).
+
+* Intermediate
+
+** Q56: What is the difference between =setNull()= and passing Java null?
+Use =setNull(index, sqlType)= when SQL type must be explicit.
+
+** Q57: Why can null handling be tricky in JDBC?
+Primitive getters return defaults (e.g., 0 for int), requiring =wasNull()= checks.
+
+** Q58: What is batch processing in JDBC?
+Grouping multiple similar statements to reduce network round trips.
+
+** Q59: How do you create a batch with PreparedStatement?
+Call =addBatch()= repeatedly, then =executeBatch()=.
+
+** Q60: What does =executeBatch()= return?
+An int[] of update counts for each batched command.
+
+** Q61: When should you use batch updates?
+Bulk inserts/updates/deletes for better throughput.
+
+** Q62: What is fetch size?
+A hint to driver/database for how many rows to fetch per trip.
+
+** Q63: How do you set fetch size?
+Use =statement.setFetchSize(n)=.
+
+** Q64: Does fetch size guarantee exact behavior?
+No, it is a hint and driver-dependent.
+
+** Q65: What is max rows setting?
+Limits number of rows a ResultSet can contain from a statement.
+
+** Q66: How do you set query timeout?
+Use =statement.setQueryTimeout(seconds)=.
+
+** Q67: What happens on query timeout?
+Driver attempts to cancel statement and throws SQLException.
+
+** Q68: What is statement cancel?
+Calling =statement.cancel()= to attempt interruption of running SQL.
+
+** Q69: What is a scrollable ResultSet?
+A ResultSet that allows cursor movement beyond forward-only.
+
+** Q70: Common ResultSet types?
+- TYPE_FORWARD_ONLY
+- TYPE_SCROLL_INSENSITIVE
+- TYPE_SCROLL_SENSITIVE
+
+** Q71: What is an updatable ResultSet?
+ResultSet allowing direct row updates with concurrency mode =CONCUR_UPDATABLE=.
+
+** Q72: Is updatable ResultSet widely used?
+Less common; many teams prefer explicit SQL updates for clarity.
+
+** Q73: What is holdability?
+Defines whether cursors remain open after commit.
+
+** Q74: Holdability options?
+- HOLD_CURSORS_OVER_COMMIT
+- CLOSE_CURSORS_AT_COMMIT
+
+** Q75: What is Savepoint?
+A marker inside a transaction allowing partial rollback.
+
+** Q76: How to create a savepoint?
+Use =Savepoint sp = connection.setSavepoint()=.
+
+** Q77: How to rollback to savepoint?
+Use =connection.rollback(sp)=.
+
+** Q78: Why use savepoints?
+To recover from part of a complex transaction without rolling back everything.
+
+** Q79: What is =DatabaseMetaData= useful for?
+Discovering tables, schemas, supported features, driver/db versions.
+
+** Q80: What is =ParameterMetaData=?
+Metadata about prepared statement parameters (driver support varies).
+
+** Q81: How can you detect driver capabilities?
+Query =DatabaseMetaData= feature methods, e.g., batch support.
+
+** Q82: What is optimistic locking with JDBC?
+Update using a version column in WHERE clause; fail if row changed.
+
+** Q83: What is pessimistic locking?
+Lock rows explicitly (e.g., SELECT ... FOR UPDATE) during transaction.
+
+** Q84: Why avoid long transactions?
+They hold locks/resources longer and increase contention.
+
+** Q85: How do you handle large result sets safely?
+Stream rows, set fetch size appropriately, avoid loading all in memory.
+
+** Q86: How do you map SQL DATE/TIME/TIMESTAMP in modern Java?
+Prefer java.time types with JDBC 4.2 APIs where supported.
+
+** Q87: How to set LocalDate in PreparedStatement?
+Often =ps.setObject(index, localDate)= with JDBC 4.2+ drivers.
+
+** Q88: How to read LocalDate from ResultSet?
+Often =rs.getObject("col", LocalDate.class)=.
+
+** Q89: What are LOBs in JDBC?
+Large Objects: BLOB (binary), CLOB (character).
+
+** Q90: How do you write BLOB data?
+Use =setBinaryStream()= or =setBlob()= depending on driver/use case.
+
+** Q91: How do you read BLOB data?
+Use =getBinaryStream()= or =getBytes()= for small payloads.
+
+** Q92: What is the risk of =getBytes()= on huge blobs?
+High memory usage; stream instead.
+
+** Q93: What is SQLWarning?
+Non-fatal DB warning retrievable from Connection/Statement/ResultSet.
+
+** Q94: How do you get warnings?
+Call =getWarnings()= and optionally =clearWarnings()=.
+
+** Q95: What is escape processing?
+JDBC processing of SQL escape syntax before sending to DB.
+
+** Q96: What is callable SQL escape syntax?
+Example: ={ call my_proc(?) }=.
+
+** Q97: How do OUT parameters work in CallableStatement?
+Register with =registerOutParameter()= before execution, then read values.
+
+** Q98: Difference between executeQuery and executeUpdate in stored procedures?
+Depends on proc result; use =execute()= when output shape may vary.
+
+** Q99: What is multi-result processing?
+Handling multiple results via =getMoreResults()= and update counts.
+
+** Q100: Why use named columns instead of indexes?
+More readable and resilient to SELECT column order changes.
+
+** Q101: Why might indexes still be used in reads?
+Potentially slightly faster and useful in dynamic column loops.
+
+** Q102: What is N+1 query problem?
+Repeated per-row queries causing many DB round trips and poor performance.
+
+** Q103: How to reduce N+1 in plain JDBC?
+Use joins, IN queries, bulk prefetch patterns.
+
+** Q104: What is SQLState class 23 typically about?
+Integrity constraint violations (e.g., unique/foreign key).
+
+** Q105: How do you classify transient vs non-transient DB errors?
+Use SQLException subclasses and SQLState/vendor code mapping.
+
+** Q106: Why log SQL with parameters carefully?
+Useful for debugging, but avoid leaking secrets/PII.
+
+** Q107: Should passwords appear in logs?
+No, always redact.
+
+** Q108: What is a deadlock?
+Two+ transactions block each other waiting on resources.
+
+** Q109: How should app react to deadlock errors?
+Rollback and retry transaction with backoff when appropriate.
+
+** Q110: What is idempotency in DB writes?
+Repeated same request leads to same final state.
+
+** Q111: Why is idempotency important with retries?
+Prevents duplicate side effects after transient failures.
+
+** Q112: How do you implement retries safely in JDBC?
+Retry only retryable errors and idempotent operations.
+
+** Q113: What is read-only connection mode?
+Hint to DB/driver that transaction is read-only.
+
+** Q114: How to set read-only?
+=connection.setReadOnly(true)= before executing statements.
+
+** Q115: Can read-only mode improve performance?
+Sometimes; depends on DB optimization and routing architecture.
+
+** Q116: What is schema selection in JDBC?
+Setting current schema/catalog for object name resolution.
+
+** Q117: Methods for schema/catalog?
+=connection.setSchema(...)= and =connection.setCatalog(...)= (support varies).
+
+** Q118: What is SQLFeatureNotSupportedException?
+Indicates requested JDBC feature isn’t supported by driver/DB.
+
+** Q119: Why wrap JDBC exceptions into domain exceptions?
+To isolate persistence concerns and simplify service-layer handling.
+
+** Q120: What is DAO pattern with JDBC?
+Data Access Object encapsulates SQL/JDBC operations behind clear interfaces.
+
+* Advanced
+
+** Q121: How does connection pool sizing affect performance?
+Too small causes waiting; too large increases DB contention and context switching.
+
+** Q122: What metrics should you monitor for JDBC pools?
+Active, idle, pending threads, acquisition time, timeout count, connection lifetime.
+
+** Q123: Why set max connection lifetime in pools?
+To recycle stale connections before network/db kills them.
+
+** Q124: What is connection validation?
+Checking connection health (test query or driver/isValid call) before use.
+
+** Q125: Why can auto-commit=true hurt throughput in write-heavy paths?
+Each statement commits separately, increasing transaction overhead.
+
+** Q126: What is server-side prepared statement?
+Prepared statement cached/managed on DB server side (driver/db dependent).
+
+** Q127: What is statement caching?
+Reusing prepared statements to reduce parse/plan overhead.
+
+** Q128: Where can statement caching exist?
+Driver-level, pool-level, or database-level plan cache.
+
+** Q129: Risk of unbounded statement cache?
+Memory pressure and degraded performance.
+
+** Q130: What are phantom reads?
+Rows appearing/disappearing between repeated range queries in same transaction.
+
+** Q131: Which isolation level prevents phantom reads?
+SERIALIZABLE (and some DB-specific mechanisms under repeatable read variants).
+
+** Q132: Why is SERIALIZABLE not always chosen?
+Highest isolation often reduces concurrency and throughput.
+
+** Q133: What is transaction propagation (conceptually)?
+How transactional boundaries interact across nested service calls.
+
+** Q134: Can JDBC alone manage propagation like frameworks?
+Not directly; frameworks add higher-level transaction management semantics.
+
+** Q135: What is XA transaction?
+A distributed transaction spanning multiple resources using two-phase commit.
+
+** Q136: Why are XA transactions complex?
+Operational overhead, locking duration, and failure handling complexity.
+
+** Q137: Alternative to XA in microservices?
+Use eventual consistency patterns (outbox, sagas, idempotent consumers).
+
+** Q138: What is the outbox pattern?
+Write domain change + outbound event record in same local DB transaction.
+
+** Q139: How does JDBC support outbox implementation?
+Single transaction containing business updates and outbox insert.
+
+** Q140: What is lost update anomaly?
+One transaction overwrites another’s change without noticing.
+
+** Q141: How to prevent lost updates?
+Optimistic locking (version column) or proper locking/isolation.
+
+** Q142: Why keep SQL close to business intent?
+Improves maintainability, review quality, and performance reasoning.
+
+** Q143: What is keyset pagination vs offset pagination?
+Keyset uses last seen key for fast stable paging; offset can be slow on large pages.
+
+** Q144: How does JDBC handle pagination?
+Through SQL patterns (LIMIT/OFFSET or keyset predicates), not special API magic.
+
+** Q145: What is backpressure with JDBC consumers?
+Controlling read/processing rate to avoid memory/resource exhaustion.
+
+** Q146: How to stream safely from DB to API response?
+Forward-only ResultSet, tuned fetch size, incremental serialization.
+
+** Q147: What is fetch direction hint?
+=rs.setFetchDirection(...)=; often advisory and may be ignored.
+
+** Q148: How can timezone bugs appear in JDBC apps?
+Mismatched JVM/DB/session timezone when mapping timestamps.
+
+** Q149: Best practice for timestamps?
+Store in UTC, convert at boundaries, use timezone-aware types when needed.
+
+** Q150: What is the impact of implicit type conversion in SQL?
+Can bypass indexes and degrade query performance.
+
+** Q151: How does JDBC type binding affect query plans?
+Incorrect binding types may force casts and reduce plan efficiency.
+
+** Q152: Why avoid SELECT * in production queries?
+Unnecessary data transfer, brittle mappings, harder index-only scans.
+
+** Q153: What is read/write split architecture?
+Reads go to replicas, writes to primary; app/router decides destination.
+
+** Q154: JDBC challenge with replicas?
+Replication lag can cause stale reads after write.
+
+** Q155: How to handle read-after-write consistency needs?
+Route critical follow-up reads to primary or use session stickiness/windowing.
+
+** Q156: What are common causes of connection leaks?
+Missing close in error paths, holding connections across slow operations.
+
+** Q157: How to detect connection leaks?
+Pool leak detection thresholds, thread dumps, acquisition timeout metrics.
+
+** Q158: Why avoid doing network calls inside DB transaction?
+Increases transaction duration and lock holding time.
+
+** Q159: What is a retry storm?
+Too many clients retry simultaneously, amplifying outage load.
+
+** Q160: How to reduce retry storm risk?
+Exponential backoff + jitter + retry budgets/circuit breakers.
+
+** Q161: How to safely perform schema migrations with JDBC apps?
+Backward-compatible, phased rollout, dual-read/write if needed, feature flags.
+
+** Q162: What is blue/green DB migration concern?
+Application and schema versions must be compatible during cutover.
+
+** Q163: How do you test JDBC code effectively?
+Use integration tests with real DB (or testcontainers), not only mocks.
+
+** Q164: Why are in-memory DB tests sometimes misleading?
+SQL dialect/behavior differs from production DB.
+
+** Q165: What should be included in JDBC observability?
+Query latency, error rates by SQLState, pool metrics, slow query logging.
+
+** Q166: How to correlate SQL performance with app traces?
+Add trace/span IDs around DAO calls and include DB timing tags.
+
+** Q167: What are safe logging practices for SQL failures?
+Log statement template, timing, SQLState/vendor code; redact sensitive values.
+
+** Q168: How to design resilient JDBC data layer?
+Timeouts, retries (carefully), idempotency, bulkheads, circuit breakers, metrics.
+
+** Q169: When should you move from raw JDBC to higher abstraction?
+When productivity/maintainability needs exceed benefits of direct control.
+
+** Q170: Why still learn raw JDBC deeply?
+It builds strong fundamentals for performance tuning and debugging across all Java data stacks.
+
+-----
+
+#+INCLUDE: "../footer.org"

@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java JDBC API</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Java JDBC API</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org1c06e0f" class="outline-2">
+<h2 id="org1c06e0f">Java JDBC API</h2>
+<div class="outline-text-2" id="text-org1c06e0f">
+<hr>
+</div>
+</div>
+<div id="outline-container-org210863a" class="outline-2">
+<h2 id="org210863a">Beginner</h2>
+<div class="outline-text-2" id="text-org210863a">
+</div>
+<div id="outline-container-org7b46ae6" class="outline-3">
+<h3 id="org7b46ae6">Q1: What is JDBC?</h3>
+<div class="outline-text-3" id="text-org7b46ae6">
+<p>
+JDBQC (Java Database Connectivity) is a standard Java API for connecting to relational databases, executing SQL, and processing results.
+</p>
+</div>
+</div>
+<div id="outline-container-org2712a10" class="outline-3">
+<h3 id="org2712a10">Q2: Why do we need JDBC?</h3>
+<div class="outline-text-3" id="text-org2712a10">
+<p>
+It provides a vendor-neutral way to access databases from Java applications.
+</p>
+</div>
+</div>
+<div id="outline-container-org790d28c" class="outline-3">
+<h3 id="org790d28c">Q3: Which package contains core JDBC interfaces?</h3>
+<div class="outline-text-3" id="text-org790d28c">
+<p>
+Most core interfaces are in <code>java.sql</code> (and additional features in <code>javax.sql</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-org4377e55" class="outline-3">
+<h3 id="org4377e55">Q4: What is a JDBC driver?</h3>
+<div class="outline-text-3" id="text-org4377e55">
+<p>
+A JDBC driver is a vendor-provided implementation that allows Java applications to communicate with a specific database.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb4ac0d1" class="outline-3">
+<h3 id="orgb4ac0d1">Q5: What are common JDBC interfaces?</h3>
+<div class="outline-text-3" id="text-orgb4ac0d1">
+<ul class="org-ul">
+<li><code>Driver</code></li>
+<li><code>Connection</code></li>
+<li><code>Statement</code></li>
+<li><code>PreparedStatement</code></li>
+<li><code>CallableStatement</code></li>
+<li><code>ResultSet</code></li>
+<li><code>DatabaseMetaData</code></li>
+<li><code>ResultSetMetaData</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org98d3e4f" class="outline-3">
+<h3 id="org98d3e4f">Q6: What is a JDBC URL?</h3>
+<div class="outline-text-3" id="text-org98d3e4f">
+<p>
+A connection string that tells the driver how to connect, e.g. <code>jdbc:postgresql://localhost:5432/appdb</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c85a03" class="outline-3">
+<h3 id="org2c85a03">Q7: What is <code>DriverManager</code>?</h3>
+<div class="outline-text-3" id="text-org2c85a03">
+<p>
+A class that manages JDBC drivers and creates connections via <code>getConnection()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb89e62d" class="outline-3">
+<h3 id="orgb89e62d">Q8: How do you open a JDBC connection?</h3>
+<div class="outline-text-3" id="text-orgb89e62d">
+<p>
+By calling <code>DriverManager.getConnection(url, user, password)</code> (or via a <code>DataSource</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-org7fb0a51" class="outline-3">
+<h3 id="org7fb0a51">Q9: Is Class.forName(&#x2026;) still required?</h3>
+<div class="outline-text-3" id="text-org7fb0a51">
+<p>
+Usually not for modern drivers (auto-loading works), but it may be needed in legacy setups.
+</p>
+</div>
+</div>
+<div id="outline-container-org6234fb5" class="outline-3">
+<h3 id="org6234fb5">Q10: What is a <code>Statement</code>?</h3>
+<div class="outline-text-3" id="text-org6234fb5">
+<p>
+Used to execute static SQL without parameters.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c5ecc2" class="outline-3">
+<h3 id="org1c5ecc2">Q11: What is a <code>PreparedStatement</code>?</h3>
+<div class="outline-text-3" id="text-org1c5ecc2">
+<p>
+A precompiled SQL statement with placeholders (= ? =) for parameters.
+</p>
+</div>
+</div>
+<div id="outline-container-org656d68e" class="outline-3">
+<h3 id="org656d68e">Q12: Why is <code>PreparedStatement</code> preferred over <code>Statement</code>?</h3>
+<div class="outline-text-3" id="text-org656d68e">
+<p>
+Better performance for repeated execution and safer against SQL injection.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcb28ef1" class="outline-3">
+<h3 id="orgcb28ef1">Q13: What is a <code>CallableStatement</code>?</h3>
+<div class="outline-text-3" id="text-orgcb28ef1">
+<p>
+Used to call stored procedures/functions in the database.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e8cbc2" class="outline-3">
+<h3 id="org3e8cbc2">Q14: What is a <code>ResultSet</code>?</h3>
+<div class="outline-text-3" id="text-org3e8cbc2">
+<p>
+A cursor-like object representing query results row by row.
+</p>
+</div>
+</div>
+<div id="outline-container-org50d06de" class="outline-3">
+<h3 id="org50d06de">Q15: How do you iterate through a <code>ResultSet</code>?</h3>
+<div class="outline-text-3" id="text-org50d06de">
+<p>
+Use a loop with <code>while (rs.next()) { ... }</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcff93a6" class="outline-3">
+<h3 id="orgcff93a6">Q16: What does <code>executeQuery()</code> do?</h3>
+<div class="outline-text-3" id="text-orgcff93a6">
+<p>
+Executes SELECT SQL and returns a <code>ResultSet</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org1b4a362" class="outline-3">
+<h3 id="org1b4a362">Q17: What does <code>executeUpdate()</code> do?</h3>
+<div class="outline-text-3" id="text-org1b4a362">
+<p>
+Executes INSERT/UPDATE/DELETE (and DDL in many drivers) and returns affected row count.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a1fa6f" class="outline-3">
+<h3 id="org6a1fa6f">Q18: What does <code>execute()</code> do?</h3>
+<div class="outline-text-3" id="text-org6a1fa6f">
+<p>
+Runs any SQL and returns <code>true</code> if first result is a <code>ResultSet</code>, otherwise <code>false</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c87392" class="outline-3">
+<h3 id="org5c87392">Q19: What is SQL injection?</h3>
+<div class="outline-text-3" id="text-org5c87392">
+<p>
+A security vulnerability caused by unsafe string concatenation in SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-org075b045" class="outline-3">
+<h3 id="org075b045">Q20: How does JDBC help prevent SQL injection?</h3>
+<div class="outline-text-3" id="text-org075b045">
+<p>
+Using <code>PreparedStatement</code> parameters instead of concatenating user input.
+</p>
+</div>
+</div>
+<div id="outline-container-org3569979" class="outline-3">
+<h3 id="org3569979">Q21: What is a placeholder in SQL?</h3>
+<div class="outline-text-3" id="text-org3569979">
+<p>
+The <code>?</code> symbol in prepared SQL representing a parameter value.
+</p>
+</div>
+</div>
+<div id="outline-container-org382eed8" class="outline-3">
+<h3 id="org382eed8">Q22: How do you set an int parameter?</h3>
+<div class="outline-text-3" id="text-org382eed8">
+<p>
+Use <code>preparedStatement.setInt(index, value)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a863c0" class="outline-3">
+<h3 id="org8a863c0">Q23: How do you set a string parameter?</h3>
+<div class="outline-text-3" id="text-org8a863c0">
+<p>
+Use <code>preparedStatement.setString(index, value)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org3262b29" class="outline-3">
+<h3 id="org3262b29">Q24: Are JDBC parameter indices 0-based or 1-based?</h3>
+<div class="outline-text-3" id="text-org3262b29">
+<p>
+They are 1-based.
+</p>
+</div>
+</div>
+<div id="outline-container-org1eb2822" class="outline-3">
+<h3 id="org1eb2822">Q25: How do you read a string column?</h3>
+<div class="outline-text-3" id="text-org1eb2822">
+<p>
+Use <code>rs.getString("column_name")</code> or <code>rs.getString(columnIndex)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb19d992" class="outline-3">
+<h3 id="orgb19d992">Q26: How do you read an integer column?</h3>
+<div class="outline-text-3" id="text-orgb19d992">
+<p>
+Use <code>rs.getInt(...)</code>: Check <code>rs.wasNull()</code> if null handling matters.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b3fdf2" class="outline-3">
+<h3 id="org9b3fdf2">Q27: What is <code>rs.wasNull()</code> used for?</h3>
+<div class="outline-text-3" id="text-org9b3fdf2">
+<p>
+To determine whether the last read column value was SQL NULL.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fc628e" class="outline-3">
+<h3 id="org1fc628e">Q28: What is try-with-resources?</h3>
+<div class="outline-text-3" id="text-org1fc628e">
+<p>
+A Java construct that automatically closes resources implementing <code>AutoCloseable</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf982b91" class="outline-3">
+<h3 id="orgf982b91">Q29: Why is try-with-resources important in JDBC?</h3>
+<div class="outline-text-3" id="text-orgf982b91">
+<p>
+It prevents connection/statement/result set leaks.
+</p>
+</div>
+</div>
+<div id="outline-container-org4a18976" class="outline-3">
+<h3 id="org4a18976">Q30: What closes first in try-with-resources?</h3>
+<div class="outline-text-3" id="text-org4a18976">
+<p>
+Resources close in reverse order of declaration.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ed8a04" class="outline-3">
+<h3 id="org7ed8a04">Q31: Does closing Connection close Statements?</h3>
+<div class="outline-text-3" id="text-org7ed8a04">
+<p>
+Yes, typically associated statements are closed as well.
+</p>
+</div>
+</div>
+<div id="outline-container-org362af30" class="outline-3">
+<h3 id="org362af30">Q32: Does closing Statement close ResultSet?</h3>
+<div class="outline-text-3" id="text-org362af30">
+<p>
+Yes, its current ResultSet is usually closed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8ec432" class="outline-3">
+<h3 id="orgf8ec432">Q33: What is SQLException?</h3>
+<div class="outline-text-3" id="text-orgf8ec432">
+<p>
+The standard JDBC exception for database access errors.
+</p>
+</div>
+</div>
+<div id="outline-container-org322114d" class="outline-3">
+<h3 id="org322114d">Q34: What useful methods does SQLException provide?</h3>
+<div class="outline-text-3" id="text-org322114d">
+<ul class="org-ul">
+<li><code>getMessage()</code></li>
+<li><code>getSQLState()</code></li>
+<li><code>getErrorCode()</code></li>
+<li><code>getNextException()</code></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0fdc725" class="outline-3">
+<h3 id="org0fdc725">Q35: What is SQLState?</h3>
+<div class="outline-text-3" id="text-org0fdc725">
+<p>
+A standardized 5-character error code category for SQL errors.
+</p>
+</div>
+</div>
+<div id="outline-container-org84a7e23" class="outline-3">
+<h3 id="org84a7e23">Q36: What is the difference between SQLState and vendor error code?</h3>
+<div class="outline-text-3" id="text-org84a7e23">
+<p>
+SQLState is standardized; vendor code is database-specific.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ca2612" class="outline-3">
+<h3 id="org8ca2612">Q37: How do you perform an INSERT in JDBC?</h3>
+<div class="outline-text-3" id="text-org8ca2612">
+<p>
+Create prepared SQL, bind parameters, executeUpdate, optionally fetch generated keys.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc21c173" class="outline-3">
+<h3 id="orgc21c173">Q38: How do you fetch generated keys?</h3>
+<div class="outline-text-3" id="text-orgc21c173">
+<p>
+Create statement with <code>RETURN_GENERATED_KEYS</code> and call <code>getGeneratedKeys()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org8f386dc" class="outline-3">
+<h3 id="org8f386dc">Q39: Can you run DDL with JDBC?</h3>
+<div class="outline-text-3" id="text-org8f386dc">
+<p>
+Yes, e.g. CREATE/ALTER/DROP via <code>executeUpdate()</code> or <code>execute()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org26d2aec" class="outline-3">
+<h3 id="org26d2aec">Q40: What is auto-commit mode?</h3>
+<div class="outline-text-3" id="text-org26d2aec">
+<p>
+When true, each SQL statement is committed automatically after execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org008ffec" class="outline-3">
+<h3 id="org008ffec">Q41: Is auto-commit enabled by default?</h3>
+<div class="outline-text-3" id="text-org008ffec">
+<p>
+Usually yes, for most JDBC drivers.
+</p>
+</div>
+</div>
+<div id="outline-container-org8c7e9b3" class="outline-3">
+<h3 id="org8c7e9b3">Q42: How do you disable auto-commit?</h3>
+<div class="outline-text-3" id="text-org8c7e9b3">
+<p>
+Call <code>connection.setAutoCommit(false)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orga16ee0a" class="outline-3">
+<h3 id="orga16ee0a">Q43: How do you commit a transaction?</h3>
+<div class="outline-text-3" id="text-orga16ee0a">
+<p>
+Call <code>connection.commit()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org30662f9" class="outline-3">
+<h3 id="org30662f9">Q44: How do you rollback a transaction?</h3>
+<div class="outline-text-3" id="text-org30662f9">
+<p>
+Call <code>connection.rollback()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce56466" class="outline-3">
+<h3 id="orgce56466">Q45: When should you rollback?</h3>
+<div class="outline-text-3" id="text-orgce56466">
+<p>
+On exceptions or business validation failures during transactional work.
+</p>
+</div>
+</div>
+<div id="outline-container-orge2052a9" class="outline-3">
+<h3 id="orge2052a9">Q46: What is transaction atomicity in JDBC context?</h3>
+<div class="outline-text-3" id="text-orge2052a9">
+<p>
+All operations in a transaction succeed together or fail together.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdebc51f" class="outline-3">
+<h3 id="orgdebc51f">Q47: What are basic transaction isolation levels in JDBC?</h3>
+<div class="outline-text-3" id="text-orgdebc51f">
+<ul class="org-ul">
+<li>READ<sub>UNCOMMITTED</sub></li>
+<li>READ<sub>COMMITTED</sub></li>
+<li>REPEATABLE<sub>READ</sub></li>
+<li>SERIALIZABLE</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc8b9314" class="outline-3">
+<h3 id="orgc8b9314">Q48: How do you set isolation level?</h3>
+<div class="outline-text-3" id="text-orgc8b9314">
+<p>
+Use <code>connection.setTransactionIsolation(Connection.TRANSACTION_...)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orge0e3e5c" class="outline-3">
+<h3 id="orge0e3e5c">Q49: What is a DataSource?</h3>
+<div class="outline-text-3" id="text-orge0e3e5c">
+<p>
+A factory for connections, often supporting pooling and external configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-org77a9c7d" class="outline-3">
+<h3 id="org77a9c7d">Q50: Why prefer DataSource over DriverManager in apps?</h3>
+<div class="outline-text-3" id="text-org77a9c7d">
+<p>
+Better integration, pooling support, and cleaner configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-org5facdd4" class="outline-3">
+<h3 id="org5facdd4">Q51: What is connection pooling?</h3>
+<div class="outline-text-3" id="text-org5facdd4">
+<p>
+Reusing existing DB connections to avoid expensive connection creation.
+</p>
+</div>
+</div>
+<div id="outline-container-orgca32969" class="outline-3">
+<h3 id="orgca32969">Q52: What happens if you open too many connections?</h3>
+<div class="outline-text-3" id="text-orgca32969">
+<p>
+You can exhaust DB/server resources and degrade performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org21aed30" class="outline-3">
+<h3 id="org21aed30">Q53: Can one Connection be shared safely across threads?</h3>
+<div class="outline-text-3" id="text-org21aed30">
+<p>
+Generally no; treat JDBC objects as not thread-safe unless documented otherwise.
+</p>
+</div>
+</div>
+<div id="outline-container-org4ebe358" class="outline-3">
+<h3 id="org4ebe358">Q54: What is JDBC metadata?</h3>
+<div class="outline-text-3" id="text-org4ebe358">
+<p>
+Information about DB/database objects via <code>DatabaseMetaData</code> and <code>ResultSetMetaData</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org68a7b26" class="outline-3">
+<h3 id="org68a7b26">Q55: What is ResultSetMetaData used for?</h3>
+<div class="outline-text-3" id="text-org68a7b26">
+<p>
+Inspecting returned columns dynamically (name, type, count, etc.).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3b3bd76" class="outline-2">
+<h2 id="org3b3bd76">Intermediate</h2>
+<div class="outline-text-2" id="text-org3b3bd76">
+</div>
+<div id="outline-container-org4c92792" class="outline-3">
+<h3 id="org4c92792">Q56: What is the difference between <code>setNull()</code> and passing Java null?</h3>
+<div class="outline-text-3" id="text-org4c92792">
+<p>
+Use <code>setNull(index, sqlType)</code> when SQL type must be explicit.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf187adf" class="outline-3">
+<h3 id="orgf187adf">Q57: Why can null handling be tricky in JDBC?</h3>
+<div class="outline-text-3" id="text-orgf187adf">
+<p>
+Primitive getters return defaults (e.g., 0 for int), requiring <code>wasNull()</code> checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org7385e3f" class="outline-3">
+<h3 id="org7385e3f">Q58: What is batch processing in JDBC?</h3>
+<div class="outline-text-3" id="text-org7385e3f">
+<p>
+Grouping multiple similar statements to reduce network round trips.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfdc4f30" class="outline-3">
+<h3 id="orgfdc4f30">Q59: How do you create a batch with PreparedStatement?</h3>
+<div class="outline-text-3" id="text-orgfdc4f30">
+<p>
+Call <code>addBatch()</code> repeatedly, then <code>executeBatch()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org09d34a1" class="outline-3">
+<h3 id="org09d34a1">Q60: What does <code>executeBatch()</code> return?</h3>
+<div class="outline-text-3" id="text-org09d34a1">
+<p>
+An int[] of update counts for each batched command.
+</p>
+</div>
+</div>
+<div id="outline-container-org6bc2096" class="outline-3">
+<h3 id="org6bc2096">Q61: When should you use batch updates?</h3>
+<div class="outline-text-3" id="text-org6bc2096">
+<p>
+Bulk inserts/updates/deletes for better throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-org623d1b7" class="outline-3">
+<h3 id="org623d1b7">Q62: What is fetch size?</h3>
+<div class="outline-text-3" id="text-org623d1b7">
+<p>
+A hint to driver/database for how many rows to fetch per trip.
+</p>
+</div>
+</div>
+<div id="outline-container-org4cacf84" class="outline-3">
+<h3 id="org4cacf84">Q63: How do you set fetch size?</h3>
+<div class="outline-text-3" id="text-org4cacf84">
+<p>
+Use <code>statement.setFetchSize(n)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org389dbcc" class="outline-3">
+<h3 id="org389dbcc">Q64: Does fetch size guarantee exact behavior?</h3>
+<div class="outline-text-3" id="text-org389dbcc">
+<p>
+No, it is a hint and driver-dependent.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaba4254" class="outline-3">
+<h3 id="orgaba4254">Q65: What is max rows setting?</h3>
+<div class="outline-text-3" id="text-orgaba4254">
+<p>
+Limits number of rows a ResultSet can contain from a statement.
+</p>
+</div>
+</div>
+<div id="outline-container-org1a1f448" class="outline-3">
+<h3 id="org1a1f448">Q66: How do you set query timeout?</h3>
+<div class="outline-text-3" id="text-org1a1f448">
+<p>
+Use <code>statement.setQueryTimeout(seconds)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org15c6622" class="outline-3">
+<h3 id="org15c6622">Q67: What happens on query timeout?</h3>
+<div class="outline-text-3" id="text-org15c6622">
+<p>
+Driver attempts to cancel statement and throws SQLException.
+</p>
+</div>
+</div>
+<div id="outline-container-org292d4f7" class="outline-3">
+<h3 id="org292d4f7">Q68: What is statement cancel?</h3>
+<div class="outline-text-3" id="text-org292d4f7">
+<p>
+Calling <code>statement.cancel()</code> to attempt interruption of running SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-org764682c" class="outline-3">
+<h3 id="org764682c">Q69: What is a scrollable ResultSet?</h3>
+<div class="outline-text-3" id="text-org764682c">
+<p>
+A ResultSet that allows cursor movement beyond forward-only.
+</p>
+</div>
+</div>
+<div id="outline-container-org9948ab2" class="outline-3">
+<h3 id="org9948ab2">Q70: Common ResultSet types?</h3>
+<div class="outline-text-3" id="text-org9948ab2">
+<ul class="org-ul">
+<li>TYPE<sub>FORWARD</sub><sub>ONLY</sub></li>
+<li>TYPE<sub>SCROLL</sub><sub>INSENSITIVE</sub></li>
+<li>TYPE<sub>SCROLL</sub><sub>SENSITIVE</sub></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgfeed2a3" class="outline-3">
+<h3 id="orgfeed2a3">Q71: What is an updatable ResultSet?</h3>
+<div class="outline-text-3" id="text-orgfeed2a3">
+<p>
+ResultSet allowing direct row updates with concurrency mode <code>CONCUR_UPDATABLE</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb4105ec" class="outline-3">
+<h3 id="orgb4105ec">Q72: Is updatable ResultSet widely used?</h3>
+<div class="outline-text-3" id="text-orgb4105ec">
+<p>
+Less common; many teams prefer explicit SQL updates for clarity.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf2417e4" class="outline-3">
+<h3 id="orgf2417e4">Q73: What is holdability?</h3>
+<div class="outline-text-3" id="text-orgf2417e4">
+<p>
+Defines whether cursors remain open after commit.
+</p>
+</div>
+</div>
+<div id="outline-container-orga97a545" class="outline-3">
+<h3 id="orga97a545">Q74: Holdability options?</h3>
+<div class="outline-text-3" id="text-orga97a545">
+<ul class="org-ul">
+<li>HOLD<sub>CURSORS</sub><sub>OVER</sub><sub>COMMIT</sub></li>
+<li>CLOSE<sub>CURSORS</sub><sub>AT</sub><sub>COMMIT</sub></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org6b39d21" class="outline-3">
+<h3 id="org6b39d21">Q75: What is Savepoint?</h3>
+<div class="outline-text-3" id="text-org6b39d21">
+<p>
+A marker inside a transaction allowing partial rollback.
+</p>
+</div>
+</div>
+<div id="outline-container-orgebcdadc" class="outline-3">
+<h3 id="orgebcdadc">Q76: How to create a savepoint?</h3>
+<div class="outline-text-3" id="text-orgebcdadc">
+<p>
+Use <code>Savepoint sp = connection.setSavepoint()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org6b4d9bd" class="outline-3">
+<h3 id="org6b4d9bd">Q77: How to rollback to savepoint?</h3>
+<div class="outline-text-3" id="text-org6b4d9bd">
+<p>
+Use <code>connection.rollback(sp)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc7d7719" class="outline-3">
+<h3 id="orgc7d7719">Q78: Why use savepoints?</h3>
+<div class="outline-text-3" id="text-orgc7d7719">
+<p>
+To recover from part of a complex transaction without rolling back everything.
+</p>
+</div>
+</div>
+<div id="outline-container-org0d7460a" class="outline-3">
+<h3 id="org0d7460a">Q79: What is <code>DatabaseMetaData</code> useful for?</h3>
+<div class="outline-text-3" id="text-org0d7460a">
+<p>
+Discovering tables, schemas, supported features, driver/db versions.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e361c8" class="outline-3">
+<h3 id="org3e361c8">Q80: What is <code>ParameterMetaData</code>?</h3>
+<div class="outline-text-3" id="text-org3e361c8">
+<p>
+Metadata about prepared statement parameters (driver support varies).
+</p>
+</div>
+</div>
+<div id="outline-container-org59422b5" class="outline-3">
+<h3 id="org59422b5">Q81: How can you detect driver capabilities?</h3>
+<div class="outline-text-3" id="text-org59422b5">
+<p>
+Query <code>DatabaseMetaData</code> feature methods, e.g., batch support.
+</p>
+</div>
+</div>
+<div id="outline-container-org9076bfa" class="outline-3">
+<h3 id="org9076bfa">Q82: What is optimistic locking with JDBC?</h3>
+<div class="outline-text-3" id="text-org9076bfa">
+<p>
+Update using a version column in WHERE clause; fail if row changed.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e89ea9" class="outline-3">
+<h3 id="org0e89ea9">Q83: What is pessimistic locking?</h3>
+<div class="outline-text-3" id="text-org0e89ea9">
+<p>
+Lock rows explicitly (e.g., SELECT &#x2026; FOR UPDATE) during transaction.
+</p>
+</div>
+</div>
+<div id="outline-container-org23fc1a8" class="outline-3">
+<h3 id="org23fc1a8">Q84: Why avoid long transactions?</h3>
+<div class="outline-text-3" id="text-org23fc1a8">
+<p>
+They hold locks/resources longer and increase contention.
+</p>
+</div>
+</div>
+<div id="outline-container-org2681829" class="outline-3">
+<h3 id="org2681829">Q85: How do you handle large result sets safely?</h3>
+<div class="outline-text-3" id="text-org2681829">
+<p>
+Stream rows, set fetch size appropriately, avoid loading all in memory.
+</p>
+</div>
+</div>
+<div id="outline-container-org802a05b" class="outline-3">
+<h3 id="org802a05b">Q86: How do you map SQL DATE/TIME/TIMESTAMP in modern Java?</h3>
+<div class="outline-text-3" id="text-org802a05b">
+<p>
+Prefer java.time types with JDBC 4.2 APIs where supported.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf04ff6e" class="outline-3">
+<h3 id="orgf04ff6e">Q87: How to set LocalDate in PreparedStatement?</h3>
+<div class="outline-text-3" id="text-orgf04ff6e">
+<p>
+Often <code>ps.setObject(index, localDate)</code> with JDBC 4.2+ drivers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5bd2f6" class="outline-3">
+<h3 id="orgc5bd2f6">Q88: How to read LocalDate from ResultSet?</h3>
+<div class="outline-text-3" id="text-orgc5bd2f6">
+<p>
+Often <code>rs.getObject("col", LocalDate.class)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad8357b" class="outline-3">
+<h3 id="orgad8357b">Q89: What are LOBs in JDBC?</h3>
+<div class="outline-text-3" id="text-orgad8357b">
+<p>
+Large Objects: BLOB (binary), CLOB (character).
+</p>
+</div>
+</div>
+<div id="outline-container-org190bf3f" class="outline-3">
+<h3 id="org190bf3f">Q90: How do you write BLOB data?</h3>
+<div class="outline-text-3" id="text-org190bf3f">
+<p>
+Use <code>setBinaryStream()</code> or <code>setBlob()</code> depending on driver/use case.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ceb8d3" class="outline-3">
+<h3 id="org9ceb8d3">Q91: How do you read BLOB data?</h3>
+<div class="outline-text-3" id="text-org9ceb8d3">
+<p>
+Use <code>getBinaryStream()</code> or <code>getBytes()</code> for small payloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org990da99" class="outline-3">
+<h3 id="org990da99">Q92: What is the risk of <code>getBytes()</code> on huge blobs?</h3>
+<div class="outline-text-3" id="text-org990da99">
+<p>
+High memory usage; stream instead.
+</p>
+</div>
+</div>
+<div id="outline-container-org8bd5d42" class="outline-3">
+<h3 id="org8bd5d42">Q93: What is SQLWarning?</h3>
+<div class="outline-text-3" id="text-org8bd5d42">
+<p>
+Non-fatal DB warning retrievable from Connection/Statement/ResultSet.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda3a364" class="outline-3">
+<h3 id="orgda3a364">Q94: How do you get warnings?</h3>
+<div class="outline-text-3" id="text-orgda3a364">
+<p>
+Call <code>getWarnings()</code> and optionally <code>clearWarnings()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a3c764" class="outline-3">
+<h3 id="org6a3c764">Q95: What is escape processing?</h3>
+<div class="outline-text-3" id="text-org6a3c764">
+<p>
+JDBC processing of SQL escape syntax before sending to DB.
+</p>
+</div>
+</div>
+<div id="outline-container-org0338580" class="outline-3">
+<h3 id="org0338580">Q96: What is callable SQL escape syntax?</h3>
+<div class="outline-text-3" id="text-org0338580">
+<p>
+Example: <code>{ call my_proc(?) }</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org71d8d27" class="outline-3">
+<h3 id="org71d8d27">Q97: How do OUT parameters work in CallableStatement?</h3>
+<div class="outline-text-3" id="text-org71d8d27">
+<p>
+Register with <code>registerOutParameter()</code> before execution, then read values.
+</p>
+</div>
+</div>
+<div id="outline-container-org67fa0e2" class="outline-3">
+<h3 id="org67fa0e2">Q98: Difference between executeQuery and executeUpdate in stored procedures?</h3>
+<div class="outline-text-3" id="text-org67fa0e2">
+<p>
+Depends on proc result; use <code>execute()</code> when output shape may vary.
+</p>
+</div>
+</div>
+<div id="outline-container-org4ad7482" class="outline-3">
+<h3 id="org4ad7482">Q99: What is multi-result processing?</h3>
+<div class="outline-text-3" id="text-org4ad7482">
+<p>
+Handling multiple results via <code>getMoreResults()</code> and update counts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaf5b8a6" class="outline-3">
+<h3 id="orgaf5b8a6">Q100: Why use named columns instead of indexes?</h3>
+<div class="outline-text-3" id="text-orgaf5b8a6">
+<p>
+More readable and resilient to SELECT column order changes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9799ac" class="outline-3">
+<h3 id="orgf9799ac">Q101: Why might indexes still be used in reads?</h3>
+<div class="outline-text-3" id="text-orgf9799ac">
+<p>
+Potentially slightly faster and useful in dynamic column loops.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf625f33" class="outline-3">
+<h3 id="orgf625f33">Q102: What is N+1 query problem?</h3>
+<div class="outline-text-3" id="text-orgf625f33">
+<p>
+Repeated per-row queries causing many DB round trips and poor performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org51d1b44" class="outline-3">
+<h3 id="org51d1b44">Q103: How to reduce N+1 in plain JDBC?</h3>
+<div class="outline-text-3" id="text-org51d1b44">
+<p>
+Use joins, IN queries, bulk prefetch patterns.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcc840c4" class="outline-3">
+<h3 id="orgcc840c4">Q104: What is SQLState class 23 typically about?</h3>
+<div class="outline-text-3" id="text-orgcc840c4">
+<p>
+Integrity constraint violations (e.g., unique/foreign key).
+</p>
+</div>
+</div>
+<div id="outline-container-org98bb499" class="outline-3">
+<h3 id="org98bb499">Q105: How do you classify transient vs non-transient DB errors?</h3>
+<div class="outline-text-3" id="text-org98bb499">
+<p>
+Use SQLException subclasses and SQLState/vendor code mapping.
+</p>
+</div>
+</div>
+<div id="outline-container-org819144a" class="outline-3">
+<h3 id="org819144a">Q106: Why log SQL with parameters carefully?</h3>
+<div class="outline-text-3" id="text-org819144a">
+<p>
+Useful for debugging, but avoid leaking secrets/PII.
+</p>
+</div>
+</div>
+<div id="outline-container-org1a7c462" class="outline-3">
+<h3 id="org1a7c462">Q107: Should passwords appear in logs?</h3>
+<div class="outline-text-3" id="text-org1a7c462">
+<p>
+No, always redact.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcda1cd7" class="outline-3">
+<h3 id="orgcda1cd7">Q108: What is a deadlock?</h3>
+<div class="outline-text-3" id="text-orgcda1cd7">
+<p>
+Two+ transactions block each other waiting on resources.
+</p>
+</div>
+</div>
+<div id="outline-container-org7b317d1" class="outline-3">
+<h3 id="org7b317d1">Q109: How should app react to deadlock errors?</h3>
+<div class="outline-text-3" id="text-org7b317d1">
+<p>
+Rollback and retry transaction with backoff when appropriate.
+</p>
+</div>
+</div>
+<div id="outline-container-org6fa3d22" class="outline-3">
+<h3 id="org6fa3d22">Q110: What is idempotency in DB writes?</h3>
+<div class="outline-text-3" id="text-org6fa3d22">
+<p>
+Repeated same request leads to same final state.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeaa15d4" class="outline-3">
+<h3 id="orgeaa15d4">Q111: Why is idempotency important with retries?</h3>
+<div class="outline-text-3" id="text-orgeaa15d4">
+<p>
+Prevents duplicate side effects after transient failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0bf34f" class="outline-3">
+<h3 id="orgf0bf34f">Q112: How do you implement retries safely in JDBC?</h3>
+<div class="outline-text-3" id="text-orgf0bf34f">
+<p>
+Retry only retryable errors and idempotent operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org48c1b88" class="outline-3">
+<h3 id="org48c1b88">Q113: What is read-only connection mode?</h3>
+<div class="outline-text-3" id="text-org48c1b88">
+<p>
+Hint to DB/driver that transaction is read-only.
+</p>
+</div>
+</div>
+<div id="outline-container-org885d687" class="outline-3">
+<h3 id="org885d687">Q114: How to set read-only?</h3>
+<div class="outline-text-3" id="text-org885d687">
+<p>
+<code>connection.setReadOnly(true)</code> before executing statements.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f3aca9" class="outline-3">
+<h3 id="org4f3aca9">Q115: Can read-only mode improve performance?</h3>
+<div class="outline-text-3" id="text-org4f3aca9">
+<p>
+Sometimes; depends on DB optimization and routing architecture.
+</p>
+</div>
+</div>
+<div id="outline-container-org13e498c" class="outline-3">
+<h3 id="org13e498c">Q116: What is schema selection in JDBC?</h3>
+<div class="outline-text-3" id="text-org13e498c">
+<p>
+Setting current schema/catalog for object name resolution.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe4cd0a" class="outline-3">
+<h3 id="orgfe4cd0a">Q117: Methods for schema/catalog?</h3>
+<div class="outline-text-3" id="text-orgfe4cd0a">
+<p>
+<code>connection.setSchema(...)</code> and <code>connection.setCatalog(...)</code> (support varies).
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb3fe32" class="outline-3">
+<h3 id="orgbb3fe32">Q118: What is SQLFeatureNotSupportedException?</h3>
+<div class="outline-text-3" id="text-orgbb3fe32">
+<p>
+Indicates requested JDBC feature isn’t supported by driver/DB.
+</p>
+</div>
+</div>
+<div id="outline-container-org384a7c1" class="outline-3">
+<h3 id="org384a7c1">Q119: Why wrap JDBC exceptions into domain exceptions?</h3>
+<div class="outline-text-3" id="text-org384a7c1">
+<p>
+To isolate persistence concerns and simplify service-layer handling.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeea6438" class="outline-3">
+<h3 id="orgeea6438">Q120: What is DAO pattern with JDBC?</h3>
+<div class="outline-text-3" id="text-orgeea6438">
+<p>
+Data Access Object encapsulates SQL/JDBC operations behind clear interfaces.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org363b71f" class="outline-2">
+<h2 id="org363b71f">Advanced</h2>
+<div class="outline-text-2" id="text-org363b71f">
+</div>
+<div id="outline-container-org67ad767" class="outline-3">
+<h3 id="org67ad767">Q121: How does connection pool sizing affect performance?</h3>
+<div class="outline-text-3" id="text-org67ad767">
+<p>
+Too small causes waiting; too large increases DB contention and context switching.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4d6623" class="outline-3">
+<h3 id="orgd4d6623">Q122: What metrics should you monitor for JDBC pools?</h3>
+<div class="outline-text-3" id="text-orgd4d6623">
+<p>
+Active, idle, pending threads, acquisition time, timeout count, connection lifetime.
+</p>
+</div>
+</div>
+<div id="outline-container-org906e96f" class="outline-3">
+<h3 id="org906e96f">Q123: Why set max connection lifetime in pools?</h3>
+<div class="outline-text-3" id="text-org906e96f">
+<p>
+To recycle stale connections before network/db kills them.
+</p>
+</div>
+</div>
+<div id="outline-container-org97a8dac" class="outline-3">
+<h3 id="org97a8dac">Q124: What is connection validation?</h3>
+<div class="outline-text-3" id="text-org97a8dac">
+<p>
+Checking connection health (test query or driver/isValid call) before use.
+</p>
+</div>
+</div>
+<div id="outline-container-org90081e3" class="outline-3">
+<h3 id="org90081e3">Q125: Why can auto-commit=true hurt throughput in write-heavy paths?</h3>
+<div class="outline-text-3" id="text-org90081e3">
+<p>
+Each statement commits separately, increasing transaction overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-org3fb9073" class="outline-3">
+<h3 id="org3fb9073">Q126: What is server-side prepared statement?</h3>
+<div class="outline-text-3" id="text-org3fb9073">
+<p>
+Prepared statement cached/managed on DB server side (driver/db dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-org970ee36" class="outline-3">
+<h3 id="org970ee36">Q127: What is statement caching?</h3>
+<div class="outline-text-3" id="text-org970ee36">
+<p>
+Reusing prepared statements to reduce parse/plan overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd430d9e" class="outline-3">
+<h3 id="orgd430d9e">Q128: Where can statement caching exist?</h3>
+<div class="outline-text-3" id="text-orgd430d9e">
+<p>
+Driver-level, pool-level, or database-level plan cache.
+</p>
+</div>
+</div>
+<div id="outline-container-org84c5165" class="outline-3">
+<h3 id="org84c5165">Q129: Risk of unbounded statement cache?</h3>
+<div class="outline-text-3" id="text-org84c5165">
+<p>
+Memory pressure and degraded performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org0231fd1" class="outline-3">
+<h3 id="org0231fd1">Q130: What are phantom reads?</h3>
+<div class="outline-text-3" id="text-org0231fd1">
+<p>
+Rows appearing/disappearing between repeated range queries in same transaction.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9099b0" class="outline-3">
+<h3 id="orgb9099b0">Q131: Which isolation level prevents phantom reads?</h3>
+<div class="outline-text-3" id="text-orgb9099b0">
+<p>
+SERIALIZABLE (and some DB-specific mechanisms under repeatable read variants).
+</p>
+</div>
+</div>
+<div id="outline-container-org3065084" class="outline-3">
+<h3 id="org3065084">Q132: Why is SERIALIZABLE not always chosen?</h3>
+<div class="outline-text-3" id="text-org3065084">
+<p>
+Highest isolation often reduces concurrency and throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8b9422" class="outline-3">
+<h3 id="orgf8b9422">Q133: What is transaction propagation (conceptually)?</h3>
+<div class="outline-text-3" id="text-orgf8b9422">
+<p>
+How transactional boundaries interact across nested service calls.
+</p>
+</div>
+</div>
+<div id="outline-container-orge8e948f" class="outline-3">
+<h3 id="orge8e948f">Q134: Can JDBC alone manage propagation like frameworks?</h3>
+<div class="outline-text-3" id="text-orge8e948f">
+<p>
+Not directly; frameworks add higher-level transaction management semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org2801f82" class="outline-3">
+<h3 id="org2801f82">Q135: What is XA transaction?</h3>
+<div class="outline-text-3" id="text-org2801f82">
+<p>
+A distributed transaction spanning multiple resources using two-phase commit.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e3780a" class="outline-3">
+<h3 id="org9e3780a">Q136: Why are XA transactions complex?</h3>
+<div class="outline-text-3" id="text-org9e3780a">
+<p>
+Operational overhead, locking duration, and failure handling complexity.
+</p>
+</div>
+</div>
+<div id="outline-container-org24e51dc" class="outline-3">
+<h3 id="org24e51dc">Q137: Alternative to XA in microservices?</h3>
+<div class="outline-text-3" id="text-org24e51dc">
+<p>
+Use eventual consistency patterns (outbox, sagas, idempotent consumers).
+</p>
+</div>
+</div>
+<div id="outline-container-orgf5a8d95" class="outline-3">
+<h3 id="orgf5a8d95">Q138: What is the outbox pattern?</h3>
+<div class="outline-text-3" id="text-orgf5a8d95">
+<p>
+Write domain change + outbound event record in same local DB transaction.
+</p>
+</div>
+</div>
+<div id="outline-container-org634627a" class="outline-3">
+<h3 id="org634627a">Q139: How does JDBC support outbox implementation?</h3>
+<div class="outline-text-3" id="text-org634627a">
+<p>
+Single transaction containing business updates and outbox insert.
+</p>
+</div>
+</div>
+<div id="outline-container-org610898a" class="outline-3">
+<h3 id="org610898a">Q140: What is lost update anomaly?</h3>
+<div class="outline-text-3" id="text-org610898a">
+<p>
+One transaction overwrites another’s change without noticing.
+</p>
+</div>
+</div>
+<div id="outline-container-orgef0b60e" class="outline-3">
+<h3 id="orgef0b60e">Q141: How to prevent lost updates?</h3>
+<div class="outline-text-3" id="text-orgef0b60e">
+<p>
+Optimistic locking (version column) or proper locking/isolation.
+</p>
+</div>
+</div>
+<div id="outline-container-org53f72ae" class="outline-3">
+<h3 id="org53f72ae">Q142: Why keep SQL close to business intent?</h3>
+<div class="outline-text-3" id="text-org53f72ae">
+<p>
+Improves maintainability, review quality, and performance reasoning.
+</p>
+</div>
+</div>
+<div id="outline-container-org56eb552" class="outline-3">
+<h3 id="org56eb552">Q143: What is keyset pagination vs offset pagination?</h3>
+<div class="outline-text-3" id="text-org56eb552">
+<p>
+Keyset uses last seen key for fast stable paging; offset can be slow on large pages.
+</p>
+</div>
+</div>
+<div id="outline-container-org8defc66" class="outline-3">
+<h3 id="org8defc66">Q144: How does JDBC handle pagination?</h3>
+<div class="outline-text-3" id="text-org8defc66">
+<p>
+Through SQL patterns (LIMIT/OFFSET or keyset predicates), not special API magic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb04bdc0" class="outline-3">
+<h3 id="orgb04bdc0">Q145: What is backpressure with JDBC consumers?</h3>
+<div class="outline-text-3" id="text-orgb04bdc0">
+<p>
+Controlling read/processing rate to avoid memory/resource exhaustion.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c1f275" class="outline-3">
+<h3 id="org2c1f275">Q146: How to stream safely from DB to API response?</h3>
+<div class="outline-text-3" id="text-org2c1f275">
+<p>
+Forward-only ResultSet, tuned fetch size, incremental serialization.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc3c4603" class="outline-3">
+<h3 id="orgc3c4603">Q147: What is fetch direction hint?</h3>
+<div class="outline-text-3" id="text-orgc3c4603">
+<p>
+<code>rs.setFetchDirection(...)</code>; often advisory and may be ignored.
+</p>
+</div>
+</div>
+<div id="outline-container-org0f07552" class="outline-3">
+<h3 id="org0f07552">Q148: How can timezone bugs appear in JDBC apps?</h3>
+<div class="outline-text-3" id="text-org0f07552">
+<p>
+Mismatched JVM/DB/session timezone when mapping timestamps.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c09465" class="outline-3">
+<h3 id="org5c09465">Q149: Best practice for timestamps?</h3>
+<div class="outline-text-3" id="text-org5c09465">
+<p>
+Store in UTC, convert at boundaries, use timezone-aware types when needed.
+</p>
+</div>
+</div>
+<div id="outline-container-org26af271" class="outline-3">
+<h3 id="org26af271">Q150: What is the impact of implicit type conversion in SQL?</h3>
+<div class="outline-text-3" id="text-org26af271">
+<p>
+Can bypass indexes and degrade query performance.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcc5e130" class="outline-3">
+<h3 id="orgcc5e130">Q151: How does JDBC type binding affect query plans?</h3>
+<div class="outline-text-3" id="text-orgcc5e130">
+<p>
+Incorrect binding types may force casts and reduce plan efficiency.
+</p>
+</div>
+</div>
+<div id="outline-container-org60efa47" class="outline-3">
+<h3 id="org60efa47">Q152: Why avoid SELECT * in production queries?</h3>
+<div class="outline-text-3" id="text-org60efa47">
+<p>
+Unnecessary data transfer, brittle mappings, harder index-only scans.
+</p>
+</div>
+</div>
+<div id="outline-container-org6ea4802" class="outline-3">
+<h3 id="org6ea4802">Q153: What is read/write split architecture?</h3>
+<div class="outline-text-3" id="text-org6ea4802">
+<p>
+Reads go to replicas, writes to primary; app/router decides destination.
+</p>
+</div>
+</div>
+<div id="outline-container-org04faee5" class="outline-3">
+<h3 id="org04faee5">Q154: JDBC challenge with replicas?</h3>
+<div class="outline-text-3" id="text-org04faee5">
+<p>
+Replication lag can cause stale reads after write.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d5c61a" class="outline-3">
+<h3 id="org1d5c61a">Q155: How to handle read-after-write consistency needs?</h3>
+<div class="outline-text-3" id="text-org1d5c61a">
+<p>
+Route critical follow-up reads to primary or use session stickiness/windowing.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeff95d3" class="outline-3">
+<h3 id="orgeff95d3">Q156: What are common causes of connection leaks?</h3>
+<div class="outline-text-3" id="text-orgeff95d3">
+<p>
+Missing close in error paths, holding connections across slow operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orga752f06" class="outline-3">
+<h3 id="orga752f06">Q157: How to detect connection leaks?</h3>
+<div class="outline-text-3" id="text-orga752f06">
+<p>
+Pool leak detection thresholds, thread dumps, acquisition timeout metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3cac02" class="outline-3">
+<h3 id="orgd3cac02">Q158: Why avoid doing network calls inside DB transaction?</h3>
+<div class="outline-text-3" id="text-orgd3cac02">
+<p>
+Increases transaction duration and lock holding time.
+</p>
+</div>
+</div>
+<div id="outline-container-org7e8b411" class="outline-3">
+<h3 id="org7e8b411">Q159: What is a retry storm?</h3>
+<div class="outline-text-3" id="text-org7e8b411">
+<p>
+Too many clients retry simultaneously, amplifying outage load.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcc61202" class="outline-3">
+<h3 id="orgcc61202">Q160: How to reduce retry storm risk?</h3>
+<div class="outline-text-3" id="text-orgcc61202">
+<p>
+Exponential backoff + jitter + retry budgets/circuit breakers.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a5c807" class="outline-3">
+<h3 id="org5a5c807">Q161: How to safely perform schema migrations with JDBC apps?</h3>
+<div class="outline-text-3" id="text-org5a5c807">
+<p>
+Backward-compatible, phased rollout, dual-read/write if needed, feature flags.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d106e0" class="outline-3">
+<h3 id="org2d106e0">Q162: What is blue/green DB migration concern?</h3>
+<div class="outline-text-3" id="text-org2d106e0">
+<p>
+Application and schema versions must be compatible during cutover.
+</p>
+</div>
+</div>
+<div id="outline-container-org949a66f" class="outline-3">
+<h3 id="org949a66f">Q163: How do you test JDBC code effectively?</h3>
+<div class="outline-text-3" id="text-org949a66f">
+<p>
+Use integration tests with real DB (or testcontainers), not only mocks.
+</p>
+</div>
+</div>
+<div id="outline-container-org652782b" class="outline-3">
+<h3 id="org652782b">Q164: Why are in-memory DB tests sometimes misleading?</h3>
+<div class="outline-text-3" id="text-org652782b">
+<p>
+SQL dialect/behavior differs from production DB.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf3e5409" class="outline-3">
+<h3 id="orgf3e5409">Q165: What should be included in JDBC observability?</h3>
+<div class="outline-text-3" id="text-orgf3e5409">
+<p>
+Query latency, error rates by SQLState, pool metrics, slow query logging.
+</p>
+</div>
+</div>
+<div id="outline-container-orgffa8867" class="outline-3">
+<h3 id="orgffa8867">Q166: How to correlate SQL performance with app traces?</h3>
+<div class="outline-text-3" id="text-orgffa8867">
+<p>
+Add trace/span IDs around DAO calls and include DB timing tags.
+</p>
+</div>
+</div>
+<div id="outline-container-org86bd4c5" class="outline-3">
+<h3 id="org86bd4c5">Q167: What are safe logging practices for SQL failures?</h3>
+<div class="outline-text-3" id="text-org86bd4c5">
+<p>
+Log statement template, timing, SQLState/vendor code; redact sensitive values.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcdee534" class="outline-3">
+<h3 id="orgcdee534">Q168: How to design resilient JDBC data layer?</h3>
+<div class="outline-text-3" id="text-orgcdee534">
+<p>
+Timeouts, retries (carefully), idempotency, bulkheads, circuit breakers, metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org8b9882b" class="outline-3">
+<h3 id="org8b9882b">Q169: When should you move from raw JDBC to higher abstraction?</h3>
+<div class="outline-text-3" id="text-org8b9882b">
+<p>
+When productivity/maintainability needs exceed benefits of direct control.
+</p>
+</div>
+</div>
+<div id="outline-container-org0782aba" class="outline-3">
+<h3 id="org0782aba">Q170: Why still learn raw JDBC deeply?</h3>
+<div class="outline-text-3" id="text-org0782aba">
+<p>
+It builds strong fundamentals for performance tuning and debugging across all Java data stacks.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
