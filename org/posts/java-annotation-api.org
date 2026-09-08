@@ -1,0 +1,579 @@
+#+title: Java Annotation API
+#+date: 2026-09-08
+#+TAGS: Java
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Annotation API
+
+-----
+
+* Beginner
+
+** Q1: What is an annotation in Java?
+An annotation is metadata attached to program elements like classes, methods, fields, and parameters.
+
+** Q2: Does an annotation change business logic by itself?
+No: It only provides metadata; behavior changes when tools/frameworks process it.
+
+** Q3: Which package contains core annotation meta-annotations?
+=java.lang.annotation=.
+
+** Q4: What is the Annotation API used for?
+Defining custom annotations and controlling how/where they are applied and retained.
+
+** Q5: What is a marker annotation?
+An annotation with no elements, e.g. =@Override=-style metadata marker.
+
+** Q6: What is a single-value annotation?
+Annotation with one commonly used element, often named =value=.
+
+** Q7: What is a full annotation?
+Annotation with multiple elements (attributes).
+
+** Q8: What is an annotation element?
+A method declared inside annotation type, representing metadata property.
+
+** Q9: How do you define a custom annotation?
+Use =@interface= syntax.
+
+** Q10: Example of custom annotation declaration?
+```java
+public @interface Auditable {}
+```
+
+** Q11: What is default value in annotation elements?
+A fallback value declared with =default= keyword.
+
+** Q12: Can annotation elements be null?
+No, annotation elements cannot be null.
+
+** Q13: Allowed element types in annotations?
+Primitives, String, Class, enum, annotation, and one-dimensional arrays of these.
+
+** Q14: Can annotation element be a List or Map?
+No, only allowed Java annotation element types are supported.
+
+** Q15: What is =@Target=?
+Meta-annotation restricting where an annotation can be used.
+
+** Q16: Common ElementType values?
+- TYPE
+- FIELD
+- METHOD
+- PARAMETER
+- CONSTRUCTOR
+- LOCAL_VARIABLE
+- ANNOTATION_TYPE
+- PACKAGE
+- TYPE_USE
+- TYPE_PARAMETER
+
+** Q17: What is =@Retention=?
+Meta-annotation defining how long annotation metadata is kept.
+
+** Q18: Retention policies?
+- SOURCE
+- CLASS
+- RUNTIME
+
+** Q19: What does SOURCE retention mean?
+Annotation exists only in source code; removed by compiler.
+
+** Q20: What does CLASS retention mean?
+Stored in bytecode but not necessarily available at runtime reflection.
+
+** Q21: What does RUNTIME retention mean?
+Available in bytecode and visible through reflection at runtime.
+
+** Q22: What is =@Documented=?
+Indicates annotation should appear in generated Javadoc.
+
+** Q23: What is =@Inherited=?
+Class-level annotation inheritance marker for subclasses.
+
+** Q24: Does @Inherited apply to methods/fields?
+No, only to class-level annotations.
+
+** Q25: What is =@Repeatable=?
+Allows applying same annotation type multiple times to one element.
+
+** Q26: Why use repeatable annotations?
+To attach multiple values without manual container annotation usage in source.
+
+** Q27: What is container annotation in repeatables?
+Annotation type that holds an array of repeatable annotation instances.
+
+** Q28: Can annotations be applied to constructors?
+Yes, with proper =@Target= including CONSTRUCTOR.
+
+** Q29: Can annotations be applied to parameters?
+Yes, if PARAMETER is included in target.
+
+** Q30: Can annotations be applied to type uses?
+Yes, with TYPE_USE target.
+
+** Q31: What is a built-in annotation example?
+=@Override=, =@Deprecated=, =@SuppressWarnings=.
+
+** Q32: What does @Override do?
+Compiler checks method actually overrides a superclass/interface method.
+
+** Q33: What does @Deprecated indicate?
+Element is discouraged and may be removed in future.
+
+** Q34: What does @SuppressWarnings do?
+Suppresses selected compiler warnings in annotated scope.
+
+** Q35: Are annotations case-sensitive?
+Yes.
+
+** Q36: Can annotation names conflict across packages?
+Yes; use fully qualified names or imports to disambiguate.
+
+** Q37: Can you annotate interfaces?
+Yes, interfaces are TYPE elements.
+
+** Q38: Can you annotate enums?
+Yes.
+
+** Q39: Can you annotate annotation types?
+Yes, via ANNOTATION_TYPE target.
+
+** Q40: What is meta-annotation?
+An annotation that annotates another annotation type.
+
+** Q41: Can annotation elements have methods with parameters?
+No, annotation elements are parameterless methods.
+
+** Q42: Can annotation elements throw exceptions?
+No.
+
+** Q43: Can annotation elements be static/default methods?
+No, they are special abstract-like declarations with optional defaults.
+
+** Q44: How do you read runtime annotations?
+Using reflection APIs like =getAnnotation()=.
+
+** Q45: What happens if retention is not RUNTIME?
+Runtime reflection may not see the annotation.
+
+** Q46: Should annotation defaults be chosen carefully?
+Yes, defaults affect API usability and backward compatibility.
+
+** Q47: Can annotation values be computed at runtime?
+No, values must be compile-time constants (or class literals/enums/arrays thereof).
+
+** Q48: Can you pass variables into annotation values?
+Only if they are compile-time constants.
+
+** Q49: Can annotations replace configuration files entirely?
+Sometimes, but external config may still be better for environment-specific values.
+
+** Q50: What is the simplest annotation use case?
+Marking methods/classes for framework scanning and behavior toggles.
+
+** Q51: Are annotations inherited automatically by subclasses?
+Only class-level and only with @Inherited.
+
+** Q52: Do interfaces pass annotations to implementing classes via @Inherited?
+No.
+
+** Q53: What is a common beginner mistake with annotations?
+Forgetting to set =@Retention(RetentionPolicy.RUNTIME)= when runtime processing is needed.
+
+** Q54: Another common mistake?
+Using wrong =@Target= and then being unable to place annotation where intended.
+
+** Q55: Beginner best practice?
+Define minimal, clear annotation contracts with explicit target and retention.
+
+* Intermediate
+
+** Q56: How are annotations represented at runtime?
+As proxy instances implementing annotation interfaces.
+
+** Q57: What does =equals()= mean for annotation instances?
+Logical equality by annotation type and element values.
+
+** Q58: What does =hashCode()= for annotations depend on?
+Defined by JLS based on element names and values.
+
+** Q59: How to get all annotations on an element?
+Use =getAnnotations()= or declared variants.
+
+** Q60: Difference between getAnnotations and getDeclaredAnnotations?
+Declared returns directly present only; non-declared may include inherited class-level ones.
+
+** Q61: How to read repeatable annotations safely?
+Use =getAnnotationsByType(YourAnnotation.class)=.
+
+** Q62: What if you call getAnnotation on repeatable type with multiple entries?
+Behavior may not give all entries; prefer =getAnnotationsByType=.
+
+** Q63: What is annotation processing (APT)?
+Compile-time processing of annotations to validate/generate code/resources.
+
+** Q64: Which package supports annotation processing?
+=javax.annotation.processing= and related language model packages.
+
+** Q65: What is an annotation processor?
+A compiler plugin that reacts to annotations during compilation rounds.
+
+** Q66: What is =AbstractProcessor=?
+Convenience base class for implementing processors.
+
+** Q67: What does processor =process()= do?
+Receives annotated elements each round for validation/code generation.
+
+** Q68: What is a processing round?
+Compiler may invoke processors multiple times as new sources are generated.
+
+** Q69: How to declare supported annotations in processor?
+Override methods or use =@SupportedAnnotationTypes=.
+
+** Q70: How to declare supported source version?
+Use =@SupportedSourceVersion= or override method.
+
+** Q71: What is Filer in annotation processing?
+Utility to create source/class/resource files during compilation.
+
+** Q72: What is Messager in annotation processing?
+Utility for compile-time notes/warnings/errors.
+
+** Q73: What happens on processor error message with ERROR kind?
+Compilation fails.
+
+** Q74: Why use annotation processing instead of runtime reflection?
+Better performance and earlier feedback with compile-time guarantees.
+
+** Q75: Typical generated outputs from processors?
+Boilerplate code, registries, mappers, metadata files.
+
+** Q76: What is element model API?
+Compiler representation of program structure (=Element=, =TypeElement=, etc.).
+
+** Q77: What is type mirror API?
+Compile-time type abstraction (=TypeMirror=) used by processors.
+
+** Q78: Difference between reflection types and TypeMirror?
+Reflection is runtime; TypeMirror is compile-time model.
+
+** Q79: What is incremental annotation processing?
+Processor behavior optimized to reprocess only affected sources.
+
+** Q80: Why does incremental processing matter?
+Faster builds in large projects.
+
+** Q81: What is aggregating vs isolating processor?
+Aggregating depends on many inputs globally; isolating maps output to specific input elements.
+
+** Q82: Can processors modify existing source files?
+No, they generate new files; they do not edit existing source directly.
+
+** Q83: What is generated source directory use?
+Generated code is compiled with project sources in same build.
+
+** Q84: Common processor pitfalls?
+Duplicate file generation, missing originating elements, unstable outputs.
+
+** Q85: What is originating element in Filer APIs?
+Input element reference for better incremental tracking/tooling.
+
+** Q86: Can annotations have nested annotations as values?
+Yes, annotation element type can itself be another annotation.
+
+** Q87: Can annotations reference Class values?
+Yes, via =Class<?>=-typed elements.
+
+** Q88: Runtime pitfall with Class elements in annotations?
+May trigger class loading unexpectedly when read.
+
+** Q89: What is =TypeNotPresentException= risk?
+When annotation references class not present at runtime.
+
+** Q90: How do frameworks scan annotations?
+Classpath/module scanning, reflection, and metadata indexes.
+
+** Q91: Why can annotation scanning be slow?
+Large classpaths and repeated reflective lookups.
+
+** Q92: How optimize annotation scanning?
+Limit scan packages, cache metadata, precompute indexes.
+
+** Q93: What is composed annotation?
+Custom annotation meta-annotated with other annotations to bundle semantics.
+
+** Q94: Benefit of composed annotations?
+Reduces duplication and enforces consistent policy.
+
+** Q95: What is aliasing in annotation frameworks?
+Mapping one annotation attribute to another for ergonomic configuration.
+
+** Q96: Why keep annotation attributes small and stable?
+Large unstable APIs are hard to version and maintain.
+
+** Q97: What is binary compatibility concern for annotation changes?
+Removing/renaming elements can break clients at compile/runtime.
+
+** Q98: Is adding new element to annotation always safe?
+Only if it has a default value; otherwise existing usages break.
+
+** Q99: Can you deprecate annotation elements?
+Yes, but migration guidance is needed.
+
+** Q100: What is TYPE_USE practical example?
+Nullability annotations on any type usage location.
+
+** Q101: What is TYPE_PARAMETER practical example?
+Annotating generic type parameter declaration itself.
+
+** Q102: How are parameter annotations used in frameworks?
+Validation, DI qualifiers, web request binding metadata.
+
+** Q103: How are method annotations used?
+Transactions, caching, security, retries, metrics, routing.
+
+** Q104: How are class annotations used?
+Component registration, configuration roles, serialization rules.
+
+** Q105: Field annotations common usage?
+ORM mapping, injection, validation constraints.
+
+** Q106: What is package-level annotation usage?
+Namespace-wide metadata in =package-info.java=.
+
+** Q107: What is retention mismatch bug?
+Framework expects runtime annotation but annotation retained only SOURCE/CLASS.
+
+** Q108: How to avoid retention mismatch?
+Document processing mode and enforce tests.
+
+** Q109: What is annotation-driven AOP concept?
+Interceptors trigger behavior based on annotation presence.
+
+** Q110: Why proxy-based AOP may miss some annotated calls?
+Self-invocation and final/private method limitations (framework-dependent).
+
+** Q111: What is meta-annotation inheritance nuance?
+Frameworks may search meta-hierarchies differently; behavior is framework-specific.
+
+** Q112: Why should annotation semantics be deterministic?
+Ambiguous semantics produce fragile and surprising behavior.
+
+** Q113: How to validate annotation misuse at compile time?
+Use annotation processors emitting compile errors.
+
+** Q114: How to validate annotation config at runtime?
+Startup checks scanning required constraints and failing fast.
+
+** Q115: What is annotation bloat?
+Overusing many overlapping annotations causing complexity and unreadability.
+
+** Q116: How to avoid annotation bloat?
+Prefer cohesive composed annotations and sensible defaults.
+
+** Q117: Are annotations good for dynamic runtime values?
+Generally no; external config is better for frequently changing values.
+
+** Q118: Can annotations be used in tests?
+Yes, test frameworks heavily use them (lifecycle, parameterization, tagging).
+
+** Q119: Intermediate best practice for annotation APIs?
+Clear contract, explicit retention/target, validation tooling, and minimal surface area.
+
+** Q120: Key maintainability principle?
+Design annotation APIs like public APIs: versioned, documented, and backward compatible.
+
+* Advanced
+
+** Q121: How do annotation proxies affect performance?
+Lookup and proxy creation add overhead; caching metadata is important in hot paths.
+
+** Q122: What is annotation metadata caching strategy?
+Cache per class/method with invalidation tied to classloader lifecycle.
+
+** Q123: What is classloader leak risk with annotation caches?
+Strong references to classes/annotations can prevent unloading.
+
+** Q124: How to avoid cache-related classloader leaks?
+Use weak references and scoped caches.
+
+** Q125: What is synthesized annotation model?
+Framework-generated merged view of annotations (direct, meta, aliases, inherited rules).
+
+** Q126: Why is synthesis complex?
+Must resolve precedence, alias conflicts, repeatables, and merged defaults.
+
+** Q127: What is merged annotation search algorithm?
+Traversal strategy across element, hierarchy, interfaces, meta-annotations.
+
+** Q128: Why define deterministic search order?
+Ensures predictable behavior across versions and environments.
+
+** Q129: How do repeatable annotations appear in bytecode?
+Stored via container annotation unless runtime API expands them.
+
+** Q130: What advanced pitfall exists with repeatables?
+Mixing direct container usage and repeatable syntax inconsistently.
+
+** Q131: What is JPMS impact on runtime annotation scanning?
+Module boundaries can limit reflective access to non-open packages.
+
+** Q132: How to enable scanning across modules?
+Use module descriptors with =opens= where deep reflection is required.
+
+** Q133: Exports vs opens for annotation frameworks?
+=exports= is not enough for deep reflection; =opens= is typically needed.
+
+** Q134: How does native image affect annotation-based frameworks?
+Reflection/scanning may require explicit metadata hints/configuration.
+
+** Q135: Why AOT-friendly annotation processing is valuable?
+Shifts work to build time, reducing runtime reflection overhead.
+
+** Q136: What is build-time index generation for annotations?
+Precomputing annotated element maps to avoid classpath scans at startup.
+
+** Q137: What is annotation contract testing?
+Tests that verify annotations produce intended framework behavior.
+
+** Q138: What is semantic drift in annotation APIs?
+Annotation name remains but behavior changes subtly over time.
+
+** Q139: How prevent semantic drift?
+Strict docs, versioning policy, deprecation path, regression tests.
+
+** Q140: What are security concerns with annotation-driven execution?
+Annotations may enable privileged behavior if placed/processed improperly.
+
+** Q141: How harden annotation processors/frameworks?
+Validate allowed targets, restrict dangerous attributes, enforce policy checks.
+
+** Q142: Should user input directly map to annotation-driven class loading?
+No; avoid untrusted dynamic class resolution paths.
+
+** Q143: What is policy annotation pattern?
+Annotations declare intent while central engine enforces allowed operations.
+
+** Q144: How to design robust annotation defaults?
+Safe, least-privilege defaults with explicit opt-in for risky features.
+
+** Q145: What is cross-cutting concern explosion?
+Too many annotation-triggered interceptors causing hidden control flow.
+
+** Q146: How to control interceptor explosion?
+Ordering rules, explicit composition, diagnostics, and architectural boundaries.
+
+** Q147: What observability helps annotation-heavy systems?
+Startup reports listing discovered annotations, resolved handlers, and conflicts.
+
+** Q148: What is annotation conflict resolution?
+Rules for handling mutually exclusive or overlapping annotations.
+
+** Q149: Example conflict strategy?
+Fail fast at startup with actionable error messages.
+
+** Q150: How do you version annotation attributes safely?
+Add new attributes with defaults; avoid removal; deprecate gradually.
+
+** Q151: What is migration tooling for annotation API changes?
+Static analyzers/rewriters and compile-time warnings with autofix guides.
+
+** Q152: What is meta-annotation composition anti-pattern?
+Deeply nested composed annotations that obscure effective behavior.
+
+** Q153: How deep should composition typically be?
+Keep shallow and readable; document effective merged settings.
+
+** Q154: What is annotation-driven DSL concept?
+Using annotations to declaratively configure framework behavior.
+
+** Q155: When is annotation DSL a bad choice?
+When configuration is highly dynamic or environment-specific.
+
+** Q156: How does Kotlin/other JVM languages impact Java annotation APIs?
+Interoperability mostly works, but nullability/use-site targets may differ.
+
+** Q157: What is use-site target nuance (JVM polyglot)?
+Annotation placement on field/getter/param may differ by language syntax.
+
+** Q158: How to ensure multi-language compatibility?
+Document target expectations and test across language compilers.
+
+** Q159: What is large-scale annotation governance?
+Org-wide standards for naming, retention, targets, and review policies.
+
+** Q160: Why treat annotation definitions as architecture assets?
+They encode conventions/policies across many services.
+
+** Q161: What is compile-time vs runtime validation split?
+Use compile-time for structural rules, runtime for environment/context checks.
+
+** Q162: How to minimize startup cost in annotation-heavy apps?
+Index metadata, lazy-init noncritical paths, reduce scan scope.
+
+** Q163: What is deterministic annotation ordering concern?
+Multiple annotations/interceptors require stable order guarantees.
+
+** Q164: How to represent annotation order explicitly?
+Use order attributes or external precedence rules.
+
+** Q165: What is backward compatibility risk with target changes?
+Narrowing targets can break existing usages.
+
+** Q166: Can widening target be risky?
+Yes, it may allow unintended placements and ambiguous processing semantics.
+
+** Q167: What is mature annotation API design outcome?
+Small, explicit, validated, composable annotations with predictable behavior.
+
+** Q168: Biggest advanced anti-pattern?
+Using annotations as hidden imperative code rather than clear declarative metadata.
+
+** Q169: When should you avoid adding a new annotation?
+When existing configuration/mechanism can express intent more simply.
+
+** Q170: Final advanced principle?
+Optimize for clarity, determinism, and long-term maintainability over cleverness.
+
+* Bonus: Minimal Custom Annotation + Runtime Reader
+
+#+BEGIN_SRC java
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Method;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@interface Timed {
+    String value() default "";
+}
+
+class DemoService {
+    @Timed("create-user")
+    public void createUser() {}
+}
+
+public class AnnotationReader {
+    public static void main(String[] args) throws Exception {
+        Method m = DemoService.class.getDeclaredMethod("createUser");
+        Timed timed = m.getAnnotation(Timed.class);
+        if (timed != null) {
+            System.out.println("Timed operation: " + timed.value());
+        }
+    }
+}
+
+#+END_SRC
+
+* Final Notes
+- Always set retention and target intentionally.
+- Keep annotation contracts minimal and stable.
+- Use compile-time processing for early validation/performance where possible.
+- Cache runtime metadata in framework-heavy paths.
+- Prefer explicit, documented semantics over magic behavior.

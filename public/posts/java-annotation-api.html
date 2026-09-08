@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java Annotation API</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Java Annotation API</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-orga7f7110" class="outline-2">
+<h2 id="orga7f7110">Java Annotation API</h2>
+<div class="outline-text-2" id="text-orga7f7110">
+<hr>
+</div>
+</div>
+<div id="outline-container-org5a98799" class="outline-2">
+<h2 id="org5a98799">Beginner</h2>
+<div class="outline-text-2" id="text-org5a98799">
+</div>
+<div id="outline-container-org743a41b" class="outline-3">
+<h3 id="org743a41b">Q1: What is an annotation in Java?</h3>
+<div class="outline-text-3" id="text-org743a41b">
+<p>
+An annotation is metadata attached to program elements like classes, methods, fields, and parameters.
+</p>
+</div>
+</div>
+<div id="outline-container-org14e9544" class="outline-3">
+<h3 id="org14e9544">Q2: Does an annotation change business logic by itself?</h3>
+<div class="outline-text-3" id="text-org14e9544">
+<p>
+No: It only provides metadata; behavior changes when tools/frameworks process it.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb1fa145" class="outline-3">
+<h3 id="orgb1fa145">Q3: Which package contains core annotation meta-annotations?</h3>
+<div class="outline-text-3" id="text-orgb1fa145">
+<p>
+<code>java.lang.annotation</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orge3eaea5" class="outline-3">
+<h3 id="orge3eaea5">Q4: What is the Annotation API used for?</h3>
+<div class="outline-text-3" id="text-orge3eaea5">
+<p>
+Defining custom annotations and controlling how/where they are applied and retained.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc7a1885" class="outline-3">
+<h3 id="orgc7a1885">Q5: What is a marker annotation?</h3>
+<div class="outline-text-3" id="text-orgc7a1885">
+<p>
+An annotation with no elements, e.g. <code>@Override</code>-style metadata marker.
+</p>
+</div>
+</div>
+<div id="outline-container-org766e51a" class="outline-3">
+<h3 id="org766e51a">Q6: What is a single-value annotation?</h3>
+<div class="outline-text-3" id="text-org766e51a">
+<p>
+Annotation with one commonly used element, often named <code>value</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org5160988" class="outline-3">
+<h3 id="org5160988">Q7: What is a full annotation?</h3>
+<div class="outline-text-3" id="text-org5160988">
+<p>
+Annotation with multiple elements (attributes).
+</p>
+</div>
+</div>
+<div id="outline-container-org0e39a0d" class="outline-3">
+<h3 id="org0e39a0d">Q8: What is an annotation element?</h3>
+<div class="outline-text-3" id="text-org0e39a0d">
+<p>
+A method declared inside annotation type, representing metadata property.
+</p>
+</div>
+</div>
+<div id="outline-container-org63164b3" class="outline-3">
+<h3 id="org63164b3">Q9: How do you define a custom annotation?</h3>
+<div class="outline-text-3" id="text-org63164b3">
+<p>
+Use <code>@interface</code> syntax.
+</p>
+</div>
+</div>
+<div id="outline-container-org5efdc6a" class="outline-3">
+<h3 id="org5efdc6a">Q10: Example of custom annotation declaration?</h3>
+<div class="outline-text-3" id="text-org5efdc6a">
+<p>
+```java
+public @interface Auditable {}
+```
+</p>
+</div>
+</div>
+<div id="outline-container-orgea6a852" class="outline-3">
+<h3 id="orgea6a852">Q11: What is default value in annotation elements?</h3>
+<div class="outline-text-3" id="text-orgea6a852">
+<p>
+A fallback value declared with <code>default</code> keyword.
+</p>
+</div>
+</div>
+<div id="outline-container-org5b45163" class="outline-3">
+<h3 id="org5b45163">Q12: Can annotation elements be null?</h3>
+<div class="outline-text-3" id="text-org5b45163">
+<p>
+No, annotation elements cannot be null.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd35a266" class="outline-3">
+<h3 id="orgd35a266">Q13: Allowed element types in annotations?</h3>
+<div class="outline-text-3" id="text-orgd35a266">
+<p>
+Primitives, String, Class, enum, annotation, and one-dimensional arrays of these.
+</p>
+</div>
+</div>
+<div id="outline-container-org9dfda54" class="outline-3">
+<h3 id="org9dfda54">Q14: Can annotation element be a List or Map?</h3>
+<div class="outline-text-3" id="text-org9dfda54">
+<p>
+No, only allowed Java annotation element types are supported.
+</p>
+</div>
+</div>
+<div id="outline-container-org38a052e" class="outline-3">
+<h3 id="org38a052e">Q15: What is <code>@Target</code>?</h3>
+<div class="outline-text-3" id="text-org38a052e">
+<p>
+Meta-annotation restricting where an annotation can be used.
+</p>
+</div>
+</div>
+<div id="outline-container-org49430e1" class="outline-3">
+<h3 id="org49430e1">Q16: Common ElementType values?</h3>
+<div class="outline-text-3" id="text-org49430e1">
+<ul class="org-ul">
+<li>TYPE</li>
+<li>FIELD</li>
+<li>METHOD</li>
+<li>PARAMETER</li>
+<li>CONSTRUCTOR</li>
+<li>LOCAL<sub>VARIABLE</sub></li>
+<li>ANNOTATION<sub>TYPE</sub></li>
+<li>PACKAGE</li>
+<li>TYPE<sub>USE</sub></li>
+<li>TYPE<sub>PARAMETER</sub></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0d2b9ac" class="outline-3">
+<h3 id="org0d2b9ac">Q17: What is <code>@Retention</code>?</h3>
+<div class="outline-text-3" id="text-org0d2b9ac">
+<p>
+Meta-annotation defining how long annotation metadata is kept.
+</p>
+</div>
+</div>
+<div id="outline-container-org3315c44" class="outline-3">
+<h3 id="org3315c44">Q18: Retention policies?</h3>
+<div class="outline-text-3" id="text-org3315c44">
+<ul class="org-ul">
+<li>SOURCE</li>
+<li>CLASS</li>
+<li>RUNTIME</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org4d44ff7" class="outline-3">
+<h3 id="org4d44ff7">Q19: What does SOURCE retention mean?</h3>
+<div class="outline-text-3" id="text-org4d44ff7">
+<p>
+Annotation exists only in source code; removed by compiler.
+</p>
+</div>
+</div>
+<div id="outline-container-org2b428f9" class="outline-3">
+<h3 id="org2b428f9">Q20: What does CLASS retention mean?</h3>
+<div class="outline-text-3" id="text-org2b428f9">
+<p>
+Stored in bytecode but not necessarily available at runtime reflection.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb6bdcc1" class="outline-3">
+<h3 id="orgb6bdcc1">Q21: What does RUNTIME retention mean?</h3>
+<div class="outline-text-3" id="text-orgb6bdcc1">
+<p>
+Available in bytecode and visible through reflection at runtime.
+</p>
+</div>
+</div>
+<div id="outline-container-org547288f" class="outline-3">
+<h3 id="org547288f">Q22: What is <code>@Documented</code>?</h3>
+<div class="outline-text-3" id="text-org547288f">
+<p>
+Indicates annotation should appear in generated Javadoc.
+</p>
+</div>
+</div>
+<div id="outline-container-org525a00e" class="outline-3">
+<h3 id="org525a00e">Q23: What is <code>@Inherited</code>?</h3>
+<div class="outline-text-3" id="text-org525a00e">
+<p>
+Class-level annotation inheritance marker for subclasses.
+</p>
+</div>
+</div>
+<div id="outline-container-orga2724d4" class="outline-3">
+<h3 id="orga2724d4">Q24: Does @Inherited apply to methods/fields?</h3>
+<div class="outline-text-3" id="text-orga2724d4">
+<p>
+No, only to class-level annotations.
+</p>
+</div>
+</div>
+<div id="outline-container-org3b6d783" class="outline-3">
+<h3 id="org3b6d783">Q25: What is <code>@Repeatable</code>?</h3>
+<div class="outline-text-3" id="text-org3b6d783">
+<p>
+Allows applying same annotation type multiple times to one element.
+</p>
+</div>
+</div>
+<div id="outline-container-org540f456" class="outline-3">
+<h3 id="org540f456">Q26: Why use repeatable annotations?</h3>
+<div class="outline-text-3" id="text-org540f456">
+<p>
+To attach multiple values without manual container annotation usage in source.
+</p>
+</div>
+</div>
+<div id="outline-container-org5058c30" class="outline-3">
+<h3 id="org5058c30">Q27: What is container annotation in repeatables?</h3>
+<div class="outline-text-3" id="text-org5058c30">
+<p>
+Annotation type that holds an array of repeatable annotation instances.
+</p>
+</div>
+</div>
+<div id="outline-container-org55f407c" class="outline-3">
+<h3 id="org55f407c">Q28: Can annotations be applied to constructors?</h3>
+<div class="outline-text-3" id="text-org55f407c">
+<p>
+Yes, with proper <code>@Target</code> including CONSTRUCTOR.
+</p>
+</div>
+</div>
+<div id="outline-container-org779b119" class="outline-3">
+<h3 id="org779b119">Q29: Can annotations be applied to parameters?</h3>
+<div class="outline-text-3" id="text-org779b119">
+<p>
+Yes, if PARAMETER is included in target.
+</p>
+</div>
+</div>
+<div id="outline-container-org369b642" class="outline-3">
+<h3 id="org369b642">Q30: Can annotations be applied to type uses?</h3>
+<div class="outline-text-3" id="text-org369b642">
+<p>
+Yes, with TYPE<sub>USE</sub> target.
+</p>
+</div>
+</div>
+<div id="outline-container-org0993d95" class="outline-3">
+<h3 id="org0993d95">Q31: What is a built-in annotation example?</h3>
+<div class="outline-text-3" id="text-org0993d95">
+<p>
+<code>@Override</code>, <code>@Deprecated</code>, <code>@SuppressWarnings</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org704d521" class="outline-3">
+<h3 id="org704d521">Q32: What does @Override do?</h3>
+<div class="outline-text-3" id="text-org704d521">
+<p>
+Compiler checks method actually overrides a superclass/interface method.
+</p>
+</div>
+</div>
+<div id="outline-container-org697acc7" class="outline-3">
+<h3 id="org697acc7">Q33: What does @Deprecated indicate?</h3>
+<div class="outline-text-3" id="text-org697acc7">
+<p>
+Element is discouraged and may be removed in future.
+</p>
+</div>
+</div>
+<div id="outline-container-org8235ba6" class="outline-3">
+<h3 id="org8235ba6">Q34: What does @SuppressWarnings do?</h3>
+<div class="outline-text-3" id="text-org8235ba6">
+<p>
+Suppresses selected compiler warnings in annotated scope.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf19400d" class="outline-3">
+<h3 id="orgf19400d">Q35: Are annotations case-sensitive?</h3>
+<div class="outline-text-3" id="text-orgf19400d">
+<p>
+Yes.
+</p>
+</div>
+</div>
+<div id="outline-container-org8452a62" class="outline-3">
+<h3 id="org8452a62">Q36: Can annotation names conflict across packages?</h3>
+<div class="outline-text-3" id="text-org8452a62">
+<p>
+Yes; use fully qualified names or imports to disambiguate.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd00b9d" class="outline-3">
+<h3 id="orgfd00b9d">Q37: Can you annotate interfaces?</h3>
+<div class="outline-text-3" id="text-orgfd00b9d">
+<p>
+Yes, interfaces are TYPE elements.
+</p>
+</div>
+</div>
+<div id="outline-container-orge5a7004" class="outline-3">
+<h3 id="orge5a7004">Q38: Can you annotate enums?</h3>
+<div class="outline-text-3" id="text-orge5a7004">
+<p>
+Yes.
+</p>
+</div>
+</div>
+<div id="outline-container-org1a84739" class="outline-3">
+<h3 id="org1a84739">Q39: Can you annotate annotation types?</h3>
+<div class="outline-text-3" id="text-org1a84739">
+<p>
+Yes, via ANNOTATION<sub>TYPE</sub> target.
+</p>
+</div>
+</div>
+<div id="outline-container-orge2dae6c" class="outline-3">
+<h3 id="orge2dae6c">Q40: What is meta-annotation?</h3>
+<div class="outline-text-3" id="text-orge2dae6c">
+<p>
+An annotation that annotates another annotation type.
+</p>
+</div>
+</div>
+<div id="outline-container-orga11fd3a" class="outline-3">
+<h3 id="orga11fd3a">Q41: Can annotation elements have methods with parameters?</h3>
+<div class="outline-text-3" id="text-orga11fd3a">
+<p>
+No, annotation elements are parameterless methods.
+</p>
+</div>
+</div>
+<div id="outline-container-orgae3f3eb" class="outline-3">
+<h3 id="orgae3f3eb">Q42: Can annotation elements throw exceptions?</h3>
+<div class="outline-text-3" id="text-orgae3f3eb">
+<p>
+No.
+</p>
+</div>
+</div>
+<div id="outline-container-org10bc6d0" class="outline-3">
+<h3 id="org10bc6d0">Q43: Can annotation elements be static/default methods?</h3>
+<div class="outline-text-3" id="text-org10bc6d0">
+<p>
+No, they are special abstract-like declarations with optional defaults.
+</p>
+</div>
+</div>
+<div id="outline-container-org94ff338" class="outline-3">
+<h3 id="org94ff338">Q44: How do you read runtime annotations?</h3>
+<div class="outline-text-3" id="text-org94ff338">
+<p>
+Using reflection APIs like <code>getAnnotation()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgffaa830" class="outline-3">
+<h3 id="orgffaa830">Q45: What happens if retention is not RUNTIME?</h3>
+<div class="outline-text-3" id="text-orgffaa830">
+<p>
+Runtime reflection may not see the annotation.
+</p>
+</div>
+</div>
+<div id="outline-container-org334295a" class="outline-3">
+<h3 id="org334295a">Q46: Should annotation defaults be chosen carefully?</h3>
+<div class="outline-text-3" id="text-org334295a">
+<p>
+Yes, defaults affect API usability and backward compatibility.
+</p>
+</div>
+</div>
+<div id="outline-container-org8e0843d" class="outline-3">
+<h3 id="org8e0843d">Q47: Can annotation values be computed at runtime?</h3>
+<div class="outline-text-3" id="text-org8e0843d">
+<p>
+No, values must be compile-time constants (or class literals/enums/arrays thereof).
+</p>
+</div>
+</div>
+<div id="outline-container-org8cacd9a" class="outline-3">
+<h3 id="org8cacd9a">Q48: Can you pass variables into annotation values?</h3>
+<div class="outline-text-3" id="text-org8cacd9a">
+<p>
+Only if they are compile-time constants.
+</p>
+</div>
+</div>
+<div id="outline-container-orge0f8977" class="outline-3">
+<h3 id="orge0f8977">Q49: Can annotations replace configuration files entirely?</h3>
+<div class="outline-text-3" id="text-orge0f8977">
+<p>
+Sometimes, but external config may still be better for environment-specific values.
+</p>
+</div>
+</div>
+<div id="outline-container-orga1d085a" class="outline-3">
+<h3 id="orga1d085a">Q50: What is the simplest annotation use case?</h3>
+<div class="outline-text-3" id="text-orga1d085a">
+<p>
+Marking methods/classes for framework scanning and behavior toggles.
+</p>
+</div>
+</div>
+<div id="outline-container-orga9fcf62" class="outline-3">
+<h3 id="orga9fcf62">Q51: Are annotations inherited automatically by subclasses?</h3>
+<div class="outline-text-3" id="text-orga9fcf62">
+<p>
+Only class-level and only with @Inherited.
+</p>
+</div>
+</div>
+<div id="outline-container-org515cd0d" class="outline-3">
+<h3 id="org515cd0d">Q52: Do interfaces pass annotations to implementing classes via @Inherited?</h3>
+<div class="outline-text-3" id="text-org515cd0d">
+<p>
+No.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a44da9" class="outline-3">
+<h3 id="org6a44da9">Q53: What is a common beginner mistake with annotations?</h3>
+<div class="outline-text-3" id="text-org6a44da9">
+<p>
+Forgetting to set <code>@Retention(RetentionPolicy.RUNTIME)</code> when runtime processing is needed.
+</p>
+</div>
+</div>
+<div id="outline-container-org01a5e1b" class="outline-3">
+<h3 id="org01a5e1b">Q54: Another common mistake?</h3>
+<div class="outline-text-3" id="text-org01a5e1b">
+<p>
+Using wrong <code>@Target</code> and then being unable to place annotation where intended.
+</p>
+</div>
+</div>
+<div id="outline-container-org0fb086b" class="outline-3">
+<h3 id="org0fb086b">Q55: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org0fb086b">
+<p>
+Define minimal, clear annotation contracts with explicit target and retention.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org50f012a" class="outline-2">
+<h2 id="org50f012a">Intermediate</h2>
+<div class="outline-text-2" id="text-org50f012a">
+</div>
+<div id="outline-container-org123ed9f" class="outline-3">
+<h3 id="org123ed9f">Q56: How are annotations represented at runtime?</h3>
+<div class="outline-text-3" id="text-org123ed9f">
+<p>
+As proxy instances implementing annotation interfaces.
+</p>
+</div>
+</div>
+<div id="outline-container-org7bddbdc" class="outline-3">
+<h3 id="org7bddbdc">Q57: What does <code>equals()</code> mean for annotation instances?</h3>
+<div class="outline-text-3" id="text-org7bddbdc">
+<p>
+Logical equality by annotation type and element values.
+</p>
+</div>
+</div>
+<div id="outline-container-orgabe200f" class="outline-3">
+<h3 id="orgabe200f">Q58: What does <code>hashCode()</code> for annotations depend on?</h3>
+<div class="outline-text-3" id="text-orgabe200f">
+<p>
+Defined by JLS based on element names and values.
+</p>
+</div>
+</div>
+<div id="outline-container-org0596d04" class="outline-3">
+<h3 id="org0596d04">Q59: How to get all annotations on an element?</h3>
+<div class="outline-text-3" id="text-org0596d04">
+<p>
+Use <code>getAnnotations()</code> or declared variants.
+</p>
+</div>
+</div>
+<div id="outline-container-org04ba20c" class="outline-3">
+<h3 id="org04ba20c">Q60: Difference between getAnnotations and getDeclaredAnnotations?</h3>
+<div class="outline-text-3" id="text-org04ba20c">
+<p>
+Declared returns directly present only; non-declared may include inherited class-level ones.
+</p>
+</div>
+</div>
+<div id="outline-container-org45596b3" class="outline-3">
+<h3 id="org45596b3">Q61: How to read repeatable annotations safely?</h3>
+<div class="outline-text-3" id="text-org45596b3">
+<p>
+Use <code>getAnnotationsByType(YourAnnotation.class)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf633449" class="outline-3">
+<h3 id="orgf633449">Q62: What if you call getAnnotation on repeatable type with multiple entries?</h3>
+<div class="outline-text-3" id="text-orgf633449">
+<p>
+Behavior may not give all entries; prefer <code>getAnnotationsByType</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb891a99" class="outline-3">
+<h3 id="orgb891a99">Q63: What is annotation processing (APT)?</h3>
+<div class="outline-text-3" id="text-orgb891a99">
+<p>
+Compile-time processing of annotations to validate/generate code/resources.
+</p>
+</div>
+</div>
+<div id="outline-container-org78e6c01" class="outline-3">
+<h3 id="org78e6c01">Q64: Which package supports annotation processing?</h3>
+<div class="outline-text-3" id="text-org78e6c01">
+<p>
+<code>javax.annotation.processing</code> and related language model packages.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcc306a3" class="outline-3">
+<h3 id="orgcc306a3">Q65: What is an annotation processor?</h3>
+<div class="outline-text-3" id="text-orgcc306a3">
+<p>
+A compiler plugin that reacts to annotations during compilation rounds.
+</p>
+</div>
+</div>
+<div id="outline-container-org9aa00ba" class="outline-3">
+<h3 id="org9aa00ba">Q66: What is <code>AbstractProcessor</code>?</h3>
+<div class="outline-text-3" id="text-org9aa00ba">
+<p>
+Convenience base class for implementing processors.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e1d3c7" class="outline-3">
+<h3 id="org2e1d3c7">Q67: What does processor <code>process()</code> do?</h3>
+<div class="outline-text-3" id="text-org2e1d3c7">
+<p>
+Receives annotated elements each round for validation/code generation.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d089dc" class="outline-3">
+<h3 id="org5d089dc">Q68: What is a processing round?</h3>
+<div class="outline-text-3" id="text-org5d089dc">
+<p>
+Compiler may invoke processors multiple times as new sources are generated.
+</p>
+</div>
+</div>
+<div id="outline-container-org08ad6de" class="outline-3">
+<h3 id="org08ad6de">Q69: How to declare supported annotations in processor?</h3>
+<div class="outline-text-3" id="text-org08ad6de">
+<p>
+Override methods or use <code>@SupportedAnnotationTypes</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org090973f" class="outline-3">
+<h3 id="org090973f">Q70: How to declare supported source version?</h3>
+<div class="outline-text-3" id="text-org090973f">
+<p>
+Use <code>@SupportedSourceVersion</code> or override method.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fe0575" class="outline-3">
+<h3 id="org1fe0575">Q71: What is Filer in annotation processing?</h3>
+<div class="outline-text-3" id="text-org1fe0575">
+<p>
+Utility to create source/class/resource files during compilation.
+</p>
+</div>
+</div>
+<div id="outline-container-org199f43d" class="outline-3">
+<h3 id="org199f43d">Q72: What is Messager in annotation processing?</h3>
+<div class="outline-text-3" id="text-org199f43d">
+<p>
+Utility for compile-time notes/warnings/errors.
+</p>
+</div>
+</div>
+<div id="outline-container-org768ae2c" class="outline-3">
+<h3 id="org768ae2c">Q73: What happens on processor error message with ERROR kind?</h3>
+<div class="outline-text-3" id="text-org768ae2c">
+<p>
+Compilation fails.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb95b912" class="outline-3">
+<h3 id="orgb95b912">Q74: Why use annotation processing instead of runtime reflection?</h3>
+<div class="outline-text-3" id="text-orgb95b912">
+<p>
+Better performance and earlier feedback with compile-time guarantees.
+</p>
+</div>
+</div>
+<div id="outline-container-org7db0c52" class="outline-3">
+<h3 id="org7db0c52">Q75: Typical generated outputs from processors?</h3>
+<div class="outline-text-3" id="text-org7db0c52">
+<p>
+Boilerplate code, registries, mappers, metadata files.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e3e17f" class="outline-3">
+<h3 id="org3e3e17f">Q76: What is element model API?</h3>
+<div class="outline-text-3" id="text-org3e3e17f">
+<p>
+Compiler representation of program structure (<code>Element</code>, <code>TypeElement</code>, etc.).
+</p>
+</div>
+</div>
+<div id="outline-container-org5e3c934" class="outline-3">
+<h3 id="org5e3c934">Q77: What is type mirror API?</h3>
+<div class="outline-text-3" id="text-org5e3c934">
+<p>
+Compile-time type abstraction (<code>TypeMirror</code>) used by processors.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1aedee" class="outline-3">
+<h3 id="orgc1aedee">Q78: Difference between reflection types and TypeMirror?</h3>
+<div class="outline-text-3" id="text-orgc1aedee">
+<p>
+Reflection is runtime; TypeMirror is compile-time model.
+</p>
+</div>
+</div>
+<div id="outline-container-orga9d809a" class="outline-3">
+<h3 id="orga9d809a">Q79: What is incremental annotation processing?</h3>
+<div class="outline-text-3" id="text-orga9d809a">
+<p>
+Processor behavior optimized to reprocess only affected sources.
+</p>
+</div>
+</div>
+<div id="outline-container-org42da472" class="outline-3">
+<h3 id="org42da472">Q80: Why does incremental processing matter?</h3>
+<div class="outline-text-3" id="text-org42da472">
+<p>
+Faster builds in large projects.
+</p>
+</div>
+</div>
+<div id="outline-container-org193fbcc" class="outline-3">
+<h3 id="org193fbcc">Q81: What is aggregating vs isolating processor?</h3>
+<div class="outline-text-3" id="text-org193fbcc">
+<p>
+Aggregating depends on many inputs globally; isolating maps output to specific input elements.
+</p>
+</div>
+</div>
+<div id="outline-container-org11e5174" class="outline-3">
+<h3 id="org11e5174">Q82: Can processors modify existing source files?</h3>
+<div class="outline-text-3" id="text-org11e5174">
+<p>
+No, they generate new files; they do not edit existing source directly.
+</p>
+</div>
+</div>
+<div id="outline-container-org93f21bb" class="outline-3">
+<h3 id="org93f21bb">Q83: What is generated source directory use?</h3>
+<div class="outline-text-3" id="text-org93f21bb">
+<p>
+Generated code is compiled with project sources in same build.
+</p>
+</div>
+</div>
+<div id="outline-container-org7abce26" class="outline-3">
+<h3 id="org7abce26">Q84: Common processor pitfalls?</h3>
+<div class="outline-text-3" id="text-org7abce26">
+<p>
+Duplicate file generation, missing originating elements, unstable outputs.
+</p>
+</div>
+</div>
+<div id="outline-container-org91028a4" class="outline-3">
+<h3 id="org91028a4">Q85: What is originating element in Filer APIs?</h3>
+<div class="outline-text-3" id="text-org91028a4">
+<p>
+Input element reference for better incremental tracking/tooling.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd31627" class="outline-3">
+<h3 id="orgdd31627">Q86: Can annotations have nested annotations as values?</h3>
+<div class="outline-text-3" id="text-orgdd31627">
+<p>
+Yes, annotation element type can itself be another annotation.
+</p>
+</div>
+</div>
+<div id="outline-container-org0f98294" class="outline-3">
+<h3 id="org0f98294">Q87: Can annotations reference Class values?</h3>
+<div class="outline-text-3" id="text-org0f98294">
+<p>
+Yes, via <code>Class&lt;?&gt;</code>-typed elements.
+</p>
+</div>
+</div>
+<div id="outline-container-org800f9b6" class="outline-3">
+<h3 id="org800f9b6">Q88: Runtime pitfall with Class elements in annotations?</h3>
+<div class="outline-text-3" id="text-org800f9b6">
+<p>
+May trigger class loading unexpectedly when read.
+</p>
+</div>
+</div>
+<div id="outline-container-org1928aec" class="outline-3">
+<h3 id="org1928aec">Q89: What is <code>TypeNotPresentException</code> risk?</h3>
+<div class="outline-text-3" id="text-org1928aec">
+<p>
+When annotation references class not present at runtime.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8233b0" class="outline-3">
+<h3 id="orgc8233b0">Q90: How do frameworks scan annotations?</h3>
+<div class="outline-text-3" id="text-orgc8233b0">
+<p>
+Classpath/module scanning, reflection, and metadata indexes.
+</p>
+</div>
+</div>
+<div id="outline-container-org33589cc" class="outline-3">
+<h3 id="org33589cc">Q91: Why can annotation scanning be slow?</h3>
+<div class="outline-text-3" id="text-org33589cc">
+<p>
+Large classpaths and repeated reflective lookups.
+</p>
+</div>
+</div>
+<div id="outline-container-org4fc0c7a" class="outline-3">
+<h3 id="org4fc0c7a">Q92: How optimize annotation scanning?</h3>
+<div class="outline-text-3" id="text-org4fc0c7a">
+<p>
+Limit scan packages, cache metadata, precompute indexes.
+</p>
+</div>
+</div>
+<div id="outline-container-org7a66780" class="outline-3">
+<h3 id="org7a66780">Q93: What is composed annotation?</h3>
+<div class="outline-text-3" id="text-org7a66780">
+<p>
+Custom annotation meta-annotated with other annotations to bundle semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a32c65" class="outline-3">
+<h3 id="org8a32c65">Q94: Benefit of composed annotations?</h3>
+<div class="outline-text-3" id="text-org8a32c65">
+<p>
+Reduces duplication and enforces consistent policy.
+</p>
+</div>
+</div>
+<div id="outline-container-org1b786ce" class="outline-3">
+<h3 id="org1b786ce">Q95: What is aliasing in annotation frameworks?</h3>
+<div class="outline-text-3" id="text-org1b786ce">
+<p>
+Mapping one annotation attribute to another for ergonomic configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-org20e6a15" class="outline-3">
+<h3 id="org20e6a15">Q96: Why keep annotation attributes small and stable?</h3>
+<div class="outline-text-3" id="text-org20e6a15">
+<p>
+Large unstable APIs are hard to version and maintain.
+</p>
+</div>
+</div>
+<div id="outline-container-orgab06c66" class="outline-3">
+<h3 id="orgab06c66">Q97: What is binary compatibility concern for annotation changes?</h3>
+<div class="outline-text-3" id="text-orgab06c66">
+<p>
+Removing/renaming elements can break clients at compile/runtime.
+</p>
+</div>
+</div>
+<div id="outline-container-org175a89f" class="outline-3">
+<h3 id="org175a89f">Q98: Is adding new element to annotation always safe?</h3>
+<div class="outline-text-3" id="text-org175a89f">
+<p>
+Only if it has a default value; otherwise existing usages break.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a15309" class="outline-3">
+<h3 id="org8a15309">Q99: Can you deprecate annotation elements?</h3>
+<div class="outline-text-3" id="text-org8a15309">
+<p>
+Yes, but migration guidance is needed.
+</p>
+</div>
+</div>
+<div id="outline-container-org7f0f29f" class="outline-3">
+<h3 id="org7f0f29f">Q100: What is TYPE<sub>USE</sub> practical example?</h3>
+<div class="outline-text-3" id="text-org7f0f29f">
+<p>
+Nullability annotations on any type usage location.
+</p>
+</div>
+</div>
+<div id="outline-container-org2deb7ef" class="outline-3">
+<h3 id="org2deb7ef">Q101: What is TYPE<sub>PARAMETER</sub> practical example?</h3>
+<div class="outline-text-3" id="text-org2deb7ef">
+<p>
+Annotating generic type parameter declaration itself.
+</p>
+</div>
+</div>
+<div id="outline-container-org872f903" class="outline-3">
+<h3 id="org872f903">Q102: How are parameter annotations used in frameworks?</h3>
+<div class="outline-text-3" id="text-org872f903">
+<p>
+Validation, DI qualifiers, web request binding metadata.
+</p>
+</div>
+</div>
+<div id="outline-container-org1351a8c" class="outline-3">
+<h3 id="org1351a8c">Q103: How are method annotations used?</h3>
+<div class="outline-text-3" id="text-org1351a8c">
+<p>
+Transactions, caching, security, retries, metrics, routing.
+</p>
+</div>
+</div>
+<div id="outline-container-org34f0f6b" class="outline-3">
+<h3 id="org34f0f6b">Q104: How are class annotations used?</h3>
+<div class="outline-text-3" id="text-org34f0f6b">
+<p>
+Component registration, configuration roles, serialization rules.
+</p>
+</div>
+</div>
+<div id="outline-container-org5ce8ee7" class="outline-3">
+<h3 id="org5ce8ee7">Q105: Field annotations common usage?</h3>
+<div class="outline-text-3" id="text-org5ce8ee7">
+<p>
+ORM mapping, injection, validation constraints.
+</p>
+</div>
+</div>
+<div id="outline-container-org5b33f0b" class="outline-3">
+<h3 id="org5b33f0b">Q106: What is package-level annotation usage?</h3>
+<div class="outline-text-3" id="text-org5b33f0b">
+<p>
+Namespace-wide metadata in <code>package-info.java</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org9288976" class="outline-3">
+<h3 id="org9288976">Q107: What is retention mismatch bug?</h3>
+<div class="outline-text-3" id="text-org9288976">
+<p>
+Framework expects runtime annotation but annotation retained only SOURCE/CLASS.
+</p>
+</div>
+</div>
+<div id="outline-container-org01f4e1b" class="outline-3">
+<h3 id="org01f4e1b">Q108: How to avoid retention mismatch?</h3>
+<div class="outline-text-3" id="text-org01f4e1b">
+<p>
+Document processing mode and enforce tests.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ed6a04" class="outline-3">
+<h3 id="org7ed6a04">Q109: What is annotation-driven AOP concept?</h3>
+<div class="outline-text-3" id="text-org7ed6a04">
+<p>
+Interceptors trigger behavior based on annotation presence.
+</p>
+</div>
+</div>
+<div id="outline-container-org022b1dd" class="outline-3">
+<h3 id="org022b1dd">Q110: Why proxy-based AOP may miss some annotated calls?</h3>
+<div class="outline-text-3" id="text-org022b1dd">
+<p>
+Self-invocation and final/private method limitations (framework-dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-orgce1cd9e" class="outline-3">
+<h3 id="orgce1cd9e">Q111: What is meta-annotation inheritance nuance?</h3>
+<div class="outline-text-3" id="text-orgce1cd9e">
+<p>
+Frameworks may search meta-hierarchies differently; behavior is framework-specific.
+</p>
+</div>
+</div>
+<div id="outline-container-org1b997fd" class="outline-3">
+<h3 id="org1b997fd">Q112: Why should annotation semantics be deterministic?</h3>
+<div class="outline-text-3" id="text-org1b997fd">
+<p>
+Ambiguous semantics produce fragile and surprising behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb1f9fd5" class="outline-3">
+<h3 id="orgb1f9fd5">Q113: How to validate annotation misuse at compile time?</h3>
+<div class="outline-text-3" id="text-orgb1f9fd5">
+<p>
+Use annotation processors emitting compile errors.
+</p>
+</div>
+</div>
+<div id="outline-container-org1556303" class="outline-3">
+<h3 id="org1556303">Q114: How to validate annotation config at runtime?</h3>
+<div class="outline-text-3" id="text-org1556303">
+<p>
+Startup checks scanning required constraints and failing fast.
+</p>
+</div>
+</div>
+<div id="outline-container-org12982f1" class="outline-3">
+<h3 id="org12982f1">Q115: What is annotation bloat?</h3>
+<div class="outline-text-3" id="text-org12982f1">
+<p>
+Overusing many overlapping annotations causing complexity and unreadability.
+</p>
+</div>
+</div>
+<div id="outline-container-org34d12af" class="outline-3">
+<h3 id="org34d12af">Q116: How to avoid annotation bloat?</h3>
+<div class="outline-text-3" id="text-org34d12af">
+<p>
+Prefer cohesive composed annotations and sensible defaults.
+</p>
+</div>
+</div>
+<div id="outline-container-org2205430" class="outline-3">
+<h3 id="org2205430">Q117: Are annotations good for dynamic runtime values?</h3>
+<div class="outline-text-3" id="text-org2205430">
+<p>
+Generally no; external config is better for frequently changing values.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf13252f" class="outline-3">
+<h3 id="orgf13252f">Q118: Can annotations be used in tests?</h3>
+<div class="outline-text-3" id="text-orgf13252f">
+<p>
+Yes, test frameworks heavily use them (lifecycle, parameterization, tagging).
+</p>
+</div>
+</div>
+<div id="outline-container-orge23d910" class="outline-3">
+<h3 id="orge23d910">Q119: Intermediate best practice for annotation APIs?</h3>
+<div class="outline-text-3" id="text-orge23d910">
+<p>
+Clear contract, explicit retention/target, validation tooling, and minimal surface area.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d88104" class="outline-3">
+<h3 id="org7d88104">Q120: Key maintainability principle?</h3>
+<div class="outline-text-3" id="text-org7d88104">
+<p>
+Design annotation APIs like public APIs: versioned, documented, and backward compatible.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org4b142da" class="outline-2">
+<h2 id="org4b142da">Advanced</h2>
+<div class="outline-text-2" id="text-org4b142da">
+</div>
+<div id="outline-container-org9b439af" class="outline-3">
+<h3 id="org9b439af">Q121: How do annotation proxies affect performance?</h3>
+<div class="outline-text-3" id="text-org9b439af">
+<p>
+Lookup and proxy creation add overhead; caching metadata is important in hot paths.
+</p>
+</div>
+</div>
+<div id="outline-container-org3825315" class="outline-3">
+<h3 id="org3825315">Q122: What is annotation metadata caching strategy?</h3>
+<div class="outline-text-3" id="text-org3825315">
+<p>
+Cache per class/method with invalidation tied to classloader lifecycle.
+</p>
+</div>
+</div>
+<div id="outline-container-org449cd1b" class="outline-3">
+<h3 id="org449cd1b">Q123: What is classloader leak risk with annotation caches?</h3>
+<div class="outline-text-3" id="text-org449cd1b">
+<p>
+Strong references to classes/annotations can prevent unloading.
+</p>
+</div>
+</div>
+<div id="outline-container-org128c9fd" class="outline-3">
+<h3 id="org128c9fd">Q124: How to avoid cache-related classloader leaks?</h3>
+<div class="outline-text-3" id="text-org128c9fd">
+<p>
+Use weak references and scoped caches.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdef0f46" class="outline-3">
+<h3 id="orgdef0f46">Q125: What is synthesized annotation model?</h3>
+<div class="outline-text-3" id="text-orgdef0f46">
+<p>
+Framework-generated merged view of annotations (direct, meta, aliases, inherited rules).
+</p>
+</div>
+</div>
+<div id="outline-container-org2b20391" class="outline-3">
+<h3 id="org2b20391">Q126: Why is synthesis complex?</h3>
+<div class="outline-text-3" id="text-org2b20391">
+<p>
+Must resolve precedence, alias conflicts, repeatables, and merged defaults.
+</p>
+</div>
+</div>
+<div id="outline-container-org5cf3ba7" class="outline-3">
+<h3 id="org5cf3ba7">Q127: What is merged annotation search algorithm?</h3>
+<div class="outline-text-3" id="text-org5cf3ba7">
+<p>
+Traversal strategy across element, hierarchy, interfaces, meta-annotations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgae1d2ad" class="outline-3">
+<h3 id="orgae1d2ad">Q128: Why define deterministic search order?</h3>
+<div class="outline-text-3" id="text-orgae1d2ad">
+<p>
+Ensures predictable behavior across versions and environments.
+</p>
+</div>
+</div>
+<div id="outline-container-org04a6401" class="outline-3">
+<h3 id="org04a6401">Q129: How do repeatable annotations appear in bytecode?</h3>
+<div class="outline-text-3" id="text-org04a6401">
+<p>
+Stored via container annotation unless runtime API expands them.
+</p>
+</div>
+</div>
+<div id="outline-container-org0815f3e" class="outline-3">
+<h3 id="org0815f3e">Q130: What advanced pitfall exists with repeatables?</h3>
+<div class="outline-text-3" id="text-org0815f3e">
+<p>
+Mixing direct container usage and repeatable syntax inconsistently.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf43c0af" class="outline-3">
+<h3 id="orgf43c0af">Q131: What is JPMS impact on runtime annotation scanning?</h3>
+<div class="outline-text-3" id="text-orgf43c0af">
+<p>
+Module boundaries can limit reflective access to non-open packages.
+</p>
+</div>
+</div>
+<div id="outline-container-org51e2af0" class="outline-3">
+<h3 id="org51e2af0">Q132: How to enable scanning across modules?</h3>
+<div class="outline-text-3" id="text-org51e2af0">
+<p>
+Use module descriptors with <code>opens</code> where deep reflection is required.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf92289e" class="outline-3">
+<h3 id="orgf92289e">Q133: Exports vs opens for annotation frameworks?</h3>
+<div class="outline-text-3" id="text-orgf92289e">
+<p>
+<code>exports</code> is not enough for deep reflection; <code>opens</code> is typically needed.
+</p>
+</div>
+</div>
+<div id="outline-container-orge108476" class="outline-3">
+<h3 id="orge108476">Q134: How does native image affect annotation-based frameworks?</h3>
+<div class="outline-text-3" id="text-orge108476">
+<p>
+Reflection/scanning may require explicit metadata hints/configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-org2aac6d3" class="outline-3">
+<h3 id="org2aac6d3">Q135: Why AOT-friendly annotation processing is valuable?</h3>
+<div class="outline-text-3" id="text-org2aac6d3">
+<p>
+Shifts work to build time, reducing runtime reflection overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-org436159c" class="outline-3">
+<h3 id="org436159c">Q136: What is build-time index generation for annotations?</h3>
+<div class="outline-text-3" id="text-org436159c">
+<p>
+Precomputing annotated element maps to avoid classpath scans at startup.
+</p>
+</div>
+</div>
+<div id="outline-container-org36f1755" class="outline-3">
+<h3 id="org36f1755">Q137: What is annotation contract testing?</h3>
+<div class="outline-text-3" id="text-org36f1755">
+<p>
+Tests that verify annotations produce intended framework behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org34a4b9c" class="outline-3">
+<h3 id="org34a4b9c">Q138: What is semantic drift in annotation APIs?</h3>
+<div class="outline-text-3" id="text-org34a4b9c">
+<p>
+Annotation name remains but behavior changes subtly over time.
+</p>
+</div>
+</div>
+<div id="outline-container-org9dd3890" class="outline-3">
+<h3 id="org9dd3890">Q139: How prevent semantic drift?</h3>
+<div class="outline-text-3" id="text-org9dd3890">
+<p>
+Strict docs, versioning policy, deprecation path, regression tests.
+</p>
+</div>
+</div>
+<div id="outline-container-org9adca00" class="outline-3">
+<h3 id="org9adca00">Q140: What are security concerns with annotation-driven execution?</h3>
+<div class="outline-text-3" id="text-org9adca00">
+<p>
+Annotations may enable privileged behavior if placed/processed improperly.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf3881fc" class="outline-3">
+<h3 id="orgf3881fc">Q141: How harden annotation processors/frameworks?</h3>
+<div class="outline-text-3" id="text-orgf3881fc">
+<p>
+Validate allowed targets, restrict dangerous attributes, enforce policy checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org3feff73" class="outline-3">
+<h3 id="org3feff73">Q142: Should user input directly map to annotation-driven class loading?</h3>
+<div class="outline-text-3" id="text-org3feff73">
+<p>
+No; avoid untrusted dynamic class resolution paths.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ae3252" class="outline-3">
+<h3 id="org9ae3252">Q143: What is policy annotation pattern?</h3>
+<div class="outline-text-3" id="text-org9ae3252">
+<p>
+Annotations declare intent while central engine enforces allowed operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e515bd" class="outline-3">
+<h3 id="org2e515bd">Q144: How to design robust annotation defaults?</h3>
+<div class="outline-text-3" id="text-org2e515bd">
+<p>
+Safe, least-privilege defaults with explicit opt-in for risky features.
+</p>
+</div>
+</div>
+<div id="outline-container-org21a9dd6" class="outline-3">
+<h3 id="org21a9dd6">Q145: What is cross-cutting concern explosion?</h3>
+<div class="outline-text-3" id="text-org21a9dd6">
+<p>
+Too many annotation-triggered interceptors causing hidden control flow.
+</p>
+</div>
+</div>
+<div id="outline-container-org92bfc5e" class="outline-3">
+<h3 id="org92bfc5e">Q146: How to control interceptor explosion?</h3>
+<div class="outline-text-3" id="text-org92bfc5e">
+<p>
+Ordering rules, explicit composition, diagnostics, and architectural boundaries.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc7f270" class="outline-3">
+<h3 id="orgdc7f270">Q147: What observability helps annotation-heavy systems?</h3>
+<div class="outline-text-3" id="text-orgdc7f270">
+<p>
+Startup reports listing discovered annotations, resolved handlers, and conflicts.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f76568" class="outline-3">
+<h3 id="org4f76568">Q148: What is annotation conflict resolution?</h3>
+<div class="outline-text-3" id="text-org4f76568">
+<p>
+Rules for handling mutually exclusive or overlapping annotations.
+</p>
+</div>
+</div>
+<div id="outline-container-org5633719" class="outline-3">
+<h3 id="org5633719">Q149: Example conflict strategy?</h3>
+<div class="outline-text-3" id="text-org5633719">
+<p>
+Fail fast at startup with actionable error messages.
+</p>
+</div>
+</div>
+<div id="outline-container-org55a80b8" class="outline-3">
+<h3 id="org55a80b8">Q150: How do you version annotation attributes safely?</h3>
+<div class="outline-text-3" id="text-org55a80b8">
+<p>
+Add new attributes with defaults; avoid removal; deprecate gradually.
+</p>
+</div>
+</div>
+<div id="outline-container-org47f2e2f" class="outline-3">
+<h3 id="org47f2e2f">Q151: What is migration tooling for annotation API changes?</h3>
+<div class="outline-text-3" id="text-org47f2e2f">
+<p>
+Static analyzers/rewriters and compile-time warnings with autofix guides.
+</p>
+</div>
+</div>
+<div id="outline-container-org37976e2" class="outline-3">
+<h3 id="org37976e2">Q152: What is meta-annotation composition anti-pattern?</h3>
+<div class="outline-text-3" id="text-org37976e2">
+<p>
+Deeply nested composed annotations that obscure effective behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb1fa6d" class="outline-3">
+<h3 id="orgbb1fa6d">Q153: How deep should composition typically be?</h3>
+<div class="outline-text-3" id="text-orgbb1fa6d">
+<p>
+Keep shallow and readable; document effective merged settings.
+</p>
+</div>
+</div>
+<div id="outline-container-orgac2ccd8" class="outline-3">
+<h3 id="orgac2ccd8">Q154: What is annotation-driven DSL concept?</h3>
+<div class="outline-text-3" id="text-orgac2ccd8">
+<p>
+Using annotations to declaratively configure framework behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb4f3dd0" class="outline-3">
+<h3 id="orgb4f3dd0">Q155: When is annotation DSL a bad choice?</h3>
+<div class="outline-text-3" id="text-orgb4f3dd0">
+<p>
+When configuration is highly dynamic or environment-specific.
+</p>
+</div>
+</div>
+<div id="outline-container-org94e8691" class="outline-3">
+<h3 id="org94e8691">Q156: How does Kotlin/other JVM languages impact Java annotation APIs?</h3>
+<div class="outline-text-3" id="text-org94e8691">
+<p>
+Interoperability mostly works, but nullability/use-site targets may differ.
+</p>
+</div>
+</div>
+<div id="outline-container-org48ac258" class="outline-3">
+<h3 id="org48ac258">Q157: What is use-site target nuance (JVM polyglot)?</h3>
+<div class="outline-text-3" id="text-org48ac258">
+<p>
+Annotation placement on field/getter/param may differ by language syntax.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d76168" class="outline-3">
+<h3 id="org7d76168">Q158: How to ensure multi-language compatibility?</h3>
+<div class="outline-text-3" id="text-org7d76168">
+<p>
+Document target expectations and test across language compilers.
+</p>
+</div>
+</div>
+<div id="outline-container-org102e649" class="outline-3">
+<h3 id="org102e649">Q159: What is large-scale annotation governance?</h3>
+<div class="outline-text-3" id="text-org102e649">
+<p>
+Org-wide standards for naming, retention, targets, and review policies.
+</p>
+</div>
+</div>
+<div id="outline-container-org984ce3c" class="outline-3">
+<h3 id="org984ce3c">Q160: Why treat annotation definitions as architecture assets?</h3>
+<div class="outline-text-3" id="text-org984ce3c">
+<p>
+They encode conventions/policies across many services.
+</p>
+</div>
+</div>
+<div id="outline-container-org2f2c3a9" class="outline-3">
+<h3 id="org2f2c3a9">Q161: What is compile-time vs runtime validation split?</h3>
+<div class="outline-text-3" id="text-org2f2c3a9">
+<p>
+Use compile-time for structural rules, runtime for environment/context checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f4af30" class="outline-3">
+<h3 id="org4f4af30">Q162: How to minimize startup cost in annotation-heavy apps?</h3>
+<div class="outline-text-3" id="text-org4f4af30">
+<p>
+Index metadata, lazy-init noncritical paths, reduce scan scope.
+</p>
+</div>
+</div>
+<div id="outline-container-org8fd2061" class="outline-3">
+<h3 id="org8fd2061">Q163: What is deterministic annotation ordering concern?</h3>
+<div class="outline-text-3" id="text-org8fd2061">
+<p>
+Multiple annotations/interceptors require stable order guarantees.
+</p>
+</div>
+</div>
+<div id="outline-container-org69a9643" class="outline-3">
+<h3 id="org69a9643">Q164: How to represent annotation order explicitly?</h3>
+<div class="outline-text-3" id="text-org69a9643">
+<p>
+Use order attributes or external precedence rules.
+</p>
+</div>
+</div>
+<div id="outline-container-org917d4f6" class="outline-3">
+<h3 id="org917d4f6">Q165: What is backward compatibility risk with target changes?</h3>
+<div class="outline-text-3" id="text-org917d4f6">
+<p>
+Narrowing targets can break existing usages.
+</p>
+</div>
+</div>
+<div id="outline-container-org06a4fc4" class="outline-3">
+<h3 id="org06a4fc4">Q166: Can widening target be risky?</h3>
+<div class="outline-text-3" id="text-org06a4fc4">
+<p>
+Yes, it may allow unintended placements and ambiguous processing semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org8f7fa14" class="outline-3">
+<h3 id="org8f7fa14">Q167: What is mature annotation API design outcome?</h3>
+<div class="outline-text-3" id="text-org8f7fa14">
+<p>
+Small, explicit, validated, composable annotations with predictable behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org098f3fd" class="outline-3">
+<h3 id="org098f3fd">Q168: Biggest advanced anti-pattern?</h3>
+<div class="outline-text-3" id="text-org098f3fd">
+<p>
+Using annotations as hidden imperative code rather than clear declarative metadata.
+</p>
+</div>
+</div>
+<div id="outline-container-org0f12064" class="outline-3">
+<h3 id="org0f12064">Q169: When should you avoid adding a new annotation?</h3>
+<div class="outline-text-3" id="text-org0f12064">
+<p>
+When existing configuration/mechanism can express intent more simply.
+</p>
+</div>
+</div>
+<div id="outline-container-orge49b217" class="outline-3">
+<h3 id="orge49b217">Q170: Final advanced principle?</h3>
+<div class="outline-text-3" id="text-orge49b217">
+<p>
+Optimize for clarity, determinism, and long-term maintainability over cleverness.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7c1ac0b" class="outline-2">
+<h2 id="org7c1ac0b">Bonus: Minimal Custom Annotation + Runtime Reader</h2>
+<div class="outline-text-2" id="text-org7c1ac0b">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">java</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">annotation</span>.<span style="font-weight: bold; text-decoration: underline;">Retention</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">java</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">annotation</span>.<span style="font-weight: bold; text-decoration: underline;">RetentionPolicy</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">java</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">annotation</span>.<span style="font-weight: bold; text-decoration: underline;">Target</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">java</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">annotation</span>.<span style="font-weight: bold; text-decoration: underline;">ElementType</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">java</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">reflect</span>.<span style="font-weight: bold; text-decoration: underline;">Method</span>;
+
+<span style="font-weight: bold; text-decoration: underline;">@Retention</span>(<span style="font-weight: bold; text-decoration: underline;">RetentionPolicy</span>.<span style="font-weight: bold; text-decoration: underline;">RUNTIME</span>)
+<span style="font-weight: bold; text-decoration: underline;">@Target</span>(<span style="font-weight: bold; text-decoration: underline;">ElementType</span>.<span style="font-weight: bold; text-decoration: underline;">METHOD</span>)
+<span style="font-weight: bold;">@interface</span> <span style="font-weight: bold; text-decoration: underline;">Timed</span> {
+    <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold;">value</span>() <span style="font-weight: bold;">default</span> <span style="font-style: italic;">""</span>;
+}
+
+<span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">DemoService</span> {
+    <span style="font-weight: bold; text-decoration: underline;">@Timed</span>(<span style="font-style: italic;">"create-user"</span>)
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">void</span> <span style="font-weight: bold;">createUser</span>() {}
+}
+
+<span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">AnnotationReader</span> {
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">void</span> <span style="font-weight: bold;">main</span>(<span style="font-weight: bold; text-decoration: underline;">String</span>[] <span style="font-weight: bold; font-style: italic;">args</span>) <span style="font-weight: bold;">throws</span> <span style="font-weight: bold; text-decoration: underline;">Exception</span> {
+        <span style="font-weight: bold; text-decoration: underline;">Method</span> <span style="font-weight: bold; font-style: italic;">m</span> = DemoService.<span style="font-weight: bold;">class</span>.getDeclaredMethod(<span style="font-style: italic;">"createUser"</span>);
+        <span style="font-weight: bold; text-decoration: underline;">Timed</span> <span style="font-weight: bold; font-style: italic;">timed</span> = m.getAnnotation(Timed.<span style="font-weight: bold;">class</span>);
+        <span style="font-weight: bold;">if</span> (timed != <span style="font-weight: bold; text-decoration: underline;">null</span>) {
+            System.out.println(<span style="font-style: italic;">"Timed operation: "</span> + timed.value());
+        }
+    }
+}
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc5984e5" class="outline-2">
+<h2 id="orgc5984e5">Final Notes</h2>
+<div class="outline-text-2" id="text-orgc5984e5">
+<ul class="org-ul">
+<li>Always set retention and target intentionally.</li>
+<li>Keep annotation contracts minimal and stable.</li>
+<li>Use compile-time processing for early validation/performance where possible.</li>
+<li>Cache runtime metadata in framework-heavy paths.</li>
+<li>Prefer explicit, documented semantics over magic behavior.</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
