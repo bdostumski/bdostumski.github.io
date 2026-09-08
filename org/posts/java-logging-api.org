@@ -1,0 +1,565 @@
+#+title: Java Logging API
+#+date: 2026-09-08
+#+TAGS: Java
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Logging API
+
+-----
+
+* Beginner
+
+** Q1: What is application logging?
+Application logging is recording runtime events, errors, and diagnostic information for troubleshooting and monitoring.
+
+** Q2: Why is logging important?
+It helps understand system behavior, detect incidents, debug failures, and support audits.
+
+** Q3: What is a logging API in Java?
+A logging API is an interface your code uses to produce logs, independent of the backend implementation.
+
+** Q4: What is the difference between logging API and logging framework?
+API defines how you call logging methods; framework implements output, formatting, routing, and storage.
+
+** Q5: What is SLF4J?
+SLF4J (Simple Logging Facade for Java) is a popular logging facade/API used to decouple code from logging backends.
+
+** Q6: What is a logging backend?
+A concrete framework (e.g., Logback, Log4j2, JUL) that writes logs to console/files/remote systems.
+
+** Q7: What is Java Util Logging (JUL)?
+JUL is Java’s built-in logging framework in =java.util.logging=.
+
+** Q8: What is Logback?
+Logback is a logging framework often used as the default backend with SLF4J.
+
+** Q9: What is Log4j2?
+Log4j2 is a high-performance logging framework with rich configuration and async logging features.
+
+** Q10: What is a logger?
+A logger is an object identified by name/category that emits log events.
+
+** Q11: How are logger names commonly structured?
+Usually by class/package name, e.g: =com.example.service.UserService=.
+
+** Q12: What is a log event?
+A single emitted record containing message, level, timestamp, thread, and optional context/exception.
+
+** Q13: What is a log level?
+A severity/category marker used for filtering and routing logs.
+
+** Q14: Common log levels?
+- TRACE
+- DEBUG
+- INFO
+- WARN
+- ERROR
+
+** Q15: What is TRACE used for?
+Very detailed diagnostics, typically disabled in production.
+
+** Q16: What is DEBUG used for?
+Developer-oriented diagnostics during debugging/investigation.
+
+** Q17: What is INFO used for?
+Important lifecycle/business events that are expected in normal flow.
+
+** Q18: What is WARN used for?
+Unexpected or suspicious situations that don’t stop execution.
+
+** Q19: What is ERROR used for?
+Failures that impact an operation or request.
+
+** Q20: What does level filtering mean?
+Only events at/above configured severity are emitted for a logger/appender.
+
+** Q21: What is the root logger?
+Top-level logger from which all loggers inherit defaults.
+
+** Q22: What is logger hierarchy?
+Package/class logger names form a tree where child loggers inherit configuration.
+
+** Q23: What is an appender (or handler)?
+Destination component that writes logs (console, file, socket, etc.).
+
+** Q24: What is a layout/encoder?
+It formats log events into text/JSON before output.
+
+** Q25: What is a pattern layout?
+A formatter using placeholders like timestamp, thread, level, logger, message.
+
+** Q26: What is a log message template?
+A message with placeholders, e.g. ="Order {} created"=.
+
+** Q27: Why use parameterized logging?
+Avoids eager string concatenation and improves readability/performance.
+
+** Q28: Example of parameterized logging?
+=log.info("User {} logged in from {}", userId, ip)=
+
+** Q29: Why avoid string concatenation in logs?
+Concatenation executes even if level is disabled, wasting CPU/allocations.
+
+** Q30: What is lazy logging?
+Deferring expensive message creation unless level is enabled.
+
+** Q31: How to check level explicitly?
+Use methods like =log.isDebugEnabled()= around expensive logic.
+
+** Q32: What is stack trace logging?
+Including exception trace details to diagnose failures.
+
+** Q33: How should exceptions be logged?
+Pass the exception object as last argument so framework prints full stack trace.
+
+** Q34: Why not log only exception message?
+Message alone often lacks call-site/context needed for root cause.
+
+** Q35: What is duplicate logging?
+Same error logged multiple times across layers.
+
+** Q36: Why is duplicate logging bad?
+Adds noise, inflates storage costs, and confuses incident analysis.
+
+** Q37: What is log configuration?
+Rules defining levels, appenders, formats, rolling policies, and filters.
+
+** Q38: Where is logging config commonly stored?
+Framework-specific files (XML/YAML/properties) on classpath.
+
+** Q39: Can logging config change by environment?
+Yes, usually different config/profiles for local, test, staging, prod.
+
+** Q40: What is console logging?
+Writing logs to stdout/stderr, common in containers.
+
+** Q41: What is file logging?
+Writing logs to local files, sometimes with rotation.
+
+** Q42: What is log rotation?
+Rolling log files by size/time to control disk usage.
+
+** Q43: What is retention policy?
+How long logs are kept before deletion/archiving.
+
+** Q44: Why include timestamps in logs?
+To reconstruct event order and correlate across systems.
+
+** Q45: Why include thread name in logs?
+Useful for debugging concurrency and request handling.
+
+** Q46: Why include logger/class name?
+Identifies code location producing the event.
+
+** Q47: What is structured logging?
+Logging as key-value/JSON data rather than plain free text.
+
+** Q48: Why structured logs?
+Better machine parsing, querying, and dashboarding.
+
+** Q49: What is correlation ID?
+An identifier used to trace one request across services/components.
+
+** Q50: Where to put correlation ID in logs?
+In logging context (e.g., MDC) so every line carries it.
+
+** Q51: What is MDC?
+Mapped Diagnostic Context: thread-local key-value map attached to log events.
+
+** Q52: Example MDC keys?
+=requestId=, =traceId=, =tenantId=, =userId=.
+
+** Q53: Why clear MDC after request completion?
+To prevent context leakage between reused threads.
+
+** Q54: Can logs contain sensitive data?
+They can, but they should not; secrets/PII must be protected/redacted.
+
+** Q55: What is redaction?
+Masking/removing sensitive values before logs are stored.
+
+** Q56: Should passwords/tokens be logged?
+No, never log raw credentials, tokens, private keys, or secrets.
+
+** Q57: What is sampling in logging?
+Recording only a subset of repetitive events to reduce volume.
+
+** Q58: What is log aggregation?
+Centralizing logs from many instances into a searchable system.
+
+** Q59: What is log search/indexing?
+Storing logs in systems that support fast querying/filtering.
+
+** Q60: What is the first logging rule in production?
+Log useful context, avoid sensitive data, and keep signal-to-noise high.
+
+* Intermediate
+
+** Q61: What is log propagation/additivity?
+Whether child logger events also flow to parent appenders.
+
+** Q62: Why disable additivity sometimes?
+To prevent duplicate outputs when custom appenders are attached.
+
+** Q63: What is asynchronous logging?
+Decoupling app threads from log I/O using queues/background workers.
+
+** Q64: Benefits of async logging?
+Lower request latency and reduced blocking on disk/network I/O.
+
+** Q65: Risks of async logging?
+Queue overflow, potential message loss on crash, ordering nuances.
+
+** Q66: What is bounded log queue?
+A queue with max capacity to protect memory.
+
+** Q67: What happens when async queue is full?
+Framework policy applies: block, drop, or fallback; configurable by backend.
+
+** Q68: What is immediateFlush?
+Whether each event forces output flush; safer but slower.
+
+** Q69: Why can excessive flushing hurt performance?
+More syscalls and I/O overhead per log event.
+
+** Q70: What is caller data/location info?
+Class/method/line metadata for call site.
+
+** Q71: Why can caller data be expensive?
+Capturing stack frame information adds runtime overhead.
+
+** Q72: What is threshold filter?
+Filter allowing only events above a minimum level.
+
+** Q73: What is marker-based logging?
+Tagging events with semantic markers for routing/filtering.
+
+** Q74: Example marker use?
+Security events, audit events, payments events.
+
+** Q75: What is turbo filter (conceptually)?
+Early decision filter to quickly accept/deny events before full formatting.
+
+** Q76: What is rolling policy by size?
+Create new file after log reaches configured byte size.
+
+** Q77: What is time-based rolling?
+Rotate logs by period (hour/day/etc.).
+
+** Q78: What is combined size+time rolling?
+Rotate by time and cap file sizes within each period.
+
+** Q79: Why compress rotated logs?
+Reduce storage footprint for retained archives.
+
+** Q80: What is prudent mode (concept)?
+Safer file writing when multiple JVMs may write same file, with trade-offs.
+
+** Q81: What is bridge/adaptor in logging?
+Component routing one API’s logs into another backend.
+
+** Q82: Example bridging scenario?
+Route JUL logs into SLF4J backend for unified output.
+
+** Q83: Why avoid multiple competing bindings?
+Can cause conflicts/warnings and unpredictable logging behavior.
+
+** Q84: What is “single binding” best practice for SLF4J?
+Use one backend binding at runtime (e.g., logback-classic only).
+
+** Q85: What is logging classpath conflict?
+Multiple backend jars or bridges causing loops/duplicate logs.
+
+** Q86: How detect classpath logging issues?
+Startup warnings, duplicated lines, missing logs, dependency tree inspection.
+
+** Q87: What is logger instantiation best practice?
+Use static final logger per class (or equivalent idiom).
+
+** Q88: Why avoid dynamic logger names per request?
+Creates cardinality explosion and hard-to-manage configurations.
+
+** Q89: What is log cardinality?
+Number of unique field/message values; high cardinality burdens indexing systems.
+
+** Q90: How to reduce cardinality?
+Use stable templates and controlled keys; avoid random/unbounded values as field names.
+
+** Q91: What is event schema for structured logs?
+Defined set of fields/types for consistent ingestion and queries.
+
+** Q92: Why standardize field names?
+Enables reusable dashboards, alerts, and cross-service analysis.
+
+** Q93: What is UTC logging best practice?
+Emit timestamps in UTC to avoid timezone ambiguity.
+
+** Q94: Should you log local timezone too?
+Optional for readability, but canonical timestamp should remain UTC.
+
+** Q95: What is multiline log problem?
+Stack traces/messages split across lines can break parsers in some pipelines.
+
+** Q96: How mitigate multiline issues?
+Use structured logging, multiline-aware shippers, or stacktrace encoders.
+
+** Q97: What is contextual enrichment?
+Adding request/user/tenant/build metadata to each event.
+
+** Q98: How to enrich logs in web apps?
+Middleware/filter sets MDC at request start, clears at end.
+
+** Q99: What is per-package log level control?
+Different verbosity by package, e.g: app DEBUG while framework WARN.
+
+** Q100: Why tune third-party library log levels?
+Reduce noise and storage from verbose dependencies.
+
+** Q101: What is audit logging?
+Tamper-aware recording of security/compliance-critical actions.
+
+** Q102: How does audit logging differ from debug logging?
+Audit logs emphasize integrity, accountability, and retention requirements.
+
+** Q103: What is immutable log storage?
+Write-once/read-many or append-only storage reducing tampering risk.
+
+** Q104: What is log shipping agent?
+Sidecar/daemon forwarding logs from app output/files to central platform.
+
+** Q105: Why container apps often log to stdout?
+Platform-native collection (Kubernetes/Docker) simplifies ops.
+
+** Q106: When might file logs still be used in containers?
+Special compliance/local buffering/legacy constraints.
+
+** Q107: What is log backpressure?
+Downstream ingestion slowdowns affecting producers/pipelines.
+
+** Q108: How protect app from logging backpressure?
+Async buffers, drop policies, rate limits, circuit breakers to log sinks.
+
+** Q109: What is rate-limited logging?
+Limit repeated identical logs per time window.
+
+** Q110: Why use rate limits?
+Prevent flood during incidents and preserve important signal.
+
+** Q111: What is deduplicated logging?
+Collapsing repeated events and keeping counts.
+
+** Q112: What is a “log once” pattern?
+Emit first occurrence of repetitive warning/error, suppress rest temporarily.
+
+** Q113: What is exception wrapping impact on logs?
+Can hide root cause if original exception not preserved as cause.
+
+** Q114: Best practice when rethrowing exceptions?
+Include original cause and avoid losing stacktrace chain.
+
+** Q115: Where to log errors in layered apps?
+At boundary where action is taken; avoid logging same exception in every layer.
+
+** Q116: What is semantic log level misuse?
+Using ERROR for expected business outcomes (e.g., validation failures).
+
+** Q117: Example level mapping for HTTP APIs?
+5xx→ERROR, 4xx often INFO/WARN depending policy, success→INFO/DEBUG.
+
+** Q118: What is startup logging?
+Emitting version/config/environment info at service boot.
+
+** Q119: What to avoid in startup logs?
+Secrets, full private configs, sensitive endpoints credentials.
+
+** Q120: What is dynamic log level change?
+Adjusting verbosity at runtime without redeploy.
+
+** Q121: Why use dynamic level changes?
+Short-term diagnostics in production with minimal downtime.
+
+** Q122: Risk of long-running DEBUG in prod?
+Large cost/noise and potential sensitive data exposure.
+
+** Q123: What is logger context reset?
+Reloading/reinitializing logging config and appenders.
+
+** Q124: Why can frequent reconfiguration be risky?
+Potential event loss, performance spikes, config drift.
+
+** Q125: What is fail-safe appender strategy?
+Fallback destination if primary appender/sink fails.
+
+** Q126: What is network appender?
+Sends logs over TCP/HTTP/UDP to remote collector.
+
+** Q127: What failure modes affect network appenders?
+Timeouts, DNS issues, TLS errors, endpoint throttling.
+
+** Q128: Should app requests block on remote log sink?
+Prefer no; use async and bounded impact on business path.
+
+** Q129: What is message internationalization in logs?
+Localized text support; often less desirable for machine-centric ops logs.
+
+** Q130: What is ideal intermediate-level logging mindset?
+Consistent schema, right levels, controlled volume, secure context-rich events.
+
+* Advanced
+
+** Q131: What is end-to-end observability relation of logs, metrics, traces?
+Logs provide detail, metrics provide trends, traces provide request causality.
+
+** Q132: How do trace IDs connect logs and tracing?
+Inject trace/span IDs into MDC so log lines can be correlated to spans.
+
+** Q133: What is OpenTelemetry log correlation?
+Standardized propagation/enrichment linking logs with telemetry context.
+
+** Q134: What is log ingestion pipeline architecture?
+Producers → shippers/collectors → broker/processors → storage/index → query/alerts.
+
+** Q135: Why design for schema evolution in logs?
+Fields change over time; consumers must tolerate versioned event formats.
+
+** Q136: What is log contract testing?
+Tests ensuring emitted structured events conform to required schema.
+
+** Q137: What is PII classification in logging strategy?
+Categorize fields by sensitivity and enforce handling/masking policies.
+
+** Q138: What is deterministic tokenization?
+Replace sensitive values with consistent tokens for correlation without exposure.
+
+** Q139: What is field-level encryption in logs?
+Encrypt selected sensitive fields before storage/transit.
+
+** Q140: What is secure transport for log shipping?
+Use TLS/mTLS and authenticated endpoints.
+
+** Q141: What is at-least-once log delivery implication?
+Possible duplicates; downstream should handle idempotency/dedup.
+
+** Q142: What is exactly-once challenge in logging?
+High complexity/cost; many systems accept at-least-once semantics.
+
+** Q143: What is eventual consistency in log platforms?
+Recently emitted logs may appear after short indexing delay.
+
+** Q144: How does high-throughput logging affect GC?
+Excessive allocations from formatting/strings can increase GC pressure.
+
+** Q145: How reduce logging allocation overhead?
+Parameterized templates, async appenders, reuse buffers, avoid heavy toString.
+
+** Q146: What is garbage-free logging (concept)?
+Techniques minimizing allocations in hot logging paths.
+
+** Q147: What is disruptor-based async logging?
+Ring-buffer concurrency model used by some frameworks for high throughput.
+
+** Q148: Why benchmark logging configuration?
+Performance depends on pattern complexity, appenders, sync/async choices.
+
+** Q149: What should a logging benchmark include?
+Throughput, p99 latency impact, CPU, memory, drop rates under stress.
+
+** Q150: What is log storm?
+Sudden massive volume increase, often during cascading failures.
+
+** Q151: How mitigate log storms?
+Sampling, rate limits, adaptive suppression, circuit breakers.
+
+** Q152: What is adaptive logging?
+Dynamic verbosity adjustments based on system state/incidents.
+
+** Q153: What is feedback-loop risk with logging?
+Logging failures trigger more logs about failures, amplifying load.
+
+** Q154: How break logging feedback loops?
+Guarded error reporting, capped retries, suppression counters.
+
+** Q155: What is audit trail integrity verification?
+Cryptographic chaining/signatures to detect tampering.
+
+** Q156: What are compliance considerations for logs?
+Retention, access control, immutability, privacy regulations, deletion workflows.
+
+** Q157: How does “right to be forgotten” impact logs?
+Need strategies to minimize personal data and support compliant deletion where required.
+
+** Q158: What is role-based access control for logs?
+Restrict who can view sensitive logs by role/need-to-know.
+
+** Q159: Why separate security logs from app logs?
+Different retention, alerting, access, and incident workflows.
+
+** Q160: What is canary logging change rollout?
+Apply new config/schema to subset instances before full rollout.
+
+** Q161: What is versioned log schema field?
+Include schema/version key to ease downstream parser migration.
+
+** Q162: How handle breaking log format changes?
+Dual-write old+new fields during transition, then deprecate.
+
+** Q163: What is operational SLO for logging pipeline?
+Targets for ingestion latency, durability, and query availability.
+
+** Q164: What is dead-letter queue for logs?
+Store events that fail parsing/indexing for later reprocessing.
+
+** Q165: What is index lifecycle management?
+Automated hot/warm/cold tiers and retention/deletion by age/value.
+
+** Q166: How control log storage costs?
+Sampling, retention tuning, compression, lower-cardinality fields, tiered storage.
+
+** Q167: What is query anti-pattern in log analytics?
+Wildcard-heavy, unbounded-time queries on high-cardinality fields.
+
+** Q168: How design actionable log alerts?
+Alert on meaningful patterns with context and dedup/suppression.
+
+** Q169: Why alerts directly on ERROR count can be noisy?
+Not all ERRORs are incidents; combine with rate, impact, and service context.
+
+** Q170: What is runbook-driven logging?
+Emit events aligned with operational runbooks for faster triage.
+
+** Q171: What is chaos testing for logging?
+Inject sink outages/latency to validate resilience and degradation behavior.
+
+** Q172: What is graceful degradation for logging?
+System continues core business even if logging path partially fails.
+
+** Q173: What are safe defaults for prod logging?
+INFO baseline, structured output, redaction enabled, async with bounded queues.
+
+** Q174: What is cross-service event taxonomy?
+Shared naming conventions for event types/actions across microservices.
+
+** Q175: Why include deployment metadata in logs?
+Correlate incidents with version/release/environment changes.
+
+** Q176: What is “golden signal” enrichment in logs?
+Attach latency/error/resource context to events aiding rapid diagnosis.
+
+** Q177: What is log-driven incident timeline reconstruction?
+Using timestamped correlated events to rebuild failure sequence.
+
+** Q178: What is the biggest advanced logging anti-pattern?
+Treating logs as unlimited free text instead of curated observability data.
+
+** Q179: When should teams revisit logging strategy?
+After major architecture shifts, compliance changes, or repeated incident pain.
+
+** Q180: What is the mature endpoint for logging practice?
+Secure, structured, cost-aware, high-signal logs integrated with full observability.
+
+-----
+
+#+INCLUDE: "../footer.org"
