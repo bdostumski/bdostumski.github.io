@@ -1,0 +1,548 @@
+#+title: Java Reflection API
+#+date: 2026-09-08
+#+TAGS: Java
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Reflection API
+
+-----
+
+* Beginner
+
+** Q1: What is Java Reflection?
+Reflection is the capability of Java code to inspect and interact with class metadata and members at runtime.
+
+** Q2: Why is reflection useful?
+It enables dynamic behavior when types are unknown at compile time.
+
+** Q3: Which package contains core reflection APIs?
+=java.lang.reflect=.
+
+** Q4: What does the =Class= object represent?
+Runtime metadata for classes, interfaces, enums, annotations, arrays, and primitives.
+
+** Q5: How do you obtain a =Class= object?
+- =MyType.class=
+- =obj.getClass()=
+- =Class.forName("com.example.MyType")=
+
+** Q6: What is =Class.forName()= commonly used for?
+Loading classes dynamically by fully qualified name.
+
+** Q7: What can reflection inspect?
+Fields, methods, constructors, modifiers, annotations, superclass, interfaces, generics metadata.
+
+** Q8: What is a reflective =Field=?
+Metadata and access handle for a class variable/member.
+
+** Q9: What is a reflective =Method=?
+Metadata and invocation handle for a class method.
+
+** Q10: What is a reflective =Constructor=?
+Metadata and invocation handle for constructing instances.
+
+** Q11: How do you list public methods including inherited ones?
+=clazz.getMethods()=.
+
+** Q12: How do you list methods declared only in a class?
+=clazz.getDeclaredMethods()=.
+
+** Q13: Difference between =getField()= and =getDeclaredField()=?
+=getField()= resolves public (including inherited); =getDeclaredField()= resolves declared in that class (any visibility).
+
+** Q14: Difference between =getMethods()= and =getDeclaredMethods()=?
+=getMethods()= includes inherited public methods; =getDeclaredMethods()= includes all declared methods in that class only.
+
+** Q15: How do you read a field value with reflection?
+=field.get(target)= (or primitive-specific getters).
+
+** Q16: How do you write a field value reflectively?
+=field.set(target, value)=.
+
+** Q17: How do you invoke a method reflectively?
+=method.invoke(target, args...)=.
+
+** Q18: How do you invoke a static method reflectively?
+Pass =null= as the target instance.
+
+** Q19: How do you create object instances reflectively?
+=clazz.getDeclaredConstructor(...).newInstance(...)=.
+
+** Q20: Why is =Class.newInstance()= discouraged?
+Poor exception behavior and no-arg-only limitations; use constructor APIs instead.
+
+** Q21: What is =InvocationTargetException=?
+Wrapper exception thrown when invoked method itself throws an exception.
+
+** Q22: What is =IllegalAccessException=?
+Thrown when reflective access violates visibility/access rules.
+
+** Q23: What is =NoSuchMethodException=?
+Thrown when a method with the requested signature is not found.
+
+** Q24: What is =NoSuchFieldException=?
+Thrown when requested field is absent.
+
+** Q25: What does =setAccessible(true)= attempt to do?
+Bypass Java language access checks for reflective member access.
+
+** Q26: Is =setAccessible(true)= always guaranteed?
+No; module encapsulation/security constraints can block it.
+
+** Q27: How do you check member modifiers?
+Use =member.getModifiers()= with =Modifier= helper methods.
+
+** Q28: How to check if a method is public?
+=Modifier.isPublic(method.getModifiers())=.
+
+** Q29: How to check if a method is static?
+=Modifier.isStatic(method.getModifiers())=.
+
+** Q30: How to check if a class is interface?
+=clazz.isInterface()=.
+
+** Q31: How to check if a class is enum?
+=clazz.isEnum()=.
+
+** Q32: How to check if a class is annotation?
+=clazz.isAnnotation()=.
+
+** Q33: How to inspect superclass?
+=clazz.getSuperclass()=.
+
+** Q34: How to inspect implemented interfaces?
+=clazz.getInterfaces()=.
+
+** Q35: How do arrays appear in reflection?
+As special classes where =isArray()= is true.
+
+** Q36: How to get array component type?
+=clazz.getComponentType()=.
+
+** Q37: Can reflection create arrays dynamically?
+Yes, with =java.lang.reflect.Array.newInstance()=.
+
+** Q38: How do primitive classes appear reflectively?
+As literals like =int.class=, =boolean.class=.
+
+** Q39: What is =Integer.TYPE=?
+Alias for primitive =int.class=.
+
+** Q40: What is runtime annotation access?
+Reading annotations via reflection during execution.
+
+** Q41: How to read class annotation?
+=clazz.getAnnotation(MyAnnotation.class)=.
+
+** Q42: What annotation retention is needed for runtime reflection?
+=RetentionPolicy.RUNTIME=.
+
+** Q43: Can SOURCE-retained annotations be read at runtime?
+No.
+
+** Q44: What is =AnnotatedElement=?
+Interface implemented by reflection elements that can carry annotations.
+
+** Q45: What does =isAssignableFrom()= do?
+Checks runtime type compatibility relationship.
+
+** Q46: Example assignability check?
+=Number.class.isAssignableFrom(Integer.class)= returns true.
+
+** Q47: Is reflection compile-time type-safe?
+No, many errors are deferred to runtime.
+
+** Q48: Why is reflection generally slower than direct access?
+Extra checks, indirection, boxing, and limited JIT inlining opportunities.
+
+** Q49: Can reflection break encapsulation?
+It can bypass access checks in some conditions, so use carefully.
+
+** Q50: Is reflection thread-safe by default?
+Reflection objects are mostly immutable metadata, but target object mutation still needs synchronization.
+
+** Q51: Does reflection guarantee declared member order?
+No, do not rely on order of returned members.
+
+** Q52: How to get method return type?
+=method.getReturnType()=.
+
+** Q53: How to get method parameter types?
+=method.getParameterTypes()=.
+
+** Q54: How to get constructor parameter types?
+=constructor.getParameterTypes()=.
+
+** Q55: How to inspect declared checked exceptions?
+=method.getExceptionTypes()=.
+
+** Q56: How to detect synthetic members?
+Use =isSynthetic()=.
+
+** Q57: How to detect varargs method?
+=method.isVarArgs()=.
+
+** Q58: Why avoid reflection for ordinary code paths?
+It adds complexity and runtime failure modes without benefits in static scenarios.
+
+** Q59: Typical beginner use cases for reflection?
+Simple plugin loading, testing utilities, annotation-driven configuration.
+
+** Q60: What is the key beginner rule?
+Prefer direct code first; use reflection only for explicit dynamic needs.
+
+* Intermediate
+
+** Q61: What is type erasure?
+Generic type parameters are mostly removed at runtime, limiting reflective generic precision.
+
+** Q62: Which API exposes generic type info?
+=getGenericType()=, =getGenericReturnType()=, =getGenericParameterTypes()=, etc.
+
+** Q63: What is =Type= in reflection?
+Root abstraction for Java types beyond raw =Class=.
+
+** Q64: What =Type= variants are common?
+=Class=, =ParameterizedType=, =TypeVariable=, =WildcardType=, =GenericArrayType=.
+
+** Q65: What is =ParameterizedType=?
+Represents parameterized forms like =List<String>=.
+
+** Q66: What is =TypeVariable=?
+Represents type parameters like =T= in =class Box<T>=.
+
+** Q67: What is =WildcardType=?
+Represents wildcards such as =? extends Number=.
+
+** Q68: What is =GenericArrayType=?
+Represents array types whose component is a parameterized/type-variable type.
+
+** Q69: Can you always recover generic arguments from object instances?
+No, not reliably due to erasure.
+
+** Q70: What is a bridge method?
+Compiler-generated method preserving polymorphism across erased generics boundaries.
+
+** Q71: Why might bridge methods matter in reflection?
+You may see extra methods that are not explicitly declared in source.
+
+** Q72: How to inspect nested classes?
+=clazz.getDeclaredClasses()=.
+
+** Q73: How to detect anonymous/local/member classes?
+=isAnonymousClass()=, =isLocalClass()=, =isMemberClass()=.
+
+** Q74: Reflection and autoboxing pitfalls?
+Signature matching may fail if wrapper/primitive types don’t match expected parameters.
+
+** Q75: Why does invoke sometimes throw IllegalArgumentException?
+Wrong argument count/type or improper varargs packaging.
+
+** Q76: How to access parameter annotations?
+=method.getParameterAnnotations()= or Parameter API.
+
+** Q77: What does =getParameters()= provide?
+Parameter objects (names, modifiers, annotations, synthetic flags).
+
+** Q78: Are parameter names always available?
+Only when compiled with appropriate metadata (e.g., =-parameters=).
+
+** Q79: Difference between =getAnnotation()= and =getDeclaredAnnotation()=?
+Declared variant only checks directly present annotation on that element.
+
+** Q80: What does =@Inherited= influence?
+Inheritance of class-level annotations only (not fields/methods).
+
+** Q81: How to read repeatable annotations?
+Use =getAnnotationsByType()=.
+
+** Q82: Why cache reflection lookups?
+Repeated lookup is costly; caching improves throughput.
+
+** Q83: What should be cached?
+Resolved fields/methods/constructors, accessibility state, annotation presence.
+
+** Q84: What is classloader identity pitfall?
+Same class name loaded by different classloaders are distinct incompatible types.
+
+** Q85: Common symptom of classloader mismatch?
+Unexpected =ClassCastException=.
+
+** Q86: What is context classloader pattern?
+Frameworks use thread context loader to resolve app classes/resources in containers.
+
+** Q87: What are dynamic proxies?
+Runtime-generated classes implementing interfaces and delegating calls to handlers.
+
+** Q88: Which API supports dynamic proxies?
+=Proxy.newProxyInstance()= with =InvocationHandler=.
+
+** Q89: Limitation of JDK proxies?
+They proxy interfaces, not concrete classes directly.
+
+** Q90: Common proxy use cases?
+AOP interception, client stubs, transaction wrappers, metrics logging.
+
+** Q91: What is invocation handler method signature?
+=invoke(Object proxy, Method method, Object[] args)=.
+
+** Q92: What should handlers do with Object methods?
+Handle =equals/hashCode/toString= carefully to avoid surprises.
+
+** Q93: Reflection vs Introspector for beans?
+Introspector is property-centric; reflection is lower-level member-centric.
+
+** Q94: What is BeanInfo?
+Metadata about bean properties/events/methods from JavaBeans introspection.
+
+** Q95: Reflection in serialization frameworks?
+Discovers fields/getters/setters and type metadata dynamically.
+
+** Q96: Reflection in dependency injection frameworks?
+Finds constructors/fields/methods and applies injection rules.
+
+** Q97: Reflection in ORM frameworks?
+Maps entity members to columns and invokes accessors/constructors.
+
+** Q98: What is module system impact (Java 9+)?
+Strong encapsulation can deny deep reflection across module boundaries.
+
+** Q99: Difference between module =exports= and =opens=?
+=exports= for public API access; =opens= for deep reflection access.
+
+** Q100: What does =--add-opens= do?
+Opens a package at runtime to specific/all unnamed modules for reflective access.
+
+** Q101: Why avoid relying on JDK internals reflectively?
+They are unstable and often blocked by encapsulation.
+
+** Q102: What is =ReflectiveOperationException=?
+Common checked superclass for many reflection-related exceptions.
+
+** Q103: Why unwrap =InvocationTargetException=?
+Real failure is in =getCause()=.
+
+** Q104: How to pick correct overloaded method reflectively?
+Match exact parameter type array and account for primitives/interfaces.
+
+** Q105: Why can reflection-based frameworks fail after refactor?
+String-based member names/signatures become stale.
+
+** Q106: How reduce brittleness of reflection usage?
+Use annotations/contracts and centralized lookup utilities.
+
+** Q107: What is fail-fast reflective initialization?
+Validate all required members at startup, not lazily in production traffic.
+
+** Q108: Why add rich diagnostics around reflection failures?
+Speeds up debugging of signature/access/module mismatches.
+
+** Q109: Can private final fields be changed reflectively?
+Sometimes technically, but unsafe and can violate JVM assumptions.
+
+** Q110: Why is mutating final fields risky?
+Breaks immutability and may create visibility/optimization anomalies.
+
+** Q111: Reflection versus code generation trade-off?
+Reflection is flexible and simpler; codegen can offer better speed/type safety.
+
+** Q112: Annotation processing vs reflection?
+Annotation processing is compile-time; reflection is runtime.
+
+** Q113: When prefer annotation processing?
+When runtime overhead and startup scanning must be minimized.
+
+** Q114: How to test reflection-heavy utilities?
+Contract tests across representative classes and edge-case signatures.
+
+** Q115: What is method accessibility inflation concern?
+Frequent dynamic access adjustments can add overhead and complexity.
+
+** Q116: Can reflection be used in security-sensitive code?
+Yes, but with strict input validation and limited scope.
+
+** Q117: Why never reflect on untrusted class/member names blindly?
+Could expose dangerous behavior or internal APIs.
+
+** Q118: How to constrain plugin reflection safely?
+Whitelist packages/interfaces and verify signatures before invocation.
+
+** Q119: What is annotation scanning optimization?
+Restrict base packages and pre-index metadata.
+
+** Q120: What is warm-up strategy for reflection systems?
+Perform metadata resolution at boot and cache handles.
+
+** Q121: Should reflection be in hot loops?
+Prefer no; pre-resolve handles or use alternatives.
+
+** Q122: What alternative can outperform reflection for invocation?
+=MethodHandle= with stable call sites.
+
+** Q123: When is reflection still the right tool?
+When late-binding flexibility outweighs performance/complexity costs.
+
+** Q124: Intermediate-level best practice summary?
+Cache, constrain, validate, and isolate reflection behind small APIs.
+
+** Q125: What architectural principle helps most?
+Keep dynamic behavior at boundaries; keep core domain mostly static and type-safe.
+
+* Advanced
+
+** Q126: How does JIT treat reflective invocation?
+Harder to inline and optimize compared to direct/static dispatch.
+
+** Q127: Why can reflection increase allocation pressure?
+Argument boxing, arrays for varargs, and metadata path overhead.
+
+** Q128: What is =MethodHandle=?
+Typed, potentially optimizable executable reference from =java.lang.invoke=.
+
+** Q129: Why use MethodHandles in frameworks?
+Better performance characteristics and explicit lookup capabilities.
+
+** Q130: What is =VarHandle=?
+Modern typed variable-access API with atomic and memory-order semantics.
+
+** Q131: Reflection vs VarHandle for field access?
+VarHandle is safer/faster for many low-level access patterns.
+
+** Q132: What is call-site adaptation in MethodHandles?
+Transforming handles (bind, filter, fold, asType) to compose dynamic behavior.
+
+** Q133: What is hidden cost of generic reflective dispatch?
+Repeated runtime conversions and exception wrapping paths.
+
+** Q134: What is classpath scanning bottleneck?
+I/O + class metadata loading across many jars/classes.
+
+** Q135: How reduce scanning cost in large apps?
+Metadata indexes, narrowed scan roots, build-time generation.
+
+** Q136: What is AOT/native-image reflection challenge?
+Closed-world compilation requires explicit reflective metadata configuration.
+
+** Q137: Why native images often break reflection-heavy libs?
+Dynamic accesses not declared in hints/config are removed/inaccessible.
+
+** Q138: How do frameworks adapt for native?
+Generate code at build time and emit reflection hints automatically.
+
+** Q139: What is classloader leak from reflection caches?
+Strong refs to classes/members prevent class unloading in app servers/plugins.
+
+** Q140: Mitigation for classloader leaks?
+Use weak references, scoped caches, and lifecycle cleanup hooks.
+
+** Q141: What is deep reflection boundary in JPMS?
+Non-open packages block private/member deep access across modules.
+
+** Q142: Production strategy for JPMS + reflection?
+Define explicit =opens= for framework-needed packages, keep least privilege.
+
+** Q143: What is reflective access audit?
+Inventory and review all deep reflection points for risk/perf/compliance.
+
+** Q144: How to harden reflection entry points?
+Validate names/signatures, enforce interface constraints, deny dangerous packages.
+
+** Q145: Why avoid reflection in deterministic low-latency paths?
+Latency variance and overhead harm predictability.
+
+** Q146: What is megamorphic reflective workload effect?
+Many target shapes reduce optimization opportunities and CPU efficiency.
+
+** Q147: Can reflection affect observability quality?
+Yes, opaque dynamic dispatch can obscure stack traces/ownership if badly instrumented.
+
+** Q148: How keep reflective systems debuggable?
+Emit structured diagnostics: target class, member signature, module/access context.
+
+** Q149: What is fallback chain pattern for dynamic invocation?
+Try fast pre-bound handle, then cached reflection, then fail-fast with context.
+
+** Q150: What is safe plugin contract design?
+Interface-first APIs plus optional annotation metadata; reflection only for discovery/wiring.
+
+** Q151: How to version reflection-dependent contracts?
+Use explicit schema/version annotations and compatibility validators.
+
+** Q152: What is binary compatibility risk in reflection-driven frameworks?
+Private renames break runtime silently until exercised.
+
+** Q153: How detect breaking reflective changes early?
+CI startup validation tests scanning required members.
+
+** Q154: What is reflection metadata precomputation?
+Generating lookup tables at build/startup to avoid repeated runtime introspection.
+
+** Q155: What is annotation synthesis?
+Merging direct/meta/aliased annotation models (common in advanced frameworks).
+
+** Q156: Why is annotation synthesis complex?
+Alias rules, inheritance, repeatables, and composed annotations interact subtly.
+
+** Q157: Reflection and sealed classes?
+You can inspect permitted subclasses; still subject to module/access rules.
+
+** Q158: Reflection and records?
+Record components are first-class metadata simplifying serializers/mappers.
+
+** Q159: How do proxies interact with default interface methods?
+Need specialized invocation logic (often MethodHandles) for default dispatch.
+
+** Q160: Reflection security in sandboxed environments?
+Historically constrained by security manager/policies; modern controls rely more on modules/process boundaries.
+
+** Q161: What is confused-deputy risk with reflection?
+Privileged code executing untrusted reflective requests.
+
+** Q162: Mitigation for confused-deputy scenarios?
+Capability boundaries, explicit allowlists, no raw user-controlled member dispatch.
+
+** Q163: Why centralize reflection utilities in large codebases?
+Consistency, caching, auditing, and safer error handling.
+
+** Q164: What logging fields are essential for reflection failures?
+Class name, loader, module, member signature, argument types, cause chain.
+
+** Q165: Should reflective frameworks expose typed extension SPI?
+Yes; typed SPI reduces fragile string-based dynamic lookups.
+
+** Q166: What is migration path away from heavy reflection?
+Incremental codegen/MethodHandle adapters and stricter compile-time contracts.
+
+** Q167: How to balance flexibility and performance?
+Use reflection at configuration/bootstrap boundaries, typed calls in steady-state flow.
+
+** Q168: What is reflection usage budget?
+Defined acceptable startup and per-request overhead allocated to dynamic behavior.
+
+** Q169: How to measure reflection overhead?
+Profile call counts, wall time, allocations, and p95/p99 latency impact.
+
+** Q170: What is resilience pattern for reflection failures?
+Fail fast at startup for required bindings; graceful degradation for optional features.
+
+** Q171: What governance practice improves reflection safety?
+Architecture reviews for new deep-reflection usage and module-open exceptions.
+
+** Q172: What documentation should accompany reflective code?
+Target members, rationale, fallback behavior, and compatibility guarantees.
+
+** Q173: Biggest advanced anti-pattern?
+Using unrestricted reflection as core control flow instead of explicit contracts.
+
+** Q174: When is reflection mastery most valuable?
+Framework internals, debugging complex runtime behavior, and performance tuning.
+
+** Q175: What is the mature endpoint for reflection usage?
+Constrained, cached, observable, secure, and justified by clear dynamic requirements.
+
+-----
+
+#+INCLUDE: "../footer.org"
