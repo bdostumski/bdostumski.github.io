@@ -1,0 +1,548 @@
+#+title: Spring Core
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Core
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Core?
+Spring Core is the foundational module of Spring providing IoC container and dependency injection features.
+
+** Q2: What is IoC (Inversion of Control)?
+A principle where object creation and dependency wiring are delegated to a container.
+
+** Q3: What is Dependency Injection?
+Supplying dependencies from outside a class rather than constructing them internally.
+
+** Q4: Why use DI?
+Better testability, loose coupling, and clearer object responsibilities.
+
+** Q5: What is a Spring Bean?
+An object managed by the Spring container.
+
+** Q6: What is BeanFactory?
+Basic Spring container interface for managing beans.
+
+** Q7: What is ApplicationContext?
+Advanced container interface extending BeanFactory with enterprise features.
+
+** Q8: BeanFactory vs ApplicationContext?
+ApplicationContext adds events, message source, resource loading, and more convenient capabilities.
+
+** Q9: What is configuration metadata in Spring?
+Instructions telling container what beans to create and how to wire them.
+
+** Q10: What are common bean configuration styles?
+XML, Java-based =@Configuration=, and component scanning annotations.
+
+** Q11: What is @Component?
+Generic stereotype for auto-detected Spring-managed classes.
+
+** Q12: What is @Service?
+Specialized stereotype for service-layer beans.
+
+** Q13: What is @Repository?
+Persistence stereotype that also participates in data-access exception translation.
+
+** Q14: What is @Controller in core context?
+Stereotype for presentation layer beans (commonly MVC controllers).
+
+** Q15: What is component scanning?
+Automatic discovery of candidate beans in specified packages.
+
+** Q16: What does @Configuration indicate?
+Class contains bean definitions (typically methods annotated with =@Bean=).
+
+** Q17: What does @Bean do?
+Registers the method return object as a bean in the context.
+
+** Q18: What is @Autowired?
+Annotation for automatic dependency injection by type.
+
+** Q19: What injection types does Spring support?
+Constructor, setter, and field injection.
+
+** Q20: Which injection style is preferred?
+Constructor injection.
+
+** Q21: Why prefer constructor injection?
+Makes required dependencies explicit and supports immutability.
+
+** Q22: What is dependency ambiguity?
+Multiple candidate beans match one injection point.
+
+** Q23: How resolve ambiguity?
+Use =@Qualifier= or =@Primary=.
+
+** Q24: What is @Qualifier?
+Annotation selecting a specific bean candidate.
+
+** Q25: What is @Primary?
+Marks one bean as default autowire candidate.
+
+** Q26: What is bean scope?
+Defines lifecycle/visibility of bean instances.
+
+** Q27: Default bean scope?
+Singleton.
+
+** Q28: What is singleton scope in Spring?
+One bean instance per container.
+
+** Q29: What is prototype scope?
+New bean instance each time requested.
+
+** Q30: What are web scopes (conceptually)?
+Request, session, application, websocket (in web-aware contexts).
+
+** Q31: What is bean lifecycle?
+Instantiation, dependency population, initialization, and destruction.
+
+** Q32: What is @PostConstruct?
+Lifecycle callback after dependency injection and before use.
+
+** Q33: What is @PreDestroy?
+Lifecycle callback before bean destruction.
+
+** Q34: Do prototype beans get destroy callbacks automatically?
+Typically no; container doesn’t fully manage prototype destruction lifecycle.
+
+** Q35: What is lazy initialization?
+Bean created only when first needed.
+
+** Q36: How enable lazy bean init?
+Use =@Lazy= on bean or configuration.
+
+** Q37: What is eager initialization?
+Beans created at context startup (default for singletons).
+
+** Q38: What is circular dependency?
+Two or more beans depend on each other directly/indirectly.
+
+** Q39: Is circular dependency good design?
+Usually no; it signals tight coupling and design issues.
+
+** Q40: What is dependency lookup?
+Programmatically retrieving beans from container (e.g., getBean).
+
+** Q41: DI vs dependency lookup?
+DI is preferred; lookup couples code to container API.
+
+** Q42: What is ApplicationContextAware?
+Callback to access ApplicationContext from a bean.
+
+** Q43: Should ApplicationContextAware be overused?
+No; prefer constructor DI and explicit dependencies.
+
+** Q44: What is Environment in Spring?
+Abstraction to access profiles and properties.
+
+** Q45: What is a property source?
+Origin of key-value config (files, env vars, system properties, etc.).
+
+** Q46: What is @Value?
+Injects single property/expression into bean fields/params.
+
+** Q47: What is SpEL?
+Spring Expression Language for dynamic value expressions.
+
+** Q48: What is @PropertySource?
+Adds external property file to Spring Environment.
+
+** Q49: What is profile in Spring Core?
+Conditional activation mechanism for bean definitions per environment.
+
+** Q50: How activate profiles?
+Through config, environment variables, JVM args, or programmatic setup.
+
+** Q51: What is autowiring by type?
+Container matches dependency using its type.
+
+** Q52: Can Spring inject collections?
+Yes, lists/sets/maps of matching bean types.
+
+** Q53: What is bean name default?
+Usually decapitalized class name or method name for =@Bean=.
+
+** Q54: What is the role of spring-core best known for?
+Providing DI container and fundamental infrastructure abstractions.
+
+** Q55: Beginner best practice?
+Prefer constructor injection, clear bean boundaries, and explicit configuration.
+
+* Intermediate
+
+** Q56: What is BeanDefinition?
+Internal metadata representation of a bean configuration.
+
+** Q57: What is BeanDefinitionRegistry?
+Registry storing BeanDefinitions before bean instantiation.
+
+** Q58: What is BeanFactoryPostProcessor?
+Allows modifying bean definitions before beans are created.
+
+** Q59: What is BeanPostProcessor?
+Intercepts bean instances before/after initialization callbacks.
+
+** Q60: Difference between BeanFactoryPostProcessor and BeanPostProcessor?
+One changes metadata pre-instantiation; other decorates actual bean instances.
+
+** Q61: What is InstantiationAwareBeanPostProcessor?
+Advanced hook around instantiation and property population phases.
+
+** Q62: What is DestructionAwareBeanPostProcessor?
+Hook for custom logic before bean destruction.
+
+** Q63: What is FactoryBean?
+Special bean that itself produces other objects.
+
+** Q64: How to get FactoryBean product vs factory itself?
+By name for product; prefix with =&= for factory bean instance.
+
+** Q65: What is ObjectFactory?
+Provider-style lazy access to bean instances.
+
+** Q66: What is ObjectProvider?
+Enhanced provider with optional/stream-friendly retrieval.
+
+** Q67: Why use ObjectProvider?
+Handle optional or multiple beans lazily without hard failure.
+
+** Q68: What is dependency resolution order concept?
+Spring resolves constructor args, then properties, then init callbacks.
+
+** Q69: What is @DependsOn?
+Forces initialization order between beans.
+
+** Q70: Should @DependsOn be common?
+Use sparingly; often indicates hidden coupling.
+
+** Q71: What is @Order?
+Defines precedence among ordered beans (where applicable).
+
+** Q72: What is Ordered interface?
+Alternative way to provide order value programmatically.
+
+** Q73: What is PriorityOrdered?
+Higher-priority ordering contract used in infrastructure processing.
+
+** Q74: What is merged bean definition?
+Combined metadata after parent/child and defaults resolution.
+
+** Q75: What is parent-child bean definition in XML era?
+Bean definition inheritance for shared configuration templates.
+
+** Q76: What is method injection in Spring?
+Container overrides methods to return managed dependencies dynamically.
+
+** Q77: What is lookup-method injection?
+Injects prototype dependency into singleton via method override.
+
+** Q78: What is replaced-method injection?
+Legacy mechanism to replace method implementation at runtime.
+
+** Q79: What is CGLIB role in core container?
+Creates subclasses/proxies for certain runtime enhancements.
+
+** Q80: Why can final methods/classes be problematic?
+They limit subclass-based proxy/enhancement strategies.
+
+** Q81: What is scoped proxy?
+Proxy enabling narrower-scoped bean injection into broader-scoped beans.
+
+** Q82: Example scoped proxy use?
+Inject request-scoped bean into singleton service safely.
+
+** Q83: What is autowire candidate?
+Bean eligible for selection at injection points.
+
+** Q84: How disable autowire candidacy?
+Configuration flags (XML/bean definition) or design patterns to hide internal beans.
+
+** Q85: What is resolvable dependency?
+Special dependency type provided directly by container (e.g., ApplicationContext).
+
+** Q86: What is conversion service?
+Type conversion system used during property binding and injection.
+
+** Q87: Converter vs PropertyEditor?
+Converter is modern type-safe approach; PropertyEditor is older mutable API.
+
+** Q88: What is Formatter?
+Locale-aware text formatting/parsing abstraction.
+
+** Q89: What is embedded value resolver?
+Resolves placeholders and expressions in annotation attributes/strings.
+
+** Q90: What is placeholder syntax?
+Usually =${property.name}=.
+
+** Q91: What if placeholder is missing?
+Can fail startup unless default provided or ignore settings enabled.
+
+** Q92: How provide default in placeholder?
+Syntax like =${name:defaultValue}=.
+
+** Q93: What is Resource abstraction?
+Unified access to classpath/file/url resources.
+
+** Q94: Common Resource implementations?
+ClassPathResource, FileSystemResource, UrlResource, ByteArrayResource.
+
+** Q95: What is ResourceLoader?
+Strategy interface to load resources by location string.
+
+** Q96: What is ApplicationEvent?
+Base type for events published within Spring context.
+
+** Q97: How publish events?
+Using =ApplicationEventPublisher=.
+
+** Q98: How consume events?
+With =@EventListener= methods or listener interfaces.
+
+** Q99: Synchronous or async events by default?
+Synchronous by default (unless configured otherwise).
+
+** Q100: What is SmartLifecycle?
+Lifecycle contract with phase control and auto-start behavior.
+
+** Q101: What is lifecycle phase ordering?
+Controls startup/shutdown order among lifecycle beans.
+
+** Q102: What is MessageSource?
+Strategy for internationalization (i18n) message resolution.
+
+** Q103: What is HierarchicalBeanFactory?
+BeanFactory supporting parent-child container relationships.
+
+** Q104: What is parent context usage?
+Share common infrastructure beans across child contexts.
+
+** Q105: What is context refresh?
+Reinitialize container state and recreate singleton beans.
+
+** Q106: What is context close?
+Shuts container down and triggers destruction callbacks.
+
+** Q107: What is context startup failure strategy?
+Fail fast with clear diagnostics when mandatory beans/properties are missing.
+
+** Q108: What is bean overriding?
+Registering another bean with same name, replacing existing definition (policy-dependent).
+
+** Q109: Why avoid accidental bean overriding?
+It causes unpredictable wiring and hard-to-debug behavior.
+
+** Q110: What is conditional bean registration in core style?
+Programmatic/profile/property-based conditions deciding bean creation.
+
+** Q111: What is @Profile at bean level?
+Conditionally registers bean when profile is active.
+
+** Q112: What is @Lazy at injection point?
+Injects proxy/provider delaying actual target resolution.
+
+** Q113: What is @Lookup?
+Annotation-based lookup method injection.
+
+** Q114: What is SmartInitializingSingleton?
+Callback after all singleton beans are instantiated.
+
+** Q115: When is SmartInitializingSingleton useful?
+Post-bootstrap coordination once singleton graph is ready.
+
+** Q116: What is bean definition role metadata?
+Hint distinguishing application/support/infrastructure beans.
+
+** Q117: Why separate infrastructure beans?
+Improves maintainability and avoids accidental application coupling.
+
+** Q118: What is metadata reader/scanning concept?
+Reads class metadata without loading every class eagerly.
+
+** Q119: Why avoid classloading everything during scanning?
+Improves startup and avoids side effects.
+
+** Q120: Intermediate best practice?
+Use extension points intentionally; keep container customizations minimal and well-tested.
+
+* Advanced
+
+** Q121: What is DefaultListableBeanFactory?
+Primary Spring bean factory implementation handling registration and autowiring.
+
+** Q122: What is AutowireCapableBeanFactory?
+Interface for programmatic wiring/initialization of existing objects.
+
+** Q123: Why use programmatic autowiring sparingly?
+It can bypass clean architecture and couple code to container internals.
+
+** Q124: What is candidate constructor resolution?
+Algorithm selecting constructor for bean instantiation/autowiring.
+
+** Q125: What is parameter name discovery role?
+Helps resolve dependencies and bind values when names are needed.
+
+** Q126: What is merged annotations model in Spring?
+Unified view over direct/meta/repeatable annotations for consistent processing.
+
+** Q127: What is synthetic bean definition?
+Container-generated definition not directly declared by user.
+
+** Q128: What is infrastructure advisor auto-proxy creator concept?
+BeanPostProcessor that wraps eligible beans with proxies for cross-cutting behavior.
+
+** Q129: How does proxying affect equals/hashCode assumptions?
+Proxy types may differ; equality semantics must be designed carefully.
+
+** Q130: What is target source abstraction?
+Strategy for obtaining actual target object behind proxy.
+
+** Q131: What is hot-swappable target source use case?
+Swap implementation instances at runtime behind stable proxy.
+
+** Q132: What is performance cost of excessive proxies?
+More indirection, memory overhead, and debugging complexity.
+
+** Q133: What is bean creation deadlock risk?
+Complex circular references plus locks can stall startup in extreme cases.
+
+** Q134: How reduce bean graph complexity?
+Smaller modules, explicit boundaries, event-driven decoupling.
+
+** Q135: What is fail-fast module boundary validation?
+Verify required beans/contracts at startup per module.
+
+** Q136: What is functional bean registration?
+Programmatic bean registration style (common in advanced/bootstrap scenarios).
+
+** Q137: What is ApplicationContextInitializer?
+Hook to customize context before refresh.
+
+** Q138: What is EnvironmentPostProcessor (Boot-adjacent concept)?
+Early hook to customize property sources before app context fully builds.
+
+** Q139: Why care about bootstrap phases?
+Wrong-phase customization may be ignored or applied too late.
+
+** Q140: What is AOT implication for Spring Core patterns?
+Dynamic reflection/proxy behavior may need hints or alternative generation strategies.
+
+** Q141: How does strong encapsulation (JPMS) impact Spring Core?
+Reflective access may require opened modules/packages.
+
+** Q142: What is bean definition profile explosion?
+Too many profile-specific variants causing configuration complexity.
+
+** Q143: How control profile complexity?
+Layer shared defaults, minimize branching, document environment matrix.
+
+** Q144: What is container memory footprint concern?
+Large bean graphs and metadata caches increase startup/runtime memory usage.
+
+** Q145: How optimize context startup time?
+Reduce scanning scope, avoid unnecessary beans, prefer lazy where sensible.
+
+** Q146: What is context slicing for large systems?
+Creating smaller focused contexts per service/module/tests.
+
+** Q147: Why avoid “one giant context” in modular monoliths?
+It slows startup and increases coupling/failure blast radius.
+
+** Q148: What is bean lifecycle observability?
+Measuring creation times and failures per bean for diagnostics.
+
+** Q149: How improve bean creation diagnostics?
+Enable debug logs, custom post-processors, startup metrics/reporting.
+
+** Q150: What is deterministic wiring principle?
+Dependency resolution should be explicit and reproducible across environments.
+
+** Q151: What is hidden dependency anti-pattern?
+Using container lookups or static holders instead of explicit constructor dependencies.
+
+** Q152: Why are hidden dependencies harmful?
+They reduce readability, testability, and refactoring safety.
+
+** Q153: What is plugin architecture with Spring Core?
+Register extension beans via interfaces and discover/invoke dynamically.
+
+** Q154: How keep plugin systems safe?
+Strict interfaces, validation, isolation boundaries, and controlled classloading.
+
+** Q155: What is bean scope mismatch problem?
+Injecting short-lived stateful bean into long-lived singleton incorrectly.
+
+** Q156: Correct fix for scope mismatch?
+Scoped proxies, providers, or redesign state handling.
+
+** Q157: What is immutable configuration object pattern?
+Bind external properties once into validated immutable classes.
+
+** Q158: Why immutable config?
+Thread-safety, predictability, and safer runtime behavior.
+
+** Q159: What is configuration drift detection?
+Detecting differences between expected and actual runtime configuration.
+
+** Q160: How enforce architecture with Spring Core?
+Package rules, dependency direction checks, and context-level contract tests.
+
+** Q161: What is advanced testing approach for container behavior?
+Context integration tests for wiring + focused unit tests for business logic.
+
+** Q162: What is bean definition overriding policy best practice?
+Disallow by default in large codebases unless explicit need exists.
+
+** Q163: What is graceful degradation in container startup?
+Optional subsystems fail independently while critical core still boots (carefully controlled).
+
+** Q164: What is startup critical path?
+Minimum bean set required before app can serve traffic.
+
+** Q165: Why map critical path explicitly?
+Improves reliability, readiness checks, and incident recovery speed.
+
+** Q166: What is biggest advanced Spring Core anti-pattern?
+Over-customizing container internals when simpler design would solve the problem.
+
+** Q167: When should you create a custom BeanPostProcessor?
+Only for cross-cutting infrastructure concerns not achievable by simpler means.
+
+** Q168: What is mature Spring Core design outcome?
+Clear modules, explicit DI, minimal magic, observable lifecycle, and predictable wiring.
+
+** Q169: What should be documented for custom container extensions?
+Purpose, ordering, affected beans, failure modes, and rollback plan.
+
+** Q170: Final advanced principle?
+Treat the container as infrastructure foundation—keep domain logic independent and clean.
+
+* Bonus: Minimal Core Configuration Template
+
+#+BEGIN_SRC java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class CoreConfig {
+
+    @Bean
+    public EmailService emailService(SmtpClient smtpClient) {
+        return new EmailService(smtpClient);
+    }
+
+    @Bean
+    public SmtpClient smtpClient() {
+        return new SmtpClient("smtp.example.com", 587);
+    }
+}
+#+END_SRC
