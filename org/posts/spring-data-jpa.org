@@ -1,0 +1,562 @@
+#+title: Spring Data JPA
+#+date: 2026-09-10
+#+TAGS: Java
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Data JPA
+
+-----
+
+* Beginner
+
+** Q1: What is JPA?
+JPA (Jakarta Persistence API) is a Java specification for ORM and relational persistence.
+
+** Q2: What is Spring Data JPA?
+A Spring project that simplifies data access on top of JPA providers (e.g., Hibernate).
+
+** Q3: Is JPA a framework?
+No, it is a specification; implementations include Hibernate, EclipseLink, etc.
+
+** Q4: What problem does Spring Data JPA solve?
+Reduces boilerplate repository/CRUD code and standardizes data access patterns.
+
+** Q5: What is an Entity?
+A lightweight persistent domain object mapped to a database table.
+
+** Q6: Which annotation marks an entity?
+=@Entity=.
+
+** Q7: What is @Table used for?
+Customizes table mapping details (name, schema, indexes, etc.).
+
+** Q8: What is primary key in JPA entity?
+Unique identifier field marked with =@Id=.
+
+** Q9: What is @GeneratedValue?
+Specifies strategy for automatic primary key generation.
+
+** Q10: Common generation strategies?
+=AUTO=, =IDENTITY=, =SEQUENCE=, =TABLE=.
+
+** Q11: What is a Repository in Spring Data?
+Interface-based abstraction for persistence operations.
+
+** Q12: What is CrudRepository?
+Provides basic CRUD methods.
+
+** Q13: What is JpaRepository?
+Extends paging/sorting + JPA-specific operations.
+
+** Q14: Difference between CrudRepository and JpaRepository?
+JpaRepository adds flushing, batch-related helpers, and richer APIs.
+
+** Q15: What is PagingAndSortingRepository?
+Adds pagination and sorting operations.
+
+** Q16: What is derived query method?
+Query inferred from method name (e.g., =findByEmail=).
+
+** Q17: Example derived query?
+=Optional<User> findByEmail(String email);=
+
+** Q18: What does findBy... mean?
+Select rows matching property criteria encoded in method name.
+
+** Q19: What does existsBy... do?
+Checks existence without fetching full entity.
+
+** Q20: What does countBy... do?
+Returns count of matching rows.
+
+** Q21: What is Optional in repository results?
+Container representing possible absence of entity.
+
+** Q22: What is @Query annotation?
+Defines custom JPQL/native query on repository method.
+
+** Q23: JPQL vs SQL?
+JPQL queries entities/fields; SQL queries tables/columns.
+
+** Q24: What is nativeQuery=true?
+Treats @Query string as database-native SQL.
+
+** Q25: What is @Param?
+Binds named method parameter to query parameter.
+
+** Q26: What is @Transactional in data layer?
+Defines transaction boundaries for persistence operations.
+
+** Q27: Are repository methods transactional by default?
+Many are transactional by default (read-only for reads, write for mutations), depending on configuration.
+
+** Q28: What is EntityManager?
+Core JPA interface for persistence context operations.
+
+** Q29: What is persistence context?
+First-level cache and tracking context for managed entities.
+
+** Q30: Entity states in JPA?
+Transient, Managed, Detached, Removed.
+
+** Q31: What is transient entity?
+New object not associated with persistence context.
+
+** Q32: What is managed entity?
+Tracked by persistence context; changes may be synchronized automatically.
+
+** Q33: What is detached entity?
+Previously managed but no longer attached to current persistence context.
+
+** Q34: What is removed entity?
+Marked for deletion in current transaction.
+
+** Q35: What is dirty checking?
+Automatic detection of managed entity changes and SQL update generation.
+
+** Q36: What is flush in JPA?
+Synchronizing persistence context changes to database.
+
+** Q37: Flush vs commit?
+Flush sends SQL; commit finalizes transaction permanently.
+
+** Q38: What is save() in Spring Data JPA?
+Persists new entity or merges existing depending on identifier state/provider behavior.
+
+** Q39: What is deleteById()?
+Deletes entity by primary key.
+
+** Q40: What is findAll()?
+Fetches all records (use carefully on large tables).
+
+** Q41: Why can findAll() be dangerous?
+Memory/performance issues on large datasets.
+
+** Q42: What is pagination?
+Fetching data in chunks/pages rather than all at once.
+
+** Q43: What is Pageable?
+Spring Data abstraction for page request (page, size, sort).
+
+** Q44: What is Page?
+Result containing content plus total counts and page metadata.
+
+** Q45: What is Slice?
+Page-like result without total count query.
+
+** Q46: When prefer Slice over Page?
+When total count is expensive/unnecessary.
+
+** Q47: What is Sort?
+Abstraction for ordering query results.
+
+** Q48: What is @Column?
+Customizes column mapping properties.
+
+** Q49: What is nullable=false in @Column?
+Column cannot store NULL values.
+
+** Q50: What is unique=true in @Column?
+Requests unique constraint (DDL generation context).
+
+** Q51: What is @Enumerated?
+Controls enum persistence strategy (ORDINAL or STRING).
+
+** Q52: Why prefer EnumType.STRING?
+Safer against enum order changes.
+
+** Q53: What is @Lob?
+Maps large object fields (BLOB/CLOB).
+
+** Q54: What is @Temporal (legacy context)?
+Specifies temporal precision for old Date/Calendar mappings.
+
+** Q55: Modern Java time support in JPA?
+Use =java.time= types (LocalDate, Instant, etc.) with provider support.
+
+** Q56: What is beginner anti-pattern in JPA?
+Exposing entities directly in external API contracts.
+
+** Q57: Why separate DTO and entity?
+Prevents coupling and accidental lazy loading/leaks.
+
+** Q58: What is N+1 query problem?
+One query for parent list + many queries for child data per row.
+
+** Q59: Beginner way to reduce N+1?
+Use fetch joins/entity graphs strategically.
+
+** Q60: Beginner best practice?
+Model entities clearly, paginate reads, and understand transaction boundaries.
+
+* Intermediate
+
+** Q61: What is relationship mapping in JPA?
+Associating entities via one-to-one, one-to-many, many-to-one, many-to-many.
+
+** Q62: What is @OneToOne?
+Maps one entity instance to one related instance.
+
+** Q63: What is @OneToMany?
+Maps parent to multiple child entities.
+
+** Q64: What is @ManyToOne?
+Maps many child rows to one parent.
+
+** Q65: What is @ManyToMany?
+Maps many-to-many association, often via join table.
+
+** Q66: What is mappedBy?
+Indicates inverse side of bidirectional association.
+
+** Q67: Owning side vs inverse side?
+Owning side controls foreign key/join table updates.
+
+** Q68: What is FetchType.LAZY?
+Association loaded on access (provider may use proxies).
+
+** Q69: What is FetchType.EAGER?
+Association loaded immediately with entity (can hurt performance).
+
+** Q70: Why avoid broad EAGER mappings?
+Can cause over-fetching, N+1 variants, and heavy queries.
+
+** Q71: What is cascade in JPA?
+Propagating persistence operations from parent to associated entities.
+
+** Q72: Common cascade types?
+PERSIST, MERGE, REMOVE, REFRESH, DETACH, ALL.
+
+** Q73: What is orphanRemoval?
+Deletes child row when removed from parent collection/association.
+
+** Q74: Cascade REMOVE vs orphanRemoval?
+REMOVE propagates parent delete; orphanRemoval handles disassociation cleanup.
+
+** Q75: What is @JoinColumn?
+Defines foreign key column mapping.
+
+** Q76: What is @JoinTable?
+Defines association join table details.
+
+** Q77: What is bidirectional relationship pitfall?
+Inconsistent both-side updates causing stale object graph state.
+
+** Q78: Best practice for bidirectional setters?
+Utility methods updating both sides consistently.
+
+** Q79: What is @Embeddable?
+Value object type embedded in entity table columns.
+
+** Q80: What is @Embedded?
+Embeds @Embeddable object into entity.
+
+** Q81: What is @AttributeOverride?
+Overrides embedded field column mapping names.
+
+** Q82: What is @MappedSuperclass?
+Base class contributing mappings to subclasses, not its own table.
+
+** Q83: What is inheritance mapping in JPA?
+Mapping class hierarchies to relational structures.
+
+** Q84: Inheritance strategies?
+SINGLE_TABLE, JOINED, TABLE_PER_CLASS.
+
+** Q85: SINGLE_TABLE pros/cons?
+Fast reads/simple joins; nullable unused columns and weaker normalization.
+
+** Q86: JOINED pros/cons?
+Normalized schema; extra joins for polymorphic queries.
+
+** Q87: TABLE_PER_CLASS pros/cons?
+Independent tables; union-heavy polymorphic queries can be expensive.
+
+** Q88: What is @DiscriminatorColumn?
+Column distinguishing subclass type in SINGLE_TABLE.
+
+** Q89: What is optimistic locking?
+Version-based concurrency control detecting conflicting updates.
+
+** Q90: What annotation enables optimistic locking?
+=@Version=.
+
+** Q91: What happens on optimistic conflict?
+Exception (e.g., OptimisticLockException) and transaction rollback.
+
+** Q92: What is pessimistic locking?
+Database lock acquisition during transaction to prevent concurrent modifications.
+
+** Q93: How request lock in Spring Data JPA?
+Use =@Lock= with lock mode on repository query methods.
+
+** Q94: Tradeoff of pessimistic locks?
+More blocking/deadlock risk but stronger immediate consistency control.
+
+** Q95: What is fetch join in JPQL?
+Join that eagerly fetches association in single query.
+
+** Q96: Why be careful with fetch join + pagination?
+Can produce duplicates/incorrect paging depending on relationship cardinality/provider behavior.
+
+** Q97: What is EntityGraph?
+Declarative fetch plan for specific query use cases.
+
+** Q98: Why use EntityGraph?
+Control loading without hardcoding eager mappings globally.
+
+** Q99: What is DTO projection?
+Query returns non-entity shape mapped to interface/class DTO.
+
+** Q100: Projection types in Spring Data?
+Interface-based, class-based (constructor), open projections.
+
+** Q101: Why use projections?
+Reduce selected columns and serialization overhead.
+
+** Q102: What is closed projection?
+Projection exposing mapped fields only.
+
+** Q103: What is open projection drawback?
+May use SpEL/computed values with potential performance overhead.
+
+** Q104: What is @Modifying?
+Marks repository query as update/delete operation.
+
+** Q105: Why pair @Modifying with @Transactional?
+Write queries need transaction boundary.
+
+** Q106: What is clearAutomatically in @Modifying?
+Clears persistence context after bulk update to avoid stale managed entities.
+
+** Q107: What is bulk update caveat?
+Bypasses dirty checking for existing managed instances.
+
+** Q108: What is first-level cache?
+Persistence context cache scoped to EntityManager/transaction.
+
+** Q109: What is second-level cache?
+Shared cache across sessions/entity managers (provider-specific, optional).
+
+** Q110: Query cache vs entity cache?
+Query cache stores result ids/sets; entity cache stores entity state.
+
+** Q111: What is batch fetching?
+Loading multiple lazy associations/entities in grouped queries.
+
+** Q112: What is JDBC batching in JPA context?
+Grouping SQL writes to reduce round trips.
+
+** Q113: Why IDENTITY strategy can limit batching?
+Immediate key retrieval requirements can reduce batch efficiency.
+
+** Q114: What is flush mode?
+Controls when persistence context flush occurs (AUTO/COMMIT variants).
+
+** Q115: What is read-only transaction optimization?
+Hints provider/DB for read paths, potentially reducing overhead.
+
+** Q116: What is specification in Spring Data JPA?
+Criteria-based composable query predicates.
+
+** Q117: Why use Specifications?
+Dynamic filtering with reusable predicate components.
+
+** Q118: What is Criteria API?
+Type-safe programmatic query construction API in JPA.
+
+** Q119: Derived query method naming limits?
+Very long names become unreadable and hard to maintain.
+
+** Q120: When switch from derived methods to @Query/Specification?
+When query complexity grows beyond clarity.
+
+** Q121: What is auditing in Spring Data?
+Automatic population of created/modified timestamps/users.
+
+** Q122: Common auditing annotations?
+=@CreatedDate=, =@LastModifiedDate=, =@CreatedBy=, =@LastModifiedBy=.
+
+** Q123: What enables auditing?
+Configuration with =@EnableJpaAuditing= and auditor provider.
+
+** Q124: What is soft delete pattern?
+Mark records deleted via flag/timestamp instead of physical delete.
+
+** Q125: Soft delete challenge?
+Need global filters and uniqueness/index strategy consideration.
+
+** Q126: What is intermediate anti-pattern?
+Open session plus lazy serialization causing unexpected DB queries in web layer.
+
+** Q127: How avoid lazy initialization surprises?
+Fetch explicitly in service layer and map to DTOs within transaction.
+
+** Q128: What is intermediate testing approach?
+@DataJpaTest for repository slice plus integration tests for complex queries.
+
+** Q129: Why test against real DB dialect when possible?
+H2 behavior may differ from production DB features/plans.
+
+** Q130: Intermediate best practice?
+Design fetch plans per use case and validate with SQL logs/profiling.
+
+* Advanced
+
+** Q131: What is query plan stability concern?
+Small query/mapping changes can trigger inefficient DB execution plans.
+
+** Q132: How detect JPA performance regressions?
+Track SQL counts, latency percentiles, and execution plans in CI/perf tests.
+
+** Q133: What is cartesian explosion in ORM queries?
+Joining multiple collections can multiply row counts drastically.
+
+** Q134: Mitigation for cartesian explosion?
+Split queries, projection strategy, dedicated read models.
+
+** Q135: What is keyset pagination?
+Cursor-based paging using stable sort key for large datasets.
+
+** Q136: Why keyset over offset at scale?
+Better performance and consistency for deep pages.
+
+** Q137: How use keyset with Spring Data JPA?
+Custom queries/repositories beyond basic Pageable offset style.
+
+** Q138: What is multi-tenancy in JPA?
+Isolating tenant data via schema/database/discriminator strategies.
+
+** Q139: Multi-tenant pitfalls?
+Leaky filters, wrong cache keys, cross-tenant query exposure.
+
+** Q140: What is transactional outbox with JPA?
+Store domain event and entity changes atomically in same DB transaction.
+
+** Q141: Why outbox pattern?
+Reliable event publishing without distributed transactions.
+
+** Q142: What is domain event publication timing concern?
+Publishing before commit can leak rolled-back state.
+
+** Q143: Safer event timing approach?
+Publish after commit or process outbox asynchronously.
+
+** Q144: What is extended persistence context?
+Context spans multiple transactions (less common in typical Spring Boot apps).
+
+** Q145: Why avoid long-lived persistence contexts?
+Memory growth, stale data, unintended flush side effects.
+
+** Q146: What is detached graph merge risk?
+Blind merge may overwrite newer DB state unintentionally.
+
+** Q147: How reduce merge overwrite risks?
+Load managed entity then apply explicit field changes.
+
+** Q148: What is write skew anomaly?
+Concurrent transactions read overlapping data and write disjoint rows violating invariant.
+
+** Q149: Is optimistic locking always enough?
+Not for all invariants; sometimes need stronger isolation or explicit locks.
+
+** Q150: What is deadlock handling strategy?
+Retry idempotent transactions with backoff on transient deadlock errors.
+
+** Q151: Why classify SQL exceptions carefully?
+Differentiate retryable transient vs fatal integrity/configuration failures.
+
+** Q152: What is repository boundary design in DDD?
+Repositories per aggregate root with invariant-preserving operations.
+
+** Q153: Why avoid generic mega-repositories?
+They leak persistence concerns and weaken aggregate boundaries.
+
+** Q154: What is CQRS read model relation to JPA?
+Use dedicated projections/queries for reads, separate from write model complexity.
+
+** Q155: What is batch write throughput tuning?
+Batch size, flush/clear cycles, sequence strategy, JDBC settings.
+
+** Q156: Why periodic flush+clear in large imports?
+Prevents persistence context memory bloat.
+
+** Q157: What is second-level cache invalidation challenge?
+Keeping cached entity state consistent across updates/nodes.
+
+** Q158: When not to use second-level cache?
+Highly volatile data with low hit ratio.
+
+** Q159: What is query cache hazard?
+Caching highly dynamic query results can create stale/memory-heavy behavior.
+
+** Q160: What is immutable entity optimization?
+Marking reference data immutable can reduce dirty checking/update overhead.
+
+** Q161: What is @NaturalId concept (provider-specific)?
+Alternative business-key identity mapping for lookups/caching.
+
+** Q162: What is database-generated column mapping challenge?
+Need refresh/reload strategies to observe computed/default values reliably.
+
+** Q163: What is migration-safe enum strategy?
+Store STRING values and plan rename migrations explicitly.
+
+** Q164: What is JSON column mapping trend?
+Map structured fields to JSON columns with converter/provider support.
+
+** Q165: What is AttributeConverter?
+JPA mechanism converting between entity attribute type and DB column type.
+
+** Q166: AttributeConverter use cases?
+Encryption wrappers, value objects, custom serialization.
+
+** Q167: Converter pitfall?
+Can hide queryability/indexing implications of transformed values.
+
+** Q168: What is read replica routing concern with JPA?
+Transaction/read consistency issues under replication lag.
+
+** Q169: How handle read-after-write consistency?
+Route critical follow-up reads to primary or enforce consistency window.
+
+** Q170: What is observability baseline for JPA in production?
+SQL timing, slow query logs, pool metrics, lock wait/deadlock metrics, error taxonomy.
+
+** Q171: Why monitor row-level lock waits?
+Early indicator of contention and transaction design issues.
+
+** Q172: What is zero-downtime schema evolution rule?
+Backward-compatible phased DB/app changes across rolling deploys.
+
+** Q173: Expand-contract migration pattern?
+Add new schema first, dual-read/write if needed, then remove old schema later.
+
+** Q174: What is advanced testing pyramid for JPA?
+Unit (minimal), repository slice, integration with real DB, migration tests, performance tests.
+
+** Q175: Why include migration tests in CI?
+Prevent drift between entity mappings and schema migration history.
+
+** Q176: Biggest advanced Spring Data JPA anti-pattern?
+Ignoring generated SQL and assuming ORM always produces efficient queries.
+
+** Q177: What is mature team behavior with JPA?
+Review SQL plans, tune mappings intentionally, and measure continuously.
+
+** Q178: When step beyond Spring Data abstractions?
+For critical paths needing handcrafted SQL or specialized data access patterns.
+
+** Q179: Final architecture principle for JPA layer?
+Model aggregates clearly and align persistence operations with business invariants.
+
+** Q180: Final maturity principle?
+Use Spring Data JPA for productivity, but validate every performance and consistency assumption.
+
+
+-----
+
+#+INCLUDE: "../footer.org"
