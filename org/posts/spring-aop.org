@@ -545,30 +545,6 @@ Prefer explicitness: annotate intent, constrain scope, measure impact.
 ** Q175: Final maturity principle?
 Use AOP as a precision tool for cross-cutting concerns, not as hidden business orchestration.
 
-* Bonus: Minimal Timing Aspect Template
-
-#+BEGIN_SRC java
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.stereotype.Component;
-
-@Aspect
-@Component
-public class TimingAspect {
-
-    @Around("@annotation(com.example.Timed)")
-    public Object time(ProceedingJoinPoint pjp) throws Throwable {
-        long start = System.nanoTime();
-        try {
-            return pjp.proceed();
-        } finally {
-            long elapsedNanos = System.nanoTime() - start;
-            // publish metric/log with method + elapsedNanos
-        }
-    }
-}
-#+END_SRC
 
 -----
 
