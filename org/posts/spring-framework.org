@@ -1,0 +1,591 @@
+#+title: Spring Framework 
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Framework
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Framework?
+Spring is a Java framework for building enterprise applications with dependency injection, modular architecture, and infrastructure support.
+
+** Q2: Why is Spring popular?
+It reduces boilerplate, improves testability, and provides consistent solutions for common backend concerns.
+
+** Q3: What is IoC (Inversion of Control)?
+A design principle where object creation and wiring are handled by a container instead of application code.
+
+** Q4: What is Dependency Injection (DI)?
+A technique where dependencies are provided to a class from outside rather than created internally.
+
+** Q5: What is a Spring Bean?
+An object managed by the Spring IoC container.
+
+** Q6: What is ApplicationContext?
+The central Spring container interface for bean lifecycle, configuration, and dependency resolution.
+
+** Q7: Difference between BeanFactory and ApplicationContext?
+BeanFactory is basic IoC; ApplicationContext adds enterprise features (events, i18n, AOP integration, etc.).
+
+** Q8: What is Spring Boot?
+A Spring-based project that simplifies setup with auto-configuration and starter dependencies.
+
+** Q9: Is Spring Boot the same as Spring Framework?
+No: Spring Boot builds on top of Spring Framework for faster development and deployment.
+
+** Q10: What is auto-configuration?
+Spring Boot feature that configures beans automatically based on classpath and properties.
+
+** Q11: What are starter dependencies?
+Curated dependency bundles like =spring-boot-starter-web=.
+
+** Q12: What is convention over configuration in Spring Boot?
+Using sensible defaults so less manual configuration is needed.
+
+** Q13: What does @SpringBootApplication include?
+Combination of =@Configuration=, =@EnableAutoConfiguration=, and =@ComponentScan=.
+
+** Q14: What is @Component?
+Generic stereotype for Spring-managed component classes.
+
+** Q15: What is @Service?
+Specialized stereotype indicating service/business-layer component.
+
+** Q16: What is @Repository?
+Stereotype for persistence components, with exception translation support.
+
+** Q17: What is @Controller?
+Stereotype for MVC web controller returning views or model/view responses.
+
+** Q18: What is @RestController?
+Combination of =@Controller= and =@ResponseBody= for REST endpoints.
+
+** Q19: What is @Configuration?
+Class-level annotation indicating bean definitions via =@Bean= methods.
+
+** Q20: What is @Bean?
+Method-level annotation registering returned object as a Spring bean.
+
+** Q21: What is component scanning?
+Automatic detection and registration of annotated classes as beans.
+
+** Q22: How does @Autowired work?
+It injects dependencies by type (with additional resolution rules if needed).
+
+** Q23: Constructor vs field injection?
+Constructor injection is preferred for immutability and easier testing.
+
+** Q24: Why prefer constructor injection?
+Makes required dependencies explicit and supports final fields.
+
+** Q25: What is @Qualifier?
+Used to choose a specific bean when multiple candidates of same type exist.
+
+** Q26: What is @Primary?
+Marks a bean as default candidate for autowiring when ambiguity exists.
+
+** Q27: What is bean scope?
+Defines bean lifecycle/visibility (singleton, prototype, request, session, etc.).
+
+** Q28: Default bean scope in Spring?
+Singleton.
+
+** Q29: What is prototype scope?
+A new bean instance is created each time requested.
+
+** Q30: What is request scope?
+One bean instance per HTTP request (web context).
+
+** Q31: What is session scope?
+One bean instance per HTTP session.
+
+** Q32: What is bean lifecycle?
+Creation, dependency injection, initialization, usage, and destruction.
+
+** Q33: How to run initialization logic?
+Use =@PostConstruct= or init-method configuration.
+
+** Q34: How to run cleanup logic?
+Use =@PreDestroy= or destroy-method configuration.
+
+** Q35: What is profile in Spring?
+A way to activate environment-specific bean/config sets.
+
+** Q36: How to activate a profile?
+Via property/env var/command-line (e.g., =spring.profiles.active=dev=).
+
+** Q37: What is externalized configuration?
+Keeping config outside code (properties, YAML, env vars, secrets systems).
+
+** Q38: Common Spring config files?
+=application.properties= and =application.yml=.
+
+** Q39: What is @Value used for?
+Injecting configuration values into fields/constructors/method params.
+
+** Q40: What is @ConfigurationProperties?
+Type-safe binding of grouped configuration properties into POJOs.
+
+** Q41: Why prefer @ConfigurationProperties over many @Value fields?
+Better structure, validation, and maintainability.
+
+** Q42: What is DispatcherServlet?
+Front controller in Spring MVC routing requests to handlers.
+
+** Q43: What is @RequestMapping?
+Maps HTTP requests to controller methods.
+
+** Q44: Difference between @GetMapping and @RequestMapping?
+=@GetMapping= is specialized shortcut for HTTP GET mapping.
+
+** Q45: What is @PathVariable?
+Binds URI path segment to method parameter.
+
+** Q46: What is @RequestParam?
+Binds query/form parameter to method parameter.
+
+** Q47: What is @RequestBody?
+Binds HTTP request body to Java object.
+
+** Q48: What is @ResponseBody?
+Writes method return value directly to HTTP response body.
+
+** Q49: What handles JSON serialization in Spring Boot?
+Typically Jackson via HTTP message converters.
+
+** Q50: What is ResponseEntity?
+Type giving full control over HTTP status, headers, and body.
+
+** Q51: What is exception handling in Spring MVC?
+Using =@ExceptionHandler= and global =@ControllerAdvice=.
+
+** Q52: What is @ControllerAdvice?
+Global component for exception handling and cross-controller concerns.
+
+** Q53: What is Spring Data JPA?
+Abstraction simplifying JPA repository/data-access patterns.
+
+** Q54: What is JpaRepository?
+Spring Data interface providing CRUD, paging, sorting, and query methods.
+
+** Q55: What is transaction management in Spring?
+Declarative/programmatic control of database transaction boundaries.
+
+** Q56: What is @Transactional?
+Declares transactional behavior for class or method.
+
+** Q57: Does @Transactional work on private methods?
+Not with proxy-based default AOP; typically public methods are proxied.
+
+** Q58: What is Actuator?
+Spring Boot module exposing production endpoints (health, metrics, info, etc.).
+
+** Q59: What is Spring Initializr?
+Tool for generating Spring Boot project templates quickly.
+
+** Q60: Beginner best practice in Spring?
+Start simple: constructor injection, clear layers, external config, and test early.
+
+* Intermediate
+
+** Q61: What is Spring AOP?
+Aspect-Oriented Programming support for cross-cutting concerns like logging, security, transactions.
+
+** Q62: What is an Aspect?
+A module containing advice and pointcuts.
+
+** Q63: What is a Join Point?
+A point during execution (commonly method execution) where advice can apply.
+
+** Q64: What is a Pointcut?
+Expression selecting join points where advice runs.
+
+** Q65: What is Advice?
+Action taken by an aspect (before/after/around/throwing).
+
+** Q66: Types of advice in Spring AOP?
+- @Before
+- @After
+- @AfterReturning
+- @AfterThrowing
+- @Around
+
+** Q67: What is proxy-based AOP?
+Spring wraps beans in proxies that intercept method calls.
+
+** Q68: JDK dynamic proxy vs CGLIB?
+JDK proxies interfaces; CGLIB proxies concrete classes via subclassing.
+
+** Q69: What is self-invocation issue with @Transactional/AOP?
+Internal method calls bypass proxy, so advice may not execute.
+
+** Q70: How to mitigate self-invocation problems?
+Refactor to separate bean or use proxy exposure patterns carefully.
+
+** Q71: What is transaction propagation?
+Rules for how nested method calls join/create transactions.
+
+** Q72: Common propagation modes?
+REQUIRED, REQUIRES_NEW, SUPPORTS, MANDATORY, NEVER, NOT_SUPPORTED, NESTED.
+
+** Q73: What does REQUIRED mean?
+Join existing transaction or create new one if none exists.
+
+** Q74: What does REQUIRES_NEW mean?
+Always start a new transaction, suspending existing one.
+
+** Q75: What is transaction isolation in Spring?
+Underlying DB isolation setting controlling read/write visibility anomalies.
+
+** Q76: Isolation levels commonly used?
+READ_COMMITTED, REPEATABLE_READ, SERIALIZABLE (DB dependent).
+
+** Q77: What triggers rollback by default in @Transactional?
+Runtime (unchecked) exceptions by default.
+
+** Q78: How to rollback on checked exceptions?
+Use =rollbackFor= in =@Transactional=.
+
+** Q79: What is readOnly transaction flag?
+Hint for optimization for read operations (behavior DB/provider dependent).
+
+** Q80: What is PlatformTransactionManager?
+Core Spring strategy interface managing transactions.
+
+** Q81: What is lazy initialization?
+Bean created on first use instead of startup.
+
+** Q82: Pros/cons of lazy init?
+Faster startup but potential first-request latency and delayed failures.
+
+** Q83: What is circular dependency?
+Bean A depends on B and B depends on A, causing resolution complexity/failure.
+
+** Q84: How to resolve circular dependencies?
+Refactor design, use interfaces/events, avoid field injection loops.
+
+** Q85: What is @Lazy annotation?
+Defers bean initialization or injects lazy proxy.
+
+** Q86: What is Environment abstraction?
+Access to properties and active profiles from Spring context.
+
+** Q87: What is PropertySource?
+Declares additional property file sources.
+
+** Q88: What is Spring Expression Language (SpEL)?
+Expression language for dynamic values and wiring logic.
+
+** Q89: What is conversion service in Spring?
+Type conversion system used in binding configuration and request params.
+
+** Q90: What is validation integration?
+Using Bean Validation annotations with =@Valid= / =@Validated=.
+
+** Q91: Difference between @Valid and @Validated?
+=@Validated= supports groups and method-level validation in Spring contexts.
+
+** Q92: What is method-level validation?
+Applying validation constraints to method parameters/return values.
+
+** Q93: What is BindingResult?
+Holds validation/binding errors in MVC request handling.
+
+** Q94: What is HandlerInterceptor?
+MVC interceptor before/after controller execution.
+
+** Q95: Filter vs Interceptor?
+Filter is servlet-level; interceptor is Spring MVC handler-level.
+
+** Q96: What is WebMvcConfigurer used for?
+Customize MVC config (formatters, CORS, interceptors, message converters).
+
+** Q97: How does Spring handle CORS?
+Global or per-controller mapping via CORS configuration.
+
+** Q98: What is content negotiation?
+Selecting response representation (JSON/XML/etc.) based on request preferences.
+
+** Q99: What is HttpMessageConverter?
+Converts HTTP body to/from Java objects.
+
+** Q100: What is RestTemplate?
+Synchronous HTTP client (still used, but newer apps often prefer WebClient).
+
+** Q101: What is WebClient?
+Reactive/non-blocking HTTP client from Spring WebFlux.
+
+** Q102: Difference: Spring MVC vs WebFlux?
+MVC is servlet/blocking; WebFlux supports reactive/non-blocking model.
+
+** Q103: Should you mix blocking DB calls in reactive flow?
+Avoid when possible; blocking can negate reactive scalability benefits.
+
+** Q104: What is Spring Security?
+Framework for authentication, authorization, and security protections.
+
+** Q105: What is SecurityFilterChain?
+Configures HTTP security behavior in modern Spring Security.
+
+** Q106: What is CSRF protection?
+Defense against cross-site request forgery on state-changing requests.
+
+** Q107: What is CORS vs CSRF?
+CORS controls cross-origin browser access; CSRF protects authenticated state-changing requests.
+
+** Q108: What is password encoder in Spring Security?
+Component hashing passwords (e.g., BCryptPasswordEncoder).
+
+** Q109: Why use BCrypt?
+Adaptive hashing designed for password storage security.
+
+** Q110: What is method security?
+Authorization checks at method level (e.g., =@PreAuthorize=).
+
+** Q111: What is Spring Cache abstraction?
+Unified annotations/API for caching regardless of cache provider.
+
+** Q112: Common cache annotations?
+=@Cacheable=, =@CachePut=, =@CacheEvict=.
+
+** Q113: What is @Cacheable?
+Caches method result based on key unless already cached.
+
+** Q114: What is @CacheEvict?
+Removes cache entries, often after data updates.
+
+** Q115: What is scheduling in Spring?
+Running tasks periodically using =@Scheduled=.
+
+** Q116: What is async method execution?
+Running methods asynchronously using =@Async= and executors.
+
+** Q117: What is @EnableAsync?
+Enables async processing infrastructure.
+
+** Q118: What is @EnableScheduling?
+Enables scheduled task processing.
+
+** Q119: Why configure custom task executors?
+Control thread pool size, queueing, naming, and rejection policy.
+
+** Q120: What is Spring Boot auto-configuration report?
+Diagnostic info showing applied/ignored auto-configurations and reasons.
+
+** Q121: What is conditional bean registration?
+Registering beans only when conditions match (class, property, missing bean, etc.).
+
+** Q122: Common conditional annotations?
+=@ConditionalOnClass=, =@ConditionalOnMissingBean=, =@ConditionalOnProperty=.
+
+** Q123: What is @Import?
+Includes additional configuration classes/selectors into context.
+
+** Q124: What is @EnableConfigurationProperties?
+Registers configuration properties classes for binding.
+
+** Q125: What is actuator health indicator?
+Component contributing subsystem health status.
+
+** Q126: Why customize health groups?
+Expose different health details for liveness/readiness/security needs.
+
+** Q127: What is liveness vs readiness?
+Liveness: app alive; readiness: app ready to serve traffic.
+
+** Q128: What is Spring test slice annotation concept?
+Load partial context for focused tests (=@WebMvcTest=, =@DataJpaTest=, etc.).
+
+** Q129: Why use test slices?
+Faster, more focused tests with fewer dependencies.
+
+** Q130: Intermediate best practice?
+Understand proxies/transactions deeply and keep configuration explicit but minimal.
+
+* Advanced
+
+** Q131: What is bean post-processor?
+Extension point to modify beans before/after initialization.
+
+** Q132: What is BeanFactoryPostProcessor?
+Allows modifying bean definitions before beans are instantiated.
+
+** Q133: What is lifecycle callback ordering concern?
+Multiple hooks/advisors can execute in order-sensitive ways; define order explicitly.
+
+** Q134: What is @Order used for?
+Controls precedence among ordered components (interceptors, aspects, etc.).
+
+** Q135: What is custom starter in Spring Boot?
+Reusable dependency + auto-configuration package for organization-wide conventions.
+
+** Q136: What is auto-configuration class loading mechanism?
+Based on metadata/import selectors reading configuration registrations.
+
+** Q137: Why isolate auto-config from core code?
+Prevents accidental hard dependency coupling and improves modular reuse.
+
+** Q138: What is fail-fast configuration validation?
+Validate required properties/credentials at startup and stop early on errors.
+
+** Q139: What is configuration drift?
+Environment configs diverge unexpectedly across deployments.
+
+** Q140: How reduce configuration drift?
+Central config management, validation, immutable deployments, config review.
+
+** Q141: What is idempotency in Spring REST APIs?
+Repeated same request yields same final effect/result semantics.
+
+** Q142: How implement idempotency?
+Idempotency keys, unique constraints, conditional writes, safe retries.
+
+** Q143: What is outbox pattern in Spring architectures?
+Persist event record with domain transaction, publish asynchronously for consistency.
+
+** Q144: Why use outbox instead of distributed XA often?
+Lower operational complexity and better microservice resilience.
+
+** Q145: What is transactional event listener?
+Event listener tied to transaction phase (before/after commit, etc.).
+
+** Q146: What is eventual consistency?
+Data converges across services asynchronously, not instantly.
+
+** Q147: What is saga pattern relevance to Spring microservices?
+Coordinates multi-step distributed workflows with compensating actions.
+
+** Q148: What is backpressure concern in reactive Spring apps?
+Producers emitting faster than consumers can process, requiring flow control.
+
+** Q149: How does WebFlux support backpressure?
+Via Reactive Streams semantics (Publisher/Subscriber demand signals).
+
+** Q150: What is blocking call detection in reactive pipelines?
+Identifying accidental blocking operations that hurt reactive throughput.
+
+** Q151: Why separate command and query models sometimes?
+Optimize write consistency and read scalability independently (CQRS style).
+
+** Q152: What is domain event in Spring context?
+Application-level event representing meaningful business occurrence.
+
+** Q153: In-process events vs external messaging?
+In-process is local and simple; external messaging supports inter-service communication.
+
+** Q154: What is resilience pattern integration in Spring?
+Retries, circuit breakers, bulkheads, timeouts via libraries and config.
+
+** Q155: Why avoid blind retries?
+Can amplify outages and duplicate side effects.
+
+** Q156: What is retry with backoff and jitter?
+Increasing delay + randomization to reduce retry storms.
+
+** Q157: What is circuit breaker?
+Stops calls to failing dependency temporarily to protect system.
+
+** Q158: What is bulkhead pattern?
+Isolates resource pools so one failure domain doesn’t exhaust all resources.
+
+** Q159: What is graceful degradation in Spring services?
+Provide partial functionality/fallback when dependencies fail.
+
+** Q160: What is observability triad?
+Logs, metrics, traces correlated for production diagnosis.
+
+** Q161: How to correlate logs in Spring?
+Use request/trace IDs propagated via filters/interceptors and MDC.
+
+** Q162: What is Micrometer?
+Metrics facade used by Spring Boot for monitoring integrations.
+
+** Q163: Why use percentiles/histograms for latency?
+Averages hide tail latency; percentiles show real user experience.
+
+** Q164: What is structured logging best practice?
+Emit machine-parseable key-value/JSON logs with stable fields.
+
+** Q165: What is Spring Native/AOT direction conceptually?
+Move more analysis/generation to build time for startup/performance benefits.
+
+** Q166: What is reflection hinting concern in native builds?
+Dynamic reflection needs explicit configuration/hints.
+
+** Q167: What is module boundary design in large Spring systems?
+Clear bounded contexts, explicit interfaces, minimal shared mutable state.
+
+** Q168: How to avoid “god service” anti-pattern?
+Split by business capability and keep service responsibilities focused.
+
+** Q169: What is anti-corruption layer?
+Translation boundary protecting domain model from external model leakage.
+
+** Q170: Why enforce architecture tests?
+Prevent package/layer violations and preserve design over time.
+
+** Q171: What is zero-downtime deployment requirement for Spring apps?
+Backward-compatible API/schema changes and safe rollout strategies.
+
+** Q172: Blue/green vs rolling deployment?
+Blue/green switches environments; rolling updates instances gradually.
+
+** Q173: What is schema migration compatibility rule?
+Deploy schema changes in backward-compatible phases before code relying on new constraints.
+
+** Q174: Why avoid long DB transactions in web requests?
+Increases lock duration/contention and harms scalability.
+
+** Q175: What is thread pool exhaustion symptom?
+Rising latency/timeouts, queued tasks, rejected executions.
+
+** Q176: How to tune executors safely?
+Measure workload, set bounded queues, monitor rejection/queue time/active threads.
+
+** Q177: What is memory leak risk in Spring apps?
+Static caches, unbounded collections, thread-local misuse, classloader leaks.
+
+** Q178: What is advanced testing strategy?
+Layered tests: unit, slice, integration, contract, and selective end-to-end.
+
+** Q179: Biggest advanced Spring anti-pattern?
+Overusing magic auto-configuration without understanding runtime behavior.
+
+** Q180: Mature Spring engineering principle?
+Keep framework usage explicit, observable, and aligned with domain-driven design.
+
+* Bonus: Minimal Service + Transaction + Validation Template
+
+#+BEGIN_SRC java
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+@Service
+public class AccountService {
+
+    private final AccountRepository repository;
+
+    public AccountService(AccountRepository repository) {
+        this.repository = repository;
+    }
+
+    @Transactional
+    public Long createAccount(@NotBlank String email) {
+        // domain checks, uniqueness checks, persistence
+        return repository.create(email);
+    }
+}
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
