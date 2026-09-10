@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spring AOP</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Spring AOP</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org507abd9" class="outline-2">
+<h2 id="org507abd9">Spring AOP</h2>
+<div class="outline-text-2" id="text-org507abd9">
+<hr>
+</div>
+</div>
+<div id="outline-container-orge4e3be3" class="outline-2">
+<h2 id="orge4e3be3">Beginner</h2>
+<div class="outline-text-2" id="text-orge4e3be3">
+</div>
+<div id="outline-container-org8f6c3b7" class="outline-3">
+<h3 id="org8f6c3b7">Q1: What is AOP?</h3>
+<div class="outline-text-3" id="text-org8f6c3b7">
+<p>
+AOP (Aspect-Oriented Programming) is a way to modularize cross-cutting concerns like logging, security, and transactions.
+</p>
+</div>
+</div>
+<div id="outline-container-org3ce131b" class="outline-3">
+<h3 id="org3ce131b">Q2: What is Spring AOP?</h3>
+<div class="outline-text-3" id="text-org3ce131b">
+<p>
+Spring AOP is Spring’s proxy-based AOP framework for method-level interception on Spring-managed beans.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea8c3d9" class="outline-3">
+<h3 id="orgea8c3d9">Q3: Why use Spring AOP?</h3>
+<div class="outline-text-3" id="text-orgea8c3d9">
+<p>
+To keep cross-cutting logic separate from business code and reduce duplication.
+</p>
+</div>
+</div>
+<div id="outline-container-org8b61683" class="outline-3">
+<h3 id="org8b61683">Q4: What is a cross-cutting concern?</h3>
+<div class="outline-text-3" id="text-org8b61683">
+<p>
+A concern affecting multiple modules, e.g., logging, metrics, auth checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org89d07fd" class="outline-3">
+<h3 id="org89d07fd">Q5: What is an Aspect?</h3>
+<div class="outline-text-3" id="text-org89d07fd">
+<p>
+A class that groups advice and pointcut definitions.
+</p>
+</div>
+</div>
+<div id="outline-container-org8537277" class="outline-3">
+<h3 id="org8537277">Q6: What is Advice?</h3>
+<div class="outline-text-3" id="text-org8537277">
+<p>
+Action executed at a matched join point (before/after/around/etc.).
+</p>
+</div>
+</div>
+<div id="outline-container-org198eab7" class="outline-3">
+<h3 id="org198eab7">Q7: What is a Join Point in Spring AOP?</h3>
+<div class="outline-text-3" id="text-org198eab7">
+<p>
+A method execution point on a proxied bean.
+</p>
+</div>
+</div>
+<div id="outline-container-orga89cbcc" class="outline-3">
+<h3 id="orga89cbcc">Q8: What is a Pointcut?</h3>
+<div class="outline-text-3" id="text-orga89cbcc">
+<p>
+A predicate/expression selecting which join points should run advice.
+</p>
+</div>
+</div>
+<div id="outline-container-org5414d86" class="outline-3">
+<h3 id="org5414d86">Q9: What is Weaving?</h3>
+<div class="outline-text-3" id="text-org5414d86">
+<p>
+Applying aspects to target objects (in Spring AOP, via runtime proxies).
+</p>
+</div>
+</div>
+<div id="outline-container-org5ed0265" class="outline-3">
+<h3 id="org5ed0265">Q10: Is Spring AOP compile-time weaving?</h3>
+<div class="outline-text-3" id="text-org5ed0265">
+<p>
+No, it is primarily runtime proxy-based weaving.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdf86805" class="outline-3">
+<h3 id="orgdf86805">Q11: What are common advice types?</h3>
+<div class="outline-text-3" id="text-orgdf86805">
+<ul class="org-ul">
+<li>Before</li>
+<li>After</li>
+<li>AfterReturning</li>
+<li>AfterThrowing</li>
+<li>Around</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org9b7e711" class="outline-3">
+<h3 id="org9b7e711">Q12: What does @Before do?</h3>
+<div class="outline-text-3" id="text-org9b7e711">
+<p>
+Runs advice before target method execution.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb0b8a1d" class="outline-3">
+<h3 id="orgb0b8a1d">Q13: What does @After do?</h3>
+<div class="outline-text-3" id="text-orgb0b8a1d">
+<p>
+Runs advice after method finishes (success or exception).
+</p>
+</div>
+</div>
+<div id="outline-container-orgffe8791" class="outline-3">
+<h3 id="orgffe8791">Q14: What does @AfterReturning do?</h3>
+<div class="outline-text-3" id="text-orgffe8791">
+<p>
+Runs only when method returns successfully.
+</p>
+</div>
+</div>
+<div id="outline-container-orgca03992" class="outline-3">
+<h3 id="orgca03992">Q15: What does @AfterThrowing do?</h3>
+<div class="outline-text-3" id="text-orgca03992">
+<p>
+Runs only when method throws an exception.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9ffcbf" class="outline-3">
+<h3 id="orgb9ffcbf">Q16: What does @Around do?</h3>
+<div class="outline-text-3" id="text-orgb9ffcbf">
+<p>
+Wraps method execution and controls whether/when target executes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd717ebd" class="outline-3">
+<h3 id="orgd717ebd">Q17: What is ProceedingJoinPoint?</h3>
+<div class="outline-text-3" id="text-orgd717ebd">
+<p>
+Object passed to around advice enabling <code>proceed()</code> invocation.
+</p>
+</div>
+</div>
+<div id="outline-container-org471cf34" class="outline-3">
+<h3 id="org471cf34">Q18: What happens if around advice never calls proceed()?</h3>
+<div class="outline-text-3" id="text-org471cf34">
+<p>
+Target method is skipped.
+</p>
+</div>
+</div>
+<div id="outline-container-orge7bda56" class="outline-3">
+<h3 id="orge7bda56">Q19: What is @Aspect?</h3>
+<div class="outline-text-3" id="text-orge7bda56">
+<p>
+Annotation marking a class as an aspect.
+</p>
+</div>
+</div>
+<div id="outline-container-org0f5cb77" class="outline-3">
+<h3 id="org0f5cb77">Q20: What is @EnableAspectJAutoProxy?</h3>
+<div class="outline-text-3" id="text-org0f5cb77">
+<p>
+Enables proxy-based AOP processing in Spring configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ea2cd2" class="outline-3">
+<h3 id="org2ea2cd2">Q21: Is AspectJ required to use Spring AOP annotations?</h3>
+<div class="outline-text-3" id="text-org2ea2cd2">
+<p>
+AspectJ expression syntax is used, but full AspectJ weaving is not required for basic Spring AOP.
+</p>
+</div>
+</div>
+<div id="outline-container-org0cb343b" class="outline-3">
+<h3 id="org0cb343b">Q22: What is a target object?</h3>
+<div class="outline-text-3" id="text-org0cb343b">
+<p>
+The original bean instance being proxied/intercepted.
+</p>
+</div>
+</div>
+<div id="outline-container-org9761ca8" class="outline-3">
+<h3 id="org9761ca8">Q23: What is an AOP proxy?</h3>
+<div class="outline-text-3" id="text-org9761ca8">
+<p>
+A wrapper object that intercepts method calls and applies advice.
+</p>
+</div>
+</div>
+<div id="outline-container-orgae7e9f1" class="outline-3">
+<h3 id="orgae7e9f1">Q24: JDK dynamic proxy vs CGLIB in Spring AOP?</h3>
+<div class="outline-text-3" id="text-orgae7e9f1">
+<p>
+JDK proxies interfaces; CGLIB subclasses concrete classes.
+</p>
+</div>
+</div>
+<div id="outline-container-org0953e13" class="outline-3">
+<h3 id="org0953e13">Q25: When does Spring use JDK proxies?</h3>
+<div class="outline-text-3" id="text-org0953e13">
+<p>
+When target implements at least one interface (default strategy).
+</p>
+</div>
+</div>
+<div id="outline-container-org601671c" class="outline-3">
+<h3 id="org601671c">Q26: When does Spring use CGLIB?</h3>
+<div class="outline-text-3" id="text-org601671c">
+<p>
+When proxying class-based targets (or when forced).
+</p>
+</div>
+</div>
+<div id="outline-container-org0e2a9b8" class="outline-3">
+<h3 id="org0e2a9b8">Q27: Can final classes be proxied by CGLIB?</h3>
+<div class="outline-text-3" id="text-org0e2a9b8">
+<p>
+Final classes cannot be subclassed, so class-based proxying is limited.
+</p>
+</div>
+</div>
+<div id="outline-container-org8d0c67d" class="outline-3">
+<h3 id="org8d0c67d">Q28: Can final methods be advised with Spring proxy AOP?</h3>
+<div class="outline-text-3" id="text-org8d0c67d">
+<p>
+Generally no, because subclass proxies cannot override final methods.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbaa5338" class="outline-3">
+<h3 id="orgbaa5338">Q29: Can private methods be advised in Spring proxy AOP?</h3>
+<div class="outline-text-3" id="text-orgbaa5338">
+<p>
+No, proxy interception targets externally invoked methods.
+</p>
+</div>
+</div>
+<div id="outline-container-org64f24c6" class="outline-3">
+<h3 id="org64f24c6">Q30: What is self-invocation problem?</h3>
+<div class="outline-text-3" id="text-org64f24c6">
+<p>
+A method within a bean calling another method in same bean bypasses proxy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd74ba26" class="outline-3">
+<h3 id="orgd74ba26">Q31: Why does self-invocation bypass advice?</h3>
+<div class="outline-text-3" id="text-orgd74ba26">
+<p>
+Internal call uses <code>this</code> directly, not proxy reference.
+</p>
+</div>
+</div>
+<div id="outline-container-org94da367" class="outline-3">
+<h3 id="org94da367">Q32: What is the simplest fix for self-invocation issue?</h3>
+<div class="outline-text-3" id="text-org94da367">
+<p>
+Move advised method to another bean and call through container-managed proxy.
+</p>
+</div>
+</div>
+<div id="outline-container-org31fb124" class="outline-3">
+<h3 id="org31fb124">Q33: What is pointcut expression language in Spring AOP?</h3>
+<div class="outline-text-3" id="text-org31fb124">
+<p>
+AspectJ pointcut expression syntax for matching methods/types.
+</p>
+</div>
+</div>
+<div id="outline-container-org5e6226b" class="outline-3">
+<h3 id="org5e6226b">Q34: Common pointcut designator in Spring AOP?</h3>
+<div class="outline-text-3" id="text-org5e6226b">
+<p>
+<code>execution(...)</code> is most common.
+</p>
+</div>
+</div>
+<div id="outline-container-org8b3cf4f" class="outline-3">
+<h3 id="org8b3cf4f">Q35: Example execution expression?</h3>
+<div class="outline-text-3" id="text-org8b3cf4f">
+<p>
+<code>execution(* com.example.service.*.*(..))</code>
+</p>
+</div>
+</div>
+<div id="outline-container-org8a1c162" class="outline-3">
+<h3 id="org8a1c162">Q36: What does *(..) mean in pointcut?</h3>
+<div class="outline-text-3" id="text-org8a1c162">
+<p>
+Any method name with any argument list.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5ebef4" class="outline-3">
+<h3 id="orgc5ebef4">Q37: What does package wildcard .. mean?</h3>
+<div class="outline-text-3" id="text-orgc5ebef4">
+<p>
+Matches current package and subpackages.
+</p>
+</div>
+</div>
+<div id="outline-container-org4934042" class="outline-3">
+<h3 id="org4934042">Q38: What is @annotation pointcut?</h3>
+<div class="outline-text-3" id="text-org4934042">
+<p>
+Matches methods annotated with a specific annotation.
+</p>
+</div>
+</div>
+<div id="outline-container-org5abe1f5" class="outline-3">
+<h3 id="org5abe1f5">Q39: What is within pointcut?</h3>
+<div class="outline-text-3" id="text-org5abe1f5">
+<p>
+Matches join points within certain types/packages.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbeba996" class="outline-3">
+<h3 id="orgbeba996">Q40: What is this() in pointcuts?</h3>
+<div class="outline-text-3" id="text-orgbeba996">
+<p>
+Matches based on proxy type.
+</p>
+</div>
+</div>
+<div id="outline-container-org7561103" class="outline-3">
+<h3 id="org7561103">Q41: What is target() in pointcuts?</h3>
+<div class="outline-text-3" id="text-org7561103">
+<p>
+Matches based on target object type.
+</p>
+</div>
+</div>
+<div id="outline-container-org9d9ddbd" class="outline-3">
+<h3 id="org9d9ddbd">Q42: What is args() in pointcuts?</h3>
+<div class="outline-text-3" id="text-org9d9ddbd">
+<p>
+Matches runtime argument types.
+</p>
+</div>
+</div>
+<div id="outline-container-org656c741" class="outline-3">
+<h3 id="org656c741">Q43: What is bean() pointcut in Spring?</h3>
+<div class="outline-text-3" id="text-org656c741">
+<p>
+Spring-specific designator matching bean names.
+</p>
+</div>
+</div>
+<div id="outline-container-org379783d" class="outline-3">
+<h3 id="org379783d">Q44: Why keep pointcuts specific?</h3>
+<div class="outline-text-3" id="text-org379783d">
+<p>
+Prevents accidental interception and performance/noise issues.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf7cd6d7" class="outline-3">
+<h3 id="orgf7cd6d7">Q45: What is advice ordering?</h3>
+<div class="outline-text-3" id="text-orgf7cd6d7">
+<p>
+Determines execution precedence when multiple aspects match same join point.
+</p>
+</div>
+</div>
+<div id="outline-container-org3a132c7" class="outline-3">
+<h3 id="org3a132c7">Q46: How define order?</h3>
+<div class="outline-text-3" id="text-org3a132c7">
+<p>
+Use <code>@Order</code> or <code>Ordered</code> interface.
+</p>
+</div>
+</div>
+<div id="outline-container-org478fb40" class="outline-3">
+<h3 id="org478fb40">Q47: What is use case for before advice?</h3>
+<div class="outline-text-3" id="text-org478fb40">
+<p>
+Input validation, correlation ID setup, audit pre-log.
+</p>
+</div>
+</div>
+<div id="outline-container-org69ee5a7" class="outline-3">
+<h3 id="org69ee5a7">Q48: What is use case for after returning advice?</h3>
+<div class="outline-text-3" id="text-org69ee5a7">
+<p>
+Result transformation metadata logging, success metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org388bb39" class="outline-3">
+<h3 id="org388bb39">Q49: What is use case for after throwing advice?</h3>
+<div class="outline-text-3" id="text-org388bb39">
+<p>
+Error logging, exception metrics, alert enrichment.
+</p>
+</div>
+</div>
+<div id="outline-container-org838be76" class="outline-3">
+<h3 id="org838be76">Q50: What is use case for around advice?</h3>
+<div class="outline-text-3" id="text-org838be76">
+<p>
+Timing, retries, transaction wrappers, conditional execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org2136df4" class="outline-3">
+<h3 id="org2136df4">Q51: Is around advice most powerful?</h3>
+<div class="outline-text-3" id="text-org2136df4">
+<p>
+Yes, but also easiest to misuse.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd450dc3" class="outline-3">
+<h3 id="orgd450dc3">Q52: Can advice change method arguments?</h3>
+<div class="outline-text-3" id="text-orgd450dc3">
+<p>
+Around advice can supply different args when calling <code>proceed(args)</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org8066048" class="outline-3">
+<h3 id="org8066048">Q53: Can advice change return value?</h3>
+<div class="outline-text-3" id="text-org8066048">
+<p>
+Around advice can wrap/replace return value.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea4cb37" class="outline-3">
+<h3 id="orgea4cb37">Q54: Should business logic live in aspects?</h3>
+<div class="outline-text-3" id="text-orgea4cb37">
+<p>
+No, keep aspects focused on cross-cutting concerns.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc06b331" class="outline-3">
+<h3 id="orgc06b331">Q55: What is best first AOP use in projects?</h3>
+<div class="outline-text-3" id="text-orgc06b331">
+<p>
+Observability concerns (logging, metrics, tracing).
+</p>
+</div>
+</div>
+<div id="outline-container-orgfba5920" class="outline-3">
+<h3 id="orgfba5920">Q56: How to test if aspect is applied?</h3>
+<div class="outline-text-3" id="text-orgfba5920">
+<p>
+Integration tests with Spring context and assertions on side effects.
+</p>
+</div>
+</div>
+<div id="outline-container-org37ed705" class="outline-3">
+<h3 id="org37ed705">Q57: Can you apply AOP to non-Spring objects?</h3>
+<div class="outline-text-3" id="text-org37ed705">
+<p>
+Not with Spring proxy AOP unless object is managed/proxied by container.
+</p>
+</div>
+</div>
+<div id="outline-container-orge5ce5be" class="outline-3">
+<h3 id="orge5ce5be">Q58: What is proxy exposure option?</h3>
+<div class="outline-text-3" id="text-orge5ce5be">
+<p>
+Allows obtaining current proxy in special cases (use sparingly).
+</p>
+</div>
+</div>
+<div id="outline-container-org64d5b8e" class="outline-3">
+<h3 id="org64d5b8e">Q59: Is Spring AOP only method-level?</h3>
+<div class="outline-text-3" id="text-org64d5b8e">
+<p>
+Yes for proxy model; field/constructor join points require AspectJ weaving.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb7a319b" class="outline-3">
+<h3 id="orgb7a319b">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-orgb7a319b">
+<p>
+Use narrow pointcuts, simple advice, and avoid hidden business behavior.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3ecd85c" class="outline-2">
+<h2 id="org3ecd85c">Intermediate</h2>
+<div class="outline-text-2" id="text-org3ecd85c">
+</div>
+<div id="outline-container-org1881a38" class="outline-3">
+<h3 id="org1881a38">Q61: How do multiple advices execute on same method?</h3>
+<div class="outline-text-3" id="text-org1881a38">
+<p>
+According to precedence/order; around advice nests others.
+</p>
+</div>
+</div>
+<div id="outline-container-org255f0f2" class="outline-3">
+<h3 id="org255f0f2">Q62: Around advice call chain concept?</h3>
+<div class="outline-text-3" id="text-org255f0f2">
+<p>
+Outer aspect proceeds to next interceptor until target executes.
+</p>
+</div>
+</div>
+<div id="outline-container-org776ca1d" class="outline-3">
+<h3 id="org776ca1d">Q63: What happens if around advice catches exception and swallows it?</h3>
+<div class="outline-text-3" id="text-org776ca1d">
+<p>
+Caller sees success path, which may break semantics/monitoring.
+</p>
+</div>
+</div>
+<div id="outline-container-org86272e4" class="outline-3">
+<h3 id="org86272e4">Q64: Should around advice always proceed exactly once?</h3>
+<div class="outline-text-3" id="text-org86272e4">
+<p>
+Usually yes; multiple/no proceed calls require deliberate design.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc7f993f" class="outline-3">
+<h3 id="orgc7f993f">Q65: What is reusable named pointcut?</h3>
+<div class="outline-text-3" id="text-orgc7f993f">
+<p>
+Method annotated with <code>@Pointcut</code> reused across advice methods.
+</p>
+</div>
+</div>
+<div id="outline-container-org90fa198" class="outline-3">
+<h3 id="org90fa198">Q66: Why use named pointcuts?</h3>
+<div class="outline-text-3" id="text-org90fa198">
+<p>
+Improves readability and consistency across aspects.
+</p>
+</div>
+</div>
+<div id="outline-container-org8cb17e1" class="outline-3">
+<h3 id="org8cb17e1">Q67: Can pointcuts be composed?</h3>
+<div class="outline-text-3" id="text-org8cb17e1">
+<p>
+Yes, using boolean operators (&amp;&amp;, ||, !).
+</p>
+</div>
+</div>
+<div id="outline-container-org25f6078" class="outline-3">
+<h3 id="org25f6078">Q68: Example composed pointcut idea?</h3>
+<div class="outline-text-3" id="text-org25f6078">
+<p>
+Service package AND public methods AND annotated with @Timed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgde280aa" class="outline-3">
+<h3 id="orgde280aa">Q69: What is join point context access?</h3>
+<div class="outline-text-3" id="text-orgde280aa">
+<p>
+Reading method signature, args, target class from JoinPoint.
+</p>
+</div>
+</div>
+<div id="outline-container-org9287cad" class="outline-3">
+<h3 id="org9287cad">Q70: How get method name in advice?</h3>
+<div class="outline-text-3" id="text-org9287cad">
+<p>
+From <code>joinPoint.getSignature().getName()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org7035b77" class="outline-3">
+<h3 id="org7035b77">Q71: How access method arguments in advice?</h3>
+<div class="outline-text-3" id="text-org7035b77">
+<p>
+<code>joinPoint.getArgs()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc75affe" class="outline-3">
+<h3 id="orgc75affe">Q72: How get target class?</h3>
+<div class="outline-text-3" id="text-orgc75affe">
+<p>
+<code>joinPoint.getTarget().getClass()</code> (or signature metadata).
+</p>
+</div>
+</div>
+<div id="outline-container-org728f5d2" class="outline-3">
+<h3 id="org728f5d2">Q73: What is MethodSignature in AOP?</h3>
+<div class="outline-text-3" id="text-org728f5d2">
+<p>
+Signature subtype exposing method-specific metadata.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfb6de44" class="outline-3">
+<h3 id="orgfb6de44">Q74: What is annotation-driven pointcut common use?</h3>
+<div class="outline-text-3" id="text-orgfb6de44">
+<p>
+Custom annotations like <code>@Auditable</code>, <code>@Timed</code>, <code>@Retryable</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb900f7a" class="outline-3">
+<h3 id="orgb900f7a">Q75: Why prefer annotation pointcuts over broad package cuts?</h3>
+<div class="outline-text-3" id="text-orgb900f7a">
+<p>
+More explicit intent and lower accidental match risk.
+</p>
+</div>
+</div>
+<div id="outline-container-org42a4569" class="outline-3">
+<h3 id="org42a4569">Q76: What is introduction/inter-type declaration in AOP concept?</h3>
+<div class="outline-text-3" id="text-org42a4569">
+<p>
+Adding interfaces/behavior to proxied objects (limited in Spring vs full AspectJ).
+</p>
+</div>
+</div>
+<div id="outline-container-org11a0446" class="outline-3">
+<h3 id="org11a0446">Q77: Does Spring AOP support full AspectJ introductions?</h3>
+<div class="outline-text-3" id="text-org11a0446">
+<p>
+Limited compared to full AspectJ weaving.
+</p>
+</div>
+</div>
+<div id="outline-container-orge0a0cad" class="outline-3">
+<h3 id="orge0a0cad">Q78: What is proxyTargetClass flag?</h3>
+<div class="outline-text-3" id="text-orge0a0cad">
+<p>
+Forces class-based (CGLIB) proxies.
+</p>
+</div>
+</div>
+<div id="outline-container-org33493b5" class="outline-3">
+<h3 id="org33493b5">Q79: Tradeoff of forcing CGLIB?</h3>
+<div class="outline-text-3" id="text-org33493b5">
+<p>
+Can proxy classes without interfaces but has subclassing constraints.
+</p>
+</div>
+</div>
+<div id="outline-container-orgacf65ab" class="outline-3">
+<h3 id="orgacf65ab">Q80: What is exposeProxy flag?</h3>
+<div class="outline-text-3" id="text-orgacf65ab">
+<p>
+Exposes current proxy via AopContext for advanced scenarios.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c87a32" class="outline-3">
+<h3 id="org4c87a32">Q81: Why avoid heavy AopContext usage?</h3>
+<div class="outline-text-3" id="text-org4c87a32">
+<p>
+Creates coupling and hides design issues (often self-invocation smell).
+</p>
+</div>
+</div>
+<div id="outline-container-org10245ef" class="outline-3">
+<h3 id="org10245ef">Q82: What is transaction advice relationship?</h3>
+<div class="outline-text-3" id="text-org10245ef">
+<p>
+<code>@Transactional</code> is implemented via AOP proxies/interceptors.
+</p>
+</div>
+</div>
+<div id="outline-container-org4548224" class="outline-3">
+<h3 id="org4548224">Q83: Why does @Transactional fail on private method?</h3>
+<div class="outline-text-3" id="text-org4548224">
+<p>
+Proxy cannot intercept private method calls.
+</p>
+</div>
+</div>
+<div id="outline-container-orge69a79b" class="outline-3">
+<h3 id="orge69a79b">Q84: Why does @Transactional fail on self-invocation?</h3>
+<div class="outline-text-3" id="text-orge69a79b">
+<p>
+Internal method call bypasses transactional proxy.
+</p>
+</div>
+</div>
+<div id="outline-container-orga92538d" class="outline-3">
+<h3 id="orga92538d">Q85: How does AOP relate to method security annotations?</h3>
+<div class="outline-text-3" id="text-orga92538d">
+<p>
+Annotations like <code>@PreAuthorize</code> are applied via interceptors/proxies.
+</p>
+</div>
+</div>
+<div id="outline-container-org8487af7" class="outline-3">
+<h3 id="org8487af7">Q86: How does AOP support caching annotations?</h3>
+<div class="outline-text-3" id="text-org8487af7">
+<p>
+<code>@Cacheable</code> and related annotations rely on proxy interception.
+</p>
+</div>
+</div>
+<div id="outline-container-org771e5d1" class="outline-3">
+<h3 id="org771e5d1">Q87: Why proxy order matters with tx/cache/security?</h3>
+<div class="outline-text-3" id="text-org771e5d1">
+<p>
+Different interceptor order changes behavior and side effects.
+</p>
+</div>
+</div>
+<div id="outline-container-orge7fe4de" class="outline-3">
+<h3 id="orge7fe4de">Q88: What is advisor in Spring AOP?</h3>
+<div class="outline-text-3" id="text-orge7fe4de">
+<p>
+Combination of advice + pointcut packaged for application.
+</p>
+</div>
+</div>
+<div id="outline-container-org12646cb" class="outline-3">
+<h3 id="org12646cb">Q89: What is Advised interface?</h3>
+<div class="outline-text-3" id="text-org12646cb">
+<p>
+Exposes proxy configuration details for advanced inspection.
+</p>
+</div>
+</div>
+<div id="outline-container-org85a2c25" class="outline-3">
+<h3 id="org85a2c25">Q90: What is ProxyFactory?</h3>
+<div class="outline-text-3" id="text-org85a2c25">
+<p>
+Programmatic API to create AOP proxies manually.
+</p>
+</div>
+</div>
+<div id="outline-container-org13e6a61" class="outline-3">
+<h3 id="org13e6a61">Q91: What is DefaultPointcutAdvisor?</h3>
+<div class="outline-text-3" id="text-org13e6a61">
+<p>
+Common advisor implementation combining pointcut and advice.
+</p>
+</div>
+</div>
+<div id="outline-container-org7babaf7" class="outline-3">
+<h3 id="org7babaf7">Q92: What is static vs dynamic pointcut?</h3>
+<div class="outline-text-3" id="text-org7babaf7">
+<p>
+Static matched by signature; dynamic may evaluate runtime arguments.
+</p>
+</div>
+</div>
+<div id="outline-container-org25b37af" class="outline-3">
+<h3 id="org25b37af">Q93: Why avoid overly dynamic pointcuts?</h3>
+<div class="outline-text-3" id="text-org25b37af">
+<p>
+Higher runtime overhead and complexity.
+</p>
+</div>
+</div>
+<div id="outline-container-org38c3920" class="outline-3">
+<h3 id="org38c3920">Q94: What is control flow pointcut concept?</h3>
+<div class="outline-text-3" id="text-org38c3920">
+<p>
+Match based on call stack/control flow (AspectJ concept, limited/expensive patterns).
+</p>
+</div>
+</div>
+<div id="outline-container-orge64216c" class="outline-3">
+<h3 id="orge64216c">Q95: What is common logging aspect pitfall?</h3>
+<div class="outline-text-3" id="text-orge64216c">
+<p>
+Logging sensitive data or flooding logs in high-traffic methods.
+</p>
+</div>
+</div>
+<div id="outline-container-org151957a" class="outline-3">
+<h3 id="org151957a">Q96: How avoid sensitive logging in aspects?</h3>
+<div class="outline-text-3" id="text-org151957a">
+<p>
+Redact fields and define explicit allowlist for logged values.
+</p>
+</div>
+</div>
+<div id="outline-container-org31d03e7" class="outline-3">
+<h3 id="org31d03e7">Q97: What is performance timing aspect pattern?</h3>
+<div class="outline-text-3" id="text-org31d03e7">
+<p>
+Around advice measuring duration and recording metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org26ac2fb" class="outline-3">
+<h3 id="org26ac2fb">Q98: Why include tags in metrics aspect?</h3>
+<div class="outline-text-3" id="text-org26ac2fb">
+<p>
+Supports filtering by operation/class/outcome in dashboards.
+</p>
+</div>
+</div>
+<div id="outline-container-org31796d1" class="outline-3">
+<h3 id="org31796d1">Q99: What is retry aspect risk?</h3>
+<div class="outline-text-3" id="text-org31796d1">
+<p>
+Retrying non-idempotent operations can duplicate side effects.
+</p>
+</div>
+</div>
+<div id="outline-container-org07e8252" class="outline-3">
+<h3 id="org07e8252">Q100: How make retry safer?</h3>
+<div class="outline-text-3" id="text-org07e8252">
+<p>
+Restrict to transient exceptions and idempotent operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org133e011" class="outline-3">
+<h3 id="org133e011">Q101: What is exception translation aspect?</h3>
+<div class="outline-text-3" id="text-org133e011">
+<p>
+Maps low-level exceptions to domain-specific exceptions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd13a673" class="outline-3">
+<h3 id="orgd13a673">Q102: Should exception translation hide root cause?</h3>
+<div class="outline-text-3" id="text-orgd13a673">
+<p>
+No, preserve cause chain.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcf78bbc" class="outline-3">
+<h3 id="orgcf78bbc">Q103: What is auditing aspect?</h3>
+<div class="outline-text-3" id="text-orgcf78bbc">
+<p>
+Captures who/what/when for critical actions.
+</p>
+</div>
+</div>
+<div id="outline-container-orga793443" class="outline-3">
+<h3 id="orga793443">Q104: Where should audit persistence occur?</h3>
+<div class="outline-text-3" id="text-orga793443">
+<p>
+Prefer reliable async/event pipeline or dedicated audit store pattern.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf1d3b7b" class="outline-3">
+<h3 id="orgf1d3b7b">Q105: What is pointcut drift?</h3>
+<div class="outline-text-3" id="text-orgf1d3b7b">
+<p>
+Pointcut unintentionally starts/stops matching after refactoring.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc81100" class="outline-3">
+<h3 id="orgbc81100">Q106: How prevent pointcut drift?</h3>
+<div class="outline-text-3" id="text-orgbc81100">
+<p>
+Use annotation markers and tests verifying interception coverage.
+</p>
+</div>
+</div>
+<div id="outline-container-orga9f183e" class="outline-3">
+<h3 id="orga9f183e">Q107: What is contract test for aspects?</h3>
+<div class="outline-text-3" id="text-orga9f183e">
+<p>
+Test asserting aspect behavior on representative target methods.
+</p>
+</div>
+</div>
+<div id="outline-container-org864be1f" class="outline-3">
+<h3 id="org864be1f">Q108: How debug whether bean is proxied?</h3>
+<div class="outline-text-3" id="text-org864be1f">
+<p>
+Check class name/proxy utilities/logging of advisor application.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdb6dac1" class="outline-3">
+<h3 id="orgdb6dac1">Q109: Can final return types affect proxying?</h3>
+<div class="outline-text-3" id="text-orgdb6dac1">
+<p>
+Proxy type compatibility must satisfy injection/casting expectations.
+</p>
+</div>
+</div>
+<div id="outline-container-org818e215" class="outline-3">
+<h3 id="org818e215">Q110: What is equals/hashCode caveat with proxies?</h3>
+<div class="outline-text-3" id="text-org818e215">
+<p>
+Proxy class may differ from target; equality assumptions can break.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf1b0a93" class="outline-3">
+<h3 id="orgf1b0a93">Q111: What is serialization caveat with proxies?</h3>
+<div class="outline-text-3" id="text-orgf1b0a93">
+<p>
+Some proxies/handlers are not serialization-friendly by default.
+</p>
+</div>
+</div>
+<div id="outline-container-orga5d5209" class="outline-3">
+<h3 id="orga5d5209">Q112: What is thread safety requirement for aspects?</h3>
+<div class="outline-text-3" id="text-orga5d5209">
+<p>
+Aspect beans are usually singletons; state must be immutable/thread-safe.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb6b0778" class="outline-3">
+<h3 id="orgb6b0778">Q113: Should aspects keep mutable per-request fields?</h3>
+<div class="outline-text-3" id="text-orgb6b0778">
+<p>
+No, use method-local variables or request context holders.
+</p>
+</div>
+</div>
+<div id="outline-container-org1758c92" class="outline-3">
+<h3 id="org1758c92">Q114: What is MDC correlation in aspect usage?</h3>
+<div class="outline-text-3" id="text-org1758c92">
+<p>
+Aspect sets request/trace context for logs and clears it reliably.
+</p>
+</div>
+</div>
+<div id="outline-container-org406dab4" class="outline-3">
+<h3 id="org406dab4">Q115: What happens if MDC is not cleared?</h3>
+<div class="outline-text-3" id="text-org406dab4">
+<p>
+Context leakage across reused threads.
+</p>
+</div>
+</div>
+<div id="outline-container-orga501f4c" class="outline-3">
+<h3 id="orga501f4c">Q116: What is idempotent advice design?</h3>
+<div class="outline-text-3" id="text-orga501f4c">
+<p>
+Advice should avoid duplicate side effects if call chain retries/reenters.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c0f700" class="outline-3">
+<h3 id="org9c0f700">Q117: How can AOP impact stack traces?</h3>
+<div class="outline-text-3" id="text-org9c0f700">
+<p>
+Adds proxy/interceptor frames, sometimes obscuring direct call flow.
+</p>
+</div>
+</div>
+<div id="outline-container-orgffd4a6c" class="outline-3">
+<h3 id="orgffd4a6c">Q118: What is best doc practice for aspects?</h3>
+<div class="outline-text-3" id="text-orgffd4a6c">
+<p>
+Document scope, pointcuts, order, and expected side effects.
+</p>
+</div>
+</div>
+<div id="outline-container-org6f8ac70" class="outline-3">
+<h3 id="org6f8ac70">Q119: When to use full AspectJ over Spring AOP?</h3>
+<div class="outline-text-3" id="text-org6f8ac70">
+<p>
+Need field/constructor join points or non-Spring object weaving.
+</p>
+</div>
+</div>
+<div id="outline-container-org10d050e" class="outline-3">
+<h3 id="org10d050e">Q120: Key intermediate guideline?</h3>
+<div class="outline-text-3" id="text-org10d050e">
+<p>
+Keep aspects explicit, test-covered, and limited to true cross-cutting needs.
+</p>
+</div>
+</div>
+<div id="outline-container-org090d39f" class="outline-3">
+<h3 id="org090d39f">Q121: What is perthis/pertarget concept (AspectJ)?</h3>
+<div class="outline-text-3" id="text-org090d39f">
+<p>
+Aspect instantiation models beyond singleton; mostly full AspectJ territory.
+</p>
+</div>
+</div>
+<div id="outline-container-org574a4ce" class="outline-3">
+<h3 id="org574a4ce">Q122: Is Spring @Aspect bean singleton by default?</h3>
+<div class="outline-text-3" id="text-org574a4ce">
+<p>
+Yes, unless scope changed.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e7fbf8" class="outline-3">
+<h3 id="org6e7fbf8">Q123: What is advisor chain inspection use case?</h3>
+<div class="outline-text-3" id="text-org6e7fbf8">
+<p>
+Troubleshooting unexpected behavior due to interceptor order.
+</p>
+</div>
+</div>
+<div id="outline-container-org1f913f0" class="outline-3">
+<h3 id="org1f913f0">Q124: What is no-op advice anti-pattern?</h3>
+<div class="outline-text-3" id="text-org1f913f0">
+<p>
+Interception overhead without meaningful value.
+</p>
+</div>
+</div>
+<div id="outline-container-orge91e1dc" class="outline-3">
+<h3 id="orge91e1dc">Q125: Intermediate anti-pattern summary?</h3>
+<div class="outline-text-3" id="text-orge91e1dc">
+<p>
+Broad pointcuts + hidden side effects + poor tests.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org8e8427b" class="outline-2">
+<h2 id="org8e8427b">Advanced</h2>
+<div class="outline-text-2" id="text-org8e8427b">
+</div>
+<div id="outline-container-org068cf94" class="outline-3">
+<h3 id="org068cf94">Q126: How does proxy depth affect latency?</h3>
+<div class="outline-text-3" id="text-org068cf94">
+<p>
+Each interceptor adds call overhead; excessive chains increase latency.
+</p>
+</div>
+</div>
+<div id="outline-container-org08c34c2" class="outline-3">
+<h3 id="org08c34c2">Q127: What is interception hot-path concern?</h3>
+<div class="outline-text-3" id="text-org08c34c2">
+<p>
+Applying heavy advice to ultra-frequent methods can hurt throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0d53fb" class="outline-3">
+<h3 id="orgf0d53fb">Q128: How profile AOP overhead?</h3>
+<div class="outline-text-3" id="text-orgf0d53fb">
+<p>
+Measure with/without aspects, inspect p95/p99 latency and CPU allocation.
+</p>
+</div>
+</div>
+<div id="outline-container-orga035556" class="outline-3">
+<h3 id="orga035556">Q129: What is compile-time weaving advantage (AspectJ)?</h3>
+<div class="outline-text-3" id="text-orga035556">
+<p>
+Broader join point model and potentially lower proxy indirection in some cases.
+</p>
+</div>
+</div>
+<div id="outline-container-orgefdd7d5" class="outline-3">
+<h3 id="orgefdd7d5">Q130: What is load-time weaving (LTW)?</h3>
+<div class="outline-text-3" id="text-orgefdd7d5">
+<p>
+Weaving aspects during class loading via agents/instrumentation.
+</p>
+</div>
+</div>
+<div id="outline-container-org467a673" class="outline-3">
+<h3 id="org467a673">Q131: Why is LTW operationally complex?</h3>
+<div class="outline-text-3" id="text-org467a673">
+<p>
+Agent setup, classloader interactions, and deployment constraints.
+</p>
+</div>
+</div>
+<div id="outline-container-org8dc3f2b" class="outline-3">
+<h3 id="org8dc3f2b">Q132: When is proxy-based AOP preferable?</h3>
+<div class="outline-text-3" id="text-org8dc3f2b">
+<p>
+Most enterprise method interception needs with simpler ops model.
+</p>
+</div>
+</div>
+<div id="outline-container-org18a5168" class="outline-3">
+<h3 id="org18a5168">Q133: What is architectural boundary aspect pattern?</h3>
+<div class="outline-text-3" id="text-org18a5168">
+<p>
+Enforce rules (e.g., no repository access from controllers) via checks/instrumentation.
+</p>
+</div>
+</div>
+<div id="outline-container-org4e323eb" class="outline-3">
+<h3 id="org4e323eb">Q134: Should AOP enforce all architecture rules at runtime?</h3>
+<div class="outline-text-3" id="text-org4e323eb">
+<p>
+Prefer compile/test-time checks when possible; runtime checks for critical safeguards.
+</p>
+</div>
+</div>
+<div id="outline-container-orga5014b1" class="outline-3">
+<h3 id="orga5014b1">Q135: What is security boundary pitfall in AOP?</h3>
+<div class="outline-text-3" id="text-orga5014b1">
+<p>
+Assuming advice runs everywhere despite self-invocation or non-proxied objects.
+</p>
+</div>
+</div>
+<div id="outline-container-org839c663" class="outline-3">
+<h3 id="org839c663">Q136: How harden security with AOP?</h3>
+<div class="outline-text-3" id="text-org839c663">
+<p>
+Combine method security with explicit boundary design and tests.
+</p>
+</div>
+</div>
+<div id="outline-container-org6d8ab93" class="outline-3">
+<h3 id="org6d8ab93">Q137: What is transactional consistency pitfall with nested proxies?</h3>
+<div class="outline-text-3" id="text-org6d8ab93">
+<p>
+Unexpected propagation/ordering can alter commit/rollback behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ddf661" class="outline-3">
+<h3 id="org7ddf661">Q138: How validate tx + AOP behavior?</h3>
+<div class="outline-text-3" id="text-org7ddf661">
+<p>
+Integration tests covering propagation, exceptions, and rollback semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org7b9517e" class="outline-3">
+<h3 id="org7b9517e">Q139: What is distributed tracing aspect strategy?</h3>
+<div class="outline-text-3" id="text-org7b9517e">
+<p>
+Aspect creates spans/tags around service methods with error status recording.
+</p>
+</div>
+</div>
+<div id="outline-container-org8669c8a" class="outline-3">
+<h3 id="org8669c8a">Q140: Risk of double instrumentation?</h3>
+<div class="outline-text-3" id="text-org8669c8a">
+<p>
+Duplicate spans/metrics if both auto-instrumentation and custom aspects run.
+</p>
+</div>
+</div>
+<div id="outline-container-org9228919" class="outline-3">
+<h3 id="org9228919">Q141: How avoid double instrumentation?</h3>
+<div class="outline-text-3" id="text-org9228919">
+<p>
+Define clear ownership and disable overlapping instrumentation points.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbeed242" class="outline-3">
+<h3 id="orgbeed242">Q142: What is adaptive sampling relevance for logging aspects?</h3>
+<div class="outline-text-3" id="text-orgbeed242">
+<p>
+Controls volume during high traffic/incidents while preserving diagnostic value.
+</p>
+</div>
+</div>
+<div id="outline-container-org239162b" class="outline-3">
+<h3 id="org239162b">Q143: What is resilient aspect design?</h3>
+<div class="outline-text-3" id="text-org239162b">
+<p>
+Advice failures should not cascade and break core business flow (unless required).
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3fb25c" class="outline-3">
+<h3 id="orgd3fb25c">Q144: Should observability aspects throw business exceptions?</h3>
+<div class="outline-text-3" id="text-orgd3fb25c">
+<p>
+Generally no; fail open carefully and log internal failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc9cc4c2" class="outline-3">
+<h3 id="orgc9cc4c2">Q145: What is fail-closed vs fail-open in security aspects?</h3>
+<div class="outline-text-3" id="text-orgc9cc4c2">
+<p>
+Fail-closed denies on uncertainty; fail-open allows continuation—choose by risk model.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc179d78" class="outline-3">
+<h3 id="orgc179d78">Q146: What is ordering contract documentation?</h3>
+<div class="outline-text-3" id="text-orgc179d78">
+<p>
+Explicitly define precedence among tracing, security, transactions, caching, retries.
+</p>
+</div>
+</div>
+<div id="outline-container-org99895b5" class="outline-3">
+<h3 id="org99895b5">Q147: Typical safe order heuristic?</h3>
+<div class="outline-text-3" id="text-org99895b5">
+<p>
+Security/auth first, then idempotency/validation, then tx, then business, then logging/metrics (context-dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-org862521d" class="outline-3">
+<h3 id="org862521d">Q148: Why can retry + transaction ordering be dangerous?</h3>
+<div class="outline-text-3" id="text-org862521d">
+<p>
+Incorrect nesting may retry inside same failed transaction context.
+</p>
+</div>
+</div>
+<div id="outline-container-org19c4f5b" class="outline-3">
+<h3 id="org19c4f5b">Q149: What is compensating action concern in around advice?</h3>
+<div class="outline-text-3" id="text-org19c4f5b">
+<p>
+Custom rollback/compensation must align with transaction boundaries.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdaf38df" class="outline-3">
+<h3 id="orgdaf38df">Q150: How to version aspect behavior safely?</h3>
+<div class="outline-text-3" id="text-orgdaf38df">
+<p>
+Feature flags, canary rollout, and backward-compatible defaults.
+</p>
+</div>
+</div>
+<div id="outline-container-org0d1c4c1" class="outline-3">
+<h3 id="org0d1c4c1">Q151: What is aspect blast radius?</h3>
+<div class="outline-text-3" id="text-org0d1c4c1">
+<p>
+Number of methods/services affected by one pointcut change.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f809bb" class="outline-3">
+<h3 id="org3f809bb">Q152: How reduce blast radius?</h3>
+<div class="outline-text-3" id="text-org3f809bb">
+<p>
+Narrow pointcuts, annotation markers, incremental rollout.
+</p>
+</div>
+</div>
+<div id="outline-container-orgab433a6" class="outline-3">
+<h3 id="orgab433a6">Q153: What is AOP governance in large orgs?</h3>
+<div class="outline-text-3" id="text-orgab433a6">
+<p>
+Review process for new aspects, pointcut patterns, and operational impact.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1602fc" class="outline-3">
+<h3 id="orgc1602fc">Q154: What metrics should be tracked for aspects?</h3>
+<div class="outline-text-3" id="text-orgc1602fc">
+<p>
+Invocation count, added latency, error rate, dropped/skipped behavior counts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd459e13" class="outline-3">
+<h3 id="orgd459e13">Q155: What is reentrancy issue in aspects?</h3>
+<div class="outline-text-3" id="text-orgd459e13">
+<p>
+Advice triggers code paths that re-trigger same advice unintentionally.
+</p>
+</div>
+</div>
+<div id="outline-container-org98a7fb2" class="outline-3">
+<h3 id="org98a7fb2">Q156: How prevent reentrancy loops?</h3>
+<div class="outline-text-3" id="text-org98a7fb2">
+<p>
+Guard flags/context markers and carefully scoped pointcuts.
+</p>
+</div>
+</div>
+<div id="outline-container-org5b9a255" class="outline-3">
+<h3 id="org5b9a255">Q157: What is classloader/proxy memory risk?</h3>
+<div class="outline-text-3" id="text-org5b9a255">
+<p>
+Many generated proxies can increase metaspace/memory pressure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb8ce006" class="outline-3">
+<h3 id="orgb8ce006">Q158: How mitigate proxy explosion?</h3>
+<div class="outline-text-3" id="text-orgb8ce006">
+<p>
+Proxy only necessary beans and avoid dynamic per-tenant/per-request proxy generation.
+</p>
+</div>
+</div>
+<div id="outline-container-org15f969f" class="outline-3">
+<h3 id="org15f969f">Q159: What is native image consideration for Spring AOP?</h3>
+<div class="outline-text-3" id="text-org15f969f">
+<p>
+Proxy/reflection configuration may need explicit AOT hints.
+</p>
+</div>
+</div>
+<div id="outline-container-org5efce98" class="outline-3">
+<h3 id="org5efce98">Q160: How does AOT change AOP strategy?</h3>
+<div class="outline-text-3" id="text-org5efce98">
+<p>
+Encourage build-time analysis and explicit proxy registrations.
+</p>
+</div>
+</div>
+<div id="outline-container-org00e0939" class="outline-3">
+<h3 id="org00e0939">Q161: What is anti-corruption use with aspects?</h3>
+<div class="outline-text-3" id="text-org00e0939">
+<p>
+Translate external exceptions/protocol concerns at boundary services.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc516cea" class="outline-3">
+<h3 id="orgc516cea">Q162: What is domain purity rule regarding AOP?</h3>
+<div class="outline-text-3" id="text-orgc516cea">
+<p>
+Aspects should support domain logic, not replace explicit domain workflows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9d8142" class="outline-3">
+<h3 id="orgf9d8142">Q163: Why keep aspects stateless?</h3>
+<div class="outline-text-3" id="text-orgf9d8142">
+<p>
+Singleton scope + concurrency safety + easier reasoning.
+</p>
+</div>
+</div>
+<div id="outline-container-org4d56798" class="outline-3">
+<h3 id="org4d56798">Q164: What is incident response benefit of well-designed aspects?</h3>
+<div class="outline-text-3" id="text-org4d56798">
+<p>
+Consistent logs/metrics/traces across services speed root-cause analysis.
+</p>
+</div>
+</div>
+<div id="outline-container-org3963243" class="outline-3">
+<h3 id="org3963243">Q165: What is biggest advanced anti-pattern in Spring AOP?</h3>
+<div class="outline-text-3" id="text-org3963243">
+<p>
+Using broad around advice as hidden control flow engine.
+</p>
+</div>
+</div>
+<div id="outline-container-org96435e9" class="outline-3">
+<h3 id="org96435e9">Q166: When should you refactor away from aspect logic?</h3>
+<div class="outline-text-3" id="text-org96435e9">
+<p>
+When it encodes business decisions better expressed in explicit services.
+</p>
+</div>
+</div>
+<div id="outline-container-orge4934bf" class="outline-3">
+<h3 id="orge4934bf">Q167: What is mature AOP usage profile?</h3>
+<div class="outline-text-3" id="text-orge4934bf">
+<p>
+Small set of well-documented, high-value aspects with strict tests and observability.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f9e051" class="outline-3">
+<h3 id="org4f9e051">Q168: What testing pyramid addition helps AOP-heavy apps?</h3>
+<div class="outline-text-3" id="text-org4f9e051">
+<p>
+Dedicated interception contract tests plus end-to-end behavior verification.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5735ee" class="outline-3">
+<h3 id="orgc5735ee">Q169: What deployment practice reduces AOP regressions?</h3>
+<div class="outline-text-3" id="text-orgc5735ee">
+<p>
+Canary + shadow traffic + fast rollback for pointcut/order changes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc38e10e" class="outline-3">
+<h3 id="orgc38e10e">Q170: What code review checklist item is critical for AOP?</h3>
+<div class="outline-text-3" id="text-orgc38e10e">
+<p>
+Verify pointcut scope, ordering, side effects, and failure behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc337021" class="outline-3">
+<h3 id="orgc337021">Q171: What is long-term maintenance strategy?</h3>
+<div class="outline-text-3" id="text-orgc337021">
+<p>
+Centralize common pointcuts and deprecate risky patterns gradually.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ef71f0" class="outline-3">
+<h3 id="org9ef71f0">Q172: What is principle of least astonishment for aspects?</h3>
+<div class="outline-text-3" id="text-org9ef71f0">
+<p>
+Advice behavior should be predictable and unsurprising to developers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec92bf9" class="outline-3">
+<h3 id="orgec92bf9">Q173: What is advanced performance rule?</h3>
+<div class="outline-text-3" id="text-orgec92bf9">
+<p>
+Never put expensive I/O inside ubiquitous advice on hot paths.
+</p>
+</div>
+</div>
+<div id="outline-container-org51582a1" class="outline-3">
+<h3 id="org51582a1">Q174: Final architecture rule for Spring AOP?</h3>
+<div class="outline-text-3" id="text-org51582a1">
+<p>
+Prefer explicitness: annotate intent, constrain scope, measure impact.
+</p>
+</div>
+</div>
+<div id="outline-container-org0d4c2d8" class="outline-3">
+<h3 id="org0d4c2d8">Q175: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org0d4c2d8">
+<p>
+Use AOP as a precision tool for cross-cutting concerns, not as hidden business orchestration.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org8a8c9a6" class="outline-2">
+<h2 id="org8a8c9a6">Bonus: Minimal Timing Aspect Template</h2>
+<div class="outline-text-2" id="text-org8a8c9a6">
+<div class="org-src-container">
+<pre class="src src-java"><span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">aspectj</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">ProceedingJoinPoint</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">aspectj</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">annotation</span>.<span style="font-weight: bold; text-decoration: underline;">Around</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">aspectj</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">annotation</span>.<span style="font-weight: bold; text-decoration: underline;">Aspect</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">springframework</span>.<span style="font-weight: bold; text-decoration: underline;">stereotype</span>.<span style="font-weight: bold; text-decoration: underline;">Component</span>;
+
+<span style="font-weight: bold; text-decoration: underline;">@Aspect</span>
+<span style="font-weight: bold; text-decoration: underline;">@Component</span>
+<span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">TimingAspect</span> {
+
+    <span style="font-weight: bold; text-decoration: underline;">@Around</span>(<span style="font-style: italic;">"@annotation(com.example.Timed)"</span>)
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">Object</span> <span style="font-weight: bold;">time</span>(<span style="font-weight: bold; text-decoration: underline;">ProceedingJoinPoint</span> <span style="font-weight: bold; font-style: italic;">pjp</span>) <span style="font-weight: bold;">throws</span> <span style="font-weight: bold; text-decoration: underline;">Throwable</span> {
+        <span style="font-weight: bold; text-decoration: underline;">long</span> <span style="font-weight: bold; font-style: italic;">start</span> = System.nanoTime();
+        <span style="font-weight: bold;">try</span> {
+            <span style="font-weight: bold;">return</span> pjp.proceed();
+        } <span style="font-weight: bold;">finally</span> {
+            <span style="font-weight: bold; text-decoration: underline;">long</span> <span style="font-weight: bold; font-style: italic;">elapsedNanos</span> = System.nanoTime() - start;
+            <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">publish metric/log with method + elapsedNanos
+</span>        }
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

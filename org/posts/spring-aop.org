@@ -1,0 +1,571 @@
+#+title: Spring AOP
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring AOP
+
+-----
+
+* Beginner
+
+** Q1: What is AOP?
+AOP (Aspect-Oriented Programming) is a way to modularize cross-cutting concerns like logging, security, and transactions.
+
+** Q2: What is Spring AOP?
+Spring AOP is Spring’s proxy-based AOP framework for method-level interception on Spring-managed beans.
+
+** Q3: Why use Spring AOP?
+To keep cross-cutting logic separate from business code and reduce duplication.
+
+** Q4: What is a cross-cutting concern?
+A concern affecting multiple modules, e.g., logging, metrics, auth checks.
+
+** Q5: What is an Aspect?
+A class that groups advice and pointcut definitions.
+
+** Q6: What is Advice?
+Action executed at a matched join point (before/after/around/etc.).
+
+** Q7: What is a Join Point in Spring AOP?
+A method execution point on a proxied bean.
+
+** Q8: What is a Pointcut?
+A predicate/expression selecting which join points should run advice.
+
+** Q9: What is Weaving?
+Applying aspects to target objects (in Spring AOP, via runtime proxies).
+
+** Q10: Is Spring AOP compile-time weaving?
+No, it is primarily runtime proxy-based weaving.
+
+** Q11: What are common advice types?
+- Before
+- After
+- AfterReturning
+- AfterThrowing
+- Around
+
+** Q12: What does @Before do?
+Runs advice before target method execution.
+
+** Q13: What does @After do?
+Runs advice after method finishes (success or exception).
+
+** Q14: What does @AfterReturning do?
+Runs only when method returns successfully.
+
+** Q15: What does @AfterThrowing do?
+Runs only when method throws an exception.
+
+** Q16: What does @Around do?
+Wraps method execution and controls whether/when target executes.
+
+** Q17: What is ProceedingJoinPoint?
+Object passed to around advice enabling =proceed()= invocation.
+
+** Q18: What happens if around advice never calls proceed()?
+Target method is skipped.
+
+** Q19: What is @Aspect?
+Annotation marking a class as an aspect.
+
+** Q20: What is @EnableAspectJAutoProxy?
+Enables proxy-based AOP processing in Spring configuration.
+
+** Q21: Is AspectJ required to use Spring AOP annotations?
+AspectJ expression syntax is used, but full AspectJ weaving is not required for basic Spring AOP.
+
+** Q22: What is a target object?
+The original bean instance being proxied/intercepted.
+
+** Q23: What is an AOP proxy?
+A wrapper object that intercepts method calls and applies advice.
+
+** Q24: JDK dynamic proxy vs CGLIB in Spring AOP?
+JDK proxies interfaces; CGLIB subclasses concrete classes.
+
+** Q25: When does Spring use JDK proxies?
+When target implements at least one interface (default strategy).
+
+** Q26: When does Spring use CGLIB?
+When proxying class-based targets (or when forced).
+
+** Q27: Can final classes be proxied by CGLIB?
+Final classes cannot be subclassed, so class-based proxying is limited.
+
+** Q28: Can final methods be advised with Spring proxy AOP?
+Generally no, because subclass proxies cannot override final methods.
+
+** Q29: Can private methods be advised in Spring proxy AOP?
+No, proxy interception targets externally invoked methods.
+
+** Q30: What is self-invocation problem?
+A method within a bean calling another method in same bean bypasses proxy.
+
+** Q31: Why does self-invocation bypass advice?
+Internal call uses =this= directly, not proxy reference.
+
+** Q32: What is the simplest fix for self-invocation issue?
+Move advised method to another bean and call through container-managed proxy.
+
+** Q33: What is pointcut expression language in Spring AOP?
+AspectJ pointcut expression syntax for matching methods/types.
+
+** Q34: Common pointcut designator in Spring AOP?
+=execution(...)= is most common.
+
+** Q35: Example execution expression?
+=execution(* com.example.service.*.*(..))=
+
+** Q36: What does *(..) mean in pointcut?
+Any method name with any argument list.
+
+** Q37: What does package wildcard .. mean?
+Matches current package and subpackages.
+
+** Q38: What is @annotation pointcut?
+Matches methods annotated with a specific annotation.
+
+** Q39: What is within pointcut?
+Matches join points within certain types/packages.
+
+** Q40: What is this() in pointcuts?
+Matches based on proxy type.
+
+** Q41: What is target() in pointcuts?
+Matches based on target object type.
+
+** Q42: What is args() in pointcuts?
+Matches runtime argument types.
+
+** Q43: What is bean() pointcut in Spring?
+Spring-specific designator matching bean names.
+
+** Q44: Why keep pointcuts specific?
+Prevents accidental interception and performance/noise issues.
+
+** Q45: What is advice ordering?
+Determines execution precedence when multiple aspects match same join point.
+
+** Q46: How define order?
+Use =@Order= or =Ordered= interface.
+
+** Q47: What is use case for before advice?
+Input validation, correlation ID setup, audit pre-log.
+
+** Q48: What is use case for after returning advice?
+Result transformation metadata logging, success metrics.
+
+** Q49: What is use case for after throwing advice?
+Error logging, exception metrics, alert enrichment.
+
+** Q50: What is use case for around advice?
+Timing, retries, transaction wrappers, conditional execution.
+
+** Q51: Is around advice most powerful?
+Yes, but also easiest to misuse.
+
+** Q52: Can advice change method arguments?
+Around advice can supply different args when calling =proceed(args)=.
+
+** Q53: Can advice change return value?
+Around advice can wrap/replace return value.
+
+** Q54: Should business logic live in aspects?
+No, keep aspects focused on cross-cutting concerns.
+
+** Q55: What is best first AOP use in projects?
+Observability concerns (logging, metrics, tracing).
+
+** Q56: How to test if aspect is applied?
+Integration tests with Spring context and assertions on side effects.
+
+** Q57: Can you apply AOP to non-Spring objects?
+Not with Spring proxy AOP unless object is managed/proxied by container.
+
+** Q58: What is proxy exposure option?
+Allows obtaining current proxy in special cases (use sparingly).
+
+** Q59: Is Spring AOP only method-level?
+Yes for proxy model; field/constructor join points require AspectJ weaving.
+
+** Q60: Beginner best practice?
+Use narrow pointcuts, simple advice, and avoid hidden business behavior.
+
+* Intermediate
+
+** Q61: How do multiple advices execute on same method?
+According to precedence/order; around advice nests others.
+
+** Q62: Around advice call chain concept?
+Outer aspect proceeds to next interceptor until target executes.
+
+** Q63: What happens if around advice catches exception and swallows it?
+Caller sees success path, which may break semantics/monitoring.
+
+** Q64: Should around advice always proceed exactly once?
+Usually yes; multiple/no proceed calls require deliberate design.
+
+** Q65: What is reusable named pointcut?
+Method annotated with =@Pointcut= reused across advice methods.
+
+** Q66: Why use named pointcuts?
+Improves readability and consistency across aspects.
+
+** Q67: Can pointcuts be composed?
+Yes, using boolean operators (&&, ||, !).
+
+** Q68: Example composed pointcut idea?
+Service package AND public methods AND annotated with @Timed.
+
+** Q69: What is join point context access?
+Reading method signature, args, target class from JoinPoint.
+
+** Q70: How get method name in advice?
+From =joinPoint.getSignature().getName()=.
+
+** Q71: How access method arguments in advice?
+=joinPoint.getArgs()=.
+
+** Q72: How get target class?
+=joinPoint.getTarget().getClass()= (or signature metadata).
+
+** Q73: What is MethodSignature in AOP?
+Signature subtype exposing method-specific metadata.
+
+** Q74: What is annotation-driven pointcut common use?
+Custom annotations like =@Auditable=, =@Timed=, =@Retryable=.
+
+** Q75: Why prefer annotation pointcuts over broad package cuts?
+More explicit intent and lower accidental match risk.
+
+** Q76: What is introduction/inter-type declaration in AOP concept?
+Adding interfaces/behavior to proxied objects (limited in Spring vs full AspectJ).
+
+** Q77: Does Spring AOP support full AspectJ introductions?
+Limited compared to full AspectJ weaving.
+
+** Q78: What is proxyTargetClass flag?
+Forces class-based (CGLIB) proxies.
+
+** Q79: Tradeoff of forcing CGLIB?
+Can proxy classes without interfaces but has subclassing constraints.
+
+** Q80: What is exposeProxy flag?
+Exposes current proxy via AopContext for advanced scenarios.
+
+** Q81: Why avoid heavy AopContext usage?
+Creates coupling and hides design issues (often self-invocation smell).
+
+** Q82: What is transaction advice relationship?
+=@Transactional= is implemented via AOP proxies/interceptors.
+
+** Q83: Why does @Transactional fail on private method?
+Proxy cannot intercept private method calls.
+
+** Q84: Why does @Transactional fail on self-invocation?
+Internal method call bypasses transactional proxy.
+
+** Q85: How does AOP relate to method security annotations?
+Annotations like =@PreAuthorize= are applied via interceptors/proxies.
+
+** Q86: How does AOP support caching annotations?
+=@Cacheable= and related annotations rely on proxy interception.
+
+** Q87: Why proxy order matters with tx/cache/security?
+Different interceptor order changes behavior and side effects.
+
+** Q88: What is advisor in Spring AOP?
+Combination of advice + pointcut packaged for application.
+
+** Q89: What is Advised interface?
+Exposes proxy configuration details for advanced inspection.
+
+** Q90: What is ProxyFactory?
+Programmatic API to create AOP proxies manually.
+
+** Q91: What is DefaultPointcutAdvisor?
+Common advisor implementation combining pointcut and advice.
+
+** Q92: What is static vs dynamic pointcut?
+Static matched by signature; dynamic may evaluate runtime arguments.
+
+** Q93: Why avoid overly dynamic pointcuts?
+Higher runtime overhead and complexity.
+
+** Q94: What is control flow pointcut concept?
+Match based on call stack/control flow (AspectJ concept, limited/expensive patterns).
+
+** Q95: What is common logging aspect pitfall?
+Logging sensitive data or flooding logs in high-traffic methods.
+
+** Q96: How avoid sensitive logging in aspects?
+Redact fields and define explicit allowlist for logged values.
+
+** Q97: What is performance timing aspect pattern?
+Around advice measuring duration and recording metrics.
+
+** Q98: Why include tags in metrics aspect?
+Supports filtering by operation/class/outcome in dashboards.
+
+** Q99: What is retry aspect risk?
+Retrying non-idempotent operations can duplicate side effects.
+
+** Q100: How make retry safer?
+Restrict to transient exceptions and idempotent operations.
+
+** Q101: What is exception translation aspect?
+Maps low-level exceptions to domain-specific exceptions.
+
+** Q102: Should exception translation hide root cause?
+No, preserve cause chain.
+
+** Q103: What is auditing aspect?
+Captures who/what/when for critical actions.
+
+** Q104: Where should audit persistence occur?
+Prefer reliable async/event pipeline or dedicated audit store pattern.
+
+** Q105: What is pointcut drift?
+Pointcut unintentionally starts/stops matching after refactoring.
+
+** Q106: How prevent pointcut drift?
+Use annotation markers and tests verifying interception coverage.
+
+** Q107: What is contract test for aspects?
+Test asserting aspect behavior on representative target methods.
+
+** Q108: How debug whether bean is proxied?
+Check class name/proxy utilities/logging of advisor application.
+
+** Q109: Can final return types affect proxying?
+Proxy type compatibility must satisfy injection/casting expectations.
+
+** Q110: What is equals/hashCode caveat with proxies?
+Proxy class may differ from target; equality assumptions can break.
+
+** Q111: What is serialization caveat with proxies?
+Some proxies/handlers are not serialization-friendly by default.
+
+** Q112: What is thread safety requirement for aspects?
+Aspect beans are usually singletons; state must be immutable/thread-safe.
+
+** Q113: Should aspects keep mutable per-request fields?
+No, use method-local variables or request context holders.
+
+** Q114: What is MDC correlation in aspect usage?
+Aspect sets request/trace context for logs and clears it reliably.
+
+** Q115: What happens if MDC is not cleared?
+Context leakage across reused threads.
+
+** Q116: What is idempotent advice design?
+Advice should avoid duplicate side effects if call chain retries/reenters.
+
+** Q117: How can AOP impact stack traces?
+Adds proxy/interceptor frames, sometimes obscuring direct call flow.
+
+** Q118: What is best doc practice for aspects?
+Document scope, pointcuts, order, and expected side effects.
+
+** Q119: When to use full AspectJ over Spring AOP?
+Need field/constructor join points or non-Spring object weaving.
+
+** Q120: Key intermediate guideline?
+Keep aspects explicit, test-covered, and limited to true cross-cutting needs.
+
+** Q121: What is perthis/pertarget concept (AspectJ)?
+Aspect instantiation models beyond singleton; mostly full AspectJ territory.
+
+** Q122: Is Spring @Aspect bean singleton by default?
+Yes, unless scope changed.
+
+** Q123: What is advisor chain inspection use case?
+Troubleshooting unexpected behavior due to interceptor order.
+
+** Q124: What is no-op advice anti-pattern?
+Interception overhead without meaningful value.
+
+** Q125: Intermediate anti-pattern summary?
+Broad pointcuts + hidden side effects + poor tests.
+
+* Advanced
+
+** Q126: How does proxy depth affect latency?
+Each interceptor adds call overhead; excessive chains increase latency.
+
+** Q127: What is interception hot-path concern?
+Applying heavy advice to ultra-frequent methods can hurt throughput.
+
+** Q128: How profile AOP overhead?
+Measure with/without aspects, inspect p95/p99 latency and CPU allocation.
+
+** Q129: What is compile-time weaving advantage (AspectJ)?
+Broader join point model and potentially lower proxy indirection in some cases.
+
+** Q130: What is load-time weaving (LTW)?
+Weaving aspects during class loading via agents/instrumentation.
+
+** Q131: Why is LTW operationally complex?
+Agent setup, classloader interactions, and deployment constraints.
+
+** Q132: When is proxy-based AOP preferable?
+Most enterprise method interception needs with simpler ops model.
+
+** Q133: What is architectural boundary aspect pattern?
+Enforce rules (e.g., no repository access from controllers) via checks/instrumentation.
+
+** Q134: Should AOP enforce all architecture rules at runtime?
+Prefer compile/test-time checks when possible; runtime checks for critical safeguards.
+
+** Q135: What is security boundary pitfall in AOP?
+Assuming advice runs everywhere despite self-invocation or non-proxied objects.
+
+** Q136: How harden security with AOP?
+Combine method security with explicit boundary design and tests.
+
+** Q137: What is transactional consistency pitfall with nested proxies?
+Unexpected propagation/ordering can alter commit/rollback behavior.
+
+** Q138: How validate tx + AOP behavior?
+Integration tests covering propagation, exceptions, and rollback semantics.
+
+** Q139: What is distributed tracing aspect strategy?
+Aspect creates spans/tags around service methods with error status recording.
+
+** Q140: Risk of double instrumentation?
+Duplicate spans/metrics if both auto-instrumentation and custom aspects run.
+
+** Q141: How avoid double instrumentation?
+Define clear ownership and disable overlapping instrumentation points.
+
+** Q142: What is adaptive sampling relevance for logging aspects?
+Controls volume during high traffic/incidents while preserving diagnostic value.
+
+** Q143: What is resilient aspect design?
+Advice failures should not cascade and break core business flow (unless required).
+
+** Q144: Should observability aspects throw business exceptions?
+Generally no; fail open carefully and log internal failures.
+
+** Q145: What is fail-closed vs fail-open in security aspects?
+Fail-closed denies on uncertainty; fail-open allows continuation—choose by risk model.
+
+** Q146: What is ordering contract documentation?
+Explicitly define precedence among tracing, security, transactions, caching, retries.
+
+** Q147: Typical safe order heuristic?
+Security/auth first, then idempotency/validation, then tx, then business, then logging/metrics (context-dependent).
+
+** Q148: Why can retry + transaction ordering be dangerous?
+Incorrect nesting may retry inside same failed transaction context.
+
+** Q149: What is compensating action concern in around advice?
+Custom rollback/compensation must align with transaction boundaries.
+
+** Q150: How to version aspect behavior safely?
+Feature flags, canary rollout, and backward-compatible defaults.
+
+** Q151: What is aspect blast radius?
+Number of methods/services affected by one pointcut change.
+
+** Q152: How reduce blast radius?
+Narrow pointcuts, annotation markers, incremental rollout.
+
+** Q153: What is AOP governance in large orgs?
+Review process for new aspects, pointcut patterns, and operational impact.
+
+** Q154: What metrics should be tracked for aspects?
+Invocation count, added latency, error rate, dropped/skipped behavior counts.
+
+** Q155: What is reentrancy issue in aspects?
+Advice triggers code paths that re-trigger same advice unintentionally.
+
+** Q156: How prevent reentrancy loops?
+Guard flags/context markers and carefully scoped pointcuts.
+
+** Q157: What is classloader/proxy memory risk?
+Many generated proxies can increase metaspace/memory pressure.
+
+** Q158: How mitigate proxy explosion?
+Proxy only necessary beans and avoid dynamic per-tenant/per-request proxy generation.
+
+** Q159: What is native image consideration for Spring AOP?
+Proxy/reflection configuration may need explicit AOT hints.
+
+** Q160: How does AOT change AOP strategy?
+Encourage build-time analysis and explicit proxy registrations.
+
+** Q161: What is anti-corruption use with aspects?
+Translate external exceptions/protocol concerns at boundary services.
+
+** Q162: What is domain purity rule regarding AOP?
+Aspects should support domain logic, not replace explicit domain workflows.
+
+** Q163: Why keep aspects stateless?
+Singleton scope + concurrency safety + easier reasoning.
+
+** Q164: What is incident response benefit of well-designed aspects?
+Consistent logs/metrics/traces across services speed root-cause analysis.
+
+** Q165: What is biggest advanced anti-pattern in Spring AOP?
+Using broad around advice as hidden control flow engine.
+
+** Q166: When should you refactor away from aspect logic?
+When it encodes business decisions better expressed in explicit services.
+
+** Q167: What is mature AOP usage profile?
+Small set of well-documented, high-value aspects with strict tests and observability.
+
+** Q168: What testing pyramid addition helps AOP-heavy apps?
+Dedicated interception contract tests plus end-to-end behavior verification.
+
+** Q169: What deployment practice reduces AOP regressions?
+Canary + shadow traffic + fast rollback for pointcut/order changes.
+
+** Q170: What code review checklist item is critical for AOP?
+Verify pointcut scope, ordering, side effects, and failure behavior.
+
+** Q171: What is long-term maintenance strategy?
+Centralize common pointcuts and deprecate risky patterns gradually.
+
+** Q172: What is principle of least astonishment for aspects?
+Advice behavior should be predictable and unsurprising to developers.
+
+** Q173: What is advanced performance rule?
+Never put expensive I/O inside ubiquitous advice on hot paths.
+
+** Q174: Final architecture rule for Spring AOP?
+Prefer explicitness: annotate intent, constrain scope, measure impact.
+
+** Q175: Final maturity principle?
+Use AOP as a precision tool for cross-cutting concerns, not as hidden business orchestration.
+
+* Bonus: Minimal Timing Aspect Template
+
+#+BEGIN_SRC java
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class TimingAspect {
+
+    @Around("@annotation(com.example.Timed)")
+    public Object time(ProceedingJoinPoint pjp) throws Throwable {
+        long start = System.nanoTime();
+        try {
+            return pjp.proceed();
+        } finally {
+            long elapsedNanos = System.nanoTime() - start;
+            // publish metric/log with method + elapsedNanos
+        }
+    }
+}
+#+END_SRC
