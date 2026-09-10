@@ -1,0 +1,587 @@
+#+title: Spring Boot
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Boot Interview Questions (Beginner → Advanced)
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Boot?
+Spring Boot is a framework built on Spring that simplifies application setup, configuration, and deployment.
+
+** Q2: Why use Spring Boot?
+It reduces boilerplate, provides sensible defaults, and accelerates production-ready development.
+
+** Q3: How is Spring Boot different from Spring Framework?
+Spring Framework provides core features; Boot adds auto-configuration, starters, and operational tooling.
+
+** Q4: What is auto-configuration?
+Automatic configuration of beans based on classpath, environment, and properties.
+
+** Q5: What are starter dependencies?
+Predefined dependency bundles for specific capabilities (web, data, security, etc.).
+
+** Q6: Example starter dependency?
+=spring-boot-starter-web=.
+
+** Q7: What does @SpringBootApplication include?
+=@Configuration=, =@EnableAutoConfiguration=, and =@ComponentScan=.
+
+** Q8: What is component scanning in Boot?
+Automatic discovery of beans in package hierarchy from main app class.
+
+** Q9: Why is package location of main class important?
+It defines default scan scope for components/configuration.
+
+** Q10: What is Spring Initializr?
+Tool to generate Spring Boot project templates quickly.
+
+** Q11: Typical Boot project structure?
+Main app class, controllers/services/repositories, config, resources, tests.
+
+** Q12: Where are Boot properties usually stored?
+=application.properties= or =application.yml=.
+
+** Q13: Can Boot read environment variables?
+Yes, environment variables are part of property resolution.
+
+** Q14: What is externalized configuration?
+Keeping config outside code for environment-specific deployment.
+
+** Q15: What is profile in Spring Boot?
+Environment-specific configuration activation (dev/test/prod, etc.).
+
+** Q16: How activate a profile?
+=spring.profiles.active= via file/env/CLI.
+
+** Q17: What is application-{profile}.properties?
+Profile-specific property file loaded when that profile is active.
+
+** Q18: What is embedded server support?
+Boot can run with embedded Tomcat/Jetty/Undertow without external app server.
+
+** Q19: Default embedded server in Boot web starter?
+Tomcat (by default).
+
+** Q20: How run a Boot app?
+Run main method or package and execute jar.
+
+** Q21: What is executable (fat) jar?
+Self-contained jar bundling app classes and dependencies.
+
+** Q22: What is boot loader in executable jar?
+Spring Boot launcher that sets up classpath and starts app.
+
+** Q23: What is @RestController?
+Shortcut for REST controllers returning response bodies.
+
+** Q24: What is @RequestMapping?
+Maps HTTP requests to handler methods/classes.
+
+** Q25: Difference between @GetMapping and @PostMapping?
+Shortcut annotations for GET and POST HTTP methods.
+
+** Q26: What is @RequestBody?
+Binds request payload to Java object.
+
+** Q27: What is @PathVariable?
+Binds URI template variable to method parameter.
+
+** Q28: What is @RequestParam?
+Binds query/form parameter to method parameter.
+
+** Q29: What serializes objects to JSON in Boot?
+Typically Jackson auto-configured message converters.
+
+** Q30: What is ResponseEntity?
+Represents full HTTP response (status, headers, body).
+
+** Q31: What is @Service?
+Marks service-layer component for business logic.
+
+** Q32: What is @Repository?
+Marks persistence component and enables exception translation patterns.
+
+** Q33: What is @Autowired?
+Injects dependencies managed by Spring container.
+
+** Q34: Preferred injection style in Boot apps?
+Constructor injection.
+
+** Q35: Why constructor injection?
+Immutability, explicit dependencies, test friendliness.
+
+** Q36: What is @Value?
+Injects single property value into fields/params.
+
+** Q37: What is @ConfigurationProperties?
+Type-safe binding of grouped properties into POJOs.
+
+** Q38: Why prefer @ConfigurationProperties?
+Validation, structure, maintainability.
+
+** Q39: What is Actuator?
+Production-ready endpoints for health, metrics, info, and management.
+
+** Q40: Common Actuator endpoint?
+=/actuator/health=.
+
+** Q41: What is dependency management in Boot?
+BOM-managed compatible dependency versions.
+
+** Q42: Why avoid hardcoding many dependency versions?
+Increases conflict risk and maintenance burden.
+
+** Q43: What is CommandLineRunner?
+Interface for logic execution after context startup.
+
+** Q44: What is ApplicationRunner?
+Similar to CommandLineRunner with parsed application arguments.
+
+** Q45: What is banner in Boot?
+Startup text/logo displayed on app launch.
+
+** Q46: Can you disable Boot banner?
+Yes, via properties or programmatic config.
+
+** Q47: What is default logging in Spring Boot?
+SLF4J facade with Logback backend (typical default).
+
+** Q48: Where place static web resources?
+Usually under =src/main/resources/static=.
+
+** Q49: Where place templates (MVC)?
+Usually under =src/main/resources/templates=.
+
+** Q50: What is devtools?
+Development-time utilities (auto-restart, live reload conveniences).
+
+** Q51: Is devtools for production?
+No, development only.
+
+** Q52: What is auto-restart?
+App restarts when classpath changes in development.
+
+** Q53: What is Boot’s opinionated configuration?
+Sensible defaults requiring minimal manual setup.
+
+** Q54: Can defaults be overridden?
+Yes, via explicit beans/properties/configuration.
+
+** Q55: What happens if multiple beans of same type exist?
+Autowiring ambiguity; resolve with @Primary/@Qualifier.
+
+** Q56: What is @Primary?
+Marks default bean candidate.
+
+** Q57: What is @Qualifier?
+Selects a specific bean for injection.
+
+** Q58: What is beginner pitfall in Boot?
+Relying on magic defaults without understanding what got auto-configured.
+
+** Q59: How inspect auto-config decisions quickly?
+Use condition evaluation report/logging/Actuator insights.
+
+** Q60: Beginner best practice?
+Start with defaults, then customize deliberately with clear rationale.
+
+* Intermediate
+
+** Q61: How does Boot auto-configuration decide what to create?
+Conditional rules based on classpath, existing beans, properties, and environment.
+
+** Q62: Common conditional annotations?
+=@ConditionalOnClass=, =@ConditionalOnMissingBean=, =@ConditionalOnProperty=.
+
+** Q63: What is back-off behavior in auto-config?
+User-defined bean prevents conflicting default bean creation.
+
+** Q64: Why is this back-off useful?
+Allows safe customization without disabling whole auto-config module.
+
+** Q65: What is @EnableConfigurationProperties?
+Registers configuration properties classes for binding.
+
+** Q66: How validate configuration properties?
+Use Bean Validation annotations with =@Validated=.
+
+** Q67: What is relaxed binding?
+Flexible property naming formats mapping to same target fields.
+
+** Q68: YAML vs properties in Boot?
+Both supported; YAML is hierarchical and often cleaner for nested config.
+
+** Q69: What is profile-specific YAML document?
+Multi-document YAML with profile activation sections.
+
+** Q70: What is random value property source?
+Built-in support for random values in config placeholders.
+
+** Q71: What is Spring Boot test starter?
+Dependency bundle simplifying testing with JUnit, assertions, mocks, etc.
+
+** Q72: What is @SpringBootTest?
+Loads full application context for integration tests.
+
+** Q73: What is @WebMvcTest?
+MVC slice test for controller layer only.
+
+** Q74: What is @DataJpaTest?
+Slice test focused on JPA repositories.
+
+** Q75: Why use test slices?
+Faster focused tests with reduced context size.
+
+** Q76: What is @MockBean?
+Replaces bean in test context with Mockito mock.
+
+** Q77: What is TestRestTemplate?
+Convenient synchronous REST client for integration tests.
+
+** Q78: What is random port test mode?
+Starts embedded server on random port to avoid conflicts.
+
+** Q79: What is @TestConfiguration?
+Test-specific bean configuration class.
+
+** Q80: What is property override in tests?
+Set test-specific properties via annotations/files/env.
+
+** Q81: What is Boot SQL initialization?
+Automatic schema/data script execution (config dependent).
+
+** Q82: What is Flyway/Liquibase in Boot?
+Database migration tools integrated for versioned schema changes.
+
+** Q83: Why prefer migrations over manual SQL changes?
+Repeatability, traceability, safer deployments.
+
+** Q84: What is connection pooling default in Boot?
+Typically HikariCP.
+
+** Q85: Why is connection pooling important?
+Improves performance and controls DB resource usage.
+
+** Q86: What is transaction management in Boot apps?
+Usually declarative via =@Transactional=.
+
+** Q87: Default rollback behavior for @Transactional?
+Rollback on unchecked exceptions by default.
+
+** Q88: What is Open Session in View (OSIV) concept?
+Keeps persistence context open during web request rendering (trade-offs exist).
+
+** Q89: Why can OSIV be problematic?
+Hidden queries in view layer and long-lived persistence context.
+
+** Q90: What is Spring Boot Actuator exposure control?
+Configure which management endpoints are available and to whom.
+
+** Q91: What is custom health indicator?
+Component adding subsystem-specific health checks.
+
+** Q92: Liveness vs readiness in Boot?
+Liveness: process alive; readiness: ready to serve traffic.
+
+** Q93: What is Micrometer?
+Metrics facade used by Boot to publish monitoring data.
+
+** Q94: Common metrics backend integrations?
+Prometheus, Datadog, Graphite, Cloud monitoring systems.
+
+** Q95: Why use tags in metrics?
+Dimension-based filtering and dashboard slicing.
+
+** Q96: What is distributed tracing integration concept?
+Correlate requests across services with trace/span IDs.
+
+** Q97: How correlate logs and traces?
+Include trace identifiers in logging context/output.
+
+** Q98: What is CORS configuration in Boot?
+Global or endpoint-specific cross-origin request rules.
+
+** Q99: What is global exception handling?
+Centralized REST error mapping via =@ControllerAdvice=.
+
+** Q100: What is Problem Details support concept?
+Standardized HTTP API error response structure.
+
+** Q101: What is Spring Security auto-configuration behavior?
+Applies secure defaults when security starter is present.
+
+** Q102: What is SecurityFilterChain in modern config?
+Primary bean defining HTTP security rules.
+
+** Q103: Why avoid deprecated WebSecurityConfigurerAdapter style?
+Modern Boot/Security favors component-based SecurityFilterChain configuration.
+
+** Q104: What is CSRF protection in Boot apps?
+Protection against forged state-changing requests in browser sessions.
+
+** Q105: What is stateless API security pattern?
+Token-based auth (e.g., JWT), no server session state.
+
+** Q106: What is method-level security?
+Authorization constraints on methods (e.g., =@PreAuthorize=).
+
+** Q107: What is Boot caching abstraction use?
+Annotation-driven caching independent of provider implementation.
+
+** Q108: Common caching annotations?
+=@Cacheable=, =@CachePut=, =@CacheEvict=.
+
+** Q109: What is scheduling in Boot?
+Periodic task execution via =@Scheduled=.
+
+** Q110: What is async execution in Boot?
+Background method execution via =@Async= and executors.
+
+** Q111: Why configure custom executors?
+Control concurrency, queueing, and rejection behavior.
+
+** Q112: What is graceful shutdown support?
+Coordinated shutdown allowing in-flight request handling.
+
+** Q113: What is Boot external config precedence?
+Multiple property sources with deterministic override order.
+
+** Q114: What is command-line property override?
+Passing =--key=value= at startup to override config.
+
+** Q115: What is environment post-processing concept?
+Adjust property sources early in application bootstrap.
+
+** Q116: What is custom starter in orgs?
+Reusable internal dependency with auto-configuration conventions.
+
+** Q117: Why build internal starters?
+Standardize platform defaults across many services.
+
+** Q118: What is ConditionEvaluationReport?
+Diagnostic report explaining why auto-configurations matched or not.
+
+** Q119: How debug missing auto-config bean?
+Check classpath, properties, exclusions, and condition report.
+
+** Q120: What is excluding auto-configuration?
+Explicitly disabling specific auto-config classes.
+
+** Q121: When should auto-config be excluded?
+Only with clear reason to prevent unintended behavior conflicts.
+
+** Q122: What is servlet stack vs reactive stack choice?
+Choose based on workload, blocking dependencies, and team expertise.
+
+** Q123: Can you mix MVC and WebFlux?
+Possible with caveats; usually choose one primary model per service.
+
+** Q124: What is config data import?
+Boot feature to import external config locations/sources.
+
+** Q125: What is secret management best practice in Boot?
+Use vault/secret manager/env vars, never hardcode secrets.
+
+** Q126: What is intermediate anti-pattern?
+Copy-pasting many properties without understanding defaults/impacts.
+
+** Q127: What is intermediate best practice?
+Prefer explicit critical config + observable runtime behavior.
+
+** Q128: Why keep Boot version current?
+Security fixes, performance improvements, ecosystem compatibility.
+
+** Q129: What is dependency convergence concern?
+Conflicting transitive versions causing runtime/classpath issues.
+
+** Q130: Intermediate maturity signal?
+Team can explain every major auto-config/customization in production.
+
+* Advanced
+
+** Q131: What is AOT in Spring Boot?
+Ahead-of-time processing generating optimized runtime setup metadata/code.
+
+** Q132: Why is AOT important?
+Improves startup and can reduce memory, especially for native deployments.
+
+** Q133: What is native image deployment concept?
+Compile app ahead-of-time to native binary (trade-offs in build/debug/dynamics).
+
+** Q134: What is reflection hint challenge in native mode?
+Dynamic reflection needs explicit hints/registrations.
+
+** Q135: What is runtime hints API use?
+Declare reflection/resource/proxy needs for AOT/native compatibility.
+
+** Q136: What is startup time optimization strategy?
+Trim classpath, reduce bean count, lazy noncritical components, AOT where suitable.
+
+** Q137: What is memory optimization strategy?
+Right-size caches, avoid unnecessary autoconfig modules, tune JVM/container limits.
+
+** Q138: What is layered jar/image concept?
+Separate layers for dependencies/app classes to optimize Docker caching.
+
+** Q139: Why use layered container images?
+Faster incremental rebuilds and deployments.
+
+** Q140: What is buildpack support in Boot?
+Create OCI images without custom Dockerfile using buildpacks.
+
+** Q141: What is config drift at scale?
+Service environments diverge unexpectedly over time.
+
+** Q142: How prevent config drift?
+Central config governance, validation, immutable release pipelines.
+
+** Q143: What is multi-module Boot architecture concern?
+Avoid tight coupling and uncontrolled component scanning across modules.
+
+** Q144: How enforce module boundaries?
+Explicit package structure, architecture tests, limited exports.
+
+** Q145: What is anti-corruption layer in Boot microservices?
+Translates external models/protocols into internal domain language.
+
+** Q146: What is outbox pattern with Boot services?
+Write domain change and event record in one local transaction.
+
+** Q147: Why outbox pattern?
+Improves reliability of event publication without distributed XA complexity.
+
+** Q148: What is idempotency key pattern?
+Client-provided key preventing duplicate side effects on retries.
+
+** Q149: Why is idempotency critical in distributed systems?
+Network retries/timeouts can repeat requests unpredictably.
+
+** Q150: What is resilience4j integration purpose?
+Circuit breakers, retries, rate limiting, bulkheads, time limiters.
+
+** Q151: Why avoid naive retries in Boot services?
+Can amplify failures and overload dependencies.
+
+** Q152: What is retry storm?
+Many clients retrying simultaneously during outages.
+
+** Q153: How mitigate retry storms?
+Exponential backoff, jitter, retry budgets, circuit breaking.
+
+** Q154: What is thread pool isolation (bulkhead)?
+Separate resource pools per dependency/workload to limit blast radius.
+
+** Q155: What is backpressure concern in reactive Boot apps?
+Need to control producer/consumer demand to prevent overload.
+
+** Q156: What is blocking detection importance in reactive stack?
+Blocking calls can collapse non-blocking scalability.
+
+** Q157: What is observability-first Boot design?
+Logs, metrics, traces, and health semantics built into service from start.
+
+** Q158: Which Actuator endpoints are high-value in prod?
+health, metrics, prometheus, info, env (carefully), threaddump (restricted).
+
+** Q159: Why secure Actuator endpoints strictly?
+They may expose sensitive internals and operational controls.
+
+** Q160: What is SLO-driven metrics design?
+Instrument according to latency/error/availability objectives.
+
+** Q161: Why monitor p95/p99 latency, not only average?
+Tail latency reflects worst user experience and incident risk.
+
+** Q162: What is advanced transaction pitfall in Boot?
+Misunderstanding proxy boundaries causing missing rollbacks/partial commits.
+
+** Q163: What is advanced cache pitfall?
+Stale data and inconsistent eviction under concurrent updates.
+
+** Q164: How design safe cache strategy?
+Define TTLs, explicit invalidation, key design, and fallback behavior.
+
+** Q165: What is schema migration deployment strategy?
+Backward-compatible phased migrations aligned with rolling deploys.
+
+** Q166: Blue/green vs rolling with Boot apps?
+Blue/green swaps environments; rolling replaces instances gradually.
+
+** Q167: What is graceful degradation strategy?
+Return partial responses/fallbacks when dependencies fail.
+
+** Q168: What is fail-fast startup policy?
+Refuse startup if critical dependencies/config are invalid.
+
+** Q169: What is fail-open vs fail-closed choice?
+Security-critical paths often fail-closed; noncritical observability may fail-open.
+
+** Q170: What is classpath hygiene at scale?
+Minimize unused starters/libs to reduce attack surface and complexity.
+
+** Q171: What is platform engineering role with Boot?
+Provide shared starters, baselines, templates, and governance for teams.
+
+** Q172: What is golden path template?
+Recommended service scaffold with best-practice defaults.
+
+** Q173: What is biggest advanced Boot anti-pattern?
+Treating auto-configuration as magic and skipping architecture discipline.
+
+** Q174: How to review Boot service readiness?
+Check security, observability, resilience, config validation, scaling behavior.
+
+** Q175: What is performance test priority for Boot APIs?
+Measure throughput, latency percentiles, saturation, and dependency bottlenecks.
+
+** Q176: What is chaos testing relevance for Boot?
+Validates resilience under dependency faults and partial outages.
+
+** Q177: What is production incident triage workflow?
+Correlate traces, logs, metrics, recent deploy/config changes.
+
+** Q178: What is long-term maintainability principle?
+Keep Boot upgrades regular and customizations minimal/intentional.
+
+** Q179: What is mature Spring Boot team behavior?
+They can explain framework behavior, not just copy configuration snippets.
+
+** Q180: Final advanced principle?
+Use Spring Boot for speed, but preserve explicit architecture and operational rigor.
+
+* Bonus: Minimal Boot Configuration Properties + Validation Template
+
+#+BEGIN_SRC java
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+@Validated
+@ConfigurationProperties(prefix = "app.mail")
+public class MailProperties {
+
+    @NotBlank
+    private String host;
+
+    @Min(1)
+    private int port = 587;
+
+    public String getHost() { return host; }
+    public void setHost(String host) { this.host = host; }
+
+    public int getPort() { return port; }
+    public void setPort(int port) { this.port = port; }
+}
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
