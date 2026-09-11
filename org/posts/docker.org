@@ -1,0 +1,561 @@
+#+title: Docker
+#+date: 2026-08-01
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Docker
+
+-----
+
+* Beginner
+
+** Q1: What is Docker?
+Docker is a platform for building, shipping, and running applications in containers.
+
+** Q2: What is a container?
+A lightweight isolated process with its own filesystem, network, and runtime settings.
+
+** Q3: Container vs virtual machine?
+Containers share host kernel; VMs emulate full OS with separate kernels.
+
+** Q4: Why are containers popular?
+Fast startup, portability, efficient resource usage, and consistent environments.
+
+** Q5: What is a Docker image?
+Immutable template containing app code, runtime, libraries, and metadata.
+
+** Q6: What is a Docker container instance?
+A running (or stopped) instantiation of an image.
+
+** Q7: What is Docker Engine?
+Core runtime (daemon + APIs) managing images, containers, networks, and volumes.
+
+** Q8: What is Docker daemon?
+Background service (=dockerd=) handling container lifecycle operations.
+
+** Q9: What is Docker CLI?
+Command-line client that talks to Docker daemon API.
+
+** Q10: What is Dockerfile?
+Text file with instructions to build a Docker image.
+
+** Q11: What does FROM do in Dockerfile?
+Sets base image for subsequent build steps.
+
+** Q12: What does RUN do?
+Executes commands at build time, creating image layers.
+
+** Q13: What does COPY do?
+Copies files from build context into image.
+
+** Q14: What does ADD do?
+Like COPY plus extra features (URL/tar auto-extract), used more cautiously.
+
+** Q15: COPY vs ADD?
+Prefer COPY unless ADD-specific behavior is truly needed.
+
+** Q16: What does WORKDIR do?
+Sets working directory for subsequent instructions.
+
+** Q17: What does CMD do?
+Defines default command/args when container starts (overridable).
+
+** Q18: What does ENTRYPOINT do?
+Defines main executable for container (harder to override semantics).
+
+** Q19: CMD + ENTRYPOINT together?
+ENTRYPOINT sets executable; CMD provides default arguments.
+
+** Q20: What does EXPOSE do?
+Documents intended listening ports (does not publish by itself).
+
+** Q21: What does ENV do?
+Sets environment variables in image/container.
+
+** Q22: What does ARG do?
+Defines build-time variables available during image build.
+
+** Q23: ARG vs ENV?
+ARG build-time only (unless copied into ENV); ENV available at runtime.
+
+** Q24: What is image layer?
+Read-only filesystem delta created by each Dockerfile instruction.
+
+** Q25: Why layers matter?
+Enable caching, reuse, and smaller incremental image transfers.
+
+** Q26: What is build context?
+Directory/files sent to daemon for image build.
+
+** Q27: Why keep build context small?
+Faster builds and less accidental file leakage.
+
+** Q28: What is .dockerignore?
+File listing paths excluded from build context.
+
+** Q29: What is Docker Hub?
+Public registry for hosting and distributing container images.
+
+** Q30: What is a container registry?
+Repository service storing versioned container images.
+
+** Q31: What is image tag?
+Human-friendly image version label (e.g., =myapp:1.2.0=).
+
+** Q32: What does latest tag mean?
+Just a tag name, not guaranteed newest unless maintained that way.
+
+** Q33: What is docker pull?
+Downloads image from registry.
+
+** Q34: What is docker run?
+Creates and starts a new container from image.
+
+** Q35: What is docker ps?
+Lists running containers (= -a= includes stopped).
+
+** Q36: What is docker stop?
+Gracefully stops running container.
+
+** Q37: What is docker kill?
+Forcibly terminates container process.
+
+** Q38: What is docker rm?
+Removes stopped container.
+
+** Q39: What is docker rmi?
+Removes image from local cache.
+
+** Q40: What is port mapping?
+Publishing container port to host port (e.g., =-p 8080:80=).
+
+** Q41: What is docker logs?
+Shows container stdout/stderr logs.
+
+** Q42: What is docker exec?
+Runs command inside running container.
+
+** Q43: What is detached mode (-d)?
+Runs container in background.
+
+** Q44: What is interactive mode (-it)?
+Attaches terminal input/output for interactive sessions.
+
+** Q45: What is named container (--name)?
+Assigns stable container name for easier management.
+
+** Q46: What is restart policy?
+Rules for auto-restarting containers (e.g., unless-stopped).
+
+** Q47: What is bind mount?
+Mount host path into container.
+
+** Q48: What is Docker volume?
+Managed persistent storage independent from container lifecycle.
+
+** Q49: Bind mount vs volume?
+Bind uses explicit host path; volume managed by Docker abstraction.
+
+** Q50: Why persistent storage needed?
+Container writable layer is ephemeral and removed with container.
+
+** Q51: What is default Docker network?
+Bridge network for local container connectivity.
+
+** Q52: Can containers talk by name?
+Yes, on user-defined bridge networks via embedded DNS.
+
+** Q53: What is docker-compose (Compose)?
+Tool for defining/running multi-container applications declaratively.
+
+** Q54: What is compose file?
+YAML describing services, networks, volumes, env, and dependencies.
+
+** Q55: Why use Compose in development?
+Reproducible local stacks with one command.
+
+** Q56: Common beginner Docker anti-pattern?
+Running everything as root with oversized images.
+
+** Q57: Another beginner anti-pattern?
+Hardcoding secrets directly in Dockerfile/image.
+
+** Q58: Beginner security baseline?
+Minimal base image, non-root user, trusted image sources.
+
+** Q59: Beginner performance baseline?
+Use build cache, .dockerignore, and multi-stage builds.
+
+** Q60: Beginner best practice?
+Keep images small, explicit, versioned, and reproducible.
+
+* Intermediate
+
+** Q61: What is multi-stage build?
+Dockerfile pattern using multiple FROM stages to separate build/runtime artifacts.
+
+** Q62: Why multi-stage builds?
+Smaller final images and reduced attack surface.
+
+** Q63: What is BuildKit?
+Modern Docker build backend with advanced caching and features.
+
+** Q64: BuildKit benefits?
+Faster builds, better cache control, secret mounts, parallelism.
+
+** Q65: What is layer cache invalidation?
+Changing one step invalidates cache for subsequent dependent layers.
+
+** Q66: How optimize cache usage?
+Place rarely changed steps (deps install) before frequently changed code copy.
+
+** Q67: Why pin image versions/digests?
+Reproducibility and supply-chain safety.
+
+** Q68: Tag pinning vs digest pinning?
+Tags can move; digests are immutable content addresses.
+
+** Q69: What is image provenance/signing concept?
+Cryptographically verifying image origin/integrity.
+
+** Q70: What is SBOM?
+Software Bill of Materials listing components in image.
+
+** Q71: Why SBOM important?
+Vulnerability management and compliance visibility.
+
+** Q72: What is container image scanning?
+Checking image layers/dependencies for known vulnerabilities.
+
+** Q73: Can scanning eliminate all risk?
+No, but it significantly reduces known exposure.
+
+** Q74: What is CVE?
+Common Vulnerabilities and Exposures identifier for disclosed security flaws.
+
+** Q75: Distroless image concept?
+Minimal runtime image without package manager/shell.
+
+** Q76: Distroless tradeoff?
+Better security/smaller size but harder interactive debugging.
+
+** Q77: Alpine image tradeoff?
+Small size, but musl-based environment may cause compatibility/perf differences for some apps.
+
+** Q78: What is healthcheck in Dockerfile?
+Command Docker runs to determine container health.
+
+** Q79: Why health checks matter?
+Enable orchestrators/scripts to detect unhealthy instances.
+
+** Q80: What is ENTRYPOINT exec form?
+JSON-array syntax preferred for signal handling and argument safety.
+
+** Q81: Shell form vs exec form?
+Shell form runs through shell; exec form runs process directly.
+
+** Q82: Why PID 1 behavior matters in containers?
+PID 1 has special signal/reaping responsibilities.
+
+** Q83: What is init process need in containers?
+Small init helps forward signals and reap zombies.
+
+** Q84: What is TTY allocation pitfall in production?
+Can alter buffering/signal behavior unexpectedly.
+
+** Q85: What is container exit code?
+Process return code indicating success/failure cause.
+
+** Q86: What is tmpfs mount?
+In-memory filesystem mount for ephemeral sensitive/temp data.
+
+** Q87: What is read-only root filesystem?
+Security hardening by preventing writes to image filesystem.
+
+** Q88: How allow writes with read-only root?
+Use writable volumes/tmpfs for required paths.
+
+** Q89: What are Linux capabilities in Docker?
+Fine-grained kernel privileges assignable to containers.
+
+** Q90: Why drop capabilities?
+Principle of least privilege reduces exploit impact.
+
+** Q91: What is seccomp profile?
+Syscall filtering policy for container processes.
+
+** Q92: What is AppArmor/SELinux role?
+Mandatory access control policies restricting container actions.
+
+** Q93: What is user namespace remapping?
+Maps container root to non-root host UID range.
+
+** Q94: What is rootless Docker?
+Running Docker daemon/containers without root privileges.
+
+** Q95: Rootless tradeoff?
+Improved security with some networking/storage feature constraints.
+
+** Q96: What is cgroups in Docker context?
+Kernel mechanism limiting CPU, memory, I/O resources.
+
+** Q97: What is memory limit flag use?
+Prevents container from exhausting host memory.
+
+** Q98: What happens on OOM?
+Kernel may kill process/container (OOMKill).
+
+** Q99: What is CPU quota/share configuration?
+Controls CPU time allocation across containers.
+
+** Q100: What is Docker bridge network?
+NATed local network for containers on single host.
+
+** Q101: What is host network mode?
+Container shares host network namespace (less isolation).
+
+** Q102: What is overlay network?
+Multi-host network abstraction (commonly with orchestrators).
+
+** Q103: What is MACVLAN/IPVLAN use case?
+Assign near-native network identity to containers in specific environments.
+
+** Q104: What is DNS behavior in containers?
+Docker provides embedded DNS for service/container name resolution on user-defined networks.
+
+** Q105: What is volume driver?
+Plugin/system enabling different volume backends.
+
+** Q106: What is named volume lifecycle?
+Persists beyond container deletion until explicitly removed.
+
+** Q107: What is anonymous volume?
+Unnamed volume created automatically (harder to manage).
+
+** Q108: Why avoid anonymous volumes in prod?
+Can accumulate orphaned storage.
+
+** Q109: What is docker system prune?
+Removes unused resources (images/containers/networks/build cache, optionally volumes).
+
+** Q110: Prune risk?
+Accidental deletion of needed cache/data if used carelessly.
+
+** Q111: What is log driver in Docker?
+Mechanism for routing container logs (json-file, journald, fluentd, etc.).
+
+** Q112: Why configure log rotation?
+Prevent disks filling from unbounded logs.
+
+** Q113: What is docker stats?
+Live resource usage metrics per container.
+
+** Q114: What is docker inspect?
+Low-level JSON metadata for container/image/network/volume.
+
+** Q115: What is compose override file?
+Environment-specific extension to base compose config.
+
+** Q116: What is depends_on limitation in Compose?
+Controls startup order, not full service readiness by itself.
+
+** Q117: What is wait-for-it/readiness pattern?
+Explicitly wait for dependent service availability before start logic.
+
+** Q118: What is intermediate anti-pattern?
+Using one giant mutable “pet” container instead of immutable rebuilds.
+
+** Q119: Better release pattern?
+Immutable versioned images + recreate containers from new image.
+
+** Q120: What is CI/CD Docker baseline?
+Build, scan, test, sign, push, deploy with rollback path.
+
+** Q121: Why avoid docker commit for releases?
+Non-reproducible image creation outside source-controlled Dockerfile.
+
+** Q122: What is multi-arch image?
+Single image tag supporting multiple CPU architectures.
+
+** Q123: How build multi-arch images?
+Buildx with platform targets and manifest lists.
+
+** Q124: Intermediate maturity signal?
+Team can explain image hardening, cache strategy, and runtime limits.
+
+** Q125: Intermediate debugging baseline?
+Logs + inspect + exec + metrics + reproducible local compose.
+
+** Q126: What is intermediate reliability principle?
+Assume containers are ephemeral and design statelessly where possible.
+
+** Q127: What is intermediate security principle?
+Trust but verify images via scanning, signatures, and least privilege.
+
+** Q128: What is intermediate cost principle?
+Optimize image size, build time, and host density.
+
+** Q129: What is intermediate operations principle?
+Standardize Dockerfiles and runtime policies across services.
+
+** Q130: Intermediate best practice?
+Balance developer speed with strong supply-chain and runtime controls.
+
+* Advanced
+
+** Q131: What is container supply-chain security?
+Protecting build sources, dependencies, images, registries, and deployment artifacts.
+
+** Q132: What is SLSA/in-toto style provenance concept?
+Attestable build provenance proving how/where artifact was produced.
+
+** Q133: Why reproducible builds matter?
+Same source should yield same artifact for trust and debugging.
+
+** Q134: What is hermetic build concept?
+Build isolated from uncontrolled external network/state dependencies.
+
+** Q135: What is cache poisoning risk?
+Untrusted cache layers introducing compromised artifacts.
+
+** Q136: How mitigate cache poisoning?
+Trusted builders, signed caches, isolated CI, provenance verification.
+
+** Q137: What is image promotion pipeline?
+Move same tested digest through envs (dev→staging→prod) without rebuild.
+
+** Q138: Why promote by digest not tag?
+Avoid tag drift and ensure exact artifact parity.
+
+** Q139: What is runtime drift?
+Running container config/image diverges from declared desired state.
+
+** Q140: How detect runtime drift?
+Continuous reconciliation and policy/audit checks.
+
+** Q141: What is policy-as-code for containers?
+Automated enforcement of security/compliance rules on Dockerfiles/images/runtime specs.
+
+** Q142: Example policy checks?
+No root user, pinned base image, no latest tag, resource limits required.
+
+** Q143: What is secret zero problem?
+Securely bootstrapping first credential needed to fetch other secrets.
+
+** Q144: Why environment variables for secrets can be risky?
+May leak via logs, process listings, crash dumps, or debug endpoints.
+
+** Q145: Better secret handling pattern?
+External secret manager + short-lived credentials + mounted files/tokens.
+
+** Q146: What is egress control for containers?
+Restrict outbound network to necessary destinations only.
+
+** Q147: Why egress control matters?
+Limits data exfiltration and command-and-control channels.
+
+** Q148: What is syscall attack surface minimization?
+Use hardened seccomp/capability profiles and minimal binaries.
+
+** Q149: What is immutable infrastructure principle with containers?
+Never patch running containers; rebuild and redeploy new images.
+
+** Q150: What is golden base image strategy?
+Curated hardened base images reused organization-wide.
+
+** Q151: Golden image downside?
+Centralized updates can create broad coordinated upgrade needs.
+
+** Q152: What is noisy-neighbor issue on container hosts?
+One workload consumes disproportionate resources affecting others.
+
+** Q153: Mitigation for noisy neighbors?
+Resource quotas, isolation classes, scheduling policies, autoscaling.
+
+** Q154: What is container density tradeoff?
+Higher density improves cost efficiency but may reduce isolation headroom.
+
+** Q155: What is cold start optimization for containers?
+Smaller images, lazy loading, pre-pulled layers, fast init paths.
+
+** Q156: What is union filesystem overhead consideration?
+Layered FS adds abstraction costs; workload-dependent performance impact.
+
+** Q157: What is I/O amplification in copy-on-write layers?
+Small writes can trigger larger underlying operations.
+
+** Q158: How optimize write-heavy workloads?
+Use volumes for data paths rather than container writable layer.
+
+** Q159: What is advanced logging strategy?
+Structured logs, centralized aggregation, correlation IDs, retention controls.
+
+** Q160: What is metrics/tracing role in container ops?
+Visibility into resource saturation, latency, and dependency behavior.
+
+** Q161: What is “pets vs cattle” in container operations?
+Treat containers as replaceable units, not manually curated long-lived pets.
+
+** Q162: What is disaster recovery concern for container platforms?
+Image registry availability, backup of persistent volumes/config/secrets.
+
+** Q163: What is registry mirror/caching use?
+Improve pull speed and resilience against upstream outages.
+
+** Q164: What is air-gapped Docker workflow?
+Offline image import/sign/scan/deploy pipelines for restricted environments.
+
+** Q165: What is multi-tenant host hardening baseline?
+Strong isolation, rootless where possible, strict policies, continuous auditing.
+
+** Q166: What is compliance evidence for containerized systems?
+SBOMs, scan reports, signed artifacts, deployment attestations, audit logs.
+
+** Q167: What is chaos testing for container workloads?
+Inject container crashes/network faults/resource pressure to test resilience.
+
+** Q168: Why test OOM and disk-full scenarios?
+Common real-world failure modes for container hosts.
+
+** Q169: What is blue/green deployment with containers?
+Run old/new versions concurrently and switch traffic safely.
+
+** Q170: What is canary deployment with containers?
+Gradually route traffic to new version while monitoring risk indicators.
+
+** Q171: What is rollback best practice?
+Fast revert to previous known-good image digest and config.
+
+** Q172: What is orchestration relationship to Docker?
+Orchestrators (Kubernetes/Swarm/etc.) manage container fleets at scale.
+
+** Q173: Is Docker alone enough for large production clusters?
+Usually orchestration is needed for scheduling, self-healing, and scaling.
+
+** Q174: What is advanced anti-pattern?
+Using privileged containers broadly to “make things work.”
+
+** Q175: Why avoid privileged mode?
+It effectively removes many isolation boundaries and increases host compromise risk.
+
+** Q176: What is final reliability principle?
+Design for container replacement, failure, and rapid recovery.
+
+** Q177: What is final security principle?
+Harden every stage: build, registry, runtime, and operations.
+
+** Q178: What is final performance principle?
+Benchmark real workloads; tune images, limits, and storage/network paths empirically.
+
+** Q179: What is final governance principle?
+Standardize policies/templates and enforce continuously in CI/CD.
+
+** Q180: Final maturity principle?
+Docker excellence is reproducible, secure, observable, and operable container delivery at scale.
+
+-----
+
+#+INCLUDE: "../footer.org"

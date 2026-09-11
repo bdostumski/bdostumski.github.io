@@ -1,0 +1,531 @@
+#+title: Docker Compose
+#+date: 2026-08-02
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Docker Compose
+
+-----
+
+* Beginner
+
+** Q1: What is Docker Compose?
+Docker Compose is a tool for defining and running multi-container Docker applications.
+
+** Q2: Why use Docker Compose?
+It lets you manage multiple services declaratively in one YAML file.
+
+** Q3: What file does Compose use by default?
+=docker-compose.yml= (and Compose specification-compatible file names).
+
+** Q4: What is a service in Compose?
+A containerized application component defined in Compose config.
+
+** Q5: What is a project in Compose?
+A group of services/networks/volumes created from one Compose configuration.
+
+** Q6: How do you start services with Compose?
+Use =docker compose up=.
+
+** Q7: How do you stop and remove Compose services?
+Use =docker compose down=.
+
+** Q8: Difference between stop and down?
+=stop= halts containers; =down= removes containers/networks (and optionally volumes).
+
+** Q9: What does =docker compose up -d= do?
+Starts services in detached (background) mode.
+
+** Q10: How view running Compose services?
+Use =docker compose ps=.
+
+** Q11: How view logs for services?
+Use =docker compose logs=.
+
+** Q12: How follow logs in real time?
+Use =docker compose logs -f=.
+
+** Q13: How rebuild images before startup?
+Use =docker compose up --build=.
+
+** Q14: What is =build:= in Compose?
+Instructions for building image from local Dockerfile/context.
+
+** Q15: What is =image:= in Compose?
+Specifies prebuilt image to run for a service.
+
+** Q16: Can a service use both build and image?
+Yes, commonly for tagging built result.
+
+** Q17: What is =ports:= in Compose?
+Maps host ports to container ports.
+
+** Q18: What is =expose:= in Compose?
+Documents/internally exposes ports to linked services without host publishing.
+
+** Q19: What is =environment:= in Compose?
+Sets environment variables in service containers.
+
+** Q20: What is =env_file:=?
+Loads environment variables from external file(s).
+
+** Q21: What is .env file in Compose?
+File for variable substitution and/or env defaults in Compose context.
+
+** Q22: What is variable substitution syntax?
+Like =${VAR}= or =${VAR:-default}=.
+
+** Q23: What is a Compose network?
+Virtual network enabling service-to-service communication.
+
+** Q24: Default networking behavior in Compose?
+Creates project-scoped default network; services can reach each other by service name.
+
+** Q25: What is a Compose volume?
+Persistent storage managed by Docker and attachable to services.
+
+** Q26: Why use volumes in Compose?
+Persist data across container restarts/recreation.
+
+** Q27: Bind mount vs volume in Compose?
+Bind mount uses host path; volume is Docker-managed storage.
+
+** Q28: What is =depends_on=?
+Defines startup dependency order between services.
+
+** Q29: Does depends_on guarantee app readiness?
+No, it does not guarantee dependency is fully ready.
+
+** Q30: How run one-off command in a service?
+Use =docker compose run=.
+
+** Q31: What is difference between run and exec?
+=run= starts new container; =exec= runs command in existing container.
+
+** Q32: How execute shell inside running service?
+Use =docker compose exec <service> sh= (or bash if available).
+
+** Q33: How scale a service quickly?
+Use =docker compose up --scale service=n= (where applicable).
+
+** Q34: What is container_name in Compose?
+Custom fixed container name (often avoided in scalable setups).
+
+** Q35: Why avoid fixed container_name often?
+Can cause naming collisions and reduce flexibility.
+
+** Q36: What is restart policy in Compose?
+Controls automatic restart behavior (no, always, on-failure, unless-stopped).
+
+** Q37: What is healthcheck in Compose?
+Command-based liveness/readiness signal for container health.
+
+** Q38: Why healthchecks matter in local stacks?
+Improve reliability and dependency coordination.
+
+** Q39: What is command override in Compose?
+Override Dockerfile CMD per environment/service need.
+
+** Q40: What is entrypoint override?
+Replace image entrypoint command.
+
+** Q41: What is tty: true used for?
+Allocates TTY for interactive/debug workflows.
+
+** Q42: What is stdin_open: true?
+Keeps STDIN open for interactive containers.
+
+** Q43: What is profiles in Compose?
+Feature to enable optional service groups (e.g., debug, monitoring).
+
+** Q44: How start only selected profiles?
+Use =--profile= flag.
+
+** Q45: What is pull policy behavior concept?
+Controls when images are pulled vs reused locally.
+
+** Q46: What is beginner Compose anti-pattern?
+Putting secrets directly in compose YAML committed to git.
+
+** Q47: Another beginner anti-pattern?
+Using latest tags everywhere without version pinning.
+
+** Q48: Beginner security baseline?
+Use minimal images, non-root users, and keep secrets outside source.
+
+** Q49: Beginner performance baseline?
+Use build cache and avoid oversized bind mounts.
+
+** Q50: Beginner reliability baseline?
+Healthchecks + restart policies + persistent data volumes.
+
+** Q51: What command validates Compose config?
+=docker compose config=.
+
+** Q52: Why use docker compose config?
+Shows merged, resolved final configuration for debugging.
+
+** Q53: How remove stopped containers only?
+Use =docker compose rm=.
+
+** Q54: How remove volumes with stack?
+Use =docker compose down -v= carefully.
+
+** Q55: Beginner best practice?
+Keep compose files clear, versioned, and environment-specific via overrides/profiles.
+
+* Intermediate
+
+** Q56: What is multiple Compose file merge?
+Combining base and override files via multiple =-f= flags.
+
+** Q57: Why use override files?
+Separate common config from dev/test/ci-specific settings.
+
+** Q58: Merge order rule?
+Later files override/extend earlier ones.
+
+** Q59: What is extension fields pattern (x-*)?
+Reusable YAML fragments for DRY configuration.
+
+** Q60: What is YAML anchor/alias use in Compose?
+Reuse repeated config blocks safely.
+
+** Q61: What is project name control?
+Use =-p= flag or environment variable to isolate stacks.
+
+** Q62: Why customize project name?
+Avoid collisions across branches/teams on shared hosts.
+
+** Q63: What is internal-only network?
+Network not exposed externally; limits service reachability.
+
+** Q64: How connect service to multiple networks?
+Declare multiple networks under service.
+
+** Q65: Why use multiple networks?
+Segment traffic (frontend/backend/data-plane) for security/isolation.
+
+** Q66: What is network alias?
+Alternative DNS name for service on specific network.
+
+** Q67: What is extra_hosts in Compose?
+Adds custom host-to-IP mappings inside container.
+
+** Q68: What is DNS config in Compose?
+Customize resolvers/search domains/options for containers.
+
+** Q69: What is init: true?
+Runs tiny init process for signal forwarding/zombie reaping.
+
+** Q70: Why init is useful?
+Improves process lifecycle behavior in containers.
+
+** Q71: What is stop_grace_period?
+Time allowed for graceful shutdown before force kill.
+
+** Q72: Why tune stop_grace_period?
+Stateful services may need extra flush/cleanup time.
+
+** Q73: What is ulimits in Compose?
+Sets process resource limits (nofile, nproc, etc.).
+
+** Q74: Why configure ulimits?
+Prevent runtime failures under high load.
+
+** Q75: What is sysctls in Compose?
+Kernel parameter tweaks at container runtime (where supported).
+
+** Q76: What is cap_add/cap_drop?
+Add/remove Linux capabilities for least-privilege tuning.
+
+** Q77: Why drop capabilities?
+Reduce attack surface for compromised containers.
+
+** Q78: What is read_only: true?
+Mounts container root filesystem read-only.
+
+** Q79: How write data with read-only root?
+Use writable volumes/tmpfs for specific paths.
+
+** Q80: What is tmpfs in Compose?
+In-memory filesystem mount for ephemeral data.
+
+** Q81: What is secrets support in Compose (concept)?
+Inject secret material without hardcoding in image/environment.
+
+** Q82: Configs vs secrets conceptually?
+Both inject data; secrets intended for sensitive values with stricter handling.
+
+** Q83: What is develop/watch workflow concept?
+Auto-sync/rebuild behavior for local development iterations.
+
+** Q84: Why bind mounts can be slow on some platforms?
+Host<->VM filesystem bridging overhead (especially desktop virtualization setups).
+
+** Q85: Mitigation for slow bind mounts?
+Use cached/delegated options (where supported), smaller mounts, sync tools.
+
+** Q86: What is platform field in Compose?
+Specifies target architecture/OS for image run.
+
+** Q87: Why set platform explicitly?
+Consistency across mixed-architecture developer machines.
+
+** Q88: What is build target in Compose?
+Select specific Dockerfile multi-stage target.
+
+** Q89: Why use build target?
+Different images for dev/test/prod from one Dockerfile.
+
+** Q90: What is cache_from/cache_to concept?
+Leverage external build caches to speed CI builds.
+
+** Q91: What is no-cache build?
+Forces rebuild without using cached layers.
+
+** Q92: When use no-cache?
+Dependency freshness debugging or cache corruption suspicion.
+
+** Q93: What is depends_on condition support concept?
+Can coordinate based on service_started/service_healthy semantics (spec/runtime dependent).
+
+** Q94: Why still use app-level retries?
+Infra ordering is insufficient for real readiness guarantees.
+
+** Q95: What is wait-for script pattern?
+Entry command waits for dependency port/health before app start.
+
+** Q96: What is one-shot init service pattern?
+Dedicated service runs migrations/setup before app services.
+
+** Q97: How share artifacts between services?
+Named volumes or object storage, depending workflow.
+
+** Q98: What is logging section in Compose?
+Configures log driver and options per service.
+
+** Q99: Why configure logging options?
+Control size/rotation and centralization behavior.
+
+** Q100: What is json-file max-size/max-file?
+Limits local log file growth.
+
+** Q101: What is resource constraints in Compose?
+CPU/memory/pids limits to prevent host exhaustion.
+
+** Q102: Why set memory limits in dev too?
+Catch memory issues early and protect workstation stability.
+
+** Q103: What is healthcheck retry/start_period?
+Tuning for startup grace and transient failures.
+
+** Q104: What is intermediate anti-pattern?
+Single compose file trying to cover all envs with heavy conditionals.
+
+** Q105: Better pattern?
+Base compose + targeted overrides/profiles per environment.
+
+** Q106: What is image immutability practice in Compose workflows?
+Pin explicit versions/digests for reproducible runs.
+
+** Q107: Why avoid mutable tags in CI integration tests?
+Can cause nondeterministic failures across runs.
+
+** Q108: What is Compose in CI use case?
+Spin up integration dependencies for automated test suites.
+
+** Q109: How ensure clean CI state?
+Use unique project names and always teardown after tests.
+
+** Q110: What is orphan container warning?
+Containers from old config no longer referenced by current compose set.
+
+** Q111: How remove orphans?
+Use =--remove-orphans= when bringing stack up/down as appropriate.
+
+** Q112: What is volume migration concern?
+Schema/data upgrades must be managed between image versions.
+
+** Q113: Why backup named volumes?
+Protect state before destructive changes.
+
+** Q114: What is intermediate debugging toolkit?
+compose logs, exec, top, events, inspect, config output.
+
+** Q115: What is intermediate security concern?
+Excessive host mounts exposing sensitive filesystem paths.
+
+** Q116: Mitigation for mount risk?
+Mount least required paths read-only where possible.
+
+** Q117: What is intermediate reliability principle?
+Design services to start independently and retry dependencies gracefully.
+
+** Q118: Intermediate maturity signal?
+Team can reproduce full local stack with one command and deterministic behavior.
+
+** Q119: Intermediate operations principle?
+Standardize compose templates and document service contracts/ports/health.
+
+** Q120: Intermediate best practice?
+Use Compose as declarative environment contract, not ad-hoc scripts.
+
+* Advanced
+
+** Q121: What is Compose as “platform interface” concept?
+A stable developer-facing contract abstracting infra complexity.
+
+** Q122: Why treat Compose files as product assets?
+They define reproducible onboarding, testing, and incident-debug environments.
+
+** Q123: What is drift between local and prod concern?
+Differences in config/dependencies cause “works on my machine” failures.
+
+** Q124: How reduce environment drift?
+Use shared images, pinned versions, and prod-like settings in dev profiles.
+
+** Q125: What is multi-arch development challenge?
+Different host CPUs (amd64/arm64) can change behavior/performance.
+
+** Q126: Mitigation for multi-arch issues?
+Buildx multi-platform images and explicit platform testing matrix.
+
+** Q127: What is hermetic integration test environment?
+Self-contained stack with controlled dependencies and deterministic inputs.
+
+** Q128: Why hermetic CI stacks matter?
+Reduce flaky tests caused by shared external services.
+
+** Q129: What is ephemeral preview environment pattern?
+Per-branch isolated Compose stack for validation/review.
+
+** Q130: What is project namespace collision risk?
+Shared host conflicts in container/network/volume names.
+
+** Q131: How prevent collisions?
+Unique project names plus automated lifecycle cleanup.
+
+** Q132: What is advanced secret management pattern with Compose?
+External secret store injection at runtime, not committed plaintext values.
+
+** Q133: What is supply-chain security for Compose workflows?
+Signed images, SBOMs, vulnerability scanning, trusted registries.
+
+** Q134: Why verify image provenance in Compose stacks?
+Prevent pulling tampered or untrusted artifacts.
+
+** Q135: What is policy-as-code for Compose?
+Automated checks enforcing rules (no root, pinned tags, limits required).
+
+** Q136: What is least-privilege runtime in Compose?
+Drop caps, read-only FS, non-root user, minimal mounts/networks.
+
+** Q137: What is egress restriction challenge in Compose?
+Limit outbound access for sensitive services to reduce exfiltration risk.
+
+** Q138: What is sidecar pattern in Compose?
+Auxiliary container (proxy/agent/exporter) paired with main service.
+
+** Q139: Sidecar tradeoff?
+Better modularity/observability but more operational complexity.
+
+** Q140: What is service mesh simulation in Compose?
+Local emulation of proxies/policies for integration testing.
+
+** Q141: What is advanced health orchestration pattern?
+Dependency graph with healthchecks + init jobs + retry-capable apps.
+
+** Q142: Why startup order alone fails at scale?
+Real readiness depends on migrations, warmups, and external dependencies.
+
+** Q143: What is chaos testing with Compose?
+Inject failures (kill, delay, packet loss) to validate resilience behavior.
+
+** Q144: Tooling for network fault injection concept?
+Traffic control/proxy tools can emulate latency/loss in local stacks.
+
+** Q145: What is observability stack in Compose?
+Local Prometheus/Grafana/ELK/OTel services alongside app for diagnostics.
+
+** Q146: Why include observability in local compose?
+Catch telemetry gaps before production.
+
+** Q147: What is performance testing with Compose caveat?
+Local host limits may not reflect production infrastructure accurately.
+
+** Q148: How still gain value from local perf tests?
+Trend comparisons and bottleneck discovery under controlled scenarios.
+
+** Q149: What is data lifecycle governance for Compose volumes?
+Backup/restore/versioning/cleanup policies for persistent local/CI data.
+
+** Q150: What is migration-safe workflow for stateful services?
+Versioned migrations + compatibility checks + rollback plans.
+
+** Q151: What is blue/green style testing with Compose?
+Run old/new service versions concurrently and switch traffic route locally.
+
+** Q152: What is canary simulation in Compose?
+Route subset of test traffic to new container version.
+
+** Q153: What is dependency pinning governance?
+Central policy for approved base images and versions.
+
+** Q154: What is advanced anti-pattern in Compose ecosystems?
+Using Compose as production orchestrator substitute beyond its intended scope.
+
+** Q155: Better production direction?
+Use Compose for dev/test; use full orchestrator for large-scale production needs.
+
+** Q156: What is incident reproduction advantage of Compose?
+Recreate prod-like bug scenarios quickly on engineer machines.
+
+** Q157: What is runbook codification in Compose?
+Encode operational steps (init, debug, recovery) as repeatable service tasks.
+
+** Q158: What is security scanning integration point?
+Pre-merge CI validates compose config and referenced images.
+
+** Q159: What is compliance evidence for Compose-based workflows?
+Versioned configs, scan reports, signed artifacts, audit trails.
+
+** Q160: What is cost-awareness in Compose CI pipelines?
+Optimize parallel stack counts, cache reuse, and teardown discipline.
+
+** Q161: What is flakiness root cause in Compose CI?
+Port collisions, shared resources, weak readiness checks, orphaned state.
+
+** Q162: Flakiness mitigation checklist?
+Unique namespaces, health-gated startup, deterministic seeds, strict cleanup.
+
+** Q163: What is advanced debugging pattern?
+Capture full compose events/logs/config snapshot as CI artifacts.
+
+** Q164: What is recovery strategy for corrupted local volumes?
+Documented reset scripts plus optional seed data restore.
+
+** Q165: What is platform team role for Compose?
+Provide golden templates, lint rules, and shared service definitions.
+
+** Q166: What is final reliability principle?
+Stacks must be reproducible, restartable, and dependency-failure tolerant.
+
+** Q167: What is final security principle?
+No plaintext secrets, least privilege everywhere, trusted artifacts only.
+
+** Q168: What is final maintainability principle?
+Keep Compose files modular, documented, and policy-validated.
+
+** Q169: What is final developer-experience principle?
+One command up/down with predictable behavior across machines.
+
+** Q170: Final maturity principle?
+Compose excellence is deterministic multi-service environments with strong guardrails.
+
+-----
+
+#+INCLUDE: "../footer.org"
