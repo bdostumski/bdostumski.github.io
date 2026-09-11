@@ -1,0 +1,546 @@
+#+title: Spring WebFlux Interview Questions: Beginner to Advanced (175 Q&A)
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring WebFlux
+
+-----
+
+* Beginner
+
+** Q1: What is Spring WebFlux?
+Spring WebFlux is Spring’s reactive web framework for non-blocking applications.
+
+** Q2: Why was WebFlux introduced?
+To support asynchronous, non-blocking I/O and efficient resource usage under high concurrency.
+
+** Q3: Spring MVC vs WebFlux in one line?
+MVC is traditionally blocking/servlet-based; WebFlux is reactive/non-blocking.
+
+** Q4: What is reactive programming?
+Programming model based on asynchronous data streams and event propagation.
+
+** Q5: What is Publisher in Reactive Streams?
+Source that emits items asynchronously to subscribers.
+
+** Q6: What is Subscriber?
+Consumer that receives stream signals (=onNext=, =onError=, =onComplete=).
+
+** Q7: What is Subscription?
+Link between publisher/subscriber that controls demand/cancellation.
+
+** Q8: What is backpressure?
+Mechanism where subscriber controls how much data it can handle.
+
+** Q9: Which library powers WebFlux streams?
+Project Reactor.
+
+** Q10: What is Mono?
+Reactive type representing zero or one item.
+
+** Q11: What is Flux?
+Reactive type representing zero to many items.
+
+** Q12: When use Mono vs Flux?
+Mono for single/optional result; Flux for sequences/multiple results.
+
+** Q13: What is non-blocking I/O?
+I/O operations that do not block threads while waiting for responses.
+
+** Q14: What is event-loop model?
+Small number of threads handling many connections via async callbacks/events.
+
+** Q15: Default server often used with WebFlux?
+Reactor Netty (commonly in Spring Boot setups).
+
+** Q16: Can WebFlux run on servlet containers?
+Yes, with compatible adapters, though model remains reactive.
+
+** Q17: What is WebClient?
+Reactive HTTP client in Spring for non-blocking outbound calls.
+
+** Q18: What replaced RestTemplate in reactive stacks?
+WebClient is preferred for reactive use cases.
+
+** Q19: What is @RestController in WebFlux?
+Works similarly, but handler methods return Mono/Flux or reactive-compatible types.
+
+** Q20: What is functional endpoint style in WebFlux?
+Routing/handler functions instead of annotation-based controllers.
+
+** Q21: What is RouterFunction?
+Defines request routing rules in functional WebFlux API.
+
+** Q22: What is HandlerFunction?
+Function handling matched requests and returning reactive ServerResponse.
+
+** Q23: What is ServerRequest?
+Reactive abstraction of HTTP request in functional style.
+
+** Q24: What is ServerResponse?
+Reactive abstraction for building HTTP response in functional style.
+
+** Q25: What is MediaType.TEXT_EVENT_STREAM used for?
+Streaming responses (e.g., Server-Sent Events).
+
+** Q26: What is SSE?
+Server-Sent Events: server pushes one-way event stream over HTTP.
+
+** Q27: What is reactive pipeline?
+Chain of operators transforming and controlling data flow.
+
+** Q28: Common simple operators?
+=map=, =filter=, =flatMap=, =doOnNext=.
+
+** Q29: What does map do?
+Transforms each emitted item synchronously.
+
+** Q30: What does flatMap do?
+Transforms each item into async publisher and merges results.
+
+** Q31: Why is flatMap powerful?
+Composes async operations without blocking.
+
+** Q32: What does subscribe do?
+Starts stream execution by attaching a subscriber.
+
+** Q33: Is Reactor pipeline executed before subscribe?
+Usually lazy; execution starts on subscription.
+
+** Q34: What is cold publisher?
+Starts producing data separately for each subscriber.
+
+** Q35: What is hot publisher?
+Can emit independently of individual subscriber start times.
+
+** Q36: What is error signal in reactive streams?
+Terminal signal representing failure (=onError=).
+
+** Q37: What is completion signal?
+Terminal signal indicating successful end (=onComplete=).
+
+** Q38: Can Flux emit both onError and onComplete?
+No, terminal signals are mutually exclusive.
+
+** Q39: What is reactive repository concept?
+Data access returning Mono/Flux for non-blocking composition.
+
+** Q40: Should you call block() in reactive request flow?
+Generally no; it defeats non-blocking model and may cause issues.
+
+** Q41: Why is blocking harmful in WebFlux?
+Can stall event-loop threads and reduce scalability.
+
+** Q42: What is scheduler in Reactor?
+Abstraction controlling execution threads for operators/subscriptions.
+
+** Q43: What is boundedElastic scheduler?
+Scheduler intended for blocking/longer tasks with bounded thread growth.
+
+** Q44: What is parallel scheduler?
+Scheduler optimized for CPU-bound parallel work.
+
+** Q45: What is immediate scheduler?
+Executes tasks on current thread immediately.
+
+** Q46: What is @ExceptionHandler in WebFlux?
+Supports reactive exception handling similarly to MVC with reactive return types.
+
+** Q47: What is WebExceptionHandler?
+Global reactive error handling component at web layer.
+
+** Q48: What is validation in WebFlux?
+Bean Validation on request bodies/params with reactive controller support.
+
+** Q49: What is @Valid in reactive endpoints?
+Triggers validation for bound request objects.
+
+** Q50: What is a common beginner mistake in WebFlux?
+Mixing reactive types with hidden blocking calls.
+
+** Q51: Another beginner mistake?
+Using reactive return types without understanding backpressure/error semantics.
+
+** Q52: Is WebFlux always faster than MVC?
+Not always; benefits depend on workload and I/O patterns.
+
+** Q53: Best fit use case for WebFlux?
+High-concurrency I/O-bound services with many waiting external calls.
+
+** Q54: Poor fit use case for WebFlux?
+Simple CRUD apps with mostly blocking dependencies and low concurrency needs.
+
+** Q55: What is reactive streams spec promise?
+Standardized async stream semantics with backpressure interoperability.
+
+** Q56: What is context propagation challenge?
+Passing request metadata across async/reactive boundaries.
+
+** Q57: What is Reactor Context?
+Per-subscriber key-value context propagated through reactive chain.
+
+** Q58: Beginner observability baseline?
+Structured logs, latency/error metrics, trace IDs in context.
+
+** Q59: Beginner testing baseline?
+StepVerifier for publishers + WebTestClient for HTTP endpoints.
+
+** Q60: Beginner best practice?
+Stay non-blocking end-to-end and keep pipelines simple/readable.
+
+* Intermediate
+
+** Q61: What is WebTestClient?
+Reactive HTTP test client for testing WebFlux endpoints.
+
+** Q62: Why use WebTestClient?
+Works with live server or application context and supports reactive assertions.
+
+** Q63: What is StepVerifier?
+Reactor test utility to verify sequence emissions and terminal signals.
+
+** Q64: What is VirtualTime in Reactor tests?
+Simulates time passage for deterministic testing of delays/timeouts/retries.
+
+** Q65: Why virtual time matters?
+Avoids slow/flaky time-based tests.
+
+** Q66: What is flatMap vs concatMap?
+flatMap merges async outputs (unordered); concatMap preserves order sequentially.
+
+** Q67: What is switchMap?
+Switches to latest inner publisher and cancels previous one.
+
+** Q68: What is merge vs zip?
+merge interleaves emissions; zip pairs items by index from sources.
+
+** Q69: What is onErrorResume?
+Fallback to alternative publisher when error occurs.
+
+** Q70: What is onErrorReturn?
+Return static fallback value on error.
+
+** Q71: What is retry operator?
+Resubscribes on failure according to policy.
+
+** Q72: Why use retry carefully?
+Can amplify load and duplicate side effects.
+
+** Q73: What is retryWhen?
+Advanced retry with custom backoff/filters.
+
+** Q74: What is timeout operator?
+Fails sequence if signal not received within duration.
+
+** Q75: What is doOnError used for?
+Side-effect logging/metrics on error without handling it.
+
+** Q76: What is doFinally?
+Runs cleanup logic on completion, error, or cancellation.
+
+** Q77: What is cancellation in reactive streams?
+Subscriber stops demand and terminates upstream processing.
+
+** Q78: Why cancellation handling matters?
+Prevents wasted work/resource leaks after client disconnects/timeouts.
+
+** Q79: What is backpressure strategy operator example?
+=onBackpressureBuffer=, =onBackpressureDrop=, =onBackpressureLatest=.
+
+** Q80: What is risk of unbounded buffering?
+Memory growth and potential OOM.
+
+** Q81: What is publishOn?
+Switches execution context downstream of operator.
+
+** Q82: What is subscribeOn?
+Influences where subscription/upstream source runs.
+
+** Q83: publishOn vs subscribeOn quick rule?
+subscribeOn affects source subscription; publishOn affects downstream execution point.
+
+** Q84: What is contextWrite?
+Adds/modifies Reactor Context entries in pipeline.
+
+** Q85: MDC logging challenge in reactive apps?
+Thread-local MDC does not naturally follow async/reactive thread hops.
+
+** Q86: How correlate logs in WebFlux?
+Use Reactor Context + instrumentation bridges for MDC propagation.
+
+** Q87: What is functional routing advantage?
+Explicit composable route definitions, often good for modular APIs.
+
+** Q88: Annotation vs functional endpoints choice?
+Team preference/use case; both supported and can coexist.
+
+** Q89: What is bodyToMono/bodyToFlux in WebClient?
+Decode HTTP response body to reactive types.
+
+** Q90: What is exchangeToMono vs retrieve in WebClient?
+exchangeToMono gives full response control; retrieve is simpler for common flows.
+
+** Q91: What is WebClient filter?
+Interceptor-like hook for request/response cross-cutting logic.
+
+** Q92: Common WebClient filter use cases?
+Auth headers, correlation IDs, logging, metrics, retries.
+
+** Q93: What is connection pooling in WebClient/Reactor Netty?
+Reuse HTTP connections for performance and resource efficiency.
+
+** Q94: Why configure connection/read/write timeouts?
+Prevent hanging calls and protect event-loop capacity.
+
+** Q95: What is max in-memory size for codecs?
+Limit for buffering decoded content to avoid excessive memory use.
+
+** Q96: What is DataBuffer in WebFlux?
+Abstraction for byte buffers in reactive I/O processing.
+
+** Q97: DataBuffer leak risk?
+Improper handling in low-level code can leak memory.
+
+** Q98: What is multipart support in WebFlux?
+Reactive handling of multipart/form-data uploads.
+
+** Q99: What is streaming file response approach?
+Return Flux<DataBuffer> or Resource-based reactive response.
+
+** Q100: What is reactive security integration?
+Spring Security supports WebFlux with dedicated reactive filter chain APIs.
+
+** Q101: What is SecurityWebFilterChain?
+Reactive counterpart to servlet SecurityFilterChain.
+
+** Q102: What is reactive method security?
+Authorization checks on reactive methods with non-blocking support.
+
+** Q103: What is R2DBC?
+Reactive relational database connectivity API for non-blocking SQL access.
+
+** Q104: Why not use blocking JPA in WebFlux handlers?
+Would block event loops and undermine reactive scalability.
+
+** Q105: How integrate blocking libraries if unavoidable?
+Isolate calls on boundedElastic and limit usage carefully.
+
+** Q106: What is bulkhead in reactive systems?
+Concurrency isolation limits per downstream dependency.
+
+** Q107: What is rate limiting in reactive APIs?
+Controlling request throughput to protect resources.
+
+** Q108: What is intermediate anti-pattern in WebFlux?
+Calling block()/toIterable() inside request pipelines.
+
+** Q109: Another intermediate anti-pattern?
+Complex unreadable operator chains without clear error semantics.
+
+** Q110: How keep pipelines maintainable?
+Small composed functions, clear naming, documented error/retry behavior.
+
+** Q111: What is checkpoint() operator?
+Adds assembly trace markers for easier debugging.
+
+** Q112: Why use checkpoints sparingly?
+Helpful for debugging but can add overhead/noise.
+
+** Q113: What is Hooks.onOperatorDebug?
+Global debug mode for assembly tracing (expensive, mostly non-prod).
+
+** Q114: What is intermediate testing strategy?
+Unit test operators/services + integration test HTTP and dependency behavior.
+
+** Q115: How test backpressure behavior?
+StepVerifier request control and bounded demand assertions.
+
+** Q116: How test cancellation behavior?
+Cancel subscriptions in tests and verify cleanup side effects.
+
+** Q117: What is contract testing in reactive APIs?
+Validate payload/status/stream semantics between services.
+
+** Q118: What is intermediate observability must-have?
+Per-endpoint latency, errors, saturation, event-loop health, downstream timings.
+
+** Q119: What is event-loop starvation symptom?
+Rising latency/timeouts despite low CPU due to blocked loop threads.
+
+** Q120: How detect blocking calls in reactive threads?
+Thread analysis, instrumentation, and tools that flag blocking operations.
+
+** Q121: What is intermediate resilience baseline?
+Timeouts + retries with backoff + circuit breakers + fallbacks.
+
+** Q122: Why jitter in retries?
+Avoid synchronized retry spikes.
+
+** Q123: Intermediate maturity signal?
+Team can trace thread/scheduler/backpressure behavior for critical flows.
+
+** Q124: Intermediate best practice?
+Prefer end-to-end reactive dependencies and explicit resilience policies.
+
+** Q125: Intermediate architecture rule?
+Use reactive where it adds clear concurrency/latency benefits.
+
+* Advanced
+
+** Q126: What is end-to-end reactive architecture requirement?
+Non-blocking boundaries across web, client, data, and messaging layers.
+
+** Q127: Why partial reactive adoption can disappoint?
+Blocking bottlenecks still dominate throughput/latency.
+
+** Q128: What is tail-latency amplification in reactive chains?
+Slow downstream calls propagate and multiply latency across composed async hops.
+
+** Q129: How control tail latency?
+Tight timeout budgets, hedging/cancellation strategies, bulkheads, caching.
+
+** Q130: What is coordinated timeout budget?
+Allocate per-hop deadlines under global request SLA.
+
+** Q131: What is deadline propagation?
+Passing remaining time budget downstream via headers/context.
+
+** Q132: What is structured concurrency relevance conceptually?
+Managing lifecycles/cancellation of related async tasks coherently.
+
+** Q133: What is fan-out/fan-in reactive pattern?
+Parallel downstream calls combined into single response.
+
+** Q134: Fan-out risk?
+Explosive concurrency/load against dependencies.
+
+** Q135: Mitigation for fan-out risk?
+Bound concurrency and short-circuit on partial failure where appropriate.
+
+** Q136: What is flatMap concurrency parameter use?
+Limits concurrent inner subscriptions to control resource usage.
+
+** Q137: What is prefetch tuning?
+Controls upstream request batch sizes for operators.
+
+** Q138: Prefetch too high risk?
+Memory pressure and unfair resource use.
+
+** Q139: Prefetch too low risk?
+Lower throughput due to frequent demand signaling.
+
+** Q140: What is fusion optimization in Reactor?
+Internal operator optimization reducing overhead between compatible stages.
+
+** Q141: Why should developers still care about fusion?
+Operator choices can impact performance characteristics.
+
+** Q142: What is assembly vs subscription time distinction?
+Pipeline declared at assembly; execution behavior materializes at subscription.
+
+** Q143: What is context loss across boundaries issue?
+Context not automatically propagated through non-reactive adapters/threads.
+
+** Q144: How preserve context across bridges?
+Use explicit context propagation utilities/instrumentation hooks.
+
+** Q145: What is advanced memory tuning in WebFlux?
+Codec limits, buffer management, streaming over buffering, controlled concurrency.
+
+** Q146: What is zero-copy/file transfer relevance?
+Can improve large file response efficiency depending server/runtime capabilities.
+
+** Q147: What is reactive transaction support?
+Non-blocking transactional boundaries with reactive-capable drivers (e.g., R2DBC).
+
+** Q148: Why JDBC transactions mismatch reactive model?
+JDBC is blocking and thread-bound.
+
+** Q149: What is exactly-once effect challenge in reactive messaging flows?
+Async retries/cancellations can duplicate side effects without idempotent design.
+
+** Q150: How achieve reliable effects?
+Idempotency keys, dedup stores, transactional outbox/inbox patterns.
+
+** Q151: What is reactive security advanced concern?
+Context propagation for auth across async boundaries and downstream calls.
+
+** Q152: What is token relay in reactive gateways/services?
+Propagating OAuth tokens non-blockingly via filters/context.
+
+** Q153: What is observability correlation in reactive systems?
+Consistent trace/span/log context across operator chains and thread hops.
+
+** Q154: Why cardinality control matters in metrics?
+Unbounded labels can overwhelm monitoring systems.
+
+** Q155: What is reactive load shedding?
+Early rejecting low-priority requests under saturation.
+
+** Q156: What is graceful degradation pattern in WebFlux?
+Fallback partial responses when dependencies fail or time out.
+
+** Q157: What is circuit breaker placement strategy?
+Wrap downstream boundaries, not internal pure transformations.
+
+** Q158: What is retry placement pitfall?
+Retrying too high in stack can repeat expensive upstream work.
+
+** Q159: Better retry placement?
+Closest safe boundary around transient failing dependency calls.
+
+** Q160: What is backpressure mismatch with external systems?
+Some dependencies ignore reactive demand and still overwhelm consumers.
+
+** Q161: Mitigation for mismatch?
+Adapters with buffering limits, rate limits, and concurrency caps.
+
+** Q162: What is chaos testing for WebFlux services?
+Inject latency/errors/cancellations to verify resilience and recovery behavior.
+
+** Q163: What is advanced benchmarking requirement?
+Measure throughput, p95/p99 latency, GC, event-loop utilization, queue depths.
+
+** Q164: Why benchmark with realistic payloads?
+Serialization and buffer behavior depend heavily on payload shape/size.
+
+** Q165: What is native image/AOT consideration for WebFlux apps?
+Startup/memory gains possible, but verify compatibility and runtime behavior.
+
+** Q166: What is biggest advanced WebFlux anti-pattern?
+Using reactive APIs with hidden blocking dependencies everywhere.
+
+** Q167: What is team skill prerequisite for WebFlux success?
+Strong understanding of async flows, debugging tools, and backpressure semantics.
+
+** Q168: What is migration strategy from MVC to WebFlux?
+Incremental edge/service migration where reactive benefits are clear.
+
+** Q169: What is coexistence strategy in large systems?
+Use MVC for simple blocking domains and WebFlux for high-concurrency I/O services.
+
+** Q170: What is final performance principle?
+Measure, don’t assume—reactive gains are workload-dependent.
+
+** Q171: What is final reliability principle?
+Assume cancellation, retries, and partial failures are normal.
+
+** Q172: What is final security principle?
+Preserve auth context and validate every downstream boundary.
+
+** Q173: What is final operations principle?
+Invest in tracing/metrics/debuggability before scaling traffic.
+
+** Q174: What is final architecture principle?
+Keep reactive pipelines explicit, bounded, and domain-focused.
+
+** Q175: Final maturity principle?
+WebFlux excellence is disciplined non-blocking design plus operational rigor.
+
+-----
+
+#+INCLUDE: "../footer.org"
