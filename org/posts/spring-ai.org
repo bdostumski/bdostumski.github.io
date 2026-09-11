@@ -1,0 +1,547 @@
+#+title: Spring AI
+#+date: 2026-09-11
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring AI
+
+-----
+
+* Beginner
+
+** Q1: What is Spring AI?
+Spring AI is a Spring ecosystem project that provides abstractions for building AI-powered applications on the JVM.
+
+** Q2: Why use Spring AI?
+It offers consistent APIs for models, prompts, embeddings, vector stores, and tool calling across providers.
+
+** Q3: What problem does Spring AI solve?
+It reduces vendor-specific boilerplate and integrates AI patterns into familiar Spring programming models.
+
+** Q4: What is an LLM?
+A Large Language Model that predicts/generates text based on input context.
+
+** Q5: What is a prompt?
+Input instructions/context sent to a model.
+
+** Q6: What is prompt engineering?
+Designing prompts to improve output quality, structure, and reliability.
+
+** Q7: What is a system prompt?
+High-priority instruction defining assistant behavior/constraints.
+
+** Q8: What is a user prompt?
+End-user request content for a model.
+
+** Q9: What is a completion?
+Model-generated output text/result.
+
+** Q10: What is temperature?
+Sampling control affecting randomness/creativity in output.
+
+** Q11: Low vs high temperature?
+Low: deterministic/focused; high: diverse/creative.
+
+** Q12: What are tokens?
+Units of text models consume/generate for context and billing.
+
+** Q13: Why token limits matter?
+They cap prompt+response size and affect cost/performance.
+
+** Q14: What is context window?
+Maximum number of tokens model can consider in one request.
+
+** Q15: What is hallucination?
+Confident but incorrect model output.
+
+** Q16: Can hallucinations be fully eliminated?
+No, but they can be reduced significantly with good design.
+
+** Q17: What is RAG?
+Retrieval-Augmented Generation: retrieve relevant data and provide it to model before generation.
+
+** Q18: Why use RAG?
+Grounds responses in trusted data and reduces hallucinations.
+
+** Q19: What is an embedding?
+Numeric vector representation of text semantics.
+
+** Q20: Why embeddings are useful?
+They enable semantic search and similarity matching.
+
+** Q21: What is a vector database/store?
+Storage optimized for vector similarity search.
+
+** Q22: What is semantic search?
+Finding content by meaning rather than exact keywords.
+
+** Q23: What is cosine similarity (conceptually)?
+A metric comparing vector direction similarity.
+
+** Q24: What is chunking in RAG?
+Splitting documents into smaller retrievable passages.
+
+** Q25: Why chunk documents?
+Improves retrieval precision and fits context limits.
+
+** Q26: What is metadata in vector docs?
+Attributes (source, date, tenant, tags) used for filtering and governance.
+
+** Q27: What is top-k retrieval?
+Returning top K most similar chunks for a query.
+
+** Q28: What is ChatClient in Spring AI?
+High-level API for interacting with chat models.
+
+** Q29: What is a model abstraction in Spring AI?
+Unified interface over different AI providers/capabilities.
+
+** Q30: What is provider portability?
+Ability to swap model vendors with minimal app changes.
+
+** Q31: What is tool/function calling?
+Model requests execution of defined functions/tools to get external data/actions.
+
+** Q32: Why tool calling matters?
+Lets models perform grounded operations beyond pure text generation.
+
+** Q33: What is structured output?
+Forcing/modeling response into defined schema (JSON/object).
+
+** Q34: Why structured output is important?
+Reliability for downstream parsing/automation.
+
+** Q35: What is prompt template?
+Reusable prompt with placeholders for runtime values.
+
+** Q36: Why use templates?
+Consistency, reuse, and easier testing/versioning.
+
+** Q37: What is chat memory (concept)?
+Persisted conversation context across turns.
+
+** Q38: Why memory can be risky?
+May leak stale/sensitive context if not scoped/governed.
+
+** Q39: What is AI safety in app context?
+Controls reducing harmful, insecure, or policy-violating outputs/actions.
+
+** Q40: What is content moderation?
+Screening inputs/outputs for unsafe policy categories.
+
+** Q41: What is jailbreak attempt?
+Prompt trying to bypass system constraints/policies.
+
+** Q42: What is prompt injection?
+Untrusted input attempts to override instructions or exfiltrate data.
+
+** Q43: Why is prompt injection serious in RAG/tools?
+Model may follow malicious instructions hidden in retrieved content.
+
+** Q44: What is grounding data source?
+Trusted enterprise documents/databases used in RAG.
+
+** Q45: What is AI latency?
+Total response time including retrieval, model inference, and post-processing.
+
+** Q46: What is streaming response?
+Returning tokens incrementally as generated.
+
+** Q47: Why stream responses?
+Better perceived latency and UX.
+
+** Q48: What is fallback model strategy?
+Use alternative model when primary fails/timeout/over-budget.
+
+** Q49: What is cost control in GenAI apps?
+Managing token usage, model selection, and caching to stay within budget.
+
+** Q50: What is evaluation in AI apps?
+Measuring quality/helpfulness/correctness/safety against test sets.
+
+** Q51: What is deterministic test challenge with LLMs?
+Outputs can vary; need robust assertions/evaluations.
+
+** Q52: What is beginner AI anti-pattern?
+Sending raw user input directly to powerful tools without safeguards.
+
+** Q53: Another beginner anti-pattern?
+No retrieval governance, causing irrelevant or sensitive context leakage.
+
+** Q54: Beginner observability baseline?
+Track prompts, latency, token usage, errors, model/provider.
+
+** Q55: Beginner security baseline?
+AuthN/Z, PII redaction, prompt filtering, tool permission checks.
+
+** Q56: Why human-in-the-loop sometimes needed?
+High-risk decisions require review before action.
+
+** Q57: What is best first Spring AI use case?
+Internal Q&A assistant over trusted documentation (RAG).
+
+** Q58: Why start with narrow use cases?
+Improves quality, control, and time-to-value.
+
+** Q59: Beginner architecture guideline?
+Separate retrieval, prompting, model call, and output validation layers.
+
+** Q60: Beginner best practice?
+Optimize for grounded, safe, and observable behavior before adding complexity.
+
+* Intermediate
+
+** Q61: What is prompt layering strategy?
+System instructions + task instructions + retrieved context + user query.
+
+** Q62: Why keep system prompt concise and strict?
+Reduces ambiguity and improves controllability.
+
+** Q63: What is context packing?
+Selecting and ordering retrieved chunks within token budget.
+
+** Q64: Why ranking quality is critical in RAG?
+Poor retrieval causes poor generation regardless of model quality.
+
+** Q65: What is hybrid search?
+Combining lexical (keyword) and vector (semantic) retrieval.
+
+** Q66: Why hybrid often outperforms pure vector?
+Handles exact terms, codes, names, and semantic intent together.
+
+** Q67: What is re-ranking?
+Secondary model/algorithm reorders retrieved results for relevance.
+
+** Q68: What is MMR-style diversification concept?
+Select relevant but non-redundant chunks to improve context variety.
+
+** Q69: What is chunk overlap?
+Shared boundary text between chunks to preserve context continuity.
+
+** Q70: Chunk too small vs too large tradeoff?
+Too small loses context; too large dilutes relevance and wastes tokens.
+
+** Q71: What is metadata filtering in retrieval?
+Restrict search by attributes (tenant, product, version, date, ACL).
+
+** Q72: Why ACL-aware retrieval is mandatory?
+Prevents exposing unauthorized documents to model context.
+
+** Q73: What is embedding drift?
+Changes in embedding model/chunking causing retrieval behavior changes.
+
+** Q74: How manage embedding model upgrades?
+Version indexes, backfill carefully, compare retrieval quality before cutover.
+
+** Q75: What is vector normalization concern?
+Similarity metrics may assume/benefit from normalized vectors.
+
+** Q76: What is ANN search?
+Approximate nearest neighbor search for scalable vector retrieval.
+
+** Q77: ANN tradeoff?
+Much faster queries with potential small recall loss.
+
+** Q78: What is recall vs precision in retrieval?
+Recall: find relevant docs; precision: retrieved docs are relevant.
+
+** Q79: What is context truncation risk?
+Cutting critical instructions/evidence due to token limits.
+
+** Q80: Mitigation for truncation?
+Token budgeting, summarization, retrieval compression, stricter top-k.
+
+** Q81: What is retrieval compression?
+Condensing retrieved passages while preserving key facts/citations.
+
+** Q82: What is citation requirement pattern?
+Force answer to reference provided sources/snippets.
+
+** Q83: Why require citations in enterprise assistants?
+Auditability and user trust.
+
+** Q84: What is tool schema design best practice?
+Small explicit parameters with validation constraints.
+
+** Q85: Why limit tool surface area?
+Reduces abuse risk and execution errors.
+
+** Q86: What is tool execution sandboxing?
+Run tools with restricted permissions/network/data scopes.
+
+** Q87: What is tool result grounding?
+Feed tool outputs back into model as trusted structured context.
+
+** Q88: What is function calling loop guard?
+Limit recursive/chain tool calls to avoid runaway behavior.
+
+** Q89: What is structured output validation?
+Validate model JSON against schema before use.
+
+** Q90: What if model returns invalid JSON?
+Retry with repair prompt/parser or fail gracefully.
+
+** Q91: What is guardrail?
+Rule/policy layer constraining model inputs/outputs/actions.
+
+** Q92: Types of guardrails?
+Policy filters, regex/schema checks, moderation, allowlists, tool auth gates.
+
+** Q93: What is prompt injection mitigation baseline?
+Instruction hierarchy, untrusted-content isolation, allowlisted tools, output checks.
+
+** Q94: Should retrieved documents be treated as trusted instructions?
+No, treat as untrusted data unless explicitly curated.
+
+** Q95: What is conversation memory scoping?
+Isolate memory by user/session/tenant/use case boundaries.
+
+** Q96: Why TTL for memory?
+Reduce stale context, privacy risk, and token bloat.
+
+** Q97: What is summarizing memory strategy?
+Compress older turns into concise state to fit context window.
+
+** Q98: What is model routing?
+Choose model dynamically by task complexity/cost/latency policy.
+
+** Q99: Example routing policy?
+Cheap model for classification, stronger model for complex reasoning.
+
+** Q100: What is fallback hierarchy?
+Primary model → secondary model → safe degraded response.
+
+** Q101: What is caching in AI apps?
+Reuse previous responses/embeddings/retrieval for similar requests.
+
+** Q102: Semantic cache vs exact cache?
+Semantic uses similarity; exact uses identical keys/prompt hashes.
+
+** Q103: Cache risk in AI responses?
+Stale or cross-tenant leakage if keys/scopes poorly designed.
+
+** Q104: What is token accounting?
+Tracking prompt/completion tokens per request/user/feature.
+
+** Q105: Why token accounting matters?
+Cost control, anomaly detection, and quota enforcement.
+
+** Q106: What is rate limiting for AI endpoints?
+Limit requests/tokens per principal/time window.
+
+** Q107: What is burst control?
+Absorb short spikes while enforcing sustained limits.
+
+** Q108: What is evaluation dataset?
+Curated prompts/questions with expected quality criteria.
+
+** Q109: What is golden set in AI evaluation?
+High-value benchmark cases tracked across releases.
+
+** Q110: What is offline eval vs online eval?
+Offline on static dataset; online on live traffic/experiments.
+
+** Q111: What is LLM-as-judge concept?
+Using model to score outputs (with caveats/bias controls).
+
+** Q112: Why combine automatic and human eval?
+Human review captures nuance; automation scales regression checks.
+
+** Q113: What is hallucination detection heuristic?
+Check claims against retrieved sources and flag unsupported statements.
+
+** Q114: What is abstention strategy?
+Model says “I don’t know” when confidence/evidence insufficient.
+
+** Q115: Why abstention is valuable?
+Safer than confident incorrect answers.
+
+** Q116: What is intermediate anti-pattern in Spring AI?
+Overlong mega-prompts with mixed instructions and no retrieval discipline.
+
+** Q117: Better prompt architecture?
+Modular templates + strict roles + bounded context blocks.
+
+** Q118: What is intermediate testing strategy?
+Unit tests for prompt assembly/tools + integration evals for end-to-end quality.
+
+** Q119: What is chaos testing idea for AI systems?
+Simulate provider timeout/errors and verify fallbacks/degradation.
+
+** Q120: What is intermediate observability must-have?
+Latency decomposition (retrieval/model/tool), token cost, safety events, fallback rate.
+
+** Q121: What is PII redaction pipeline?
+Detect/mask sensitive data before logging/storage/model calls as needed.
+
+** Q122: Why separate dev and prod prompts/config?
+Prevent accidental unsafe experiments in production.
+
+** Q123: Intermediate maturity signal?
+Team can explain failure modes and mitigation per AI component.
+
+** Q124: Intermediate governance baseline?
+Prompt/version control, approval workflow, and traceable deployments.
+
+** Q125: Intermediate best practice?
+Treat AI features as distributed systems: measured, guarded, and iteratively improved.
+
+* Advanced
+
+** Q126: What is agentic workflow?
+LLM plans/executes multi-step tool actions toward goal with feedback loops.
+
+** Q127: Agentic risk?
+Unbounded autonomy can amplify errors, cost, and security exposure.
+
+** Q128: Safe agent design principle?
+Constrain tools, require confirmations, enforce budgets/timeouts/step limits.
+
+** Q129: What is planner-executor pattern?
+One component plans steps; executor performs with strict controls.
+
+** Q130: What is reflection/self-critique pattern?
+Model reviews/improves draft answer against rubric before final output.
+
+** Q131: Reflection tradeoff?
+Higher quality potential but increased latency/cost.
+
+** Q132: What is multi-agent architecture?
+Specialized agents collaborate (retrieval, reasoning, compliance, action).
+
+** Q133: Multi-agent challenge?
+Coordination overhead, error propagation, and observability complexity.
+
+** Q134: What is toolformer-style dynamic tool use concept?
+Model decides when tool invocation is beneficial during reasoning.
+
+** Q135: Why enforce deterministic tool contracts?
+Predictability and safer automation pipelines.
+
+** Q136: What is provenance in AI responses?
+Trace of sources/tools/prompts leading to final output.
+
+** Q137: Why provenance is critical?
+Auditability, debugging, trust, and compliance.
+
+** Q138: What is policy-as-code for AI?
+Declarative machine-enforced safety/compliance rules in pipeline.
+
+** Q139: What is prompt firewall concept?
+Layer that sanitizes/classifies input and blocks malicious instruction patterns.
+
+** Q140: What is indirect prompt injection?
+Malicious instructions embedded in retrieved web/docs/tool outputs.
+
+** Q141: Advanced mitigation for indirect injection?
+Content sandboxing, instruction stripping, signed trusted sources, tool allowlists.
+
+** Q142: What is secure tool calling architecture?
+Per-tool auth scopes, parameter validation, approval gates, immutable audit logs.
+
+** Q143: What is least-privilege for AI agents?
+Agent gets minimal permissions required for current task only.
+
+** Q144: What is model exfiltration risk in enterprise AI?
+Sensitive data leakage through prompts, outputs, logs, or external tools.
+
+** Q145: Mitigation for exfiltration risk?
+Data classification, redaction, egress controls, strict logging policies.
+
+** Q146: What is retrieval poisoning?
+Corrupted knowledge base content manipulates model outputs.
+
+** Q147: How defend against retrieval poisoning?
+Source trust scoring, ingestion validation, anomaly detection, signed content.
+
+** Q148: What is evaluation drift?
+Model/app quality changes over time due to data/use-case/provider shifts.
+
+** Q149: How detect eval drift?
+Continuous benchmark runs, online quality signals, periodic human audits.
+
+** Q150: What is canary release for AI prompts/models?
+Route small traffic subset to new config and compare metrics before rollout.
+
+** Q151: What is shadow evaluation?
+Run new pipeline in parallel without user impact for comparison.
+
+** Q152: What is cost-performance frontier?
+Balancing quality, latency, and cost across model choices.
+
+** Q153: How optimize frontier?
+Routing, caching, prompt compression, selective tool usage, smaller models where possible.
+
+** Q154: What is speculative decoding conceptually?
+Technique to accelerate generation by combining models/strategies (provider-dependent).
+
+** Q155: What is batching requests strategy?
+Aggregate compatible requests to improve throughput/cost (with latency tradeoffs).
+
+** Q156: What is SLO for AI endpoints?
+Targets for latency, availability, safety violations, and quality metrics.
+
+** Q157: What is error budget in AI operations?
+Allowed unreliability window guiding rollout pace and risk.
+
+** Q158: What is human escalation policy?
+Route uncertain/high-risk outputs to humans for decision.
+
+** Q159: What is “right to explanation” pressure in AI systems?
+Need to justify outputs/actions in regulated contexts.
+
+** Q160: How support explainability in Spring AI apps?
+Return citations, tool traces, policy decisions, and confidence signals.
+
+** Q161: What is memory poisoning?
+Adversarial or incorrect conversation memory corrupting future responses.
+
+** Q162: Mitigation for memory poisoning?
+Scoped memory, trust labels, summarization validation, memory reset controls.
+
+** Q163: What is multi-tenant isolation requirement?
+Strict separation for prompts, memory, vectors, caches, logs, and quotas.
+
+** Q164: What is noisy-neighbor problem in shared AI infra?
+One tenant’s heavy traffic degrades others’ latency/cost.
+
+** Q165: Controls for noisy-neighbor?
+Per-tenant rate/token quotas, priority queues, workload isolation.
+
+** Q166: What is compliance concern for AI data retention?
+Prompt/response storage may contain regulated data requiring retention/deletion controls.
+
+** Q167: What is model card relevance?
+Documents model behavior, limitations, and risk considerations for governance.
+
+** Q168: What is advanced anti-pattern in Spring AI?
+Shipping autonomous tool-calling to production without guardrails and auditability.
+
+** Q169: Mature architecture outcome for Spring AI?
+Grounded retrieval, constrained tools, strong evals, and policy-enforced operations.
+
+** Q170: Final reliability principle?
+Assume providers/tools fail; design graceful fallback and retry budgets.
+
+** Q171: Final security principle?
+Treat model and retrieved content as potentially unsafe boundaries.
+
+** Q172: Final quality principle?
+Continuously evaluate with real tasks, not only demo prompts.
+
+** Q173: Final cost principle?
+Track token economics per feature and optimize systematically.
+
+** Q174: Final operations principle?
+Version everything: prompts, models, indexes, tools, and policies.
+
+** Q175: Final maturity principle?
+Spring AI excellence is safe, grounded, measurable intelligence in production.
+
+-----
+
+#+INCLUDE: "../footer.org"
+
