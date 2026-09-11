@@ -1,0 +1,546 @@
+#+title: Spring JDBC
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring JDBC
+
+-----
+
+* Beginner
+
+** Q1: What is Spring JDBC?
+Spring JDBC is a module that simplifies JDBC-based data access by reducing boilerplate code.
+
+** Q2: Why use Spring JDBC over plain JDBC?
+It handles repetitive tasks like resource management and exception translation.
+
+** Q3: What is JdbcTemplate?
+Core Spring class for executing SQL queries/updates with callback-based result handling.
+
+** Q4: What problem does JdbcTemplate solve?
+Eliminates manual connection/statement/result-set lifecycle code.
+
+** Q5: What is NamedParameterJdbcTemplate?
+JdbcTemplate variant supporting named SQL parameters instead of positional placeholders only.
+
+** Q6: Why use named parameters?
+Improves readability and reduces parameter index mistakes.
+
+** Q7: What is DataSource in Spring JDBC?
+Factory for database connections, typically backed by a connection pool.
+
+** Q8: Is DriverManager commonly used directly in Spring apps?
+Usually no; DataSource abstraction is preferred.
+
+** Q9: What is connection pooling?
+Reusing DB connections to improve performance and scalability.
+
+** Q10: Typical default pool in Spring Boot?
+HikariCP.
+
+** Q11: What is RowMapper?
+Strategy interface mapping one ResultSet row to one object.
+
+** Q12: What is ResultSetExtractor?
+Strategy interface for extracting complex results from entire ResultSet.
+
+** Q13: What is RowCallbackHandler?
+Callback processing each row without building a full list in memory.
+
+** Q14: When use RowMapper?
+Standard one-row-to-one-object list mapping.
+
+** Q15: When use ResultSetExtractor?
+Complex aggregations/hierarchical mappings across many rows.
+
+** Q16: What is SQLExceptionTranslator?
+Converts vendor SQL exceptions into Spring’s data access exception hierarchy.
+
+** Q17: Why is exception translation useful?
+Enables consistent, vendor-neutral exception handling.
+
+** Q18: What is DataAccessException?
+Root runtime exception for Spring data access errors.
+
+** Q19: What is queryForObject?
+Returns single mapped object/value from query expecting one row.
+
+** Q20: What happens if queryForObject finds no rows?
+Throws EmptyResultDataAccessException (unless handled differently).
+
+** Q21: What is query?
+Executes SELECT and maps multiple rows via callback/mapper.
+
+** Q22: What is update?
+Executes INSERT/UPDATE/DELETE and returns affected row count.
+
+** Q23: What is batchUpdate?
+Executes multiple updates in batch for better throughput.
+
+** Q24: What is PreparedStatementSetter?
+Callback to set statement parameters safely.
+
+** Q25: Why avoid SQL string concatenation?
+Prevents SQL injection and improves correctness.
+
+** Q26: How does JdbcTemplate help prevent SQL injection?
+Promotes prepared statements with bound parameters.
+
+** Q27: What is BeanPropertyRowMapper?
+RowMapper implementation mapping columns to bean properties by naming conventions.
+
+** Q28: BeanPropertyRowMapper tradeoff?
+Convenient but may be slower/less explicit than custom mappers.
+
+** Q29: What is SingleColumnRowMapper?
+Maps one-column result rows to simple types.
+
+** Q30: What is MapSqlParameterSource?
+Container for named SQL parameters with values/types.
+
+** Q31: What is SqlParameterSource?
+Abstraction for named parameter binding.
+
+** Q32: What is GeneratedKeyHolder?
+Captures auto-generated keys from insert operations.
+
+** Q33: How retrieve generated keys with Spring JDBC?
+Use update with PreparedStatementCreator + KeyHolder.
+
+** Q34: What is SimpleJdbcInsert?
+Helper for insert operations using table metadata and less boilerplate.
+
+** Q35: What is SimpleJdbcCall?
+Helper abstraction for calling stored procedures/functions.
+
+** Q36: Is JdbcTemplate thread-safe?
+Yes, designed for shared use after configuration.
+
+** Q37: Is RowMapper thread-safe?
+Usually stateless implementations are; avoid mutable shared state.
+
+** Q38: What is SQL type binding?
+Setting correct JDBC/SQL types for parameters.
+
+** Q39: Why does null binding need care?
+DB may need explicit SQL type for null values.
+
+** Q40: What is transaction in DB context?
+Atomic unit of work with commit/rollback semantics.
+
+** Q41: Does JdbcTemplate auto-manage transactions?
+It participates in Spring-managed transactions when configured.
+
+** Q42: What is @Transactional with Spring JDBC?
+Declarative transaction boundary around service/repository methods.
+
+** Q43: Default rollback behavior in Spring transactions?
+Rollback on unchecked exceptions by default.
+
+** Q44: What is PlatformTransactionManager for JDBC?
+Usually DataSourceTransactionManager.
+
+** Q45: What is DataSourceTransactionManager?
+Spring transaction manager for single JDBC DataSource.
+
+** Q46: What is auto-commit?
+Mode where each statement commits immediately unless transaction management disables it.
+
+** Q47: Should business logic live in repository classes?
+Prefer no; keep repositories focused on data access.
+
+** Q48: What is DAO pattern?
+Data Access Object encapsulates persistence operations.
+
+** Q49: What is repository layering benefit?
+Separation of concerns and testability.
+
+** Q50: What is SQL script initialization in Spring?
+Executing schema/data scripts at startup in some configurations.
+
+** Q51: What is JdbcOperations?
+Interface implemented by JdbcTemplate for easier mocking/abstraction.
+
+** Q52: What is NamedParameterJdbcOperations?
+Interface for named parameter JDBC operations.
+
+** Q53: What is common beginner mistake in Spring JDBC?
+Using queryForObject where zero/many rows are possible.
+
+** Q54: Another beginner mistake?
+Selecting * and loading huge datasets without pagination.
+
+** Q55: What is logging best practice for SQL errors?
+Log SQL template + SQLState/error category, redact sensitive params.
+
+** Q56: Should credentials appear in logs?
+Never.
+
+** Q57: Why keep SQL in constants/files clearly?
+Improves readability, reuse, and maintainability.
+
+** Q58: What is beginner testing approach for Spring JDBC?
+Repository integration tests against real/test DB.
+
+** Q59: Why not rely only on mocks for JDBC code?
+Mocks miss SQL syntax/dialect/runtime behavior issues.
+
+** Q60: Beginner best practice?
+Use JdbcTemplate patterns consistently and keep SQL explicit and safe.
+
+* Intermediate
+
+** Q61: JdbcTemplate vs NamedParameterJdbcTemplate?
+Positional parameters vs named parameters; named improves readability for complex SQL.
+
+** Q62: How pass list to IN clause with named parameters?
+Use named parameter collection support in NamedParameterJdbcTemplate.
+
+** Q63: What is query timeout setting?
+Limit execution time per statement to avoid hanging queries.
+
+** Q64: How set fetch size in Spring JDBC?
+Via PreparedStatement customization or template/query settings.
+
+** Q65: What is fetch size?
+Hint controlling rows fetched per round trip from DB cursor.
+
+** Q66: Why tune fetch size?
+Balance memory usage and network round trips for large reads.
+
+** Q67: What is maxRows?
+Limit max number of rows returned by statement.
+
+** Q68: What is skipResultsProcessing use case?
+Optimizations in specific stored procedure patterns.
+
+** Q69: What is batch size tuning?
+Choosing chunk size for batchUpdate operations based on DB/driver behavior.
+
+** Q70: Why too-large batch can hurt?
+Memory pressure, lock duration, packet limits, rollback cost.
+
+** Q71: What is PreparedStatementCreator?
+Callback creating prepared statement with custom options.
+
+** Q72: When use PreparedStatementCreator?
+Need generated keys, special statement flags, or fine-grained control.
+
+** Q73: What is BatchPreparedStatementSetter?
+Sets parameters for each batch item by index.
+
+** Q74: What is ParameterizedPreparedStatementSetter?
+Type-safe setter for collection-driven batching.
+
+** Q75: What is interruptible batch setter?
+Allows early termination before full declared batch size.
+
+** Q76: What is lob handling in Spring JDBC?
+Using LobHandler/LobCreator or standard streams for BLOB/CLOB operations.
+
+** Q77: Why stream large LOBs?
+Avoid loading huge payloads fully into memory.
+
+** Q78: What is SqlRowSet?
+Disconnected, wrapper-style row set alternative to ResultSet in some use cases.
+
+** Q79: What is MappingSqlQuery?
+Object-style reusable query abstraction (classic Spring JDBC style).
+
+** Q80: What is SqlUpdate helper?
+Reusable update operation abstraction.
+
+** Q81: What is StoredProcedure class abstraction?
+OO wrapper for stored procedure calls (legacy/classic style).
+
+** Q82: What is transaction propagation?
+How nested transactional methods join/suspend/create transactions.
+
+** Q83: REQUIRED propagation meaning?
+Join existing transaction or create new one.
+
+** Q84: REQUIRES_NEW meaning?
+Always start new transaction and suspend existing one.
+
+** Q85: NESTED meaning with JDBC manager?
+Uses savepoints when supported.
+
+** Q86: What is savepoint?
+Partial rollback marker inside transaction.
+
+** Q87: What is isolation level?
+Controls visibility anomalies between concurrent transactions.
+
+** Q88: Common isolation levels?
+READ_UNCOMMITTED, READ_COMMITTED, REPEATABLE_READ, SERIALIZABLE.
+
+** Q89: Why isolation matters in JDBC apps?
+Affects consistency, locking behavior, and concurrency throughput.
+
+** Q90: What is deadlock?
+Transactions cyclically waiting on each other’s locks.
+
+** Q91: How handle deadlocks in service layer?
+Rollback and retry idempotent operations with backoff.
+
+** Q92: What is optimistic locking with Spring JDBC?
+Version column check in UPDATE WHERE clause.
+
+** Q93: Example optimistic update pattern?
+UPDATE ..: SET version=version+1 ... WHERE id=? AND version=?.
+
+** Q94: How detect optimistic lock failure?
+Affected row count is 0 when expected 1.
+
+** Q95: What is pessimistic locking in SQL?
+Row-level locking via statements like SELECT ..: FOR UPDATE.
+
+** Q96: When use pessimistic locks?
+High-contention critical sections requiring strict serialization.
+
+** Q97: What is pagination SQL pattern?
+LIMIT/OFFSET (or DB equivalent) with stable ORDER BY.
+
+** Q98: Offset pagination drawback?
+Gets slower for deep pages on large datasets.
+
+** Q99: What is keyset pagination?
+Paging via last-seen key for better large-offset performance.
+
+** Q100: How map one-to-many results efficiently in JDBC?
+Single join query + ResultSetExtractor assembling parent-child graph.
+
+** Q101: Why can ORMs be avoided in some modules?
+Need precise SQL control and predictable performance.
+
+** Q102: What is duplicate row inflation from joins?
+Parent data repeated per child row; requires aggregation in mapper.
+
+** Q103: What is DataClassRowMapper (modern Spring)?
+Mapper for constructor-based classes/records where supported.
+
+** Q104: Why explicit mappers are often preferred?
+Compile-time visibility of mapping logic and safer refactoring.
+
+** Q105: What is SQLState class 23 often indicates?
+Constraint violations (unique/foreign key/etc.).
+
+** Q106: How categorize DataAccessException types?
+Transient, recoverable, non-transient patterns in Spring hierarchy.
+
+** Q107: What is CannotGetJdbcConnectionException?
+Failure obtaining DB connection from DataSource/pool.
+
+** Q108: What is DuplicateKeyException?
+Insert/update violates unique constraint/key rule.
+
+** Q109: What is EmptyResultDataAccessException?
+Expected single row but none found.
+
+** Q110: What is IncorrectResultSizeDataAccessException?
+Expected one size but actual row count differs.
+
+** Q111: Why centralize exception mapping to domain errors?
+Cleaner service APIs and consistent error semantics.
+
+** Q112: What is read-only transaction hint?
+Signals operation should not modify data (optimization/policy dependent).
+
+** Q113: Can read-only guarantee no writes always?
+Not universally; enforcement depends on DB/driver/permissions.
+
+** Q114: What is statement caching?
+Reusing prepared statements (driver/pool dependent) to reduce parse overhead.
+
+** Q115: How does pool sizing affect JDBC throughput?
+Too small causes waits; too large increases DB contention.
+
+** Q116: Which pool metrics are essential?
+Active, idle, pending, acquisition time, timeout count, max lifetime events.
+
+** Q117: What is connection leak?
+Connection borrowed but not returned/closed properly.
+
+** Q118: How detect leaks?
+Pool leak detection thresholds and timeout/stack diagnostics.
+
+** Q119: What is intermediate anti-pattern in Spring JDBC?
+Mixing SQL, mapping, and business rules in one giant method.
+
+** Q120: Better design alternative?
+Repository methods + dedicated mappers + service orchestration.
+
+** Q121: What is SQL template organization strategy?
+Group by aggregate/use case with clear naming.
+
+** Q122: Should repositories return entities or DTOs?
+Depends on architecture; often return domain objects/internal DTOs, not transport models.
+
+** Q123: What is testcontainers value for Spring JDBC?
+Real database behavior in tests with reproducible environments.
+
+** Q124: Why verify query plans in critical paths?
+Correct SQL can still be slow with poor indexing/plans.
+
+** Q125: Intermediate best practice?
+Treat SQL as first-class code: reviewed, tested, profiled, observable.
+
+* Advanced
+
+** Q126: What is advanced retry strategy for JDBC operations?
+Retry only transient/idempotent failures with bounded exponential backoff + jitter.
+
+** Q127: Why avoid retrying all SQL exceptions?
+Non-transient errors won’t succeed and retries increase load.
+
+** Q128: What is retry storm in DB outages?
+Mass simultaneous retries overwhelm recovering database.
+
+** Q129: How prevent retry storms?
+Jitter, circuit breakers, retry budgets, backpressure.
+
+** Q130: What is circuit breaker role with JDBC?
+Fail fast when DB unhealthy to protect app threads/resources.
+
+** Q131: What is bulkhead pattern for DB access?
+Isolate DB-bound thread pools and workloads.
+
+** Q132: Why separate critical and noncritical DB workloads?
+Prevents low-priority load from starving critical operations.
+
+** Q133: What is outbox pattern with Spring JDBC?
+Write business change + outbox event row in same local transaction.
+
+** Q134: Why outbox with JDBC is straightforward?
+Explicit SQL + single transaction boundary gives clear consistency guarantees.
+
+** Q135: What is transactional messaging pitfall without outbox?
+DB commit succeeds but message publish fails (or vice versa).
+
+** Q136: What is exactly-once myth in distributed systems?
+Usually achieved via at-least-once + idempotency, not true global exactly-once.
+
+** Q137: How enforce idempotent writes in SQL?
+Unique business keys/upsert patterns/idempotency tables.
+
+** Q138: What is upsert?
+Insert-or-update operation using DB-specific syntax/merge semantics.
+
+** Q139: Upsert caveat?
+Vendor-specific syntax and concurrency semantics vary.
+
+** Q140: What is read/write splitting concern?
+Replica lag can cause stale reads after writes.
+
+** Q141: How handle read-after-write consistency?
+Route critical reads to primary or use consistency window/stickiness.
+
+** Q142: What is transaction boundary anti-pattern?
+Long transactions including remote API calls.
+
+** Q143: Why avoid remote calls inside DB transactions?
+Locks/resources held too long, raising contention and failure impact.
+
+** Q144: What is lock escalation/contended lock impact?
+Reduced concurrency and potential system-wide slowdown.
+
+** Q145: What is advanced batching pattern for huge imports?
+Chunked batches + periodic commit + checkpointing for restartability.
+
+** Q146: Why periodic commits in import jobs?
+Limit rollback scope and transaction log growth.
+
+** Q147: What is checkpointing in ETL jobs?
+Persist progress offsets to resume safely after failure.
+
+** Q148: What is schema evolution strategy for JDBC-heavy systems?
+Backward-compatible phased migrations with dual-read/write where needed.
+
+** Q149: Expand-contract migration pattern?
+Add new schema, migrate traffic/data, then remove old schema later.
+
+** Q150: What is SQL observability baseline?
+Per-query latency, rows read/written, error tags, timeout/deadlock counts.
+
+** Q151: Why log SQL templates not raw concatenated SQL?
+Security + better aggregation in monitoring systems.
+
+** Q152: How handle sensitive parameter logging?
+Mask/redact/tokenize PII/secrets before output.
+
+** Q153: What is cardinality issue in DB metrics?
+Too many unique labels (raw SQL/IDs) can overload metrics backend.
+
+** Q154: How reduce metric cardinality?
+Normalize query names and use bounded label sets.
+
+** Q155: What is connection maxLifetime tuning principle?
+Set below DB/network idle termination thresholds.
+
+** Q156: What is idleTimeout tuning concern?
+Too low causes churn; too high may keep stale/unneeded connections.
+
+** Q157: What is keepalive/validation query purpose?
+Ensure borrowed connections are healthy before use.
+
+** Q158: What is fail-fast startup for DB connectivity?
+Validate schema/connectivity at boot for critical services.
+
+** Q159: When avoid fail-fast on DB at startup?
+If service can operate partially without DB and has graceful degradation plan.
+
+** Q160: What is multi-tenant JDBC strategy?
+Tenant isolation via schema/database/row discriminator with strict routing rules.
+
+** Q161: Multi-tenant risk in JDBC layer?
+Cross-tenant data leakage from missing tenant predicates/routing bugs.
+
+** Q162: How enforce tenant safety?
+Centralized query builders/guards and mandatory tenant context tests.
+
+** Q163: What is advanced testing pyramid for Spring JDBC?
+Unit (small), repository integration, migration tests, load/perf and failure-injection tests.
+
+** Q164: Why include failure-injection tests?
+Validate timeout, deadlock, pool exhaustion, and retry behavior.
+
+** Q165: What is chaos scenario for JDBC services?
+DB latency spikes, connection drops, replica lag, failover events.
+
+** Q166: What is biggest advanced Spring JDBC anti-pattern?
+Ignoring DB fundamentals while assuming template abstraction solves performance/consistency.
+
+** Q167: What is mature SQL ownership model?
+Application teams co-own query quality, indexes, and migration safety.
+
+** Q168: When choose Spring JDBC over JPA for critical modules?
+When explicit SQL control, predictability, and performance transparency are priorities.
+
+** Q169: What is long-term maintainability principle?
+Keep SQL explicit, modular, tested, and documented with domain intent.
+
+** Q170: What is final architecture rule for Spring JDBC?
+Use thin repositories and explicit transactional services aligned to business invariants.
+
+** Q171: What is final performance principle?
+Measure end-to-end: app threads, pool behavior, query plans, and DB locks.
+
+** Q172: What is final resilience principle?
+Combine timeouts, bounded retries, bulkheads, and graceful degradation.
+
+** Q173: What is final security principle?
+Least-privilege DB access, strict input binding, and zero secret leakage in logs.
+
+** Q174: What is final delivery principle?
+Ship schema and code changes in compatible phases with rollback strategy.
+
+** Q175: Final maturity principle?
+Spring JDBC excels when teams treat SQL and transactions as core architecture, not plumbing.
+
+-----
+
+#+INCLUDE: "../footer.org"

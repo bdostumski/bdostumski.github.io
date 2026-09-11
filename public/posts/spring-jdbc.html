@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spring JDBC</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Spring JDBC</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-orgc9a1d37" class="outline-2">
+<h2 id="orgc9a1d37">Spring JDBC</h2>
+<div class="outline-text-2" id="text-orgc9a1d37">
+<hr>
+</div>
+</div>
+<div id="outline-container-orgb4ec112" class="outline-2">
+<h2 id="orgb4ec112">Beginner</h2>
+<div class="outline-text-2" id="text-orgb4ec112">
+</div>
+<div id="outline-container-orgb9accf7" class="outline-3">
+<h3 id="orgb9accf7">Q1: What is Spring JDBC?</h3>
+<div class="outline-text-3" id="text-orgb9accf7">
+<p>
+Spring JDBC is a module that simplifies JDBC-based data access by reducing boilerplate code.
+</p>
+</div>
+</div>
+<div id="outline-container-org750ff25" class="outline-3">
+<h3 id="org750ff25">Q2: Why use Spring JDBC over plain JDBC?</h3>
+<div class="outline-text-3" id="text-org750ff25">
+<p>
+It handles repetitive tasks like resource management and exception translation.
+</p>
+</div>
+</div>
+<div id="outline-container-org3a04aaf" class="outline-3">
+<h3 id="org3a04aaf">Q3: What is JdbcTemplate?</h3>
+<div class="outline-text-3" id="text-org3a04aaf">
+<p>
+Core Spring class for executing SQL queries/updates with callback-based result handling.
+</p>
+</div>
+</div>
+<div id="outline-container-org68a2aa5" class="outline-3">
+<h3 id="org68a2aa5">Q4: What problem does JdbcTemplate solve?</h3>
+<div class="outline-text-3" id="text-org68a2aa5">
+<p>
+Eliminates manual connection/statement/result-set lifecycle code.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e1fc99" class="outline-3">
+<h3 id="org9e1fc99">Q5: What is NamedParameterJdbcTemplate?</h3>
+<div class="outline-text-3" id="text-org9e1fc99">
+<p>
+JdbcTemplate variant supporting named SQL parameters instead of positional placeholders only.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a5c4f9" class="outline-3">
+<h3 id="org8a5c4f9">Q6: Why use named parameters?</h3>
+<div class="outline-text-3" id="text-org8a5c4f9">
+<p>
+Improves readability and reduces parameter index mistakes.
+</p>
+</div>
+</div>
+<div id="outline-container-org4dc06b5" class="outline-3">
+<h3 id="org4dc06b5">Q7: What is DataSource in Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org4dc06b5">
+<p>
+Factory for database connections, typically backed by a connection pool.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a6a7dc" class="outline-3">
+<h3 id="org5a6a7dc">Q8: Is DriverManager commonly used directly in Spring apps?</h3>
+<div class="outline-text-3" id="text-org5a6a7dc">
+<p>
+Usually no; DataSource abstraction is preferred.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf33d49f" class="outline-3">
+<h3 id="orgf33d49f">Q9: What is connection pooling?</h3>
+<div class="outline-text-3" id="text-orgf33d49f">
+<p>
+Reusing DB connections to improve performance and scalability.
+</p>
+</div>
+</div>
+<div id="outline-container-org16b19c8" class="outline-3">
+<h3 id="org16b19c8">Q10: Typical default pool in Spring Boot?</h3>
+<div class="outline-text-3" id="text-org16b19c8">
+<p>
+HikariCP.
+</p>
+</div>
+</div>
+<div id="outline-container-org305e5ff" class="outline-3">
+<h3 id="org305e5ff">Q11: What is RowMapper?</h3>
+<div class="outline-text-3" id="text-org305e5ff">
+<p>
+Strategy interface mapping one ResultSet row to one object.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d312fc" class="outline-3">
+<h3 id="org1d312fc">Q12: What is ResultSetExtractor?</h3>
+<div class="outline-text-3" id="text-org1d312fc">
+<p>
+Strategy interface for extracting complex results from entire ResultSet.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc3c9c36" class="outline-3">
+<h3 id="orgc3c9c36">Q13: What is RowCallbackHandler?</h3>
+<div class="outline-text-3" id="text-orgc3c9c36">
+<p>
+Callback processing each row without building a full list in memory.
+</p>
+</div>
+</div>
+<div id="outline-container-org48acbbd" class="outline-3">
+<h3 id="org48acbbd">Q14: When use RowMapper?</h3>
+<div class="outline-text-3" id="text-org48acbbd">
+<p>
+Standard one-row-to-one-object list mapping.
+</p>
+</div>
+</div>
+<div id="outline-container-org6984fdf" class="outline-3">
+<h3 id="org6984fdf">Q15: When use ResultSetExtractor?</h3>
+<div class="outline-text-3" id="text-org6984fdf">
+<p>
+Complex aggregations/hierarchical mappings across many rows.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b19d5a" class="outline-3">
+<h3 id="org9b19d5a">Q16: What is SQLExceptionTranslator?</h3>
+<div class="outline-text-3" id="text-org9b19d5a">
+<p>
+Converts vendor SQL exceptions into Spring’s data access exception hierarchy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfbdaf74" class="outline-3">
+<h3 id="orgfbdaf74">Q17: Why is exception translation useful?</h3>
+<div class="outline-text-3" id="text-orgfbdaf74">
+<p>
+Enables consistent, vendor-neutral exception handling.
+</p>
+</div>
+</div>
+<div id="outline-container-org36bf65d" class="outline-3">
+<h3 id="org36bf65d">Q18: What is DataAccessException?</h3>
+<div class="outline-text-3" id="text-org36bf65d">
+<p>
+Root runtime exception for Spring data access errors.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe74ded" class="outline-3">
+<h3 id="orgfe74ded">Q19: What is queryForObject?</h3>
+<div class="outline-text-3" id="text-orgfe74ded">
+<p>
+Returns single mapped object/value from query expecting one row.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c858a4" class="outline-3">
+<h3 id="org9c858a4">Q20: What happens if queryForObject finds no rows?</h3>
+<div class="outline-text-3" id="text-org9c858a4">
+<p>
+Throws EmptyResultDataAccessException (unless handled differently).
+</p>
+</div>
+</div>
+<div id="outline-container-orge8c8e99" class="outline-3">
+<h3 id="orge8c8e99">Q21: What is query?</h3>
+<div class="outline-text-3" id="text-orge8c8e99">
+<p>
+Executes SELECT and maps multiple rows via callback/mapper.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb4d3d55" class="outline-3">
+<h3 id="orgb4d3d55">Q22: What is update?</h3>
+<div class="outline-text-3" id="text-orgb4d3d55">
+<p>
+Executes INSERT/UPDATE/DELETE and returns affected row count.
+</p>
+</div>
+</div>
+<div id="outline-container-org08e0905" class="outline-3">
+<h3 id="org08e0905">Q23: What is batchUpdate?</h3>
+<div class="outline-text-3" id="text-org08e0905">
+<p>
+Executes multiple updates in batch for better throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-org55751f6" class="outline-3">
+<h3 id="org55751f6">Q24: What is PreparedStatementSetter?</h3>
+<div class="outline-text-3" id="text-org55751f6">
+<p>
+Callback to set statement parameters safely.
+</p>
+</div>
+</div>
+<div id="outline-container-org034251f" class="outline-3">
+<h3 id="org034251f">Q25: Why avoid SQL string concatenation?</h3>
+<div class="outline-text-3" id="text-org034251f">
+<p>
+Prevents SQL injection and improves correctness.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcfe3f89" class="outline-3">
+<h3 id="orgcfe3f89">Q26: How does JdbcTemplate help prevent SQL injection?</h3>
+<div class="outline-text-3" id="text-orgcfe3f89">
+<p>
+Promotes prepared statements with bound parameters.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbbda43c" class="outline-3">
+<h3 id="orgbbda43c">Q27: What is BeanPropertyRowMapper?</h3>
+<div class="outline-text-3" id="text-orgbbda43c">
+<p>
+RowMapper implementation mapping columns to bean properties by naming conventions.
+</p>
+</div>
+</div>
+<div id="outline-container-org8f8f0d5" class="outline-3">
+<h3 id="org8f8f0d5">Q28: BeanPropertyRowMapper tradeoff?</h3>
+<div class="outline-text-3" id="text-org8f8f0d5">
+<p>
+Convenient but may be slower/less explicit than custom mappers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgba82b16" class="outline-3">
+<h3 id="orgba82b16">Q29: What is SingleColumnRowMapper?</h3>
+<div class="outline-text-3" id="text-orgba82b16">
+<p>
+Maps one-column result rows to simple types.
+</p>
+</div>
+</div>
+<div id="outline-container-org17dfd46" class="outline-3">
+<h3 id="org17dfd46">Q30: What is MapSqlParameterSource?</h3>
+<div class="outline-text-3" id="text-org17dfd46">
+<p>
+Container for named SQL parameters with values/types.
+</p>
+</div>
+</div>
+<div id="outline-container-org33de48b" class="outline-3">
+<h3 id="org33de48b">Q31: What is SqlParameterSource?</h3>
+<div class="outline-text-3" id="text-org33de48b">
+<p>
+Abstraction for named parameter binding.
+</p>
+</div>
+</div>
+<div id="outline-container-org462539f" class="outline-3">
+<h3 id="org462539f">Q32: What is GeneratedKeyHolder?</h3>
+<div class="outline-text-3" id="text-org462539f">
+<p>
+Captures auto-generated keys from insert operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orge69be0d" class="outline-3">
+<h3 id="orge69be0d">Q33: How retrieve generated keys with Spring JDBC?</h3>
+<div class="outline-text-3" id="text-orge69be0d">
+<p>
+Use update with PreparedStatementCreator + KeyHolder.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfca6b0e" class="outline-3">
+<h3 id="orgfca6b0e">Q34: What is SimpleJdbcInsert?</h3>
+<div class="outline-text-3" id="text-orgfca6b0e">
+<p>
+Helper for insert operations using table metadata and less boilerplate.
+</p>
+</div>
+</div>
+<div id="outline-container-org495bda6" class="outline-3">
+<h3 id="org495bda6">Q35: What is SimpleJdbcCall?</h3>
+<div class="outline-text-3" id="text-org495bda6">
+<p>
+Helper abstraction for calling stored procedures/functions.
+</p>
+</div>
+</div>
+<div id="outline-container-org77a251b" class="outline-3">
+<h3 id="org77a251b">Q36: Is JdbcTemplate thread-safe?</h3>
+<div class="outline-text-3" id="text-org77a251b">
+<p>
+Yes, designed for shared use after configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce8df5e" class="outline-3">
+<h3 id="orgce8df5e">Q37: Is RowMapper thread-safe?</h3>
+<div class="outline-text-3" id="text-orgce8df5e">
+<p>
+Usually stateless implementations are; avoid mutable shared state.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc41e627" class="outline-3">
+<h3 id="orgc41e627">Q38: What is SQL type binding?</h3>
+<div class="outline-text-3" id="text-orgc41e627">
+<p>
+Setting correct JDBC/SQL types for parameters.
+</p>
+</div>
+</div>
+<div id="outline-container-org786ed05" class="outline-3">
+<h3 id="org786ed05">Q39: Why does null binding need care?</h3>
+<div class="outline-text-3" id="text-org786ed05">
+<p>
+DB may need explicit SQL type for null values.
+</p>
+</div>
+</div>
+<div id="outline-container-org604a1e3" class="outline-3">
+<h3 id="org604a1e3">Q40: What is transaction in DB context?</h3>
+<div class="outline-text-3" id="text-org604a1e3">
+<p>
+Atomic unit of work with commit/rollback semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0bdcef" class="outline-3">
+<h3 id="orgf0bdcef">Q41: Does JdbcTemplate auto-manage transactions?</h3>
+<div class="outline-text-3" id="text-orgf0bdcef">
+<p>
+It participates in Spring-managed transactions when configured.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd6a4845" class="outline-3">
+<h3 id="orgd6a4845">Q42: What is @Transactional with Spring JDBC?</h3>
+<div class="outline-text-3" id="text-orgd6a4845">
+<p>
+Declarative transaction boundary around service/repository methods.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e1b7cf" class="outline-3">
+<h3 id="org1e1b7cf">Q43: Default rollback behavior in Spring transactions?</h3>
+<div class="outline-text-3" id="text-org1e1b7cf">
+<p>
+Rollback on unchecked exceptions by default.
+</p>
+</div>
+</div>
+<div id="outline-container-org0ec20d8" class="outline-3">
+<h3 id="org0ec20d8">Q44: What is PlatformTransactionManager for JDBC?</h3>
+<div class="outline-text-3" id="text-org0ec20d8">
+<p>
+Usually DataSourceTransactionManager.
+</p>
+</div>
+</div>
+<div id="outline-container-org0fc2105" class="outline-3">
+<h3 id="org0fc2105">Q45: What is DataSourceTransactionManager?</h3>
+<div class="outline-text-3" id="text-org0fc2105">
+<p>
+Spring transaction manager for single JDBC DataSource.
+</p>
+</div>
+</div>
+<div id="outline-container-org019d9a0" class="outline-3">
+<h3 id="org019d9a0">Q46: What is auto-commit?</h3>
+<div class="outline-text-3" id="text-org019d9a0">
+<p>
+Mode where each statement commits immediately unless transaction management disables it.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd301496" class="outline-3">
+<h3 id="orgd301496">Q47: Should business logic live in repository classes?</h3>
+<div class="outline-text-3" id="text-orgd301496">
+<p>
+Prefer no; keep repositories focused on data access.
+</p>
+</div>
+</div>
+<div id="outline-container-org5390906" class="outline-3">
+<h3 id="org5390906">Q48: What is DAO pattern?</h3>
+<div class="outline-text-3" id="text-org5390906">
+<p>
+Data Access Object encapsulates persistence operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb80df41" class="outline-3">
+<h3 id="orgb80df41">Q49: What is repository layering benefit?</h3>
+<div class="outline-text-3" id="text-orgb80df41">
+<p>
+Separation of concerns and testability.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf469c5c" class="outline-3">
+<h3 id="orgf469c5c">Q50: What is SQL script initialization in Spring?</h3>
+<div class="outline-text-3" id="text-orgf469c5c">
+<p>
+Executing schema/data scripts at startup in some configurations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5d8a9d" class="outline-3">
+<h3 id="orgc5d8a9d">Q51: What is JdbcOperations?</h3>
+<div class="outline-text-3" id="text-orgc5d8a9d">
+<p>
+Interface implemented by JdbcTemplate for easier mocking/abstraction.
+</p>
+</div>
+</div>
+<div id="outline-container-org67c140e" class="outline-3">
+<h3 id="org67c140e">Q52: What is NamedParameterJdbcOperations?</h3>
+<div class="outline-text-3" id="text-org67c140e">
+<p>
+Interface for named parameter JDBC operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e1eb4c" class="outline-3">
+<h3 id="org0e1eb4c">Q53: What is common beginner mistake in Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org0e1eb4c">
+<p>
+Using queryForObject where zero/many rows are possible.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc977d77" class="outline-3">
+<h3 id="orgc977d77">Q54: Another beginner mistake?</h3>
+<div class="outline-text-3" id="text-orgc977d77">
+<p>
+Selecting * and loading huge datasets without pagination.
+</p>
+</div>
+</div>
+<div id="outline-container-org4fe03b4" class="outline-3">
+<h3 id="org4fe03b4">Q55: What is logging best practice for SQL errors?</h3>
+<div class="outline-text-3" id="text-org4fe03b4">
+<p>
+Log SQL template + SQLState/error category, redact sensitive params.
+</p>
+</div>
+</div>
+<div id="outline-container-org55f6a57" class="outline-3">
+<h3 id="org55f6a57">Q56: Should credentials appear in logs?</h3>
+<div class="outline-text-3" id="text-org55f6a57">
+<p>
+Never.
+</p>
+</div>
+</div>
+<div id="outline-container-org40aa9ec" class="outline-3">
+<h3 id="org40aa9ec">Q57: Why keep SQL in constants/files clearly?</h3>
+<div class="outline-text-3" id="text-org40aa9ec">
+<p>
+Improves readability, reuse, and maintainability.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d6cde4" class="outline-3">
+<h3 id="org7d6cde4">Q58: What is beginner testing approach for Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org7d6cde4">
+<p>
+Repository integration tests against real/test DB.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcc36ba3" class="outline-3">
+<h3 id="orgcc36ba3">Q59: Why not rely only on mocks for JDBC code?</h3>
+<div class="outline-text-3" id="text-orgcc36ba3">
+<p>
+Mocks miss SQL syntax/dialect/runtime behavior issues.
+</p>
+</div>
+</div>
+<div id="outline-container-org35dec24" class="outline-3">
+<h3 id="org35dec24">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org35dec24">
+<p>
+Use JdbcTemplate patterns consistently and keep SQL explicit and safe.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbde0490" class="outline-2">
+<h2 id="orgbde0490">Intermediate</h2>
+<div class="outline-text-2" id="text-orgbde0490">
+</div>
+<div id="outline-container-orgbf03e32" class="outline-3">
+<h3 id="orgbf03e32">Q61: JdbcTemplate vs NamedParameterJdbcTemplate?</h3>
+<div class="outline-text-3" id="text-orgbf03e32">
+<p>
+Positional parameters vs named parameters; named improves readability for complex SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-org70d4db7" class="outline-3">
+<h3 id="org70d4db7">Q62: How pass list to IN clause with named parameters?</h3>
+<div class="outline-text-3" id="text-org70d4db7">
+<p>
+Use named parameter collection support in NamedParameterJdbcTemplate.
+</p>
+</div>
+</div>
+<div id="outline-container-org5862a0f" class="outline-3">
+<h3 id="org5862a0f">Q63: What is query timeout setting?</h3>
+<div class="outline-text-3" id="text-org5862a0f">
+<p>
+Limit execution time per statement to avoid hanging queries.
+</p>
+</div>
+</div>
+<div id="outline-container-org485c161" class="outline-3">
+<h3 id="org485c161">Q64: How set fetch size in Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org485c161">
+<p>
+Via PreparedStatement customization or template/query settings.
+</p>
+</div>
+</div>
+<div id="outline-container-org99075d9" class="outline-3">
+<h3 id="org99075d9">Q65: What is fetch size?</h3>
+<div class="outline-text-3" id="text-org99075d9">
+<p>
+Hint controlling rows fetched per round trip from DB cursor.
+</p>
+</div>
+</div>
+<div id="outline-container-org1b7a141" class="outline-3">
+<h3 id="org1b7a141">Q66: Why tune fetch size?</h3>
+<div class="outline-text-3" id="text-org1b7a141">
+<p>
+Balance memory usage and network round trips for large reads.
+</p>
+</div>
+</div>
+<div id="outline-container-org8537311" class="outline-3">
+<h3 id="org8537311">Q67: What is maxRows?</h3>
+<div class="outline-text-3" id="text-org8537311">
+<p>
+Limit max number of rows returned by statement.
+</p>
+</div>
+</div>
+<div id="outline-container-org90b96ea" class="outline-3">
+<h3 id="org90b96ea">Q68: What is skipResultsProcessing use case?</h3>
+<div class="outline-text-3" id="text-org90b96ea">
+<p>
+Optimizations in specific stored procedure patterns.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf2b7f67" class="outline-3">
+<h3 id="orgf2b7f67">Q69: What is batch size tuning?</h3>
+<div class="outline-text-3" id="text-orgf2b7f67">
+<p>
+Choosing chunk size for batchUpdate operations based on DB/driver behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd792f8a" class="outline-3">
+<h3 id="orgd792f8a">Q70: Why too-large batch can hurt?</h3>
+<div class="outline-text-3" id="text-orgd792f8a">
+<p>
+Memory pressure, lock duration, packet limits, rollback cost.
+</p>
+</div>
+</div>
+<div id="outline-container-org756cd64" class="outline-3">
+<h3 id="org756cd64">Q71: What is PreparedStatementCreator?</h3>
+<div class="outline-text-3" id="text-org756cd64">
+<p>
+Callback creating prepared statement with custom options.
+</p>
+</div>
+</div>
+<div id="outline-container-org2fe1d7b" class="outline-3">
+<h3 id="org2fe1d7b">Q72: When use PreparedStatementCreator?</h3>
+<div class="outline-text-3" id="text-org2fe1d7b">
+<p>
+Need generated keys, special statement flags, or fine-grained control.
+</p>
+</div>
+</div>
+<div id="outline-container-org4a6abb0" class="outline-3">
+<h3 id="org4a6abb0">Q73: What is BatchPreparedStatementSetter?</h3>
+<div class="outline-text-3" id="text-org4a6abb0">
+<p>
+Sets parameters for each batch item by index.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc148a75" class="outline-3">
+<h3 id="orgc148a75">Q74: What is ParameterizedPreparedStatementSetter?</h3>
+<div class="outline-text-3" id="text-orgc148a75">
+<p>
+Type-safe setter for collection-driven batching.
+</p>
+</div>
+</div>
+<div id="outline-container-org878ed08" class="outline-3">
+<h3 id="org878ed08">Q75: What is interruptible batch setter?</h3>
+<div class="outline-text-3" id="text-org878ed08">
+<p>
+Allows early termination before full declared batch size.
+</p>
+</div>
+</div>
+<div id="outline-container-org210aa69" class="outline-3">
+<h3 id="org210aa69">Q76: What is lob handling in Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org210aa69">
+<p>
+Using LobHandler/LobCreator or standard streams for BLOB/CLOB operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orga821fa7" class="outline-3">
+<h3 id="orga821fa7">Q77: Why stream large LOBs?</h3>
+<div class="outline-text-3" id="text-orga821fa7">
+<p>
+Avoid loading huge payloads fully into memory.
+</p>
+</div>
+</div>
+<div id="outline-container-org52186b3" class="outline-3">
+<h3 id="org52186b3">Q78: What is SqlRowSet?</h3>
+<div class="outline-text-3" id="text-org52186b3">
+<p>
+Disconnected, wrapper-style row set alternative to ResultSet in some use cases.
+</p>
+</div>
+</div>
+<div id="outline-container-org188a446" class="outline-3">
+<h3 id="org188a446">Q79: What is MappingSqlQuery?</h3>
+<div class="outline-text-3" id="text-org188a446">
+<p>
+Object-style reusable query abstraction (classic Spring JDBC style).
+</p>
+</div>
+</div>
+<div id="outline-container-orge7cd7c9" class="outline-3">
+<h3 id="orge7cd7c9">Q80: What is SqlUpdate helper?</h3>
+<div class="outline-text-3" id="text-orge7cd7c9">
+<p>
+Reusable update operation abstraction.
+</p>
+</div>
+</div>
+<div id="outline-container-org8279918" class="outline-3">
+<h3 id="org8279918">Q81: What is StoredProcedure class abstraction?</h3>
+<div class="outline-text-3" id="text-org8279918">
+<p>
+OO wrapper for stored procedure calls (legacy/classic style).
+</p>
+</div>
+</div>
+<div id="outline-container-orgb7c51f8" class="outline-3">
+<h3 id="orgb7c51f8">Q82: What is transaction propagation?</h3>
+<div class="outline-text-3" id="text-orgb7c51f8">
+<p>
+How nested transactional methods join/suspend/create transactions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2f7c8a" class="outline-3">
+<h3 id="orgd2f7c8a">Q83: REQUIRED propagation meaning?</h3>
+<div class="outline-text-3" id="text-orgd2f7c8a">
+<p>
+Join existing transaction or create new one.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc94812" class="outline-3">
+<h3 id="orgfc94812">Q84: REQUIRES<sub>NEW</sub> meaning?</h3>
+<div class="outline-text-3" id="text-orgfc94812">
+<p>
+Always start new transaction and suspend existing one.
+</p>
+</div>
+</div>
+<div id="outline-container-org4592c08" class="outline-3">
+<h3 id="org4592c08">Q85: NESTED meaning with JDBC manager?</h3>
+<div class="outline-text-3" id="text-org4592c08">
+<p>
+Uses savepoints when supported.
+</p>
+</div>
+</div>
+<div id="outline-container-org286c01b" class="outline-3">
+<h3 id="org286c01b">Q86: What is savepoint?</h3>
+<div class="outline-text-3" id="text-org286c01b">
+<p>
+Partial rollback marker inside transaction.
+</p>
+</div>
+</div>
+<div id="outline-container-org8df04e3" class="outline-3">
+<h3 id="org8df04e3">Q87: What is isolation level?</h3>
+<div class="outline-text-3" id="text-org8df04e3">
+<p>
+Controls visibility anomalies between concurrent transactions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9e78ed" class="outline-3">
+<h3 id="orgf9e78ed">Q88: Common isolation levels?</h3>
+<div class="outline-text-3" id="text-orgf9e78ed">
+<p>
+READ<sub>UNCOMMITTED</sub>, READ<sub>COMMITTED</sub>, REPEATABLE<sub>READ</sub>, SERIALIZABLE.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ecce1c" class="outline-3">
+<h3 id="org1ecce1c">Q89: Why isolation matters in JDBC apps?</h3>
+<div class="outline-text-3" id="text-org1ecce1c">
+<p>
+Affects consistency, locking behavior, and concurrency throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-org72e926c" class="outline-3">
+<h3 id="org72e926c">Q90: What is deadlock?</h3>
+<div class="outline-text-3" id="text-org72e926c">
+<p>
+Transactions cyclically waiting on each other’s locks.
+</p>
+</div>
+</div>
+<div id="outline-container-org436a7a1" class="outline-3">
+<h3 id="org436a7a1">Q91: How handle deadlocks in service layer?</h3>
+<div class="outline-text-3" id="text-org436a7a1">
+<p>
+Rollback and retry idempotent operations with backoff.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf070253" class="outline-3">
+<h3 id="orgf070253">Q92: What is optimistic locking with Spring JDBC?</h3>
+<div class="outline-text-3" id="text-orgf070253">
+<p>
+Version column check in UPDATE WHERE clause.
+</p>
+</div>
+</div>
+<div id="outline-container-org24a8ea8" class="outline-3">
+<h3 id="org24a8ea8">Q93: Example optimistic update pattern?</h3>
+<div class="outline-text-3" id="text-org24a8ea8">
+<p>
+UPDATE ..: SET version=version+1 &#x2026; WHERE id=? AND version=?.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc74b2e7" class="outline-3">
+<h3 id="orgc74b2e7">Q94: How detect optimistic lock failure?</h3>
+<div class="outline-text-3" id="text-orgc74b2e7">
+<p>
+Affected row count is 0 when expected 1.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d84238" class="outline-3">
+<h3 id="org2d84238">Q95: What is pessimistic locking in SQL?</h3>
+<div class="outline-text-3" id="text-org2d84238">
+<p>
+Row-level locking via statements like SELECT ..: FOR UPDATE.
+</p>
+</div>
+</div>
+<div id="outline-container-org5495789" class="outline-3">
+<h3 id="org5495789">Q96: When use pessimistic locks?</h3>
+<div class="outline-text-3" id="text-org5495789">
+<p>
+High-contention critical sections requiring strict serialization.
+</p>
+</div>
+</div>
+<div id="outline-container-org2aabb9d" class="outline-3">
+<h3 id="org2aabb9d">Q97: What is pagination SQL pattern?</h3>
+<div class="outline-text-3" id="text-org2aabb9d">
+<p>
+LIMIT/OFFSET (or DB equivalent) with stable ORDER BY.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfec6578" class="outline-3">
+<h3 id="orgfec6578">Q98: Offset pagination drawback?</h3>
+<div class="outline-text-3" id="text-orgfec6578">
+<p>
+Gets slower for deep pages on large datasets.
+</p>
+</div>
+</div>
+<div id="outline-container-org0791cb7" class="outline-3">
+<h3 id="org0791cb7">Q99: What is keyset pagination?</h3>
+<div class="outline-text-3" id="text-org0791cb7">
+<p>
+Paging via last-seen key for better large-offset performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org1203b0f" class="outline-3">
+<h3 id="org1203b0f">Q100: How map one-to-many results efficiently in JDBC?</h3>
+<div class="outline-text-3" id="text-org1203b0f">
+<p>
+Single join query + ResultSetExtractor assembling parent-child graph.
+</p>
+</div>
+</div>
+<div id="outline-container-org284a4d3" class="outline-3">
+<h3 id="org284a4d3">Q101: Why can ORMs be avoided in some modules?</h3>
+<div class="outline-text-3" id="text-org284a4d3">
+<p>
+Need precise SQL control and predictable performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org5ef1727" class="outline-3">
+<h3 id="org5ef1727">Q102: What is duplicate row inflation from joins?</h3>
+<div class="outline-text-3" id="text-org5ef1727">
+<p>
+Parent data repeated per child row; requires aggregation in mapper.
+</p>
+</div>
+</div>
+<div id="outline-container-orge2f4e5c" class="outline-3">
+<h3 id="orge2f4e5c">Q103: What is DataClassRowMapper (modern Spring)?</h3>
+<div class="outline-text-3" id="text-orge2f4e5c">
+<p>
+Mapper for constructor-based classes/records where supported.
+</p>
+</div>
+</div>
+<div id="outline-container-org1814927" class="outline-3">
+<h3 id="org1814927">Q104: Why explicit mappers are often preferred?</h3>
+<div class="outline-text-3" id="text-org1814927">
+<p>
+Compile-time visibility of mapping logic and safer refactoring.
+</p>
+</div>
+</div>
+<div id="outline-container-org459448d" class="outline-3">
+<h3 id="org459448d">Q105: What is SQLState class 23 often indicates?</h3>
+<div class="outline-text-3" id="text-org459448d">
+<p>
+Constraint violations (unique/foreign key/etc.).
+</p>
+</div>
+</div>
+<div id="outline-container-org26b7f2d" class="outline-3">
+<h3 id="org26b7f2d">Q106: How categorize DataAccessException types?</h3>
+<div class="outline-text-3" id="text-org26b7f2d">
+<p>
+Transient, recoverable, non-transient patterns in Spring hierarchy.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fc3500" class="outline-3">
+<h3 id="org1fc3500">Q107: What is CannotGetJdbcConnectionException?</h3>
+<div class="outline-text-3" id="text-org1fc3500">
+<p>
+Failure obtaining DB connection from DataSource/pool.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb04a71b" class="outline-3">
+<h3 id="orgb04a71b">Q108: What is DuplicateKeyException?</h3>
+<div class="outline-text-3" id="text-orgb04a71b">
+<p>
+Insert/update violates unique constraint/key rule.
+</p>
+</div>
+</div>
+<div id="outline-container-org1b1feaf" class="outline-3">
+<h3 id="org1b1feaf">Q109: What is EmptyResultDataAccessException?</h3>
+<div class="outline-text-3" id="text-org1b1feaf">
+<p>
+Expected single row but none found.
+</p>
+</div>
+</div>
+<div id="outline-container-org45f7c16" class="outline-3">
+<h3 id="org45f7c16">Q110: What is IncorrectResultSizeDataAccessException?</h3>
+<div class="outline-text-3" id="text-org45f7c16">
+<p>
+Expected one size but actual row count differs.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd61511e" class="outline-3">
+<h3 id="orgd61511e">Q111: Why centralize exception mapping to domain errors?</h3>
+<div class="outline-text-3" id="text-orgd61511e">
+<p>
+Cleaner service APIs and consistent error semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org6c19167" class="outline-3">
+<h3 id="org6c19167">Q112: What is read-only transaction hint?</h3>
+<div class="outline-text-3" id="text-org6c19167">
+<p>
+Signals operation should not modify data (optimization/policy dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-org38c63d0" class="outline-3">
+<h3 id="org38c63d0">Q113: Can read-only guarantee no writes always?</h3>
+<div class="outline-text-3" id="text-org38c63d0">
+<p>
+Not universally; enforcement depends on DB/driver/permissions.
+</p>
+</div>
+</div>
+<div id="outline-container-org5775cc2" class="outline-3">
+<h3 id="org5775cc2">Q114: What is statement caching?</h3>
+<div class="outline-text-3" id="text-org5775cc2">
+<p>
+Reusing prepared statements (driver/pool dependent) to reduce parse overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-org756072c" class="outline-3">
+<h3 id="org756072c">Q115: How does pool sizing affect JDBC throughput?</h3>
+<div class="outline-text-3" id="text-org756072c">
+<p>
+Too small causes waits; too large increases DB contention.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb73044c" class="outline-3">
+<h3 id="orgb73044c">Q116: Which pool metrics are essential?</h3>
+<div class="outline-text-3" id="text-orgb73044c">
+<p>
+Active, idle, pending, acquisition time, timeout count, max lifetime events.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb5efecd" class="outline-3">
+<h3 id="orgb5efecd">Q117: What is connection leak?</h3>
+<div class="outline-text-3" id="text-orgb5efecd">
+<p>
+Connection borrowed but not returned/closed properly.
+</p>
+</div>
+</div>
+<div id="outline-container-org1284dee" class="outline-3">
+<h3 id="org1284dee">Q118: How detect leaks?</h3>
+<div class="outline-text-3" id="text-org1284dee">
+<p>
+Pool leak detection thresholds and timeout/stack diagnostics.
+</p>
+</div>
+</div>
+<div id="outline-container-org7474ae2" class="outline-3">
+<h3 id="org7474ae2">Q119: What is intermediate anti-pattern in Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org7474ae2">
+<p>
+Mixing SQL, mapping, and business rules in one giant method.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf02efa3" class="outline-3">
+<h3 id="orgf02efa3">Q120: Better design alternative?</h3>
+<div class="outline-text-3" id="text-orgf02efa3">
+<p>
+Repository methods + dedicated mappers + service orchestration.
+</p>
+</div>
+</div>
+<div id="outline-container-org10ac08c" class="outline-3">
+<h3 id="org10ac08c">Q121: What is SQL template organization strategy?</h3>
+<div class="outline-text-3" id="text-org10ac08c">
+<p>
+Group by aggregate/use case with clear naming.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c1eb7a" class="outline-3">
+<h3 id="org0c1eb7a">Q122: Should repositories return entities or DTOs?</h3>
+<div class="outline-text-3" id="text-org0c1eb7a">
+<p>
+Depends on architecture; often return domain objects/internal DTOs, not transport models.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b193a5" class="outline-3">
+<h3 id="org9b193a5">Q123: What is testcontainers value for Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org9b193a5">
+<p>
+Real database behavior in tests with reproducible environments.
+</p>
+</div>
+</div>
+<div id="outline-container-org739f874" class="outline-3">
+<h3 id="org739f874">Q124: Why verify query plans in critical paths?</h3>
+<div class="outline-text-3" id="text-org739f874">
+<p>
+Correct SQL can still be slow with poor indexing/plans.
+</p>
+</div>
+</div>
+<div id="outline-container-org327e6b9" class="outline-3">
+<h3 id="org327e6b9">Q125: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org327e6b9">
+<p>
+Treat SQL as first-class code: reviewed, tested, profiled, observable.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc659105" class="outline-2">
+<h2 id="orgc659105">Advanced</h2>
+<div class="outline-text-2" id="text-orgc659105">
+</div>
+<div id="outline-container-org567a189" class="outline-3">
+<h3 id="org567a189">Q126: What is advanced retry strategy for JDBC operations?</h3>
+<div class="outline-text-3" id="text-org567a189">
+<p>
+Retry only transient/idempotent failures with bounded exponential backoff + jitter.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc406351" class="outline-3">
+<h3 id="orgc406351">Q127: Why avoid retrying all SQL exceptions?</h3>
+<div class="outline-text-3" id="text-orgc406351">
+<p>
+Non-transient errors won’t succeed and retries increase load.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaabc332" class="outline-3">
+<h3 id="orgaabc332">Q128: What is retry storm in DB outages?</h3>
+<div class="outline-text-3" id="text-orgaabc332">
+<p>
+Mass simultaneous retries overwhelm recovering database.
+</p>
+</div>
+</div>
+<div id="outline-container-org890e787" class="outline-3">
+<h3 id="org890e787">Q129: How prevent retry storms?</h3>
+<div class="outline-text-3" id="text-org890e787">
+<p>
+Jitter, circuit breakers, retry budgets, backpressure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcba12d1" class="outline-3">
+<h3 id="orgcba12d1">Q130: What is circuit breaker role with JDBC?</h3>
+<div class="outline-text-3" id="text-orgcba12d1">
+<p>
+Fail fast when DB unhealthy to protect app threads/resources.
+</p>
+</div>
+</div>
+<div id="outline-container-org6837cfb" class="outline-3">
+<h3 id="org6837cfb">Q131: What is bulkhead pattern for DB access?</h3>
+<div class="outline-text-3" id="text-org6837cfb">
+<p>
+Isolate DB-bound thread pools and workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf953216" class="outline-3">
+<h3 id="orgf953216">Q132: Why separate critical and noncritical DB workloads?</h3>
+<div class="outline-text-3" id="text-orgf953216">
+<p>
+Prevents low-priority load from starving critical operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org1289d03" class="outline-3">
+<h3 id="org1289d03">Q133: What is outbox pattern with Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org1289d03">
+<p>
+Write business change + outbox event row in same local transaction.
+</p>
+</div>
+</div>
+<div id="outline-container-orga52ed95" class="outline-3">
+<h3 id="orga52ed95">Q134: Why outbox with JDBC is straightforward?</h3>
+<div class="outline-text-3" id="text-orga52ed95">
+<p>
+Explicit SQL + single transaction boundary gives clear consistency guarantees.
+</p>
+</div>
+</div>
+<div id="outline-container-org76aef3c" class="outline-3">
+<h3 id="org76aef3c">Q135: What is transactional messaging pitfall without outbox?</h3>
+<div class="outline-text-3" id="text-org76aef3c">
+<p>
+DB commit succeeds but message publish fails (or vice versa).
+</p>
+</div>
+</div>
+<div id="outline-container-org494bbbe" class="outline-3">
+<h3 id="org494bbbe">Q136: What is exactly-once myth in distributed systems?</h3>
+<div class="outline-text-3" id="text-org494bbbe">
+<p>
+Usually achieved via at-least-once + idempotency, not true global exactly-once.
+</p>
+</div>
+</div>
+<div id="outline-container-org36d369d" class="outline-3">
+<h3 id="org36d369d">Q137: How enforce idempotent writes in SQL?</h3>
+<div class="outline-text-3" id="text-org36d369d">
+<p>
+Unique business keys/upsert patterns/idempotency tables.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ec7812" class="outline-3">
+<h3 id="org2ec7812">Q138: What is upsert?</h3>
+<div class="outline-text-3" id="text-org2ec7812">
+<p>
+Insert-or-update operation using DB-specific syntax/merge semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org0437502" class="outline-3">
+<h3 id="org0437502">Q139: Upsert caveat?</h3>
+<div class="outline-text-3" id="text-org0437502">
+<p>
+Vendor-specific syntax and concurrency semantics vary.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc6eb298" class="outline-3">
+<h3 id="orgc6eb298">Q140: What is read/write splitting concern?</h3>
+<div class="outline-text-3" id="text-orgc6eb298">
+<p>
+Replica lag can cause stale reads after writes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd32e417" class="outline-3">
+<h3 id="orgd32e417">Q141: How handle read-after-write consistency?</h3>
+<div class="outline-text-3" id="text-orgd32e417">
+<p>
+Route critical reads to primary or use consistency window/stickiness.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf94bb45" class="outline-3">
+<h3 id="orgf94bb45">Q142: What is transaction boundary anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgf94bb45">
+<p>
+Long transactions including remote API calls.
+</p>
+</div>
+</div>
+<div id="outline-container-org52cf3ca" class="outline-3">
+<h3 id="org52cf3ca">Q143: Why avoid remote calls inside DB transactions?</h3>
+<div class="outline-text-3" id="text-org52cf3ca">
+<p>
+Locks/resources held too long, raising contention and failure impact.
+</p>
+</div>
+</div>
+<div id="outline-container-org98a7e52" class="outline-3">
+<h3 id="org98a7e52">Q144: What is lock escalation/contended lock impact?</h3>
+<div class="outline-text-3" id="text-org98a7e52">
+<p>
+Reduced concurrency and potential system-wide slowdown.
+</p>
+</div>
+</div>
+<div id="outline-container-org358388d" class="outline-3">
+<h3 id="org358388d">Q145: What is advanced batching pattern for huge imports?</h3>
+<div class="outline-text-3" id="text-org358388d">
+<p>
+Chunked batches + periodic commit + checkpointing for restartability.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcd1ba0f" class="outline-3">
+<h3 id="orgcd1ba0f">Q146: Why periodic commits in import jobs?</h3>
+<div class="outline-text-3" id="text-orgcd1ba0f">
+<p>
+Limit rollback scope and transaction log growth.
+</p>
+</div>
+</div>
+<div id="outline-container-org49f1cea" class="outline-3">
+<h3 id="org49f1cea">Q147: What is checkpointing in ETL jobs?</h3>
+<div class="outline-text-3" id="text-org49f1cea">
+<p>
+Persist progress offsets to resume safely after failure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb464e00" class="outline-3">
+<h3 id="orgb464e00">Q148: What is schema evolution strategy for JDBC-heavy systems?</h3>
+<div class="outline-text-3" id="text-orgb464e00">
+<p>
+Backward-compatible phased migrations with dual-read/write where needed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgabc6bc3" class="outline-3">
+<h3 id="orgabc6bc3">Q149: Expand-contract migration pattern?</h3>
+<div class="outline-text-3" id="text-orgabc6bc3">
+<p>
+Add new schema, migrate traffic/data, then remove old schema later.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a0f7df" class="outline-3">
+<h3 id="org6a0f7df">Q150: What is SQL observability baseline?</h3>
+<div class="outline-text-3" id="text-org6a0f7df">
+<p>
+Per-query latency, rows read/written, error tags, timeout/deadlock counts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd9d43af" class="outline-3">
+<h3 id="orgd9d43af">Q151: Why log SQL templates not raw concatenated SQL?</h3>
+<div class="outline-text-3" id="text-orgd9d43af">
+<p>
+Security + better aggregation in monitoring systems.
+</p>
+</div>
+</div>
+<div id="outline-container-org02f2192" class="outline-3">
+<h3 id="org02f2192">Q152: How handle sensitive parameter logging?</h3>
+<div class="outline-text-3" id="text-org02f2192">
+<p>
+Mask/redact/tokenize PII/secrets before output.
+</p>
+</div>
+</div>
+<div id="outline-container-org55adba5" class="outline-3">
+<h3 id="org55adba5">Q153: What is cardinality issue in DB metrics?</h3>
+<div class="outline-text-3" id="text-org55adba5">
+<p>
+Too many unique labels (raw SQL/IDs) can overload metrics backend.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfff847e" class="outline-3">
+<h3 id="orgfff847e">Q154: How reduce metric cardinality?</h3>
+<div class="outline-text-3" id="text-orgfff847e">
+<p>
+Normalize query names and use bounded label sets.
+</p>
+</div>
+</div>
+<div id="outline-container-org67a370b" class="outline-3">
+<h3 id="org67a370b">Q155: What is connection maxLifetime tuning principle?</h3>
+<div class="outline-text-3" id="text-org67a370b">
+<p>
+Set below DB/network idle termination thresholds.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd035c10" class="outline-3">
+<h3 id="orgd035c10">Q156: What is idleTimeout tuning concern?</h3>
+<div class="outline-text-3" id="text-orgd035c10">
+<p>
+Too low causes churn; too high may keep stale/unneeded connections.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd050b37" class="outline-3">
+<h3 id="orgd050b37">Q157: What is keepalive/validation query purpose?</h3>
+<div class="outline-text-3" id="text-orgd050b37">
+<p>
+Ensure borrowed connections are healthy before use.
+</p>
+</div>
+</div>
+<div id="outline-container-org4159c6c" class="outline-3">
+<h3 id="org4159c6c">Q158: What is fail-fast startup for DB connectivity?</h3>
+<div class="outline-text-3" id="text-org4159c6c">
+<p>
+Validate schema/connectivity at boot for critical services.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8efe99" class="outline-3">
+<h3 id="orgc8efe99">Q159: When avoid fail-fast on DB at startup?</h3>
+<div class="outline-text-3" id="text-orgc8efe99">
+<p>
+If service can operate partially without DB and has graceful degradation plan.
+</p>
+</div>
+</div>
+<div id="outline-container-org94c8326" class="outline-3">
+<h3 id="org94c8326">Q160: What is multi-tenant JDBC strategy?</h3>
+<div class="outline-text-3" id="text-org94c8326">
+<p>
+Tenant isolation via schema/database/row discriminator with strict routing rules.
+</p>
+</div>
+</div>
+<div id="outline-container-org7a56bf6" class="outline-3">
+<h3 id="org7a56bf6">Q161: Multi-tenant risk in JDBC layer?</h3>
+<div class="outline-text-3" id="text-org7a56bf6">
+<p>
+Cross-tenant data leakage from missing tenant predicates/routing bugs.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d4fd7b" class="outline-3">
+<h3 id="org2d4fd7b">Q162: How enforce tenant safety?</h3>
+<div class="outline-text-3" id="text-org2d4fd7b">
+<p>
+Centralized query builders/guards and mandatory tenant context tests.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1b871e" class="outline-3">
+<h3 id="orgc1b871e">Q163: What is advanced testing pyramid for Spring JDBC?</h3>
+<div class="outline-text-3" id="text-orgc1b871e">
+<p>
+Unit (small), repository integration, migration tests, load/perf and failure-injection tests.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9bd42f" class="outline-3">
+<h3 id="orgf9bd42f">Q164: Why include failure-injection tests?</h3>
+<div class="outline-text-3" id="text-orgf9bd42f">
+<p>
+Validate timeout, deadlock, pool exhaustion, and retry behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orge386cbb" class="outline-3">
+<h3 id="orge386cbb">Q165: What is chaos scenario for JDBC services?</h3>
+<div class="outline-text-3" id="text-orge386cbb">
+<p>
+DB latency spikes, connection drops, replica lag, failover events.
+</p>
+</div>
+</div>
+<div id="outline-container-orga7e0fba" class="outline-3">
+<h3 id="orga7e0fba">Q166: What is biggest advanced Spring JDBC anti-pattern?</h3>
+<div class="outline-text-3" id="text-orga7e0fba">
+<p>
+Ignoring DB fundamentals while assuming template abstraction solves performance/consistency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd79664e" class="outline-3">
+<h3 id="orgd79664e">Q167: What is mature SQL ownership model?</h3>
+<div class="outline-text-3" id="text-orgd79664e">
+<p>
+Application teams co-own query quality, indexes, and migration safety.
+</p>
+</div>
+</div>
+<div id="outline-container-org99a44c7" class="outline-3">
+<h3 id="org99a44c7">Q168: When choose Spring JDBC over JPA for critical modules?</h3>
+<div class="outline-text-3" id="text-org99a44c7">
+<p>
+When explicit SQL control, predictability, and performance transparency are priorities.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdecb6a4" class="outline-3">
+<h3 id="orgdecb6a4">Q169: What is long-term maintainability principle?</h3>
+<div class="outline-text-3" id="text-orgdecb6a4">
+<p>
+Keep SQL explicit, modular, tested, and documented with domain intent.
+</p>
+</div>
+</div>
+<div id="outline-container-org61bd607" class="outline-3">
+<h3 id="org61bd607">Q170: What is final architecture rule for Spring JDBC?</h3>
+<div class="outline-text-3" id="text-org61bd607">
+<p>
+Use thin repositories and explicit transactional services aligned to business invariants.
+</p>
+</div>
+</div>
+<div id="outline-container-org363cce2" class="outline-3">
+<h3 id="org363cce2">Q171: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-org363cce2">
+<p>
+Measure end-to-end: app threads, pool behavior, query plans, and DB locks.
+</p>
+</div>
+</div>
+<div id="outline-container-orge98c8da" class="outline-3">
+<h3 id="orge98c8da">Q172: What is final resilience principle?</h3>
+<div class="outline-text-3" id="text-orge98c8da">
+<p>
+Combine timeouts, bounded retries, bulkheads, and graceful degradation.
+</p>
+</div>
+</div>
+<div id="outline-container-org283ada0" class="outline-3">
+<h3 id="org283ada0">Q173: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org283ada0">
+<p>
+Least-privilege DB access, strict input binding, and zero secret leakage in logs.
+</p>
+</div>
+</div>
+<div id="outline-container-org64f767e" class="outline-3">
+<h3 id="org64f767e">Q174: What is final delivery principle?</h3>
+<div class="outline-text-3" id="text-org64f767e">
+<p>
+Ship schema and code changes in compatible phases with rollback strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-org90803b7" class="outline-3">
+<h3 id="org90803b7">Q175: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org90803b7">
+<p>
+Spring JDBC excels when teams treat SQL and transactions as core architecture, not plumbing.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
