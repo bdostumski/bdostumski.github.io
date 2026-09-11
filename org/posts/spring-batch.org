@@ -1,0 +1,546 @@
+#+title: Spring Batch
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Batch
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Batch?
+Spring Batch is a framework for building robust batch processing applications in Java.
+
+** Q2: What is batch processing?
+Executing large volumes of data tasks without user interaction, typically scheduled/offline.
+
+** Q3: Typical use cases for Spring Batch?
+ETL, file processing, reporting, reconciliation, billing, data migration.
+
+** Q4: What is a Job in Spring Batch?
+Top-level container representing an entire batch process.
+
+** Q5: What is a Step?
+A phase within a job that performs a specific processing task.
+
+** Q6: What is a JobInstance?
+Logical job run identified by job name + identifying JobParameters.
+
+** Q7: What is a JobExecution?
+A single attempt to run a JobInstance.
+
+** Q8: What is a StepExecution?
+Execution metadata for one step attempt within a job execution.
+
+** Q9: What are JobParameters?
+Input parameters used to launch and identify job instances.
+
+** Q10: Why are JobParameters important?
+They control job identity, scheduling semantics, and restart behavior.
+
+** Q11: What is JobLauncher?
+Component used to start jobs programmatically.
+
+** Q12: What is JobRepository?
+Persistent store for batch metadata (executions, statuses, contexts).
+
+** Q13: Why does Spring Batch need metadata tables?
+To track progress, failures, and enable restartability.
+
+** Q14: What is JobExplorer?
+Read-only API to inspect job/step execution metadata.
+
+** Q15: What is JobOperator?
+Higher-level API for starting/stopping/restarting jobs.
+
+** Q16: What is chunk-oriented processing?
+Read-process-write pattern in chunks within transactional boundaries.
+
+** Q17: Main chunk components?
+ItemReader, ItemProcessor, ItemWriter.
+
+** Q18: What does ItemReader do?
+Reads one item at a time from source.
+
+** Q19: What does ItemProcessor do?
+Transforms/validates/filter items between read and write.
+
+** Q20: What does ItemWriter do?
+Writes processed items to target system.
+
+** Q21: What is a chunk size?
+Number of items processed/written per transaction.
+
+** Q22: Why is chunk size important?
+Affects memory usage, throughput, and rollback scope.
+
+** Q23: What is tasklet step?
+A step executing custom logic once (or repeat loop) rather than chunk pipeline.
+
+** Q24: When use tasklet?
+For simple operations: cleanup, file move, trigger task, pre/post checks.
+
+** Q25: What is StepBuilder?
+Builder API to configure step behavior.
+
+** Q26: What is JobBuilder?
+Builder API to define jobs and step flow.
+
+** Q27: What is ExitStatus?
+Step/job outcome status used in flow decisions.
+
+** Q28: What is BatchStatus?
+Execution state lifecycle (STARTING, STARTED, COMPLETED, FAILED, etc.).
+
+** Q29: What is ExecutionContext?
+Persistent key-value state storage for job/step executions.
+
+** Q30: Why ExecutionContext is useful?
+Supports restart from last checkpoint and state sharing.
+
+** Q31: What is checkpoint in Spring Batch?
+Stored progress marker allowing restart near failure point.
+
+** Q32: What is restartability?
+Ability to rerun failed job from saved state rather than from scratch.
+
+** Q33: Can every job be restarted automatically?
+Only if designed/configured for restart and state consistency.
+
+** Q34: What is RunIdIncrementer?
+Utility adding/incrementing run.id parameter to create new instances.
+
+** Q35: Why use unique JobParameters?
+Prevent accidental “job instance already complete” conflicts.
+
+** Q36: What is FlatFileItemReader?
+Reader for line-based flat files (CSV/fixed width, etc.).
+
+** Q37: What is FlatFileItemWriter?
+Writer for flat files with configurable formatting.
+
+** Q38: What is JdbcCursorItemReader?
+Reads DB rows via cursor.
+
+** Q39: What is JdbcPagingItemReader?
+Reads DB rows page by page for scalable large datasets.
+
+** Q40: Cursor vs paging reader basic tradeoff?
+Cursor can hold long connection; paging offers chunked retrieval/control.
+
+** Q41: What is JpaPagingItemReader?
+JPA-based paging reader for entities.
+
+** Q42: What is RepositoryItemReader?
+Reader backed by Spring Data repository methods.
+
+** Q43: What is CompositeItemProcessor?
+Chains multiple processors in sequence.
+
+** Q44: What is CompositeItemWriter?
+Delegates writes to multiple writers.
+
+** Q45: What is filtering in ItemProcessor?
+Returning null to skip writing an item (semantic filtering).
+
+** Q46: What is skip in batch?
+Ignoring specific recoverable item-level failures.
+
+** Q47: What is retry in batch?
+Re-attempting failed item processing/writing for transient errors.
+
+** Q48: What is skip limit?
+Max number of skippable exceptions allowed before step fails.
+
+** Q49: What is retry limit?
+Max retry attempts before treating as failure.
+
+** Q50: What is listener in Spring Batch?
+Hook interface for lifecycle callbacks (job/step/chunk/read/process/write).
+
+** Q51: Why use listeners?
+Auditing, metrics, custom logging, notifications, resource handling.
+
+** Q52: What is JobExecutionListener?
+Callback before/after job execution.
+
+** Q53: What is StepExecutionListener?
+Callback before/after step execution.
+
+** Q54: What is ChunkListener?
+Callbacks around chunk processing boundaries.
+
+** Q55: What is basic transaction role in chunk step?
+Each chunk typically processed in one transaction.
+
+** Q56: What is rollback in chunk processing?
+On failure, current chunk transaction rolls back.
+
+** Q57: What is idempotency in batch?
+Safe reprocessing without duplicate harmful side effects.
+
+** Q58: Beginner batch anti-pattern?
+Putting all logic in one huge step/job without clear boundaries.
+
+** Q59: Beginner monitoring minimum?
+Track job start/end, status, counts, and failure reason.
+
+** Q60: Beginner best practice?
+Design small restartable steps with clear inputs/outputs.
+
+* Intermediate
+
+** Q61: What is job flow control?
+Conditional transitions between steps based on exit status.
+
+** Q62: How branch job flow?
+Use transition rules (on/to) with statuses.
+
+** Q63: What is decider in Spring Batch?
+Custom flow decision component based on runtime state.
+
+** Q64: What is split flow?
+Parallel execution of independent step flows.
+
+** Q65: What is FlowStep?
+Embedding a flow as a single step in a larger job.
+
+** Q66: What is JobStep?
+Launching another job as a step.
+
+** Q67: What is partitioning?
+Splitting one step into multiple parallel partitions over data ranges.
+
+** Q68: What is remote partitioning?
+Manager step distributes partition work to remote workers.
+
+** Q69: What is remote chunking?
+Reader/processor/writer responsibilities distributed via messaging.
+
+** Q70: Partitioning vs multi-threaded step?
+Partitioning splits data domain; multithreaded step parallelizes within one step instance.
+
+** Q71: What is TaskExecutor in Spring Batch?
+Executor enabling asynchronous/multi-threaded step processing.
+
+** Q72: What is throttle limit concept?
+Controls concurrency level for parallel processing.
+
+** Q73: Why concurrency control matters?
+Avoid DB/resource saturation and contention.
+
+** Q74: What is ItemStream?
+Component with open/update/close for stateful checkpointing support.
+
+** Q75: Why implement ItemStream?
+Persist reader/writer state for restartability.
+
+** Q76: What is saveState flag?
+Controls whether reader/writer stores restart state.
+
+** Q77: When disable saveState?
+Stateless/idempotent scenarios or when metadata overhead is unnecessary.
+
+** Q78: What is ExecutionContextPromotionListener?
+Promotes step context values to job context for later steps.
+
+** Q79: What is Late Binding with StepScope?
+Defers bean creation so step/job parameters can be injected at runtime.
+
+** Q80: What is @StepScope?
+Bean scope tied to step execution lifecycle.
+
+** Q81: What is @JobScope?
+Bean scope tied to job execution lifecycle.
+
+** Q82: Why scopes matter in batch?
+Enable parameterized/stateful components per execution.
+
+** Q83: What is faultTolerant() step configuration?
+Enables skip/retry and related fault-handling policies.
+
+** Q84: What is SkipPolicy?
+Custom logic deciding whether exception should be skipped.
+
+** Q85: What is RetryPolicy?
+Custom logic controlling retry eligibility and attempts.
+
+** Q86: What is BackOffPolicy?
+Controls delay strategy between retries.
+
+** Q87: Why use backoff in retries?
+Prevents hammering unstable dependencies.
+
+** Q88: What is noRollback exception configuration?
+Exceptions that should not trigger transaction rollback.
+
+** Q89: Why use noRollback carefully?
+Can compromise consistency if misapplied.
+
+** Q90: What is skip listener?
+Callback when item is skipped during read/process/write.
+
+** Q91: Why record skipped items?
+Auditability and later reconciliation/replay.
+
+** Q92: What is dead-letter handling in batch pipelines?
+Store permanently failed items for later inspection/reprocessing.
+
+** Q93: What is validating processor pattern?
+Validate input and reject/filter invalid items early.
+
+** Q94: What is classifier composite writer?
+Routes items to different writers based on classification logic.
+
+** Q95: What is multi-resource reader?
+Reads from multiple files/resources in sequence.
+
+** Q96: What is resource-aware item?
+Item carrying source resource metadata for diagnostics/routing.
+
+** Q97: What is SynchronizedItemStreamReader?
+Wrapper improving thread safety for non-thread-safe readers.
+
+** Q98: Why many readers are not thread-safe?
+They keep mutable cursor/state internally.
+
+** Q99: What is restart from failed step behavior?
+Only failed/incomplete steps rerun depending job configuration and instance state.
+
+** Q100: What is allowStartIfComplete?
+Allows step rerun even if previously completed.
+
+** Q101: What is startLimit?
+Limits number of times a step can start.
+
+** Q102: Why use startLimit?
+Prevent endless retries on repeatedly failing steps.
+
+** Q103: What is job parameter identifying flag concept?
+Determines whether parameter contributes to JobInstance identity.
+
+** Q104: Why non-identifying parameters?
+Pass runtime hints without creating new logical instance.
+
+** Q105: What is schema of Spring Batch metadata tables?
+Set of BATCH_* tables storing job/step execution info and contexts.
+
+** Q106: Can metadata DB be shared by multiple apps?
+Yes, with proper naming/prefix/management strategy.
+
+** Q107: What is table prefix customization?
+Changing default BATCH_ prefix for metadata tables.
+
+** Q108: What is isolation-level-for-create setting?
+Controls transaction isolation when creating job execution records.
+
+** Q109: Why can job launching race occur?
+Concurrent launch attempts for same JobInstance parameters.
+
+** Q110: How prevent duplicate launches?
+Unique job parameters + repository constraints + scheduler coordination.
+
+** Q111: What is scheduling integration approach?
+Use cron/scheduler/orchestrator to trigger jobs.
+
+** Q112: What is external orchestration benefit?
+Central visibility, retries, dependency management, calendars.
+
+** Q113: What is intermediate testing strategy for batch?
+Unit test processors + integration test full step/job with sample datasets.
+
+** Q114: How test restartability?
+Force mid-step failure, rerun, verify resumed progress and correctness.
+
+** Q115: What is file footer/header callback usage?
+Write metadata lines or validate file boundaries.
+
+** Q116: What is transactional reader queue mode concept?
+Special handling when reading from transactional resources like JMS.
+
+** Q117: What is intermediate anti-pattern?
+Ignoring item-level metrics and only tracking final job status.
+
+** Q118: Better observability approach?
+Track read/process/write/skip/retry counts, chunk durations, and error taxonomy.
+
+** Q119: Why define SLA per job?
+Clarifies expected completion window and operational alerts.
+
+** Q120: What is data drift concern in recurring jobs?
+Input schema/quality changes over time can silently break processing.
+
+** Q121: How detect data drift early?
+Validation steps, schema checks, anomaly metrics, canary runs.
+
+** Q122: What is intermediate performance lever?
+Tune chunk size, fetch size, commit interval, and parallelism carefully.
+
+** Q123: What is intermediate reliability lever?
+Idempotent writes + checkpointed restart + bounded retry/skip policies.
+
+** Q124: Intermediate maturity signal?
+Team can recover failed jobs predictably without manual data corruption.
+
+** Q125: Intermediate best practice?
+Design for restart, observability, and controlled fault tolerance from day one.
+
+* Advanced
+
+** Q126: What is high-volume batch architecture principle?
+Separate ingestion, processing, and output concerns with explicit backpressure controls.
+
+** Q127: What is throughput vs latency in batch?
+Primary goal is total completion throughput; latency matters per SLA checkpoints.
+
+** Q128: What is commit interval tuning strategy?
+Balance transaction overhead against rollback cost and memory footprint.
+
+** Q129: Why too-large chunks can be risky?
+Large rollback scope, memory pressure, long lock duration.
+
+** Q130: Why too-small chunks can be inefficient?
+Excess transaction overhead and lower throughput.
+
+** Q131: What is advanced partitioning key design?
+Choose evenly distributed stable keys minimizing skew/hot partitions.
+
+** Q132: What is partition skew?
+Uneven data distribution causing straggler partitions and poor parallel efficiency.
+
+** Q133: How mitigate partition skew?
+Dynamic partitioning, range rebalancing, or workload-aware partition keys.
+
+** Q134: What is exactly-once processing challenge in batch?
+Retries/restarts can duplicate writes unless idempotency/dedup applied.
+
+** Q135: Idempotent writer strategies?
+Upsert keys, unique constraints, checksum tables, processed-item ledgers.
+
+** Q136: What is reconciliation job?
+Follow-up job verifying source/target counts and data correctness.
+
+** Q137: Why reconciliation matters?
+Detects silent partial failures and data quality issues.
+
+** Q138: What is dual-write hazard in batch integrations?
+Updating DB and external system separately can diverge on failure.
+
+** Q139: How reduce dual-write risk?
+Transactional outbox or staged writes with replay mechanisms.
+
+** Q140: What is watermarking in incremental jobs?
+Track last processed timestamp/id/version to process only new changes.
+
+** Q141: Watermark pitfall?
+Clock skew/out-of-order events can miss or duplicate records.
+
+** Q142: Safer incremental extraction pattern?
+Use overlap window + deduplication.
+
+** Q143: What is late-arriving data handling?
+Reprocess windows or correction jobs for delayed records.
+
+** Q144: What is backfill job?
+Processing historical data to populate or correct datasets.
+
+** Q145: Backfill operational risk?
+Competes with daily jobs for resources and can breach SLAs.
+
+** Q146: How run backfills safely?
+Throttle, isolate resources, and schedule during low-load windows.
+
+** Q147: What is multi-tenant batch isolation?
+Ensure tenant data/process failures remain isolated.
+
+** Q148: Multi-tenant isolation mechanisms?
+Separate queues/partitions/schemas/resources and per-tenant limits.
+
+** Q149: What is checkpoint corruption risk?
+Invalid persisted state causing incorrect restart behavior.
+
+** Q150: Mitigation for checkpoint corruption?
+Versioned context schema, validation, and safe reset/restart procedures.
+
+** Q151: What is metadata DB bottleneck?
+High job concurrency can overload Batch metadata repository.
+
+** Q152: How scale metadata repository?
+DB tuning, indexing, cleanup policies, and controlled job launch concurrency.
+
+** Q153: What is metadata retention policy?
+Archiving/purging old execution records to maintain performance.
+
+** Q154: What is purge safety concern?
+Retain enough history for audits/debugging before deletion.
+
+** Q155: What is observability gold standard for batch?
+Per-step metrics, structured logs, traceable item errors, SLA dashboards, alerting.
+
+** Q156: Key advanced batch metrics?
+Throughput/sec, chunk duration, retry/skip rates, lag, completion time percentile.
+
+** Q157: What is lag metric in scheduled jobs?
+Difference between expected processing point and actual completed point.
+
+** Q158: What is anomaly detection for batch?
+Detect unusual volume/error/runtime changes automatically.
+
+** Q159: What is chaos testing for batch?
+Inject DB/network/file failures to verify restart and fault policies.
+
+** Q160: Why practice failure drills?
+Operational teams need proven recovery runbooks before incidents.
+
+** Q161: What is blue/green deployment concern for batch?
+Avoid duplicate concurrent execution of same logical job instance.
+
+** Q162: How prevent duplicate runs during deployment?
+Leader election/locks/scheduler control/idempotent job parameters.
+
+** Q163: What is scheduler handoff strategy?
+Coordinated cutover so only one environment triggers jobs.
+
+** Q164: What is schema evolution challenge in batch pipelines?
+Input/output schema changes can break readers/writers/processors.
+
+** Q165: Schema evolution mitigation?
+Versioned contracts, compatibility layers, and staged rollout.
+
+** Q166: What is security baseline for batch workloads?
+Least privilege DB/file access, secret rotation, encrypted transport/storage.
+
+** Q167: What is PII handling requirement in batch logs?
+Mask/redact sensitive fields and enforce retention/access controls.
+
+** Q168: What is cost optimization lever in batch platforms?
+Autoscaling workers and right-sizing resources per job window.
+
+** Q169: What is spot/preemptible compute tradeoff for batch?
+Lower cost but higher interruption risk; requires robust restartability.
+
+** Q170: Biggest advanced Spring Batch anti-pattern?
+Treating restart/idempotency as optional instead of core design requirements.
+
+** Q171: What is mature batch architecture outcome?
+Deterministic, restartable, observable pipelines with controlled failure recovery.
+
+** Q172: Final performance principle?
+Benchmark with realistic volumes and tune chunking/parallelism empirically.
+
+** Q173: Final reliability principle?
+Assume every dependency can fail; design retries/skips/checkpoints intentionally.
+
+** Q174: Final operations principle?
+Automate runbooks, alerts, and reconciliation—manual heroics do not scale.
+
+** Q175: Final maturity principle?
+Spring Batch excellence means predictable correctness at scale, not just job completion.
+
+-----
+
+#+INCLUDE: "../footer.org"
