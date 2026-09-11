@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spring Kafka / Messaging</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Spring Kafka / Messaging</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org81f5147" class="outline-2">
+<h2 id="org81f5147">Spring Kafka / Messaging</h2>
+<div class="outline-text-2" id="text-org81f5147">
+<hr>
+</div>
+</div>
+<div id="outline-container-org707e64e" class="outline-2">
+<h2 id="org707e64e">Beginner</h2>
+<div class="outline-text-2" id="text-org707e64e">
+</div>
+<div id="outline-container-org39bcdb8" class="outline-3">
+<h3 id="org39bcdb8">Q1: What is messaging in distributed systems?</h3>
+<div class="outline-text-3" id="text-org39bcdb8">
+<p>
+Asynchronous communication where producers send messages and consumers process them.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc157e9e" class="outline-3">
+<h3 id="orgc157e9e">Q2: Why use messaging?</h3>
+<div class="outline-text-3" id="text-orgc157e9e">
+<p>
+Decouples services, improves scalability, and enables asynchronous workflows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb73c78b" class="outline-3">
+<h3 id="orgb73c78b">Q3: What is Apache Kafka?</h3>
+<div class="outline-text-3" id="text-orgb73c78b">
+<p>
+A distributed event streaming platform for high-throughput, durable message processing.
+</p>
+</div>
+</div>
+<div id="outline-container-org5ad9625" class="outline-3">
+<h3 id="org5ad9625">Q4: What is Spring for Apache Kafka?</h3>
+<div class="outline-text-3" id="text-org5ad9625">
+<p>
+Spring project providing convenient Kafka producer/consumer integration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc9aae31" class="outline-3">
+<h3 id="orgc9aae31">Q5: What is a topic?</h3>
+<div class="outline-text-3" id="text-orgc9aae31">
+<p>
+Named stream/category where Kafka records are published.
+</p>
+</div>
+</div>
+<div id="outline-container-org41c5b6d" class="outline-3">
+<h3 id="org41c5b6d">Q6: What is a partition?</h3>
+<div class="outline-text-3" id="text-org41c5b6d">
+<p>
+Ordered sub-log of a topic enabling parallelism and scalability.
+</p>
+</div>
+</div>
+<div id="outline-container-org627c6ac" class="outline-3">
+<h3 id="org627c6ac">Q7: What is an offset?</h3>
+<div class="outline-text-3" id="text-org627c6ac">
+<p>
+Position of a record within a partition log.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbeb1a30" class="outline-3">
+<h3 id="orgbeb1a30">Q8: What is a producer?</h3>
+<div class="outline-text-3" id="text-orgbeb1a30">
+<p>
+Client that publishes records to Kafka topics.
+</p>
+</div>
+</div>
+<div id="outline-container-orga6893e6" class="outline-3">
+<h3 id="orga6893e6">Q9: What is a consumer?</h3>
+<div class="outline-text-3" id="text-orga6893e6">
+<p>
+Client that reads records from Kafka topics.
+</p>
+</div>
+</div>
+<div id="outline-container-org966231e" class="outline-3">
+<h3 id="org966231e">Q10: What is a consumer group?</h3>
+<div class="outline-text-3" id="text-org966231e">
+<p>
+Set of consumers sharing work of topic partitions.
+</p>
+</div>
+</div>
+<div id="outline-container-org51036ac" class="outline-3">
+<h3 id="org51036ac">Q11: How are partitions assigned in a group?</h3>
+<div class="outline-text-3" id="text-org51036ac">
+<p>
+Each partition is consumed by at most one consumer in a group at a time.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaa7f200" class="outline-3">
+<h3 id="orgaa7f200">Q12: What is a broker?</h3>
+<div class="outline-text-3" id="text-orgaa7f200">
+<p>
+Kafka server node storing and serving topic partitions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgddf46e9" class="outline-3">
+<h3 id="orgddf46e9">Q13: What is replication factor?</h3>
+<div class="outline-text-3" id="text-orgddf46e9">
+<p>
+Number of copies of each partition across brokers.
+</p>
+</div>
+</div>
+<div id="outline-container-org154c94f" class="outline-3">
+<h3 id="org154c94f">Q14: Why replication matters?</h3>
+<div class="outline-text-3" id="text-org154c94f">
+<p>
+Improves fault tolerance and availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c05302" class="outline-3">
+<h3 id="org2c05302">Q15: What is leader partition replica?</h3>
+<div class="outline-text-3" id="text-org2c05302">
+<p>
+Replica handling reads/writes for a partition.
+</p>
+</div>
+</div>
+<div id="outline-container-org6ea8761" class="outline-3">
+<h3 id="org6ea8761">Q16: What are follower replicas?</h3>
+<div class="outline-text-3" id="text-org6ea8761">
+<p>
+Replicas syncing from leader for redundancy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc6e836" class="outline-3">
+<h3 id="orgfc6e836">Q17: What is ISR (in-sync replicas)?</h3>
+<div class="outline-text-3" id="text-orgfc6e836">
+<p>
+Replicas sufficiently caught up with leader.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfaae7b6" class="outline-3">
+<h3 id="orgfaae7b6">Q18: What is Kafka record structure?</h3>
+<div class="outline-text-3" id="text-orgfaae7b6">
+<p>
+Key, value, headers, timestamp, topic, partition, offset metadata.
+</p>
+</div>
+</div>
+<div id="outline-container-org06b2361" class="outline-3">
+<h3 id="org06b2361">Q19: Why use message keys?</h3>
+<div class="outline-text-3" id="text-org06b2361">
+<p>
+Control partitioning and preserve per-key ordering.
+</p>
+</div>
+</div>
+<div id="outline-container-orgabdec2e" class="outline-3">
+<h3 id="orgabdec2e">Q20: What is ordering guarantee in Kafka?</h3>
+<div class="outline-text-3" id="text-orgabdec2e">
+<p>
+Order is guaranteed within a partition, not across partitions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad01f7b" class="outline-3">
+<h3 id="orgad01f7b">Q21: What is Spring KafkaTemplate?</h3>
+<div class="outline-text-3" id="text-orgad01f7b">
+<p>
+Main helper for sending messages in Spring applications.
+</p>
+</div>
+</div>
+<div id="outline-container-org2f5dcee" class="outline-3">
+<h3 id="org2f5dcee">Q22: How do you consume messages in Spring Kafka?</h3>
+<div class="outline-text-3" id="text-org2f5dcee">
+<p>
+Typically with <code>@KafkaListener</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc76101f" class="outline-3">
+<h3 id="orgc76101f">Q23: What is @KafkaListener?</h3>
+<div class="outline-text-3" id="text-orgc76101f">
+<p>
+Annotation marking method to receive Kafka messages from topics.
+</p>
+</div>
+</div>
+<div id="outline-container-org8483375" class="outline-3">
+<h3 id="org8483375">Q24: What is container factory in Spring Kafka?</h3>
+<div class="outline-text-3" id="text-org8483375">
+<p>
+Config object controlling listener container behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org153405b" class="outline-3">
+<h3 id="org153405b">Q25: What is deserializer?</h3>
+<div class="outline-text-3" id="text-org153405b">
+<p>
+Converts byte data from Kafka into Java objects.
+</p>
+</div>
+</div>
+<div id="outline-container-org12aae88" class="outline-3">
+<h3 id="org12aae88">Q26: What is serializer?</h3>
+<div class="outline-text-3" id="text-org12aae88">
+<p>
+Converts Java objects to bytes for Kafka transmission.
+</p>
+</div>
+</div>
+<div id="outline-container-org7423859" class="outline-3">
+<h3 id="org7423859">Q27: Common payload formats?</h3>
+<div class="outline-text-3" id="text-org7423859">
+<p>
+JSON, Avro, Protobuf, plain strings, binary custom formats.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a2018c" class="outline-3">
+<h3 id="org5a2018c">Q28: What is bootstrap servers config?</h3>
+<div class="outline-text-3" id="text-org5a2018c">
+<p>
+Initial broker addresses for Kafka client connection discovery.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b09f35" class="outline-3">
+<h3 id="org4b09f35">Q29: What is ack in producer send?</h3>
+<div class="outline-text-3" id="text-org4b09f35">
+<p>
+Broker acknowledgment level for write durability behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org7efa7d6" class="outline-3">
+<h3 id="org7efa7d6">Q30: Common producer acks values?</h3>
+<div class="outline-text-3" id="text-org7efa7d6">
+<p>
+0, 1, all (or -1 equivalent).
+</p>
+</div>
+</div>
+<div id="outline-container-org900644c" class="outline-3">
+<h3 id="org900644c">Q31: What does acks=all imply?</h3>
+<div class="outline-text-3" id="text-org900644c">
+<p>
+Leader waits for all in-sync replicas before acknowledging.
+</p>
+</div>
+</div>
+<div id="outline-container-org16b26e0" class="outline-3">
+<h3 id="org16b26e0">Q32: What is at-most-once delivery?</h3>
+<div class="outline-text-3" id="text-org16b26e0">
+<p>
+Messages may be lost, but never redelivered.
+</p>
+</div>
+</div>
+<div id="outline-container-org32ca79b" class="outline-3">
+<h3 id="org32ca79b">Q33: What is at-least-once delivery?</h3>
+<div class="outline-text-3" id="text-org32ca79b">
+<p>
+Messages are not lost (under expected conditions) but may be duplicated.
+</p>
+</div>
+</div>
+<div id="outline-container-org3347394" class="outline-3">
+<h3 id="org3347394">Q34: What is exactly-once semantics (EOS) concept?</h3>
+<div class="outline-text-3" id="text-org3347394">
+<p>
+Processing/output appears once logically, requiring transactional/idempotent patterns.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1bee71" class="outline-3">
+<h3 id="orgc1bee71">Q35: Is “exactly once” simple in distributed systems?</h3>
+<div class="outline-text-3" id="text-orgc1bee71">
+<p>
+No, it needs careful end-to-end design.
+</p>
+</div>
+</div>
+<div id="outline-container-org230fe38" class="outline-3">
+<h3 id="org230fe38">Q36: What is auto-commit in consumers?</h3>
+<div class="outline-text-3" id="text-org230fe38">
+<p>
+Periodic automatic offset commits by client.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcd9f1e5" class="outline-3">
+<h3 id="orgcd9f1e5">Q37: Why can auto-commit be risky?</h3>
+<div class="outline-text-3" id="text-orgcd9f1e5">
+<p>
+Offsets may commit before processing truly succeeds.
+</p>
+</div>
+</div>
+<div id="outline-container-org293b6e4" class="outline-3">
+<h3 id="org293b6e4">Q38: What is manual acknowledgment?</h3>
+<div class="outline-text-3" id="text-org293b6e4">
+<p>
+Application explicitly commits offsets after successful processing.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c5a174" class="outline-3">
+<h3 id="org4c5a174">Q39: Why use manual ack?</h3>
+<div class="outline-text-3" id="text-org4c5a174">
+<p>
+Better control over processing and failure semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org7c52498" class="outline-3">
+<h3 id="org7c52498">Q40: What is rebalance?</h3>
+<div class="outline-text-3" id="text-org7c52498">
+<p>
+Redistribution of partitions among consumers in a group.
+</p>
+</div>
+</div>
+<div id="outline-container-org821d94a" class="outline-3">
+<h3 id="org821d94a">Q41: What can trigger rebalance?</h3>
+<div class="outline-text-3" id="text-org821d94a">
+<p>
+Consumer join/leave, crashes, subscription changes, metadata changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d979ec" class="outline-3">
+<h3 id="org7d979ec">Q42: Why are frequent rebalances bad?</h3>
+<div class="outline-text-3" id="text-org7d979ec">
+<p>
+Pause processing and increase latency/duplicate risk.
+</p>
+</div>
+</div>
+<div id="outline-container-orgab726ab" class="outline-3">
+<h3 id="orgab726ab">Q43: What is dead-letter topic (DLT)?</h3>
+<div class="outline-text-3" id="text-orgab726ab">
+<p>
+Topic where failed/unprocessable messages are routed.
+</p>
+</div>
+</div>
+<div id="outline-container-org02dfad6" class="outline-3">
+<h3 id="org02dfad6">Q44: Why use dead-letter topics?</h3>
+<div class="outline-text-3" id="text-org02dfad6">
+<p>
+Preserve problematic events for analysis/replay without blocking pipeline.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb59138a" class="outline-3">
+<h3 id="orgb59138a">Q45: What is retry topic pattern?</h3>
+<div class="outline-text-3" id="text-orgb59138a">
+<p>
+Failed messages retried via delayed/retry topics before DLT.
+</p>
+</div>
+</div>
+<div id="outline-container-org6d641c3" class="outline-3">
+<h3 id="org6d641c3">Q46: What is idempotent consumer?</h3>
+<div class="outline-text-3" id="text-org6d641c3">
+<p>
+Consumer logic safe against duplicate message processing.
+</p>
+</div>
+</div>
+<div id="outline-container-org203f24a" class="outline-3">
+<h3 id="org203f24a">Q47: Why idempotency is critical?</h3>
+<div class="outline-text-3" id="text-org203f24a">
+<p>
+At-least-once delivery means duplicates can happen.
+</p>
+</div>
+</div>
+<div id="outline-container-org87e7252" class="outline-3">
+<h3 id="org87e7252">Q48: What is poison pill message?</h3>
+<div class="outline-text-3" id="text-org87e7252">
+<p>
+Record consistently failing processing due to bad data/schema/business rule.
+</p>
+</div>
+</div>
+<div id="outline-container-org902ffe8" class="outline-3">
+<h3 id="org902ffe8">Q49: How to handle poison pills?</h3>
+<div class="outline-text-3" id="text-org902ffe8">
+<p>
+Route to DLT with diagnostics instead of infinite retries.
+</p>
+</div>
+</div>
+<div id="outline-container-org5edb61b" class="outline-3">
+<h3 id="org5edb61b">Q50: What is message header in Kafka?</h3>
+<div class="outline-text-3" id="text-org5edb61b">
+<p>
+Metadata key-value pairs attached to records.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc4e6d01" class="outline-3">
+<h3 id="orgc4e6d01">Q51: Header use cases?</h3>
+<div class="outline-text-3" id="text-orgc4e6d01">
+<p>
+Trace IDs, schema version, tenant, source system identifiers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda0ff61" class="outline-3">
+<h3 id="orgda0ff61">Q52: What is lag?</h3>
+<div class="outline-text-3" id="text-orgda0ff61">
+<p>
+Difference between produced and consumed offsets.
+</p>
+</div>
+</div>
+<div id="outline-container-org21196d8" class="outline-3">
+<h3 id="org21196d8">Q53: Why monitor consumer lag?</h3>
+<div class="outline-text-3" id="text-org21196d8">
+<p>
+Indicates backlog growth and processing health.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c51343" class="outline-3">
+<h3 id="org0c51343">Q54: What is retention in Kafka?</h3>
+<div class="outline-text-3" id="text-org0c51343">
+<p>
+How long records are kept (time/size policy).
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd52e8c" class="outline-3">
+<h3 id="orgdd52e8c">Q55: What is compaction?</h3>
+<div class="outline-text-3" id="text-orgdd52e8c">
+<p>
+Retention mode keeping latest record per key.
+</p>
+</div>
+</div>
+<div id="outline-container-org46d3dce" class="outline-3">
+<h3 id="org46d3dce">Q56: When use compacted topics?</h3>
+<div class="outline-text-3" id="text-org46d3dce">
+<p>
+State/event-upsert streams where latest key state matters.
+</p>
+</div>
+</div>
+<div id="outline-container-orge71cf68" class="outline-3">
+<h3 id="orge71cf68">Q57: Beginner messaging anti-pattern?</h3>
+<div class="outline-text-3" id="text-orge71cf68">
+<p>
+Assuming no duplicates and writing non-idempotent consumers.
+</p>
+</div>
+</div>
+<div id="outline-container-org9f3992b" class="outline-3">
+<h3 id="org9f3992b">Q58: Beginner observability baseline?</h3>
+<div class="outline-text-3" id="text-org9f3992b">
+<p>
+Track throughput, lag, error rates, retry/DLT counts.
+</p>
+</div>
+</div>
+<div id="outline-container-org0deafa9" class="outline-3">
+<h3 id="org0deafa9">Q59: Beginner security baseline for Kafka?</h3>
+<div class="outline-text-3" id="text-org0deafa9">
+<p>
+TLS, authentication, ACL authorization, secret management.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd6fce2" class="outline-3">
+<h3 id="orgfd6fce2">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-orgfd6fce2">
+<p>
+Design for retries, duplicates, and failure from day one.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org92b2758" class="outline-2">
+<h2 id="org92b2758">Intermediate</h2>
+<div class="outline-text-2" id="text-org92b2758">
+</div>
+<div id="outline-container-orgd0c1cc2" class="outline-3">
+<h3 id="orgd0c1cc2">Q61: What is producer idempotence in Kafka?</h3>
+<div class="outline-text-3" id="text-orgd0c1cc2">
+<p>
+Feature ensuring producer retries don’t create duplicates on broker log per session.
+</p>
+</div>
+</div>
+<div id="outline-container-org611074c" class="outline-3">
+<h3 id="org611074c">Q62: How enable producer idempotence conceptually?</h3>
+<div class="outline-text-3" id="text-org611074c">
+<p>
+Set producer idempotence configuration and compatible reliability settings.
+</p>
+</div>
+</div>
+<div id="outline-container-orge7f2721" class="outline-3">
+<h3 id="orge7f2721">Q63: What is transactional producer?</h3>
+<div class="outline-text-3" id="text-orge7f2721">
+<p>
+Producer that groups writes (and optionally offsets) into atomic transactions.
+</p>
+</div>
+</div>
+<div id="outline-container-org81c2510" class="outline-3">
+<h3 id="org81c2510">Q64: What is read<sub>committed</sub> isolation?</h3>
+<div class="outline-text-3" id="text-org81c2510">
+<p>
+Consumers read only committed transactional records.
+</p>
+</div>
+</div>
+<div id="outline-container-org41b382d" class="outline-3">
+<h3 id="org41b382d">Q65: What is read<sub>uncommitted</sub>?</h3>
+<div class="outline-text-3" id="text-org41b382d">
+<p>
+Consumers may read uncommitted/aborted transactional records.
+</p>
+</div>
+</div>
+<div id="outline-container-org14053bc" class="outline-3">
+<h3 id="org14053bc">Q66: What is transactional.id?</h3>
+<div class="outline-text-3" id="text-org14053bc">
+<p>
+Producer identity enabling transactional guarantees across restarts/sessions.
+</p>
+</div>
+</div>
+<div id="outline-container-org4e0f654" class="outline-3">
+<h3 id="org4e0f654">Q67: What is outbox pattern with Spring Kafka?</h3>
+<div class="outline-text-3" id="text-org4e0f654">
+<p>
+Write domain change + outbox row in DB transaction, publish asynchronously to Kafka.
+</p>
+</div>
+</div>
+<div id="outline-container-org5dd6dc8" class="outline-3">
+<h3 id="org5dd6dc8">Q68: Why outbox pattern?</h3>
+<div class="outline-text-3" id="text-org5dd6dc8">
+<p>
+Avoid dual-write inconsistency between DB and Kafka send.
+</p>
+</div>
+</div>
+<div id="outline-container-org2aa2e61" class="outline-3">
+<h3 id="org2aa2e61">Q69: What is dual-write problem?</h3>
+<div class="outline-text-3" id="text-org2aa2e61">
+<p>
+DB commit succeeds but publish fails, or publish succeeds but DB rollback.
+</p>
+</div>
+</div>
+<div id="outline-container-org6d8d835" class="outline-3">
+<h3 id="org6d8d835">Q70: CDC vs polling outbox?</h3>
+<div class="outline-text-3" id="text-org6d8d835">
+<p>
+CDC streams DB changes; polling periodically reads outbox table.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd8dc19f" class="outline-3">
+<h3 id="orgd8dc19f">Q71: What is @Transactional with Kafka integration caveat?</h3>
+<div class="outline-text-3" id="text-orgd8dc19f">
+<p>
+DB and Kafka transactions are distinct unless explicitly coordinated pattern used.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb97d688" class="outline-3">
+<h3 id="orgb97d688">Q72: What is Chained transaction manager concept (historical/complex)?</h3>
+<div class="outline-text-3" id="text-orgb97d688">
+<p>
+Attempts multi-resource coordination; often replaced by outbox for simplicity/resilience.
+</p>
+</div>
+</div>
+<div id="outline-container-org0d5302e" class="outline-3">
+<h3 id="org0d5302e">Q73: What is concurrency setting in @KafkaListener container?</h3>
+<div class="outline-text-3" id="text-org0d5302e">
+<p>
+Number of concurrent consumer threads/containers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0724a1" class="outline-3">
+<h3 id="orgf0724a1">Q74: How does concurrency relate to partitions?</h3>
+<div class="outline-text-3" id="text-orgf0724a1">
+<p>
+Effective parallelism limited by partition count per group.
+</p>
+</div>
+</div>
+<div id="outline-container-org573f1e7" class="outline-3">
+<h3 id="org573f1e7">Q75: What if concurrency &gt; partitions?</h3>
+<div class="outline-text-3" id="text-org573f1e7">
+<p>
+Extra threads idle for that topic/group combination.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda84b23" class="outline-3">
+<h3 id="orgda84b23">Q76: What is max.poll.records?</h3>
+<div class="outline-text-3" id="text-orgda84b23">
+<p>
+Max records returned in one poll call.
+</p>
+</div>
+</div>
+<div id="outline-container-org100b709" class="outline-3">
+<h3 id="org100b709">Q77: Why tune max.poll.records?</h3>
+<div class="outline-text-3" id="text-org100b709">
+<p>
+Balance throughput, processing time, and rebalance timeout risk.
+</p>
+</div>
+</div>
+<div id="outline-container-org710bf9f" class="outline-3">
+<h3 id="org710bf9f">Q78: What is max.poll.interval.ms?</h3>
+<div class="outline-text-3" id="text-org710bf9f">
+<p>
+Max allowed delay between polls before consumer considered failed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgadbf007" class="outline-3">
+<h3 id="orgadbf007">Q79: Long processing risk with max.poll.interval?</h3>
+<div class="outline-text-3" id="text-orgadbf007">
+<p>
+Consumer removed from group causing rebalance/duplicates.
+</p>
+</div>
+</div>
+<div id="outline-container-org8beed76" class="outline-3">
+<h3 id="org8beed76">Q80: What is session.timeout.ms?</h3>
+<div class="outline-text-3" id="text-org8beed76">
+<p>
+Failure detection timeout for consumer heartbeats.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf239dbe" class="outline-3">
+<h3 id="orgf239dbe">Q81: What is heartbeat interval?</h3>
+<div class="outline-text-3" id="text-orgf239dbe">
+<p>
+Frequency of consumer liveness heartbeats to group coordinator.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc997528" class="outline-3">
+<h3 id="orgc997528">Q82: What is pause/resume consumption?</h3>
+<div class="outline-text-3" id="text-orgc997528">
+<p>
+Temporarily stop/resume partition fetching for backpressure/control.
+</p>
+</div>
+</div>
+<div id="outline-container-org725c8ce" class="outline-3">
+<h3 id="org725c8ce">Q83: When pause partitions?</h3>
+<div class="outline-text-3" id="text-org725c8ce">
+<p>
+Downstream outage, overload, or controlled throttling scenarios.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd7c65d7" class="outline-3">
+<h3 id="orgd7c65d7">Q84: What is CommonErrorHandler (Spring Kafka)?</h3>
+<div class="outline-text-3" id="text-orgd7c65d7">
+<p>
+Centralized listener error handling strategy in modern Spring Kafka.
+</p>
+</div>
+</div>
+<div id="outline-container-org934783f" class="outline-3">
+<h3 id="org934783f">Q85: What is DefaultErrorHandler?</h3>
+<div class="outline-text-3" id="text-org934783f">
+<p>
+Configurable error handler supporting retries, backoff, and recovery.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdbdebca" class="outline-3">
+<h3 id="orgdbdebca">Q86: What is BackOff strategy?</h3>
+<div class="outline-text-3" id="text-orgdbdebca">
+<p>
+Delay policy between retry attempts (fixed/exponential).
+</p>
+</div>
+</div>
+<div id="outline-container-org826e4d1" class="outline-3">
+<h3 id="org826e4d1">Q87: Why exponential backoff?</h3>
+<div class="outline-text-3" id="text-org826e4d1">
+<p>
+Reduces pressure on failing dependencies over time.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb2a0200" class="outline-3">
+<h3 id="orgb2a0200">Q88: What is DeadLetterPublishingRecoverer?</h3>
+<div class="outline-text-3" id="text-orgb2a0200">
+<p>
+Publishes failed records to DLT after retries exhausted.
+</p>
+</div>
+</div>
+<div id="outline-container-orga02e947" class="outline-3">
+<h3 id="orga02e947">Q89: What context should be added to DLT messages?</h3>
+<div class="outline-text-3" id="text-orga02e947">
+<p>
+Original topic/partition/offset, exception type, stack summary, timestamp, trace ID.
+</p>
+</div>
+</div>
+<div id="outline-container-org403687b" class="outline-3">
+<h3 id="org403687b">Q90: What is seek in consumer error handling?</h3>
+<div class="outline-text-3" id="text-org403687b">
+<p>
+Move offset position to reprocess or skip records intentionally.
+</p>
+</div>
+</div>
+<div id="outline-container-org42b6b08" class="outline-3">
+<h3 id="org42b6b08">Q91: What is ack mode in listener containers?</h3>
+<div class="outline-text-3" id="text-org42b6b08">
+<p>
+Defines when offsets are committed (record, batch, manual, etc.).
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3091f0" class="outline-3">
+<h3 id="orgd3091f0">Q92: Record ack mode vs batch ack mode?</h3>
+<div class="outline-text-3" id="text-orgd3091f0">
+<p>
+Commit per record vs per batch of polled records.
+</p>
+</div>
+</div>
+<div id="outline-container-org545a856" class="outline-3">
+<h3 id="org545a856">Q93: What is batch listener?</h3>
+<div class="outline-text-3" id="text-org545a856">
+<p>
+Listener receives list of records for batch processing.
+</p>
+</div>
+</div>
+<div id="outline-container-org80250e8" class="outline-3">
+<h3 id="org80250e8">Q94: Batch listener tradeoff?</h3>
+<div class="outline-text-3" id="text-org80250e8">
+<p>
+Higher throughput but more complex error granularity.
+</p>
+</div>
+</div>
+<div id="outline-container-org6ddcbd4" class="outline-3">
+<h3 id="org6ddcbd4">Q95: What is record filtering strategy?</h3>
+<div class="outline-text-3" id="text-org6ddcbd4">
+<p>
+Drop duplicates/unwanted records before listener logic.
+</p>
+</div>
+</div>
+<div id="outline-container-org37d40b3" class="outline-3">
+<h3 id="org37d40b3">Q96: What is RecordFilterStrategy?</h3>
+<div class="outline-text-3" id="text-org37d40b3">
+<p>
+Spring hook for filtering records pre-processing.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ebda3b" class="outline-3">
+<h3 id="org8ebda3b">Q97: Why include schema version in messages?</h3>
+<div class="outline-text-3" id="text-org8ebda3b">
+<p>
+Supports backward/forward-compatible deserialization and migration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd08e9fb" class="outline-3">
+<h3 id="orgd08e9fb">Q98: What is schema registry concept?</h3>
+<div class="outline-text-3" id="text-orgd08e9fb">
+<p>
+Central service storing and validating message schemas.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c7c244" class="outline-3">
+<h3 id="org2c7c244">Q99: Why use Avro/Protobuf with schema registry?</h3>
+<div class="outline-text-3" id="text-org2c7c244">
+<p>
+Strong contracts and evolution controls for event payloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org06d5097" class="outline-3">
+<h3 id="org06d5097">Q100: What is backward compatibility in schema evolution?</h3>
+<div class="outline-text-3" id="text-org06d5097">
+<p>
+New schema can read old data.
+</p>
+</div>
+</div>
+<div id="outline-container-org39a19f4" class="outline-3">
+<h3 id="org39a19f4">Q101: What is forward compatibility?</h3>
+<div class="outline-text-3" id="text-org39a19f4">
+<p>
+Old consumers can read new producer data under defined rules.
+</p>
+</div>
+</div>
+<div id="outline-container-orge1132e7" class="outline-3">
+<h3 id="orge1132e7">Q102: What is full compatibility?</h3>
+<div class="outline-text-3" id="text-orge1132e7">
+<p>
+Both backward and forward compatibility constraints satisfied.
+</p>
+</div>
+</div>
+<div id="outline-container-org6815884" class="outline-3">
+<h3 id="org6815884">Q103: What is tombstone record?</h3>
+<div class="outline-text-3" id="text-org6815884">
+<p>
+Compacted-topic record with key and null value indicating delete semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org3780674" class="outline-3">
+<h3 id="org3780674">Q104: Why careful with null payload handling?</h3>
+<div class="outline-text-3" id="text-org3780674">
+<p>
+Deserializer/business logic must distinguish tombstones from malformed data.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e6178a" class="outline-3">
+<h3 id="org9e6178a">Q105: What is partition key design principle?</h3>
+<div class="outline-text-3" id="text-org9e6178a">
+<p>
+Stable business key balancing ordering needs and partition distribution.
+</p>
+</div>
+</div>
+<div id="outline-container-org5b317ed" class="outline-3">
+<h3 id="org5b317ed">Q106: What is hot partition problem?</h3>
+<div class="outline-text-3" id="text-org5b317ed">
+<p>
+Uneven key distribution overloads specific partition/consumer.
+</p>
+</div>
+</div>
+<div id="outline-container-orge758aa0" class="outline-3">
+<h3 id="orge758aa0">Q107: How mitigate hot partitions?</h3>
+<div class="outline-text-3" id="text-orge758aa0">
+<p>
+Better key strategy, more partitions, key salting (carefully), workload redesign.
+</p>
+</div>
+</div>
+<div id="outline-container-org3edf782" class="outline-3">
+<h3 id="org3edf782">Q108: What is message ordering vs parallelism tradeoff?</h3>
+<div class="outline-text-3" id="text-org3edf782">
+<p>
+More partitions improve parallelism but ordering is per key/partition only.
+</p>
+</div>
+</div>
+<div id="outline-container-org402f3dd" class="outline-3">
+<h3 id="org402f3dd">Q109: What is request-reply messaging over Kafka?</h3>
+<div class="outline-text-3" id="text-org402f3dd">
+<p>
+Pattern using reply topics/correlation IDs for pseudo-synchronous workflows.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e09f54" class="outline-3">
+<h3 id="org6e09f54">Q110: When avoid request-reply over Kafka?</h3>
+<div class="outline-text-3" id="text-org6e09f54">
+<p>
+Low-latency synchronous requirements often better served by HTTP/gRPC.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb33abe0" class="outline-3">
+<h3 id="orgb33abe0">Q111: What is exactly-once in Kafka Streams vs consumer apps?</h3>
+<div class="outline-text-3" id="text-orgb33abe0">
+<p>
+Kafka Streams has built-in EOS features; plain consumers need explicit patterns.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd9b4a09" class="outline-3">
+<h3 id="orgd9b4a09">Q112: What is retry topic orchestration pattern?</h3>
+<div class="outline-text-3" id="text-orgd9b4a09">
+<p>
+Route failures through staged retry topics with increasing delays.
+</p>
+</div>
+</div>
+<div id="outline-container-org0722bba" class="outline-3">
+<h3 id="org0722bba">Q113: What is non-blocking retry concept?</h3>
+<div class="outline-text-3" id="text-org0722bba">
+<p>
+Main consumer continues processing newer messages while failed ones retry asynchronously.
+</p>
+</div>
+</div>
+<div id="outline-container-org00d2d57" class="outline-3">
+<h3 id="org00d2d57">Q114: What is blocking retry concept?</h3>
+<div class="outline-text-3" id="text-org00d2d57">
+<p>
+Consumer thread retries immediately, potentially reducing throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfe3643d" class="outline-3">
+<h3 id="orgfe3643d">Q115: What is intermediate anti-pattern in messaging?</h3>
+<div class="outline-text-3" id="text-orgfe3643d">
+<p>
+Infinite retries with no DLT and no observability.
+</p>
+</div>
+</div>
+<div id="outline-container-org4e78913" class="outline-3">
+<h3 id="org4e78913">Q116: Better failure strategy?</h3>
+<div class="outline-text-3" id="text-org4e78913">
+<p>
+Bounded retries + backoff + DLT + replay tooling.
+</p>
+</div>
+</div>
+<div id="outline-container-orga0f6295" class="outline-3">
+<h3 id="orga0f6295">Q117: What is replay strategy?</h3>
+<div class="outline-text-3" id="text-orga0f6295">
+<p>
+Reprocess historical or DLT events safely with idempotent logic.
+</p>
+</div>
+</div>
+<div id="outline-container-org528ba77" class="outline-3">
+<h3 id="org528ba77">Q118: Why replay tooling is essential?</h3>
+<div class="outline-text-3" id="text-org528ba77">
+<p>
+Incidents/data fixes often require controlled reprocessing.
+</p>
+</div>
+</div>
+<div id="outline-container-org0aa5943" class="outline-3">
+<h3 id="org0aa5943">Q119: What is secure deserialization concern?</h3>
+<div class="outline-text-3" id="text-org0aa5943">
+<p>
+Avoid unsafe polymorphic deserialization that enables gadget attacks.
+</p>
+</div>
+</div>
+<div id="outline-container-org70a8cce" class="outline-3">
+<h3 id="org70a8cce">Q120: How harden deserialization?</h3>
+<div class="outline-text-3" id="text-org70a8cce">
+<p>
+Trusted packages, explicit type mapping, schema validation, minimal polymorphism.
+</p>
+</div>
+</div>
+<div id="outline-container-org37a9ef7" class="outline-3">
+<h3 id="org37a9ef7">Q121: What is ACL in Kafka?</h3>
+<div class="outline-text-3" id="text-org37a9ef7">
+<p>
+Authorization rules controlling topic/group operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org203d342" class="outline-3">
+<h3 id="org203d342">Q122: Why principle of least privilege for Kafka ACLs?</h3>
+<div class="outline-text-3" id="text-org203d342">
+<p>
+Limit blast radius of compromised credentials/services.
+</p>
+</div>
+</div>
+<div id="outline-container-org17450b0" class="outline-3">
+<h3 id="org17450b0">Q123: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-org17450b0">
+<p>
+Team can explain delivery semantics and offset strategy per consumer.
+</p>
+</div>
+</div>
+<div id="outline-container-org0b1216d" class="outline-3">
+<h3 id="org0b1216d">Q124: Intermediate testing strategy?</h3>
+<div class="outline-text-3" id="text-org0b1216d">
+<p>
+Embedded/integration tests with real broker containers + failure scenarios.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb4a14aa" class="outline-3">
+<h3 id="orgb4a14aa">Q125: Why test rebalance scenarios?</h3>
+<div class="outline-text-3" id="text-orgb4a14aa">
+<p>
+They frequently reveal duplication/order and timeout bugs.
+</p>
+</div>
+</div>
+<div id="outline-container-org56488b1" class="outline-3">
+<h3 id="org56488b1">Q126: What is contract testing for events?</h3>
+<div class="outline-text-3" id="text-org56488b1">
+<p>
+Validate producer/consumer schema and semantic expectations continuously.
+</p>
+</div>
+</div>
+<div id="outline-container-org66ef311" class="outline-3">
+<h3 id="org66ef311">Q127: Why monitor DLT rate trends?</h3>
+<div class="outline-text-3" id="text-org66ef311">
+<p>
+Spikes indicate upstream regressions or schema/data drift.
+</p>
+</div>
+</div>
+<div id="outline-container-org89f8951" class="outline-3">
+<h3 id="org89f8951">Q128: What is lag-based autoscaling concept?</h3>
+<div class="outline-text-3" id="text-org89f8951">
+<p>
+Scale consumers based on lag/throughput metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org771f50e" class="outline-3">
+<h3 id="org771f50e">Q129: Why lag alone can mislead scaling?</h3>
+<div class="outline-text-3" id="text-org771f50e">
+<p>
+Need partition limits, processing cost, and downstream capacity context.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5824a6" class="outline-3">
+<h3 id="orgc5824a6">Q130: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-orgc5824a6">
+<p>
+Optimize for correctness first, then throughput with measured tuning.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3505dca" class="outline-2">
+<h2 id="org3505dca">Advanced</h2>
+<div class="outline-text-2" id="text-org3505dca">
+</div>
+<div id="outline-container-orgb3bae74" class="outline-3">
+<h3 id="orgb3bae74">Q131: What is end-to-end exactly-once challenge?</h3>
+<div class="outline-text-3" id="text-orgb3bae74">
+<p>
+Requires coordinated idempotency/transactions across producers, brokers, consumers, and sinks.
+</p>
+</div>
+</div>
+<div id="outline-container-org7aa44b3" class="outline-3">
+<h3 id="org7aa44b3">Q132: Why Kafka EOS alone may be insufficient?</h3>
+<div class="outline-text-3" id="text-org7aa44b3">
+<p>
+External DB/API side effects still need idempotent handling.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9b2ea7" class="outline-3">
+<h3 id="orgb9b2ea7">Q133: What is idempotency key store pattern?</h3>
+<div class="outline-text-3" id="text-orgb9b2ea7">
+<p>
+Persist processed event IDs/keys to prevent duplicate side effects.
+</p>
+</div>
+</div>
+<div id="outline-container-org410130d" class="outline-3">
+<h3 id="org410130d">Q134: Tradeoff of idempotency store?</h3>
+<div class="outline-text-3" id="text-org410130d">
+<p>
+Extra storage/lookups vs correctness under retries/replays.
+</p>
+</div>
+</div>
+<div id="outline-container-org4401977" class="outline-3">
+<h3 id="org4401977">Q135: What is transactional outbox relay scaling concern?</h3>
+<div class="outline-text-3" id="text-org4401977">
+<p>
+Relay throughput, lock contention, and ordering guarantees need careful design.
+</p>
+</div>
+</div>
+<div id="outline-container-org5353c21" class="outline-3">
+<h3 id="org5353c21">Q136: Polling outbox vs CDC advanced tradeoff?</h3>
+<div class="outline-text-3" id="text-org5353c21">
+<p>
+Polling simpler but adds query load/latency; CDC near-real-time but operationally heavier.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc768858" class="outline-3">
+<h3 id="orgc768858">Q137: What is event versioning strategy?</h3>
+<div class="outline-text-3" id="text-orgc768858">
+<p>
+Use explicit version fields and compatibility rules per event type.
+</p>
+</div>
+</div>
+<div id="outline-container-org62301d0" class="outline-3">
+<h3 id="org62301d0">Q138: What is schema evolution anti-pattern?</h3>
+<div class="outline-text-3" id="text-org62301d0">
+<p>
+Breaking field changes without staged consumer migration.
+</p>
+</div>
+</div>
+<div id="outline-container-org0d9444d" class="outline-3">
+<h3 id="org0d9444d">Q139: What is consumer-driven event evolution?</h3>
+<div class="outline-text-3" id="text-org0d9444d">
+<p>
+Producers coordinate changes based on downstream consumer compatibility needs.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf39d56e" class="outline-3">
+<h3 id="orgf39d56e">Q140: What is event envelope pattern?</h3>
+<div class="outline-text-3" id="text-orgf39d56e">
+<p>
+Standard metadata wrapper (id, type, version, timestamp, trace) around payload.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea5d7a3" class="outline-3">
+<h3 id="orgea5d7a3">Q141: Why event envelope helps?</h3>
+<div class="outline-text-3" id="text-orgea5d7a3">
+<p>
+Consistent observability, routing, governance across topics.
+</p>
+</div>
+</div>
+<div id="outline-container-org78d37dc" class="outline-3">
+<h3 id="org78d37dc">Q142: What is data lineage in event systems?</h3>
+<div class="outline-text-3" id="text-org78d37dc">
+<p>
+Tracking origin and transformations of data across services/topics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd21c79d" class="outline-3">
+<h3 id="orgd21c79d">Q143: What is poison message quarantine workflow?</h3>
+<div class="outline-text-3" id="text-orgd21c79d">
+<p>
+DLT + triage + fix + controlled replay + postmortem.
+</p>
+</div>
+</div>
+<div id="outline-container-org4966797" class="outline-3">
+<h3 id="org4966797">Q144: What is deterministic replay requirement?</h3>
+<div class="outline-text-3" id="text-org4966797">
+<p>
+Reprocessing should produce predictable results with versioned logic.
+</p>
+</div>
+</div>
+<div id="outline-container-org87919c5" class="outline-3">
+<h3 id="org87919c5">Q145: What is ordering recovery challenge after retries?</h3>
+<div class="outline-text-3" id="text-org87919c5">
+<p>
+Retry paths can alter apparent processing order across partitions/topics.
+</p>
+</div>
+</div>
+<div id="outline-container-org01092d5" class="outline-3">
+<h3 id="org01092d5">Q146: How preserve per-key ordering under retries?</h3>
+<div class="outline-text-3" id="text-org01092d5">
+<p>
+Keyed partitions + careful retry routing + ordered consumer execution policies.
+</p>
+</div>
+</div>
+<div id="outline-container-orgccf4bb0" class="outline-3">
+<h3 id="orgccf4bb0">Q147: What is throughput collapse during incidents?</h3>
+<div class="outline-text-3" id="text-orgccf4bb0">
+<p>
+Retries and downstream slowness consume consumer capacity.
+</p>
+</div>
+</div>
+<div id="outline-container-org730755c" class="outline-3">
+<h3 id="org730755c">Q148: How prevent retry storms in Kafka consumers?</h3>
+<div class="outline-text-3" id="text-org730755c">
+<p>
+Bound retries, circuit breakers, adaptive pause, retry budgets.
+</p>
+</div>
+</div>
+<div id="outline-container-orgab6c37c" class="outline-3">
+<h3 id="orgab6c37c">Q149: What is backpressure strategy in message consumers?</h3>
+<div class="outline-text-3" id="text-orgab6c37c">
+<p>
+Control poll/processing rate and downstream concurrency limits.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd427da8" class="outline-3">
+<h3 id="orgd427da8">Q150: What is cooperative rebalancing concept?</h3>
+<div class="outline-text-3" id="text-orgd427da8">
+<p>
+Rebalance strategy reducing stop-the-world partition movement impact.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ea6b80" class="outline-3">
+<h3 id="org2ea6b80">Q151: Why static membership can help?</h3>
+<div class="outline-text-3" id="text-org2ea6b80">
+<p>
+Reduces disruptive rebalances during brief restarts.
+</p>
+</div>
+</div>
+<div id="outline-container-org4ee1c1d" class="outline-3">
+<h3 id="org4ee1c1d">Q152: What is rack awareness in Kafka?</h3>
+<div class="outline-text-3" id="text-org4ee1c1d">
+<p>
+Replica placement across failure domains for resilience.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d8afdf" class="outline-3">
+<h3 id="org7d8afdf">Q153: What is unclean leader election risk?</h3>
+<div class="outline-text-3" id="text-org7d8afdf">
+<p>
+Can improve availability but risks data loss.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeb63a54" class="outline-3">
+<h3 id="orgeb63a54">Q154: What is min.insync.replicas importance?</h3>
+<div class="outline-text-3" id="text-orgeb63a54">
+<p>
+Defines durability threshold for successful writes with stronger ack settings.
+</p>
+</div>
+</div>
+<div id="outline-container-org74e36d3" class="outline-3">
+<h3 id="org74e36d3">Q155: acks=all without proper min.insync.replicas risk?</h3>
+<div class="outline-text-3" id="text-org74e36d3">
+<p>
+False sense of durability if ISR requirement too low.
+</p>
+</div>
+</div>
+<div id="outline-container-org3fea580" class="outline-3">
+<h3 id="org3fea580">Q156: What is compression in Kafka producers?</h3>
+<div class="outline-text-3" id="text-org3fea580">
+<p>
+Compress batches (snappy/lz4/zstd/gzip) to reduce bandwidth/storage.
+</p>
+</div>
+</div>
+<div id="outline-container-orga246f0e" class="outline-3">
+<h3 id="orga246f0e">Q157: Compression tradeoff?</h3>
+<div class="outline-text-3" id="text-orga246f0e">
+<p>
+CPU overhead vs network/storage efficiency.
+</p>
+</div>
+</div>
+<div id="outline-container-org8780cc5" class="outline-3">
+<h3 id="org8780cc5">Q158: What is linger.ms effect?</h3>
+<div class="outline-text-3" id="text-org8780cc5">
+<p>
+Wait briefly to batch more records, improving throughput with slight latency cost.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9f3cfe" class="outline-3">
+<h3 id="orgb9f3cfe">Q159: What is batch.size effect?</h3>
+<div class="outline-text-3" id="text-orgb9f3cfe">
+<p>
+Producer batch memory target influencing throughput/latency profile.
+</p>
+</div>
+</div>
+<div id="outline-container-org427c4ad" class="outline-3">
+<h3 id="org427c4ad">Q160: What is max.in.flight.requests.per.connection concern?</h3>
+<div class="outline-text-3" id="text-org427c4ad">
+<p>
+Affects ordering guarantees during retries for some configurations.
+</p>
+</div>
+</div>
+<div id="outline-container-org878a999" class="outline-3">
+<h3 id="org878a999">Q161: What is advanced security baseline for Kafka platforms?</h3>
+<div class="outline-text-3" id="text-org878a999">
+<p>
+TLS+mTLS, SCRAM/OAuth auth, ACL governance, secret rotation, audit logs.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc0ca10c" class="outline-3">
+<h3 id="orgc0ca10c">Q162: What is message-level encryption need?</h3>
+<div class="outline-text-3" id="text-orgc0ca10c">
+<p>
+Protect sensitive payload fields end-to-end beyond transport encryption.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e537b0" class="outline-3">
+<h3 id="org3e537b0">Q163: What is PII governance in event streams?</h3>
+<div class="outline-text-3" id="text-org3e537b0">
+<p>
+Schema classification, minimization, retention controls, deletion workflows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb3e0b28" class="outline-3">
+<h3 id="orgb3e0b28">Q164: What is right-to-erasure challenge with Kafka?</h3>
+<div class="outline-text-3" id="text-orgb3e0b28">
+<p>
+Immutable logs complicate deletion; use compaction/tombstones and data minimization strategies.
+</p>
+</div>
+</div>
+<div id="outline-container-org23f9e93" class="outline-3">
+<h3 id="org23f9e93">Q165: What is multi-cluster Kafka strategy?</h3>
+<div class="outline-text-3" id="text-org23f9e93">
+<p>
+Replication/failover across clusters for DR and geo requirements.
+</p>
+</div>
+</div>
+<div id="outline-container-org193c83a" class="outline-3">
+<h3 id="org193c83a">Q166: What is active-active messaging complexity?</h3>
+<div class="outline-text-3" id="text-org193c83a">
+<p>
+Conflict resolution, ordering, duplication, and failover coordination challenges.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf814658" class="outline-3">
+<h3 id="orgf814658">Q167: What is MirrorMaker/replication role conceptually?</h3>
+<div class="outline-text-3" id="text-orgf814658">
+<p>
+Replicate topics across clusters for disaster recovery/regional distribution.
+</p>
+</div>
+</div>
+<div id="outline-container-orga5baf6c" class="outline-3">
+<h3 id="orga5baf6c">Q168: What is SLA/SLO for messaging systems?</h3>
+<div class="outline-text-3" id="text-orga5baf6c">
+<p>
+Targets for publish latency, consumer lag, durability, and availability.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad9c28e" class="outline-3">
+<h3 id="orgad9c28e">Q169: What metrics are critical for Spring Kafka consumers?</h3>
+<div class="outline-text-3" id="text-orgad9c28e">
+<p>
+Lag, poll duration, processing latency, retry counts, DLT volume, rebalance frequency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbd9430e" class="outline-3">
+<h3 id="orgbd9430e">Q170: What metrics are critical for producers?</h3>
+<div class="outline-text-3" id="text-orgbd9430e">
+<p>
+Send latency, error rate, record retry rate, batch utilization, buffer exhaustion.
+</p>
+</div>
+</div>
+<div id="outline-container-org76ae5aa" class="outline-3">
+<h3 id="org76ae5aa">Q171: What is tracing strategy for async messaging?</h3>
+<div class="outline-text-3" id="text-org76ae5aa">
+<p>
+Propagate trace context in headers and create spans for produce/consume/process.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d19887" class="outline-3">
+<h3 id="org1d19887">Q172: What is incident response playbook for Kafka failures?</h3>
+<div class="outline-text-3" id="text-org1d19887">
+<p>
+Identify scope, isolate failing consumers, control retries, drain/replay safely.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc512ed6" class="outline-3">
+<h3 id="orgc512ed6">Q173: What is game day for messaging systems?</h3>
+<div class="outline-text-3" id="text-orgc512ed6">
+<p>
+Planned drills for broker outages, lag spikes, schema breakages, replay operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org003e22a" class="outline-3">
+<h3 id="org003e22a">Q174: Biggest advanced Spring Kafka anti-pattern?</h3>
+<div class="outline-text-3" id="text-org003e22a">
+<p>
+Treating messaging as fire-and-forget without contracts, observability, and replay design.
+</p>
+</div>
+</div>
+<div id="outline-container-org73c4cf2" class="outline-3">
+<h3 id="org73c4cf2">Q175: What is mature event-driven architecture indicator?</h3>
+<div class="outline-text-3" id="text-org73c4cf2">
+<p>
+Clear ownership of schemas, semantics, retries, and recovery workflows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb460b17" class="outline-3">
+<h3 id="orgb460b17">Q176: Final reliability principle for messaging?</h3>
+<div class="outline-text-3" id="text-orgb460b17">
+<p>
+Assume duplicates, delays, and partial failures are normal conditions.
+</p>
+</div>
+</div>
+<div id="outline-container-org8779850" class="outline-3">
+<h3 id="org8779850">Q177: Final performance principle?</h3>
+<div class="outline-text-3" id="text-org8779850">
+<p>
+Tune producers/consumers empirically with production-like workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org017cbf1" class="outline-3">
+<h3 id="org017cbf1">Q178: Final security principle?</h3>
+<div class="outline-text-3" id="text-org017cbf1">
+<p>
+Secure brokers, clients, payloads, and operational access paths end-to-end.
+</p>
+</div>
+</div>
+<div id="outline-container-org9cb544c" class="outline-3">
+<h3 id="org9cb544c">Q179: Final operations principle?</h3>
+<div class="outline-text-3" id="text-org9cb544c">
+<p>
+Automate monitoring, DLT handling, replay tooling, and runbooks.
+</p>
+</div>
+</div>
+<div id="outline-container-org47a7284" class="outline-3">
+<h3 id="org47a7284">Q180: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org47a7284">
+<p>
+Spring Kafka excellence means predictable correctness and operability at scale.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

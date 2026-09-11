@@ -1,0 +1,561 @@
+#+title: Spring Kafka / Messaging
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Kafka / Messaging
+
+-----
+
+* Beginner
+
+** Q1: What is messaging in distributed systems?
+Asynchronous communication where producers send messages and consumers process them.
+
+** Q2: Why use messaging?
+Decouples services, improves scalability, and enables asynchronous workflows.
+
+** Q3: What is Apache Kafka?
+A distributed event streaming platform for high-throughput, durable message processing.
+
+** Q4: What is Spring for Apache Kafka?
+Spring project providing convenient Kafka producer/consumer integration.
+
+** Q5: What is a topic?
+Named stream/category where Kafka records are published.
+
+** Q6: What is a partition?
+Ordered sub-log of a topic enabling parallelism and scalability.
+
+** Q7: What is an offset?
+Position of a record within a partition log.
+
+** Q8: What is a producer?
+Client that publishes records to Kafka topics.
+
+** Q9: What is a consumer?
+Client that reads records from Kafka topics.
+
+** Q10: What is a consumer group?
+Set of consumers sharing work of topic partitions.
+
+** Q11: How are partitions assigned in a group?
+Each partition is consumed by at most one consumer in a group at a time.
+
+** Q12: What is a broker?
+Kafka server node storing and serving topic partitions.
+
+** Q13: What is replication factor?
+Number of copies of each partition across brokers.
+
+** Q14: Why replication matters?
+Improves fault tolerance and availability.
+
+** Q15: What is leader partition replica?
+Replica handling reads/writes for a partition.
+
+** Q16: What are follower replicas?
+Replicas syncing from leader for redundancy.
+
+** Q17: What is ISR (in-sync replicas)?
+Replicas sufficiently caught up with leader.
+
+** Q18: What is Kafka record structure?
+Key, value, headers, timestamp, topic, partition, offset metadata.
+
+** Q19: Why use message keys?
+Control partitioning and preserve per-key ordering.
+
+** Q20: What is ordering guarantee in Kafka?
+Order is guaranteed within a partition, not across partitions.
+
+** Q21: What is Spring KafkaTemplate?
+Main helper for sending messages in Spring applications.
+
+** Q22: How do you consume messages in Spring Kafka?
+Typically with =@KafkaListener=.
+
+** Q23: What is @KafkaListener?
+Annotation marking method to receive Kafka messages from topics.
+
+** Q24: What is container factory in Spring Kafka?
+Config object controlling listener container behavior.
+
+** Q25: What is deserializer?
+Converts byte data from Kafka into Java objects.
+
+** Q26: What is serializer?
+Converts Java objects to bytes for Kafka transmission.
+
+** Q27: Common payload formats?
+JSON, Avro, Protobuf, plain strings, binary custom formats.
+
+** Q28: What is bootstrap servers config?
+Initial broker addresses for Kafka client connection discovery.
+
+** Q29: What is ack in producer send?
+Broker acknowledgment level for write durability behavior.
+
+** Q30: Common producer acks values?
+0, 1, all (or -1 equivalent).
+
+** Q31: What does acks=all imply?
+Leader waits for all in-sync replicas before acknowledging.
+
+** Q32: What is at-most-once delivery?
+Messages may be lost, but never redelivered.
+
+** Q33: What is at-least-once delivery?
+Messages are not lost (under expected conditions) but may be duplicated.
+
+** Q34: What is exactly-once semantics (EOS) concept?
+Processing/output appears once logically, requiring transactional/idempotent patterns.
+
+** Q35: Is “exactly once” simple in distributed systems?
+No, it needs careful end-to-end design.
+
+** Q36: What is auto-commit in consumers?
+Periodic automatic offset commits by client.
+
+** Q37: Why can auto-commit be risky?
+Offsets may commit before processing truly succeeds.
+
+** Q38: What is manual acknowledgment?
+Application explicitly commits offsets after successful processing.
+
+** Q39: Why use manual ack?
+Better control over processing and failure semantics.
+
+** Q40: What is rebalance?
+Redistribution of partitions among consumers in a group.
+
+** Q41: What can trigger rebalance?
+Consumer join/leave, crashes, subscription changes, metadata changes.
+
+** Q42: Why are frequent rebalances bad?
+Pause processing and increase latency/duplicate risk.
+
+** Q43: What is dead-letter topic (DLT)?
+Topic where failed/unprocessable messages are routed.
+
+** Q44: Why use dead-letter topics?
+Preserve problematic events for analysis/replay without blocking pipeline.
+
+** Q45: What is retry topic pattern?
+Failed messages retried via delayed/retry topics before DLT.
+
+** Q46: What is idempotent consumer?
+Consumer logic safe against duplicate message processing.
+
+** Q47: Why idempotency is critical?
+At-least-once delivery means duplicates can happen.
+
+** Q48: What is poison pill message?
+Record consistently failing processing due to bad data/schema/business rule.
+
+** Q49: How to handle poison pills?
+Route to DLT with diagnostics instead of infinite retries.
+
+** Q50: What is message header in Kafka?
+Metadata key-value pairs attached to records.
+
+** Q51: Header use cases?
+Trace IDs, schema version, tenant, source system identifiers.
+
+** Q52: What is lag?
+Difference between produced and consumed offsets.
+
+** Q53: Why monitor consumer lag?
+Indicates backlog growth and processing health.
+
+** Q54: What is retention in Kafka?
+How long records are kept (time/size policy).
+
+** Q55: What is compaction?
+Retention mode keeping latest record per key.
+
+** Q56: When use compacted topics?
+State/event-upsert streams where latest key state matters.
+
+** Q57: Beginner messaging anti-pattern?
+Assuming no duplicates and writing non-idempotent consumers.
+
+** Q58: Beginner observability baseline?
+Track throughput, lag, error rates, retry/DLT counts.
+
+** Q59: Beginner security baseline for Kafka?
+TLS, authentication, ACL authorization, secret management.
+
+** Q60: Beginner best practice?
+Design for retries, duplicates, and failure from day one.
+
+* Intermediate
+
+** Q61: What is producer idempotence in Kafka?
+Feature ensuring producer retries don’t create duplicates on broker log per session.
+
+** Q62: How enable producer idempotence conceptually?
+Set producer idempotence configuration and compatible reliability settings.
+
+** Q63: What is transactional producer?
+Producer that groups writes (and optionally offsets) into atomic transactions.
+
+** Q64: What is read_committed isolation?
+Consumers read only committed transactional records.
+
+** Q65: What is read_uncommitted?
+Consumers may read uncommitted/aborted transactional records.
+
+** Q66: What is transactional.id?
+Producer identity enabling transactional guarantees across restarts/sessions.
+
+** Q67: What is outbox pattern with Spring Kafka?
+Write domain change + outbox row in DB transaction, publish asynchronously to Kafka.
+
+** Q68: Why outbox pattern?
+Avoid dual-write inconsistency between DB and Kafka send.
+
+** Q69: What is dual-write problem?
+DB commit succeeds but publish fails, or publish succeeds but DB rollback.
+
+** Q70: CDC vs polling outbox?
+CDC streams DB changes; polling periodically reads outbox table.
+
+** Q71: What is @Transactional with Kafka integration caveat?
+DB and Kafka transactions are distinct unless explicitly coordinated pattern used.
+
+** Q72: What is Chained transaction manager concept (historical/complex)?
+Attempts multi-resource coordination; often replaced by outbox for simplicity/resilience.
+
+** Q73: What is concurrency setting in @KafkaListener container?
+Number of concurrent consumer threads/containers.
+
+** Q74: How does concurrency relate to partitions?
+Effective parallelism limited by partition count per group.
+
+** Q75: What if concurrency > partitions?
+Extra threads idle for that topic/group combination.
+
+** Q76: What is max.poll.records?
+Max records returned in one poll call.
+
+** Q77: Why tune max.poll.records?
+Balance throughput, processing time, and rebalance timeout risk.
+
+** Q78: What is max.poll.interval.ms?
+Max allowed delay between polls before consumer considered failed.
+
+** Q79: Long processing risk with max.poll.interval?
+Consumer removed from group causing rebalance/duplicates.
+
+** Q80: What is session.timeout.ms?
+Failure detection timeout for consumer heartbeats.
+
+** Q81: What is heartbeat interval?
+Frequency of consumer liveness heartbeats to group coordinator.
+
+** Q82: What is pause/resume consumption?
+Temporarily stop/resume partition fetching for backpressure/control.
+
+** Q83: When pause partitions?
+Downstream outage, overload, or controlled throttling scenarios.
+
+** Q84: What is CommonErrorHandler (Spring Kafka)?
+Centralized listener error handling strategy in modern Spring Kafka.
+
+** Q85: What is DefaultErrorHandler?
+Configurable error handler supporting retries, backoff, and recovery.
+
+** Q86: What is BackOff strategy?
+Delay policy between retry attempts (fixed/exponential).
+
+** Q87: Why exponential backoff?
+Reduces pressure on failing dependencies over time.
+
+** Q88: What is DeadLetterPublishingRecoverer?
+Publishes failed records to DLT after retries exhausted.
+
+** Q89: What context should be added to DLT messages?
+Original topic/partition/offset, exception type, stack summary, timestamp, trace ID.
+
+** Q90: What is seek in consumer error handling?
+Move offset position to reprocess or skip records intentionally.
+
+** Q91: What is ack mode in listener containers?
+Defines when offsets are committed (record, batch, manual, etc.).
+
+** Q92: Record ack mode vs batch ack mode?
+Commit per record vs per batch of polled records.
+
+** Q93: What is batch listener?
+Listener receives list of records for batch processing.
+
+** Q94: Batch listener tradeoff?
+Higher throughput but more complex error granularity.
+
+** Q95: What is record filtering strategy?
+Drop duplicates/unwanted records before listener logic.
+
+** Q96: What is RecordFilterStrategy?
+Spring hook for filtering records pre-processing.
+
+** Q97: Why include schema version in messages?
+Supports backward/forward-compatible deserialization and migration.
+
+** Q98: What is schema registry concept?
+Central service storing and validating message schemas.
+
+** Q99: Why use Avro/Protobuf with schema registry?
+Strong contracts and evolution controls for event payloads.
+
+** Q100: What is backward compatibility in schema evolution?
+New schema can read old data.
+
+** Q101: What is forward compatibility?
+Old consumers can read new producer data under defined rules.
+
+** Q102: What is full compatibility?
+Both backward and forward compatibility constraints satisfied.
+
+** Q103: What is tombstone record?
+Compacted-topic record with key and null value indicating delete semantics.
+
+** Q104: Why careful with null payload handling?
+Deserializer/business logic must distinguish tombstones from malformed data.
+
+** Q105: What is partition key design principle?
+Stable business key balancing ordering needs and partition distribution.
+
+** Q106: What is hot partition problem?
+Uneven key distribution overloads specific partition/consumer.
+
+** Q107: How mitigate hot partitions?
+Better key strategy, more partitions, key salting (carefully), workload redesign.
+
+** Q108: What is message ordering vs parallelism tradeoff?
+More partitions improve parallelism but ordering is per key/partition only.
+
+** Q109: What is request-reply messaging over Kafka?
+Pattern using reply topics/correlation IDs for pseudo-synchronous workflows.
+
+** Q110: When avoid request-reply over Kafka?
+Low-latency synchronous requirements often better served by HTTP/gRPC.
+
+** Q111: What is exactly-once in Kafka Streams vs consumer apps?
+Kafka Streams has built-in EOS features; plain consumers need explicit patterns.
+
+** Q112: What is retry topic orchestration pattern?
+Route failures through staged retry topics with increasing delays.
+
+** Q113: What is non-blocking retry concept?
+Main consumer continues processing newer messages while failed ones retry asynchronously.
+
+** Q114: What is blocking retry concept?
+Consumer thread retries immediately, potentially reducing throughput.
+
+** Q115: What is intermediate anti-pattern in messaging?
+Infinite retries with no DLT and no observability.
+
+** Q116: Better failure strategy?
+Bounded retries + backoff + DLT + replay tooling.
+
+** Q117: What is replay strategy?
+Reprocess historical or DLT events safely with idempotent logic.
+
+** Q118: Why replay tooling is essential?
+Incidents/data fixes often require controlled reprocessing.
+
+** Q119: What is secure deserialization concern?
+Avoid unsafe polymorphic deserialization that enables gadget attacks.
+
+** Q120: How harden deserialization?
+Trusted packages, explicit type mapping, schema validation, minimal polymorphism.
+
+** Q121: What is ACL in Kafka?
+Authorization rules controlling topic/group operations.
+
+** Q122: Why principle of least privilege for Kafka ACLs?
+Limit blast radius of compromised credentials/services.
+
+** Q123: Intermediate maturity signal?
+Team can explain delivery semantics and offset strategy per consumer.
+
+** Q124: Intermediate testing strategy?
+Embedded/integration tests with real broker containers + failure scenarios.
+
+** Q125: Why test rebalance scenarios?
+They frequently reveal duplication/order and timeout bugs.
+
+** Q126: What is contract testing for events?
+Validate producer/consumer schema and semantic expectations continuously.
+
+** Q127: Why monitor DLT rate trends?
+Spikes indicate upstream regressions or schema/data drift.
+
+** Q128: What is lag-based autoscaling concept?
+Scale consumers based on lag/throughput metrics.
+
+** Q129: Why lag alone can mislead scaling?
+Need partition limits, processing cost, and downstream capacity context.
+
+** Q130: Intermediate best practice?
+Optimize for correctness first, then throughput with measured tuning.
+
+* Advanced
+
+** Q131: What is end-to-end exactly-once challenge?
+Requires coordinated idempotency/transactions across producers, brokers, consumers, and sinks.
+
+** Q132: Why Kafka EOS alone may be insufficient?
+External DB/API side effects still need idempotent handling.
+
+** Q133: What is idempotency key store pattern?
+Persist processed event IDs/keys to prevent duplicate side effects.
+
+** Q134: Tradeoff of idempotency store?
+Extra storage/lookups vs correctness under retries/replays.
+
+** Q135: What is transactional outbox relay scaling concern?
+Relay throughput, lock contention, and ordering guarantees need careful design.
+
+** Q136: Polling outbox vs CDC advanced tradeoff?
+Polling simpler but adds query load/latency; CDC near-real-time but operationally heavier.
+
+** Q137: What is event versioning strategy?
+Use explicit version fields and compatibility rules per event type.
+
+** Q138: What is schema evolution anti-pattern?
+Breaking field changes without staged consumer migration.
+
+** Q139: What is consumer-driven event evolution?
+Producers coordinate changes based on downstream consumer compatibility needs.
+
+** Q140: What is event envelope pattern?
+Standard metadata wrapper (id, type, version, timestamp, trace) around payload.
+
+** Q141: Why event envelope helps?
+Consistent observability, routing, governance across topics.
+
+** Q142: What is data lineage in event systems?
+Tracking origin and transformations of data across services/topics.
+
+** Q143: What is poison message quarantine workflow?
+DLT + triage + fix + controlled replay + postmortem.
+
+** Q144: What is deterministic replay requirement?
+Reprocessing should produce predictable results with versioned logic.
+
+** Q145: What is ordering recovery challenge after retries?
+Retry paths can alter apparent processing order across partitions/topics.
+
+** Q146: How preserve per-key ordering under retries?
+Keyed partitions + careful retry routing + ordered consumer execution policies.
+
+** Q147: What is throughput collapse during incidents?
+Retries and downstream slowness consume consumer capacity.
+
+** Q148: How prevent retry storms in Kafka consumers?
+Bound retries, circuit breakers, adaptive pause, retry budgets.
+
+** Q149: What is backpressure strategy in message consumers?
+Control poll/processing rate and downstream concurrency limits.
+
+** Q150: What is cooperative rebalancing concept?
+Rebalance strategy reducing stop-the-world partition movement impact.
+
+** Q151: Why static membership can help?
+Reduces disruptive rebalances during brief restarts.
+
+** Q152: What is rack awareness in Kafka?
+Replica placement across failure domains for resilience.
+
+** Q153: What is unclean leader election risk?
+Can improve availability but risks data loss.
+
+** Q154: What is min.insync.replicas importance?
+Defines durability threshold for successful writes with stronger ack settings.
+
+** Q155: acks=all without proper min.insync.replicas risk?
+False sense of durability if ISR requirement too low.
+
+** Q156: What is compression in Kafka producers?
+Compress batches (snappy/lz4/zstd/gzip) to reduce bandwidth/storage.
+
+** Q157: Compression tradeoff?
+CPU overhead vs network/storage efficiency.
+
+** Q158: What is linger.ms effect?
+Wait briefly to batch more records, improving throughput with slight latency cost.
+
+** Q159: What is batch.size effect?
+Producer batch memory target influencing throughput/latency profile.
+
+** Q160: What is max.in.flight.requests.per.connection concern?
+Affects ordering guarantees during retries for some configurations.
+
+** Q161: What is advanced security baseline for Kafka platforms?
+TLS+mTLS, SCRAM/OAuth auth, ACL governance, secret rotation, audit logs.
+
+** Q162: What is message-level encryption need?
+Protect sensitive payload fields end-to-end beyond transport encryption.
+
+** Q163: What is PII governance in event streams?
+Schema classification, minimization, retention controls, deletion workflows.
+
+** Q164: What is right-to-erasure challenge with Kafka?
+Immutable logs complicate deletion; use compaction/tombstones and data minimization strategies.
+
+** Q165: What is multi-cluster Kafka strategy?
+Replication/failover across clusters for DR and geo requirements.
+
+** Q166: What is active-active messaging complexity?
+Conflict resolution, ordering, duplication, and failover coordination challenges.
+
+** Q167: What is MirrorMaker/replication role conceptually?
+Replicate topics across clusters for disaster recovery/regional distribution.
+
+** Q168: What is SLA/SLO for messaging systems?
+Targets for publish latency, consumer lag, durability, and availability.
+
+** Q169: What metrics are critical for Spring Kafka consumers?
+Lag, poll duration, processing latency, retry counts, DLT volume, rebalance frequency.
+
+** Q170: What metrics are critical for producers?
+Send latency, error rate, record retry rate, batch utilization, buffer exhaustion.
+
+** Q171: What is tracing strategy for async messaging?
+Propagate trace context in headers and create spans for produce/consume/process.
+
+** Q172: What is incident response playbook for Kafka failures?
+Identify scope, isolate failing consumers, control retries, drain/replay safely.
+
+** Q173: What is game day for messaging systems?
+Planned drills for broker outages, lag spikes, schema breakages, replay operations.
+
+** Q174: Biggest advanced Spring Kafka anti-pattern?
+Treating messaging as fire-and-forget without contracts, observability, and replay design.
+
+** Q175: What is mature event-driven architecture indicator?
+Clear ownership of schemas, semantics, retries, and recovery workflows.
+
+** Q176: Final reliability principle for messaging?
+Assume duplicates, delays, and partial failures are normal conditions.
+
+** Q177: Final performance principle?
+Tune producers/consumers empirically with production-like workloads.
+
+** Q178: Final security principle?
+Secure brokers, clients, payloads, and operational access paths end-to-end.
+
+** Q179: Final operations principle?
+Automate monitoring, DLT handling, replay tooling, and runbooks.
+
+** Q180: Final maturity principle?
+Spring Kafka excellence means predictable correctness and operability at scale.
+
+-----
+
+#+INCLUDE: "../footer.org"

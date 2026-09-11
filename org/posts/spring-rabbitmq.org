@@ -1,0 +1,546 @@
+#+title: Spring RabbitMQ / Messaging
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring RabbitMQ / Messaging
+
+-----
+
+* Beginner
+
+** Q1: What is RabbitMQ?
+RabbitMQ is a message broker implementing AMQP and related protocols for asynchronous communication.
+
+** Q2: What is Spring AMQP?
+Spring project providing abstractions and integrations for AMQP brokers like RabbitMQ.
+
+** Q3: What is Spring Rabbit?
+Module in Spring AMQP focused on RabbitMQ support.
+
+** Q4: Why use messaging with RabbitMQ?
+Decouples producers/consumers, supports async processing, and smooths traffic spikes.
+
+** Q5: What is AMQP?
+Application-level messaging protocol defining exchanges, queues, bindings, and routing rules.
+
+** Q6: What is a producer in RabbitMQ?
+Application that publishes messages to an exchange.
+
+** Q7: What is a consumer?
+Application that receives messages from queues.
+
+** Q8: What is a queue?
+Buffer storing messages until consumed.
+
+** Q9: What is an exchange?
+Router that receives messages and routes them to queues based on rules.
+
+** Q10: What is a binding?
+Association between exchange and queue with optional routing pattern/key.
+
+** Q11: What is routing key?
+Message attribute used by exchanges to decide routing.
+
+** Q12: What is RabbitTemplate?
+Spring helper class for sending/receiving messages with RabbitMQ.
+
+** Q13: What is @RabbitListener?
+Annotation to declare asynchronous message listener methods.
+
+** Q14: What is listener container?
+Runtime component managing consumer threads, channels, and message delivery to listeners.
+
+** Q15: Why are exchanges used instead of publishing directly to queues?
+They provide flexible decoupled routing and fanout patterns.
+
+** Q16: What are core exchange types?
+Direct, Topic, Fanout, Headers.
+
+** Q17: Direct exchange behavior?
+Routes by exact routing key match.
+
+** Q18: Topic exchange behavior?
+Routes by pattern matching routing keys with wildcards.
+
+** Q19: Fanout exchange behavior?
+Broadcasts message to all bound queues, ignoring routing key.
+
+** Q20: Headers exchange behavior?
+Routes based on header values instead of routing key.
+
+** Q21: Topic wildcard * meaning?
+Matches exactly one routing key segment.
+
+** Q22: Topic wildcard # meaning?
+Matches zero or more routing key segments.
+
+** Q23: What is default exchange?
+Built-in direct exchange routing by queue name.
+
+** Q24: What is message acknowledgment?
+Consumer confirms successful processing to broker.
+
+** Q25: Why are acknowledgments important?
+Prevent message loss and enable redelivery on failure.
+
+** Q26: Auto-ack vs manual ack?
+Auto acknowledges on delivery; manual ack after successful processing.
+
+** Q27: Why prefer manual ack for critical processing?
+More control over failure and redelivery semantics.
+
+** Q28: What is message redelivery?
+Broker re-sends unacked/rejected-requeue messages.
+
+** Q29: What is negative acknowledgment (nack)?
+Consumer indicates failure, optionally requesting requeue.
+
+** Q30: What is reject?
+Rejects single message with optional requeue flag.
+
+** Q31: What is prefetch count?
+Limit of unacked messages delivered per consumer/channel.
+
+** Q32: Why prefetch tuning matters?
+Balances throughput, fairness, and consumer memory pressure.
+
+** Q33: What is durable queue?
+Queue definition survives broker restart.
+
+** Q34: What is persistent message?
+Message marked for disk persistence (with durable queue/exchange for durability goals).
+
+** Q35: Is durable queue alone enough for full durability?
+No, publishing and broker settings also matter.
+
+** Q36: What is exclusive queue?
+Queue used by one connection and deleted when connection closes.
+
+** Q37: What is auto-delete queue?
+Queue deleted when no consumers remain (per rules).
+
+** Q38: What is dead-letter exchange (DLX)?
+Exchange receiving messages that expire/reject/maxlen out from queues.
+
+** Q39: What is dead-letter queue (DLQ)?
+Queue bound to DLX for failed/unroutable lifecycle messages.
+
+** Q40: Why use DLQ?
+Prevents poison messages from blocking normal processing.
+
+** Q41: What is TTL in RabbitMQ?
+Time-to-live for messages or queues.
+
+** Q42: Message TTL vs queue TTL?
+Message TTL expires messages; queue TTL expires unused queues.
+
+** Q43: What is poison message?
+Message consistently failing consumer processing.
+
+** Q44: How handle poison messages?
+Bounded retries then route to DLQ for triage.
+
+** Q45: What is RPC over RabbitMQ concept?
+Request/reply pattern using reply queues and correlation IDs.
+
+** Q46: What is correlationId used for?
+Match replies to original requests.
+
+** Q47: What is message converter in Spring AMQP?
+Converts payload between Java objects and AMQP message bytes.
+
+** Q48: Common converter for JSON?
+Jackson2JsonMessageConverter.
+
+** Q49: Why include content-type header?
+Helps consumers choose correct deserialization.
+
+** Q50: What is queue depth?
+Current message count waiting in queue.
+
+** Q51: Why monitor queue depth?
+Shows backlog and consumer capacity mismatch.
+
+** Q52: What is consumer lag equivalent in RabbitMQ?
+Queue backlog growth and message age trends.
+
+** Q53: Beginner anti-pattern in RabbitMQ?
+Assuming exactly-once delivery without idempotent consumer logic.
+
+** Q54: Are duplicates possible in RabbitMQ workflows?
+Yes, due to retries/redelivery/network failures.
+
+** Q55: What is idempotent consumer?
+Consumer safe to process same message multiple times.
+
+** Q56: Beginner observability baseline?
+Track publish rate, consume rate, ack/nack/requeue, queue depth, DLQ count.
+
+** Q57: Beginner security baseline?
+TLS, authenticated users, vhost isolation, least-privilege permissions.
+
+** Q58: What is vhost in RabbitMQ?
+Logical namespace isolating exchanges/queues/users/permissions.
+
+** Q59: Why use vhosts?
+Multi-tenant/environment isolation and safer permission scoping.
+
+** Q60: Beginner best practice?
+Design for failures/retries and keep routing topology explicit/documented.
+
+* Intermediate
+
+** Q61: What is publisher confirm?
+Broker acknowledgment that published message reached broker-side handling path.
+
+** Q62: Why publisher confirms matter?
+Detect publish failures and improve delivery guarantees.
+
+** Q63: What is publisher return?
+Callback when message is unroutable and mandatory flag is set.
+
+** Q64: Confirm vs return difference?
+Confirm acknowledges broker receipt; return signals routing failure.
+
+** Q65: What is mandatory publish flag?
+Requests broker to return unroutable messages to producer.
+
+** Q66: What is alternate exchange?
+Fallback exchange for unroutable messages.
+
+** Q67: Why use alternate exchange?
+Centralized handling of routing misses.
+
+** Q68: What is listener concurrency in Spring Rabbit?
+Number/range of consumer threads in listener container.
+
+** Q69: How set concurrency safely?
+Tune based on queue partitions/workload, CPU, downstream capacity.
+
+** Q70: What is SimpleMessageListenerContainer?
+Classic listener container implementation with configurable consumers.
+
+** Q71: What is DirectMessageListenerContainer?
+Alternative container with different threading/channel model and responsiveness tradeoffs.
+
+** Q72: What is container acknowledgment mode?
+AUTO, MANUAL, NONE modes controlling ack behavior.
+
+** Q73: What does AUTO ack mode do in Spring?
+Container acks on successful listener completion; errors can trigger reject/requeue policies.
+
+** Q74: What is requeue rejected behavior?
+Determines whether failed messages return to queue or dead-letter/drop path.
+
+** Q75: Why endless requeue is dangerous?
+Creates hot-loop failures and resource exhaustion.
+
+** Q76: What is retry interceptor in Spring AMQP?
+Applies retry logic around listener processing.
+
+** Q77: Stateless vs stateful retry?
+Stateful can correlate retries by message; stateless simpler but less contextual tracking.
+
+** Q78: What is backoff policy in retries?
+Controls delay between retry attempts.
+
+** Q79: Why bounded retries are important?
+Prevent infinite loops and backlog collapse.
+
+** Q80: What is RepublishMessageRecoverer?
+After retries, republishes failed message (often to error exchange) with diagnostics.
+
+** Q81: What metadata should error republish include?
+Exception info, stack summary, original exchange/routing key, timestamp, trace id.
+
+** Q82: What is delayed retry pattern with TTL + DLX?
+Message sent to delay queue with TTL, then dead-lettered back for retry.
+
+** Q83: Why use delayed retries?
+Avoid immediate retry storms and allow dependency recovery.
+
+** Q84: What is x-death header?
+RabbitMQ header tracking dead-lettering history.
+
+** Q85: Why inspect x-death?
+Understand retry/death count and routing path.
+
+** Q86: What is quorum queue?
+Replicated durable queue type using Raft for high availability.
+
+** Q87: Classic mirrored queue vs quorum queue?
+Quorum is modern replicated approach; mirrored classic is legacy/deprecated path.
+
+** Q88: What is stream queue concept in RabbitMQ?
+Log-like queue type optimized for high-throughput streaming use cases.
+
+** Q89: When choose quorum queues?
+When strong durability/HA is priority for work queues.
+
+** Q90: Quorum tradeoff?
+Higher resource overhead compared to simple classic queues.
+
+** Q91: What is single active consumer feature?
+Ensures only one active consumer processes queue at a time for strict ordering semantics.
+
+** Q92: Why single active consumer?
+Simplify ordering-sensitive workloads.
+
+** Q93: What is message ordering guarantee in RabbitMQ?
+Queue preserves order, but redeliveries/multiple consumers can affect perceived ordering.
+
+** Q94: How improve ordering guarantees?
+Single consumer (or single active consumer) and careful retry strategy.
+
+** Q95: What is competing consumers pattern?
+Multiple consumers process messages from same queue for scalability.
+
+** Q96: What is work queue fair dispatch concern?
+Prefetch and consumer speed influence load distribution fairness.
+
+** Q97: What is batching in consumers?
+Process multiple messages together for throughput efficiency.
+
+** Q98: Batching tradeoff?
+Higher throughput but larger failure/rollback complexity.
+
+** Q99: What is transactional channel in RabbitMQ?
+AMQP tx mode for publish/ack atomicity on channel (often slower).
+
+** Q100: Why often prefer confirms over channel transactions?
+Better performance/scalability for publisher reliability.
+
+** Q101: What is Spring transaction integration with Rabbit listeners?
+Coordinate DB and message ack flow carefully (best-effort patterns).
+
+** Q102: Exactly-once with DB + Rabbit straightforward?
+No, requires idempotency/outbox/inbox patterns.
+
+** Q103: What is inbox pattern?
+Store processed message IDs/results to deduplicate consumer side effects.
+
+** Q104: What is outbox pattern with RabbitMQ?
+Persist event in DB transaction, publish asynchronously from outbox.
+
+** Q105: Why outbox helps?
+Avoids dual-write inconsistencies between DB updates and publish.
+
+** Q106: What is message schema versioning?
+Managing payload evolution with backward/forward compatibility.
+
+** Q107: Why include schemaVersion field/header?
+Consumer can apply version-specific parsing/logic.
+
+** Q108: What is contract testing for messaging?
+Verify producer and consumer agree on schema/semantics.
+
+** Q109: What is payload bloat issue?
+Large messages increase latency, memory, and broker pressure.
+
+** Q110: Large payload mitigation?
+Store blob externally and send reference/event metadata.
+
+** Q111: What is message compression tradeoff?
+Lower bandwidth/storage vs higher CPU.
+
+** Q112: What is connection vs channel in AMQP?
+Connection is TCP-level link; channels are lightweight multiplexed sessions.
+
+** Q113: Why reuse channels/connections via caching factory?
+Reduce connection overhead and improve throughput.
+
+** Q114: What is CachingConnectionFactory?
+Spring component caching channels/connections for efficiency.
+
+** Q115: What is intermediate anti-pattern?
+One queue for unrelated event types with weak routing semantics.
+
+** Q116: Better topology approach?
+Explicit exchanges/routing keys/queues per domain concern.
+
+** Q117: What is consumer priority?
+Broker feature preferring higher-priority consumers.
+
+** Q118: When use consumer priority?
+Special failover/operational control scenarios (use cautiously).
+
+** Q119: What is intermediate testing approach?
+Integration tests with real RabbitMQ container + routing/failure scenarios.
+
+** Q120: Why test DLQ flows explicitly?
+Failure handling is core behavior, not edge case.
+
+** Q121: What is intermediate observability must-have?
+Per-queue depth/age, ack-nack-requeue rates, consumer utilization, error routing counts.
+
+** Q122: What is message age metric?
+Time message spends queued before consumption.
+
+** Q123: Why message age is important?
+Shows latent backlog risk even if queue depth seems moderate.
+
+** Q124: Intermediate maturity signal?
+Team can explain each queue’s purpose, SLA, retry, and DLQ policy.
+
+** Q125: Intermediate best practice?
+Model topology intentionally and validate with production-like load tests.
+
+* Advanced
+
+** Q126: What is end-to-end delivery semantics challenge?
+Producer confirms, broker durability, and consumer idempotency must align for reliability goals.
+
+** Q127: Why “exactly once” is hard with RabbitMQ integrations?
+Network retries/crashes can duplicate deliveries and side effects.
+
+** Q128: Advanced idempotency strategy?
+Use deterministic business keys + dedup store + idempotent writes.
+
+** Q129: What is dedup store TTL concern?
+Too short misses late duplicates; too long increases storage cost.
+
+** Q130: What is retry storm in RabbitMQ?
+Many failing messages repeatedly requeued causing broker/consumer overload.
+
+** Q131: How prevent retry storms?
+Bounded retries, delayed retries, circuit breakers, quarantine queues.
+
+** Q132: What is parking lot queue?
+Queue for manually triaged messages after retry exhaustion.
+
+** Q133: Why use parking lot over immediate discard?
+Preserves evidence and supports controlled replay.
+
+** Q134: What is replay pipeline requirement?
+Safe tools to reprocess DLQ/parking messages with rate limits/idempotency.
+
+** Q135: What is backpressure strategy in consumers?
+Limit concurrency/prefetch and coordinate downstream capacity.
+
+** Q136: Prefetch too high risk?
+Memory growth and unfair dispatch; slow recovery during failures.
+
+** Q137: Prefetch too low risk?
+Underutilization and reduced throughput.
+
+** Q138: What is flow control in RabbitMQ?
+Broker mechanisms slowing publishers under memory/disk pressure.
+
+** Q139: How should publishers react to backpressure?
+Apply retry/backoff and circuit breaking, avoid unbounded buffering.
+
+** Q140: What is cluster partition handling concern?
+Network partitions can impact availability/consistency behavior.
+
+** Q141: What is quorum queue leader placement impact?
+Affects latency and failure-domain resilience.
+
+** Q142: What is geo-distributed RabbitMQ challenge?
+Higher latency and consensus overhead for replicated queues.
+
+** Q143: DR strategy with RabbitMQ?
+Federation/shovel/replication patterns + tested failover runbooks.
+
+** Q144: Federation vs shovel conceptually?
+Federation links brokers dynamically; shovel moves messages between endpoints.
+
+** Q145: What is security hardening baseline for RabbitMQ?
+TLS everywhere, credential rotation, vhost isolation, least-privilege perms, audit logs.
+
+** Q146: What is mTLS benefit for messaging?
+Strong mutual authentication of clients and brokers.
+
+** Q147: What is secret sprawl risk?
+Hardcoded creds across services/environments.
+
+** Q148: How reduce secret sprawl?
+Central secret manager + short-lived credentials + rotation automation.
+
+** Q149: What is PII handling in messages?
+Minimize sensitive data, encrypt where needed, enforce retention/deletion policies.
+
+** Q150: What is compliance retention challenge?
+Need lifecycle controls for queues, DLQs, backups, and logs.
+
+** Q151: What is schema evolution safe rollout?
+Consumer-first compatibility, dual-read/write transforms if needed.
+
+** Q152: What is canary consumer deployment?
+Deploy new consumer to subset and compare behavior before full rollout.
+
+** Q153: What is shadow consumption?
+Consume/copy messages for validation without affecting primary processing.
+
+** Q154: What is exactly-once effect approximation pattern?
+At-least-once delivery + idempotent side effects + reconciliation jobs.
+
+** Q155: What is reconciliation role in messaging systems?
+Detect and repair missed/duplicated business outcomes.
+
+** Q156: What is observability gold standard for RabbitMQ?
+Unified dashboards for publish/consume, backlog age, retries, DLQ, broker resource health.
+
+** Q157: Key broker resource metrics?
+Memory, disk free alarms, file descriptors, connection/channel counts.
+
+** Q158: Why monitor connection churn?
+Frequent reconnects indicate instability and increase overhead.
+
+** Q159: What is incident playbook for stuck queues?
+Identify bottleneck, scale/fix consumers, control retries, drain safely, validate outcomes.
+
+** Q160: What is brownout strategy for messaging platforms?
+Temporarily disable noncritical consumers/features during overload.
+
+** Q161: What is chaos testing for RabbitMQ workloads?
+Inject broker restarts/network delay/consumer crashes to verify resilience.
+
+** Q162: Why practice failover drills?
+Ensures operational readiness before real outages.
+
+** Q163: What is topology-as-code?
+Declarative exchange/queue/binding definitions versioned with application/platform code.
+
+** Q164: Why topology-as-code matters?
+Consistency, repeatability, auditable changes across environments.
+
+** Q165: What is multi-tenant isolation strategy in RabbitMQ?
+Separate vhosts/queues/policies/quotas per tenant or domain.
+
+** Q166: What is noisy-neighbor mitigation?
+Resource limits, per-tenant quotas, isolated clusters if needed.
+
+** Q167: What is advanced anti-pattern in Spring RabbitMQ?
+Combining business orchestration logic with ad-hoc retry loops in listeners.
+
+** Q168: Better architectural approach?
+Clear state machines/workflow engines + messaging for events/commands.
+
+** Q169: What is final reliability principle?
+Assume duplicates, delays, and outages; engineer deterministic recovery paths.
+
+** Q170: What is final performance principle?
+Tune prefetch, concurrency, and topology empirically with realistic loads.
+
+** Q171: What is final security principle?
+Protect transport, identities, permissions, and payload sensitivity end-to-end.
+
+** Q172: What is final operations principle?
+Automate monitoring, alerting, replay, and topology governance.
+
+** Q173: What is mature team behavior in RabbitMQ ecosystems?
+They can explain routing, retry, and failure semantics per queue clearly.
+
+** Q174: What is final architecture principle?
+Use messaging boundaries to decouple services, not to hide unclear domain design.
+
+** Q175: Final maturity principle?
+Spring RabbitMQ success means predictable correctness and operability under failure.
+
+-----
+
+#+INCLUDE: "../footer.org"
