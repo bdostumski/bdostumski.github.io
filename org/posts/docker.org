@@ -556,6 +556,27 @@ Standardize policies/templates and enforce continuously in CI/CD.
 ** Q180: Final maturity principle?
 Docker excellence is reproducible, secure, observable, and operable container delivery at scale.
 
+#+BEGIN_SRC dockerfile
+# Build stage
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw -q -DskipTests package
+
+# Runtime stage
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+# Create non-root user
+RUN useradd -r -u 10001 appuser
+USER 10001
+
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+#+END_SRC
+
 -----
 
 #+INCLUDE: "../footer.org"

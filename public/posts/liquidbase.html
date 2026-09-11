@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Liquibase</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Liquibase</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org403951a" class="outline-2">
+<h2 id="org403951a">Liquibase</h2>
+<div class="outline-text-2" id="text-org403951a">
+<hr>
+</div>
+</div>
+<div id="outline-container-org97af507" class="outline-2">
+<h2 id="org97af507">Beginner</h2>
+<div class="outline-text-2" id="text-org97af507">
+</div>
+<div id="outline-container-org78cea77" class="outline-3">
+<h3 id="org78cea77">Q1: What is Liquibase?</h3>
+<div class="outline-text-3" id="text-org78cea77">
+<p>
+Liquibase is a database schema change management tool using changelogs to track and apply migrations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbe44e0f" class="outline-3">
+<h3 id="orgbe44e0f">Q2: Why use Liquibase?</h3>
+<div class="outline-text-3" id="text-orgbe44e0f">
+<p>
+It makes database changes repeatable, auditable, and automatable across environments.
+</p>
+</div>
+</div>
+<div id="outline-container-org440007a" class="outline-3">
+<h3 id="org440007a">Q3: What problem does Liquibase solve?</h3>
+<div class="outline-text-3" id="text-org440007a">
+<p>
+Schema drift and unsafe manual SQL deployments.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf6dfc50" class="outline-3">
+<h3 id="orgf6dfc50">Q4: What is a changelog?</h3>
+<div class="outline-text-3" id="text-orgf6dfc50">
+<p>
+A file (XML/YAML/JSON/SQL) describing database changes in ordered changeSets.
+</p>
+</div>
+</div>
+<div id="outline-container-org6986c3b" class="outline-3">
+<h3 id="org6986c3b">Q5: What is a changeSet?</h3>
+<div class="outline-text-3" id="text-org6986c3b">
+<p>
+Smallest unit of change in Liquibase with unique identity and execution metadata.
+</p>
+</div>
+</div>
+<div id="outline-container-org0823cde" class="outline-3">
+<h3 id="org0823cde">Q6: How is a changeSet uniquely identified?</h3>
+<div class="outline-text-3" id="text-org0823cde">
+<p>
+By <code>id</code> + <code>author</code> + changelog path.
+</p>
+</div>
+</div>
+<div id="outline-container-org7fd55e0" class="outline-3">
+<h3 id="org7fd55e0">Q7: What tables does Liquibase use for tracking?</h3>
+<div class="outline-text-3" id="text-org7fd55e0">
+<p>
+Typically <code>DATABASECHANGELOG</code> and <code>DATABASECHANGELOGLOCK</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb9a051" class="outline-3">
+<h3 id="orgbb9a051">Q8: What is DATABASECHANGELOG?</h3>
+<div class="outline-text-3" id="text-orgbb9a051">
+<p>
+History table recording executed changeSets.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfeafff9" class="outline-3">
+<h3 id="orgfeafff9">Q9: What is DATABASECHANGELOGLOCK?</h3>
+<div class="outline-text-3" id="text-orgfeafff9">
+<p>
+Lock table preventing concurrent migration execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org242e523" class="outline-3">
+<h3 id="org242e523">Q10: Why locking is important?</h3>
+<div class="outline-text-3" id="text-org242e523">
+<p>
+Avoids race conditions and partial conflicting schema changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org0778e7f" class="outline-3">
+<h3 id="org0778e7f">Q11: What is update command?</h3>
+<div class="outline-text-3" id="text-org0778e7f">
+<p>
+Applies pending changeSets to target database.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf84cacf" class="outline-3">
+<h3 id="orgf84cacf">Q12: What is rollback command?</h3>
+<div class="outline-text-3" id="text-orgf84cacf">
+<p>
+Reverts applied changes to a prior state (when rollback info exists).
+</p>
+</div>
+</div>
+<div id="outline-container-orge1596b2" class="outline-3">
+<h3 id="orge1596b2">Q13: What is status command?</h3>
+<div class="outline-text-3" id="text-orge1596b2">
+<p>
+Shows undeployed changeSets.
+</p>
+</div>
+</div>
+<div id="outline-container-org3433819" class="outline-3">
+<h3 id="org3433819">Q14: What is validate command?</h3>
+<div class="outline-text-3" id="text-org3433819">
+<p>
+Checks changelog correctness and structure before execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org74e3e37" class="outline-3">
+<h3 id="org74e3e37">Q15: What is diff command (conceptually)?</h3>
+<div class="outline-text-3" id="text-org74e3e37">
+<p>
+Compares two database schemas (or schema vs reference) to identify differences.
+</p>
+</div>
+</div>
+<div id="outline-container-org805665c" class="outline-3">
+<h3 id="org805665c">Q16: What is generateChangeLog?</h3>
+<div class="outline-text-3" id="text-org805665c">
+<p>
+Creates changelog from existing database schema.
+</p>
+</div>
+</div>
+<div id="outline-container-org61cc48e" class="outline-3">
+<h3 id="org61cc48e">Q17: What is change type in Liquibase?</h3>
+<div class="outline-text-3" id="text-org61cc48e">
+<p>
+Predefined operation like <code>createTable</code>, <code>addColumn</code>, <code>createIndex</code>, etc.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc49617" class="outline-3">
+<h3 id="orgbc49617">Q18: Why prefer structured change types?</h3>
+<div class="outline-text-3" id="text-orgbc49617">
+<p>
+Database portability and readability versus raw vendor SQL only.
+</p>
+</div>
+</div>
+<div id="outline-container-org610e796" class="outline-3">
+<h3 id="org610e796">Q19: Can Liquibase run raw SQL?</h3>
+<div class="outline-text-3" id="text-org610e796">
+<p>
+Yes, via SQL changes or SQL-formatted changelogs.
+</p>
+</div>
+</div>
+<div id="outline-container-org94fcd9b" class="outline-3">
+<h3 id="org94fcd9b">Q20: What is SQL-formatted changelog?</h3>
+<div class="outline-text-3" id="text-org94fcd9b">
+<p>
+Migration file using special comments to define Liquibase metadata in SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a92de4" class="outline-3">
+<h3 id="org5a92de4">Q21: What is precondition?</h3>
+<div class="outline-text-3" id="text-org5a92de4">
+<p>
+Rule checked before running a changeSet.
+</p>
+</div>
+</div>
+<div id="outline-container-org71aa938" class="outline-3">
+<h3 id="org71aa938">Q22: Why use preconditions?</h3>
+<div class="outline-text-3" id="text-org71aa938">
+<p>
+Prevent unsafe execution when database state is unexpected.
+</p>
+</div>
+</div>
+<div id="outline-container-org8677909" class="outline-3">
+<h3 id="org8677909">Q23: Example precondition use?</h3>
+<div class="outline-text-3" id="text-org8677909">
+<p>
+Run change only if table/column exists or DBMS type matches.
+</p>
+</div>
+</div>
+<div id="outline-container-org8d53e5b" class="outline-3">
+<h3 id="org8d53e5b">Q24: What is onFail behavior in preconditions?</h3>
+<div class="outline-text-3" id="text-org8d53e5b">
+<p>
+Defines action on precondition failure (halt, warn, mark ran, etc.).
+</p>
+</div>
+</div>
+<div id="outline-container-org43772ab" class="outline-3">
+<h3 id="org43772ab">Q25: What is context in Liquibase?</h3>
+<div class="outline-text-3" id="text-org43772ab">
+<p>
+Tag to include/exclude changeSets by environment/use case.
+</p>
+</div>
+</div>
+<div id="outline-container-org89067b1" class="outline-3">
+<h3 id="org89067b1">Q26: What is label in Liquibase?</h3>
+<div class="outline-text-3" id="text-org89067b1">
+<p>
+Flexible tagging mechanism for selective deployment logic.
+</p>
+</div>
+</div>
+<div id="outline-container-org77adfca" class="outline-3">
+<h3 id="org77adfca">Q27: Contexts vs labels?</h3>
+<div class="outline-text-3" id="text-org77adfca">
+<p>
+Both filter execution; labels often used for richer targeting strategies.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2f886a" class="outline-3">
+<h3 id="orgd2f886a">Q28: What is checksum in Liquibase?</h3>
+<div class="outline-text-3" id="text-orgd2f886a">
+<p>
+Hash for changeSet content used to detect modifications.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcbd31c2" class="outline-3">
+<h3 id="orgcbd31c2">Q29: Can you edit an applied changeSet freely?</h3>
+<div class="outline-text-3" id="text-orgcbd31c2">
+<p>
+Not recommended; it causes checksum mismatch and audit issues.
+</p>
+</div>
+</div>
+<div id="outline-container-org75a1cb3" class="outline-3">
+<h3 id="org75a1cb3">Q30: Proper fix for applied changeSet mistake?</h3>
+<div class="outline-text-3" id="text-org75a1cb3">
+<p>
+Create new corrective changeSet.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a30cf6" class="outline-3">
+<h3 id="org5a30cf6">Q31: What is runAlways?</h3>
+<div class="outline-text-3" id="text-org5a30cf6">
+<p>
+Forces changeSet execution every update (use carefully).
+</p>
+</div>
+</div>
+<div id="outline-container-orgb954afa" class="outline-3">
+<h3 id="orgb954afa">Q32: What is runOnChange?</h3>
+<div class="outline-text-3" id="text-orgb954afa">
+<p>
+Re-runs changeSet when content changes (common for views/procs).
+</p>
+</div>
+</div>
+<div id="outline-container-orga149b55" class="outline-3">
+<h3 id="orga149b55">Q33: When use runOnChange?</h3>
+<div class="outline-text-3" id="text-orga149b55">
+<p>
+For replaceable objects like views/functions requiring refresh on edits.
+</p>
+</div>
+</div>
+<div id="outline-container-orgff4ac40" class="outline-3">
+<h3 id="orgff4ac40">Q34: What is tag in Liquibase?</h3>
+<div class="outline-text-3" id="text-orgff4ac40">
+<p>
+Named marker in migration history used for rollback/reference points.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb777784" class="outline-3">
+<h3 id="orgb777784">Q35: Why tag releases?</h3>
+<div class="outline-text-3" id="text-orgb777784">
+<p>
+Easier rollback and audit by release boundary.
+</p>
+</div>
+</div>
+<div id="outline-container-org7af9014" class="outline-3">
+<h3 id="org7af9014">Q36: What is baseline concept in Liquibase?</h3>
+<div class="outline-text-3" id="text-org7af9014">
+<p>
+Starting migration tracking from existing schema state.
+</p>
+</div>
+</div>
+<div id="outline-container-org12717bc" class="outline-3">
+<h3 id="org12717bc">Q37: How onboard legacy DB with Liquibase?</h3>
+<div class="outline-text-3" id="text-org12717bc">
+<p>
+Generate baseline changelog and mark/manage initial state carefully.
+</p>
+</div>
+</div>
+<div id="outline-container-org78c3dec" class="outline-3">
+<h3 id="org78c3dec">Q38: What is changelog include?</h3>
+<div class="outline-text-3" id="text-org78c3dec">
+<p>
+Split large changelog into modular files.
+</p>
+</div>
+</div>
+<div id="outline-container-org22207bf" class="outline-3">
+<h3 id="org22207bf">Q39: include vs includeAll?</h3>
+<div class="outline-text-3" id="text-org22207bf">
+<p>
+<code>include</code> explicit file; <code>includeAll</code> includes all files from directory.
+</p>
+</div>
+</div>
+<div id="outline-container-orge3d6a5b" class="outline-3">
+<h3 id="orge3d6a5b">Q40: Why modular changelogs?</h3>
+<div class="outline-text-3" id="text-orge3d6a5b">
+<p>
+Better team ownership and maintainability.
+</p>
+</div>
+</div>
+<div id="outline-container-org434a4ad" class="outline-3">
+<h3 id="org434a4ad">Q41: What is logicalFilePath?</h3>
+<div class="outline-text-3" id="text-org434a4ad">
+<p>
+Stable identifier path helping avoid checksum/identity drift after file moves.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd56397" class="outline-3">
+<h3 id="orgfd56397">Q42: What is fail-fast migration principle?</h3>
+<div class="outline-text-3" id="text-orgfd56397">
+<p>
+Stop deployment immediately on migration validation/execution failure.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ea99af" class="outline-3">
+<h3 id="org2ea99af">Q43: What is dry run SQL output concept?</h3>
+<div class="outline-text-3" id="text-org2ea99af">
+<p>
+Preview SQL generated/executed before applying changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org0bcebd0" class="outline-3">
+<h3 id="org0bcebd0">Q44: Why preview SQL?</h3>
+<div class="outline-text-3" id="text-org0bcebd0">
+<p>
+Review lock/performance risk and vendor-specific output.
+</p>
+</div>
+</div>
+<div id="outline-container-orgedd5917" class="outline-3">
+<h3 id="orgedd5917">Q45: Beginner Liquibase anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgedd5917">
+<p>
+One huge changeSet with many unrelated operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org3ea7fcc" class="outline-3">
+<h3 id="org3ea7fcc">Q46: Better changeSet design?</h3>
+<div class="outline-text-3" id="text-org3ea7fcc">
+<p>
+Small, focused, atomic, reviewable units.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdcc68f1" class="outline-3">
+<h3 id="orgdcc68f1">Q47: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgdcc68f1">
+<p>
+Using contexts/labels inconsistently without strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-org261ac44" class="outline-3">
+<h3 id="org261ac44">Q48: Beginner testing baseline?</h3>
+<div class="outline-text-3" id="text-org261ac44">
+<p>
+Run changelogs on fresh DB and upgrade path DB in CI.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf314d74" class="outline-3">
+<h3 id="orgf314d74">Q49: Why test both fresh and upgrade paths?</h3>
+<div class="outline-text-3" id="text-orgf314d74">
+<p>
+Catches issues in bootstrap and incremental evolution scenarios.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd57f5df" class="outline-3">
+<h3 id="orgd57f5df">Q50: What is immutable migration artifact principle?</h3>
+<div class="outline-text-3" id="text-orgd57f5df">
+<p>
+Promote same reviewed changelog files across environments.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d29258" class="outline-3">
+<h3 id="org1d29258">Q51: Why avoid manual DB hotfix outside changelog?</h3>
+<div class="outline-text-3" id="text-org1d29258">
+<p>
+Causes drift and undermines auditability.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e66b38" class="outline-3">
+<h3 id="org1e66b38">Q52: Liquibase with Spring Boot?</h3>
+<div class="outline-text-3" id="text-org1e66b38">
+<p>
+Spring Boot can auto-run Liquibase at startup when configured.
+</p>
+</div>
+</div>
+<div id="outline-container-org3aded89" class="outline-3">
+<h3 id="org3aded89">Q53: Should clean/reset commands run in production?</h3>
+<div class="outline-text-3" id="text-org3aded89">
+<p>
+Generally no, except strictly controlled exceptional cases.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaba9029" class="outline-3">
+<h3 id="orgaba9029">Q54: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-orgaba9029">
+<p>
+Least-privilege DB creds and protected changelog repos/pipelines.
+</p>
+</div>
+</div>
+<div id="outline-container-org4ada83d" class="outline-3">
+<h3 id="org4ada83d">Q55: Beginner reliability baseline?</h3>
+<div class="outline-text-3" id="text-org4ada83d">
+<p>
+Backups, validation gates, and tested rollback/roll-forward plans.
+</p>
+</div>
+</div>
+<div id="outline-container-org95fdfc9" class="outline-3">
+<h3 id="org95fdfc9">Q56: Beginner observability baseline?</h3>
+<div class="outline-text-3" id="text-org95fdfc9">
+<p>
+Track migration duration, failures, and deployment correlation.
+</p>
+</div>
+</div>
+<div id="outline-container-orge5029d8" class="outline-3">
+<h3 id="orge5029d8">Q57: What is naming convention value in changeSets?</h3>
+<div class="outline-text-3" id="text-orge5029d8">
+<p>
+Predictable IDs improve traceability and teamwork.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb630dd4" class="outline-3">
+<h3 id="orgb630dd4">Q58: What is documentation minimum for each migration?</h3>
+<div class="outline-text-3" id="text-orgb630dd4">
+<p>
+Purpose, risk level, rollback plan, owner.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec4ba3a" class="outline-3">
+<h3 id="orgec4ba3a">Q59: Beginner delivery principle?</h3>
+<div class="outline-text-3" id="text-orgec4ba3a">
+<p>
+Schema changes travel through same PR/CI process as application code.
+</p>
+</div>
+</div>
+<div id="outline-container-org8129464" class="outline-3">
+<h3 id="org8129464">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org8129464">
+<p>
+Treat database evolution as disciplined software delivery, not manual ops.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org4036d0b" class="outline-2">
+<h2 id="org4036d0b">Intermediate</h2>
+<div class="outline-text-2" id="text-org4036d0b">
+</div>
+<div id="outline-container-org8701568" class="outline-3">
+<h3 id="org8701568">Q61: What is expand-contract pattern with Liquibase?</h3>
+<div class="outline-text-3" id="text-org8701568">
+<p>
+Two-phase backward-compatible schema evolution for zero-downtime deploys.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdfe9feb" class="outline-3">
+<h3 id="orgdfe9feb">Q62: Expand phase examples?</h3>
+<div class="outline-text-3" id="text-orgdfe9feb">
+<p>
+Add nullable columns, new tables, additive indexes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf26db36" class="outline-3">
+<h3 id="orgf26db36">Q63: Contract phase examples?</h3>
+<div class="outline-text-3" id="text-orgf26db36">
+<p>
+Drop old columns/constraints after app fully migrated.
+</p>
+</div>
+</div>
+<div id="outline-container-org04d7036" class="outline-3">
+<h3 id="org04d7036">Q64: Why avoid breaking DDL in one release?</h3>
+<div class="outline-text-3" id="text-org04d7036">
+<p>
+Rolling deployments run mixed app versions concurrently.
+</p>
+</div>
+</div>
+<div id="outline-container-org6c0a2d2" class="outline-3">
+<h3 id="org6c0a2d2">Q65: What is data backfill changeSet?</h3>
+<div class="outline-text-3" id="text-org6c0a2d2">
+<p>
+Migration that populates new schema from existing data.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc58826d" class="outline-3">
+<h3 id="orgc58826d">Q66: Why separate backfill from structural change?</h3>
+<div class="outline-text-3" id="text-orgc58826d">
+<p>
+Independent rollback, safer execution windows, clearer troubleshooting.
+</p>
+</div>
+</div>
+<div id="outline-container-org054e1c2" class="outline-3">
+<h3 id="org054e1c2">Q67: What is long-running migration risk?</h3>
+<div class="outline-text-3" id="text-org054e1c2">
+<p>
+Locks, replication lag, and user-facing latency spikes.
+</p>
+</div>
+</div>
+<div id="outline-container-orga0908a3" class="outline-3">
+<h3 id="orga0908a3">Q68: Mitigation for long-running DML?</h3>
+<div class="outline-text-3" id="text-orga0908a3">
+<p>
+Batching/chunking with checkpoints and throttling.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd5ff9dd" class="outline-3">
+<h3 id="orgd5ff9dd">Q69: What is customChange?</h3>
+<div class="outline-text-3" id="text-orgd5ff9dd">
+<p>
+Extension point for custom Java logic in migrations.
+</p>
+</div>
+</div>
+<div id="outline-container-orged23ec9" class="outline-3">
+<h3 id="orged23ec9">Q70: When use customChange?</h3>
+<div class="outline-text-3" id="text-orged23ec9">
+<p>
+When built-in change types/SQL are insufficient for complex operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d09d2f" class="outline-3">
+<h3 id="org5d09d2f">Q71: What is dbms attribute in changeSet?</h3>
+<div class="outline-text-3" id="text-org5d09d2f">
+<p>
+Restricts execution to specific database engines.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0ad158" class="outline-3">
+<h3 id="orgf0ad158">Q72: Why dbms scoping matters?</h3>
+<div class="outline-text-3" id="text-orgf0ad158">
+<p>
+Different SQL/DDL semantics across vendors.
+</p>
+</div>
+</div>
+<div id="outline-container-org8b874d7" class="outline-3">
+<h3 id="org8b874d7">Q73: What is splitStatements/endDelimiter in SQL changelogs?</h3>
+<div class="outline-text-3" id="text-org8b874d7">
+<p>
+Controls SQL statement parsing behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org2460d57" class="outline-3">
+<h3 id="org2460d57">Q74: What is stripComments option?</h3>
+<div class="outline-text-3" id="text-org2460d57">
+<p>
+Controls comment handling in SQL execution contexts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2e3626" class="outline-3">
+<h3 id="orgd2e3626">Q75: What is modifySql?</h3>
+<div class="outline-text-3" id="text-orgd2e3626">
+<p>
+Post-process generated SQL (e.g., engine-specific hints/tweaks).
+</p>
+</div>
+</div>
+<div id="outline-container-orgbaddf79" class="outline-3">
+<h3 id="orgbaddf79">Q76: Why use modifySql carefully?</h3>
+<div class="outline-text-3" id="text-orgbaddf79">
+<p>
+Can reduce portability and hide complexity.
+</p>
+</div>
+</div>
+<div id="outline-container-org92e46c0" class="outline-3">
+<h3 id="org92e46c0">Q77: What is markNextChangeSetRan?</h3>
+<div class="outline-text-3" id="text-org92e46c0">
+<p>
+Marks pending changeSet as executed without running it (special cases only).
+</p>
+</div>
+</div>
+<div id="outline-container-org862b14d" class="outline-3">
+<h3 id="org862b14d">Q78: Risk of mark-ran operations?</h3>
+<div class="outline-text-3" id="text-org862b14d">
+<p>
+History may diverge from actual schema if misused.
+</p>
+</div>
+</div>
+<div id="outline-container-org65a89d8" class="outline-3">
+<h3 id="org65a89d8">Q79: What is clearCheckSums?</h3>
+<div class="outline-text-3" id="text-org65a89d8">
+<p>
+Clears stored checksums so Liquibase recalculates on next run.
+</p>
+</div>
+</div>
+<div id="outline-container-orga64a6ba" class="outline-3">
+<h3 id="orga64a6ba">Q80: When use clearCheckSums?</h3>
+<div class="outline-text-3" id="text-orga64a6ba">
+<p>
+Controlled recovery after verified non-functional edits/path changes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf5f257b" class="outline-3">
+<h3 id="orgf5f257b">Q81: What is checksum mismatch incident workflow?</h3>
+<div class="outline-text-3" id="text-orgf5f257b">
+<p>
+Investigate root cause, avoid silent overrides, apply corrective process.
+</p>
+</div>
+</div>
+<div id="outline-container-org4529fc4" class="outline-3">
+<h3 id="org4529fc4">Q82: What is lock contention in Liquibase deployments?</h3>
+<div class="outline-text-3" id="text-org4529fc4">
+<p>
+Concurrent deploy processes waiting/failing on changelog lock.
+</p>
+</div>
+</div>
+<div id="outline-container-org2130b9e" class="outline-3">
+<h3 id="org2130b9e">Q83: How avoid lock contention?</h3>
+<div class="outline-text-3" id="text-org2130b9e">
+<p>
+Single migration executor per DB and disciplined pipeline orchestration.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c93385" class="outline-3">
+<h3 id="org0c93385">Q84: What if lock is stuck?</h3>
+<div class="outline-text-3" id="text-org0c93385">
+<p>
+Verify no active migration, then safely release lock via documented procedure.
+</p>
+</div>
+</div>
+<div id="outline-container-org5cb1666" class="outline-3">
+<h3 id="org5cb1666">Q85: What is rollbackCount?</h3>
+<div class="outline-text-3" id="text-org5cb1666">
+<p>
+Rollback a specific number of executed changeSets.
+</p>
+</div>
+</div>
+<div id="outline-container-org13377db" class="outline-3">
+<h3 id="org13377db">Q86: What is rollbackToDate?</h3>
+<div class="outline-text-3" id="text-org13377db">
+<p>
+Rollback changes applied after specified timestamp.
+</p>
+</div>
+</div>
+<div id="outline-container-org28dfbd5" class="outline-3">
+<h3 id="org28dfbd5">Q87: What is rollback to tag?</h3>
+<div class="outline-text-3" id="text-org28dfbd5">
+<p>
+Revert database to previously tagged state.
+</p>
+</div>
+</div>
+<div id="outline-container-org9071699" class="outline-3">
+<h3 id="org9071699">Q88: Is rollback always guaranteed?</h3>
+<div class="outline-text-3" id="text-org9071699">
+<p>
+No; depends on rollback definitions and DB capabilities.
+</p>
+</div>
+</div>
+<div id="outline-container-org1a11c91" class="outline-3">
+<h3 id="org1a11c91">Q89: Roll-forward vs rollback in practice?</h3>
+<div class="outline-text-3" id="text-org1a11c91">
+<p>
+Many teams prefer roll-forward corrective migrations for safety.
+</p>
+</div>
+</div>
+<div id="outline-container-orga5c8141" class="outline-3">
+<h3 id="orga5c8141">Q90: What is precondition onSqlOutput behavior?</h3>
+<div class="outline-text-3" id="text-orga5c8141">
+<p>
+Controls precondition handling during SQL preview mode.
+</p>
+</div>
+</div>
+<div id="outline-container-orgae74be6" class="outline-3">
+<h3 id="orgae74be6">Q91: What is failOnError in changeSet?</h3>
+<div class="outline-text-3" id="text-orgae74be6">
+<p>
+Controls whether statement errors fail migration immediately.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf949487" class="outline-3">
+<h3 id="orgf949487">Q92: Should failOnError be disabled often?</h3>
+<div class="outline-text-3" id="text-orgf949487">
+<p>
+Rarely; usually fail-fast is safer.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdba9f0a" class="outline-3">
+<h3 id="orgdba9f0a">Q93: What is logical ordering challenge in monorepos?</h3>
+<div class="outline-text-3" id="text-orgdba9f0a">
+<p>
+Parallel team migrations can collide or interleave unsafely.
+</p>
+</div>
+</div>
+<div id="outline-container-org13c05da" class="outline-3">
+<h3 id="org13c05da">Q94: Mitigation for migration collisions?</h3>
+<div class="outline-text-3" id="text-org13c05da">
+<p>
+Conventions (timestamp IDs), ownership boundaries, CI checks.
+</p>
+</div>
+</div>
+<div id="outline-container-orgebe25f4" class="outline-3">
+<h3 id="orgebe25f4">Q95: What is reference data migration pattern?</h3>
+<div class="outline-text-3" id="text-orgebe25f4">
+<p>
+Version controlled inserts/updates for stable lookup data.
+</p>
+</div>
+</div>
+<div id="outline-container-org5644ea4" class="outline-3">
+<h3 id="org5644ea4">Q96: Reference data pitfall?</h3>
+<div class="outline-text-3" id="text-org5644ea4">
+<p>
+Non-idempotent inserts causing duplicates/conflicts.
+</p>
+</div>
+</div>
+<div id="outline-container-org674c0d4" class="outline-3">
+<h3 id="org674c0d4">Q97: Safer reference data approach?</h3>
+<div class="outline-text-3" id="text-org674c0d4">
+<p>
+Upsert/merge patterns keyed by business identifiers.
+</p>
+</div>
+</div>
+<div id="outline-container-org055452a" class="outline-3">
+<h3 id="org055452a">Q98: What is includeAll ordering concern?</h3>
+<div class="outline-text-3" id="text-org055452a">
+<p>
+File ordering rules may affect execution sequence unexpectedly.
+</p>
+</div>
+</div>
+<div id="outline-container-org14074c3" class="outline-3">
+<h3 id="org14074c3">Q99: How control includeAll determinism?</h3>
+<div class="outline-text-3" id="text-org14074c3">
+<p>
+Consistent naming conventions and explicit ordering strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-org521740d" class="outline-3">
+<h3 id="org521740d">Q100: What is generated diff changelog risk?</h3>
+<div class="outline-text-3" id="text-org521740d">
+<p>
+Auto-generated changes may be noisy or unsafe without review.
+</p>
+</div>
+</div>
+<div id="outline-container-org714926d" class="outline-3">
+<h3 id="org714926d">Q101: Best practice for diff output?</h3>
+<div class="outline-text-3" id="text-org714926d">
+<p>
+Treat as draft; manually curate before merge.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc0187a1" class="outline-3">
+<h3 id="orgc0187a1">Q102: What is Liquibase Hub/observability concept?</h3>
+<div class="outline-text-3" id="text-orgc0187a1">
+<p>
+Central visibility/governance features for migration activity (edition dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-org6c54a42" class="outline-3">
+<h3 id="org6c54a42">Q103: What is CI/CD integration baseline?</h3>
+<div class="outline-text-3" id="text-org6c54a42">
+<p>
+Validate + update against ephemeral DB + integration tests + artifact promotion.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea37d1a" class="outline-3">
+<h3 id="orgea37d1a">Q104: Why run migrations in deployment pipeline, not manually?</h3>
+<div class="outline-text-3" id="text-orgea37d1a">
+<p>
+Consistency, audit trail, repeatability, and reduced human error.
+</p>
+</div>
+</div>
+<div id="outline-container-org857b28e" class="outline-3">
+<h3 id="org857b28e">Q105: What is environment promotion model?</h3>
+<div class="outline-text-3" id="text-org857b28e">
+<p>
+Dev -&gt; test -&gt; staging -&gt; prod using same immutable changelog artifacts.
+</p>
+</div>
+</div>
+<div id="outline-container-orge64bb02" class="outline-3">
+<h3 id="orge64bb02">Q106: What is drift detection strategy with Liquibase?</h3>
+<div class="outline-text-3" id="text-orge64bb02">
+<p>
+Regular diff/validation against expected state and reconcile via changeSets.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad1a045" class="outline-3">
+<h3 id="orgad1a045">Q107: What is migration code review checklist?</h3>
+<div class="outline-text-3" id="text-orgad1a045">
+<p>
+Lock risk, downtime risk, backward compatibility, rollback/forward fix, index impact.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a66308" class="outline-3">
+<h3 id="org5a66308">Q108: What is online index build consideration?</h3>
+<div class="outline-text-3" id="text-org5a66308">
+<p>
+Use engine-specific non-blocking options when available.
+</p>
+</div>
+</div>
+<div id="outline-container-org8b4255a" class="outline-3">
+<h3 id="org8b4255a">Q109: What is transaction-per-changeSet behavior?</h3>
+<div class="outline-text-3" id="text-org8b4255a">
+<p>
+Liquibase may wrap changeSets in transactions where DB supports it.
+</p>
+</div>
+</div>
+<div id="outline-container-org09411a1" class="outline-3">
+<h3 id="org09411a1">Q110: Why DB transactional DDL differences matter?</h3>
+<div class="outline-text-3" id="text-org09411a1">
+<p>
+Partial apply behavior varies by engine on failure.
+</p>
+</div>
+</div>
+<div id="outline-container-orga524e2f" class="outline-3">
+<h3 id="orga524e2f">Q111: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orga524e2f">
+<p>
+Mixing destructive DDL with large data rewrite in one deployment step.
+</p>
+</div>
+</div>
+<div id="outline-container-org4294bcb" class="outline-3">
+<h3 id="org4294bcb">Q112: Better release strategy?</h3>
+<div class="outline-text-3" id="text-org4294bcb">
+<p>
+Phased compatible schema changes with separate backfill windows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd9f00e7" class="outline-3">
+<h3 id="orgd9f00e7">Q113: What is blue/green DB compatibility requirement?</h3>
+<div class="outline-text-3" id="text-orgd9f00e7">
+<p>
+Both old and new app versions must work during traffic switch.
+</p>
+</div>
+</div>
+<div id="outline-container-org84a4b3d" class="outline-3">
+<h3 id="org84a4b3d">Q114: What is canary migration approach?</h3>
+<div class="outline-text-3" id="text-org84a4b3d">
+<p>
+Apply changes with progressive exposure and health verification.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb573509" class="outline-3">
+<h3 id="orgb573509">Q115: What is intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-orgb573509">
+<p>
+Dedicated migration credentials, secret rotation, audited execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org8662248" class="outline-3">
+<h3 id="org8662248">Q116: Why separate app user from migration user?</h3>
+<div class="outline-text-3" id="text-org8662248">
+<p>
+Limit runtime app privileges and reduce attack surface.
+</p>
+</div>
+</div>
+<div id="outline-container-org5f33ea5" class="outline-3">
+<h3 id="org5f33ea5">Q117: What is intermediate observability must-have?</h3>
+<div class="outline-text-3" id="text-org5f33ea5">
+<p>
+Migration duration, lock wait, statement failures, app latency correlation.
+</p>
+</div>
+</div>
+<div id="outline-container-org7bfa4af" class="outline-3">
+<h3 id="org7bfa4af">Q118: What is migration SLO?</h3>
+<div class="outline-text-3" id="text-org7bfa4af">
+<p>
+Defined acceptable execution time/error impact per release.
+</p>
+</div>
+</div>
+<div id="outline-container-org9645630" class="outline-3">
+<h3 id="org9645630">Q119: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-org9645630">
+<p>
+Team consistently delivers backward-compatible schema changes without incidents.
+</p>
+</div>
+</div>
+<div id="outline-container-org988a2f8" class="outline-3">
+<h3 id="org988a2f8">Q120: What is intermediate troubleshooting flow?</h3>
+<div class="outline-text-3" id="text-org988a2f8">
+<p>
+Lock/history tables -&gt; failing SQL -&gt; DB logs/plans -&gt; corrective changeSet.
+</p>
+</div>
+</div>
+<div id="outline-container-org5f6d336" class="outline-3">
+<h3 id="org5f6d336">Q121: What is test data volume importance?</h3>
+<div class="outline-text-3" id="text-org5f6d336">
+<p>
+Migration performance can differ dramatically at production scale.
+</p>
+</div>
+</div>
+<div id="outline-container-org15c7a30" class="outline-3">
+<h3 id="org15c7a30">Q122: What is shadow migration test?</h3>
+<div class="outline-text-3" id="text-org15c7a30">
+<p>
+Run migrations against production-like clone before release.
+</p>
+</div>
+</div>
+<div id="outline-container-org3d31c63" class="outline-3">
+<h3 id="org3d31c63">Q123: What is release freeze consideration for risky migrations?</h3>
+<div class="outline-text-3" id="text-org3d31c63">
+<p>
+Schedule during low-traffic windows with rollback team on standby.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc6bcb6" class="outline-3">
+<h3 id="orgdc6bcb6">Q124: Intermediate governance principle?</h3>
+<div class="outline-text-3" id="text-orgdc6bcb6">
+<p>
+Every migration needs owner, risk classification, and execution plan.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb0c3b14" class="outline-3">
+<h3 id="orgb0c3b14">Q125: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-orgb0c3b14">
+<p>
+Optimize for safe incremental evolution, not one-shot schema rewrites.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5c3547f" class="outline-2">
+<h2 id="org5c3547f">Advanced</h2>
+<div class="outline-text-2" id="text-org5c3547f">
+</div>
+<div id="outline-container-org13e0435" class="outline-3">
+<h3 id="org13e0435">Q126: What is enterprise migration governance?</h3>
+<div class="outline-text-3" id="text-org13e0435">
+<p>
+Organization-wide standards, tooling, and approvals for DB changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org98fab2e" class="outline-3">
+<h3 id="org98fab2e">Q127: What is blast radius analysis for changeSets?</h3>
+<div class="outline-text-3" id="text-org98fab2e">
+<p>
+Assess affected tables, services, queries, and operational windows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgca12eec" class="outline-3">
+<h3 id="orgca12eec">Q128: What is zero-downtime migration architecture?</h3>
+<div class="outline-text-3" id="text-orgca12eec">
+<p>
+Backward-compatible schema + phased app rollout + delayed cleanup.
+</p>
+</div>
+</div>
+<div id="outline-container-org7e82bab" class="outline-3">
+<h3 id="org7e82bab">Q129: What is phased column replacement pattern?</h3>
+<div class="outline-text-3" id="text-org7e82bab">
+<p>
+Add new column, dual-write/read migrate, backfill, cutover, drop old.
+</p>
+</div>
+</div>
+<div id="outline-container-org7694505" class="outline-3">
+<h3 id="org7694505">Q130: Why dual-write monitoring is essential?</h3>
+<div class="outline-text-3" id="text-org7694505">
+<p>
+Detect divergence between old/new data paths early.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec4af91" class="outline-3">
+<h3 id="orgec4af91">Q131: What is chunked backfill with checkpoints?</h3>
+<div class="outline-text-3" id="text-orgec4af91">
+<p>
+Process data in bounded batches with resumable progress markers.
+</p>
+</div>
+</div>
+<div id="outline-container-org2bb3e4e" class="outline-3">
+<h3 id="org2bb3e4e">Q132: Backfill throttling purpose?</h3>
+<div class="outline-text-3" id="text-org2bb3e4e">
+<p>
+Limit impact on OLTP latency and replica lag.
+</p>
+</div>
+</div>
+<div id="outline-container-org190ec94" class="outline-3">
+<h3 id="org190ec94">Q133: What is replica lag migration risk?</h3>
+<div class="outline-text-3" id="text-org190ec94">
+<p>
+Read replicas fall behind, causing stale reads and failover complications.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfaddc32" class="outline-3">
+<h3 id="orgfaddc32">Q134: How mitigate replica lag during migrations?</h3>
+<div class="outline-text-3" id="text-orgfaddc32">
+<p>
+Throttle heavy writes, monitor lag, pause if thresholds exceeded.
+</p>
+</div>
+</div>
+<div id="outline-container-org83654ab" class="outline-3">
+<h3 id="org83654ab">Q135: What is sharded database migration challenge?</h3>
+<div class="outline-text-3" id="text-org83654ab">
+<p>
+Coordinating consistent changelog execution across many shards.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcfc89c6" class="outline-3">
+<h3 id="orgcfc89c6">Q136: Shard rollout strategy?</h3>
+<div class="outline-text-3" id="text-orgcfc89c6">
+<p>
+Wave-based shard batches with automated health gates.
+</p>
+</div>
+</div>
+<div id="outline-container-orge7cc276" class="outline-3">
+<h3 id="orge7cc276">Q137: What is tenant-isolated migration pattern?</h3>
+<div class="outline-text-3" id="text-orge7cc276">
+<p>
+Migrate tenant schemas progressively to reduce global risk.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcbc38fe" class="outline-3">
+<h3 id="orgcbc38fe">Q138: What is schema contract testing?</h3>
+<div class="outline-text-3" id="text-orgcbc38fe">
+<p>
+Automated verification app queries work across transitional schema states.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb5abc5a" class="outline-3">
+<h3 id="orgb5abc5a">Q139: Why test intermediate compatibility states?</h3>
+<div class="outline-text-3" id="text-orgb5abc5a">
+<p>
+Rolling deployments create mixed-version runtime periods.
+</p>
+</div>
+</div>
+<div id="outline-container-org0341ba6" class="outline-3">
+<h3 id="org0341ba6">Q140: What is query plan regression after DDL?</h3>
+<div class="outline-text-3" id="text-org0341ba6">
+<p>
+Optimizer chooses slower plans due to schema/statistics/index changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e2585f" class="outline-3">
+<h3 id="org0e2585f">Q141: How catch plan regressions?</h3>
+<div class="outline-text-3" id="text-org0e2585f">
+<p>
+Pre-prod explain-plan baselines + performance tests on realistic data.
+</p>
+</div>
+</div>
+<div id="outline-container-org1d8ac35" class="outline-3">
+<h3 id="org1d8ac35">Q142: What is Liquibase policy checks concept?</h3>
+<div class="outline-text-3" id="text-org1d8ac35">
+<p>
+Automated rules enforcing allowed/prohibited migration patterns (edition/tooling dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-org8af23d3" class="outline-3">
+<h3 id="org8af23d3">Q143: What is signed changelog artifact approach?</h3>
+<div class="outline-text-3" id="text-org8af23d3">
+<p>
+Cryptographically verify changelog integrity through pipeline stages.
+</p>
+</div>
+</div>
+<div id="outline-container-org82147a6" class="outline-3">
+<h3 id="org82147a6">Q144: What is supply-chain threat for DB migrations?</h3>
+<div class="outline-text-3" id="text-org82147a6">
+<p>
+Tampered SQL/changeSets injected before deployment.
+</p>
+</div>
+</div>
+<div id="outline-container-org3cd94b4" class="outline-3">
+<h3 id="org3cd94b4">Q145: Mitigation for migration supply-chain threats?</h3>
+<div class="outline-text-3" id="text-org3cd94b4">
+<p>
+Protected branches, signed commits/artifacts, CI attestation, least privilege.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf3b5ec" class="outline-3">
+<h3 id="orgbf3b5ec">Q146: What is break-glass migration process?</h3>
+<div class="outline-text-3" id="text-orgbf3b5ec">
+<p>
+Controlled emergency path with extra auditing and post-incident review.
+</p>
+</div>
+</div>
+<div id="outline-container-orga427908" class="outline-3">
+<h3 id="orga427908">Q147: What is database change freeze policy?</h3>
+<div class="outline-text-3" id="text-orga427908">
+<p>
+Restrict high-risk schema changes during peak business periods.
+</p>
+</div>
+</div>
+<div id="outline-container-org1671eaa" class="outline-3">
+<h3 id="org1671eaa">Q148: What is progressive delivery for schema?</h3>
+<div class="outline-text-3" id="text-org1671eaa">
+<p>
+Canary DB changes, monitor SLOs, then broaden rollout.
+</p>
+</div>
+</div>
+<div id="outline-container-org7e0df51" class="outline-3">
+<h3 id="org7e0df51">Q149: What is automated migration abort policy?</h3>
+<div class="outline-text-3" id="text-org7e0df51">
+<p>
+Stop rollout when lock wait/error/latency thresholds breach.
+</p>
+</div>
+</div>
+<div id="outline-container-org5eb31d8" class="outline-3">
+<h3 id="org5eb31d8">Q150: Why automatic rollback may be unsafe?</h3>
+<div class="outline-text-3" id="text-org5eb31d8">
+<p>
+DDL reversibility varies; roll-forward often safer operationally.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeca430f" class="outline-3">
+<h3 id="orgeca430f">Q151: What is drift reconciliation at scale?</h3>
+<div class="outline-text-3" id="text-orgeca430f">
+<p>
+Continuously detect out-of-band schema changes and codify corrections.
+</p>
+</div>
+</div>
+<div id="outline-container-orgee902fe" class="outline-3">
+<h3 id="orgee902fe">Q152: What is compliance evidence for DB changes?</h3>
+<div class="outline-text-3" id="text-orgee902fe">
+<p>
+Who approved, what changed, when applied, and outcome metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org43ad0b6" class="outline-3">
+<h3 id="org43ad0b6">Q153: What is segregation of duties in DB delivery?</h3>
+<div class="outline-text-3" id="text-org43ad0b6">
+<p>
+Different roles for authoring, approving, and executing sensitive changes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd56548" class="outline-3">
+<h3 id="orgdd56548">Q154: What is least-privilege advanced migration model?</h3>
+<div class="outline-text-3" id="text-orgdd56548">
+<p>
+Time-bound scoped permissions only for required schemas/operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcabb865" class="outline-3">
+<h3 id="orgcabb865">Q155: What is observability gold standard for migrations?</h3>
+<div class="outline-text-3" id="text-orgcabb865">
+<p>
+Per-changeSet telemetry + DB health + app SLO impact in one timeline.
+</p>
+</div>
+</div>
+<div id="outline-container-orge43350f" class="outline-3">
+<h3 id="orge43350f">Q156: Key advanced metrics?</h3>
+<div class="outline-text-3" id="text-orge43350f">
+<p>
+Execution time, lock duration, rows touched, replication lag, error class, rollback/forward-fix counts.
+</p>
+</div>
+</div>
+<div id="outline-container-org57b362e" class="outline-3">
+<h3 id="org57b362e">Q157: What is game day for schema delivery?</h3>
+<div class="outline-text-3" id="text-org57b362e">
+<p>
+Practice failure scenarios: stuck lock, partial apply, performance degradation.
+</p>
+</div>
+</div>
+<div id="outline-container-org466d524" class="outline-3">
+<h3 id="org466d524">Q158: Why rehearse restore procedures?</h3>
+<div class="outline-text-3" id="text-org466d524">
+<p>
+Backup confidence is meaningless without tested restoration.
+</p>
+</div>
+</div>
+<div id="outline-container-org1f3f6c8" class="outline-3">
+<h3 id="org1f3f6c8">Q159: What is RPO/RTO relevance to migration strategy?</h3>
+<div class="outline-text-3" id="text-org1f3f6c8">
+<p>
+Defines acceptable data loss and recovery time during migration incidents.
+</p>
+</div>
+</div>
+<div id="outline-container-org8cdaa32" class="outline-3">
+<h3 id="org8cdaa32">Q160: What is multi-region migration coordination?</h3>
+<div class="outline-text-3" id="text-org8cdaa32">
+<p>
+Staggered rollout with compatibility guarantees and failover awareness.
+</p>
+</div>
+</div>
+<div id="outline-container-org74f8b6d" class="outline-3">
+<h3 id="org74f8b6d">Q161: What is active-active database schema challenge?</h3>
+<div class="outline-text-3" id="text-org74f8b6d">
+<p>
+Schema changes must remain compatible across simultaneously active regions.
+</p>
+</div>
+</div>
+<div id="outline-container-org6fc7567" class="outline-3">
+<h3 id="org6fc7567">Q162: What is data sovereignty consideration?</h3>
+<div class="outline-text-3" id="text-org6fc7567">
+<p>
+Migration workflows must respect region-specific legal data constraints.
+</p>
+</div>
+</div>
+<div id="outline-container-org17d7ef1" class="outline-3">
+<h3 id="org17d7ef1">Q163: What is archival strategy before destructive changes?</h3>
+<div class="outline-text-3" id="text-org17d7ef1">
+<p>
+Snapshot/export critical data before drop/truncate operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd685988" class="outline-3">
+<h3 id="orgd685988">Q164: What is safe deprecation lifecycle for columns/tables?</h3>
+<div class="outline-text-3" id="text-orgd685988">
+<p>
+Mark unused, monitor reads/writes, remove only after proven inactivity window.
+</p>
+</div>
+</div>
+<div id="outline-container-org39d0cdc" class="outline-3">
+<h3 id="org39d0cdc">Q165: What is telemetry-driven deprecation?</h3>
+<div class="outline-text-3" id="text-org39d0cdc">
+<p>
+Use query/access metrics to decide safe removal timing.
+</p>
+</div>
+</div>
+<div id="outline-container-org1749457" class="outline-3">
+<h3 id="org1749457">Q166: What is biggest advanced Liquibase anti-pattern?</h3>
+<div class="outline-text-3" id="text-org1749457">
+<p>
+Treating changelogs as deployment detail instead of core architecture artifact.
+</p>
+</div>
+</div>
+<div id="outline-container-org39613e9" class="outline-3">
+<h3 id="org39613e9">Q167: What is platform team role with Liquibase?</h3>
+<div class="outline-text-3" id="text-org39613e9">
+<p>
+Provide templates, linting, policy gates, and migration runbooks.
+</p>
+</div>
+</div>
+<div id="outline-container-org53b48b5" class="outline-3">
+<h3 id="org53b48b5">Q168: What is mature team behavior in DB delivery?</h3>
+<div class="outline-text-3" id="text-org53b48b5">
+<p>
+Design backward-compatible changes and measure impact continuously.
+</p>
+</div>
+</div>
+<div id="outline-container-org90da8a3" class="outline-3">
+<h3 id="org90da8a3">Q169: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-org90da8a3">
+<p>
+Every migration must be rehearsed, observable, and recoverable.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcb65ee9" class="outline-3">
+<h3 id="orgcb65ee9">Q170: What is final security principle?</h3>
+<div class="outline-text-3" id="text-orgcb65ee9">
+<p>
+Protect changelog integrity, credentials, and execution paths end-to-end.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc9d6f99" class="outline-3">
+<h3 id="orgc9d6f99">Q171: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-orgc9d6f99">
+<p>
+Benchmark migration impact on production-like data and traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org15440ef" class="outline-3">
+<h3 id="org15440ef">Q172: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-org15440ef">
+<p>
+Enforce standards automatically, not by tribal knowledge.
+</p>
+</div>
+</div>
+<div id="outline-container-orge20045a" class="outline-3">
+<h3 id="orge20045a">Q173: What is final architecture principle?</h3>
+<div class="outline-text-3" id="text-orge20045a">
+<p>
+Evolve schemas incrementally with explicit compatibility contracts.
+</p>
+</div>
+</div>
+<div id="outline-container-orga15fdc4" class="outline-3">
+<h3 id="orga15fdc4">Q174: What is final operations principle?</h3>
+<div class="outline-text-3" id="text-orga15fdc4">
+<p>
+Run schema changes as first-class production events with SLO guardrails.
+</p>
+</div>
+</div>
+<div id="outline-container-org7a3f6f5" class="outline-3">
+<h3 id="org7a3f6f5">Q175: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org7a3f6f5">
+<p>
+Liquibase excellence is disciplined, low-risk, continuously auditable schema evolution.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org62da18c" class="outline-2">
+<h2 id="org62da18c">Bonus: Minimal Liquibase + Spring Boot Configuration Example</h2>
+<div class="outline-text-2" id="text-org62da18c">
+<div class="org-src-container">
+<pre class="src src-yaml">spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    contexts: dev
+    drop-first: false
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

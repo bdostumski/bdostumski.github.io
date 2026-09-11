@@ -1,0 +1,599 @@
+#+title: Maven
+#+date: 2026-08-06
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Maven
+
+-----
+
+* Beginner
+
+** Q1: What is Maven?
+Maven is a build automation and project management tool primarily for Java projects.
+
+** Q2: What problems does Maven solve?
+Dependency management, standardized build lifecycle, and reproducible project structure.
+
+** Q3: What is POM?
+Project Object Model file (=pom.xml=) describing project metadata and build configuration.
+
+** Q4: Why is pom.xml central in Maven?
+It defines coordinates, dependencies, plugins, profiles, and lifecycle behavior.
+
+** Q5: What are Maven coordinates?
+=groupId=, =artifactId=, =version= (GAV) uniquely identifying artifacts.
+
+** Q6: What is groupId?
+Organization or domain-based namespace for project artifacts.
+
+** Q7: What is artifactId?
+Module/library name within group.
+
+** Q8: What is version?
+Artifact release identifier (e.g., =1.0.0=).
+
+** Q9: What is packaging in Maven?
+Artifact type produced by build (jar, war, pom, etc.).
+
+** Q10: Default packaging type?
+=jar= if unspecified.
+
+** Q11: What is Maven lifecycle?
+Ordered sequence of build phases executed to build/test/package/deploy software.
+
+** Q12: Three built-in lifecycles?
+=clean=, =default= (build), =site=.
+
+** Q13: What is a phase?
+Named step in lifecycle (compile, test, package, verify, install, deploy...).
+
+** Q14: What is a goal?
+Specific task executed by a plugin (e.g., compiler:compile).
+
+** Q15: Phase vs goal?
+Phase is lifecycle step; goals are plugin tasks bound to phases.
+
+** Q16: What does =mvn clean= do?
+Runs clean lifecycle, removing previous build output (target directory).
+
+** Q17: What does =mvn compile= do?
+Compiles main source code.
+
+** Q18: What does =mvn test= do?
+Runs tests (usually unit tests) in test phase.
+
+** Q19: What does =mvn package= do?
+Packages compiled code into distributable artifact (jar/war).
+
+** Q20: What does =mvn verify= do?
+Runs checks/verification after packaging (integration with QA gates/plugins).
+
+** Q21: What does =mvn install= do?
+Installs built artifact into local Maven repository.
+
+** Q22: What does =mvn deploy= do?
+Publishes artifact to remote repository for team/shared usage.
+
+** Q23: What is local repository?
+Local cache/store of artifacts, usually under =~/.m2/repository=.
+
+** Q24: What is remote repository?
+Server-hosted artifact repository (Maven Central, Nexus, Artifactory, etc.).
+
+** Q25: What is Maven Central?
+Default public repository hosting open-source Maven artifacts.
+
+** Q26: What is dependency in Maven?
+External artifact required by project.
+
+** Q27: How declare dependency?
+Inside =<dependencies>= section in pom.xml.
+
+** Q28: What is dependency scope?
+Defines classpath visibility and transitivity behavior.
+
+** Q29: Common scopes?
+=compile=, =provided=, =runtime=, =test=, =system=, =import=.
+
+** Q30: compile scope meaning?
+Available in all classpaths and transitive by default.
+
+** Q31: provided scope meaning?
+Needed for compile/test but expected from runtime container (not packaged transitively as runtime).
+
+** Q32: runtime scope meaning?
+Not needed at compile time, required at runtime/test runtime.
+
+** Q33: test scope meaning?
+Only available during test compilation/execution.
+
+** Q34: What is transitive dependency?
+Dependency brought indirectly by another dependency.
+
+** Q35: Why transitive deps are useful?
+Reduce manual declaration burden.
+
+** Q36: Risk of transitive dependencies?
+Version conflicts and hidden classpath surprises.
+
+** Q37: What is dependency conflict in Maven?
+Multiple versions of same artifact appear in dependency graph.
+
+** Q38: Maven conflict resolution default?
+“Nearest definition” in dependency tree wins.
+
+** Q39: How inspect dependency tree?
+Use =mvn dependency:tree=.
+
+** Q40: What is exclusion in dependency?
+Prevent specific transitive artifact from being included.
+
+** Q41: What is dependencyManagement?
+Central section controlling dependency versions without direct inclusion.
+
+** Q42: dependencyManagement vs dependencies?
+Management defines versions/rules; dependencies actually include artifacts.
+
+** Q43: What is parent POM?
+POM inherited by child project for shared configuration.
+
+** Q44: Why use parent POM?
+Consistency and reduced duplication across modules/projects.
+
+** Q45: What is multi-module Maven project?
+Aggregator project building multiple modules together.
+
+** Q46: What is aggregator POM packaging?
+Usually =pom= packaging.
+
+** Q47: Standard Maven directory layout?
+=src/main/java=, =src/test/java=, =src/main/resources=, etc.
+
+** Q48: Why follow standard layout?
+Convention over configuration; plugin defaults work seamlessly.
+
+** Q49: What is plugin in Maven?
+Extension component adding build functionality.
+
+** Q50: Common core plugins?
+compiler, surefire, failsafe, jar, resources, clean, install, deploy.
+
+** Q51: What is surefire plugin?
+Runs unit tests in test phase.
+
+** Q52: What is failsafe plugin?
+Runs integration tests, typically in integration-test/verify phases.
+
+** Q53: Why separate unit and integration tests?
+Faster feedback and clearer pipeline stages.
+
+** Q54: What is settings.xml?
+User/global Maven runtime configuration (repos, mirrors, credentials, profiles).
+
+** Q55: Should credentials be stored in pom.xml?
+No; use settings.xml/CI secret management.
+
+** Q56: Beginner Maven anti-pattern?
+Copy-pasting huge plugin config without understanding lifecycle impact.
+
+** Q57: Another beginner anti-pattern?
+Using dynamic/snapshot dependencies in production releases carelessly.
+
+** Q58: Beginner reproducibility baseline?
+Pin plugin/dependency versions explicitly.
+
+** Q59: Beginner CI baseline?
+Run clean verify on every pull request.
+
+** Q60: Beginner best practice?
+Keep POM minimal, explicit, and convention-aligned.
+
+* Intermediate
+
+** Q61: What is BOM in Maven?
+Bill of Materials POM centralizing compatible dependency versions.
+
+** Q62: How import BOM?
+Use =dependencyManagement= with scope =import= and type =pom=.
+
+** Q63: Why use BOM?
+Version alignment and fewer dependency conflicts.
+
+** Q64: What is effective POM?
+Fully resolved POM after inheritance, profiles, and defaults.
+
+** Q65: How view effective POM?
+=mvn help:effective-pom=.
+
+** Q66: What is effective settings?
+Resolved settings after global/user/profile interpolation.
+
+** Q67: How inspect effective settings?
+=mvn help:effective-settings=.
+
+** Q68: What is Maven profile?
+Conditional configuration activated by property/JDK/OS/file/explicit flag.
+
+** Q69: Why use profiles?
+Environment-specific behavior (dev/ci/release) without duplicating POMs.
+
+** Q70: Profile activation methods?
+=-P= flag, properties, OS, JDK version, file presence.
+
+** Q71: Profile anti-pattern?
+Encoding business logic and excessive complexity in profiles.
+
+** Q72: What is pluginManagement?
+Centralized plugin versions/config inherited by children.
+
+** Q73: pluginManagement vs plugins?
+Management defines defaults; plugins section binds executions.
+
+** Q74: Why pin plugin versions?
+Avoid non-reproducible builds due to plugin version drift.
+
+** Q75: What is Maven Wrapper?
+Project-local wrapper scripts ensuring consistent Maven version usage.
+
+** Q76: Why use Maven Wrapper in teams?
+Eliminates “works on my Maven version” problems.
+
+** Q77: What is snapshot version?
+Mutable development version ending with =-SNAPSHOT=.
+
+** Q78: Snapshot vs release artifact?
+Snapshot can change; release should be immutable.
+
+** Q79: What is updatePolicy for snapshots?
+Controls frequency of checking remote snapshot updates.
+
+** Q80: What is checksumPolicy?
+Defines behavior on artifact checksum mismatch (warn/fail).
+
+** Q81: What is mirror in settings.xml?
+Redirect repository requests through specified mirror (e.g., internal proxy).
+
+** Q82: Why use repository manager (Nexus/Artifactory)?
+Caching, access control, proxying, and artifact governance.
+
+** Q83: What is dependency convergence?
+Ensuring consistent single versions across transitive graph.
+
+** Q84: How enforce convergence?
+Maven Enforcer rules and BOM management.
+
+** Q85: What is Maven Enforcer Plugin?
+Plugin enforcing project/build rules (Java version, banned deps, convergence, etc.).
+
+** Q86: What is reproducible build in Maven context?
+Same source produces same artifact bytes/metadata (as much as possible).
+
+** Q87: Common reproducibility issues?
+Timestamps, plugin drift, generated file ordering, environment differences.
+
+** Q88: What is flatten-maven-plugin concept?
+Produces simplified consumer POM for publication/use cases.
+
+** Q89: What is versions-maven-plugin?
+Helps inspect/update dependency/plugin versions.
+
+** Q90: What is dependency mediation?
+Maven selecting one artifact version among conflicts.
+
+** Q91: How force specific dependency version?
+Declare direct dependency or manage version in dependencyManagement.
+
+** Q92: What is optional dependency?
+Dependency not transitively inherited by default consumers.
+
+** Q93: What is classifier?
+Extra artifact variant label (sources, javadoc, tests, native variants).
+
+** Q94: What is attached artifact?
+Additional artifact produced in build besides main packaging.
+
+** Q95: What is shade plugin?
+Creates uber/fat jar and can relocate packages.
+
+** Q96: Shade vs assembly plugin?
+Shade focuses class relocation/uber jars; assembly builds custom distributions.
+
+** Q97: What is resource filtering?
+Replacing placeholders in resource files during build.
+
+** Q98: Resource filtering risk?
+Accidental modification/leakage of binary/sensitive content.
+
+** Q99: What is toolchains plugin?
+Selects configured JDK/toolchain independent from runtime JAVA_HOME.
+
+** Q100: Why use toolchains?
+Consistent cross-JDK builds in CI/dev.
+
+** Q101: What is reactor build?
+Maven building modules together in dependency-aware order.
+
+** Q102: How build specific module with dependencies?
+Use reactor flags like =-pl= and =-am=.
+
+** Q103: What is =-amd=?
+Build selected module and dependents (affected downstream modules).
+
+** Q104: What is parallel build flag?
+=-T= for multithreaded module build.
+
+** Q105: Parallel build caveat?
+Plugins/tests must be thread-safe; ordering assumptions may break.
+
+** Q106: What is incremental build challenge in Maven?
+Core Maven is not fully incremental like some newer build tools.
+
+** Q107: Mitigation for slow builds?
+Module boundaries, test splitting, cache/proxy, parallelism, plugin tuning.
+
+** Q108: What is surefire vs failsafe lifecycle binding?
+Surefire in test phase; failsafe in integration-test + verify.
+
+** Q109: Why verify phase important with failsafe?
+Ensures integration test failures fail build properly.
+
+** Q110: What is JaCoCo plugin use?
+Code coverage measurement/reporting.
+
+** Q111: Coverage anti-pattern?
+Chasing percentage metrics without meaningful assertions.
+
+** Q112: What is site lifecycle in Maven?
+Generates project reports/documentation site.
+
+** Q113: Why site lifecycle less common now?
+Many teams use external docs/CI dashboards, but it remains useful.
+
+** Q114: What is GPG signing in Maven release?
+Cryptographically signing artifacts for integrity/trust.
+
+** Q115: What is release plugin concept?
+Automates version bump/tag/release flow (opinions vary on usage).
+
+** Q116: Why some teams avoid release plugin?
+Complexity and SCM workflow mismatch; prefer explicit CI release scripts.
+
+** Q117: What is CI-friendly versioning?
+Using properties (e.g., revision) to inject versions in pipelines.
+
+** Q118: What is build cache role with Maven?
+Primarily repository cache/proxy; remote build cache support varies by tooling.
+
+** Q119: What is intermediate anti-pattern?
+Huge parent POM mixing unrelated concerns for every module.
+
+** Q120: Better parent strategy?
+Layered parents/BOMs with clear scope and ownership.
+
+** Q121: What is security scanning in Maven pipelines?
+Analyze dependencies/plugins for known vulnerabilities/licenses.
+
+** Q122: Why scan plugins too?
+Build plugins execute code and can introduce supply-chain risk.
+
+** Q123: What is license compliance check?
+Ensure dependency licenses meet organization policy.
+
+** Q124: Intermediate maturity signal?
+Team can explain classpath, lifecycle bindings, and dependency graph decisions.
+
+** Q125: Intermediate troubleshooting flow?
+effective-pom -> dependency tree -> plugin execution debug -> CI env parity.
+
+** Q126: What is =-X= in Maven?
+Debug logging mode for detailed troubleshooting.
+
+** Q127: What is =-U= flag?
+Forces update checks for snapshots/releases metadata.
+
+** Q128: What is offline mode (-o)?
+Build using local repository only without remote access.
+
+** Q129: Intermediate reliability principle?
+Builds should be deterministic, policy-checked, and environment-consistent.
+
+** Q130: Intermediate best practice?
+Standardize parent/BOM/plugin governance and keep modules cohesive.
+
+* Advanced
+
+** Q131: What is enterprise Maven governance?
+Organization-wide control of dependencies, plugins, repos, and release policies.
+
+** Q132: What is golden parent POM?
+Curated parent enforcing approved plugin/dependency defaults and quality gates.
+
+** Q133: What is platform BOM strategy?
+Central BOMs per tech stack aligned with tested compatibility matrix.
+
+** Q134: What is dependency allowlist/denylist model?
+Explicitly permit trusted artifacts and block risky/unapproved ones.
+
+** Q135: What is transitive risk management challenge?
+Indirect dependencies can introduce vulnerabilities unexpectedly.
+
+** Q136: Mitigation for transitive risk?
+SBOM generation, continuous scanning, and strict upgrade cadence.
+
+** Q137: What is SBOM in Maven ecosystem?
+Machine-readable dependency inventory produced during build/release.
+
+** Q138: Why SBOM matters?
+Compliance, incident response, and supply-chain transparency.
+
+** Q139: What is artifact provenance?
+Traceability of who built artifact, from which source, with what tools.
+
+** Q140: How strengthen provenance in Maven pipelines?
+Signed commits/tags, signed artifacts, immutable CI, attestations.
+
+** Q141: What is hermetic build principle?
+Build isolated from undeclared external influences for reproducibility/security.
+
+** Q142: Maven hermeticity challenge?
+Plugins/dependencies often fetched from remote repos unless mirrored/pinned.
+
+** Q143: How approximate hermetic Maven builds?
+Internal mirrored repos, locked versions, controlled toolchains, offline-capable CI steps.
+
+** Q144: What is build promotion model?
+Promote same artifact binary across environments instead of rebuilding.
+
+** Q145: Why avoid rebuilding per environment?
+Rebuilds can produce drift and invalidate prior test assurances.
+
+** Q146: What is monorepo Maven scaling challenge?
+Large reactor size and cross-module coupling slow feedback.
+
+** Q147: Mitigation for monorepo scale?
+Clear module boundaries, selective builds, parallel CI partitioning.
+
+** Q148: What is graph-aware CI optimization?
+Run only impacted module tests/builds based on dependency graph changes.
+
+** Q149: What is flaky test impact on Maven pipelines?
+Erodes trust and blocks reliable release automation.
+
+** Q150: How manage flaky tests?
+Detection, quarantine with SLA, root-cause fix ownership.
+
+** Q151: What is remote caching/proxy tuning at scale?
+Optimize repository manager throughput, TTLs, and storage cleanup.
+
+** Q152: What is checksum fail policy importance?
+Prevents corrupted/tampered artifacts entering builds.
+
+** Q153: What is namespace takeover/dependency confusion risk?
+Malicious artifact with similar coordinates/version hijacks resolution path.
+
+** Q154: Mitigation for dependency confusion?
+Use internal repos/mirrors strictly and control external resolution.
+
+** Q155: What is plugin execution attack surface?
+Compromised plugin can execute arbitrary build-time code.
+
+** Q156: Plugin security controls?
+Pin versions, approve sources, scan/sign artifacts, restrict network/permissions in CI.
+
+** Q157: What is reproducible timestamp control?
+Configure archiver/jar settings for deterministic file metadata.
+
+** Q158: What is bytecode target consistency issue?
+Mismatched compiler/source/target settings break runtime compatibility.
+
+** Q159: How enforce Java compatibility?
+maven-compiler-plugin + enforcer + toolchains.
+
+** Q160: What is multi-release JAR concept?
+JAR containing version-specific classes for different Java runtimes.
+
+** Q161: Multi-release JAR tradeoff?
+Flexibility vs increased build/test complexity.
+
+** Q162: What is advanced versioning strategy?
+Semantic versioning + compatibility checks + automated release notes.
+
+** Q163: What is API compatibility enforcement?
+Binary/source compatibility checks in CI before release.
+
+** Q164: What is dependency lock concept in Maven?
+Not native like some tools; approximated via BOM/enforcer/fixed versions.
+
+** Q165: What is release train model?
+Coordinated version set across many modules/services on regular cadence.
+
+** Q166: Release train risk?
+Coordination overhead and delayed independent delivery.
+
+** Q167: What is polyglot build challenge with Maven?
+Integrating non-JVM assets/tools while preserving deterministic lifecycle.
+
+** Q168: What is containerized Maven build benefit?
+Consistent build environment across dev/CI platforms.
+
+** Q169: Containerized build caveat?
+Cache warm-up and I/O overhead if not optimized.
+
+** Q170: What is disaster recovery concern for Maven infra?
+Repository manager outage can block builds/deploys organization-wide.
+
+** Q171: DR mitigation for artifact infrastructure?
+Backups, geo-replication, mirror failover, cache seeding.
+
+** Q172: What is advanced anti-pattern in Maven ecosystems?
+Unbounded parent POM inheritance with opaque plugin side effects.
+
+** Q173: Better architectural principle?
+Explicit minimal conventions + strong automated policy enforcement.
+
+** Q174: What is final reliability principle?
+Builds must be deterministic, test-gated, and reproducible on demand.
+
+** Q175: What is final security principle?
+Trust nothing by default: verify dependencies, plugins, and artifacts continuously.
+
+** Q176: What is final performance principle?
+Optimize feedback loops via module design, selective CI, and cache strategy.
+
+** Q177: What is final governance principle?
+Central standards with team autonomy through well-defined extension points.
+
+** Q178: What is final operations principle?
+Continuously observe build health: duration, flake rate, failure taxonomy.
+
+** Q179: What is final architecture principle?
+Align module boundaries with domain boundaries to reduce build coupling.
+
+** Q180: Final maturity principle?
+Maven excellence is disciplined dependency governance plus fast, reproducible delivery.
+
+* Bonus: Minimal Maven POM Template (Spring Boot style)
+
+#+BEGIN_SRC xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.example</groupId>
+  <artifactId>demo</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <java.version>21</java.version>
+    <maven.compiler.release>${java.version}</maven.compiler.release>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>3.3.2</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+#+END_SRC

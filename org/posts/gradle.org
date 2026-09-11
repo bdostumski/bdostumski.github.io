@@ -1,0 +1,589 @@
+#+title: Gradle
+#+date: 2026-08-07
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Gradle
+
+-----
+
+* Beginner
+
+** Q1: What is Gradle?
+Gradle is a flexible build automation tool supporting JVM and many other ecosystems.
+
+** Q2: Why use Gradle?
+It provides fast incremental builds, rich dependency management, and programmable build logic.
+
+** Q3: Gradle vs Maven in one line?
+Maven is convention-heavy and phase-based; Gradle is task-graph-based and highly customizable.
+
+** Q4: What is a build script in Gradle?
+Configuration file defining plugins, dependencies, tasks, and build logic.
+
+** Q5: Main Gradle DSL options?
+Groovy DSL (=build.gradle=) and Kotlin DSL (=build.gradle.kts=).
+
+** Q6: What is settings file in Gradle?
+=settings.gradle(.kts)= defines root project name and included subprojects.
+
+** Q7: What is a task in Gradle?
+A unit of work (compile, test, jar, custom action).
+
+** Q8: What is task graph?
+Directed graph of tasks and dependencies Gradle executes.
+
+** Q9: What does =gradle tasks= show?
+Available tasks in the project.
+
+** Q10: What does =gradle build= do?
+Runs lifecycle tasks to compile, test, and assemble artifacts.
+
+** Q11: What does =gradle clean= do?
+Deletes build outputs (usually =build/= directories).
+
+** Q12: What does =gradle test= do?
+Executes test tasks.
+
+** Q13: What does =gradle assemble= do?
+Builds artifacts without running all verification tasks.
+
+** Q14: What does =gradle check= do?
+Runs verification tasks (tests, static checks).
+
+** Q15: What does =gradle dependencies= do?
+Displays dependency tree for configurations.
+
+** Q16: What is a plugin in Gradle?
+Reusable build logic that adds tasks/configurations/conventions.
+
+** Q17: Common core plugins?
+=java=, =application=, =jacoco=, =maven-publish=, =checkstyle=.
+
+** Q18: What does Java plugin provide?
+Standard Java source sets, compile/test/jar tasks, dependency configurations.
+
+** Q19: What are source sets?
+Logical groups of sources/resources (main, test, custom).
+
+** Q20: Default source directories in Java plugin?
+=src/main/java=, =src/test/java=, resources equivalents.
+
+** Q21: What is repository in Gradle?
+Source location for resolving dependencies/plugins (Maven Central, internal repos).
+
+** Q22: What is dependency notation?
+Usually =group:name:version= coordinates.
+
+** Q23: What is configuration in Gradle?
+Named dependency bucket with specific usage semantics.
+
+** Q24: Common configurations?
+=implementation=, =api=, =compileOnly=, =runtimeOnly=, =testImplementation=.
+
+** Q25: implementation vs api (java-library)?
+=api= leaks to consumers; =implementation= is internal to module.
+
+** Q26: What is transitive dependency?
+Dependency brought indirectly through another dependency.
+
+** Q27: Why can transitive dependencies be risky?
+Version conflicts and hidden classpath changes.
+
+** Q28: What is Gradle Wrapper?
+Project-local scripts and metadata pinning Gradle version.
+
+** Q29: Why use Wrapper?
+Consistent Gradle version across all developers/CI.
+
+** Q30: Wrapper commands?
+=./gradlew <task>= (Unix), =gradlew.bat <task>= (Windows).
+
+** Q31: What is Gradle daemon?
+Background process speeding up subsequent builds.
+
+** Q32: Why daemon improves performance?
+Reuses JVM and cached build state between runs.
+
+** Q33: What is incremental build?
+Only re-running tasks whose inputs/outputs changed.
+
+** Q34: What is up-to-date check?
+Gradle mechanism skipping task if inputs/outputs unchanged.
+
+** Q35: What is build cache?
+Reuses task outputs from local/remote cache when inputs match.
+
+** Q36: Local vs remote build cache?
+Local on machine; remote shared across team/CI.
+
+** Q37: What is =--info= and =--debug=?
+More verbose logging levels for troubleshooting.
+
+** Q38: What is =--stacktrace=?
+Prints full exception stack traces on build failures.
+
+** Q39: What is =--scan=?
+Publishes build scan with detailed performance and diagnostics (service/setup dependent).
+
+** Q40: What is configuration phase?
+Gradle evaluates build scripts and configures tasks.
+
+** Q41: What is execution phase?
+Selected tasks are executed according to task graph.
+
+** Q42: Why avoid heavy work during configuration?
+Slows every build invocation, even unrelated tasks.
+
+** Q43: What is lazy task configuration?
+Deferring task creation/config until needed.
+
+** Q44: What APIs support lazy configuration?
+=tasks.register= and Provider API patterns.
+
+** Q45: register vs create task?
+=register= is lazy; =create= is eager.
+
+** Q46: What is ext/property in Gradle?
+Extra project properties for sharing values in scripts.
+
+** Q47: What is gradle.properties?
+File for build properties/JVM args/settings at project/user level.
+
+** Q48: What is org.gradle.jvmargs used for?
+Configure JVM options for Gradle daemon.
+
+** Q49: What is common beginner Gradle anti-pattern?
+Copying large script blocks without understanding task/config impacts.
+
+** Q50: Another beginner anti-pattern?
+Using dynamic dependency versions in production builds.
+
+** Q51: Why avoid dynamic versions (e.g., 1.+)?
+Hurts reproducibility and can cause surprise breakages.
+
+** Q52: What is dependency lock concept?
+Pin resolved versions for reproducible dependency graphs.
+
+** Q53: Beginner security baseline?
+Trusted repositories, pinned versions, wrapper verification practices.
+
+** Q54: Beginner CI baseline?
+Run =./gradlew clean build= with wrapper in pipeline.
+
+** Q55: Beginner performance baseline?
+Enable daemon/build cache and avoid unnecessary clean builds.
+
+** Q56: What is task dependency declaration?
+Using =dependsOn= to enforce execution prerequisites.
+
+** Q57: MustRunAfter vs dependsOn?
+Ordering hint vs actual dependency requirement.
+
+** Q58: finalizedBy usage?
+Run cleanup/finalizer task after another task, even on failure scenarios.
+
+** Q59: Beginner project structure principle?
+Keep build scripts small and readable; move shared logic out when needed.
+
+** Q60: Beginner best practice?
+Use wrapper, pin versions, and lean on conventions before custom complexity.
+
+* Intermediate
+
+** Q61: What is multi-project build in Gradle?
+Single root build managing multiple subprojects/modules.
+
+** Q62: How include modules?
+Use =include("moduleA", "moduleB")= in settings file.
+
+** Q63: What is allprojects vs subprojects?
+Scope configuration to root+children vs children only.
+
+** Q64: Why avoid heavy allprojects blocks?
+Can create tight coupling and configuration overhead.
+
+** Q65: Better alternative to giant shared blocks?
+Convention plugins/build logic modules.
+
+** Q66: What is buildSrc?
+Special included build for reusable build logic compiled automatically.
+
+** Q67: buildSrc downside?
+Any change can invalidate configuration and slow builds.
+
+** Q68: Modern alternative to buildSrc?
+Included builds/convention plugins (composite build approach).
+
+** Q69: What is version catalog?
+Centralized dependency coordinates in =libs.versions.toml=.
+
+** Q70: Why use version catalogs?
+Consistent dependency declarations and easier upgrades.
+
+** Q71: What is platform dependency in Gradle?
+BOM-style dependency alignment via =platform(...)=.
+
+** Q72: Enforced platform vs platform?
+Enforced strictly forces versions; regular platform participates in alignment.
+
+** Q73: What is dependency constraint?
+Rule constraining allowed dependency versions.
+
+** Q74: Why use constraints?
+Prevent vulnerable/incompatible versions transitively.
+
+** Q75: What is resolution strategy?
+Rules customizing dependency conflict resolution/substitution.
+
+** Q76: What is dependency substitution?
+Replacing one module/project dependency with another.
+
+** Q77: What is component metadata rule?
+Customize metadata (status/variants/capabilities) during resolution.
+
+** Q78: What is capability conflict?
+Multiple modules providing same capability causing ambiguity.
+
+** Q79: What is java-library plugin benefit?
+Separates API and implementation dependencies for proper consumer classpaths.
+
+** Q80: What is toolchain support in Gradle?
+Declaratively selecting JDK version for compilation/testing.
+
+** Q81: Why use Java toolchains?
+Consistent builds independent of local JAVA_HOME.
+
+** Q82: What is test task configuration?
+Customize test engine, parallelism, includes/excludes, JVM args.
+
+** Q83: How separate integration tests in Gradle?
+Create custom source set and Test task bound to check/verify workflow.
+
+** Q84: What is JaCoCo integration?
+Coverage reports and verification thresholds in build.
+
+** Q85: What is publication in Gradle?
+Publishing artifacts/metadata to Maven/Ivy repositories.
+
+** Q86: What plugin for Maven publishing?
+=maven-publish=.
+
+** Q87: What is publication coordinates control?
+Define group/artifact/version and generated POM metadata.
+
+** Q88: What is signing plugin use?
+Cryptographically sign published artifacts.
+
+** Q89: What is configuration cache?
+Gradle feature caching configuration phase for faster subsequent runs.
+
+** Q90: Why config cache can fail?
+Build logic/plugins using unsupported non-cache-safe patterns.
+
+** Q91: What is task avoidance API importance?
+Reduces unnecessary task configuration, improving performance.
+
+** Q92: What is Provider API?
+Lazy value abstraction for safe deferred computation wiring.
+
+** Q93: Why prefer Provider API over direct values?
+Improves laziness, correctness, and configuration cache compatibility.
+
+** Q94: What is file system watching in Gradle?
+Tracks file changes to speed incremental behavior between builds.
+
+** Q95: What is parallel execution in Gradle?
+Run independent tasks/projects concurrently (=--parallel=).
+
+** Q96: Parallel build caveat?
+Race conditions if tasks share mutable outputs/resources.
+
+** Q97: What is max-workers?
+Controls worker thread count for parallel task execution.
+
+** Q98: What is build scan used for in performance tuning?
+Identify slow tasks, cache misses, configuration hotspots.
+
+** Q99: What is annotation processor configuration?
+Use =annotationProcessor= and =testAnnotationProcessor= dependencies.
+
+** Q100: compileOnly vs annotationProcessor?
+compileOnly adds compile classpath; annotationProcessor configures processor path.
+
+** Q101: What is shading/relocation in Gradle?
+Packaging dependencies into uber jar and relocating packages to avoid clashes.
+
+** Q102: Common plugin for shadow jar?
+Shadow plugin (community).
+
+** Q103: What is reproducible archives setting?
+Deterministic file order/timestamps for stable artifact hashes.
+
+** Q104: Why reproducible artifacts matter?
+Supply-chain trust, cache efficiency, and diff clarity.
+
+** Q105: What is dependency verification in Gradle?
+Checksum/signature verification of dependencies.
+
+** Q106: Why dependency verification is important?
+Mitigates tampered artifact/supply-chain risks.
+
+** Q107: What is pluginManagement block?
+Controls plugin repositories/versions in settings.
+
+** Q108: What is settings plugin resolution?
+How Gradle resolves plugins before project build scripts execute.
+
+** Q109: What is init script?
+Global script injecting logic/settings into Gradle builds (use carefully).
+
+** Q110: What is composite build?
+Combining independent builds for joint development without publishing.
+
+** Q111: Composite build use case?
+Develop app and local library together seamlessly.
+
+** Q112: What is intermediate anti-pattern?
+Monolithic root script with tangled conditional logic for all modules.
+
+** Q113: Better architecture for build logic?
+Convention plugins + clear module ownership boundaries.
+
+** Q114: What is Gradle Enterprise/remote cache concept?
+Centralized build analytics and shared cache infrastructure.
+
+** Q115: CI optimization baseline with Gradle?
+Remote cache, test splitting, parallel workers, configuration cache adoption.
+
+** Q116: Why avoid always running clean in CI?
+Destroys incremental/cache benefits unless isolation requires it.
+
+** Q117: What is flaky test handling in Gradle pipelines?
+Retry/quarantine carefully while fixing root causes quickly.
+
+** Q118: What is intermediate security baseline?
+Repository allowlist, dependency verification, signed publishing, secret-safe CI.
+
+** Q119: What is intermediate reliability baseline?
+Deterministic builds with locked versions and policy checks.
+
+** Q120: Intermediate maturity signal?
+Team can explain dependency graph, cache behavior, and task graph performance.
+
+** Q121: What is troubleshooting dependency conflicts flow?
+dependencyInsight -> constraints/platform -> lock update -> verification.
+
+** Q122: What is =dependencyInsight= task for?
+Detailed explanation of why a dependency/version is selected.
+
+** Q123: What is rich version constraint?
+Gradle syntax supporting preferred/strict/reject version semantics.
+
+** Q124: What is intermediate governance principle?
+Centralize standards, decentralize feature module implementation.
+
+** Q125: What is intermediate maintainability principle?
+Keep custom build logic tested and versioned like application code.
+
+** Q126: What is intermediate release principle?
+Publish immutable artifacts and promote them across environments.
+
+** Q127: What is intermediate observability principle?
+Track build duration, cache hit rate, flaky tests, and failure taxonomy.
+
+** Q128: What is intermediate DX principle?
+Fast local feedback with predictable wrapper-driven builds.
+
+** Q129: What is intermediate migration concern (Groovy->Kotlin DSL)?
+Type safety benefits vs migration effort and plugin compatibility checks.
+
+** Q130: Intermediate best practice?
+Invest in build performance and governance early; it compounds over time.
+
+* Advanced
+
+** Q131: What is enterprise Gradle platform engineering?
+Providing shared build conventions, tooling, and guardrails across many teams.
+
+** Q132: What is convention plugin?
+Internal plugin encoding approved defaults/policies for projects.
+
+** Q133: Why convention plugins over script copy-paste?
+Reusability, versioning, testing, and controlled evolution.
+
+** Q134: What is binary plugin development?
+Implementing Gradle plugins in Kotlin/Java with typed extensions/tasks.
+
+** Q135: Why test custom plugins?
+Prevent organization-wide build breakages from shared logic changes.
+
+** Q136: What is TestKit in Gradle?
+Framework for functional testing of Gradle plugins/build logic.
+
+** Q137: What is build logic versioning strategy?
+Release and consume internal plugins with semantic versions.
+
+** Q138: What is compatibility matrix in build platform?
+Mapping supported Gradle, JDK, plugin, framework versions.
+
+** Q139: What is upgrade orchestration challenge?
+Coordinating Gradle/plugin/JDK upgrades across many repositories.
+
+** Q140: Mitigation for upgrade risk?
+Canary repos, automated validation, staged rollout waves.
+
+** Q141: What is hermetic build concept in Gradle?
+Builds isolated from undeclared external influences for reproducibility/security.
+
+** Q142: How improve hermeticity?
+Pinned deps/plugins, controlled repos, locked toolchains, minimal network variance.
+
+** Q143: What is dependency locking at scale?
+Committing lockfiles and controlled update workflows across modules.
+
+** Q144: Locking tradeoff?
+Stability vs operational overhead for coordinated upgrades.
+
+** Q145: What is supply-chain risk in Gradle builds?
+Compromised dependencies/plugins/repositories affecting build outputs.
+
+** Q146: Key Gradle supply-chain controls?
+Dependency verification, repo allowlists, artifact signing, SBOM generation.
+
+** Q147: What is SBOM generation in Gradle pipelines?
+Producing dependency inventory for compliance and vulnerability response.
+
+** Q148: What is provenance/attestation concept?
+Cryptographic evidence describing how artifact was built.
+
+** Q149: Why provenance matters?
+Supports trust, auditability, and incident response.
+
+** Q150: What is remote build cache poisoning risk?
+Malicious/incorrect cached outputs reused across builds.
+
+** Q151: How mitigate cache poisoning?
+Authenticated cache, write restrictions, trust boundaries, reproducibility checks.
+
+** Q152: What is configuration cache adoption strategy?
+Fix incompatible build logic/plugins incrementally with measurement.
+
+** Q153: What is isolated projects concept (advanced Gradle)?
+Reducing cross-project configuration coupling for scalability/performance.
+
+** Q154: What is task output normalization?
+Ensuring path/timestamp-independent outputs for better cache hits.
+
+** Q155: Why normalization improves cache reuse?
+Equivalent outputs hash consistently across machines/environments.
+
+** Q156: What is deterministic test execution concern?
+Parallelism/random order/time dependencies can create flaky builds.
+
+** Q157: How harden test determinism?
+Seed control, time abstraction, isolated resources, stable ordering.
+
+** Q158: What is graph pruning in large builds?
+Executing only impacted tasks/modules via dependency graph analysis.
+
+** Q159: What is distributed test execution concept?
+Split test workload across agents for faster CI feedback.
+
+** Q160: What is advanced monorepo Gradle challenge?
+Configuration time and memory pressure with many subprojects.
+
+** Q161: Monorepo mitigation patterns?
+Composite builds, convention plugins, strict modularization, selective CI builds.
+
+** Q162: What is worker API in Gradle?
+Framework for parallelizable, isolated task work execution.
+
+** Q163: Why use Worker API in custom tasks?
+Better parallelism and performance without blocking main build thread.
+
+** Q164: What is build service in Gradle?
+Shared, lifecycle-managed service object for tasks.
+
+** Q165: Build service use case?
+Shared expensive resources (connections, tool processes) with controlled concurrency.
+
+** Q166: What is advanced publishing governance?
+Policy checks for metadata, signatures, licenses, and vulnerability thresholds.
+
+** Q167: What is dependency substitution for incident response?
+Temporarily reroute vulnerable module to patched fork/build.
+
+** Q168: What is emergency unpublish/republish concern?
+Immutable artifact policy usually forbids overwrite; use new versions.
+
+** Q169: What is final fallback if build toolchain breaks broadly?
+Pinned wrapper + cached distributions + rollback of convention plugin versions.
+
+** Q170: What is Gradle build observability gold standard?
+Dashboards for config time, cache hits, task critical path, flaky tests, failure causes.
+
+** Q171: What is SLO for build platforms?
+Targets for median/percentile build duration and success rate.
+
+** Q172: What is error budget for CI/build systems?
+Allowed instability guiding release pace and platform investments.
+
+** Q173: What is advanced anti-pattern in Gradle ecosystems?
+Unbounded custom scripting without typed APIs/tests/governance.
+
+** Q174: Better long-term build architecture?
+Small tested convention plugins + strict dependency/repository policies.
+
+** Q175: What is final reliability principle?
+Builds must be reproducible, deterministic, and resilient to infra variance.
+
+** Q176: What is final security principle?
+Continuously verify dependencies, plugins, and produced artifacts.
+
+** Q177: What is final performance principle?
+Optimize the critical path: configuration, compilation, testing, and caching.
+
+** Q178: What is final governance principle?
+Central guardrails with documented extension points for teams.
+
+** Q179: What is final developer-experience principle?
+Fast local builds, clear errors, and minimal cognitive load.
+
+** Q180: Final maturity principle?
+Gradle excellence is engineered build systems treated as core product infrastructure.
+
+* Bonus: Minimal Gradle Kotlin DSL Template (Spring Boot style)
+
+#+BEGIN_SRC kotlin
+plugins {
+    java
+    id("org.springframework.boot") version "3.3.2"
+    id("io.spring.dependency-management") version "1.1.6"
+}
+
+group = "com.example"
+version = "1.0.0"
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+#+END_SRC

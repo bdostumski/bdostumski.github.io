@@ -1,0 +1,553 @@
+#+title: Liquibase
+#+date: 2026-08-05
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Liquibase
+
+-----
+
+* Beginner
+
+** Q1: What is Liquibase?
+Liquibase is a database schema change management tool using changelogs to track and apply migrations.
+
+** Q2: Why use Liquibase?
+It makes database changes repeatable, auditable, and automatable across environments.
+
+** Q3: What problem does Liquibase solve?
+Schema drift and unsafe manual SQL deployments.
+
+** Q4: What is a changelog?
+A file (XML/YAML/JSON/SQL) describing database changes in ordered changeSets.
+
+** Q5: What is a changeSet?
+Smallest unit of change in Liquibase with unique identity and execution metadata.
+
+** Q6: How is a changeSet uniquely identified?
+By =id= + =author= + changelog path.
+
+** Q7: What tables does Liquibase use for tracking?
+Typically =DATABASECHANGELOG= and =DATABASECHANGELOGLOCK=.
+
+** Q8: What is DATABASECHANGELOG?
+History table recording executed changeSets.
+
+** Q9: What is DATABASECHANGELOGLOCK?
+Lock table preventing concurrent migration execution.
+
+** Q10: Why locking is important?
+Avoids race conditions and partial conflicting schema changes.
+
+** Q11: What is update command?
+Applies pending changeSets to target database.
+
+** Q12: What is rollback command?
+Reverts applied changes to a prior state (when rollback info exists).
+
+** Q13: What is status command?
+Shows undeployed changeSets.
+
+** Q14: What is validate command?
+Checks changelog correctness and structure before execution.
+
+** Q15: What is diff command (conceptually)?
+Compares two database schemas (or schema vs reference) to identify differences.
+
+** Q16: What is generateChangeLog?
+Creates changelog from existing database schema.
+
+** Q17: What is change type in Liquibase?
+Predefined operation like =createTable=, =addColumn=, =createIndex=, etc.
+
+** Q18: Why prefer structured change types?
+Database portability and readability versus raw vendor SQL only.
+
+** Q19: Can Liquibase run raw SQL?
+Yes, via SQL changes or SQL-formatted changelogs.
+
+** Q20: What is SQL-formatted changelog?
+Migration file using special comments to define Liquibase metadata in SQL.
+
+** Q21: What is precondition?
+Rule checked before running a changeSet.
+
+** Q22: Why use preconditions?
+Prevent unsafe execution when database state is unexpected.
+
+** Q23: Example precondition use?
+Run change only if table/column exists or DBMS type matches.
+
+** Q24: What is onFail behavior in preconditions?
+Defines action on precondition failure (halt, warn, mark ran, etc.).
+
+** Q25: What is context in Liquibase?
+Tag to include/exclude changeSets by environment/use case.
+
+** Q26: What is label in Liquibase?
+Flexible tagging mechanism for selective deployment logic.
+
+** Q27: Contexts vs labels?
+Both filter execution; labels often used for richer targeting strategies.
+
+** Q28: What is checksum in Liquibase?
+Hash for changeSet content used to detect modifications.
+
+** Q29: Can you edit an applied changeSet freely?
+Not recommended; it causes checksum mismatch and audit issues.
+
+** Q30: Proper fix for applied changeSet mistake?
+Create new corrective changeSet.
+
+** Q31: What is runAlways?
+Forces changeSet execution every update (use carefully).
+
+** Q32: What is runOnChange?
+Re-runs changeSet when content changes (common for views/procs).
+
+** Q33: When use runOnChange?
+For replaceable objects like views/functions requiring refresh on edits.
+
+** Q34: What is tag in Liquibase?
+Named marker in migration history used for rollback/reference points.
+
+** Q35: Why tag releases?
+Easier rollback and audit by release boundary.
+
+** Q36: What is baseline concept in Liquibase?
+Starting migration tracking from existing schema state.
+
+** Q37: How onboard legacy DB with Liquibase?
+Generate baseline changelog and mark/manage initial state carefully.
+
+** Q38: What is changelog include?
+Split large changelog into modular files.
+
+** Q39: include vs includeAll?
+=include= explicit file; =includeAll= includes all files from directory.
+
+** Q40: Why modular changelogs?
+Better team ownership and maintainability.
+
+** Q41: What is logicalFilePath?
+Stable identifier path helping avoid checksum/identity drift after file moves.
+
+** Q42: What is fail-fast migration principle?
+Stop deployment immediately on migration validation/execution failure.
+
+** Q43: What is dry run SQL output concept?
+Preview SQL generated/executed before applying changes.
+
+** Q44: Why preview SQL?
+Review lock/performance risk and vendor-specific output.
+
+** Q45: Beginner Liquibase anti-pattern?
+One huge changeSet with many unrelated operations.
+
+** Q46: Better changeSet design?
+Small, focused, atomic, reviewable units.
+
+** Q47: Another beginner anti-pattern?
+Using contexts/labels inconsistently without strategy.
+
+** Q48: Beginner testing baseline?
+Run changelogs on fresh DB and upgrade path DB in CI.
+
+** Q49: Why test both fresh and upgrade paths?
+Catches issues in bootstrap and incremental evolution scenarios.
+
+** Q50: What is immutable migration artifact principle?
+Promote same reviewed changelog files across environments.
+
+** Q51: Why avoid manual DB hotfix outside changelog?
+Causes drift and undermines auditability.
+
+** Q52: Liquibase with Spring Boot?
+Spring Boot can auto-run Liquibase at startup when configured.
+
+** Q53: Should clean/reset commands run in production?
+Generally no, except strictly controlled exceptional cases.
+
+** Q54: Beginner security baseline?
+Least-privilege DB creds and protected changelog repos/pipelines.
+
+** Q55: Beginner reliability baseline?
+Backups, validation gates, and tested rollback/roll-forward plans.
+
+** Q56: Beginner observability baseline?
+Track migration duration, failures, and deployment correlation.
+
+** Q57: What is naming convention value in changeSets?
+Predictable IDs improve traceability and teamwork.
+
+** Q58: What is documentation minimum for each migration?
+Purpose, risk level, rollback plan, owner.
+
+** Q59: Beginner delivery principle?
+Schema changes travel through same PR/CI process as application code.
+
+** Q60: Beginner best practice?
+Treat database evolution as disciplined software delivery, not manual ops.
+
+* Intermediate
+
+** Q61: What is expand-contract pattern with Liquibase?
+Two-phase backward-compatible schema evolution for zero-downtime deploys.
+
+** Q62: Expand phase examples?
+Add nullable columns, new tables, additive indexes.
+
+** Q63: Contract phase examples?
+Drop old columns/constraints after app fully migrated.
+
+** Q64: Why avoid breaking DDL in one release?
+Rolling deployments run mixed app versions concurrently.
+
+** Q65: What is data backfill changeSet?
+Migration that populates new schema from existing data.
+
+** Q66: Why separate backfill from structural change?
+Independent rollback, safer execution windows, clearer troubleshooting.
+
+** Q67: What is long-running migration risk?
+Locks, replication lag, and user-facing latency spikes.
+
+** Q68: Mitigation for long-running DML?
+Batching/chunking with checkpoints and throttling.
+
+** Q69: What is customChange?
+Extension point for custom Java logic in migrations.
+
+** Q70: When use customChange?
+When built-in change types/SQL are insufficient for complex operations.
+
+** Q71: What is dbms attribute in changeSet?
+Restricts execution to specific database engines.
+
+** Q72: Why dbms scoping matters?
+Different SQL/DDL semantics across vendors.
+
+** Q73: What is splitStatements/endDelimiter in SQL changelogs?
+Controls SQL statement parsing behavior.
+
+** Q74: What is stripComments option?
+Controls comment handling in SQL execution contexts.
+
+** Q75: What is modifySql?
+Post-process generated SQL (e.g., engine-specific hints/tweaks).
+
+** Q76: Why use modifySql carefully?
+Can reduce portability and hide complexity.
+
+** Q77: What is markNextChangeSetRan?
+Marks pending changeSet as executed without running it (special cases only).
+
+** Q78: Risk of mark-ran operations?
+History may diverge from actual schema if misused.
+
+** Q79: What is clearCheckSums?
+Clears stored checksums so Liquibase recalculates on next run.
+
+** Q80: When use clearCheckSums?
+Controlled recovery after verified non-functional edits/path changes.
+
+** Q81: What is checksum mismatch incident workflow?
+Investigate root cause, avoid silent overrides, apply corrective process.
+
+** Q82: What is lock contention in Liquibase deployments?
+Concurrent deploy processes waiting/failing on changelog lock.
+
+** Q83: How avoid lock contention?
+Single migration executor per DB and disciplined pipeline orchestration.
+
+** Q84: What if lock is stuck?
+Verify no active migration, then safely release lock via documented procedure.
+
+** Q85: What is rollbackCount?
+Rollback a specific number of executed changeSets.
+
+** Q86: What is rollbackToDate?
+Rollback changes applied after specified timestamp.
+
+** Q87: What is rollback to tag?
+Revert database to previously tagged state.
+
+** Q88: Is rollback always guaranteed?
+No; depends on rollback definitions and DB capabilities.
+
+** Q89: Roll-forward vs rollback in practice?
+Many teams prefer roll-forward corrective migrations for safety.
+
+** Q90: What is precondition onSqlOutput behavior?
+Controls precondition handling during SQL preview mode.
+
+** Q91: What is failOnError in changeSet?
+Controls whether statement errors fail migration immediately.
+
+** Q92: Should failOnError be disabled often?
+Rarely; usually fail-fast is safer.
+
+** Q93: What is logical ordering challenge in monorepos?
+Parallel team migrations can collide or interleave unsafely.
+
+** Q94: Mitigation for migration collisions?
+Conventions (timestamp IDs), ownership boundaries, CI checks.
+
+** Q95: What is reference data migration pattern?
+Version controlled inserts/updates for stable lookup data.
+
+** Q96: Reference data pitfall?
+Non-idempotent inserts causing duplicates/conflicts.
+
+** Q97: Safer reference data approach?
+Upsert/merge patterns keyed by business identifiers.
+
+** Q98: What is includeAll ordering concern?
+File ordering rules may affect execution sequence unexpectedly.
+
+** Q99: How control includeAll determinism?
+Consistent naming conventions and explicit ordering strategy.
+
+** Q100: What is generated diff changelog risk?
+Auto-generated changes may be noisy or unsafe without review.
+
+** Q101: Best practice for diff output?
+Treat as draft; manually curate before merge.
+
+** Q102: What is Liquibase Hub/observability concept?
+Central visibility/governance features for migration activity (edition dependent).
+
+** Q103: What is CI/CD integration baseline?
+Validate + update against ephemeral DB + integration tests + artifact promotion.
+
+** Q104: Why run migrations in deployment pipeline, not manually?
+Consistency, audit trail, repeatability, and reduced human error.
+
+** Q105: What is environment promotion model?
+Dev -> test -> staging -> prod using same immutable changelog artifacts.
+
+** Q106: What is drift detection strategy with Liquibase?
+Regular diff/validation against expected state and reconcile via changeSets.
+
+** Q107: What is migration code review checklist?
+Lock risk, downtime risk, backward compatibility, rollback/forward fix, index impact.
+
+** Q108: What is online index build consideration?
+Use engine-specific non-blocking options when available.
+
+** Q109: What is transaction-per-changeSet behavior?
+Liquibase may wrap changeSets in transactions where DB supports it.
+
+** Q110: Why DB transactional DDL differences matter?
+Partial apply behavior varies by engine on failure.
+
+** Q111: What is intermediate anti-pattern?
+Mixing destructive DDL with large data rewrite in one deployment step.
+
+** Q112: Better release strategy?
+Phased compatible schema changes with separate backfill windows.
+
+** Q113: What is blue/green DB compatibility requirement?
+Both old and new app versions must work during traffic switch.
+
+** Q114: What is canary migration approach?
+Apply changes with progressive exposure and health verification.
+
+** Q115: What is intermediate security baseline?
+Dedicated migration credentials, secret rotation, audited execution.
+
+** Q116: Why separate app user from migration user?
+Limit runtime app privileges and reduce attack surface.
+
+** Q117: What is intermediate observability must-have?
+Migration duration, lock wait, statement failures, app latency correlation.
+
+** Q118: What is migration SLO?
+Defined acceptable execution time/error impact per release.
+
+** Q119: Intermediate maturity signal?
+Team consistently delivers backward-compatible schema changes without incidents.
+
+** Q120: What is intermediate troubleshooting flow?
+Lock/history tables -> failing SQL -> DB logs/plans -> corrective changeSet.
+
+** Q121: What is test data volume importance?
+Migration performance can differ dramatically at production scale.
+
+** Q122: What is shadow migration test?
+Run migrations against production-like clone before release.
+
+** Q123: What is release freeze consideration for risky migrations?
+Schedule during low-traffic windows with rollback team on standby.
+
+** Q124: Intermediate governance principle?
+Every migration needs owner, risk classification, and execution plan.
+
+** Q125: Intermediate best practice?
+Optimize for safe incremental evolution, not one-shot schema rewrites.
+
+* Advanced
+
+** Q126: What is enterprise migration governance?
+Organization-wide standards, tooling, and approvals for DB changes.
+
+** Q127: What is blast radius analysis for changeSets?
+Assess affected tables, services, queries, and operational windows.
+
+** Q128: What is zero-downtime migration architecture?
+Backward-compatible schema + phased app rollout + delayed cleanup.
+
+** Q129: What is phased column replacement pattern?
+Add new column, dual-write/read migrate, backfill, cutover, drop old.
+
+** Q130: Why dual-write monitoring is essential?
+Detect divergence between old/new data paths early.
+
+** Q131: What is chunked backfill with checkpoints?
+Process data in bounded batches with resumable progress markers.
+
+** Q132: Backfill throttling purpose?
+Limit impact on OLTP latency and replica lag.
+
+** Q133: What is replica lag migration risk?
+Read replicas fall behind, causing stale reads and failover complications.
+
+** Q134: How mitigate replica lag during migrations?
+Throttle heavy writes, monitor lag, pause if thresholds exceeded.
+
+** Q135: What is sharded database migration challenge?
+Coordinating consistent changelog execution across many shards.
+
+** Q136: Shard rollout strategy?
+Wave-based shard batches with automated health gates.
+
+** Q137: What is tenant-isolated migration pattern?
+Migrate tenant schemas progressively to reduce global risk.
+
+** Q138: What is schema contract testing?
+Automated verification app queries work across transitional schema states.
+
+** Q139: Why test intermediate compatibility states?
+Rolling deployments create mixed-version runtime periods.
+
+** Q140: What is query plan regression after DDL?
+Optimizer chooses slower plans due to schema/statistics/index changes.
+
+** Q141: How catch plan regressions?
+Pre-prod explain-plan baselines + performance tests on realistic data.
+
+** Q142: What is Liquibase policy checks concept?
+Automated rules enforcing allowed/prohibited migration patterns (edition/tooling dependent).
+
+** Q143: What is signed changelog artifact approach?
+Cryptographically verify changelog integrity through pipeline stages.
+
+** Q144: What is supply-chain threat for DB migrations?
+Tampered SQL/changeSets injected before deployment.
+
+** Q145: Mitigation for migration supply-chain threats?
+Protected branches, signed commits/artifacts, CI attestation, least privilege.
+
+** Q146: What is break-glass migration process?
+Controlled emergency path with extra auditing and post-incident review.
+
+** Q147: What is database change freeze policy?
+Restrict high-risk schema changes during peak business periods.
+
+** Q148: What is progressive delivery for schema?
+Canary DB changes, monitor SLOs, then broaden rollout.
+
+** Q149: What is automated migration abort policy?
+Stop rollout when lock wait/error/latency thresholds breach.
+
+** Q150: Why automatic rollback may be unsafe?
+DDL reversibility varies; roll-forward often safer operationally.
+
+** Q151: What is drift reconciliation at scale?
+Continuously detect out-of-band schema changes and codify corrections.
+
+** Q152: What is compliance evidence for DB changes?
+Who approved, what changed, when applied, and outcome metrics.
+
+** Q153: What is segregation of duties in DB delivery?
+Different roles for authoring, approving, and executing sensitive changes.
+
+** Q154: What is least-privilege advanced migration model?
+Time-bound scoped permissions only for required schemas/operations.
+
+** Q155: What is observability gold standard for migrations?
+Per-changeSet telemetry + DB health + app SLO impact in one timeline.
+
+** Q156: Key advanced metrics?
+Execution time, lock duration, rows touched, replication lag, error class, rollback/forward-fix counts.
+
+** Q157: What is game day for schema delivery?
+Practice failure scenarios: stuck lock, partial apply, performance degradation.
+
+** Q158: Why rehearse restore procedures?
+Backup confidence is meaningless without tested restoration.
+
+** Q159: What is RPO/RTO relevance to migration strategy?
+Defines acceptable data loss and recovery time during migration incidents.
+
+** Q160: What is multi-region migration coordination?
+Staggered rollout with compatibility guarantees and failover awareness.
+
+** Q161: What is active-active database schema challenge?
+Schema changes must remain compatible across simultaneously active regions.
+
+** Q162: What is data sovereignty consideration?
+Migration workflows must respect region-specific legal data constraints.
+
+** Q163: What is archival strategy before destructive changes?
+Snapshot/export critical data before drop/truncate operations.
+
+** Q164: What is safe deprecation lifecycle for columns/tables?
+Mark unused, monitor reads/writes, remove only after proven inactivity window.
+
+** Q165: What is telemetry-driven deprecation?
+Use query/access metrics to decide safe removal timing.
+
+** Q166: What is biggest advanced Liquibase anti-pattern?
+Treating changelogs as deployment detail instead of core architecture artifact.
+
+** Q167: What is platform team role with Liquibase?
+Provide templates, linting, policy gates, and migration runbooks.
+
+** Q168: What is mature team behavior in DB delivery?
+Design backward-compatible changes and measure impact continuously.
+
+** Q169: What is final reliability principle?
+Every migration must be rehearsed, observable, and recoverable.
+
+** Q170: What is final security principle?
+Protect changelog integrity, credentials, and execution paths end-to-end.
+
+** Q171: What is final performance principle?
+Benchmark migration impact on production-like data and traffic.
+
+** Q172: What is final governance principle?
+Enforce standards automatically, not by tribal knowledge.
+
+** Q173: What is final architecture principle?
+Evolve schemas incrementally with explicit compatibility contracts.
+
+** Q174: What is final operations principle?
+Run schema changes as first-class production events with SLO guardrails.
+
+** Q175: Final maturity principle?
+Liquibase excellence is disciplined, low-risk, continuously auditable schema evolution.
+
+* Bonus: Minimal Liquibase + Spring Boot Configuration Example
+
+#+BEGIN_SRC yaml
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    contexts: dev
+    drop-first: false
+#+END_SRC

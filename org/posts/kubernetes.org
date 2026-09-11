@@ -1,0 +1,634 @@
+#+title: Kubernetes
+#+date: 2026-08-03
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes
+
+-----
+
+* Beginner
+
+** Q1. What is Kubernetes?
+Kubernetes is an open-source container orchestration platform for deploying and managing containerized applications.
+
+** Q2. Why use Kubernetes?
+It automates scheduling, scaling, self-healing, and service discovery for containers.
+
+** Q3. What is a cluster?
+A set of machines (nodes) running Kubernetes control plane and workloads.
+
+** Q4. What is a node?
+A worker machine (VM or physical) where pods run.
+
+** Q5. What is a pod?
+Smallest deployable Kubernetes unit; one or more containers sharing network and storage namespace.
+
+** Q6. Why are pods ephemeral?
+They are designed to be replaceable; higher-level controllers maintain desired state.
+
+** Q7. What is a Deployment?
+Controller managing stateless replicated pods with rolling updates/rollbacks.
+
+** Q8. What is a ReplicaSet?
+Controller ensuring specified number of pod replicas are running.
+
+** Q9. Deployment vs ReplicaSet?
+Deployment manages ReplicaSets and rollout strategy; ReplicaSet only maintains replica count.
+
+** Q10. What is StatefulSet?
+Controller for stateful apps needing stable identities and ordered deployment/scaling.
+
+** Q11. What is DaemonSet?
+Ensures one (or selected) pod runs on each node.
+
+** Q12. What is Job?
+Runs pods to completion for finite tasks.
+
+** Q13. What is CronJob?
+Schedules Jobs at specified times (cron syntax).
+
+** Q14. What is a Service in Kubernetes?
+Stable network abstraction exposing a set of pods.
+
+** Q15. Why Service is needed?
+Pods are ephemeral; Service provides stable endpoint and load balancing.
+
+** Q16. Service types?
+ClusterIP, NodePort, LoadBalancer, ExternalName.
+
+** Q17. What is ClusterIP?
+Internal-only service reachable within cluster.
+
+** Q18. What is NodePort?
+Exposes service on static port on each node.
+
+** Q19. What is LoadBalancer service?
+Requests external load balancer from cloud/provider integration.
+
+** Q20. What is ExternalName service?
+Maps service to external DNS name.
+
+** Q21. What is Ingress?
+API object for HTTP(S) routing into cluster, typically via Ingress Controller.
+
+** Q22. Is Ingress itself a load balancer?
+No, it defines rules; controller implements behavior.
+
+** Q23. What is Ingress Controller?
+Component that watches Ingress resources and configures actual proxy/load balancer.
+
+** Q24. What is namespace?
+Logical cluster partition for resource organization and policy scope.
+
+** Q25. Why use namespaces?
+Multi-team isolation, naming boundaries, and policy/quota management.
+
+** Q26. What is ConfigMap?
+Stores non-sensitive configuration as key-value data.
+
+** Q27. What is Secret?
+Stores sensitive data (base64-encoded; secure handling still required).
+
+** Q28. ConfigMap vs Secret?
+Purpose and handling: Secret intended for sensitive values with stricter controls.
+
+** Q29. What is kube-apiserver?
+Control plane API front door for all cluster operations.
+
+** Q30. What is etcd?
+Distributed key-value store holding cluster state/configuration.
+
+** Q31. What is kube-scheduler?
+Assigns unscheduled pods to nodes based on constraints/resources.
+
+** Q32. What is kube-controller-manager?
+Runs controllers reconciling desired vs actual cluster state.
+
+** Q33. What is kubelet?
+Node agent managing pods/containers on each node.
+
+** Q34. What is kube-proxy?
+Implements service networking rules on nodes.
+
+** Q35. What is desired state?
+Declarative target configuration submitted to Kubernetes.
+
+** Q36. What is reconciliation loop?
+Controllers continuously adjust actual state toward desired state.
+
+** Q37. What is declarative management?
+Define desired YAML state, let controllers enforce it.
+
+** Q38. Imperative vs declarative kubectl usage?
+Imperative runs commands directly; declarative applies manifests.
+
+** Q39. What does kubectl apply do?
+Creates/updates resources to match manifest desired state.
+
+** Q40. What does kubectl get do?
+Lists resources.
+
+** Q41. What does kubectl describe do?
+Shows detailed resource state/events.
+
+** Q42. What does kubectl logs do?
+Fetches container logs from pod.
+
+** Q43. What does kubectl exec do?
+Runs command inside container.
+
+** Q44. What does kubectl port-forward do?
+Forwards local port to pod/service port temporarily.
+
+** Q45. What is label?
+Key-value metadata for organizing/selecting resources.
+
+** Q46. What is selector?
+Query mechanism matching labels to target objects.
+
+** Q47. Why labels are critical?
+Services/controllers use them to select pods/resources.
+
+** Q48. What is annotation?
+Non-identifying metadata for tools/humans/controllers.
+
+** Q49. What is container image pull policy?
+Rules controlling when kubelet pulls image (Always/IfNotPresent/Never).
+
+** Q50. What is readiness probe?
+Indicates pod ready to receive traffic.
+
+** Q51. What is liveness probe?
+Detects unhealthy container needing restart.
+
+** Q52. What is startup probe?
+Gives slow-start apps time before liveness checks begin.
+
+** Q53. Why probes matter?
+Enable self-healing and prevent routing traffic to broken pods.
+
+** Q54. What is resource request?
+Guaranteed minimum CPU/memory used for scheduling.
+
+** Q55. What is resource limit?
+Maximum CPU/memory container may use.
+
+** Q56. Why set requests/limits?
+Predictable scheduling, fairness, and node stability.
+
+** Q57. What is OOMKilled?
+Container killed for exceeding memory limit.
+
+** Q58. What is CrashLoopBackOff?
+Repeated container failures with backoff restarts.
+
+** Q59. Common beginner Kubernetes anti-pattern?
+No resource limits/probes on production workloads.
+
+** Q60. Another beginner anti-pattern?
+Using latest image tags in deployments.
+
+** Q61. Beginner security baseline?
+Namespaces, least-privilege RBAC, non-root containers, trusted images.
+
+** Q62. Beginner reliability baseline?
+Replicas, probes, rolling updates, and PodDisruptionBudgets.
+
+** Q63. Beginner observability baseline?
+Metrics, logs, events, and health dashboards.
+
+** Q64. Beginner deployment baseline?
+Use Deployments with versioned immutable image tags.
+
+** Q65. Beginner best practice?
+Treat manifests as code and keep everything declarative/versioned.
+
+* Intermediate
+
+** Q66. What is rolling update strategy?
+Gradual replacement of old pods with new pods minimizing downtime.
+
+** Q67. What are maxUnavailable/maxSurge?
+Controls rollout pace and temporary extra pods.
+
+** Q68. What is rollout undo?
+Revert Deployment to previous ReplicaSet revision.
+
+** Q69. What is revision history limit?
+How many old ReplicaSets retained for rollback.
+
+** Q70. What is HPA?
+Horizontal Pod Autoscaler scales pod replicas based on metrics.
+
+** Q71. What metrics can HPA use?
+CPU/memory and custom/external metrics (with adapters).
+
+** Q72. What is VPA?
+Vertical Pod Autoscaler adjusts pod resource requests (with operational caveats).
+
+** Q73. HPA vs VPA?
+HPA scales replica count; VPA scales per-pod resources.
+
+** Q74. What is Cluster Autoscaler?
+Scales node pool size based on unschedulable pods/utilization.
+
+** Q75. What is taint?
+Node marker repelling pods unless tolerated.
+
+** Q76. What is toleration?
+Pod rule allowing scheduling onto tainted nodes.
+
+** Q77. What is nodeSelector?
+Simple pod constraint selecting nodes by label.
+
+** Q78. What is node affinity?
+Advanced scheduling rules/preferences based on node labels.
+
+** Q79. What is pod affinity/anti-affinity?
+Rules to co-locate or separate pods relative to other pods.
+
+** Q80. Why use pod anti-affinity?
+Improve high availability by spreading replicas across nodes/zones.
+
+** Q81. What is topology spread constraint?
+Evenly distributes pods across topology domains.
+
+** Q82. What is PDB (PodDisruptionBudget)?
+Limits voluntary disruptions to maintain availability.
+
+** Q83. Voluntary vs involuntary disruption?
+Voluntary: drains/upgrades; involuntary: node crash/outage.
+
+** Q84. What is eviction in Kubernetes?
+Controlled pod termination due to resource pressure/policies.
+
+** Q85. What is QoS class?
+Pod quality-of-service tier (Guaranteed/Burstable/BestEffort) based on requests/limits.
+
+** Q86. What is init container?
+Container run before app containers for setup tasks.
+
+** Q87. What is sidecar container?
+Helper container running alongside main app container in same pod.
+
+** Q88. Sidecar use cases?
+Log shipping, proxying, cert refresh, metrics export.
+
+** Q89. What is ephemeral container?
+Debug container injected into running pod for troubleshooting.
+
+** Q90. What is CNI?
+Container Network Interface plugin model for Kubernetes networking.
+
+** Q91. What is CSI?
+Container Storage Interface for pluggable storage drivers.
+
+** Q92. What is PV?
+PersistentVolume: cluster storage resource.
+
+** Q93. What is PVC?
+PersistentVolumeClaim: user request for storage.
+
+** Q94. PV vs PVC relation?
+PVC binds to matching PV dynamically or statically.
+
+** Q95. What is StorageClass?
+Defines storage provisioner and parameters for dynamic provisioning.
+
+** Q96. What is access mode?
+How volume can be mounted (RWO, ROX, RWX, etc.).
+
+** Q97. What is volume snapshot?
+Point-in-time storage copy (driver support required).
+
+** Q98. What is headless service?
+Service with no cluster IP, often used by StatefulSets for stable DNS.
+
+** Q99. What is StatefulSet stable identity?
+Persistent pod names and stable network/storage identities.
+
+** Q100. What is service discovery in cluster?
+DNS-based resolution via CoreDNS for services/pods (as configured).
+
+** Q101. What is CoreDNS?
+Cluster DNS service resolving Kubernetes service names.
+
+** Q102. What is NetworkPolicy?
+Rules controlling pod-to-pod/network traffic at L3/L4.
+
+** Q103. Default NetworkPolicy behavior if none applied?
+Typically allow-all (depends on CNI and policies).
+
+** Q104. Why implement default-deny policies?
+Reduce lateral movement and enforce least-privilege connectivity.
+
+** Q105. What is RBAC?
+Role-Based Access Control for Kubernetes API authorization.
+
+** Q106. What is Role vs ClusterRole?
+Role is namespace-scoped; ClusterRole is cluster-scoped.
+
+** Q107. What is RoleBinding vs ClusterRoleBinding?
+Binds roles to subjects at namespace vs cluster scope.
+
+** Q108. What is ServiceAccount?
+Identity for pods/processes to access Kubernetes API/resources.
+
+** Q109. Why avoid default ServiceAccount permissions?
+May be overly broad for sensitive workloads.
+
+** Q110. What is admission controller?
+Plugin intercepting API requests for validation/mutation/policy enforcement.
+
+** Q111. What is mutating vs validating admission?
+Mutating can change objects; validating accepts/rejects requests.
+
+** Q112. What is OPA/Gatekeeper/Kyverno concept?
+Policy-as-code tools enforcing governance/security constraints.
+
+** Q113. What is Helm?
+Package manager templating/deploying Kubernetes applications via charts.
+
+** Q114. What is a Helm chart?
+Parameterized package of Kubernetes manifests.
+
+** Q115. What is Kustomize?
+Native manifest customization tool using overlays/patches.
+
+** Q116. Helm vs Kustomize?
+Helm is templating/package ecosystem; Kustomize is overlay-based customization.
+
+** Q117. What is GitOps?
+Managing cluster state from Git as single source of truth with reconciliation.
+
+** Q118. GitOps benefits?
+Auditability, reproducibility, safer rollbacks, drift detection.
+
+** Q119. What is Argo CD / Flux conceptually?
+GitOps controllers syncing cluster state from Git repos.
+
+** Q120. What is intermediate anti-pattern?
+Manual kubectl edits in production bypassing Git history.
+
+** Q121. Better change management pattern?
+Pull requests + automated policy checks + GitOps sync.
+
+** Q122. What is canary deployment in Kubernetes?
+Gradual traffic shift to new version with monitoring gates.
+
+** Q123. What is blue/green deployment?
+Parallel environments with controlled traffic cutover.
+
+** Q124. What is intermediate observability must-have?
+Cluster/pod metrics, logs, traces, events, and alerting.
+
+** Q125. What is intermediate reliability baseline?
+Multi-zone spread, PDBs, autoscaling, and tested rollback playbooks.
+
+** Q126. What is intermediate security baseline?
+Pod security standards, network policies, RBAC least privilege, image scanning.
+
+** Q127. What is cost optimization baseline?
+Right-size resources, autoscale, and monitor idle overprovisioning.
+
+** Q128. Intermediate maturity signal?
+Team can explain scheduling, rollout, and failure behavior end-to-end.
+
+** Q129. What is intermediate troubleshooting flow?
+Events → describe → logs → metrics → network/storage/auth checks.
+
+** Q130. Intermediate best practice?
+Engineer for failure: assume pods/nodes/networks will break regularly.
+
+* Advanced 
+
+** Q131. What is control plane high availability?
+Running redundant control plane components to avoid single-point failure.
+
+** Q132. What is etcd quorum?
+Majority of etcd members required for consistent writes/cluster health.
+
+** Q133. Why odd etcd member count?
+Optimizes quorum fault tolerance.
+
+** Q134. What is split-brain risk in distributed control planes?
+Network partitions causing inconsistent leadership/state views.
+
+** Q135. What is API server priority and fairness?
+Mechanism protecting API responsiveness under heavy request load.
+
+** Q136. What is scheduler extender/framework concept?
+Customizing scheduling decisions with plugins/extenders.
+
+** Q137. What is descheduler?
+Rebalances pods post-scheduling to improve placement over time.
+
+** Q138. What is topology-aware routing?
+Steering traffic to nearer endpoints for latency/cost improvements.
+
+** Q139. What is service mesh?
+Dedicated data plane/control plane for service-to-service traffic policies/telemetry/security.
+
+** Q140. Why use service mesh?
+mTLS, retries, traffic shaping, detailed observability without app code changes.
+
+** Q141. Mesh tradeoff?
+Operational complexity and resource overhead.
+
+** Q142. What is mTLS in Kubernetes?
+Mutual TLS authenticating and encrypting pod/service communications.
+
+** Q143. What is SPIFFE/SPIRE concept?
+Standardized workload identity framework for zero-trust environments.
+
+** Q144. What is zero-trust networking in cluster?
+Authenticate/authorize every workload connection regardless of network location.
+
+** Q145. What is secret encryption at rest?
+Encrypting Kubernetes secrets in etcd using KMS/providers.
+
+** Q146. Why base64 in Secret is not encryption?
+Base64 is encoding only; not cryptographic protection.
+
+** Q147. What is external secrets operator pattern?
+Sync secrets from vault/cloud secret manager into Kubernetes resources.
+
+** Q148. What is supply-chain security in Kubernetes?
+Securing source, build, image, registry, deploy, and runtime.
+
+** Q149. What is image signature verification?
+Admission-time verification of signed images before allowing deployment.
+
+** Q150. What is SBOM in Kubernetes operations?
+Artifact metadata used for vulnerability/compliance tracking.
+
+** Q151. What is runtime security monitoring?
+Detect suspicious process/network/syscall behavior in running containers.
+
+** Q152. What is eBPF relevance to Kubernetes?
+Low-overhead kernel observability/network/security instrumentation.
+
+** Q153. What is multi-tenancy model in Kubernetes?
+Soft/hard isolation strategies for teams/apps/customers in shared clusters.
+
+** Q154. Namespace-only multi-tenancy risk?
+Insufficient isolation for strong security/compliance requirements.
+
+** Q155. Hard multi-tenancy alternatives?
+Separate clusters/node pools, strict policies, workload isolation.
+
+** Q156. What is cell-based architecture on Kubernetes?
+Independent workload cells reducing blast radius.
+
+** Q157. What is failure domain design?
+Aligning replicas across zones/nodes/racks to tolerate localized failures.
+
+** Q158. What is disruption budget tuning challenge?
+Too strict blocks maintenance; too loose harms availability.
+
+** Q159. What is graceful node shutdown support?
+Coordinated pod termination during node shutdown events.
+
+** Q160. What is priority class?
+Defines pod scheduling/eviction priority under contention.
+
+** Q161. What is preemption?
+Higher-priority pods evict lower-priority pods when resources scarce.
+
+** Q162. Preemption risk?
+Can destabilize lower-priority workloads if overused.
+
+** Q163. What is overcommit strategy?
+Allocating requested resources below physical capacity assumptions.
+
+** Q164. Overcommit tradeoff?
+Better utilization vs higher contention/OOM risk.
+
+** Q165. What is bin packing vs spreading?
+Packing improves utilization; spreading improves resilience/perf isolation.
+
+** Q166. What is advanced autoscaling challenge?
+Coordinating HPA, VPA, and Cluster Autoscaler without oscillations.
+
+** Q167. What causes autoscaling thrash?
+Noisy metrics, aggressive thresholds, slow startup, conflicting policies.
+
+** Q168. What is workload startup probe tuning impact?
+Prevents premature restarts of slow-boot applications.
+
+** Q169. What is persistent storage performance pitfall?
+Ignoring IOPS/throughput/latency characteristics per workload profile.
+
+** Q170. What is StatefulSet update strategy nuance?
+Ordered rolling updates may require partitioned/canary updates for safety.
+
+** Q171. What is operator pattern in Kubernetes?
+Custom controller managing domain-specific applications via CRDs.
+
+** Q172. What is CRD?
+CustomResourceDefinition extending Kubernetes API with new resource types.
+
+** Q173. Why use operators?
+Automate complex lifecycle tasks (backup, failover, scaling, upgrades).
+
+** Q174. Operator risk?
+Buggy reconciliation can cause large-scale unintended changes.
+
+** Q175. What is progressive delivery on Kubernetes?
+Canary/blue-green/analysis-driven rollout with automated promotion/rollback.
+
+** Q176. What is SLO-driven operations in Kubernetes?
+Operate workloads based on availability/latency/error objectives.
+
+** Q177. What is error budget policy?
+Defines acceptable unreliability and release pace tradeoffs.
+
+** Q178. What is advanced observability stack?
+Metrics (Prometheus), logs, traces, events, profiling, and topology views.
+
+** Q179. Why include Kubernetes events in alert triage?
+Events reveal scheduling, probe, image pull, and policy failures quickly.
+
+** Q180. What is disaster recovery strategy for Kubernetes?
+Backup/restore etcd, manifests, secrets, PV snapshots, and tested runbooks.
+
+** Q181. What is multi-cluster strategy?
+Use multiple clusters for isolation, scale, DR, or regional presence.
+
+** Q182. What is fleet management challenge?
+Consistent policy, upgrades, and visibility across many clusters.
+
+** Q183. Biggest advanced Kubernetes anti-pattern?
+Treating cluster as VM replacement without platform engineering discipline.
+
+** Q184. Final architecture principle?
+Design workloads cloud-native: stateless where possible, resilient where stateful.
+
+** Q185. Final maturity principle?
+Kubernetes excellence is secure, observable, automated operations at scale.
+
+* Bonus: Minimal Production-Oriented Deployment + Service Template
+
+#+BEGIN_SRC yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  labels:
+    app: app
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/example/app:1.0.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  selector:
+    app: app
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"

@@ -1,0 +1,544 @@
+#+title: Flyway
+#+date: 2026-08-04
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Flyway
+
+-----
+
+* Beginner
+
+** Q1: What is Flyway?
+Flyway is a database migration tool that manages schema changes using versioned scripts.
+
+** Q2: Why use Flyway?
+It makes database changes repeatable, auditable, and automatable across environments.
+
+** Q3: What problem does Flyway solve?
+Prevents ad-hoc/manual schema drift and inconsistent database states.
+
+** Q4: What is a migration?
+A script that changes database schema (and sometimes reference data) in controlled steps.
+
+** Q5: What is versioned migration in Flyway?
+A migration with ordered version prefix, applied once in sequence.
+
+** Q6: What is repeatable migration?
+Migration re-applied when its checksum/content changes.
+
+** Q7: Typical versioned migration naming?
+=V1__init.sql=, =V2__add_user_table.sql=.
+
+** Q8: Typical repeatable migration naming?
+=R__views.sql= or =R__functions.sql=.
+
+** Q9: What does Flyway track in database?
+Applied migrations metadata in a schema history table.
+
+** Q10: What is Flyway schema history table?
+Internal table (default often =flyway_schema_history=) recording applied migrations.
+
+** Q11: Why is schema history table important?
+It is source of truth for migration state and ordering.
+
+** Q12: What is checksum in Flyway?
+Hash of migration content used to detect unexpected changes.
+
+** Q13: Why should applied versioned migrations be immutable?
+Changing them breaks auditability and causes checksum validation failures.
+
+** Q14: What is =migrate= command?
+Applies pending migrations in order.
+
+** Q15: What is =validate= command?
+Checks applied migrations against available files and checksums.
+
+** Q16: What is =info= command?
+Shows migration status (applied, pending, failed, etc.).
+
+** Q17: What is =clean= command?
+Drops objects in configured schemas (destructive).
+
+** Q18: Is clean safe in production?
+Usually disabled/forbidden in production.
+
+** Q19: What is =baseline= command?
+Initializes schema history at a baseline version for existing databases.
+
+** Q20: Why baseline is useful?
+Onboard legacy DBs without replaying all historical scripts.
+
+** Q21: What is =repair= command?
+Fixes schema history metadata issues (e.g., checksums/failed markers) carefully.
+
+** Q22: When use repair?
+After understanding root cause; not as blind fix.
+
+** Q23: What is out-of-order migration?
+Applying lower version migration after higher version already applied.
+
+** Q24: Should out-of-order be common?
+No, only controlled exceptional situations.
+
+** Q25: What is migration location?
+Path(s) where Flyway scans SQL/Java migrations.
+
+** Q26: Can Flyway run Java-based migrations?
+Yes, via migration classes for complex logic.
+
+** Q27: SQL vs Java migrations?
+SQL is transparent/simple; Java handles complex conditional logic.
+
+** Q28: What is transactional migration?
+Migration executed within transaction if DB supports DDL transactions.
+
+** Q29: Do all databases support transactional DDL?
+No, behavior varies by database engine.
+
+** Q30: Why does DB-specific behavior matter in Flyway?
+Rollback/failure semantics differ across engines.
+
+** Q31: What is idempotent DDL concept?
+Scripts written to avoid failure if rerun accidentally (where appropriate).
+
+** Q32: Should versioned migrations rely only on idempotency?
+No, ordering/history guarantees are primary; idempotency is extra safety.
+
+** Q33: What is placeholder in Flyway?
+Variable substituted in migration scripts at runtime.
+
+** Q34: Why use placeholders?
+Environment-specific values without duplicating scripts.
+
+** Q35: What is default migration prefix?
+Usually =V= for versioned and =R= for repeatable migrations.
+
+** Q36: What is separator in migration naming?
+Typically double underscore between version and description.
+
+** Q37: Why meaningful migration descriptions?
+Improve readability, review quality, and audit trails.
+
+** Q38: Where should Flyway run in app lifecycle?
+Typically at startup or CI/CD deploy stage before app serves traffic.
+
+** Q39: Flyway with Spring Boot?
+Boot can auto-run Flyway migrations on startup when configured.
+
+** Q40: What is beginner Flyway anti-pattern?
+Editing old applied migration instead of creating a new one.
+
+** Q41: Another beginner anti-pattern?
+Putting risky data backfills and schema changes in one untested script.
+
+** Q42: Why keep migrations small?
+Easier review, testing, rollback planning, and incident recovery.
+
+** Q43: What is migration ordering principle?
+Schema before dependent code paths requiring new schema.
+
+** Q44: What is forward-only migration mindset?
+Prefer new corrective migrations over editing history.
+
+** Q45: What is schema drift?
+Environment schemas diverge unintentionally.
+
+** Q46: How Flyway helps prevent drift?
+Consistent scripted migrations + validation/history tracking.
+
+** Q47: What is dry-run concept (process-wise)?
+Review SQL plan and test on staging before production.
+
+** Q48: Why test migrations on production-like data volume?
+Performance/locking behavior may differ from small dev datasets.
+
+** Q49: Beginner safety checklist?
+Backups, staging test, validate, and rollback/mitigation plan.
+
+** Q50: What is migration ownership best practice?
+Application team co-owns schema evolution with DBA/platform guidance.
+
+** Q51: What is immutable artifact principle for migrations?
+Promote same migration files across environments unchanged.
+
+** Q52: Why avoid manual hotfix SQL in prod?
+Breaks history consistency and reproducibility.
+
+** Q53: What is beginner CI use for Flyway?
+Run validate/migrate on ephemeral DB in pipeline.
+
+** Q54: Beginner reliability baseline?
+Versioned scripts, validation gates, tested backups.
+
+** Q55: Beginner best practice?
+Treat DB schema as code with reviews, tests, and automation.
+
+* Intermediate
+
+** Q56: What is expand-contract migration pattern?
+Backward-compatible phased schema change for zero-downtime deploys.
+
+** Q57: Expand phase meaning?
+Add new columns/tables/indexes without breaking old code.
+
+** Q58: Contract phase meaning?
+Remove deprecated schema only after all code paths migrated.
+
+** Q59: Why is expand-contract critical?
+Supports rolling/canary deployments with mixed app versions.
+
+** Q60: What is migration coupling risk?
+Application release depends on fragile schema timing/order.
+
+** Q61: How reduce release coupling?
+Backward-compatible DB changes and feature flags.
+
+** Q62: What is long-running migration risk?
+Extended locks/downtime impacting availability.
+
+** Q63: Mitigation for long migrations?
+Chunking, online DDL tools/features, off-peak scheduling.
+
+** Q64: What is lock contention in migrations?
+DDL/DML blocks application traffic or vice versa.
+
+** Q65: Why index creation can be risky?
+May lock table or consume heavy resources depending DB/options.
+
+** Q66: Safe index rollout approach?
+Use concurrent/online index options where supported.
+
+** Q67: What is data backfill migration?
+Populate new columns/tables from existing data.
+
+** Q68: Why separate backfill from schema change often?
+Independent rollback/control and reduced blast radius.
+
+** Q69: What is repeatable migration good for?
+Views, stored procedures, functions, grants definitions.
+
+** Q70: Repeatable migration execution trigger?
+Checksum/content change causes reapplication.
+
+** Q71: What is cherry-pick migration scenario?
+Applying selected migrations to specific env (special cases).
+
+** Q72: Why cherry-pick is risky?
+Can create version graph inconsistencies across environments.
+
+** Q73: What is target version?
+Upper version limit to migrate up to.
+
+** Q74: Why use target version?
+Controlled phased rollout and safer release orchestration.
+
+** Q75: What is baselineOnMigrate?
+Auto-baseline non-empty schema on first migrate (use carefully).
+
+** Q76: Risk of baselineOnMigrate misuse?
+Can mask incorrect initialization in wrong environment.
+
+** Q77: What is mixed mode in Flyway?
+Allowing transactional and non-transactional migrations together.
+
+** Q78: Why mixed mode needs caution?
+Failure semantics become harder to reason about.
+
+** Q79: What is grouping migrations transactionally?
+Applying multiple pending migrations in one transaction where supported.
+
+** Q80: Grouping tradeoff?
+Atomicity vs larger rollback scope/lock duration.
+
+** Q81: What is ignoreMigrationPatterns concept?
+Configurable tolerance for certain validation differences.
+
+** Q82: Should ignore patterns be default?
+No, use narrowly with explicit governance.
+
+** Q83: What is placeholder replacement scope?
+Runtime substitution in SQL scripts for configurable tokens.
+
+** Q84: Placeholder anti-pattern?
+Using placeholders for structural logic that should be explicit migrations.
+
+** Q85: What is multi-schema migration strategy?
+Configure Flyway schemas/default schema explicitly per environment.
+
+** Q86: Why schema qualification matters?
+Avoid accidental object creation in wrong schema.
+
+** Q87: What is metadata table placement consideration?
+Put history table in controlled durable schema.
+
+** Q88: What is migration checksum mismatch incident?
+Applied script content differs from current artifact.
+
+** Q89: Proper response to checksum mismatch?
+Investigate root cause; prefer new migration or controlled repair after verification.
+
+** Q90: What is failed migration recovery flow?
+Fix script/versioning issue, assess partial changes, then repair/retry safely.
+
+** Q91: What is idempotent reference data migration?
+Upsert-like controlled DML for seed/reference rows.
+
+** Q92: Reference data vs transactional data in migrations?
+Reference data can be versioned; large mutable business data needs dedicated jobs.
+
+** Q93: What is callback in Flyway?
+Hook scripts/actions before/after migrate/each migration events (edition/support dependent).
+
+** Q94: Callback use cases?
+Audit logging, guard checks, session settings.
+
+** Q95: Why keep callbacks minimal?
+Hidden side effects complicate debugging.
+
+** Q96: What is migration script linting?
+Static checks for SQL style/safety/performance patterns.
+
+** Q97: Why lint migrations?
+Catch risky statements before runtime.
+
+** Q98: What is SQL review checklist example?
+Lock impact, index strategy, rollback plan, compatibility, execution time.
+
+** Q99: What is canary database migration?
+Run migration on subset/replica/shadow before full production rollout.
+
+** Q100: What is shadow schema testing?
+Apply migrations to schema copy to validate behavior.
+
+** Q101: What is drift detection beyond Flyway table?
+Compare actual schema structure with expected model periodically.
+
+** Q102: Why can drift still happen with Flyway?
+Manual DB changes or out-of-band tools can bypass process.
+
+** Q103: What is CI pipeline stage for Flyway?
+Validate -> migrate test DB -> integration tests -> package/deploy gates.
+
+** Q104: What is ephemeral DB in CI?
+Temporary database spun up for migration/test run and discarded.
+
+** Q105: Why ephemeral DB improves confidence?
+Reproducible clean-state verification each pipeline run.
+
+** Q106: What is migration ordering in monorepos challenge?
+Multiple teams generating versions concurrently.
+
+** Q107: Mitigation for version collisions?
+Timestamp-based versions or allocation conventions/tooling.
+
+** Q108: What is timestamp versioning format benefit?
+Lower collision risk across parallel branches.
+
+** Q109: What is branch rebase effect on migrations?
+Can reorder/conflict versions requiring careful reconciliation.
+
+** Q110: What is intermediate anti-pattern?
+Massive “catch-all” migration touching many domains at once.
+
+** Q111: Better migration design?
+Bounded-context-specific incremental scripts.
+
+** Q112: What is rollback philosophy with Flyway?
+Primarily roll-forward with corrective migration.
+
+** Q113: Why roll-forward often preferred?
+Safer audit trail and fewer unknowns than reversing complex live changes.
+
+** Q114: When rollback scripts may still be used?
+High-risk ops with rehearsed reversible steps (DB-specific).
+
+** Q115: What is intermediate observability baseline?
+Track migration duration, failures, lock waits, and deployment correlation.
+
+** Q116: What is migration SLA?
+Expected max migration time/error budget during deploy window.
+
+** Q117: What is intermediate security baseline?
+Least-privilege migration user, audited access, secret rotation.
+
+** Q118: Why separate app DB user and migration DB user?
+Principle of least privilege and safer operational boundaries.
+
+** Q119: Intermediate maturity signal?
+Team can execute zero-downtime schema changes repeatedly.
+
+** Q120: Intermediate best practice?
+Design every migration for compatibility, observability, and recovery.
+
+* Advanced
+
+** Q121: What is large-scale migration governance?
+Standards, approvals, tooling, and SLOs for schema delivery across teams.
+
+** Q122: What is database change advisory model?
+Formal review for high-risk DDL/data operations.
+
+** Q123: What is blast radius assessment in migrations?
+Estimate impacted tables, services, queries, and peak traffic exposure.
+
+** Q124: What is online schema change tooling concept?
+Engine-specific tools/features minimizing locks for big-table alterations.
+
+** Q125: Why combine Flyway with online schema tools?
+Flyway orchestrates versioning; specialized tools execute safer heavy DDL.
+
+** Q126: What is phased column rename strategy?
+Add new column, dual-write/read migrate, backfill, switch reads, drop old.
+
+** Q127: Why direct rename can be risky?
+Application compatibility and lock behavior may break rolling deploys.
+
+** Q128: What is dual-write period?
+Temporary writes to old and new schema fields for safe transition.
+
+** Q129: Dual-write risk?
+Inconsistency if write paths diverge; requires monitoring/reconciliation.
+
+** Q130: What is backfill throttling?
+Limiting batch size/rate to reduce production load impact.
+
+** Q131: What is chunked backfill checkpointing?
+Track progress markers for resumable long-running data migrations.
+
+** Q132: What is migration idempotency for backfills?
+Safe reruns without duplicating/corrupting data.
+
+** Q133: What is blue/green deployment DB challenge?
+Both app versions must work against same evolving schema.
+
+** Q134: How Flyway supports blue/green?
+Forward-compatible phased migrations before traffic cutover.
+
+** Q135: What is canary release + migration coordination?
+Run schema changes compatible with old/new code; verify metrics before expand.
+
+** Q136: What is multi-region migration challenge?
+Coordinating schema timing with replication and staggered deployments.
+
+** Q137: What is replication lag risk during migrations?
+DDL/DML spikes can delay replicas and stale reads.
+
+** Q138: Mitigation for lag risk?
+Throttle changes, monitor lag, schedule carefully, route critical reads appropriately.
+
+** Q139: What is sharded database migration challenge?
+Apply consistent versioning across many shards safely.
+
+** Q140: Shard migration strategy?
+Orchestrated rolling shard batches with health gates.
+
+** Q141: What is tenant-by-tenant migration pattern?
+Migrate isolated tenant schemas incrementally to reduce risk.
+
+** Q142: What is failure domain in DB migrations?
+Limit impact scope so one failure doesn’t affect all tenants/regions.
+
+** Q143: What is schema contract testing?
+Automated checks that app queries remain valid across migration states.
+
+** Q144: Why test intermediate states?
+Rolling deploys run mixed versions temporarily.
+
+** Q145: What is query plan regression risk after migration?
+New indexes/stats/schema changes may worsen critical query plans.
+
+** Q146: How detect plan regressions early?
+Pre-prod load tests and plan baselines on realistic data.
+
+** Q147: What is migration observability gold standard?
+Per-statement timing, lock metrics, replication lag, app error/latency correlation.
+
+** Q148: What is migration circuit-breaker policy?
+Abort/pause rollout when SLO thresholds degrade.
+
+** Q149: What is automated rollback trigger caveat?
+Schema rollbacks can be unsafe; prefer halt + roll-forward mitigation.
+
+** Q150: What is compliance requirement for DB changes?
+Auditable approvals, traceable artifacts, and separation of duties.
+
+** Q151: What is signed migration artifact concept?
+Cryptographically verifiable migration bundle integrity.
+
+** Q152: What is supply-chain risk for SQL migrations?
+Tampered scripts or unreviewed changes entering deploy pipeline.
+
+** Q153: Mitigation for migration supply-chain risk?
+Protected branches, signed commits/artifacts, CI policy gates.
+
+** Q154: What is least-privilege advanced model for Flyway?
+Migration role gets only required DDL/DML rights per schema and time window.
+
+** Q155: What is break-glass process in migration incidents?
+Controlled emergency access with audit and post-incident review.
+
+** Q156: What is drift reconciliation process?
+Detect unauthorized schema differences and codify corrective migrations.
+
+** Q157: What is schema deprecation lifecycle?
+Announce, dual-support, usage telemetry, retire old objects safely.
+
+** Q158: Why collect object usage telemetry?
+Know when columns/tables/views are safe to drop.
+
+** Q159: What is advanced anti-pattern with Flyway?
+Treating Flyway as mere startup step without DB engineering discipline.
+
+** Q160: What is platform team role for Flyway at scale?
+Provide templates, linting, guardrails, and migration runbooks.
+
+** Q161: What is game day for migrations?
+Practice failure scenarios: lock contention, timeout, partial apply, recovery.
+
+** Q162: Why rehearse restore procedures?
+Backups are only useful if restore is tested.
+
+** Q163: What is RPO/RTO relevance to migration planning?
+Defines acceptable data loss and recovery time objectives for incidents.
+
+** Q164: What is final reliability principle?
+Every migration must have tested forward-fix and incident response plan.
+
+** Q165: What is final performance principle?
+Evaluate lock/time/query impacts on production-like data before rollout.
+
+** Q166: What is final security principle?
+Control who can change schema, how, and with what audit trail.
+
+** Q167: What is final delivery principle?
+Promote immutable reviewed migration artifacts consistently across environments.
+
+** Q168: What is final architecture principle?
+Design app and schema for backward-compatible evolution.
+
+** Q169: What is final operations principle?
+Observe migrations as first-class production events with SLO guardrails.
+
+** Q170: Final maturity principle?
+Flyway excellence is disciplined, reversible-in-practice, low-downtime schema evolution.
+
+* Bonus: Minimal Flyway + Spring Boot Configuration Example
+
+#+BEGIN_SRC yaml
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    clean-disabled: true
+
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"

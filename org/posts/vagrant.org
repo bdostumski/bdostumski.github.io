@@ -1,0 +1,562 @@
+#+title: Vagrant
+#+date: 2026-08-01
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Vagrant
+
+-----
+
+* Beginner
+
+** Q1: What is Vagrant?
+Vagrant is a tool for building and managing reproducible virtualized development environments.
+
+** Q2: Why use Vagrant?
+It standardizes local environments and reduces “works on my machine” problems.
+
+** Q3: What is a Vagrant box?
+A packaged base VM image used to create Vagrant machines.
+
+** Q4: What file defines a Vagrant environment?
+=Vagrantfile=.
+
+** Q5: What language is Vagrantfile written in?
+Ruby-based DSL.
+
+** Q6: What does =vagrant init= do?
+Creates a starter Vagrantfile.
+
+** Q7: What does =vagrant up= do?
+Creates and starts configured VM(s).
+
+** Q8: What does =vagrant ssh= do?
+SSH into running Vagrant VM.
+
+** Q9: What does =vagrant halt= do?
+Gracefully stops VM.
+
+** Q10: What does =vagrant reload= do?
+Restarts VM and reapplies Vagrantfile config (as needed).
+
+** Q11: What does =vagrant destroy= do?
+Deletes VM instance resources.
+
+** Q12: What does =vagrant suspend= do?
+Pauses VM, preserving memory state.
+
+** Q13: Suspend vs halt?
+Suspend saves runtime state; halt performs full shutdown.
+
+** Q14: What does =vagrant status= show?
+Current state of managed machine(s).
+
+** Q15: What does =vagrant provision= do?
+Runs configured provisioners on VM.
+
+** Q16: What is a provider in Vagrant?
+Backend virtualization platform (VirtualBox, VMware, Hyper-V, libvirt, etc.).
+
+** Q17: Is Vagrant itself a hypervisor?
+No, it orchestrates existing providers/hypervisors.
+
+** Q18: What is provisioning?
+Automated setup of software/configuration inside VM.
+
+** Q19: Common provisioners in Vagrant?
+Shell, Ansible, Chef, Puppet (and others/plugins).
+
+** Q20: What is synced folder?
+Folder shared between host and guest VM.
+
+** Q21: Why synced folders useful?
+Edit code on host, run it inside VM environment.
+
+** Q22: Default synced folder path in guest?
+Typically =/vagrant=.
+
+** Q23: What is forwarded port?
+Maps host port to guest port.
+
+** Q24: Why use port forwarding?
+Access guest services from host browser/tools.
+
+** Q25: What is private network in Vagrant?
+Host-only network between host and guest(s).
+
+** Q26: What is public network in Vagrant?
+Bridged network exposing VM on external LAN.
+
+** Q27: Why be careful with public networks?
+They increase exposure to external network threats.
+
+** Q28: What is multi-machine Vagrant setup?
+Single Vagrantfile defining multiple coordinated VMs.
+
+** Q29: Why use multi-machine?
+Simulate distributed systems locally (app/db/cache clusters).
+
+** Q30: What is box versioning?
+Using specific box versions for reproducibility.
+
+** Q31: Why pin box versions?
+Avoid unexpected changes from box updates.
+
+** Q32: What does =vagrant box add= do?
+Downloads/registers box locally.
+
+** Q33: What does =vagrant box list= do?
+Lists installed local boxes.
+
+** Q34: What does =vagrant box remove= do?
+Removes local box copy.
+
+** Q35: What is =config.vm.box=?
+Sets base box name in Vagrantfile.
+
+** Q36: What is =config.vm.hostname=?
+Sets VM hostname.
+
+** Q37: What is =config.vm.provider= block?
+Provider-specific resource/settings customization.
+
+** Q38: How set VM memory/CPU?
+Provider-specific config in Vagrantfile.
+
+** Q39: What is idempotent provisioning?
+Provisioning that can run multiple times safely.
+
+** Q40: Why idempotency matters?
+Reliable reprovisioning and reduced environment drift.
+
+** Q41: What is Vagrant plugin?
+Extension adding capabilities to Vagrant.
+
+** Q42: How list plugins?
+=vagrant plugin list=.
+
+** Q43: What is common beginner Vagrant anti-pattern?
+Manual in-VM changes not captured in provisioning scripts.
+
+** Q44: Why avoid manual drift?
+Destroys reproducibility and team consistency.
+
+** Q45: What is box trust concern?
+Untrusted boxes may contain insecure/malicious configurations.
+
+** Q46: Beginner security baseline?
+Use trusted boxes, SSH keys, and least-exposed networking.
+
+** Q47: Beginner performance baseline?
+Allocate reasonable CPU/RAM and avoid heavy unnecessary services.
+
+** Q48: What is snapshot concept (provider-dependent)?
+Save VM state checkpoint for quick restore.
+
+** Q49: Why snapshots useful?
+Fast recovery during experiments.
+
+** Q50: What is =vagrant global-status=?
+Shows VMs across all Vagrant environments on host.
+
+** Q51: What is VAGRANT_HOME?
+Directory storing global Vagrant data/boxes/plugins.
+
+** Q52: Why keep Vagrantfile in version control?
+Team-shared environment definition and change history.
+
+** Q53: Beginner testing baseline?
+Bring environment up from scratch regularly to verify reproducibility.
+
+** Q54: Beginner operations principle?
+Automate everything needed after =vagrant up=.
+
+** Q55: Beginner best practice?
+Treat Vagrant environments as disposable and fully scripted.
+
+* Intermediate
+
+** Q56: What is provisioning order in Vagrant?
+Provisioners run in configured sequence; order affects final state.
+
+** Q57: Why split provisioning into stages?
+Improves clarity, reuse, and troubleshooting.
+
+** Q58: Inline shell vs external script provisioner?
+Inline for small tasks; external scripts for maintainability.
+
+** Q59: What is privileged shell provisioning?
+Runs script with elevated privileges (root/admin).
+
+** Q60: Why limit privileged provisioning?
+Reduce security risk and accidental system-wide changes.
+
+** Q61: What is run: "always" provision option?
+Forces provisioner on every up/reload/provision as configured.
+
+** Q62: run: "once" behavior?
+Provisioner runs only first creation unless explicitly reprovisioned.
+
+** Q63: What is trigger in Vagrant?
+Hook to run commands before/after lifecycle actions.
+
+** Q64: Trigger use cases?
+Pre-flight checks, notifications, local setup tasks.
+
+** Q65: What is config.ssh.insert_key?
+Controls replacement of insecure default key with unique key.
+
+** Q66: Why enable unique SSH keys?
+Improved security over shared default keys.
+
+** Q67: What is agent forwarding concern?
+Can expose host SSH agent to guest; use only when necessary.
+
+** Q68: What is synced folder type variation?
+VirtualBox shared folders, NFS, SMB, rsync, 9p (provider-dependent).
+
+** Q69: NFS synced folder advantage?
+Often faster file I/O on Unix-like hosts.
+
+** Q70: NFS caveat?
+Host setup/permissions complexity and platform differences.
+
+** Q71: Rsync synced folder model?
+One-way host-to-guest sync (manual/auto with triggers).
+
+** Q72: Why use rsync?
+Performance for large codebases where shared FS is slow.
+
+** Q73: SMB synced folder typical use?
+Common choice on Windows hosts.
+
+** Q74: What is synced folder ownership mapping?
+UID/GID/permissions mapping between host and guest files.
+
+** Q75: Why permissions mapping matters?
+Prevents build/runtime permission errors.
+
+** Q76: What is static IP private network?
+Fixed host-only IP for predictable inter-VM communication.
+
+** Q77: DHCP private network use?
+Automatically assigned private IP simpler for some setups.
+
+** Q78: Port collision issue in Vagrant?
+Forwarded host port already in use.
+
+** Q79: How handle port collisions?
+Change host port or use auto-correct options.
+
+** Q80: What is auto_correct for forwarded ports?
+Automatically finds alternate host port when conflict occurs.
+
+** Q81: What is multi-machine dependency orchestration?
+Ensure service VMs start in useful order (db before app, etc.).
+
+** Q82: Does Vagrant guarantee service readiness?
+No, startup order is not full readiness check.
+
+** Q83: How handle readiness?
+Provision scripts with health checks/retries.
+
+** Q84: What is immutable VM workflow concept?
+Recreate VM from code instead of patching long-lived instances.
+
+** Q85: Why immutable-style helps in Vagrant?
+Reduces drift and hidden state issues.
+
+** Q86: What is packaging custom box?
+Creating reusable base image from configured VM.
+
+** Q87: Why create custom boxes?
+Faster onboarding and standardized pre-baked dependencies.
+
+** Q88: Custom box tradeoff?
+Maintenance overhead for updates/security patches.
+
+** Q89: What is box update strategy?
+Controlled updates with version pinning and testing.
+
+** Q90: What does =vagrant box outdated= do?
+Checks whether newer box versions exist.
+
+** Q91: What is =vagrant up --provision=?
+Starts VM and forces provisioning run.
+
+** Q92: What is =vagrant reload --provision=?
+Restarts VM and reprovisions in one step.
+
+** Q93: What is =vagrant provision <name>=?
+Provision specific machine in multi-machine setup.
+
+** Q94: What is provider-specific tuning example?
+VirtualBox guest additions, linked clones, IO APIC, nested VT-x flags.
+
+** Q95: What is linked clone concept?
+Fast VM creation referencing base disk snapshots (provider-specific).
+
+** Q96: Linked clone tradeoff?
+Disk efficiency and speed vs snapshot/base dependency complexity.
+
+** Q97: What is Hyper-V specific concern?
+Networking and privilege requirements differ from VirtualBox/libvirt.
+
+** Q98: What is libvirt provider advantage?
+Strong Linux-native virtualization performance/flexibility.
+
+** Q99: What is Windows host path issue with Vagrant?
+Path normalization/line endings/permissions can affect scripts/tools.
+
+** Q100: How reduce cross-platform script issues?
+Use portable shell scripts, explicit line endings, and environment checks.
+
+** Q101: What is intermediate anti-pattern?
+Huge monolithic provisioning script without idempotency or error handling.
+
+** Q102: Better provisioning design?
+Modular scripts + configuration management + clear logs.
+
+** Q103: What is Ansible local provisioner?
+Runs Ansible on guest without external control node complexity.
+
+** Q104: Ansible provisioner benefit?
+Declarative idempotent provisioning and role reuse.
+
+** Q105: What is Chef/Puppet provisioner use case?
+Teams already using those ecosystems for infra consistency.
+
+** Q106: What is environment variable injection pattern?
+Pass host/CI variables into provisioning cautiously.
+
+** Q107: Security risk of env injection?
+Leaking secrets into logs or shell history.
+
+** Q108: What is Vagrant cloud box registry concept?
+Hosted catalog/distribution for versioned boxes.
+
+** Q109: Why sign/verify box sources?
+Supply-chain security and trust assurance.
+
+** Q110: What is intermediate observability baseline?
+Provision logs, startup timing, resource utilization, service health checks.
+
+** Q111: What is VM clock/time sync concern?
+Drift can break certs, builds, distributed tests.
+
+** Q112: Mitigation for time drift?
+Enable NTP/time-sync services in guests.
+
+** Q113: What is intermediate reliability baseline?
+Rebuild-from-scratch success, deterministic provisioning, health-checked services.
+
+** Q114: What is intermediate security baseline?
+Minimal exposed ports, rotated keys, trusted base boxes.
+
+** Q115: What is intermediate team workflow?
+Versioned Vagrantfile + scripted bootstrap + documented commands.
+
+** Q116: What is CI use case for Vagrant?
+Ephemeral VM-based integration tests matching local environments.
+
+** Q117: CI caveat with Vagrant?
+Slower startup/resource-heavy vs containers.
+
+** Q118: Intermediate maturity signal?
+Team can recreate full environment quickly on new machine with minimal manual steps.
+
+** Q119: Intermediate operations principle?
+Destroy/recreate regularly to detect hidden drift.
+
+** Q120: Intermediate best practice?
+Prefer declarative, idempotent provisioning with explicit network/resource design.
+
+* Advanced
+
+** Q121: What is enterprise use case for Vagrant today?
+Reproducible dev/test VMs for complex stacks, legacy systems, or kernel-level dependencies.
+
+** Q122: Vagrant vs containers for dev environments?
+VMs provide full OS isolation; containers are lighter but share host kernel.
+
+** Q123: When prefer Vagrant over Docker?
+Need different kernel/systemd/full init behavior or strong OS parity.
+
+** Q124: What is hybrid workflow pattern?
+Vagrant VM hosts Docker/Kubernetes tools for consistent host-independent dev platform.
+
+** Q125: Why hybrid can help teams?
+Uniform tooling across macOS/Windows/Linux hosts.
+
+** Q126: What is nested virtualization concern?
+Running virtualization inside VM may require provider/hardware support and impacts performance.
+
+** Q127: What is performance bottleneck in VM dev stacks?
+Disk I/O (especially synced folders), limited RAM, CPU overcommit.
+
+** Q128: Advanced performance tuning levers?
+NFS/rsync mounts, tuned VM resources, minimized background services.
+
+** Q129: What is NUMA/CPU topology relevance (advanced)?
+Can affect performance realism for heavy multi-threaded workloads.
+
+** Q130: What is secure baseline image pipeline?
+Hardened base box creation with patching, scanning, and versioned release.
+
+** Q131: What is box provenance?
+Traceability of box origin, build process, and integrity checks.
+
+** Q132: How improve box supply-chain security?
+Signed artifacts, trusted registries, reproducible Packer builds.
+
+** Q133: What is Packer + Vagrant relationship?
+Packer builds base VM images/boxes consumed by Vagrant.
+
+** Q134: Why use Packer for boxes?
+Automated repeatable image baking and patch pipelines.
+
+** Q135: What is drift detection in Vagrant environments?
+Detect config/state differences from declared provisioning.
+
+** Q136: Drift mitigation strategy?
+Frequent reprovision/rebuild and immutable workflow discipline.
+
+** Q137: What is secret management pattern for Vagrant provisioning?
+Fetch secrets at runtime from secure store, avoid hardcoding.
+
+** Q138: Why avoid storing secrets in Vagrantfile?
+Version-control leakage and broad exposure risk.
+
+** Q139: What is network segmentation in multi-VM labs?
+Separate management, app, and data networks for realism/security.
+
+** Q140: What is zero-trust mindset in local labs?
+Authenticate/authorize service communication even in dev environments.
+
+** Q141: What is service discovery simulation in Vagrant labs?
+Emulate DNS/registry behavior for distributed-system testing.
+
+** Q142: What is failure injection use case?
+Test resilience by stopping VMs, adding latency, or breaking dependencies.
+
+** Q143: How simulate network faults in VM labs?
+Traffic control/firewall tooling within guest networks.
+
+** Q144: What is reproducibility SLO for developer platforms?
+Target setup time/success rate across fresh machines.
+
+** Q145: What is onboarding optimization metric?
+Time from clone to fully working environment.
+
+** Q146: What is golden Vagrant template?
+Org-maintained starter Vagrantfile/provisioning standards.
+
+** Q147: Golden template risk?
+Over-standardization can hinder team-specific needs.
+
+** Q148: Mitigation for template rigidity?
+Composable modules and documented extension points.
+
+** Q149: What is multi-provider compatibility challenge?
+Different providers support features/networking differently.
+
+** Q150: Strategy for provider portability?
+Use lowest-common-denominator config + provider-specific optional blocks.
+
+** Q151: What is stateful test data management challenge?
+Persisted VM disks may hide flaky setup dependencies.
+
+** Q152: Better data strategy?
+Seed scripts and resettable fixtures as part of provisioning.
+
+** Q153: What is snapshot governance issue?
+Too many stale snapshots consume disk and confuse workflows.
+
+** Q154: Snapshot best practice?
+Use short-lived snapshots with naming conventions and cleanup policy.
+
+** Q155: What is compliance angle for dev VMs?
+Local environments may still handle sensitive code/data requiring controls.
+
+** Q156: Required controls for sensitive dev VMs?
+Disk encryption, access control, patching, minimal data retention.
+
+** Q157: What is remote development alternative to Vagrant?
+Cloud dev environments/workspaces with centralized management.
+
+** Q158: Why still keep Vagrant in some orgs?
+Offline capability, local performance, legacy stack compatibility.
+
+** Q159: What is advanced anti-pattern in Vagrant usage?
+Treating long-lived VMs as pets with manual patching.
+
+** Q160: Better operational principle?
+Disposable cattle-style VMs rebuilt from code.
+
+** Q161: What is incident reproduction advantage?
+Pin exact box/provision versions to recreate historical environments.
+
+** Q162: What is release parity strategy?
+Align Vagrant OS/runtime versions with production-like baselines.
+
+** Q163: What is testing strategy for provisioning code?
+Linting + idempotency tests + full create/destroy CI cycle.
+
+** Q164: Why test destroy/recreate regularly?
+Ensures no hidden manual dependency in environment setup.
+
+** Q165: What is final reliability principle?
+Environment must be rebuildable quickly and consistently.
+
+** Q166: What is final security principle?
+Trust only verified base boxes and least-privilege network access.
+
+** Q167: What is final performance principle?
+Optimize synced storage and resource allocation empirically.
+
+** Q168: What is final governance principle?
+Version and review environment code like production infrastructure.
+
+** Q169: What is final team principle?
+Shared tooling ownership beats ad-hoc local customization.
+
+** Q170: Final maturity principle?
+Vagrant excellence is reproducible, secure, and disposable VM automation at scale.
+
+* Bonus: Minimal Multi-VM Vagrantfile Template
+
+#+BEGIN_SRC ruby
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.define "db" do |db|
+    db.vm.hostname = "db.local"
+    db.vm.network "private_network", ip: "192.168.56.10"
+    db.vm.provider "virtualbox" do |vb|
+      vb.memory = 1024
+      vb.cpus = 1
+    end
+    db.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install -y postgresql
+    SHELL
+  end
+
+  config.vm.define "app" do |app|
+    app.vm.hostname = "app.local"
+    app.vm.network "private_network", ip: "192.168.56.11"
+    app.vm.network "forwarded_port", guest: 8080, host: 8080
+    app.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+    app.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install -y openjdk-21-jre
+    SHELL
+  end
+end
+#+END_SRC
