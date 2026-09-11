@@ -1,0 +1,546 @@
+#+title: Spring Cloud
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Cloud
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Cloud?
+Spring Cloud is a set of tools/patterns for building distributed systems and microservices with Spring.
+
+** Q2: Why use Spring Cloud?
+It provides common microservice building blocks like config, discovery, gateway, and resilience integrations.
+
+** Q3: Is Spring Cloud a replacement for Spring Boot?
+No: It builds on Spring Boot.
+
+** Q4: What problem does Spring Cloud Config solve?
+Centralized external configuration across multiple services/environments.
+
+** Q5: What is a Config Server?
+Service that provides versioned centralized configuration to client applications.
+
+** Q6: What is a Config Client?
+Application that fetches configuration from Config Server.
+
+** Q7: Why centralize configuration?
+Consistency, easier changes, auditability, and reduced duplication.
+
+** Q8: What is service discovery?
+Mechanism for finding service instances dynamically at runtime.
+
+** Q9: What is a service registry?
+A directory where service instances register themselves.
+
+** Q10: What is Eureka?
+A popular Netflix-origin service registry often used with Spring Cloud Netflix.
+
+** Q11: What is client-side load balancing?
+Client chooses target service instance from discovered list.
+
+** Q12: What is Spring Cloud LoadBalancer?
+Spring Cloud abstraction for client-side load balancing.
+
+** Q13: Why load balancing matters?
+Distributes traffic and improves availability/scalability.
+
+** Q14: What is API Gateway?
+Single entry point for routing, auth, and cross-cutting concerns at edge.
+
+** Q15: What is Spring Cloud Gateway?
+Reactive API gateway for routing and filtering requests.
+
+** Q16: Why use a gateway?
+Centralizes edge policies (security, rate limits, routing, observability).
+
+** Q17: What is route predicate in Gateway?
+Condition deciding whether route matches a request (path, host, headers, etc.).
+
+** Q18: What is gateway filter?
+Logic applied before/after request forwarding.
+
+** Q19: Example gateway filter use cases?
+Authentication, header rewriting, rate limiting, logging, retries.
+
+** Q20: What is distributed configuration refresh concept?
+Updating config in running services without full redeploy (when supported).
+
+** Q21: What is @RefreshScope?
+Allows bean reinitialization on config refresh triggers.
+
+** Q22: What is a circuit breaker?
+Pattern that stops calls to failing dependency temporarily.
+
+** Q23: Why circuit breaker is important?
+Prevents cascading failures and resource exhaustion.
+
+** Q24: What is retry pattern?
+Automatically retry transiently failed operations.
+
+** Q25: What is timeout pattern?
+Fail operation if response takes longer than allowed threshold.
+
+** Q26: What is bulkhead pattern?
+Isolate resources so one failing dependency doesn’t consume all capacity.
+
+** Q27: What is fallback?
+Alternative response/path when dependency call fails.
+
+** Q28: What is Resilience4j?
+Fault-tolerance library integrated with Spring Cloud ecosystem.
+
+** Q29: What is rate limiting?
+Restricting request volume per key/time window.
+
+** Q30: Why use rate limiting at gateway?
+Protects downstream services from overload/abuse.
+
+** Q31: What is distributed tracing?
+Tracking request flow across multiple services.
+
+** Q32: Why tracing in microservices?
+Helps diagnose latency and failures across service boundaries.
+
+** Q33: What is correlation ID?
+Identifier propagated across calls to tie logs/events together.
+
+** Q34: What is OpenFeign?
+Declarative HTTP client often used in Spring Cloud apps.
+
+** Q35: Why use Feign?
+Less boilerplate for service-to-service HTTP calls.
+
+** Q36: What is service-to-service communication style?
+Usually HTTP/gRPC/messaging depending architecture needs.
+
+** Q37: What is eventual consistency?
+Data becomes consistent over time rather than instantly.
+
+** Q38: Why eventual consistency common in microservices?
+Distributed transactions are costly/complex across services.
+
+** Q39: What is Spring Cloud Bus concept?
+Broadcasts configuration/state change events across services.
+
+** Q40: What is centralized logging role in cloud systems?
+Aggregates logs from all instances for querying and incident response.
+
+** Q41: What is health check endpoint?
+Endpoint reporting service health status.
+
+** Q42: What are liveness and readiness?
+Liveness: process alive; readiness: can serve traffic.
+
+** Q43: Why readiness checks matter?
+Prevent traffic routing to not-ready instances.
+
+** Q44: What is config profile?
+Environment-specific config set (dev/test/prod etc.).
+
+** Q45: What is bootstrap phase (historical concept)?
+Early context for external config loading; modern approaches evolved with config data APIs.
+
+** Q46: What is fail-fast config client behavior?
+Application fails startup if config server unreachable/misconfigured.
+
+** Q47: Why might fail-fast be desirable?
+Avoids running with invalid/missing critical configuration.
+
+** Q48: What is discovery-first vs config-first lookup idea?
+Whether config/discovery endpoints are resolved via registry or direct URI.
+
+** Q49: What is zone/region awareness concept?
+Routing traffic to nearby/appropriate instances for latency/availability.
+
+** Q50: What is blue/green deployment?
+Two environments with controlled traffic switch between versions.
+
+** Q51: What is canary deployment?
+Gradual rollout to small traffic subset first.
+
+** Q52: What is gateway path rewriting?
+Changing incoming path before forwarding to backend.
+
+** Q53: What is header propagation?
+Forwarding selected headers (trace/auth/context) downstream.
+
+** Q54: What is token relay pattern?
+Gateway forwards OAuth2 access token to downstream services.
+
+** Q55: What is beginner microservice anti-pattern?
+Creating too many tiny services without clear boundaries.
+
+** Q56: What is service boundary?
+Clear ownership of data and business capability per service.
+
+** Q57: Why keep shared libraries minimal?
+Avoid tight coupling and lockstep deployments.
+
+** Q58: What is beginner resilience mistake?
+Retries without timeout/backoff causing overload.
+
+** Q59: Beginner observability baseline?
+Structured logs + metrics + traces with correlation IDs.
+
+** Q60: Beginner best practice?
+Start simple: config, discovery, gateway, and basic resilience with clear ownership.
+
+* Intermediate
+
+** Q61: What is Config Server backend repository?
+Source of properties (Git, file system, vault integrations, etc.).
+
+** Q62: Why store config in Git?
+Versioning, audit trail, PR review workflow.
+
+** Q63: How is config encryption handled conceptually?
+Encrypt sensitive values and decrypt in controlled runtime contexts.
+
+** Q64: What is secret management best practice?
+Use dedicated secret managers, not plain-text config repos.
+
+** Q65: What is config precedence in distributed apps?
+Deterministic order of property sources to resolve overrides.
+
+** Q66: What is refresh endpoint risk?
+Unauthorized refresh could alter runtime behavior unexpectedly.
+
+** Q67: How secure refresh operations?
+Strong authN/authZ, network restrictions, auditing.
+
+** Q68: What is Eureka self-preservation mode concept?
+Registry behavior to avoid mass eviction during network instability.
+
+** Q69: Why stale registry entries are dangerous?
+Clients may route traffic to dead instances.
+
+** Q70: How reduce stale discovery risks?
+Appropriate lease intervals, health checks, and quick deregistration.
+
+** Q71: What is gateway global filter?
+Filter applied to all routes.
+
+** Q72: Route-specific filter vs global filter?
+Scoped to one route vs all routes.
+
+** Q73: What is predicate ordering concern?
+Match precedence affects which route handles a request.
+
+** Q74: What is StripPrefix filter?
+Removes leading path segments before forwarding.
+
+** Q75: What is RewritePath filter?
+Regex-based path transformation.
+
+** Q76: What is RequestRateLimiter in Gateway?
+Filter enforcing distributed rate limits per key.
+
+** Q77: What key resolver does in rate limiting?
+Determines client identity key (IP, API key, user id, etc.).
+
+** Q78: What is gateway retry filter caveat?
+Unsafe retries on non-idempotent methods can duplicate side effects.
+
+** Q79: Safe retry strategy at gateway?
+Retry only idempotent/transient failure scenarios with bounded attempts.
+
+** Q80: What is circuit breaker filter in gateway?
+Wraps routed calls with fault-tolerance behavior and optional fallback.
+
+** Q81: What is fallbackHeaders filter use?
+Adds error context headers for fallback handlers.
+
+** Q82: What is forward:/ fallback pattern?
+Internal forwarding to fallback endpoint.
+
+** Q83: What is Feign client customization?
+Timeouts, encoders/decoders, interceptors, error decoders.
+
+** Q84: Why set Feign timeouts explicitly?
+Avoid hanging threads and uncontrolled latency.
+
+** Q85: What is Feign error decoder?
+Maps HTTP error responses to domain exceptions.
+
+** Q86: What is load-balanced RestTemplate/WebClient?
+Client with discovery-aware instance resolution.
+
+** Q87: What is per-service resilience config?
+Different timeout/retry/circuit settings per downstream dependency.
+
+** Q88: Why per-service tuning matters?
+Dependencies have different latency/error profiles.
+
+** Q89: What is hedging request concept?
+Sending secondary request after delay to reduce tail latency (use carefully).
+
+** Q90: What is timeout budget?
+Allocating end-to-end SLA across service hops.
+
+** Q91: Why coordinate timeout budgets?
+Prevents upstream waiting longer than downstream total possible completion.
+
+** Q92: What is distributed transaction challenge?
+Atomic commits across services are complex and fragile.
+
+** Q93: What is saga pattern?
+Sequence of local transactions with compensating actions.
+
+** Q94: Choreography vs orchestration saga?
+Event-driven decentralized flow vs central coordinator.
+
+** Q95: What is outbox pattern in Spring Cloud systems?
+Store events atomically with local DB changes then publish asynchronously.
+
+** Q96: Why outbox helps consistency?
+Avoids dual-write race between DB commit and message publish.
+
+** Q97: What is idempotent consumer?
+Consumer that safely handles duplicate messages/events.
+
+** Q98: What is deduplication key?
+Unique key to detect and ignore repeated operations.
+
+** Q99: What is contract testing in microservices?
+Validate API compatibility between producers and consumers.
+
+** Q100: Why contract tests matter in cloud systems?
+Frequent independent deployments increase integration break risk.
+
+** Q101: What is backward-compatible API evolution?
+Additive changes and controlled deprecations without breaking clients.
+
+** Q102: What is semantic versioning for APIs?
+Version strategy communicating compatibility expectations.
+
+** Q103: What is gateway auth offloading?
+Performing authentication at gateway before forwarding.
+
+** Q104: Can auth be only at gateway?
+Usually no; downstream services still need authorization checks (defense in depth).
+
+** Q105: What is token propagation pitfall?
+Losing user context across async/thread boundaries or inter-service calls.
+
+** Q106: What is mTLS between services?
+Mutual TLS for strong service identity and encrypted transport.
+
+** Q107: What is service mesh relation to Spring Cloud?
+Mesh can provide traffic/security features; Spring Cloud still handles app-level concerns.
+
+** Q108: What is config drift in microservices?
+Services diverge unintentionally in runtime configuration.
+
+** Q109: How detect config drift?
+Central audits, startup reports, policy checks, and runtime inventory.
+
+** Q110: What is observability cardinality problem?
+Too many unique labels (userId/path raw) overload metrics systems.
+
+** Q111: How reduce cardinality?
+Use bounded tags like route templates and status classes.
+
+** Q112: What is tracing sampling?
+Recording subset of traces to control overhead.
+
+** Q113: Head-based vs tail-based sampling?
+Head samples early; tail samples after seeing full trace outcome.
+
+** Q114: What is intermediate anti-pattern in Spring Cloud?
+Gateway bloated with business logic.
+
+** Q115: Better gateway role?
+Edge concerns only: routing, security, resilience, observability.
+
+** Q116: What is consumer timeout vs retry interplay?
+Retry without shorter timeouts can multiply latency and load.
+
+** Q117: What is connection pool isolation for clients?
+Separate pools per dependency to avoid noisy-neighbor exhaustion.
+
+** Q118: What is bulkhead at thread level?
+Dedicated thread pools/semaphores per remote dependency.
+
+** Q119: What is partial outage handling?
+Degrade gracefully with fallbacks and feature-level resilience.
+
+** Q120: What is incident triage in microservices?
+Correlate logs, traces, metrics, deploy changes, and dependency health.
+
+** Q121: What is intermediate testing strategy?
+Unit + component + contract + integration + resilience scenario tests.
+
+** Q122: Why include network fault simulation?
+Real outages often involve latency, drops, DNS, and throttling.
+
+** Q123: What is chaos testing purpose?
+Validate system resilience under controlled failure injection.
+
+** Q124: Intermediate maturity signal?
+Teams can explain dependency policies: timeout, retry, breaker, fallback per call.
+
+** Q125: Intermediate best practice?
+Make distributed-system assumptions explicit and test them continuously.
+
+* Advanced
+
+** Q126: What is control plane vs data plane distinction?
+Control plane manages config/policies; data plane handles live request traffic.
+
+** Q127: Why separate control and data concerns?
+Improves reliability, security boundaries, and operational clarity.
+
+** Q128: What is multi-region deployment challenge?
+Latency, failover coordination, and data consistency across regions.
+
+** Q129: Active-active vs active-passive tradeoff?
+Active-active improves availability but increases consistency/operational complexity.
+
+** Q130: What is global traffic management role?
+Route users to healthy nearest regions/services.
+
+** Q131: What is split-brain risk in distributed registries?
+Network partition creates conflicting cluster views.
+
+** Q132: How mitigate split-brain impacts?
+Quorum strategies, health fencing, conservative failover rules.
+
+** Q133: What is cascading failure pattern?
+One dependency failure propagates and overloads upstream services.
+
+** Q134: Primary defense against cascading failures?
+Timeouts + circuit breakers + bulkheads + load shedding.
+
+** Q135: What is load shedding?
+Dropping low-priority traffic under overload to preserve core functionality.
+
+** Q136: What is adaptive concurrency limit?
+Dynamically tuning in-flight requests based on observed latency/errors.
+
+** Q137: What is brownout strategy?
+Temporarily disable noncritical features during stress.
+
+** Q138: What is retry budget?
+Cap total retries to prevent runaway amplification.
+
+** Q139: Why jitter in backoff is critical?
+Prevents synchronized retry spikes.
+
+** Q140: What is exactly-once delivery myth?
+Most systems provide at-least-once; correctness comes from idempotency design.
+
+** Q141: What is monotonic read concern with replicas?
+Clients may observe older data after newer writes due to lag.
+
+** Q142: How handle read-after-write needs?
+Sticky sessions, primary reads for critical paths, or version checks.
+
+** Q143: What is schema evolution in event-driven microservices?
+Versioned events with backward/forward compatibility handling.
+
+** Q144: What is consumer-first compatibility rule?
+Producers should evolve without breaking existing consumers.
+
+** Q145: What is anti-corruption layer in distributed architecture?
+Translates external contracts into internal domain models.
+
+** Q146: Why avoid shared database across microservices?
+Tight coupling, deployment lockstep, broken ownership boundaries.
+
+** Q147: What is platform engineering role for Spring Cloud?
+Provide paved-road templates, policy defaults, and shared operational tooling.
+
+** Q148: What is golden path microservice template?
+Preconfigured secure/observable/resilient service baseline.
+
+** Q149: What is policy-as-code in cloud platforms?
+Declarative governance rules validated automatically in CI/runtime.
+
+** Q150: What is progressive delivery?
+Gradual exposure of new versions using canary/feature flags.
+
+** Q151: What is shadow traffic?
+Mirroring production requests to new version without affecting users.
+
+** Q152: What is SLO-driven operations?
+Operating services against explicit latency/error/availability objectives.
+
+** Q153: Why error budget matters?
+Guides release velocity vs reliability tradeoffs.
+
+** Q154: What is high-cardinality log cost issue?
+Storage/query cost explosion and slower incident analysis.
+
+** Q155: What is secure-by-default cloud posture?
+TLS everywhere, least privilege, secret rotation, audited access.
+
+** Q156: What is workload identity concept?
+Service identity issued dynamically (not static long-lived secrets).
+
+** Q157: Why avoid long-lived service credentials?
+Higher compromise risk and harder rotation.
+
+** Q158: What is supply-chain security relevance?
+Dependencies/images/pipelines can introduce vulnerabilities at scale.
+
+** Q159: What is SBOM role?
+Inventory of software components for vulnerability/compliance tracking.
+
+** Q160: What is runtime drift detection?
+Detecting unauthorized/unexpected config/runtime state changes.
+
+** Q161: What is failure domain design?
+Architecting boundaries so failures stay localized.
+
+** Q162: What is cell-based architecture concept?
+Independent service cells reduce blast radius and improve resilience.
+
+** Q163: What is queue-based load leveling?
+Buffer spikes via messaging to smooth downstream processing.
+
+** Q164: What is backpressure in distributed pipelines?
+Controlling producer rate to match consumer capacity.
+
+** Q165: What is advanced gateway anti-pattern?
+Single gigantic gateway team/binary bottlenecking all changes.
+
+** Q166: Better gateway organizational model?
+Shared platform standards + domain-owned route governance.
+
+** Q167: What is migration strategy from monolith to Spring Cloud?
+Incremental extraction by business capability with strangler pattern.
+
+** Q168: What is strangler pattern?
+Gradually route functionality from old system to new services.
+
+** Q169: What is advanced testing pyramid for cloud systems?
+Many unit/component tests, strong contracts, targeted E2E and resilience drills.
+
+** Q170: What is game day in operations?
+Planned reliability exercise rehearsing failure scenarios and response.
+
+** Q171: What is biggest advanced Spring Cloud anti-pattern?
+Adopting many distributed patterns without operational readiness/observability.
+
+** Q172: What is mature Spring Cloud architecture outcome?
+Clear service boundaries, resilient communication, governed configuration, and fast recovery.
+
+** Q173: What is final reliability principle?
+Design every remote call as a potential failure point.
+
+** Q174: What is final security principle?
+Never trust network location—authenticate and authorize every hop.
+
+** Q175: Final maturity principle?
+Spring Cloud success comes from disciplined operations, not only framework features.
+
+-----
+
+#+INCLUDE: "../footer.org"
