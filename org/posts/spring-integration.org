@@ -1,0 +1,546 @@
+#+title: Spring Integration
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Integration
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Integration?
+Spring Integration is a framework implementing Enterprise Integration Patterns for message-driven architecture.
+
+** Q2: What problem does Spring Integration solve?
+It simplifies connecting heterogeneous systems using consistent messaging abstractions.
+
+** Q3: What are Enterprise Integration Patterns (EIP)?
+Reusable patterns for routing, transforming, filtering, and handling messages across systems.
+
+** Q4: Is Spring Integration only for JMS?
+No, it supports many transports/protocols (HTTP, AMQP, Kafka, files, mail, TCP, etc.).
+
+** Q5: Core concept in Spring Integration?
+Message-driven communication through channels and endpoints.
+
+** Q6: What is a Message?
+Immutable payload + headers container in Spring Messaging model.
+
+** Q7: What is payload?
+Actual business data carried by a message.
+
+** Q8: What are message headers?
+Metadata like id, timestamp, correlationId, replyChannel, errorChannel.
+
+** Q9: What is MessageChannel?
+Abstraction representing conduit through which messages flow.
+
+** Q10: What is MessageHandler?
+Component consuming messages from channel and performing action.
+
+** Q11: What is MessageSource?
+Component producing messages into a flow.
+
+** Q12: What is Poller?
+Scheduler that triggers polling consumers/sources.
+
+** Q13: What is endpoint in Spring Integration?
+Runtime component connecting channels with handlers/adapters.
+
+** Q14: What is channel adapter?
+Endpoint bridging external system and messaging channel.
+
+** Q15: Inbound vs outbound channel adapter?
+Inbound reads from external system into flow; outbound writes from flow to external system.
+
+** Q16: What is gateway in Spring Integration?
+Messaging facade exposing request/reply methods to application code.
+
+** Q17: Why use gateway?
+Hides messaging complexity behind simple interface methods.
+
+** Q18: What is DirectChannel?
+Point-to-point channel invoking subscriber in sender thread.
+
+** Q19: What is QueueChannel?
+Pollable channel buffering messages in queue.
+
+** Q20: What is PublishSubscribeChannel?
+Broadcasts message to multiple subscribers.
+
+** Q21: What is ExecutorChannel?
+Dispatches handling via TaskExecutor asynchronously.
+
+** Q22: What is RendezvousChannel?
+Synchronous handoff channel where sender/receiver rendezvous.
+
+** Q23: What is bridge in integration flow?
+Pass-through endpoint forwarding from one channel to another.
+
+** Q24: What is transformer?
+Converts message payload/headers from one form to another.
+
+** Q25: What is filter?
+Drops messages not matching condition.
+
+** Q26: What is router?
+Routes message to one/more channels based on rules.
+
+** Q27: What is splitter?
+Breaks one message into multiple messages.
+
+** Q28: What is aggregator?
+Combines related messages into a single result message.
+
+** Q29: What is service activator?
+Invokes plain Java method/service for message handling.
+
+** Q30: What is wire tap?
+Copies messages to secondary channel for side processing (logging/audit).
+
+** Q31: What is claim check pattern?
+Store large payload externally, pass lightweight token through flow.
+
+** Q32: Why use claim check?
+Reduce message size and memory/transport overhead.
+
+** Q33: What is message enricher?
+Adds data to message by querying external/internal sources.
+
+** Q34: What is header enricher?
+Adds/updates message headers.
+
+** Q35: What is content enricher?
+Adds/updates payload content.
+
+** Q36: What is request-reply messaging?
+Sender expects response message correlated to request.
+
+** Q37: What is fire-and-forget messaging?
+One-way send with no direct response expected.
+
+** Q38: What is correlation ID?
+Identifier linking related request/reply or split/aggregate messages.
+
+** Q39: What is sequence number/size header usage?
+Tracks position/total in split message groups.
+
+** Q40: What is errorChannel?
+Channel receiving asynchronous messaging exceptions.
+
+** Q41: Why separate error channel?
+Centralized, decoupled error handling.
+
+** Q42: What is global error channel?
+Default shared channel for unhandled messaging exceptions.
+
+** Q43: What is dead-letter flow concept?
+Route failed messages to dedicated recovery/analysis path.
+
+** Q44: What is retry advice?
+Interceptor adding retry behavior around endpoint invocation.
+
+** Q45: What is transaction support in integration?
+Coordinates message handling with transactional resources where configured.
+
+** Q46: What is idempotent receiver?
+Prevents duplicate processing effects for same logical message.
+
+** Q47: Why idempotency matters?
+Retries/redelivery can deliver duplicates.
+
+** Q48: What is channel interceptor?
+Hook intercepting send/receive operations for cross-cutting behavior.
+
+** Q49: Common interceptor uses?
+Logging, metrics, tracing, validation, security checks.
+
+** Q50: What is IntegrationFlow DSL?
+Java DSL for defining integration pipelines fluently.
+
+** Q51: Why prefer Java DSL often?
+Type safety, readability, modular composition.
+
+** Q52: XML config still supported?
+Yes, but many teams prefer Java DSL/config.
+
+** Q53: What is @EnableIntegration?
+Enables Spring Integration infrastructure in config.
+
+** Q54: What is MessageBuilder?
+Utility for creating immutable messages with payload/headers.
+
+** Q55: What is common beginner anti-pattern?
+Building overly complex flows without clear boundaries.
+
+** Q56: Beginner reliability baseline?
+Retries + error channel + DLQ/recovery path + idempotency.
+
+** Q57: Beginner observability baseline?
+Track throughput, failures, queue depth, processing latency.
+
+** Q58: Beginner security baseline?
+Secure endpoints/channels, sanitize payloads, protect secrets.
+
+** Q59: Beginner design principle?
+Keep each flow step single-purpose and testable.
+
+** Q60: Beginner best practice?
+Model integrations explicitly with EIP patterns, not ad-hoc code.
+
+* Intermediate
+
+** Q61: What is pollable vs subscribable channel?
+Pollable requires consumer polling; subscribable pushes to subscribers.
+
+** Q62: When use pollable channels?
+When buffering and consumer-controlled pacing are needed.
+
+** Q63: What is Poller metadata?
+Configuration for poll frequency, max messages, tx boundaries, advice chain.
+
+** Q64: What does maxMessagesPerPoll do?
+Limits messages handled each poll cycle.
+
+** Q65: Why tune pollers carefully?
+Affects latency, throughput, and downstream load.
+
+** Q66: Fixed-delay vs fixed-rate polling?
+Delay waits after completion; rate schedules by regular interval.
+
+** Q67: What is transactional poller?
+Poll + handling wrapped in transaction where applicable.
+
+** Q68: What is advice chain in endpoints?
+Ordered interceptors (retry, tx, metrics, circuit breaker-like wrappers).
+
+** Q69: What is bridgeHandler usage?
+Connect channels without payload change.
+
+** Q70: What is recipient list router?
+Routes one message to multiple recipients based on conditions.
+
+** Q71: What is routing slip pattern?
+Message carries dynamic route steps in headers.
+
+** Q72: What is method-invoking router?
+Router invoking method to decide target channel(s).
+
+** Q73: What is payload-type router?
+Routes based on payload class/type.
+
+** Q74: What is header-value router?
+Routes based on specific header values.
+
+** Q75: What is XPath/JSONPath router concept?
+Routes based on content expressions for XML/JSON payloads.
+
+** Q76: What is resequencer?
+Reorders related messages based on sequence metadata.
+
+** Q77: Why resequencing needed?
+Out-of-order arrival from parallel/distributed sources.
+
+** Q78: What is message store?
+Persistent storage for groups/messages (aggregator/resequencer state, etc.).
+
+** Q79: Why persistent message store?
+Crash recovery and large-group state management.
+
+** Q80: What is aggregator release strategy?
+Rule deciding when grouped messages are complete and releasable.
+
+** Q81: What is correlation strategy in aggregator?
+Rule mapping message to group key.
+
+** Q82: Aggregator timeout behavior?
+Can expire incomplete groups and trigger partial result/discard flow.
+
+** Q83: What is group expiry?
+Cleanup of stale message groups to prevent memory/storage leaks.
+
+** Q84: What is barrier pattern in Spring Integration?
+Synchronizes message flow until trigger/condition met.
+
+** Q85: What is delayer endpoint?
+Delays message forwarding by configured time.
+
+** Q86: Delayer use cases?
+Backoff, throttling, temporal coordination.
+
+** Q87: What is throttler pattern?
+Limits processing rate over time window.
+
+** Q88: What is control bus?
+Mechanism to send management commands to integration components at runtime.
+
+** Q89: What is channel priority support?
+Prioritized message consumption in priority-capable channels.
+
+** Q90: What is task executor role in integration flows?
+Controls concurrency/async execution of endpoints/channels.
+
+** Q91: What is backpressure concern in Spring Integration?
+Upstream producing faster than downstream can process.
+
+** Q92: How mitigate backpressure?
+Queue limits, throttling, rate control, scaling consumers.
+
+** Q93: What is publish-subscribe ordering caveat?
+Subscriber invocation order may depend on config/executor.
+
+** Q94: What is failover behavior in pub-sub?
+One subscriber failure handling depends on error strategy and channel config.
+
+** Q95: What is errorMessageStrategy?
+Controls structure/content of error messages published on error channels.
+
+** Q96: What is request-handler retry template?
+Retry policy applied around handler invocation.
+
+** Q97: Stateful vs stateless retry in integration?
+Stateful tracks message identity across retries; stateless simpler but less context.
+
+** Q98: What is message conversion service?
+Transforms payload types automatically when possible.
+
+** Q99: What is integration with Spring Retry?
+Reusable retry/backoff/recovery policies for endpoints.
+
+** Q100: What is transaction synchronization factory?
+Hooks for before/after commit/rollback actions in transactional flows.
+
+** Q101: What is inbound file adapter?
+Reads files from filesystem and emits messages.
+
+** Q102: What is file locker concept?
+Prevents concurrent processing of same file.
+
+** Q103: What is metadata store?
+Stores processed keys/state (e.g., file markers, idempotent keys).
+
+** Q104: JDBC metadata store use?
+Shared persistent state across clustered instances.
+
+** Q105: What is idempotent receiver interceptor?
+Drops duplicates based on metadata/key strategy.
+
+** Q106: What is HTTP inbound gateway?
+Exposes HTTP endpoint integrated into messaging flow.
+
+** Q107: What is HTTP outbound gateway?
+Performs external HTTP request as part of flow with reply handling.
+
+** Q108: What is AMQP inbound adapter?
+Consumes AMQP messages into integration channels.
+
+** Q109: What is Kafka inbound adapter?
+Consumes Kafka records into Spring Integration flows.
+
+** Q110: Why combine Spring Integration with broker adapters?
+Unified EIP model across multiple transports.
+
+** Q111: What is message-driven channel adapter?
+Push-based consumer endpoint triggered by external messages.
+
+** Q112: What is poller-driven adapter?
+Pull-based adapter triggered on schedule.
+
+** Q113: What is intermediate anti-pattern?
+Single giant flow handling unrelated business concerns.
+
+** Q114: Better modularization approach?
+Small focused flows connected via channels/gateways.
+
+** Q115: What is flow testing approach?
+Unit-test transformers/handlers + integration-test full flows with real adapters.
+
+** Q116: What is MockIntegration context support concept?
+Testing utilities for channels/messages without full external systems.
+
+** Q117: Why test error paths explicitly?
+Most production incidents occur in failure/retry branches.
+
+** Q118: What is intermediate observability must-have?
+Per-endpoint timings, error counts, queue/channel depth, retry/discard metrics.
+
+** Q119: What is message history header?
+Optional trace of components traversed by message.
+
+** Q120: Why message history useful?
+Debugging routing decisions and flow behavior.
+
+** Q121: What is intermediate security concern?
+Untrusted payloads causing injection/deserialization risks.
+
+** Q122: Mitigation for payload security?
+Schema validation, safe converters, strict type allowlists.
+
+** Q123: Intermediate maturity signal?
+Team can explain each flow’s SLA, retries, and compensation path.
+
+** Q124: Intermediate reliability principle?
+Every endpoint should define timeout/retry/error-channel behavior deliberately.
+
+** Q125: Intermediate best practice?
+Design integration flows as explicit, observable, and recoverable state transitions.
+
+* Advanced
+
+** Q126: What is exactly-once effect challenge in integration flows?
+Distributed retries/redelivery make duplicates possible across boundaries.
+
+** Q127: Practical solution for exactly-once effects?
+At-least-once delivery + idempotent handlers + reconciliation.
+
+** Q128: What is compensating transaction pattern?
+Undo/offset previous step effects when later steps fail.
+
+** Q129: Saga relevance to Spring Integration?
+Orchestrate long-running multi-step workflows with compensation logic.
+
+** Q130: Choreography vs orchestration in integration?
+Event-driven decentralized vs centrally coordinated process control.
+
+** Q131: What is process manager pattern?
+Stateful coordinator managing workflow state and next actions.
+
+** Q132: What is persistent queue/channel strategy?
+Use broker-backed channels for durability and decoupling.
+
+** Q133: Memory channel risk at scale?
+Message loss on crash and memory pressure under spikes.
+
+** Q134: What is store-and-forward pattern?
+Persist message before forwarding to unreliable downstream.
+
+** Q135: What is transactional outbox in integration architecture?
+Persist event in DB transaction, publish asynchronously via integration flow.
+
+** Q136: Why outbox pattern important?
+Eliminates DB/message dual-write inconsistency.
+
+** Q137: What is inbox pattern?
+Record consumed message IDs to enforce idempotent processing.
+
+** Q138: What is replay pipeline?
+Controlled reprocessing of failed/discarded messages.
+
+** Q139: Replay risk?
+Duplicate side effects if handlers are not idempotent.
+
+** Q140: What is message schema evolution strategy?
+Versioned contracts, backward compatibility, gradual consumer migration.
+
+** Q141: What is canonical data model tradeoff?
+Standardized internal schema vs potential over-centralization rigidity.
+
+** Q142: What is anti-corruption layer in integrations?
+Translate external models/protocols to internal domain semantics.
+
+** Q143: Why avoid leaking transport models into domain?
+Creates tight coupling and brittle business logic.
+
+** Q144: What is high-throughput tuning lever?
+Executor sizing, batching, serialization optimization, reduced sync boundaries.
+
+** Q145: What is latency tuning lever?
+Minimize hops, reduce blocking I/O, tune poll intervals/prefetch.
+
+** Q146: What is hot partition/hot key analogy in routing?
+Skewed keys overload specific channels/handlers.
+
+** Q147: How mitigate skew in integration flows?
+Repartitioning strategy, additional consumers, key redesign.
+
+** Q148: What is flow control under downstream outage?
+Pause/throttle upstream, queue buffering with limits, circuit-breaker-like protection.
+
+** Q149: What is circuit breaker integration pattern?
+Short-circuit failing outbound calls and route to fallback/error flow.
+
+** Q150: What is deadline propagation in integration chains?
+Carry timeout budget metadata through message headers.
+
+** Q151: Why deadline propagation matters?
+Prevents stale work and cascading queue buildup.
+
+** Q152: What is multi-tenant integration isolation?
+Separate channels/stores/quotas/security contexts per tenant.
+
+** Q153: Multi-tenant failure isolation benefit?
+One tenant’s spike/failure doesn’t collapse whole platform.
+
+** Q154: What is observability gold standard for integration?
+Traceable message lifecycle + metrics + structured logs + alertable SLIs.
+
+** Q155: Key SLIs for integration platforms?
+Throughput, success rate, end-to-end latency, retry rate, backlog age, discard rate.
+
+** Q156: What is backlog age metric?
+How long oldest waiting message has been queued.
+
+** Q157: Why backlog age is crucial?
+Direct signal of SLA risk and hidden saturation.
+
+** Q158: What is dynamic flow registration concept?
+Programmatically create/register integration flows at runtime.
+
+** Q159: Dynamic flow risk?
+Lifecycle/config drift complexity and governance challenges.
+
+** Q160: What is control plane governance need?
+Versioning, approvals, audit trails for flow topology/policy changes.
+
+** Q161: What is blue/green deployment challenge for message flows?
+Avoid duplicate consumption/side effects during cutover.
+
+** Q162: Safe cutover strategy?
+Consumer group coordination, idempotency, staged traffic migration.
+
+** Q163: What is schema registry role in integration ecosystems?
+Central contract management and compatibility enforcement.
+
+** Q164: What is PII governance in integration messages?
+Minimize sensitive fields, encrypt where needed, enforce retention/access policies.
+
+** Q165: What is secure-by-default integration posture?
+Authenticated endpoints, TLS, least privilege, validated payloads.
+
+** Q166: What is chaos testing for integration platforms?
+Inject adapter outages/latency/message corruption and verify recovery.
+
+** Q167: Why run game days for integration teams?
+Practice incident response and validate runbooks under stress.
+
+** Q168: Biggest advanced Spring Integration anti-pattern?
+Hidden business orchestration in opaque message flows without observability.
+
+** Q169: What is mature architecture outcome with Spring Integration?
+Explicit, modular, testable flows with strong contracts and recovery paths.
+
+** Q170: Final reliability principle?
+Assume every hop can fail and design deterministic compensation/retry paths.
+
+** Q171: Final performance principle?
+Benchmark end-to-end with realistic payloads and failure patterns.
+
+** Q172: Final security principle?
+Treat every inbound message as untrusted until validated.
+
+** Q173: Final operations principle?
+Automate monitoring, replay, and topology change governance.
+
+** Q174: Final design principle?
+Prefer simple composable EIP building blocks over monolithic “smart flows.”
+
+** Q175: Final maturity principle?
+Spring Integration excellence is predictable interoperability at scale.
+
+-----
+
+#+INCLUDE: "../footer.org"
