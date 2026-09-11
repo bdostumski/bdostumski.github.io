@@ -1,0 +1,561 @@
+#+title: Spring Security
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Security
+
+-----
+
+* Beginner
+
+** Q1: What is Spring Security?
+Spring Security is a framework for authentication, authorization, and protection against common attacks in Spring applications.
+
+** Q2: Why use Spring Security?
+It provides robust, configurable security with secure defaults and deep Spring integration.
+
+** Q3: Authentication vs Authorization?
+Authentication verifies identity; authorization determines allowed actions.
+
+** Q4: What is a principal?
+The currently authenticated user/system identity.
+
+** Q5: What is GrantedAuthority?
+A permission/role representation attached to authenticated principal.
+
+** Q6: What is SecurityContext?
+Holds authentication information for current execution context.
+
+** Q7: What is SecurityContextHolder?
+Utility class providing access to SecurityContext (thread-bound by default).
+
+** Q8: What is Authentication object?
+Represents authentication request or authenticated principal token.
+
+** Q9: What is UserDetails?
+Core interface describing user credentials and authorities.
+
+** Q10: What is UserDetailsService?
+Service loading UserDetails by username (or identifier).
+
+** Q11: What is PasswordEncoder?
+Strategy for hashing/verifying passwords.
+
+** Q12: Why not store plain-text passwords?
+If leaked, plain-text passwords immediately compromise all accounts.
+
+** Q13: Recommended password encoder in Spring Security?
+BCrypt is commonly recommended for password hashing.
+
+** Q14: What is BCrypt?
+Adaptive one-way password hashing algorithm with configurable strength.
+
+** Q15: What is AuthenticationManager?
+Main API that authenticates Authentication requests.
+
+** Q16: What is AuthenticationProvider?
+Component that performs actual authentication logic for specific mechanism.
+
+** Q17: What is DaoAuthenticationProvider?
+Provider using UserDetailsService + PasswordEncoder for username/password auth.
+
+** Q18: What is SecurityFilterChain?
+Defines ordered security filters and HTTP authorization rules.
+
+** Q19: Why is filter order important?
+Security behavior depends on correct sequence of authentication/authorization filters.
+
+** Q20: What is UsernamePasswordAuthenticationFilter?
+Processes username/password login submissions.
+
+** Q21: What is Basic Authentication?
+HTTP auth scheme sending credentials in Authorization header (use only with TLS).
+
+** Q22: What is form login?
+Browser-oriented authentication via HTML login page and session.
+
+** Q23: What is HttpSecurity?
+Fluent API for configuring web security rules.
+
+** Q24: What is csrf() in Spring Security?
+Configures CSRF protection settings.
+
+** Q25: What is CSRF?
+Attack forcing authenticated browser to send unintended state-changing requests.
+
+** Q26: Is CSRF protection needed for stateless JWT APIs?
+Often disabled for pure stateless APIs not using browser cookies for auth (context-dependent).
+
+** Q27: What is CORS?
+Browser security model controlling cross-origin requests.
+
+** Q28: CORS vs CSRF?
+CORS controls origin access; CSRF protects against forged authenticated actions.
+
+** Q29: What is session-based authentication?
+Server stores auth state in HTTP session after login.
+
+** Q30: What is stateless authentication?
+Each request carries credentials/token; server does not store session auth state.
+
+** Q31: What is JWT?
+JSON Web Token carrying signed claims for stateless auth.
+
+** Q32: Is JWT encrypted by default?
+No, standard JWS tokens are signed, not encrypted.
+
+** Q33: What is role in Spring Security?
+Authority convention often prefixed with =ROLE_=.
+
+** Q34: hasRole vs hasAuthority?
+=hasRole("ADMIN")= checks =ROLE_ADMIN=; =hasAuthority= checks exact authority string.
+
+** Q35: What is permitAll()?
+Allows unrestricted access to matched endpoints.
+
+** Q36: What is authenticated()?
+Requires any authenticated user.
+
+** Q37: What is denyAll()?
+Blocks all access to matched endpoints.
+
+** Q38: What is anonymous() access?
+Allows only unauthenticated users (framework anonymous principal context).
+
+** Q39: What is logout support?
+Invalidates auth/session and clears context/cookies as configured.
+
+** Q40: What is remember-me?
+Mechanism to persist login across browser restarts using secure tokens/cookies.
+
+** Q41: Should remember-me be used for high-risk apps?
+Use cautiously with strict controls or avoid for sensitive domains.
+
+** Q42: What is default login page behavior?
+Spring Security can generate one automatically if form login enabled.
+
+** Q43: What is entry point in security?
+Component starting authentication flow when unauthenticated access occurs.
+
+** Q44: What is AccessDeniedHandler?
+Handles 403 Forbidden when authenticated user lacks permissions.
+
+** Q45: What is AuthenticationEntryPoint?
+Handles 401-like responses or auth initiation for unauthenticated requests.
+
+** Q46: What is method security?
+Applying authorization rules at method level.
+
+** Q47: Common method security annotations?
+=@PreAuthorize=, =@PostAuthorize=, =@Secured=, =@RolesAllowed=.
+
+** Q48: How enable method security?
+Use annotation-based configuration (e.g., =@EnableMethodSecurity=).
+
+** Q49: What is @PreAuthorize?
+Evaluates expression before method execution.
+
+** Q50: What is @PostAuthorize?
+Evaluates authorization after method returns.
+
+** Q51: Why prefer least privilege?
+Minimizes blast radius of compromised accounts.
+
+** Q52: What is security by default mindset?
+Start restrictive, explicitly open only required endpoints/actions.
+
+** Q53: What is common beginner Spring Security mistake?
+Permitting broad paths accidentally (e.g., overly wide matchers).
+
+** Q54: Another beginner mistake?
+Disabling CSRF/CORS without understanding threat model.
+
+** Q55: Why always use HTTPS with authentication?
+Protects credentials/tokens from interception.
+
+** Q56: What is secure cookie flag?
+Ensures cookies sent only over HTTPS.
+
+** Q57: What is HttpOnly cookie flag?
+Prevents JavaScript access to cookie values.
+
+** Q58: What is SameSite cookie attribute?
+Helps mitigate cross-site request behaviors.
+
+** Q59: Beginner API security baseline?
+HTTPS, strong password hashing, narrow authorization rules, validated tokens.
+
+** Q60: Beginner best practice?
+Use framework defaults first, then customize with explicit threat-driven decisions.
+
+* Intermediate
+
+** Q61: What is request matcher in Spring Security?
+Rule that selects which requests a security rule/filter chain applies to.
+
+** Q62: Why can multiple SecurityFilterChain beans be useful?
+Different security rules for different endpoint groups (e.g., API vs actuator).
+
+** Q63: How does chain selection work conceptually?
+First matching chain handles request (ordering matters).
+
+** Q64: What is custom authentication filter?
+User-defined filter extracting credentials/tokens and creating Authentication requests.
+
+** Q65: Where place JWT filter usually?
+Before username/password auth filter (exact placement depends on design).
+
+** Q66: What is OncePerRequestFilter?
+Convenience base filter ensuring single execution per request dispatch path.
+
+** Q67: What is SecurityContext persistence behavior?
+Context loaded/saved per request depending on session/stateless configuration.
+
+** Q68: What is SessionCreationPolicy?
+Controls whether security creates/uses HTTP sessions.
+
+** Q69: SessionCreationPolicy.STATELESS meaning?
+Do not create/use HTTP session for SecurityContext.
+
+** Q70: What is request cache in Spring Security?
+Stores original request for post-login redirection in browser flows.
+
+** Q71: Should request cache be used in stateless APIs?
+Usually disabled for pure API use cases.
+
+** Q72: What is CSRF token repository?
+Storage strategy for CSRF tokens (session/cookie-based variants).
+
+** Q73: What is CookieCsrfTokenRepository?
+Stores CSRF token in cookie (commonly for browser clients).
+
+** Q74: What is CORS preflight request?
+OPTIONS request browser sends to validate cross-origin permissions.
+
+** Q75: Why must security allow proper preflight handling?
+Blocked preflight prevents legitimate browser API calls.
+
+** Q76: What is exceptionHandling() config used for?
+Customize entry points and access denied behavior.
+
+** Q77: What is custom AuthenticationProvider use case?
+Integrate LDAP, external IDP, OTP, or domain-specific credential checks.
+
+** Q78: What is account status checks in authentication?
+Validate locked/disabled/expired accounts before success.
+
+** Q79: What is brute-force mitigation pattern?
+Rate limits, lockouts/backoff, CAPTCHA/risk signals.
+
+** Q80: What is MFA (multi-factor authentication)?
+Requiring additional verification factors beyond password.
+
+** Q81: Can Spring Security support MFA flows?
+Yes, via custom/auth provider orchestration and external identity integrations.
+
+** Q82: What is password upgrade encoding?
+Re-encode old hashes with stronger settings at login.
+
+** Q83: What is DelegatingPasswordEncoder?
+Supports multiple hash formats and gradual migration.
+
+** Q84: What is authority mapping?
+Transforming external claims/roles into internal GrantedAuthorities.
+
+** Q85: What is role hierarchy?
+Defines implied roles (e.g., ADMIN implies USER).
+
+** Q86: What is SpEL in method security?
+Expression language evaluating authorization rules dynamically.
+
+** Q87: Example method security expression?
+=@PreAuthorize("hasRole('ADMIN') or #id == authentication.name")=
+
+** Q88: What is @AuthenticationPrincipal?
+Injects current principal into controller method parameter.
+
+** Q89: What is security context propagation issue?
+Auth context may be lost across async threads if not propagated.
+
+** Q90: How propagate security context in async tasks?
+Use delegating executors/wrappers designed for security context transfer.
+
+** Q91: What is ACL in Spring Security concept?
+Fine-grained object-level permission model (advanced use case).
+
+** Q92: Why ACLs can be complex?
+High rule cardinality and performance/management overhead.
+
+** Q93: What is OAuth2?
+Authorization framework allowing delegated access via tokens.
+
+** Q94: What is OpenID Connect (OIDC)?
+Identity layer on top of OAuth2 providing authentication and user identity claims.
+
+** Q95: OAuth2 roles: Resource Owner, Client, Authorization Server, Resource Server?
+Core actors in delegated authorization flow.
+
+** Q96: What is authorization code flow?
+Server-side exchange of auth code for tokens, common for web apps.
+
+** Q97: What is client credentials flow?
+Machine-to-machine flow without end-user login.
+
+** Q98: What is refresh token?
+Longer-lived credential used to obtain new access tokens.
+
+** Q99: What is token introspection?
+Runtime validation of opaque token with authorization server.
+
+** Q100: JWT validation essentials?
+Signature verification, issuer/audience checks, expiration/not-before checks.
+
+** Q101: Why validate audience claim?
+Ensures token is intended for your API/resource.
+
+** Q102: Why validate issuer claim?
+Ensures token comes from trusted authority.
+
+** Q103: What is key rotation in JWT systems?
+Changing signing keys periodically while maintaining validation continuity.
+
+** Q104: What is JWK set endpoint?
+Endpoint publishing public keys used to verify JWT signatures.
+
+** Q105: What is resource server in Spring Security?
+Component validating bearer tokens for protected APIs.
+
+** Q106: What is OAuth2 client in Spring Security?
+App acting as OAuth2 client for login or delegated calls.
+
+** Q107: What is scope-based authorization?
+Granting permissions based on token scopes (e.g., =read:orders=).
+
+** Q108: Role vs scope?
+Roles are app/domain-centric; scopes are OAuth delegated permission strings.
+
+** Q109: What is opaque token?
+Token without self-contained claims requiring introspection.
+
+** Q110: JWT vs opaque token tradeoff?
+JWT enables local validation; opaque can simplify revocation/control centrally.
+
+** Q111: What is token revocation challenge with JWT?
+Stateless tokens remain valid until expiry unless additional revocation strategy used.
+
+** Q112: Revocation mitigation options?
+Short TTL, deny-lists, token versioning, introspection-based checks.
+
+** Q113: What is security headers support?
+Automatic HTTP headers for browser hardening (HSTS, X-Content-Type-Options, etc.).
+
+** Q114: Why configure Content Security Policy (CSP)?
+Mitigates XSS by restricting script/resource sources.
+
+** Q115: What is clickjacking defense header?
+=X-Frame-Options= or CSP frame-ancestors directives.
+
+** Q116: What is HSTS?
+Forces HTTPS usage via Strict-Transport-Security header.
+
+** Q117: What is intermediate anti-pattern in Spring Security?
+Stuffing business authorization logic directly into controllers.
+
+** Q118: Better pattern for authorization logic?
+Method/domain-level policies with clear reusable authorization services.
+
+** Q119: Why separate authentication and domain authorization concerns?
+Improves maintainability, clarity, and auditability.
+
+** Q120: What is secure password reset baseline?
+Single-use short-lived tokens + strong verification + audit logging.
+
+** Q121: What is account enumeration risk?
+Leaking whether account exists via error messages/timing.
+
+** Q122: How reduce enumeration risk?
+Generic responses and consistent processing paths.
+
+** Q123: What is intermediate testing focus for security?
+Endpoint authorization matrix, method security, token validation, failure paths.
+
+** Q124: What tool style for security integration tests?
+MockMvc/WebTestClient with authenticated/unauthenticated scenarios.
+
+** Q125: Why test negative paths heavily?
+Security failures usually emerge in denied/invalid/edge conditions.
+
+** Q126: What is intermediate observability need?
+Audit auth events, denied access, anomaly rates, token failures.
+
+** Q127: What must never be logged?
+Raw passwords, secrets, private keys, full sensitive tokens.
+
+** Q128: What is token redaction logging practice?
+Log minimal token fingerprint/claims, never full bearer token.
+
+** Q129: Intermediate maturity signal?
+Team can explain every permit rule and authentication path in production.
+
+** Q130: Intermediate best practice?
+Threat-model-driven configuration with least privilege and strong tests.
+
+* Advanced
+
+** Q131: What is zero-trust mindset for Spring services?
+Authenticate/authorize every request and avoid implicit network trust.
+
+** Q132: What is defense in depth in Spring Security?
+Layered controls: gateway, app security, method rules, data policies, auditing.
+
+** Q133: What is policy decision vs enforcement separation?
+Central policy logic with distributed enforcement points.
+
+** Q134: What is ABAC?
+Attribute-based access control using subject/resource/context attributes.
+
+** Q135: RBAC vs ABAC tradeoff?
+RBAC simpler; ABAC more expressive but more complex to govern.
+
+** Q136: What is fine-grained authorization architecture?
+Domain permission checks near business operations, not only URL-level.
+
+** Q137: What is confused deputy problem in microservices?
+Service misuses higher privilege on behalf of less privileged caller.
+
+** Q138: Mitigation for confused deputy?
+Propagate caller identity/claims and enforce downstream authorization.
+
+** Q139: What is token exchange concept?
+Exchanging one token for another scoped token for downstream service.
+
+** Q140: Why use short-lived access tokens?
+Limits exposure window if token is leaked.
+
+** Q141: What is secure key management requirement?
+Protect signing keys in HSM/KMS and rotate with auditable process.
+
+** Q142: What is asymmetric vs symmetric signing tradeoff?
+Asymmetric improves key distribution separation; symmetric simpler but riskier sharing.
+
+** Q143: What is mTLS role with Spring Security ecosystems?
+Mutual TLS provides strong service identity at transport layer.
+
+** Q144: Is mTLS a replacement for app authorization?
+No, it complements but does not replace fine-grained authZ logic.
+
+** Q145: What is step-up authentication?
+Require stronger auth factors for sensitive operations.
+
+** Q146: What is risk-based authentication?
+Adaptive controls based on context/anomaly signals.
+
+** Q147: What is session fixation protection?
+Changing session id after authentication to prevent hijacking.
+
+** Q148: What is concurrent session control?
+Limit active sessions per user/account.
+
+** Q149: What is logout propagation challenge in distributed systems?
+Revoking access across many services/tokens consistently.
+
+** Q150: What is back-channel logout concept?
+Server-to-server logout notification to relying parties.
+
+** Q151: What is authorization cache pitfall?
+Stale permissions after role/policy changes.
+
+** Q152: How manage permission cache safely?
+Short TTL, event-driven invalidation, versioned policies.
+
+** Q153: What is method security performance concern?
+Excessive per-call SpEL/policy checks on hot paths.
+
+** Q154: Optimization strategy for authorization checks?
+Cache stable decisions carefully and move complex checks to dedicated policy services.
+
+** Q155: What is audit log integrity requirement?
+Tamper-evident, append-only, restricted access, retention policy alignment.
+
+** Q156: What regulations often affect security logging?
+Industry/location-specific compliance requirements (e.g., finance/health/privacy laws).
+
+** Q157: What is incident response readiness in security design?
+Actionable logs, alerting, runbooks, token/key revocation procedures.
+
+** Q158: What is security chaos testing?
+Inject auth failures/key rotation issues to validate resilience.
+
+** Q159: What is fail-open vs fail-closed in auth systems?
+Fail-closed denies on uncertainty; fail-open allows continuity with risk.
+
+** Q160: Which components should usually fail-closed?
+Authentication/authorization decision points for protected resources.
+
+** Q161: What is side-channel leakage in auth endpoints?
+Timing/error differences revealing credential/account information.
+
+** Q162: How reduce timing side channels?
+Constant-time comparisons and normalized error processing.
+
+** Q163: What is password pepper concept?
+Server-side secret combined with password hashing for extra protection.
+
+** Q164: What is secrets rotation policy?
+Regularly rotate credentials/keys with tested rollback and dual-key windows.
+
+** Q165: What is machine identity management?
+Secure issuance/rotation of service credentials/certificates.
+
+** Q166: What is SPIFFE/SPIRE relevance conceptually?
+Standardized workload identities for zero-trust environments.
+
+** Q167: What is gateway vs app auth boundary strategy?
+Gateway handles coarse controls; app enforces domain/resource-level authorization.
+
+** Q168: What is BFF security benefit?
+Tailored token handling and reduced exposure for browser/mobile clients.
+
+** Q169: What is token binding/DPoP concept?
+Binding token use to proof-of-possession key to reduce replay risk.
+
+** Q170: What is replay attack mitigation for APIs?
+Nonce/timestamps, short TTL tokens, PoP mechanisms, idempotency controls.
+
+** Q171: What is advanced CSRF nuance with SameSite?
+SameSite helps but may not replace CSRF tokens in all browser/workflow cases.
+
+** Q172: What is secure defaults governance?
+Org-level baseline configs/starters preventing insecure deviations.
+
+** Q173: What is biggest advanced Spring Security anti-pattern?
+Over-permissive wildcard rules added “temporarily” and never removed.
+
+** Q174: What is migration strategy for legacy security configs?
+Incremental hardening with automated authorization tests and telemetry.
+
+** Q175: What is production readiness checklist core?
+TLS, strong auth, least privilege, auditing, rotation, alerting, recovery drills.
+
+** Q176: What is long-term maintainability principle?
+Keep policies explicit, versioned, reviewed, and test-enforced.
+
+** Q177: What is mature team behavior in Spring Security?
+They can explain every access rule, token trust boundary, and failure mode.
+
+** Q178: What is final architecture principle?
+Treat security as product architecture, not middleware checkbox.
+
+** Q179: What is final operations principle?
+Continuously monitor, test, and rotate—security posture is never static.
+
+** Q180: Final maturity principle?
+Secure-by-default, least-privilege, observable, and resilient under attack/failure.
+
+-----
+
+#+INCLUDE: "../footer.org"
