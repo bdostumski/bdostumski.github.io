@@ -1,0 +1,546 @@
+#+title: Spring GraphQL
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring GraphQL
+
+-----
+
+* Beginner
+
+** Q1: What is GraphQL?
+GraphQL is a query language and runtime for APIs where clients request exactly the data they need.
+
+** Q2: What problem does GraphQL solve?
+It reduces over-fetching and under-fetching common in rigid REST endpoint designs.
+
+** Q3: What is Spring for GraphQL?
+Spring project integrating GraphQL Java with Spring Boot programming model.
+
+** Q4: What is a GraphQL schema?
+Type system definition describing available queries, mutations, subscriptions, and object relationships.
+
+** Q5: What is SDL?
+Schema Definition Language used to declare GraphQL types and operations.
+
+** Q6: What is a Query type?
+Entry point for read operations.
+
+** Q7: What is a Mutation type?
+Entry point for write/change operations.
+
+** Q8: What is a Subscription type?
+Entry point for real-time streaming updates.
+
+** Q9: What is a resolver?
+Function that fetches data for a field/type in schema.
+
+** Q10: What is @QueryMapping in Spring GraphQL?
+Maps a method to a GraphQL query field resolver.
+
+** Q11: What is @MutationMapping?
+Maps a method to a mutation field resolver.
+
+** Q12: What is @SubscriptionMapping?
+Maps a method to a subscription field resolver.
+
+** Q13: What is @SchemaMapping?
+General mapping for resolving arbitrary type fields.
+
+** Q14: What is @Argument?
+Binds GraphQL field argument to method parameter.
+
+** Q15: What is @ContextValue?
+Accesses values from GraphQL context in resolver methods.
+
+** Q16: What is @BatchMapping?
+Annotation for batch loading related fields to reduce N+1 queries.
+
+** Q17: What is N+1 problem in GraphQL?
+Resolving list items triggers additional query per item for nested field.
+
+** Q18: Why is N+1 common in GraphQL?
+Clients can request nested graphs that map poorly to naive resolver calls.
+
+** Q19: What is DataLoader?
+Batching/caching utility to coalesce many key-based loads efficiently.
+
+** Q20: Why use DataLoader?
+Reduces duplicated and per-item database/service roundtrips.
+
+** Q21: What is GraphQL operation?
+A query, mutation, or subscription document sent by client.
+
+** Q22: What is field selection set?
+Set of requested fields for each queried type.
+
+** Q23: What is scalar type?
+Leaf primitive-like type (String, Int, Boolean, etc.).
+
+** Q24: Built-in scalar examples?
+=Int=, =Float=, =String=, =Boolean=, =ID=.
+
+** Q25: What is custom scalar?
+Application-defined scalar with custom parse/serialize logic.
+
+** Q26: What is enum in GraphQL?
+Type with predefined constant values.
+
+** Q27: What is input type?
+Object type used for arguments (write/query inputs), separate from output object types.
+
+** Q28: Why separate input and output types?
+Clear contracts and safer schema evolution.
+
+** Q29: What does non-null (!) mean in GraphQL?
+Field/argument cannot be null in schema contract.
+
+** Q30: What does [Type] mean?
+List of nullable Type elements (unless combined with non-null markers).
+
+** Q31: Difference between [Type!] and [Type!]!?
+First allows list null but not elements; second disallows both list null and element nulls.
+
+** Q32: What is GraphiQL/GraphQL Playground style tool?
+Interactive UI for exploring/testing GraphQL APIs.
+
+** Q33: What transport does GraphQL commonly use?
+HTTP for queries/mutations; WebSocket often for subscriptions.
+
+** Q34: Is GraphQL tied to HTTP only?
+No, protocol-agnostic conceptually, though HTTP is most common.
+
+** Q35: What is response shape rule in GraphQL?
+Response JSON mirrors query field structure.
+
+** Q36: What is GraphQL error object?
+Structured error entry containing message and optional path/extensions.
+
+** Q37: Can GraphQL return partial data with errors?
+Yes, data may be partial alongside errors array.
+
+** Q38: What is schema-first approach?
+Design schema contract first, then implement resolvers.
+
+** Q39: Code-first vs schema-first?
+Code-first derives schema from code; schema-first starts with SDL contract.
+
+** Q40: Typical Spring GraphQL default style?
+Often schema-first with SDL files + annotated controllers.
+
+** Q41: Where are GraphQL schema files usually stored in Spring Boot?
+Typically under =src/main/resources/graphql/=.
+
+** Q42: What is ID scalar commonly used for?
+Stable resource identifiers.
+
+** Q43: What is pagination in GraphQL?
+Limiting result set using offset/cursor patterns.
+
+** Q44: Why pagination is necessary?
+Protect performance and response size on large datasets.
+
+** Q45: What is a resolver method return type in Spring GraphQL?
+Regular object, =Mono=, =Flux=, =CompletableFuture=, etc: depending stack style.
+
+** Q46: Can Spring GraphQL work with reactive types?
+Yes, integrates with Reactor types for async/non-blocking flows.
+
+** Q47: What is common beginner GraphQL mistake?
+Exposing entities directly without schema boundary/DTO design.
+
+** Q48: Another beginner mistake?
+Ignoring N+1 until performance degrades in production.
+
+** Q49: What is introspection in GraphQL?
+Capability to query schema metadata itself.
+
+** Q50: Why introspection is useful?
+Tooling, documentation, and client generation support.
+
+** Q51: Should introspection always be public in production?
+Depends on security posture; often restricted for private APIs.
+
+** Q52: What is GraphQL context in Spring?
+Per-request contextual data shared across resolvers (auth, tenant, trace id).
+
+** Q53: What is resolver purity guideline?
+Keep resolvers thin; delegate business logic to services.
+
+** Q54: What is mutation design baseline?
+Explicit input object + explicit payload/output type.
+
+** Q55: What is beginner observability baseline?
+Track operation latency, error rate, and slow resolver hotspots.
+
+** Q56: Why log operation names?
+Helps monitor usage patterns and diagnose issues.
+
+** Q57: What is query variable?
+External value injected into query, avoiding string concatenation.
+
+** Q58: Why use variables?
+Security, reusability, and cleaner client code.
+
+** Q59: Beginner security baseline?
+AuthN/AuthZ checks, depth/complexity limits, input validation.
+
+** Q60: Beginner best practice?
+Design schema intentionally and optimize resolvers from the start.
+
+* Intermediate
+
+** Q61: What is GraphQL Java?
+Core Java implementation/library used underneath Spring GraphQL.
+
+** Q62: What is RuntimeWiring?
+GraphQL Java configuration connecting schema types to data fetchers/scalars/directives.
+
+** Q63: What is DataFetcher?
+Low-level resolver abstraction in GraphQL Java.
+
+** Q64: Spring annotations vs DataFetcher direct usage?
+Annotations are higher-level convenience; DataFetcher gives low-level control.
+
+** Q65: What is DataFetchingEnvironment?
+Resolver context containing args, context, selection set, source object, etc.
+
+** Q66: What is source object in nested resolver?
+Parent object instance whose field is currently being resolved.
+
+** Q67: What is @BatchMapping return shape?
+Typically map from parent key/entity to resolved child data collection/item.
+
+** Q68: What is DataLoaderRegistry?
+Container registering DataLoaders for request scope.
+
+** Q69: Why DataLoader should be request-scoped?
+Prevents cache leakage across users/requests.
+
+** Q70: What is cache role in DataLoader?
+Deduplicates loads for same key within request.
+
+** Q71: What is thundering herd risk in GraphQL resolvers?
+Many nested field requests triggering duplicated backend calls.
+
+** Q72: How mitigate resolver call explosion?
+DataLoader batching, caching, and careful field design.
+
+** Q73: What is cursor pagination?
+Pagination using opaque cursor positions instead of numeric offsets.
+
+** Q74: Why prefer cursor pagination at scale?
+Better consistency/performance on changing large datasets.
+
+** Q75: What is Relay connection model?
+Standardized GraphQL pagination shape (edges, node, pageInfo).
+
+** Q76: What is pageInfo?
+Pagination metadata (hasNextPage, endCursor, etc.).
+
+** Q77: What is projection/selection optimization?
+Fetching only fields requested by client when possible.
+
+** Q78: How can selection set help optimization?
+Resolver can inspect requested subfields and tune backend query.
+
+** Q79: What is persisted query?
+Pre-registered query referenced by hash/id.
+
+** Q80: Why persisted queries?
+Smaller payloads, better caching, reduced injection surface.
+
+** Q81: What is Automatic Persisted Query (APQ) concept?
+Client sends hash first, full query only if server cache miss.
+
+** Q82: What is complexity analysis in GraphQL?
+Scoring query cost to prevent abusive expensive requests.
+
+** Q83: What is depth limiting?
+Restricting nesting depth of queries.
+
+** Q84: Why depth limit alone may be insufficient?
+Wide queries with shallow depth can still be expensive.
+
+** Q85: What is field-level authorization?
+Access checks per sensitive field resolver.
+
+** Q86: Why endpoint-level auth isn’t enough in GraphQL?
+Single endpoint serves many fields with different sensitivity.
+
+** Q87: What is method security with Spring GraphQL?
+Use Spring Security annotations/checks in resolver/service methods.
+
+** Q88: What is context-based multi-tenancy in GraphQL?
+Tenant info in request context enforced in resolver/service queries.
+
+** Q89: What is over-posting style risk in mutations?
+Accepting broad input fields that allow unintended updates.
+
+** Q90: Mitigation for mutation input risk?
+Use explicit input DTOs with strict validation.
+
+** Q91: What is bean validation in GraphQL inputs?
+Apply constraints and validate argument/input objects.
+
+** Q92: What is custom exception resolver?
+Maps exceptions to GraphQL error format/extensions.
+
+** Q93: Why standardize GraphQL error extensions?
+Machine-readable error codes and consistent client handling.
+
+** Q94: What is partial failure strategy?
+Return successful fields while attaching errors for failed paths.
+
+** Q95: What is null bubbling?
+Non-null violation causes null propagation up field hierarchy per spec.
+
+** Q96: Why non-null overuse can be risky?
+One failure can null larger response sections unexpectedly.
+
+** Q97: What is federation in GraphQL?
+Composing a unified graph from multiple subgraph services.
+
+** Q98: What is entity reference resolution in federation?
+Resolving shared entity types across service boundaries.
+
+** Q99: What is @key directive concept (federation)?
+Defines fields uniquely identifying entity across subgraphs.
+
+** Q100: Federation benefit?
+Decentralized ownership with unified client graph.
+
+** Q101: Federation risk?
+Cross-service coupling and query-plan latency complexity.
+
+** Q102: What is schema stitching concept?
+Combining schemas at gateway layer (older/alternative composition approach).
+
+** Q103: Gateway in GraphQL architecture?
+Entry point composing/routing graph requests to subgraphs.
+
+** Q104: What is query plan in federated graph?
+Execution strategy splitting operation across subgraphs.
+
+** Q105: Why monitor query plans?
+Some plans create chatty cross-service waterfalls.
+
+** Q106: What is timeout budget for GraphQL resolvers?
+Per-resolver and end-to-end deadlines to prevent hangs.
+
+** Q107: What is batched HTTP transport concern?
+Large multi-operation requests may cause resource spikes.
+
+** Q108: What is operation name requirement practice?
+Require named operations for traceability and policy enforcement.
+
+** Q109: What is introspection disabling tradeoff?
+Improves security posture but can reduce tooling convenience.
+
+** Q110: What is CORS/CSRF relevance for GraphQL?
+Same browser security concerns apply to GraphQL endpoints.
+
+** Q111: What is subscription transport choice?
+WebSocket commonly used for bidirectional streaming updates.
+
+** Q112: Subscription scaling challenge?
+Managing many concurrent connections and fanout efficiently.
+
+** Q113: What is backpressure consideration in subscriptions?
+Slow clients can accumulate buffered events.
+
+** Q114: How handle slow subscribers?
+Buffer limits, drop policies, disconnect/retry guidance.
+
+** Q115: What is intermediate anti-pattern in GraphQL?
+Single mega-query returning huge object graphs by default.
+
+** Q116: Better schema design pattern?
+Task-focused fields with pagination and clear boundaries.
+
+** Q117: What is contract testing for GraphQL?
+Validate schema compatibility and resolver behavior against expectations.
+
+** Q118: What is schema diffing?
+Detecting breaking/non-breaking changes between schema versions.
+
+** Q119: Why schema governance matters?
+GraphQL clients depend strongly on schema stability.
+
+** Q120: What is intermediate observability must-have?
+Per-operation latency/errors, resolver timings, N+1 indicators, query cost metrics.
+
+** Q121: What is sampling strategy for query logs?
+Capture enough payload shape for diagnosis without excessive cost/PII exposure.
+
+** Q122: What is sensitive data logging risk in GraphQL?
+Variables may contain PII/secrets; must redact.
+
+** Q123: Intermediate maturity signal?
+Team can explain cost controls, auth model, and N+1 mitigation.
+
+** Q124: Intermediate best practice?
+Treat schema as product contract and enforce it with tooling/tests.
+
+** Q125: Intermediate architecture principle?
+Keep GraphQL layer thin; business rules belong in domain services.
+
+* Advanced
+
+** Q126: What is supergraph architecture?
+Federated graph composed of multiple subgraphs and centrally managed schema composition.
+
+** Q127: What is bounded context mapping in GraphQL federation?
+Each subgraph owns domain slice and exposes only necessary entity boundaries.
+
+** Q128: What is cross-subgraph N+1 risk?
+Gateway/subgraph interplay can multiply downstream calls.
+
+** Q129: How reduce federated N+1?
+Entity batching, representation optimization, query plan tuning.
+
+** Q130: What is query cost model design?
+Weighted complexity scoring by field fanout and resolver cost.
+
+** Q131: Why static depth limits are insufficient at scale?
+Cost depends on cardinality and backend fanout, not depth alone.
+
+** Q132: What is demand control strategy?
+Rate limits + complexity caps + persisted queries + auth-aware quotas.
+
+** Q133: What is per-tenant query budgeting?
+Allocate complexity/request quotas by tenant plan/SLA tier.
+
+** Q134: What is persisted operations allowlist?
+Only approved operation hashes allowed in production.
+
+** Q135: Why allowlist operations?
+Prevents arbitrary expensive or malicious ad-hoc queries.
+
+** Q136: What is GraphQL DoS vector?
+Deep/wide introspective or recursive queries overwhelming resolvers/backends.
+
+** Q137: Mitigations for GraphQL DoS?
+Complexity analysis, depth limits, timeouts, concurrency guards, caching.
+
+** Q138: What is resolver-level caching?
+Caching expensive field results keyed by args/context constraints.
+
+** Q139: Cache correctness challenge in GraphQL?
+Field result may vary by auth, locale, tenant, selection context.
+
+** Q140: What is response caching in GraphQL?
+Cache full query responses when safe and keyable by operation+variables+identity context.
+
+** Q141: What is stale data mitigation in cache?
+TTL + event-driven invalidation + version tags.
+
+** Q142: What is mutation side-effect orchestration concern?
+Complex mutations spanning services risk partial failure.
+
+** Q143: Strategy for mutation reliability?
+Idempotency keys, saga/outbox patterns, explicit status/result modeling.
+
+** Q144: What is eventual consistency UX issue in GraphQL?
+Immediate query after mutation may not reflect downstream async updates.
+
+** Q145: How handle eventual consistency for clients?
+Return operation status/version and provide polling/subscription updates.
+
+** Q146: What is subscription delivery guarantee challenge?
+WebSocket disconnect/reconnect may lose events without replay strategy.
+
+** Q147: Replay strategy for subscriptions?
+Cursor/offset-based resume or fallback query synchronization.
+
+** Q148: What is GraphQL over HTTP spec compliance importance?
+Interoperability and predictable client/server behavior.
+
+** Q149: What is error classification framework?
+Distinguish validation, auth, business, transient, internal errors with codes.
+
+** Q150: Why classify errors consistently?
+Improves client handling, alert routing, and operational analytics.
+
+** Q151: What is tracing in GraphQL?
+Per-operation and per-resolver spans showing execution tree and bottlenecks.
+
+** Q152: Why resolver-level tracing matters?
+Pinpoints expensive nested fields and backend fanout.
+
+** Q153: What is cardinality pitfall in GraphQL metrics?
+High-cardinality labels from raw query strings/arguments.
+
+** Q154: How reduce metrics cardinality?
+Use normalized operation names/hashes and bounded tags.
+
+** Q155: What is schema evolution strategy for large orgs?
+Deprecate fields first, monitor usage, remove only after adoption window.
+
+** Q156: What is @deprecated directive usage?
+Mark fields/types/args as deprecated with reason for migration guidance.
+
+** Q157: What is breaking change in GraphQL examples?
+Removing field/type, tightening nullability, changing argument requirements.
+
+** Q158: Non-breaking change examples?
+Adding optional fields/types, adding optional arguments.
+
+** Q159: What is consumer usage telemetry for schema governance?
+Track field usage to guide safe deprecations/removals.
+
+** Q160: What is contract ownership model?
+Domain teams own subgraph schema segments with review standards.
+
+** Q161: What is security boundary principle in GraphQL?
+Never trust client-selected fields; enforce auth per resolver/data boundary.
+
+** Q162: What is confused deputy risk in federated graphs?
+Gateway/subgraph mishandles caller context causing over-privileged access.
+
+** Q163: Mitigation for federated auth context risks?
+Propagate verified identity/claims and enforce consistently in each subgraph.
+
+** Q164: What is PII minimization in GraphQL design?
+Expose least sensitive fields and require explicit privileged access for sensitive data.
+
+** Q165: What is chaos testing for GraphQL systems?
+Inject downstream failures/latency and verify graceful partial responses/timeouts.
+
+** Q166: What is canary rollout for schema/resolver changes?
+Release to subset traffic and monitor errors/latency before full rollout.
+
+** Q167: What is blue/green challenge in GraphQL?
+Mixed client versions require strong backward compatibility during cutover.
+
+** Q168: What is advanced anti-pattern in Spring GraphQL?
+Treating schema as thin wrapper over entities without domain-oriented design.
+
+** Q169: Better long-term pattern?
+Intent-driven schema, resolver orchestration, and explicit contracts per use case.
+
+** Q170: What is final reliability principle?
+Assume partial failures are normal and design resilient resolver composition.
+
+** Q171: What is final performance principle?
+Control demand (cost/depth/rate) and optimize hot resolvers continuously.
+
+** Q172: What is final security principle?
+Apply least privilege at field level with strict context propagation.
+
+** Q173: What is final operations principle?
+Instrument operation/resolver metrics and govern schema evolution with telemetry.
+
+** Q174: What is final architecture principle?
+Schema is a product contract, not a mirror of persistence models.
+
+** Q175: Final maturity principle?
+Spring GraphQL excellence is secure, observable, and evolution-friendly graph design.
+
+-----
+
+#+INCLUDE: "../footer.org"
