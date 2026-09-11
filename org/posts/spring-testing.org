@@ -1,0 +1,546 @@
+#+title: Spring Testing
+#+date: 2026-09-10
+#+TAGS: Spring
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Spring Testing
+
+-----
+
+* Beginner
+
+** Q1: What is testing in Spring applications?
+Testing verifies Spring components and configurations behave correctly across units, integrations, and end-to-end flows.
+
+** Q2: Why is testing especially important in Spring apps?
+Because dependency injection, auto-configuration, and proxies can introduce runtime behavior that must be validated.
+
+** Q3: What is unit testing?
+Testing a small piece of code in isolation, usually with mocked dependencies.
+
+** Q4: What is integration testing?
+Testing collaboration of multiple components and infrastructure (DB, HTTP, messaging).
+
+** Q5: What is end-to-end testing?
+Testing complete user/business flows through deployed system boundaries.
+
+** Q6: What is Spring TestContext Framework?
+Framework that loads and manages Spring application contexts for tests.
+
+** Q7: What does @SpringBootTest do?
+Loads full Spring Boot application context for integration-style testing.
+
+** Q8: When use @SpringBootTest?
+When verifying full wiring, configuration, and cross-layer behavior.
+
+** Q9: What is @ExtendWith(SpringExtension.class)?
+Integrates JUnit 5 with Spring TestContext support.
+
+** Q10: Is @SpringBootTest always best?
+No; it is heavier and slower than focused slice/unit tests.
+
+** Q11: What is a test slice in Spring Boot?
+A narrowed context loading only specific layer beans (web/data/etc.).
+
+** Q12: What is @WebMvcTest?
+Loads MVC components for controller-layer testing.
+
+** Q13: What is @DataJpaTest?
+Loads JPA repositories and related persistence configuration for data-layer tests.
+
+** Q14: What is @JsonTest?
+Focused test slice for JSON serialization/deserialization behavior.
+
+** Q15: What is @RestClientTest?
+Slice for REST client components with mock server support.
+
+** Q16: Why use slice tests?
+Faster feedback and clearer test scope.
+
+** Q17: What is MockMvc?
+Framework for testing Spring MVC endpoints without starting full server.
+
+** Q18: What can MockMvc verify?
+Status, headers, body, JSON paths, validation errors, and controller behavior.
+
+** Q19: What is @AutoConfigureMockMvc?
+Configures MockMvc in Spring Boot tests.
+
+** Q20: What is TestRestTemplate?
+Convenient HTTP client for integration tests against running server.
+
+** Q21: When use RANDOM_PORT in tests?
+To start embedded server on random port and avoid conflicts.
+
+** Q22: What is @MockBean?
+Replaces a bean in Spring context with Mockito mock.
+
+** Q23: Why use @MockBean carefully?
+Overuse can hide wiring/integration issues.
+
+** Q24: What is @SpyBean?
+Wraps real bean with spy to verify interactions while keeping real behavior.
+
+** Q25: What is @TestConfiguration?
+Test-only configuration class for extra/replacement beans.
+
+** Q26: What is @ActiveProfiles in tests?
+Activates specific Spring profiles for test context.
+
+** Q27: What is @TestPropertySource?
+Overrides/adds properties for tests.
+
+** Q28: What is @DynamicPropertySource?
+Programmatically supplies dynamic properties (common with containers).
+
+** Q29: What is context caching in Spring tests?
+Reusing loaded application contexts across tests with same configuration.
+
+** Q30: Why is context caching important?
+Greatly improves test suite performance.
+
+** Q31: What does @DirtiesContext do?
+Marks context as dirty so Spring rebuilds it for subsequent tests.
+
+** Q32: Should @DirtiesContext be used often?
+No, it slows suites by breaking cache reuse.
+
+** Q33: What is transactional test behavior?
+Tests can run in transaction rolled back after test completion.
+
+** Q34: Which annotation enables transactional test methods?
+=@Transactional= on test class/method.
+
+** Q35: Why rollback after tests?
+Keeps database clean and test-independent.
+
+** Q36: What is @Rollback?
+Controls rollback behavior for transactional tests.
+
+** Q37: What is @Commit in tests?
+Forces transaction commit instead of rollback.
+
+** Q38: What is SQL test data initialization?
+Using scripts/annotations to prepare database state.
+
+** Q39: What is @Sql annotation?
+Executes SQL scripts/statements before/after tests.
+
+** Q40: What is AssertJ?
+Fluent assertion library commonly used in Spring tests.
+
+** Q41: What is Hamcrest?
+Matcher-based assertion style, often used with MockMvc.
+
+** Q42: What is Mockito?
+Mocking framework for stubbing and verifying interactions.
+
+** Q43: What is stubbing?
+Defining mock behavior for method calls.
+
+** Q44: What is verification in Mockito?
+Asserting specific interactions occurred on mocks.
+
+** Q45: What is given/when/then style?
+BDD-like structure improving test readability.
+
+** Q46: What is test fixture?
+Known setup state used by a test.
+
+** Q47: Why keep fixtures minimal?
+Reduces noise and brittle dependencies.
+
+** Q48: What is deterministic test?
+Test with predictable outcome regardless of execution time/environment.
+
+** Q49: Why avoid real external APIs in unit/integration tests?
+They cause flakiness, slowness, and nondeterminism.
+
+** Q50: What is fake vs mock?
+Fake has working simplified implementation; mock is behavior-programmed test double.
+
+** Q51: What is repository test goal?
+Verify queries/mappings/constraints behave correctly.
+
+** Q52: What is controller test goal?
+Verify request mapping, validation, serialization, and status codes.
+
+** Q53: What is service test goal?
+Verify business rules and orchestration logic.
+
+** Q54: Common beginner test anti-pattern?
+Testing framework internals rather than application behavior.
+
+** Q55: Another beginner anti-pattern?
+Huge tests with many assertions across unrelated concerns.
+
+** Q56: What is “one behavior per test” guideline?
+Each test should validate one coherent behavior scenario.
+
+** Q57: Why name tests clearly?
+Improves maintainability and debugging speed.
+
+** Q58: What is Arrange-Act-Assert?
+Test structure: setup, execute, verify.
+
+** Q59: Beginner test priority in Spring projects?
+Fast unit tests + key slice tests + a few full integration tests.
+
+** Q60: Beginner best practice?
+Keep tests isolated, readable, deterministic, and meaningful.
+
+* Intermediate
+
+** Q61: What is SpringBootTest.WebEnvironment.MOCK?
+Loads web context without real server; useful with MockMvc.
+
+** Q62: RANDOM_PORT vs DEFINED_PORT in tests?
+Random avoids collisions; defined binds specific fixed port.
+
+** Q63: What is TestEntityManager?
+Utility in @DataJpaTest simplifying entity persistence/testing operations.
+
+** Q64: Why use TestEntityManager?
+Fine control for setup/flush/clear assertions in JPA tests.
+
+** Q65: What is flush/clear in repository tests?
+Forces SQL execution and detaches entities to validate real DB behavior.
+
+** Q66: Why can JPA tests pass without hitting DB immediately?
+Persistence context may defer SQL until flush/commit.
+
+** Q67: What is lazy loading test pitfall?
+Assertions accidentally pass within open context but fail in real boundaries.
+
+** Q68: How test lazy loading safely?
+Control transaction boundaries and assert expected fetch behavior explicitly.
+
+** Q69: What is @AutoConfigureTestDatabase?
+Controls whether test database should replace application DataSource.
+
+** Q70: Why might replacing DB be risky?
+In-memory DB behavior can differ from production dialect.
+
+** Q71: What are Testcontainers?
+Library running real ephemeral containers for DB/infrastructure in tests.
+
+** Q72: Why use Testcontainers with Spring?
+Higher fidelity integration tests with reproducible infrastructure.
+
+** Q73: What is container reuse strategy?
+Reuse containers across tests/runs to reduce startup overhead.
+
+** Q74: What is @ServiceConnection (Boot concept)?
+Simplifies binding container connection details into app context.
+
+** Q75: What is WireMock use case?
+Mock/stub external HTTP services for deterministic integration tests.
+
+** Q76: What is MockRestServiceServer?
+Tool for mocking RestTemplate HTTP interactions.
+
+** Q77: How test WebClient integrations?
+Use mock web servers or reactive test utilities with controlled responses.
+
+** Q78: What is contract testing?
+Validates provider/consumer API compatibility expectations.
+
+** Q79: Consumer-driven contract testing benefit?
+Catches breaking API changes early in CI.
+
+** Q80: What is Spring Cloud Contract concept?
+Framework for contract-driven testing in Spring ecosystems.
+
+** Q81: What is security testing with MockMvc?
+Testing authentication/authorization behavior on endpoints.
+
+** Q82: How simulate authenticated user in tests?
+Security test support annotations/helpers (e.g., mock user/request post-processors).
+
+** Q83: What is @WithMockUser?
+Creates mock authenticated user for security tests.
+
+** Q84: Why test forbidden/unauthorized paths?
+Security regressions often appear in negative authorization scenarios.
+
+** Q85: What is method security testing?
+Verifying @PreAuthorize/@PostAuthorize behavior on service methods.
+
+** Q86: What is JSONPath assertion?
+Query-like syntax to assert JSON response fields.
+
+** Q87: Why snapshot tests for JSON can be risky?
+Small harmless changes can cause brittle failures without semantic issues.
+
+** Q88: Better approach than raw snapshot-only?
+Assert critical fields/contracts plus schema/semantic checks.
+
+** Q89: What is parameterized testing?
+Running same test logic with multiple inputs.
+
+** Q90: When use parameterized tests?
+Validation rules, boundary values, format/parsing cases.
+
+** Q91: What is nested test class benefit?
+Organizes scenarios by context/feature in JUnit 5.
+
+** Q92: What is test lifecycle annotation?
+@BeforeEach, @AfterEach, @BeforeAll, @AfterAll.
+
+** Q93: Why avoid heavy @BeforeEach?
+Increases runtime and can hide per-test setup intent.
+
+** Q94: What is parallel test execution concern?
+Shared state/resources may cause race conditions/flakiness.
+
+** Q95: How make tests parallel-safe?
+Isolate data/resources and eliminate global mutable state.
+
+** Q96: What is clock/time dependency in tests?
+Logic based on current time can be nondeterministic.
+
+** Q97: How stabilize time-based tests?
+Inject Clock and use fixed/test clocks.
+
+** Q98: What is random data test pitfall?
+Non-reproducible failures if seeds/inputs are uncontrolled.
+
+** Q99: How use random data safely?
+Seed deterministically and log seed for reproducibility.
+
+** Q100: What is flaky test?
+Test that intermittently passes/fails without code changes.
+
+** Q101: Common causes of flaky Spring tests?
+Async timing, shared DB state, external dependencies, order dependence.
+
+** Q102: How detect flaky tests?
+Re-run failed tests, quarantine analysis, stability metrics over time.
+
+** Q103: Should flaky tests be ignored?
+No, prioritize fixing or quarantining with clear ownership.
+
+** Q104: What is @RepeatedTest useful for?
+Stress-checking potentially flaky behavior quickly.
+
+** Q105: What is Awaitility?
+Library for asserting asynchronous outcomes with polling/timeouts.
+
+** Q106: Why avoid Thread.sleep in tests?
+Slower and unreliable timing assumptions.
+
+** Q107: What is test pyramid?
+Many unit tests, fewer integration tests, minimal E2E tests.
+
+** Q108: What is test trophy viewpoint?
+Emphasizes integration tests for meaningful confidence with balanced unit coverage.
+
+** Q109: How choose right test type?
+Based on risk, feedback speed, and behavior under verification.
+
+** Q110: What is mutation testing?
+Evaluates test quality by introducing code mutations and checking if tests fail.
+
+** Q111: Why mutation testing useful?
+Measures assertion strength beyond line coverage.
+
+** Q112: Why code coverage alone is insufficient?
+High coverage can still miss critical behavior assertions.
+
+** Q113: What is slice boundary anti-pattern?
+Using full context for every test instead of focused slices.
+
+** Q114: What is over-mocking anti-pattern?
+Mocking everything and missing integration contract failures.
+
+** Q115: What is under-mocking anti-pattern?
+Heavy integration in unit tests causing slowness and fragility.
+
+** Q116: What is fixture factory pattern?
+Reusable builders/factories for concise domain test data creation.
+
+** Q117: Why use test data builders?
+Readable intent and fewer brittle constructor calls.
+
+** Q118: What is intermediate CI strategy for Spring tests?
+Run fast tests on PR, deeper suites nightly/merge gates.
+
+** Q119: What is selective test execution?
+Run impacted tests based on changed modules/files (carefully).
+
+** Q120: What is baseline integration suite?
+Critical-path tests verifying startup, DB, security, key endpoints.
+
+** Q121: What is intermediate observability in tests?
+Capture logs/metrics/traces for failed-test diagnosis.
+
+** Q122: Why keep test logs structured?
+Faster triage in CI pipelines.
+
+** Q123: What is intermediate best practice?
+Optimize for confidence per minute: focused, realistic, deterministic tests.
+
+** Q124: Intermediate maturity signal?
+Low flake rate, fast pipeline, and clear ownership of failures.
+
+** Q125: Intermediate anti-pattern summary?
+Slow monolithic suites with brittle assertions and unclear scope.
+
+* Advanced
+
+** Q126: What is advanced test architecture goal?
+Maximize release confidence while keeping feedback loops fast and stable.
+
+** Q127: What is hermetic testing?
+Tests run in fully controlled isolated environment with no hidden external dependencies.
+
+** Q128: Why hermetic tests matter?
+Reduce flakiness and improve reproducibility across developer machines/CI.
+
+** Q129: What is production-like test environment principle?
+Match critical infra characteristics (DB version, timezone, encoding, network behavior).
+
+** Q130: What is ephemeral environment testing?
+Spin up short-lived full environments per branch/PR for high-fidelity checks.
+
+** Q131: What is test sharding?
+Splitting test suite across workers/nodes for faster completion.
+
+** Q132: What is risk-based test prioritization?
+Run highest-risk/high-impact tests earliest.
+
+** Q133: What is change-based testing?
+Selecting tests based on impacted components/dependencies.
+
+** Q134: What is contract drift?
+Provider and consumer expectations diverge over time.
+
+** Q135: How prevent contract drift?
+Automated contract verification in CI for both sides.
+
+** Q136: What is schema migration test strategy?
+Validate DB migrations forward/backward compatibility and data integrity.
+
+** Q137: Why test migrations with real data samples?
+Catches edge-case transformation issues before production.
+
+** Q138: What is zero-downtime deployment test focus?
+Backward-compatible app + schema behavior across mixed-version rollout.
+
+** Q139: What is blue/green test requirement?
+Verify old/new versions interoperate with shared infra safely.
+
+** Q140: What is canary verification testing?
+Automated checks on partial traffic before full rollout.
+
+** Q141: What is resilience testing for Spring apps?
+Inject dependency failures/timeouts and verify fallbacks, retries, circuit breakers.
+
+** Q142: What is chaos experiment in test pipelines?
+Controlled fault injection to validate system robustness.
+
+** Q143: What is performance regression testing?
+Track latency/throughput/resource changes between builds.
+
+** Q144: Why include p95/p99 in test assertions?
+Tail behavior reveals real degradation hidden by averages.
+
+** Q145: What is load test vs stress test?
+Load: expected traffic; stress: beyond limits to observe failure modes.
+
+** Q146: What is soak test?
+Long-duration load test to detect leaks and degradation over time.
+
+** Q147: What is concurrency test focus in Spring?
+Race conditions, transaction anomalies, lock contention, thread safety.
+
+** Q148: How test transactional anomalies?
+Parallel scenario tests with controlled isolation and assertions.
+
+** Q149: What is test oracle challenge?
+Determining correct expected output for complex systems.
+
+** Q150: How improve oracles?
+Use invariant checks, contracts, and domain rules as assertions.
+
+** Q151: What is property-based testing?
+Generate many inputs to verify general properties/invariants.
+
+** Q152: Where property-based testing helps in Spring apps?
+Validation logic, mappers, parsers, idempotency behavior.
+
+** Q153: What is fuzz testing relevance?
+Randomized malformed inputs for robustness/security validation.
+
+** Q154: What is security testing advanced scope?
+AuthZ bypass attempts, CSRF/CORS misconfig, injection vectors, session/token abuse.
+
+** Q155: What is SAST/DAST relation to Spring testing?
+Static/dynamic security analyses complement automated test suites.
+
+** Q156: What is test governance?
+Policies for ownership, quality gates, flaky test SLA, and maintenance standards.
+
+** Q157: What is quality gate example?
+Block merge if critical tests fail, coverage drops, or severe vulnerabilities appear.
+
+** Q158: What is quarantined test policy?
+Temporary isolation of flaky tests with deadline/owner for fix.
+
+** Q159: Why avoid permanent quarantine?
+It erodes trust and reduces real coverage.
+
+** Q160: What is test debt?
+Accumulated poor tests/coverage gaps slowing delivery and raising risk.
+
+** Q161: How manage test debt?
+Track explicitly, prioritize by risk, and fix continuously.
+
+** Q162: What is observability-driven test design?
+Assertions include logs/metrics/traces expectations for diagnosability.
+
+** Q163: What is synthetic monitoring relation to tests?
+Production probes validate critical flows continuously after deployment.
+
+** Q164: What is golden dataset strategy?
+Curated realistic datasets for repeatable high-value integration tests.
+
+** Q165: What is PII concern in test data?
+Never use raw production sensitive data without strict anonymization/compliance.
+
+** Q166: What is advanced mocking anti-pattern?
+Mocking third-party behavior inaccurately, creating false confidence.
+
+** Q167: Better alternative for external dependency confidence?
+Use provider sandbox/contracts/testcontainers/wire-level simulations.
+
+** Q168: What is “test as specification” principle?
+Tests document business rules and expected behavior clearly.
+
+** Q169: What is maintainable assertion style?
+Specific, intention-revealing, minimal but sufficient assertions.
+
+** Q170: Biggest advanced Spring testing anti-pattern?
+Chasing coverage metrics while ignoring reliability and risk-driven scenarios.
+
+** Q171: What is mature CI/CD testing posture?
+Layered fast-feedback pipeline with deterministic gates and progressive delivery checks.
+
+** Q172: What is final architecture principle for tests?
+Design for testability: clear boundaries, pure logic, explicit dependencies.
+
+** Q173: What is final operational principle?
+Continuously measure flakiness, duration, and defect escape rate.
+
+** Q174: What is final team principle?
+Everyone owns test quality; it is not only QA responsibility.
+
+** Q175: Final maturity principle?
+High-confidence Spring delivery comes from balanced, realistic, fast, and maintainable tests.
+
+-----
+
+#+INCLUDE: "../footer.org"
