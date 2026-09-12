@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Elasticsearch &amp; Kibana</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Elasticsearch &amp; Kibana</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org0785089" class="outline-2">
+<h2 id="org0785089">Elasticsearch &amp; Kibana</h2>
+<div class="outline-text-2" id="text-org0785089">
+<hr>
+</div>
+</div>
+<div id="outline-container-org9f02144" class="outline-2">
+<h2 id="org9f02144">Beginner</h2>
+<div class="outline-text-2" id="text-org9f02144">
+</div>
+<div id="outline-container-org6aa3751" class="outline-3">
+<h3 id="org6aa3751">Q1: What is Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org6aa3751">
+<p>
+Elasticsearch is a distributed search and analytics engine built on Apache Lucene.
+</p>
+</div>
+</div>
+<div id="outline-container-orge280ecd" class="outline-3">
+<h3 id="orge280ecd">Q2: What is Kibana?</h3>
+<div class="outline-text-3" id="text-orge280ecd">
+<p>
+Kibana is a visualization and management UI for Elasticsearch data.
+</p>
+</div>
+</div>
+<div id="outline-container-org551297e" class="outline-3">
+<h3 id="org551297e">Q3: Elasticsearch + Kibana in one line?</h3>
+<div class="outline-text-3" id="text-org551297e">
+<p>
+Elasticsearch stores/searches data; Kibana explores/visualizes/manages it.
+</p>
+</div>
+</div>
+<div id="outline-container-org1991813" class="outline-3">
+<h3 id="org1991813">Q4: What is an index in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org1991813">
+<p>
+Logical namespace containing related documents.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd9ca077" class="outline-3">
+<h3 id="orgd9ca077">Q5: What is a document?</h3>
+<div class="outline-text-3" id="text-orgd9ca077">
+<p>
+JSON object stored and indexed in Elasticsearch.
+</p>
+</div>
+</div>
+<div id="outline-container-orga45ef08" class="outline-3">
+<h3 id="orga45ef08">Q6: What is a field?</h3>
+<div class="outline-text-3" id="text-orga45ef08">
+<p>
+Key in a document with a typed value used for search/aggregation.
+</p>
+</div>
+</div>
+<div id="outline-container-org6811d81" class="outline-3">
+<h3 id="org6811d81">Q7: What is mapping?</h3>
+<div class="outline-text-3" id="text-org6811d81">
+<p>
+Schema definition describing field types and indexing behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org317ea88" class="outline-3">
+<h3 id="org317ea88">Q8: Why mappings matter?</h3>
+<div class="outline-text-3" id="text-org317ea88">
+<p>
+They control correctness, query behavior, and storage/performance characteristics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgba2f629" class="outline-3">
+<h3 id="orgba2f629">Q9: What is dynamic mapping?</h3>
+<div class="outline-text-3" id="text-orgba2f629">
+<p>
+Automatic field type inference when new fields appear.
+</p>
+</div>
+</div>
+<div id="outline-container-org86216ad" class="outline-3">
+<h3 id="org86216ad">Q10: Dynamic mapping risk?</h3>
+<div class="outline-text-3" id="text-org86216ad">
+<p>
+Mapping explosion and incorrect inferred types.
+</p>
+</div>
+</div>
+<div id="outline-container-org572e346" class="outline-3">
+<h3 id="org572e346">Q11: What is a shard?</h3>
+<div class="outline-text-3" id="text-org572e346">
+<p>
+Partition of an index (Lucene index unit).
+</p>
+</div>
+</div>
+<div id="outline-container-org0bd4e1c" class="outline-3">
+<h3 id="org0bd4e1c">Q12: What is primary shard?</h3>
+<div class="outline-text-3" id="text-org0bd4e1c">
+<p>
+Original shard holding authoritative indexed data segment.
+</p>
+</div>
+</div>
+<div id="outline-container-org2b926aa" class="outline-3">
+<h3 id="org2b926aa">Q13: What is replica shard?</h3>
+<div class="outline-text-3" id="text-org2b926aa">
+<p>
+Copy of primary shard for high availability and read scaling.
+</p>
+</div>
+</div>
+<div id="outline-container-org843fa5b" class="outline-3">
+<h3 id="org843fa5b">Q14: Why replicas are useful?</h3>
+<div class="outline-text-3" id="text-org843fa5b">
+<p>
+Fault tolerance and increased search throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-org8273c47" class="outline-3">
+<h3 id="org8273c47">Q15: What is cluster in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org8273c47">
+<p>
+Group of nodes working together as one logical system.
+</p>
+</div>
+</div>
+<div id="outline-container-org18875cd" class="outline-3">
+<h3 id="org18875cd">Q16: What is node?</h3>
+<div class="outline-text-3" id="text-org18875cd">
+<p>
+Single Elasticsearch server instance in a cluster.
+</p>
+</div>
+</div>
+<div id="outline-container-orge61c47a" class="outline-3">
+<h3 id="orge61c47a">Q17: What is cluster health status?</h3>
+<div class="outline-text-3" id="text-orge61c47a">
+<p>
+Green/yellow/red indicating shard allocation state.
+</p>
+</div>
+</div>
+<div id="outline-container-org5700fcc" class="outline-3">
+<h3 id="org5700fcc">Q18: Green vs yellow vs red?</h3>
+<div class="outline-text-3" id="text-org5700fcc">
+<p>
+Green: all shards allocated; yellow: replicas unassigned; red: primaries unassigned.
+</p>
+</div>
+</div>
+<div id="outline-container-org9684a67" class="outline-3">
+<h3 id="org9684a67">Q19: What is inverted index?</h3>
+<div class="outline-text-3" id="text-org9684a67">
+<p>
+Data structure mapping terms to documents for fast full-text search.
+</p>
+</div>
+</div>
+<div id="outline-container-orga3f5fc0" class="outline-3">
+<h3 id="orga3f5fc0">Q20: What is analyzer?</h3>
+<div class="outline-text-3" id="text-orga3f5fc0">
+<p>
+Pipeline that transforms text into searchable tokens.
+</p>
+</div>
+</div>
+<div id="outline-container-org451a7e6" class="outline-3">
+<h3 id="org451a7e6">Q21: Analyzer components?</h3>
+<div class="outline-text-3" id="text-org451a7e6">
+<p>
+Character filters, tokenizer, token filters.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb04b9f5" class="outline-3">
+<h3 id="orgb04b9f5">Q22: What is tokenization?</h3>
+<div class="outline-text-3" id="text-orgb04b9f5">
+<p>
+Splitting text into terms/tokens during analysis.
+</p>
+</div>
+</div>
+<div id="outline-container-org20adcde" class="outline-3">
+<h3 id="org20adcde">Q23: What is keyword field type?</h3>
+<div class="outline-text-3" id="text-org20adcde">
+<p>
+Exact value field (not analyzed) for filtering/sorting/aggregations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2b7cfd" class="outline-3">
+<h3 id="orgd2b7cfd">Q24: Text vs keyword quick rule?</h3>
+<div class="outline-text-3" id="text-orgd2b7cfd">
+<p>
+<code>text</code> for full-text search; <code>keyword</code> for exact matching and aggregations.
+</p>
+</div>
+</div>
+<div id="outline-container-orge9e5861" class="outline-3">
+<h3 id="orge9e5861">Q25: What is relevance score?</h3>
+<div class="outline-text-3" id="text-orge9e5861">
+<p>
+Numeric ranking value indicating document match quality.
+</p>
+</div>
+</div>
+<div id="outline-container-org3690339" class="outline-3">
+<h3 id="org3690339">Q26: What is Query DSL?</h3>
+<div class="outline-text-3" id="text-org3690339">
+<p>
+JSON-based query language for Elasticsearch searches.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e2ac21" class="outline-3">
+<h3 id="org0e2ac21">Q27: What is match query?</h3>
+<div class="outline-text-3" id="text-org0e2ac21">
+<p>
+Full-text query using analyzer semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-orga6aeb0a" class="outline-3">
+<h3 id="orga6aeb0a">Q28: What is term query?</h3>
+<div class="outline-text-3" id="text-orga6aeb0a">
+<p>
+Exact term lookup (commonly for keyword/numeric fields).
+</p>
+</div>
+</div>
+<div id="outline-container-org2e37a10" class="outline-3">
+<h3 id="org2e37a10">Q29: What is bool query?</h3>
+<div class="outline-text-3" id="text-org2e37a10">
+<p>
+Combines must/should/filter/must<sub>not</sub> clauses.
+</p>
+</div>
+</div>
+<div id="outline-container-org5247ac1" class="outline-3">
+<h3 id="org5247ac1">Q30: Filter vs must difference?</h3>
+<div class="outline-text-3" id="text-org5247ac1">
+<p>
+Filter is non-scoring and cache-friendly; must affects scoring.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc0a92f" class="outline-3">
+<h3 id="orgbc0a92f">Q31: What is aggregation?</h3>
+<div class="outline-text-3" id="text-orgbc0a92f">
+<p>
+Analytics computation over documents (counts, stats, buckets).
+</p>
+</div>
+</div>
+<div id="outline-container-org8c1087b" class="outline-3">
+<h3 id="org8c1087b">Q32: Common aggregation example?</h3>
+<div class="outline-text-3" id="text-org8c1087b">
+<p>
+Terms aggregation for top values by frequency.
+</p>
+</div>
+</div>
+<div id="outline-container-org04f8796" class="outline-3">
+<h3 id="org04f8796">Q33: What is range query?</h3>
+<div class="outline-text-3" id="text-org04f8796">
+<p>
+Find docs where field values fall within bounds.
+</p>
+</div>
+</div>
+<div id="outline-container-org6b2eb07" class="outline-3">
+<h3 id="org6b2eb07">Q34: What is wildcard query?</h3>
+<div class="outline-text-3" id="text-org6b2eb07">
+<p>
+Pattern-based term matching (can be expensive).
+</p>
+</div>
+</div>
+<div id="outline-container-org12a0e43" class="outline-3">
+<h3 id="org12a0e43">Q35: What is pagination in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org12a0e43">
+<p>
+Returning result subsets via from/size or search<sub>after</sub>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce89732" class="outline-3">
+<h3 id="orgce89732">Q36: What is from/size pitfall?</h3>
+<div class="outline-text-3" id="text-orgce89732">
+<p>
+Deep pagination cost grows significantly.
+</p>
+</div>
+</div>
+<div id="outline-container-org0942488" class="outline-3">
+<h3 id="org0942488">Q37: What is Kibana Discover?</h3>
+<div class="outline-text-3" id="text-org0942488">
+<p>
+Interface for ad-hoc document exploration and filtering.
+</p>
+</div>
+</div>
+<div id="outline-container-org6485d91" class="outline-3">
+<h3 id="org6485d91">Q38: What is Kibana dashboard?</h3>
+<div class="outline-text-3" id="text-org6485d91">
+<p>
+Collection of visualizations for monitoring/analysis.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc2ff53" class="outline-3">
+<h3 id="orgfc2ff53">Q39: What is Kibana visualization?</h3>
+<div class="outline-text-3" id="text-orgfc2ff53">
+<p>
+Chart/table/metric built from Elasticsearch queries/aggregations.
+</p>
+</div>
+</div>
+<div id="outline-container-org2250b27" class="outline-3">
+<h3 id="org2250b27">Q40: What is data view (index pattern concept)?</h3>
+<div class="outline-text-3" id="text-org2250b27">
+<p>
+Kibana definition selecting indices/fields for analysis.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf91329c" class="outline-3">
+<h3 id="orgf91329c">Q41: What is time filter in Kibana?</h3>
+<div class="outline-text-3" id="text-orgf91329c">
+<p>
+Global time range constraint for time-based data exploration.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c4e67c" class="outline-3">
+<h3 id="org2c4e67c">Q42: Why time filtering is important?</h3>
+<div class="outline-text-3" id="text-org2c4e67c">
+<p>
+Narrows search scope for speed and relevance.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf3e4cfe" class="outline-3">
+<h3 id="orgf3e4cfe">Q43: What is ingestion pipeline concept?</h3>
+<div class="outline-text-3" id="text-orgf3e4cfe">
+<p>
+Preprocessing documents before indexing (enrich/transform/parse).
+</p>
+</div>
+</div>
+<div id="outline-container-org38a9f1e" class="outline-3">
+<h3 id="org38a9f1e">Q44: What is Logstash relation?</h3>
+<div class="outline-text-3" id="text-org38a9f1e">
+<p>
+Pipeline tool often used to ingest/transform data into Elasticsearch.
+</p>
+</div>
+</div>
+<div id="outline-container-org67a378e" class="outline-3">
+<h3 id="org67a378e">Q45: Beats relation to Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org67a378e">
+<p>
+Lightweight shippers (Filebeat/Metricbeat/etc.) for data collection.
+</p>
+</div>
+</div>
+<div id="outline-container-org39f7443" class="outline-3">
+<h3 id="org39f7443">Q46: What is beginner anti-pattern in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org39f7443">
+<p>
+Using default mappings for all fields without planning.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4aa268" class="outline-3">
+<h3 id="orgd4aa268">Q47: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgd4aa268">
+<p>
+Storing extremely high-cardinality fields without purpose.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc9c0c02" class="outline-3">
+<h3 id="orgc9c0c02">Q48: Beginner reliability baseline?</h3>
+<div class="outline-text-3" id="text-orgc9c0c02">
+<p>
+Replicas enabled and basic snapshot strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-org3ddaaa6" class="outline-3">
+<h3 id="org3ddaaa6">Q49: Beginner performance baseline?</h3>
+<div class="outline-text-3" id="text-org3ddaaa6">
+<p>
+Right field types and controlled shard count.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcbbf256" class="outline-3">
+<h3 id="orgcbbf256">Q50: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-orgcbbf256">
+<p>
+Authentication, TLS, and role-based access enabled.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd03b9c1" class="outline-3">
+<h3 id="orgd03b9c1">Q51: What is snapshot in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-orgd03b9c1">
+<p>
+Backup mechanism storing index data/metadata in repository.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d2c9c6" class="outline-3">
+<h3 id="org5d2c9c6">Q52: Why snapshots matter?</h3>
+<div class="outline-text-3" id="text-org5d2c9c6">
+<p>
+Primary disaster recovery method for clusters.
+</p>
+</div>
+</div>
+<div id="outline-container-org25b18c5" class="outline-3">
+<h3 id="org25b18c5">Q53: What is reindex API?</h3>
+<div class="outline-text-3" id="text-org25b18c5">
+<p>
+Copy/transform documents from one index to another.
+</p>
+</div>
+</div>
+<div id="outline-container-orga1112b8" class="outline-3">
+<h3 id="orga1112b8">Q54: Why reindex is common?</h3>
+<div class="outline-text-3" id="text-orga1112b8">
+<p>
+Schema evolution and index migration tasks.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4b74a8" class="outline-3">
+<h3 id="orgd4b74a8">Q55: What is alias in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-orgd4b74a8">
+<p>
+Logical name pointing to one or more indices.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec036d6" class="outline-3">
+<h3 id="orgec036d6">Q56: Alias benefit?</h3>
+<div class="outline-text-3" id="text-orgec036d6">
+<p>
+Decouple application index name from physical index versions.
+</p>
+</div>
+</div>
+<div id="outline-container-org0600a37" class="outline-3">
+<h3 id="org0600a37">Q57: What is rollover concept?</h3>
+<div class="outline-text-3" id="text-org0600a37">
+<p>
+Create new write index when size/age/doc thresholds reached.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd0b1da1" class="outline-3">
+<h3 id="orgd0b1da1">Q58: Why rollover helps?</h3>
+<div class="outline-text-3" id="text-orgd0b1da1">
+<p>
+Manage index growth and retention efficiently.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e248df" class="outline-3">
+<h3 id="org2e248df">Q59: Beginner workflow principle?</h3>
+<div class="outline-text-3" id="text-org2e248df">
+<p>
+Design mappings and lifecycle before scaling ingestion.
+</p>
+</div>
+</div>
+<div id="outline-container-org033e6d3" class="outline-3">
+<h3 id="org033e6d3">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org033e6d3">
+<p>
+Treat search schema as a product contract.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org51e763e" class="outline-2">
+<h2 id="org51e763e">Intermediate</h2>
+<div class="outline-text-2" id="text-org51e763e">
+</div>
+<div id="outline-container-org05595cb" class="outline-3">
+<h3 id="org05595cb">Q61: What is multi-field mapping?</h3>
+<div class="outline-text-3" id="text-org05595cb">
+<p>
+Index same field in multiple ways (e.g., text + keyword).
+</p>
+</div>
+</div>
+<div id="outline-container-org43c9a2e" class="outline-3">
+<h3 id="org43c9a2e">Q62: Why multi-fields are useful?</h3>
+<div class="outline-text-3" id="text-org43c9a2e">
+<p>
+Support both full-text and exact-match aggregations on same data.
+</p>
+</div>
+</div>
+<div id="outline-container-org001ee01" class="outline-3">
+<h3 id="org001ee01">Q63: What is custom analyzer use case?</h3>
+<div class="outline-text-3" id="text-org001ee01">
+<p>
+Language-specific stemming, synonyms, edge n-grams, normalization.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd65f2c8" class="outline-3">
+<h3 id="orgd65f2c8">Q64: What is normalizer?</h3>
+<div class="outline-text-3" id="text-orgd65f2c8">
+<p>
+Analyzer-like processing for keyword fields (no tokenization).
+</p>
+</div>
+</div>
+<div id="outline-container-org9add51a" class="outline-3">
+<h3 id="org9add51a">Q65: What is synonym filter?</h3>
+<div class="outline-text-3" id="text-org9add51a">
+<p>
+Expands equivalent terms during analysis or query time.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3571fb" class="outline-3">
+<h3 id="orgd3571fb">Q66: Synonym management pitfall?</h3>
+<div class="outline-text-3" id="text-orgd3571fb">
+<p>
+Incorrect expansion can reduce precision and relevance quality.
+</p>
+</div>
+</div>
+<div id="outline-container-org2eda5fe" class="outline-3">
+<h3 id="org2eda5fe">Q67: What is stemming?</h3>
+<div class="outline-text-3" id="text-org2eda5fe">
+<p>
+Reducing words to root forms for broader matching.
+</p>
+</div>
+</div>
+<div id="outline-container-org236f150" class="outline-3">
+<h3 id="org236f150">Q68: What is fuzziness in match queries?</h3>
+<div class="outline-text-3" id="text-org236f150">
+<p>
+Tolerance for edit distance typos.
+</p>
+</div>
+</div>
+<div id="outline-container-org425c772" class="outline-3">
+<h3 id="org425c772">Q69: Fuzzy query tradeoff?</h3>
+<div class="outline-text-3" id="text-org425c772">
+<p>
+Better recall vs potentially higher query cost/noise.
+</p>
+</div>
+</div>
+<div id="outline-container-org9fec75c" class="outline-3">
+<h3 id="org9fec75c">Q70: What is minimum<sub>should</sub><sub>match</sub>?</h3>
+<div class="outline-text-3" id="text-org9fec75c">
+<p>
+Controls required should-clause match proportion/count.
+</p>
+</div>
+</div>
+<div id="outline-container-org7342817" class="outline-3">
+<h3 id="org7342817">Q71: What is boosting?</h3>
+<div class="outline-text-3" id="text-org7342817">
+<p>
+Increasing influence of fields/clauses on relevance ranking.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb80b5b" class="outline-3">
+<h3 id="orgbb80b5b">Q72: What is function<sub>score</sub> query?</h3>
+<div class="outline-text-3" id="text-orgbb80b5b">
+<p>
+Custom scoring based on numeric signals/functions.
+</p>
+</div>
+</div>
+<div id="outline-container-org3fc01cd" class="outline-3">
+<h3 id="org3fc01cd">Q73: What is nested field type?</h3>
+<div class="outline-text-3" id="text-org3fc01cd">
+<p>
+Model arrays of objects preserving per-object field relationships.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd98f4e4" class="outline-3">
+<h3 id="orgd98f4e4">Q74: Why nested queries needed?</h3>
+<div class="outline-text-3" id="text-orgd98f4e4">
+<p>
+Avoid cross-object matching errors in arrays of objects.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc628811" class="outline-3">
+<h3 id="orgc628811">Q75: What is parent-child join?</h3>
+<div class="outline-text-3" id="text-orgc628811">
+<p>
+Relationship model across documents in same index (specialized use).
+</p>
+</div>
+</div>
+<div id="outline-container-org2910fa8" class="outline-3">
+<h3 id="org2910fa8">Q76: Parent-child tradeoff?</h3>
+<div class="outline-text-3" id="text-org2910fa8">
+<p>
+Flexibility vs query/indexing complexity and overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf33fdc4" class="outline-3">
+<h3 id="orgf33fdc4">Q77: What is runtime field?</h3>
+<div class="outline-text-3" id="text-orgf33fdc4">
+<p>
+Field computed at query time without full reindex.
+</p>
+</div>
+</div>
+<div id="outline-container-org730afe4" class="outline-3">
+<h3 id="org730afe4">Q78: Runtime field tradeoff?</h3>
+<div class="outline-text-3" id="text-org730afe4">
+<p>
+Flexibility vs higher query-time cost.
+</p>
+</div>
+</div>
+<div id="outline-container-org88c85f1" class="outline-3">
+<h3 id="org88c85f1">Q79: What is doc<sub>values</sub>?</h3>
+<div class="outline-text-3" id="text-org88c85f1">
+<p>
+Columnar storage for sorting/aggregations/script access.
+</p>
+</div>
+</div>
+<div id="outline-container-org88b868c" class="outline-3">
+<h3 id="org88b868c">Q80: Why doc<sub>values</sub> matter?</h3>
+<div class="outline-text-3" id="text-org88b868c">
+<p>
+Efficient aggregations and sorting on disk-backed structures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf77041b" class="outline-3">
+<h3 id="orgf77041b">Q81: What is fielddata?</h3>
+<div class="outline-text-3" id="text-orgf77041b">
+<p>
+Heap-based data structure for text aggregations/sorts (costly).
+</p>
+</div>
+</div>
+<div id="outline-container-org5efed20" class="outline-3">
+<h3 id="org5efed20">Q82: Why avoid fielddata on text generally?</h3>
+<div class="outline-text-3" id="text-org5efed20">
+<p>
+High memory usage; prefer keyword multi-fields.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8cdf6f" class="outline-3">
+<h3 id="orgf8cdf6f">Q83: What is refresh interval?</h3>
+<div class="outline-text-3" id="text-orgf8cdf6f">
+<p>
+Frequency making indexed docs searchable (near real-time behavior).
+</p>
+</div>
+</div>
+<div id="outline-container-org38aed11" class="outline-3">
+<h3 id="org38aed11">Q84: Lower refresh interval tradeoff?</h3>
+<div class="outline-text-3" id="text-org38aed11">
+<p>
+Faster visibility vs higher indexing overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc2d17ea" class="outline-3">
+<h3 id="orgc2d17ea">Q85: What is translog?</h3>
+<div class="outline-text-3" id="text-orgc2d17ea">
+<p>
+Write-ahead transaction log for durability/recovery.
+</p>
+</div>
+</div>
+<div id="outline-container-org10456ce" class="outline-3">
+<h3 id="org10456ce">Q86: What is segment in Lucene context?</h3>
+<div class="outline-text-3" id="text-org10456ce">
+<p>
+Immutable index file unit created during indexing.
+</p>
+</div>
+</div>
+<div id="outline-container-org02d2744" class="outline-3">
+<h3 id="org02d2744">Q87: What is merge process?</h3>
+<div class="outline-text-3" id="text-org02d2744">
+<p>
+Background compaction of segments for efficiency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4420fc" class="outline-3">
+<h3 id="orgd4420fc">Q88: Merge impact concern?</h3>
+<div class="outline-text-3" id="text-orgd4420fc">
+<p>
+I/O and CPU spikes affecting query/index performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org33608aa" class="outline-3">
+<h3 id="org33608aa">Q89: What is index template?</h3>
+<div class="outline-text-3" id="text-org33608aa">
+<p>
+Reusable settings/mappings/aliases for new indices or data streams.
+</p>
+</div>
+</div>
+<div id="outline-container-org2940582" class="outline-3">
+<h3 id="org2940582">Q90: Component template?</h3>
+<div class="outline-text-3" id="text-org2940582">
+<p>
+Composable reusable part of index template.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbcbab7a" class="outline-3">
+<h3 id="orgbcbab7a">Q91: What is ILM?</h3>
+<div class="outline-text-3" id="text-orgbcbab7a">
+<p>
+Index Lifecycle Management automating rollover, warm/cold/delete phases.
+</p>
+</div>
+</div>
+<div id="outline-container-org8028d7b" class="outline-3">
+<h3 id="org8028d7b">Q92: Why ILM is important?</h3>
+<div class="outline-text-3" id="text-org8028d7b">
+<p>
+Cost control and retention governance at scale.
+</p>
+</div>
+</div>
+<div id="outline-container-org6daff55" class="outline-3">
+<h3 id="org6daff55">Q93: What is data stream?</h3>
+<div class="outline-text-3" id="text-org6daff55">
+<p>
+Time-series abstraction managing backing indices automatically.
+</p>
+</div>
+</div>
+<div id="outline-container-org72c5e91" class="outline-3">
+<h3 id="org72c5e91">Q94: Data stream vs classic index?</h3>
+<div class="outline-text-3" id="text-org72c5e91">
+<p>
+Optimized write-once append-heavy time-series lifecycle workflows.
+</p>
+</div>
+</div>
+<div id="outline-container-orgec5207b" class="outline-3">
+<h3 id="orgec5207b">Q95: What is ingest pipeline processor?</h3>
+<div class="outline-text-3" id="text-orgec5207b">
+<p>
+Built-in transform step (grok, date, geoip, set, remove, etc.).
+</p>
+</div>
+</div>
+<div id="outline-container-orgb7535c3" class="outline-3">
+<h3 id="orgb7535c3">Q96: What is grok processor?</h3>
+<div class="outline-text-3" id="text-orgb7535c3">
+<p>
+Pattern-based text parsing into structured fields.
+</p>
+</div>
+</div>
+<div id="outline-container-org503c5f0" class="outline-3">
+<h3 id="org503c5f0">Q97: What is painless scripting?</h3>
+<div class="outline-text-3" id="text-org503c5f0">
+<p>
+Elasticsearch scripting language for updates, scoring, transforms.
+</p>
+</div>
+</div>
+<div id="outline-container-orgef88d37" class="outline-3">
+<h3 id="orgef88d37">Q98: Scripting risk?</h3>
+<div class="outline-text-3" id="text-orgef88d37">
+<p>
+Performance and security implications if overused/unbounded.
+</p>
+</div>
+</div>
+<div id="outline-container-org44938d3" class="outline-3">
+<h3 id="org44938d3">Q99: What is circuit breaker in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-org44938d3">
+<p>
+Protective limit preventing out-of-memory from expensive operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orgef3b95d" class="outline-3">
+<h3 id="orgef3b95d">Q100: What is query cache?</h3>
+<div class="outline-text-3" id="text-orgef3b95d">
+<p>
+Cache for filter context results to accelerate repeated queries.
+</p>
+</div>
+</div>
+<div id="outline-container-orga1000f5" class="outline-3">
+<h3 id="orga1000f5">Q101: What is request cache?</h3>
+<div class="outline-text-3" id="text-orga1000f5">
+<p>
+Cache for aggregation-heavy identical requests (conditions apply).
+</p>
+</div>
+</div>
+<div id="outline-container-orgb5f3f67" class="outline-3">
+<h3 id="orgb5f3f67">Q102: What is search<sub>after</sub>?</h3>
+<div class="outline-text-3" id="text-orgb5f3f67">
+<p>
+Efficient deep pagination using sort values from previous page.
+</p>
+</div>
+</div>
+<div id="outline-container-org1f05b92" class="outline-3">
+<h3 id="org1f05b92">Q103: search<sub>after</sub> vs scroll?</h3>
+<div class="outline-text-3" id="text-org1f05b92">
+<p>
+search<sub>after</sub> for user pagination; scroll for large batch extraction/reprocessing.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd864f11" class="outline-3">
+<h3 id="orgd864f11">Q104: What is point-in-time (PIT)?</h3>
+<div class="outline-text-3" id="text-orgd864f11">
+<p>
+Consistent search snapshot context for paginated queries.
+</p>
+</div>
+</div>
+<div id="outline-container-orga787479" class="outline-3">
+<h3 id="orga787479">Q105: What is slowlog?</h3>
+<div class="outline-text-3" id="text-orga787479">
+<p>
+Logs slow indexing/search operations for tuning diagnostics.
+</p>
+</div>
+</div>
+<div id="outline-container-orge1ec19e" class="outline-3">
+<h3 id="orge1ec19e">Q106: What is hot-warm-cold architecture?</h3>
+<div class="outline-text-3" id="text-orge1ec19e">
+<p>
+Tiered node roles/storage classes by data age/access frequency.
+</p>
+</div>
+</div>
+<div id="outline-container-org4174b67" class="outline-3">
+<h3 id="org4174b67">Q107: Why data tiers help?</h3>
+<div class="outline-text-3" id="text-org4174b67">
+<p>
+Optimize cost-performance across retention lifecycle.
+</p>
+</div>
+</div>
+<div id="outline-container-org2b2b2a3" class="outline-3">
+<h3 id="org2b2b2a3">Q108: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-org2b2b2a3">
+<p>
+Too many tiny shards causing overhead and poor performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c6e2a0" class="outline-3">
+<h3 id="org4c6e2a0">Q109: Better shard strategy?</h3>
+<div class="outline-text-3" id="text-org4c6e2a0">
+<p>
+Right-size shard count based on data volume and query patterns.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf2207b3" class="outline-3">
+<h3 id="orgf2207b3">Q110: What is shard rebalancing?</h3>
+<div class="outline-text-3" id="text-orgf2207b3">
+<p>
+Redistributing shards across nodes for balance/resilience.
+</p>
+</div>
+</div>
+<div id="outline-container-org5e194d9" class="outline-3">
+<h3 id="org5e194d9">Q111: What is allocation awareness?</h3>
+<div class="outline-text-3" id="text-org5e194d9">
+<p>
+Shard placement respecting zones/racks for fault tolerance.
+</p>
+</div>
+</div>
+<div id="outline-container-org7dbaa21" class="outline-3">
+<h3 id="org7dbaa21">Q112: What is Kibana Lens?</h3>
+<div class="outline-text-3" id="text-org7dbaa21">
+<p>
+User-friendly drag-and-drop visualization builder.
+</p>
+</div>
+</div>
+<div id="outline-container-orge2d6d30" class="outline-3">
+<h3 id="orge2d6d30">Q113: What is Kibana alerting concept?</h3>
+<div class="outline-text-3" id="text-orge2d6d30">
+<p>
+Rule engine for threshold/query/anomaly notifications.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf79400f" class="outline-3">
+<h3 id="orgf79400f">Q114: What is watcher/alert action use?</h3>
+<div class="outline-text-3" id="text-orgf79400f">
+<p>
+Send notifications/webhooks/tickets on conditions.
+</p>
+</div>
+</div>
+<div id="outline-container-org50e3b32" class="outline-3">
+<h3 id="org50e3b32">Q115: What is RBAC in Elastic Stack?</h3>
+<div class="outline-text-3" id="text-org50e3b32">
+<p>
+Role-based permissions for indices, features, spaces.
+</p>
+</div>
+</div>
+<div id="outline-container-org6461f73" class="outline-3">
+<h3 id="org6461f73">Q116: What are Kibana spaces?</h3>
+<div class="outline-text-3" id="text-org6461f73">
+<p>
+Logical UI separation for dashboards/saved objects/access control.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd46b5e" class="outline-3">
+<h3 id="orgfd46b5e">Q117: Intermediate observability baseline?</h3>
+<div class="outline-text-3" id="text-orgfd46b5e">
+<p>
+Track query latency, indexing throughput, JVM heap, shard states.
+</p>
+</div>
+</div>
+<div id="outline-container-org9cecd89" class="outline-3">
+<h3 id="org9cecd89">Q118: Intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-org9cecd89">
+<p>
+TLS everywhere, least-privilege roles, audit logging.
+</p>
+</div>
+</div>
+<div id="outline-container-org01cfdae" class="outline-3">
+<h3 id="org01cfdae">Q119: Intermediate reliability baseline?</h3>
+<div class="outline-text-3" id="text-org01cfdae">
+<p>
+Snapshot automation and restore drills.
+</p>
+</div>
+</div>
+<div id="outline-container-org481f0a5" class="outline-3">
+<h3 id="org481f0a5">Q120: Intermediate governance baseline?</h3>
+<div class="outline-text-3" id="text-org481f0a5">
+<p>
+Template/mapping standards and lifecycle policies.
+</p>
+</div>
+</div>
+<div id="outline-container-org366551d" class="outline-3">
+<h3 id="org366551d">Q121: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-org366551d">
+<p>
+Team can evolve mappings with minimal downtime.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcdb8d26" class="outline-3">
+<h3 id="orgcdb8d26">Q122: Intermediate ops principle?</h3>
+<div class="outline-text-3" id="text-orgcdb8d26">
+<p>
+Benchmark before and after major schema/query changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org1663185" class="outline-3">
+<h3 id="org1663185">Q123: Intermediate cost principle?</h3>
+<div class="outline-text-3" id="text-org1663185">
+<p>
+Use ILM tiers and prune unused fields aggressively.
+</p>
+</div>
+</div>
+<div id="outline-container-org8c3115d" class="outline-3">
+<h3 id="org8c3115d">Q124: Intermediate architecture principle?</h3>
+<div class="outline-text-3" id="text-org8c3115d">
+<p>
+Separate ingest-heavy and query-heavy workloads when needed.
+</p>
+</div>
+</div>
+<div id="outline-container-org8502d2b" class="outline-3">
+<h3 id="org8502d2b">Q125: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org8502d2b">
+<p>
+Design for predictable performance under realistic load.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc4d9710" class="outline-2">
+<h2 id="orgc4d9710">Advanced</h2>
+<div class="outline-text-2" id="text-orgc4d9710">
+</div>
+<div id="outline-container-org7b637d8" class="outline-3">
+<h3 id="org7b637d8">Q126: What is cluster coordination role (master-eligible nodes)?</h3>
+<div class="outline-text-3" id="text-org7b637d8">
+<p>
+Manage cluster state updates and shard allocation decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org271907d" class="outline-3">
+<h3 id="org271907d">Q127: Why dedicated master nodes?</h3>
+<div class="outline-text-3" id="text-org271907d">
+<p>
+Improve cluster stability by isolating coordination workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org3dd6f46" class="outline-3">
+<h3 id="org3dd6f46">Q128: What is split-brain risk (historical concept)?</h3>
+<div class="outline-text-3" id="text-org3dd6f46">
+<p>
+Cluster partition leading to conflicting masters/state (mitigated by modern coordination).
+</p>
+</div>
+</div>
+<div id="outline-container-org56fdf7d" class="outline-3">
+<h3 id="org56fdf7d">Q129: What is quorum relevance in cluster state?</h3>
+<div class="outline-text-3" id="text-org56fdf7d">
+<p>
+Majority decisions protect consistency during failures.
+</p>
+</div>
+</div>
+<div id="outline-container-org273c93d" class="outline-3">
+<h3 id="org273c93d">Q130: What is cluster state size challenge?</h3>
+<div class="outline-text-3" id="text-org273c93d">
+<p>
+Large mappings/indices can slow state publication and operations.
+</p>
+</div>
+</div>
+<div id="outline-container-orge40bbf6" class="outline-3">
+<h3 id="orge40bbf6">Q131: Cluster state optimization tactics?</h3>
+<div class="outline-text-3" id="text-orge40bbf6">
+<p>
+Template discipline, field limits, index count control.
+</p>
+</div>
+</div>
+<div id="outline-container-org53d9f1d" class="outline-3">
+<h3 id="org53d9f1d">Q132: What is mapping explosion?</h3>
+<div class="outline-text-3" id="text-org53d9f1d">
+<p>
+Excessive unique fields causing memory/state/performance problems.
+</p>
+</div>
+</div>
+<div id="outline-container-org619a11e" class="outline-3">
+<h3 id="org619a11e">Q133: Mapping explosion mitigation?</h3>
+<div class="outline-text-3" id="text-org619a11e">
+<p>
+dynamic: strict/false, field caps, ingestion normalization.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbcc8135" class="outline-3">
+<h3 id="orgbcc8135">Q134: What is index sorting?</h3>
+<div class="outline-text-3" id="text-orgbcc8135">
+<p>
+Pre-sorting segments by fields to accelerate certain queries.
+</p>
+</div>
+</div>
+<div id="outline-container-orgff44cf2" class="outline-3">
+<h3 id="orgff44cf2">Q135: Index sorting tradeoff?</h3>
+<div class="outline-text-3" id="text-orgff44cf2">
+<p>
+Faster query patterns vs indexing overhead and rigidity.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb3f01cb" class="outline-3">
+<h3 id="orgb3f01cb">Q136: What is kNN/vector search in Elasticsearch?</h3>
+<div class="outline-text-3" id="text-orgb3f01cb">
+<p>
+Approximate nearest-neighbor search over dense vector embeddings.
+</p>
+</div>
+</div>
+<div id="outline-container-org717a007" class="outline-3">
+<h3 id="org717a007">Q137: Hybrid search concept?</h3>
+<div class="outline-text-3" id="text-org717a007">
+<p>
+Combine lexical BM25 and vector semantic retrieval.
+</p>
+</div>
+</div>
+<div id="outline-container-org4798061" class="outline-3">
+<h3 id="org4798061">Q138: Why hybrid search is useful?</h3>
+<div class="outline-text-3" id="text-org4798061">
+<p>
+Balances precision of keyword with semantic recall.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad80066" class="outline-3">
+<h3 id="orgad80066">Q139: What is relevance tuning lifecycle?</h3>
+<div class="outline-text-3" id="text-orgad80066">
+<p>
+Offline judgments + online metrics + iterative analyzer/query adjustments.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd34500" class="outline-3">
+<h3 id="orgfd34500">Q140: What is search quality metric example?</h3>
+<div class="outline-text-3" id="text-orgfd34500">
+<p>
+NDCG, precision@k, recall@k (evaluation-dependent).
+</p>
+</div>
+</div>
+<div id="outline-container-org93afada" class="outline-3">
+<h3 id="org93afada">Q141: What is cross-cluster search (CCS)?</h3>
+<div class="outline-text-3" id="text-org93afada">
+<p>
+Query multiple clusters from one coordinating endpoint.
+</p>
+</div>
+</div>
+<div id="outline-container-org7421622" class="outline-3">
+<h3 id="org7421622">Q142: What is cross-cluster replication (CCR)?</h3>
+<div class="outline-text-3" id="text-org7421622">
+<p>
+Replicate indices between clusters for DR/locality.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2292e3" class="outline-3">
+<h3 id="orgd2292e3">Q143: CCR use cases?</h3>
+<div class="outline-text-3" id="text-orgd2292e3">
+<p>
+Disaster recovery, geo-distributed read locality.
+</p>
+</div>
+</div>
+<div id="outline-container-org8565a83" class="outline-3">
+<h3 id="org8565a83">Q144: What is snapshot lifecycle management (SLM)?</h3>
+<div class="outline-text-3" id="text-org8565a83">
+<p>
+Automates snapshot scheduling and retention.
+</p>
+</div>
+</div>
+<div id="outline-container-org699fcba" class="outline-3">
+<h3 id="org699fcba">Q145: Why SLM + ILM together?</h3>
+<div class="outline-text-3" id="text-org699fcba">
+<p>
+Coordinate backup and retention across data lifecycle.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc544269" class="outline-3">
+<h3 id="orgc544269">Q146: What is zero-downtime reindex pattern?</h3>
+<div class="outline-text-3" id="text-orgc544269">
+<p>
+Create new index version, reindex, swap alias atomically.
+</p>
+</div>
+</div>
+<div id="outline-container-orga3a111f" class="outline-3">
+<h3 id="orga3a111f">Q147: Why alias swap is powerful?</h3>
+<div class="outline-text-3" id="text-orga3a111f">
+<p>
+Instant cutover with rollback option.
+</p>
+</div>
+</div>
+<div id="outline-container-org3df9885" class="outline-3">
+<h3 id="org3df9885">Q148: What is write alias pattern?</h3>
+<div class="outline-text-3" id="text-org3df9885">
+<p>
+Stable logical write target pointing to current active index.
+</p>
+</div>
+</div>
+<div id="outline-container-orgef0804a" class="outline-3">
+<h3 id="orgef0804a">Q149: What is ingestion backpressure concern?</h3>
+<div class="outline-text-3" id="text-orgef0804a">
+<p>
+Input rate exceeds indexing capacity causing lag/failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeee039a" class="outline-3">
+<h3 id="orgeee039a">Q150: Backpressure mitigation?</h3>
+<div class="outline-text-3" id="text-orgeee039a">
+<p>
+Queue buffering, bulk tuning, scaling ingest nodes, pipeline optimization.
+</p>
+</div>
+</div>
+<div id="outline-container-org0a2491d" class="outline-3">
+<h3 id="org0a2491d">Q151: What is bulk API?</h3>
+<div class="outline-text-3" id="text-org0a2491d">
+<p>
+Efficient batched indexing/update/delete request format.
+</p>
+</div>
+</div>
+<div id="outline-container-org0218f0c" class="outline-3">
+<h3 id="org0218f0c">Q152: Bulk sizing tradeoff?</h3>
+<div class="outline-text-3" id="text-org0218f0c">
+<p>
+Too small wastes overhead; too large increases memory/latency risk.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f63185" class="outline-3">
+<h3 id="org3f63185">Q153: What is refresh/replica tuning during bulk loads?</h3>
+<div class="outline-text-3" id="text-org3f63185">
+<p>
+Temporarily reduce refresh frequency/replicas for faster ingestion (with risk controls).
+</p>
+</div>
+</div>
+<div id="outline-container-org9847812" class="outline-3">
+<h3 id="org9847812">Q154: What is advanced cache pitfall?</h3>
+<div class="outline-text-3" id="text-org9847812">
+<p>
+Low-selectivity/high-churn queries reduce cache effectiveness.
+</p>
+</div>
+</div>
+<div id="outline-container-org163f93d" class="outline-3">
+<h3 id="org163f93d">Q155: What is query profiling?</h3>
+<div class="outline-text-3" id="text-org163f93d">
+<p>
+Detailed breakdown of query execution phases for optimization.
+</p>
+</div>
+</div>
+<div id="outline-container-org21580b6" class="outline-3">
+<h3 id="org21580b6">Q156: What is security hardening baseline at scale?</h3>
+<div class="outline-text-3" id="text-org21580b6">
+<p>
+mTLS, fine-grained roles, encrypted snapshots, network segmentation.
+</p>
+</div>
+</div>
+<div id="outline-container-org2844f69" class="outline-3">
+<h3 id="org2844f69">Q157: What is field-level/document-level security?</h3>
+<div class="outline-text-3" id="text-org2844f69">
+<p>
+Restrict access to specific fields/docs by roles/policies.
+</p>
+</div>
+</div>
+<div id="outline-container-org1678e8e" class="outline-3">
+<h3 id="org1678e8e">Q158: What is compliance concern for logs/search data?</h3>
+<div class="outline-text-3" id="text-org1678e8e">
+<p>
+PII retention, right-to-delete, auditability, regional regulations.
+</p>
+</div>
+</div>
+<div id="outline-container-orga2b46f7" class="outline-3">
+<h3 id="orga2b46f7">Q159: Data minimization strategy?</h3>
+<div class="outline-text-3" id="text-orga2b46f7">
+<p>
+Index only required fields and redact sensitive content at ingest.
+</p>
+</div>
+</div>
+<div id="outline-container-org8aeb5cd" class="outline-3">
+<h3 id="org8aeb5cd">Q160: What is noisy neighbor issue in shared clusters?</h3>
+<div class="outline-text-3" id="text-org8aeb5cd">
+<p>
+One tenant’s heavy indexing/query load degrades others.
+</p>
+</div>
+</div>
+<div id="outline-container-org652f7a3" class="outline-3">
+<h3 id="org652f7a3">Q161: Mitigation for noisy neighbors?</h3>
+<div class="outline-text-3" id="text-org652f7a3">
+<p>
+Separate clusters, quotas, index-level controls, workload isolation.
+</p>
+</div>
+</div>
+<div id="outline-container-org1080476" class="outline-3">
+<h3 id="org1080476">Q162: What is cost governance for Elastic?</h3>
+<div class="outline-text-3" id="text-org1080476">
+<p>
+Lifecycle tiers, frozen/cold storage, shard optimization, query budgets.
+</p>
+</div>
+</div>
+<div id="outline-container-org45fd378" class="outline-3">
+<h3 id="org45fd378">Q163: What is Kibana scale challenge?</h3>
+<div class="outline-text-3" id="text-org45fd378">
+<p>
+Dashboard/query sprawl causing backend load spikes.
+</p>
+</div>
+</div>
+<div id="outline-container-org4512982" class="outline-3">
+<h3 id="org4512982">Q164: Kibana governance tactics?</h3>
+<div class="outline-text-3" id="text-org4512982">
+<p>
+Review dashboards, enforce ownership, archive unused assets.
+</p>
+</div>
+</div>
+<div id="outline-container-orgae4db9f" class="outline-3">
+<h3 id="orgae4db9f">Q165: What is incident response with Elastic stack?</h3>
+<div class="outline-text-3" id="text-orgae4db9f">
+<p>
+Use logs/metrics/traces correlation and saved investigations/runbooks.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd1d1542" class="outline-3">
+<h3 id="orgd1d1542">Q166: What is observability convergence pattern?</h3>
+<div class="outline-text-3" id="text-orgd1d1542">
+<p>
+Combine Elasticsearch logs with metrics/traces for triage context.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ac27f0" class="outline-3">
+<h3 id="org9ac27f0">Q167: What is advanced anti-pattern?</h3>
+<div class="outline-text-3" id="text-org9ac27f0">
+<p>
+Treating Elasticsearch as primary OLTP database for heavy transactions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf29e5cc" class="outline-3">
+<h3 id="orgf29e5cc">Q168: Better architecture principle?</h3>
+<div class="outline-text-3" id="text-orgf29e5cc">
+<p>
+Use Elasticsearch for search/analytics; keep source of truth in transactional store.
+</p>
+</div>
+</div>
+<div id="outline-container-org913b56b" class="outline-3">
+<h3 id="org913b56b">Q169: What is DR strategy for Elastic clusters?</h3>
+<div class="outline-text-3" id="text-org913b56b">
+<p>
+Snapshots, tested restore, CCR where needed, infra-as-code rebuild paths.
+</p>
+</div>
+</div>
+<div id="outline-container-org7804249" class="outline-3">
+<h3 id="org7804249">Q170: Why test restore regularly?</h3>
+<div class="outline-text-3" id="text-org7804249">
+<p>
+Backup confidence requires proven recovery execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org59251a9" class="outline-3">
+<h3 id="org59251a9">Q171: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-org59251a9">
+<p>
+Plan shard/layout/lifecycle for failure scenarios, not ideal conditions.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ec0d3e" class="outline-3">
+<h3 id="org2ec0d3e">Q172: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-org2ec0d3e">
+<p>
+Tune mappings, queries, and shard strategy with production-like benchmarks.
+</p>
+</div>
+</div>
+<div id="outline-container-org567d58f" class="outline-3">
+<h3 id="org567d58f">Q173: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org567d58f">
+<p>
+Enforce least privilege and encryption across ingest, storage, and access.
+</p>
+</div>
+</div>
+<div id="outline-container-org4d453df" class="outline-3">
+<h3 id="org4d453df">Q174: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-org4d453df">
+<p>
+Schema and dashboard changes must be reviewed/versioned like code.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb954fd9" class="outline-3">
+<h3 id="orgb954fd9">Q175: What is final cost principle?</h3>
+<div class="outline-text-3" id="text-orgb954fd9">
+<p>
+Retention and tiering should reflect actual query value.
+</p>
+</div>
+</div>
+<div id="outline-container-orga9704f3" class="outline-3">
+<h3 id="orga9704f3">Q176: What is final scaling principle?</h3>
+<div class="outline-text-3" id="text-orga9704f3">
+<p>
+Scale horizontally with clear node roles and workload separation.
+</p>
+</div>
+</div>
+<div id="outline-container-org14ccbcd" class="outline-3">
+<h3 id="org14ccbcd">Q177: What is final search-quality principle?</h3>
+<div class="outline-text-3" id="text-org14ccbcd">
+<p>
+Continuously evaluate relevance with real user behavior and test sets.
+</p>
+</div>
+</div>
+<div id="outline-container-org15fee86" class="outline-3">
+<h3 id="org15fee86">Q178: What is final operations principle?</h3>
+<div class="outline-text-3" id="text-org15fee86">
+<p>
+Instrument cluster health and automate runbooks for common failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb5d9432" class="outline-3">
+<h3 id="orgb5d9432">Q179: What is final collaboration principle?</h3>
+<div class="outline-text-3" id="text-orgb5d9432">
+<p>
+Platform, data, and app teams co-own schema and search outcomes.
+</p>
+</div>
+</div>
+<div id="outline-container-orge89a457" class="outline-3">
+<h3 id="orge89a457">Q180: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-orge89a457">
+<p>
+Elasticsearch/Kibana excellence is secure, relevant, and operationally disciplined search at scale.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga036e51" class="outline-2">
+<h2 id="orga036e51">Bonus: Minimal Index Template Example (Conceptual)</h2>
+<div class="outline-text-2" id="text-orga036e51">
+<div class="org-src-container">
+<pre class="src src-json">{
+  "index_patterns": ["logs-app-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 3,
+      "number_of_replicas": 1
+    },
+    "mappings": {
+      "dynamic": "strict",
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "level": { "type": "keyword" },
+        "message": { "type": "text" },
+        "service": { "type": "keyword" },
+        "duration_ms": { "type": "long" }
+      }
+    }
+  }
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

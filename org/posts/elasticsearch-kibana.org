@@ -1,0 +1,581 @@
+#+title: Elasticsearch & Kibana
+#+date: 2026-08-13
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Elasticsearch & Kibana
+
+-----
+
+* Beginner
+
+** Q1: What is Elasticsearch?
+Elasticsearch is a distributed search and analytics engine built on Apache Lucene.
+
+** Q2: What is Kibana?
+Kibana is a visualization and management UI for Elasticsearch data.
+
+** Q3: Elasticsearch + Kibana in one line?
+Elasticsearch stores/searches data; Kibana explores/visualizes/manages it.
+
+** Q4: What is an index in Elasticsearch?
+Logical namespace containing related documents.
+
+** Q5: What is a document?
+JSON object stored and indexed in Elasticsearch.
+
+** Q6: What is a field?
+Key in a document with a typed value used for search/aggregation.
+
+** Q7: What is mapping?
+Schema definition describing field types and indexing behavior.
+
+** Q8: Why mappings matter?
+They control correctness, query behavior, and storage/performance characteristics.
+
+** Q9: What is dynamic mapping?
+Automatic field type inference when new fields appear.
+
+** Q10: Dynamic mapping risk?
+Mapping explosion and incorrect inferred types.
+
+** Q11: What is a shard?
+Partition of an index (Lucene index unit).
+
+** Q12: What is primary shard?
+Original shard holding authoritative indexed data segment.
+
+** Q13: What is replica shard?
+Copy of primary shard for high availability and read scaling.
+
+** Q14: Why replicas are useful?
+Fault tolerance and increased search throughput.
+
+** Q15: What is cluster in Elasticsearch?
+Group of nodes working together as one logical system.
+
+** Q16: What is node?
+Single Elasticsearch server instance in a cluster.
+
+** Q17: What is cluster health status?
+Green/yellow/red indicating shard allocation state.
+
+** Q18: Green vs yellow vs red?
+Green: all shards allocated; yellow: replicas unassigned; red: primaries unassigned.
+
+** Q19: What is inverted index?
+Data structure mapping terms to documents for fast full-text search.
+
+** Q20: What is analyzer?
+Pipeline that transforms text into searchable tokens.
+
+** Q21: Analyzer components?
+Character filters, tokenizer, token filters.
+
+** Q22: What is tokenization?
+Splitting text into terms/tokens during analysis.
+
+** Q23: What is keyword field type?
+Exact value field (not analyzed) for filtering/sorting/aggregations.
+
+** Q24: Text vs keyword quick rule?
+=text= for full-text search; =keyword= for exact matching and aggregations.
+
+** Q25: What is relevance score?
+Numeric ranking value indicating document match quality.
+
+** Q26: What is Query DSL?
+JSON-based query language for Elasticsearch searches.
+
+** Q27: What is match query?
+Full-text query using analyzer semantics.
+
+** Q28: What is term query?
+Exact term lookup (commonly for keyword/numeric fields).
+
+** Q29: What is bool query?
+Combines must/should/filter/must_not clauses.
+
+** Q30: Filter vs must difference?
+Filter is non-scoring and cache-friendly; must affects scoring.
+
+** Q31: What is aggregation?
+Analytics computation over documents (counts, stats, buckets).
+
+** Q32: Common aggregation example?
+Terms aggregation for top values by frequency.
+
+** Q33: What is range query?
+Find docs where field values fall within bounds.
+
+** Q34: What is wildcard query?
+Pattern-based term matching (can be expensive).
+
+** Q35: What is pagination in Elasticsearch?
+Returning result subsets via from/size or search_after.
+
+** Q36: What is from/size pitfall?
+Deep pagination cost grows significantly.
+
+** Q37: What is Kibana Discover?
+Interface for ad-hoc document exploration and filtering.
+
+** Q38: What is Kibana dashboard?
+Collection of visualizations for monitoring/analysis.
+
+** Q39: What is Kibana visualization?
+Chart/table/metric built from Elasticsearch queries/aggregations.
+
+** Q40: What is data view (index pattern concept)?
+Kibana definition selecting indices/fields for analysis.
+
+** Q41: What is time filter in Kibana?
+Global time range constraint for time-based data exploration.
+
+** Q42: Why time filtering is important?
+Narrows search scope for speed and relevance.
+
+** Q43: What is ingestion pipeline concept?
+Preprocessing documents before indexing (enrich/transform/parse).
+
+** Q44: What is Logstash relation?
+Pipeline tool often used to ingest/transform data into Elasticsearch.
+
+** Q45: Beats relation to Elasticsearch?
+Lightweight shippers (Filebeat/Metricbeat/etc.) for data collection.
+
+** Q46: What is beginner anti-pattern in Elasticsearch?
+Using default mappings for all fields without planning.
+
+** Q47: Another beginner anti-pattern?
+Storing extremely high-cardinality fields without purpose.
+
+** Q48: Beginner reliability baseline?
+Replicas enabled and basic snapshot strategy.
+
+** Q49: Beginner performance baseline?
+Right field types and controlled shard count.
+
+** Q50: Beginner security baseline?
+Authentication, TLS, and role-based access enabled.
+
+** Q51: What is snapshot in Elasticsearch?
+Backup mechanism storing index data/metadata in repository.
+
+** Q52: Why snapshots matter?
+Primary disaster recovery method for clusters.
+
+** Q53: What is reindex API?
+Copy/transform documents from one index to another.
+
+** Q54: Why reindex is common?
+Schema evolution and index migration tasks.
+
+** Q55: What is alias in Elasticsearch?
+Logical name pointing to one or more indices.
+
+** Q56: Alias benefit?
+Decouple application index name from physical index versions.
+
+** Q57: What is rollover concept?
+Create new write index when size/age/doc thresholds reached.
+
+** Q58: Why rollover helps?
+Manage index growth and retention efficiently.
+
+** Q59: Beginner workflow principle?
+Design mappings and lifecycle before scaling ingestion.
+
+** Q60: Beginner best practice?
+Treat search schema as a product contract.
+
+* Intermediate
+
+** Q61: What is multi-field mapping?
+Index same field in multiple ways (e.g., text + keyword).
+
+** Q62: Why multi-fields are useful?
+Support both full-text and exact-match aggregations on same data.
+
+** Q63: What is custom analyzer use case?
+Language-specific stemming, synonyms, edge n-grams, normalization.
+
+** Q64: What is normalizer?
+Analyzer-like processing for keyword fields (no tokenization).
+
+** Q65: What is synonym filter?
+Expands equivalent terms during analysis or query time.
+
+** Q66: Synonym management pitfall?
+Incorrect expansion can reduce precision and relevance quality.
+
+** Q67: What is stemming?
+Reducing words to root forms for broader matching.
+
+** Q68: What is fuzziness in match queries?
+Tolerance for edit distance typos.
+
+** Q69: Fuzzy query tradeoff?
+Better recall vs potentially higher query cost/noise.
+
+** Q70: What is minimum_should_match?
+Controls required should-clause match proportion/count.
+
+** Q71: What is boosting?
+Increasing influence of fields/clauses on relevance ranking.
+
+** Q72: What is function_score query?
+Custom scoring based on numeric signals/functions.
+
+** Q73: What is nested field type?
+Model arrays of objects preserving per-object field relationships.
+
+** Q74: Why nested queries needed?
+Avoid cross-object matching errors in arrays of objects.
+
+** Q75: What is parent-child join?
+Relationship model across documents in same index (specialized use).
+
+** Q76: Parent-child tradeoff?
+Flexibility vs query/indexing complexity and overhead.
+
+** Q77: What is runtime field?
+Field computed at query time without full reindex.
+
+** Q78: Runtime field tradeoff?
+Flexibility vs higher query-time cost.
+
+** Q79: What is doc_values?
+Columnar storage for sorting/aggregations/script access.
+
+** Q80: Why doc_values matter?
+Efficient aggregations and sorting on disk-backed structures.
+
+** Q81: What is fielddata?
+Heap-based data structure for text aggregations/sorts (costly).
+
+** Q82: Why avoid fielddata on text generally?
+High memory usage; prefer keyword multi-fields.
+
+** Q83: What is refresh interval?
+Frequency making indexed docs searchable (near real-time behavior).
+
+** Q84: Lower refresh interval tradeoff?
+Faster visibility vs higher indexing overhead.
+
+** Q85: What is translog?
+Write-ahead transaction log for durability/recovery.
+
+** Q86: What is segment in Lucene context?
+Immutable index file unit created during indexing.
+
+** Q87: What is merge process?
+Background compaction of segments for efficiency.
+
+** Q88: Merge impact concern?
+I/O and CPU spikes affecting query/index performance.
+
+** Q89: What is index template?
+Reusable settings/mappings/aliases for new indices or data streams.
+
+** Q90: Component template?
+Composable reusable part of index template.
+
+** Q91: What is ILM?
+Index Lifecycle Management automating rollover, warm/cold/delete phases.
+
+** Q92: Why ILM is important?
+Cost control and retention governance at scale.
+
+** Q93: What is data stream?
+Time-series abstraction managing backing indices automatically.
+
+** Q94: Data stream vs classic index?
+Optimized write-once append-heavy time-series lifecycle workflows.
+
+** Q95: What is ingest pipeline processor?
+Built-in transform step (grok, date, geoip, set, remove, etc.).
+
+** Q96: What is grok processor?
+Pattern-based text parsing into structured fields.
+
+** Q97: What is painless scripting?
+Elasticsearch scripting language for updates, scoring, transforms.
+
+** Q98: Scripting risk?
+Performance and security implications if overused/unbounded.
+
+** Q99: What is circuit breaker in Elasticsearch?
+Protective limit preventing out-of-memory from expensive operations.
+
+** Q100: What is query cache?
+Cache for filter context results to accelerate repeated queries.
+
+** Q101: What is request cache?
+Cache for aggregation-heavy identical requests (conditions apply).
+
+** Q102: What is search_after?
+Efficient deep pagination using sort values from previous page.
+
+** Q103: search_after vs scroll?
+search_after for user pagination; scroll for large batch extraction/reprocessing.
+
+** Q104: What is point-in-time (PIT)?
+Consistent search snapshot context for paginated queries.
+
+** Q105: What is slowlog?
+Logs slow indexing/search operations for tuning diagnostics.
+
+** Q106: What is hot-warm-cold architecture?
+Tiered node roles/storage classes by data age/access frequency.
+
+** Q107: Why data tiers help?
+Optimize cost-performance across retention lifecycle.
+
+** Q108: What is intermediate anti-pattern?
+Too many tiny shards causing overhead and poor performance.
+
+** Q109: Better shard strategy?
+Right-size shard count based on data volume and query patterns.
+
+** Q110: What is shard rebalancing?
+Redistributing shards across nodes for balance/resilience.
+
+** Q111: What is allocation awareness?
+Shard placement respecting zones/racks for fault tolerance.
+
+** Q112: What is Kibana Lens?
+User-friendly drag-and-drop visualization builder.
+
+** Q113: What is Kibana alerting concept?
+Rule engine for threshold/query/anomaly notifications.
+
+** Q114: What is watcher/alert action use?
+Send notifications/webhooks/tickets on conditions.
+
+** Q115: What is RBAC in Elastic Stack?
+Role-based permissions for indices, features, spaces.
+
+** Q116: What are Kibana spaces?
+Logical UI separation for dashboards/saved objects/access control.
+
+** Q117: Intermediate observability baseline?
+Track query latency, indexing throughput, JVM heap, shard states.
+
+** Q118: Intermediate security baseline?
+TLS everywhere, least-privilege roles, audit logging.
+
+** Q119: Intermediate reliability baseline?
+Snapshot automation and restore drills.
+
+** Q120: Intermediate governance baseline?
+Template/mapping standards and lifecycle policies.
+
+** Q121: Intermediate maturity signal?
+Team can evolve mappings with minimal downtime.
+
+** Q122: Intermediate ops principle?
+Benchmark before and after major schema/query changes.
+
+** Q123: Intermediate cost principle?
+Use ILM tiers and prune unused fields aggressively.
+
+** Q124: Intermediate architecture principle?
+Separate ingest-heavy and query-heavy workloads when needed.
+
+** Q125: Intermediate best practice?
+Design for predictable performance under realistic load.
+
+* Advanced
+
+** Q126: What is cluster coordination role (master-eligible nodes)?
+Manage cluster state updates and shard allocation decisions.
+
+** Q127: Why dedicated master nodes?
+Improve cluster stability by isolating coordination workload.
+
+** Q128: What is split-brain risk (historical concept)?
+Cluster partition leading to conflicting masters/state (mitigated by modern coordination).
+
+** Q129: What is quorum relevance in cluster state?
+Majority decisions protect consistency during failures.
+
+** Q130: What is cluster state size challenge?
+Large mappings/indices can slow state publication and operations.
+
+** Q131: Cluster state optimization tactics?
+Template discipline, field limits, index count control.
+
+** Q132: What is mapping explosion?
+Excessive unique fields causing memory/state/performance problems.
+
+** Q133: Mapping explosion mitigation?
+dynamic: strict/false, field caps, ingestion normalization.
+
+** Q134: What is index sorting?
+Pre-sorting segments by fields to accelerate certain queries.
+
+** Q135: Index sorting tradeoff?
+Faster query patterns vs indexing overhead and rigidity.
+
+** Q136: What is kNN/vector search in Elasticsearch?
+Approximate nearest-neighbor search over dense vector embeddings.
+
+** Q137: Hybrid search concept?
+Combine lexical BM25 and vector semantic retrieval.
+
+** Q138: Why hybrid search is useful?
+Balances precision of keyword with semantic recall.
+
+** Q139: What is relevance tuning lifecycle?
+Offline judgments + online metrics + iterative analyzer/query adjustments.
+
+** Q140: What is search quality metric example?
+NDCG, precision@k, recall@k (evaluation-dependent).
+
+** Q141: What is cross-cluster search (CCS)?
+Query multiple clusters from one coordinating endpoint.
+
+** Q142: What is cross-cluster replication (CCR)?
+Replicate indices between clusters for DR/locality.
+
+** Q143: CCR use cases?
+Disaster recovery, geo-distributed read locality.
+
+** Q144: What is snapshot lifecycle management (SLM)?
+Automates snapshot scheduling and retention.
+
+** Q145: Why SLM + ILM together?
+Coordinate backup and retention across data lifecycle.
+
+** Q146: What is zero-downtime reindex pattern?
+Create new index version, reindex, swap alias atomically.
+
+** Q147: Why alias swap is powerful?
+Instant cutover with rollback option.
+
+** Q148: What is write alias pattern?
+Stable logical write target pointing to current active index.
+
+** Q149: What is ingestion backpressure concern?
+Input rate exceeds indexing capacity causing lag/failures.
+
+** Q150: Backpressure mitigation?
+Queue buffering, bulk tuning, scaling ingest nodes, pipeline optimization.
+
+** Q151: What is bulk API?
+Efficient batched indexing/update/delete request format.
+
+** Q152: Bulk sizing tradeoff?
+Too small wastes overhead; too large increases memory/latency risk.
+
+** Q153: What is refresh/replica tuning during bulk loads?
+Temporarily reduce refresh frequency/replicas for faster ingestion (with risk controls).
+
+** Q154: What is advanced cache pitfall?
+Low-selectivity/high-churn queries reduce cache effectiveness.
+
+** Q155: What is query profiling?
+Detailed breakdown of query execution phases for optimization.
+
+** Q156: What is security hardening baseline at scale?
+mTLS, fine-grained roles, encrypted snapshots, network segmentation.
+
+** Q157: What is field-level/document-level security?
+Restrict access to specific fields/docs by roles/policies.
+
+** Q158: What is compliance concern for logs/search data?
+PII retention, right-to-delete, auditability, regional regulations.
+
+** Q159: Data minimization strategy?
+Index only required fields and redact sensitive content at ingest.
+
+** Q160: What is noisy neighbor issue in shared clusters?
+One tenant’s heavy indexing/query load degrades others.
+
+** Q161: Mitigation for noisy neighbors?
+Separate clusters, quotas, index-level controls, workload isolation.
+
+** Q162: What is cost governance for Elastic?
+Lifecycle tiers, frozen/cold storage, shard optimization, query budgets.
+
+** Q163: What is Kibana scale challenge?
+Dashboard/query sprawl causing backend load spikes.
+
+** Q164: Kibana governance tactics?
+Review dashboards, enforce ownership, archive unused assets.
+
+** Q165: What is incident response with Elastic stack?
+Use logs/metrics/traces correlation and saved investigations/runbooks.
+
+** Q166: What is observability convergence pattern?
+Combine Elasticsearch logs with metrics/traces for triage context.
+
+** Q167: What is advanced anti-pattern?
+Treating Elasticsearch as primary OLTP database for heavy transactions.
+
+** Q168: Better architecture principle?
+Use Elasticsearch for search/analytics; keep source of truth in transactional store.
+
+** Q169: What is DR strategy for Elastic clusters?
+Snapshots, tested restore, CCR where needed, infra-as-code rebuild paths.
+
+** Q170: Why test restore regularly?
+Backup confidence requires proven recovery execution.
+
+** Q171: What is final reliability principle?
+Plan shard/layout/lifecycle for failure scenarios, not ideal conditions.
+
+** Q172: What is final performance principle?
+Tune mappings, queries, and shard strategy with production-like benchmarks.
+
+** Q173: What is final security principle?
+Enforce least privilege and encryption across ingest, storage, and access.
+
+** Q174: What is final governance principle?
+Schema and dashboard changes must be reviewed/versioned like code.
+
+** Q175: What is final cost principle?
+Retention and tiering should reflect actual query value.
+
+** Q176: What is final scaling principle?
+Scale horizontally with clear node roles and workload separation.
+
+** Q177: What is final search-quality principle?
+Continuously evaluate relevance with real user behavior and test sets.
+
+** Q178: What is final operations principle?
+Instrument cluster health and automate runbooks for common failures.
+
+** Q179: What is final collaboration principle?
+Platform, data, and app teams co-own schema and search outcomes.
+
+** Q180: Final maturity principle?
+Elasticsearch/Kibana excellence is secure, relevant, and operationally disciplined search at scale.
+
+* Bonus: Minimal Index Template Example (Conceptual)
+
+#+BEGIN_SRC json
+{
+  "index_patterns": ["logs-app-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 3,
+      "number_of_replicas": 1
+    },
+    "mappings": {
+      "dynamic": "strict",
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "level": { "type": "keyword" },
+        "message": { "type": "text" },
+        "service": { "type": "keyword" },
+        "duration_ms": { "type": "long" }
+      }
+    }
+  }
+}
+#+END_SRC
