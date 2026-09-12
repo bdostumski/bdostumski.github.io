@@ -1,0 +1,611 @@
+#+title: Jenkins
+#+date: 2026-08-16
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Jenkins
+
+-----
+
+* Beginner
+
+** Q1: What is Jenkins?
+Jenkins is an open-source automation server used for CI/CD pipelines.
+
+** Q2: Why use Jenkins?
+It automates build, test, and deployment workflows.
+
+** Q3: What is CI in Jenkins context?
+Continuous Integration with automated validation on code changes.
+
+** Q4: What is CD in Jenkins context?
+Continuous Delivery/Deployment via automated release pipelines.
+
+** Q5: What is a Jenkins job?
+A configured task Jenkins executes (build/test/deploy/etc.).
+
+** Q6: What is a Jenkins pipeline?
+Pipeline-as-code workflow describing stages and steps.
+
+** Q7: What is Jenkinsfile?
+Text file defining Jenkins pipeline, versioned with code.
+
+** Q8: Why store Jenkinsfile in repo?
+Versioning, code review, reproducibility, and traceability.
+
+** Q9: What is freestyle job?
+Classic UI-configured Jenkins job type.
+
+** Q10: Freestyle vs pipeline?
+Freestyle is UI-centric; pipeline is code-centric and more scalable.
+
+** Q11: What is Jenkins controller (master)?
+Central server coordinating jobs, queue, and agents.
+
+** Q12: What is Jenkins agent (node)?
+Worker machine that runs build steps.
+
+** Q13: Why use agents?
+Distribute workload and isolate build environments.
+
+** Q14: What is executor in Jenkins?
+Slot on a node that runs one build at a time.
+
+** Q15: What is Jenkins queue?
+Pending builds waiting for available executors.
+
+** Q16: What is stage in pipeline?
+Logical phase like Build, Test, Deploy.
+
+** Q17: What is step in pipeline?
+Single command/action inside a stage.
+
+** Q18: What is plugin in Jenkins?
+Extension adding capabilities/integrations.
+
+** Q19: Why plugins are powerful?
+Jenkins can integrate with many tools via plugins.
+
+** Q20: Plugin risk?
+Too many/unmaintained plugins increase instability/security risk.
+
+** Q21: What is SCM integration in Jenkins?
+Connecting source repositories (Git, etc.) to trigger builds.
+
+** Q22: What triggers Jenkins builds?
+Webhook, polling, schedule, manual run, upstream job.
+
+** Q23: What is webhook trigger?
+SCM sends event to Jenkins on push/PR.
+
+** Q24: What is polling SCM?
+Jenkins periodically checks repo for changes.
+
+** Q25: Webhook vs polling?
+Webhook is near real-time and efficient; polling consumes more resources.
+
+** Q26: What is =build now=?
+Manual execution of a Jenkins job.
+
+** Q27: What is console output?
+Job logs displayed during/after build.
+
+** Q28: What is build artifact?
+Output file(s) archived from build (jar, zip, reports).
+
+** Q29: Why archive artifacts?
+Traceability and reuse in downstream stages/jobs.
+
+** Q30: What is parameterized build?
+Job accepting runtime input parameters.
+
+** Q31: Parameterized build use case?
+Choose environment/version/flags at run time.
+
+** Q32: What is environment variable in Jenkins?
+Runtime variable available to build steps.
+
+** Q33: What is credentials store?
+Secure storage for secrets (tokens/passwords/keys).
+
+** Q34: Why not hardcode secrets in Jenkinsfile?
+Security risk and difficult rotation.
+
+** Q35: What is credentials binding?
+Injecting secrets into pipeline scope securely.
+
+** Q36: What is =agent any= in declarative pipeline?
+Run on any available agent.
+
+** Q37: What is =agent none=?
+No global agent; stages define their own agents.
+
+** Q38: What is post section in Jenkins pipeline?
+Actions executed after pipeline/stage (success/failure/always).
+
+** Q39: What is =post { always { ... } }= useful for?
+Cleanup, artifact upload, notifications.
+
+** Q40: What is =when= condition in declarative pipeline?
+Conditional stage execution.
+
+** Q41: What is beginner Jenkins anti-pattern?
+Running all builds on controller node.
+
+** Q42: Why avoid controller builds?
+Security/performance/stability concerns.
+
+** Q43: What is workspace in Jenkins?
+Directory on node where build executes.
+
+** Q44: Why clean workspace?
+Avoid stale files affecting reproducibility.
+
+** Q45: What is =retry= in pipeline?
+Re-run failing block a limited number of times.
+
+** Q46: What is =timeout= step?
+Abort block if runtime exceeds threshold.
+
+** Q47: Why use timeout?
+Prevent hung builds consuming executors indefinitely.
+
+** Q48: What is fail-fast principle in Jenkins?
+Stop pipeline quickly on critical failure.
+
+** Q49: What is unstable build status?
+Build completed but with issues (e.g., test failures under configured behavior).
+
+** Q50: What is difference: failed vs unstable?
+Failed indicates execution failure; unstable indicates quality/test threshold issues.
+
+** Q51: Beginner security baseline?
+Use credentials store, RBAC, and secure agent communication.
+
+** Q52: Beginner reliability baseline?
+Pipeline-as-code, pinned tools, deterministic steps.
+
+** Q53: Beginner performance baseline?
+Parallelize independent tests and cache dependencies carefully.
+
+** Q54: What is Blue Ocean?
+Jenkins UI experience for visual pipeline editing/inspection (adoption varies).
+
+** Q55: What is Jenkins restart-safe pipeline concept?
+Pipeline durability to survive controller restarts (with proper setup).
+
+** Q56: Why keep Jenkins updated?
+Security patches and plugin compatibility improvements.
+
+** Q57: What is backup importance in Jenkins?
+Recover jobs/config/credentials references after failures.
+
+** Q58: Beginner team workflow?
+One Jenkinsfile per repo, reviewed via PR.
+
+** Q59: Beginner ops principle?
+Document build ownership and failure triage process.
+
+** Q60: Beginner best practice?
+Keep pipelines simple, secure, and observable first.
+
+* Intermediate
+
+** Q61: What is declarative pipeline?
+Structured Jenkins pipeline syntax with built-in conventions.
+
+** Q62: What is scripted pipeline?
+Groovy-based flexible pipeline for advanced control flows.
+
+** Q63: Declarative vs scripted tradeoff?
+Declarative readability vs scripted flexibility.
+
+** Q64: What is shared library in Jenkins?
+Reusable pipeline code loaded from centralized repository.
+
+** Q65: Why use shared libraries?
+Standardize logic and reduce duplicated pipeline code.
+
+** Q66: What is library version pinning?
+Lock shared library to specific version/tag for stability.
+
+** Q67: Shared library risk?
+Central change can break many pipelines if unmanaged.
+
+** Q68: What is multibranch pipeline?
+Automatically creates pipelines per branch/PR.
+
+** Q69: Multibranch benefit?
+Native branch discovery and branch-specific Jenkinsfile execution.
+
+** Q70: What is Organization Folder?
+Scans SCM org and manages many multibranch projects.
+
+** Q71: What is Jenkins Configuration as Code (JCasC)?
+Declarative YAML-based Jenkins configuration management.
+
+** Q72: Why use JCasC?
+Reproducible controller setup and easier disaster recovery.
+
+** Q73: What is seed job pattern?
+Bootstrap jobs/pipelines automatically (often with Job DSL).
+
+** Q74: What is Job DSL?
+Programmatic generation of Jenkins jobs from Groovy definitions.
+
+** Q75: Job DSL vs Jenkinsfile?
+Job DSL creates jobs; Jenkinsfile defines pipeline logic for a repo.
+
+** Q76: What is credentials scope in Jenkins?
+Global/system/folder scopes controlling secret visibility.
+
+** Q77: Why use folder-level credentials?
+Least privilege by limiting secret exposure.
+
+** Q78: What is withCredentials block?
+Temporarily exposes secret(s) to enclosed steps.
+
+** Q79: Secret handling pitfall in logs?
+Echoing/env dumping can leak secrets.
+
+** Q80: How reduce secret leakage risk?
+Masking + avoid verbose output + scoped credentials.
+
+** Q81: What is agent label strategy?
+Route jobs to compatible nodes (os, toolchain, trust level).
+
+** Q82: Why label discipline matters?
+Prevents mis-scheduling and environment mismatch failures.
+
+** Q83: What is ephemeral agent?
+Short-lived agent created per build, then destroyed.
+
+** Q84: Ephemeral agent benefit?
+Cleaner isolation and less configuration drift.
+
+** Q85: What is Docker agent in Jenkins pipeline?
+Run stage/pipeline inside containerized environment.
+
+** Q86: Why use containerized agents?
+Consistent toolchains and fewer host dependencies.
+
+** Q87: What is Kubernetes plugin pattern?
+Dynamically provision container-based Jenkins agents in K8s.
+
+** Q88: What is pod template in Jenkins K8s plugin?
+Definition of containers/resources used for ephemeral build agents.
+
+** Q89: What is parallel stage execution?
+Running independent stages simultaneously.
+
+** Q90: Why parallelize?
+Reduce total pipeline duration.
+
+** Q91: Parallelization caveat?
+Shared mutable resources can cause race conditions.
+
+** Q92: What is stash/unstash?
+Transfer files between stages/nodes within a pipeline.
+
+** Q93: stash/unstash use case?
+Move compiled outputs from build stage to test/deploy stages.
+
+** Q94: What is fingerprinting artifacts?
+Tracking artifact usage across jobs/builds.
+
+** Q95: Why fingerprint artifacts?
+Traceability and dependency audit across pipeline chain.
+
+** Q96: What is upstream/downstream job relation?
+One job triggers another after completion.
+
+** Q97: Upstream/downstream risk?
+Complex chained jobs can become hard to debug/govern.
+
+** Q98: Better alternative to job chains?
+Single cohesive pipeline with clear stages where possible.
+
+** Q99: What is input step in Jenkins?
+Pauses pipeline for manual approval/input.
+
+** Q100: When use input step?
+Production deployment approval or high-risk action confirmation.
+
+** Q101: What is lockable resources concept?
+Serialize access to shared environments/resources.
+
+** Q102: Why lock shared envs?
+Avoid concurrent deployment collisions.
+
+** Q103: What is throttling in Jenkins?
+Limit concurrent builds by category/node/job rules.
+
+** Q104: What is =options { disableConcurrentBuilds() }=?
+Prevent overlapping runs of same pipeline.
+
+** Q105: What is =buildDiscarder=?
+Retention policy for old builds/artifacts/logs.
+
+** Q106: Why build retention matters?
+Control storage growth and maintain operational performance.
+
+** Q107: What is test report publishing?
+Expose JUnit/coverage results in Jenkins UI.
+
+** Q108: Why publish reports?
+Fast visibility into quality regressions.
+
+** Q109: What is flaky test management in Jenkins?
+Retries/quarantine + root-cause fixing process.
+
+** Q110: What is intermediate anti-pattern?
+Massive Jenkinsfile mixing build logic and business deployment rules.
+
+** Q111: Better pipeline structure?
+Thin Jenkinsfile orchestrating reusable shared library steps.
+
+** Q112: What is CI/CD security scanning integration?
+SAST, dependency, secret, and IaC/container scans in pipeline stages.
+
+** Q113: What is quality gate?
+Automated criteria threshold before promotion/deploy.
+
+** Q114: What is artifact promotion flow?
+Build once, promote same artifact through environments.
+
+** Q115: Why avoid rebuild during promotion?
+Maintains tested artifact integrity.
+
+** Q116: What is canary deployment orchestration in Jenkins?
+Pipeline-driven partial rollout with metric checks.
+
+** Q117: What is rollback automation in Jenkins?
+Automated redeploy of previous stable version when gate fails.
+
+** Q118: What is intermediate observability baseline?
+Track queue time, stage duration, failure types, MTTR.
+
+** Q119: Intermediate reliability baseline?
+Ephemeral agents + deterministic builds + tested recovery.
+
+** Q120: Intermediate security baseline?
+RBAC, credential scoping, plugin governance, hardened agents.
+
+** Q121: Intermediate performance baseline?
+Parallelization, dependency caching, right-sized agents.
+
+** Q122: Intermediate governance baseline?
+Pipeline template/shared library standards and review policies.
+
+** Q123: Intermediate maturity signal?
+Teams can explain pipeline trust boundaries and failure recovery clearly.
+
+** Q124: Intermediate ops principle?
+Treat Jenkins upgrades as planned change with staging validation.
+
+** Q125: Intermediate best practice?
+Standardize the 80% path, customize only where necessary.
+
+* Advanced
+
+** Q126: What is Jenkins at scale architecture challenge?
+Balancing controller stability, plugin complexity, and workload growth.
+
+** Q127: Single controller vs multiple controllers?
+Single is simpler initially; multiple improves isolation and blast-radius control.
+
+** Q128: What is controller federation strategy?
+Separate Jenkins instances by domain/trust/compliance boundaries.
+
+** Q129: What is “cattle not pets” for controllers?
+Rebuild controllers from code/JCasC rather than manual tweaks.
+
+** Q130: What is plugin governance program?
+Curated allowlist, lifecycle ownership, patch cadence, compatibility testing.
+
+** Q131: Why plugin governance is critical?
+Plugins run privileged code in automation path.
+
+** Q132: What is supply-chain risk in Jenkins?
+Compromised plugins, dependencies, agent images, or SCM integrations.
+
+** Q133: Mitigation for Jenkins supply-chain risk?
+Pin versions, verify signatures, scan images, restrict egress, attest artifacts.
+
+** Q134: What is artifact provenance in Jenkins pipelines?
+Traceable metadata linking source commit, build job, and produced artifact.
+
+** Q135: What is SBOM integration at scale?
+Automatically generate and store SBOM for each release artifact.
+
+** Q136: What is SLSA relevance to Jenkins?
+Framework to improve build integrity and provenance maturity.
+
+** Q137: What is hermetic build goal?
+Minimize undeclared external influences for reproducibility/security.
+
+** Q138: Practical hermetic strategy in Jenkins?
+Internal mirrors, pinned toolchains, isolated agents, controlled network.
+
+** Q139: What is credential sprawl risk?
+Too many long-lived secrets across jobs/nodes.
+
+** Q140: Credential sprawl mitigation?
+Short-lived tokens, vault integration, scoped credential domains.
+
+** Q141: What is Vault integration pattern?
+Dynamic secrets issued per build with TTL/lease revocation.
+
+** Q142: Why dynamic secrets improve security?
+Reduced lifetime and narrower blast radius.
+
+** Q143: What is network segmentation for Jenkins?
+Separate controller/agents/artifact stores with least-required connectivity.
+
+** Q144: What is zero-trust principle in CI infrastructure?
+Authenticate/authorize every component interaction explicitly.
+
+** Q145: What is untrusted code execution risk?
+PR builds can run attacker-controlled code on agents.
+
+** Q146: Mitigation for untrusted builds?
+Isolated low-privilege agents, no prod secrets, separate trusted deploy pipelines.
+
+** Q147: What is Jenkins queue theory insight?
+High executor utilization leads to nonlinear queue delays.
+
+** Q148: Capacity planning metrics?
+Queue percentile, executor utilization, build duration distribution, failure retry rate.
+
+** Q149: What is pipeline critical path analysis?
+Identify longest dependent stage chain limiting throughput.
+
+** Q150: Advanced optimization levers?
+Test sharding, remote caches, pre-baked agent images, selective builds.
+
+** Q151: What is monorepo Jenkins challenge?
+Frequent broad-trigger builds causing resource contention.
+
+** Q152: Monorepo mitigation?
+Path-based triggers, affected-project detection, targeted pipelines.
+
+** Q153: What is GitOps integration with Jenkins?
+Jenkins updates desired-state repos; controller reconciles deployments externally.
+
+** Q154: Why decouple deploy from Jenkins direct cluster creds?
+Improves security boundary and auditability.
+
+** Q155: What is deployment ring strategy in Jenkins?
+Progressive rollout waves with automated metric gates.
+
+** Q156: What is automatic rollback guardrail?
+Canary/SLO threshold breach triggers halt and rollback stage.
+
+** Q157: What is false-positive rollback risk?
+Noisy telemetry can rollback healthy releases.
+
+** Q158: Mitigation for noisy rollback?
+Multi-metric gates, baseline comparison, cooldown windows.
+
+** Q159: What is disaster recovery for Jenkins platform?
+Back up JCasC, job definitions, credentials metadata, plugin catalog, and test restores.
+
+** Q160: Why test restore regularly?
+Backups are only trustworthy when restoration is rehearsed.
+
+** Q161: What is RTO/RPO in Jenkins operations?
+Targets for restoration time and acceptable data loss after outage.
+
+** Q162: What is compliance evidence in Jenkins?
+Auditable link from commit -> build -> approval -> deployment.
+
+** Q163: Separation of duties in Jenkins pipelines?
+Different permissions for authoring, approving, and production deploying.
+
+** Q164: What is policy-as-code in Jenkins ecosystem?
+Automated lint/rules enforcing pipeline standards and security controls.
+
+** Q165: What is advanced anti-pattern?
+Treating Jenkins as legacy utility without platform ownership.
+
+** Q166: Better operating model?
+Dedicated CI platform team with roadmap, SLOs, and customer support mindset.
+
+** Q167: What is Jenkins observability gold standard?
+Central dashboards for queue time, stage time, failure taxonomy, DORA metrics.
+
+** Q168: What is flaky test program maturity?
+Owner-driven deflake backlog with SLA and gating policy.
+
+** Q169: What is release train vs on-demand in Jenkins?
+Scheduled batches vs continuous flow; tradeoff predictability vs speed.
+
+** Q170: What is migration strategy away from Jenkins (if needed)?
+Incremental dual-run and parity verification, not big-bang cutover.
+
+** Q171: What is final reliability principle?
+Pipelines must be deterministic, restartable, and rollback-capable.
+
+** Q172: What is final security principle?
+Every build/deploy identity must be least-privileged and auditable.
+
+** Q173: What is final performance principle?
+Continuously optimize feedback latency for developers.
+
+** Q174: What is final governance principle?
+Automate standards and plugin/pipeline policy enforcement.
+
+** Q175: What is final architecture principle?
+Isolate trust zones: untrusted CI, trusted release, controlled deploy.
+
+** Q176: What is final operations principle?
+Run Jenkins as critical production infrastructure with incident discipline.
+
+** Q177: What is final collaboration principle?
+Platform and product teams co-own delivery quality.
+
+** Q178: What is final scaling principle?
+Standardize with shared libraries/JCasC while limiting coupling.
+
+** Q179: What is final resilience principle?
+Design for node/controller failure and rehearse recovery frequently.
+
+** Q180: Final maturity principle?
+Jenkins excellence is secure, observable, and scalable automation engineering.
+
+* Bonus: Minimal Declarative Jenkinsfile Template
+
+#+BEGIN_SRC groovy
+pipeline {
+  agent any
+
+  options {
+    timeout(time: 30, unit: 'MINUTES')
+    disableConcurrentBuilds()
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'mvn -B -DskipTests package'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'mvn -B test'
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+        }
+      }
+    }
+
+    stage('Archive') {
+      steps {
+        archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+      }
+    }
+  }
+
+  post {
+    failure {
+      echo 'Build failed: Investigate console logs and test reports.'
+    }
+  }
+}
+#+END_SRC 
+
+-----
+
+#+INCLUDE: "../footer.org"
