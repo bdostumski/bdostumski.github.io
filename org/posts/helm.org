@@ -1,0 +1,576 @@
+#+title: Helm
+#+date: 2026-08-10
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Helm
+
+-----
+
+* Beginner
+
+** Q1: What is Helm?
+Helm is a package manager for Kubernetes.
+
+** Q2: Why use Helm?
+It standardizes, templates, and versions Kubernetes application deployments.
+
+** Q3: What is a Helm chart?
+Packaged collection of Kubernetes manifests plus templates and metadata.
+
+** Q4: What is a release in Helm?
+A deployed instance of a chart in a cluster/namespace.
+
+** Q5: Chart vs release?
+Chart is package definition; release is installed runtime instance.
+
+** Q6: What is =Chart.yaml=?
+Metadata file defining chart name, version, dependencies, etc.
+
+** Q7: What is =values.yaml=?
+Default configuration values consumed by templates.
+
+** Q8: What is =templates/= directory?
+Holds templated Kubernetes manifest files.
+
+** Q9: What is =helm install=?
+Installs chart and creates a release.
+
+** Q10: What is =helm upgrade=?
+Upgrades existing release with new chart/version/values.
+
+** Q11: What is =helm uninstall=?
+Removes release resources from cluster.
+
+** Q12: What is =helm list=?
+Lists releases in current/all namespaces (with flags).
+
+** Q13: What is =helm status=?
+Shows release deployment state/details.
+
+** Q14: What is =helm history=?
+Shows revision history of a release.
+
+** Q15: What is =helm rollback=?
+Reverts release to previous revision.
+
+** Q16: Why rollback is useful?
+Fast recovery from bad deployments.
+
+** Q17: What is =helm template=?
+Renders chart templates locally without installing.
+
+** Q18: Why use helm template?
+Preview/validate manifests in CI before cluster apply.
+
+** Q19: What is =helm lint=?
+Static checks for chart structure and common issues.
+
+** Q20: What is =helm repo add=?
+Registers chart repository URL locally.
+
+** Q21: What is =helm repo update=?
+Refreshes local repository index metadata.
+
+** Q22: What is =helm search repo=?
+Searches charts in configured repositories.
+
+** Q23: What is chart repository?
+HTTP-hosted index and packaged charts.
+
+** Q24: What is OCI support in Helm?
+Store/pull charts from OCI registries (container-registry style).
+
+** Q25: Why OCI charts are popular?
+Aligns with existing registry tooling and access controls.
+
+** Q26: What is chart version?
+Version of chart package itself.
+
+** Q27: What is appVersion in chart?
+Version of packaged application (informational by convention).
+
+** Q28: What is namespace flag in Helm?
+Targets release resources into specific namespace.
+
+** Q29: What is =--create-namespace=?
+Creates namespace during install if missing.
+
+** Q30: What is =--set= in Helm?
+Overrides values from CLI key-value pairs.
+
+** Q31: What is =-f values-prod.yaml=?
+Applies additional values file overrides.
+
+** Q32: Precedence of values sources?
+Defaults < values files < --set (simplified practical rule).
+
+** Q33: What is =helm get values=?
+Displays values used by a release.
+
+** Q34: What is =helm get manifest=?
+Shows rendered manifests for a release.
+
+** Q35: What is =helm get all=?
+Returns combined release information.
+
+** Q36: What is dry-run in Helm?
+Simulated install/upgrade without persisting changes.
+
+** Q37: Why use =--dry-run --debug=?
+Inspect rendered output and troubleshooting detail.
+
+** Q38: What is a template expression in Helm?
+Go template syntax like ={{ .Values.image.tag }}=.
+
+** Q39: What is .Values object?
+Access to chart configuration values.
+
+** Q40: What is .Release object?
+Metadata about current release (name, namespace, revision).
+
+** Q41: What is .Chart object?
+Chart metadata available in templates.
+
+** Q42: What is helper template ~(_helpers.tpl)~?
+Reusable named template snippets.
+
+** Q43: Why use helper templates?
+DRY naming/labels/annotations conventions.
+
+** Q44: What is =include= function?
+Renders named template and returns string.
+
+** Q45: What is =required= function?
+Fails rendering if required value missing.
+
+** Q46: What is =default= function?
+Provides fallback when value is empty/unset.
+
+** Q47: What is beginner anti-pattern in Helm?
+Huge monolithic values file with unclear ownership.
+
+** Q48: Another beginner anti-pattern?
+Using --set for complex nested production config repeatedly.
+
+** Q49: Beginner reliability baseline?
+Lint + template + dry-run before applying upgrades.
+
+** Q50: Beginner security baseline?
+Avoid plaintext secrets in values files.
+
+** Q51: Beginner maintainability baseline?
+Use clear naming conventions and helper templates.
+
+** Q52: What is chart dependency?
+Another chart referenced in =dependencies= section.
+
+** Q53: What is umbrella chart?
+Parent chart combining multiple subcharts.
+
+** Q54: Why umbrella charts can help?
+Deploy related components together with shared values.
+
+** Q55: Umbrella chart risk?
+Complexity and tight coupling of independent services.
+
+** Q56: What is =helm dependency update=?
+Fetches/updates chart dependencies.
+
+** Q57: What is lock file in Helm deps?
+=Chart.lock= pins dependency versions for reproducibility.
+
+** Q58: What is beginner CI integration?
+Run helm lint/template in pull request pipeline.
+
+** Q59: Beginner workflow principle?
+Render first, deploy second.
+
+** Q60: Beginner best practice?
+Treat charts as versioned code with review/testing.
+
+* Intermediate
+
+** Q61: What is named template definition?
+={{- define "name" -}} ..: {{- end -}} reusable block.
+
+** Q62: What is =tpl= function?
+Evaluates string as template within template context.
+
+** Q63: Why use tpl carefully?
+Powerful but can make values harder to reason about/debug.
+
+** Q64: What is =toYaml= function?
+Converts map/list values to YAML text.
+
+** Q65: Why combine =toYaml | nindent=?
+Preserve valid indentation for nested manifests.
+
+** Q66: What is whitespace trimming in templates?
+Use ={{-= and =-}}= to control extra whitespace/newlines.
+
+** Q67: Why whitespace control matters?
+Prevents malformed YAML and noisy diffs.
+
+** Q68: What is =if= conditional in Helm template?
+Render blocks only when condition true.
+
+** Q69: What is =with= block?
+Temporarily scopes context to nested object.
+
+** Q70: What is =range= loop?
+Iterates over lists/maps in templates.
+
+** Q71: What is scope pitfall in Helm templating?
+Losing root context inside loops/with blocks.
+
+** Q72: How access root context inside range?
+Use =$= (root context reference).
+
+** Q73: What is schema validation for values?
+JSON schema file validating inputs (=values.schema.json=).
+
+** Q74: Why values schema is useful?
+Early feedback and safer chart consumption.
+
+** Q75: What is hook in Helm?
+Special annotated resource executed at lifecycle points.
+
+** Q76: Common hook phases?
+pre-install, post-install, pre-upgrade, post-upgrade, pre-delete, etc.
+
+** Q77: Hook use cases?
+DB migrations, smoke tests, bootstrap jobs.
+
+** Q78: Hook risk?
+Operational complexity and failure handling surprises.
+
+** Q79: What is hook delete policy?
+Controls cleanup behavior of hook-created resources.
+
+** Q80: What is =--atomic= on upgrade/install?
+Rollback automatically on failure (with wait).
+
+** Q81: Why use --atomic in production?
+Reduces partial-failure states during releases.
+
+** Q82: What is =--wait=?
+Waits for resources readiness before success.
+
+** Q83: What is =--timeout=?
+Maximum wait time for operations/hooks/readiness.
+
+** Q84: What is =--cleanup-on-fail=?
+Removes newly created resources if install fails.
+
+** Q85: What is =helm diff= plugin concept?
+Shows manifest changes before upgrade.
+
+** Q86: Why diff before upgrade?
+Risk review and approval confidence.
+
+** Q87: What is immutable field upgrade issue?
+Some K8s fields cannot be patched; upgrade may fail.
+
+** Q88: Mitigation for immutable field changes?
+Resource recreation strategy/versioned naming/migration planning.
+
+** Q89: What is chart testing (ct) tool concept?
+Automated lint/install tests for chart changes.
+
+** Q90: What is chart unit testing approach?
+Template assertion tools validating rendered output behavior.
+
+** Q91: Why test rendered manifests?
+Catch logic regressions before cluster deployment.
+
+** Q92: What is chart signing?
+Cryptographic signing of chart packages.
+
+** Q93: Why sign charts?
+Integrity and provenance verification.
+
+** Q94: What is provenance file (.prov)?
+Metadata/signature file used for chart verification.
+
+** Q95: What is =helm verify=?
+Checks chart package signature/provenance.
+
+** Q96: What is secrets handling pattern with Helm?
+Use external secret managers/operators; avoid raw secrets in git.
+
+** Q97: What is helm-secrets plugin concept?
+Encrypt/decrypt values files workflow (commonly with SOPS).
+
+** Q98: Why encrypt values files?
+Protect sensitive configuration at rest in repositories.
+
+** Q99: What is strategic values layering?
+Base values + env overlay + region/team overrides.
+
+** Q100: Layering pitfall?
+Too many overlays obscure effective configuration.
+
+** Q101: How inspect final values quickly?
+=helm get values --all= and rendered manifests.
+
+** Q102: What is release drift?
+Live cluster resources diverge from chart intent/state.
+
+** Q103: Drift mitigation?
+GitOps reconciliation, policy controls, limited manual kubectl edits.
+
+** Q104: What is Helm in GitOps model?
+Template/packaging source used by reconciler tools (Argo CD/Flux).
+
+** Q105: Why Helm + GitOps is common?
+Combines reusable templating with declarative reconciliation.
+
+** Q106: What is dependency alias in Helm?
+Rename dependency instance for multiple inclusions.
+
+** Q107: What is condition/tag for dependencies?
+Enable/disable subcharts via values selectors.
+
+** Q108: What is global values key?
+Shared values accessible by subcharts via =.Values.global=.
+
+** Q109: Global values risk?
+Unexpected coupling between parent/subchart configs.
+
+** Q110: What is intermediate anti-pattern?
+Embedding environment-specific logic directly in templates.
+
+** Q111: Better chart design?
+Keep templates generic; drive environment differences through values.
+
+** Q112: What is chart deprecation?
+Mark chart no longer maintained/recommended.
+
+** Q113: What is semantic versioning for charts?
+Communicate breaking/non-breaking template/interface changes.
+
+** Q114: What is backward compatibility in chart values?
+Avoid breaking keys/semantics unexpectedly across upgrades.
+
+** Q115: What is intermediate observability baseline?
+Track release success/failure, duration, rollback counts.
+
+** Q116: What is intermediate reliability baseline?
+Use atomic upgrades, diff checks, and tested rollback playbooks.
+
+** Q117: What is intermediate security baseline?
+Signed charts, encrypted secrets, least-privilege deploy identity.
+
+** Q118: What is intermediate performance baseline?
+Efficient templates and controlled dependency/chart size.
+
+** Q119: Intermediate maturity signal?
+Teams can predict upgrade outcomes and recover quickly.
+
+** Q120: Intermediate ops principle?
+Version and promote charts through environments like application artifacts.
+
+** Q121: Intermediate governance principle?
+Define chart standards (labels, probes, resources, securityContext).
+
+** Q122: Intermediate collaboration principle?
+Platform team provides reusable chart patterns, app teams own values.
+
+** Q123: Intermediate migration principle?
+Plan CRD/resource lifecycle carefully during chart evolution.
+
+** Q124: Intermediate architecture principle?
+Separate app chart concerns from cluster platform concerns.
+
+** Q125: Intermediate best practice?
+Optimize for predictable upgrades, not template cleverness.
+
+* Advanced
+
+** Q126: What is Helm at enterprise scale challenge?
+Balancing reuse, flexibility, and governance across many teams.
+
+** Q127: What is golden/base chart strategy?
+Platform-maintained foundational chart patterns reused widely.
+
+** Q128: Golden chart risk?
+Over-abstraction and slow change velocity if too rigid.
+
+** Q129: Mitigation for rigidity?
+Versioned modules, extension points, clear ownership boundaries.
+
+** Q130: What is policy-as-code with Helm?
+Automated checks on rendered manifests (OPA/Kyverno/conftest).
+
+** Q131: Why policy on rendered output?
+Actual Kubernetes resources matter more than template intent.
+
+** Q132: What is supply-chain risk in Helm ecosystem?
+Compromised chart repos, dependencies, plugins, or CI pipelines.
+
+** Q133: Supply-chain mitigations?
+OCI registries, signed charts, pinned dependencies, provenance verification.
+
+** Q134: What is OCI registry governance benefit?
+Unified access control/audit with container artifact ecosystems.
+
+** Q135: What is SLSA relevance for Helm pipelines?
+Improves artifact integrity and build provenance maturity.
+
+** Q136: What is reproducible chart packaging?
+Deterministic build/version process for chart artifacts.
+
+** Q137: Why reproducibility matters?
+Trust, auditability, and consistent promotion.
+
+** Q138: What is multi-cluster Helm deployment pattern?
+Promote same chart/version with cluster-specific values overlays.
+
+** Q139: What is fleet management challenge?
+Consistent policy/version rollout across many clusters/regions.
+
+** Q140: What is progressive delivery with Helm?
+Canary/blue-green orchestrated via chart values and deployment controllers.
+
+** Q141: What is Helm + Argo Rollouts style integration?
+Helm defines rollout resources; controller manages traffic progression.
+
+** Q142: What is CRD lifecycle challenge in Helm?
+CRDs require careful upgrade ordering and compatibility handling.
+
+** Q143: Why CRD upgrades are sensitive?
+Version/schema mismatches can break custom resources/controllers.
+
+** Q144: What is advanced hook anti-pattern?
+Critical business logic hidden in hooks without observability/retry strategy.
+
+** Q145: Better hook practice?
+Keep hooks minimal, idempotent, observable, and timeout-bounded.
+
+** Q146: What is zero-downtime DB migration relation to Helm?
+Coordinate schema expand/contract outside risky blocking chart hooks.
+
+** Q147: What is release orchestration dependency issue?
+Service upgrade order can impact compatibility in microservice systems.
+
+** Q148: Mitigation for orchestration issues?
+Contract testing, staged rollouts, explicit dependency policies.
+
+** Q149: What is blast radius control in Helm releases?
+Scope rollout by namespace/tenant/region rings progressively.
+
+** Q150: What is canary analysis gating?
+Promote release only when SLO/error metrics pass thresholds.
+
+** Q151: What is automatic rollback caveat?
+Rollback may fail if irreversible external changes occurred (e.g., DB schema).
+
+** Q152: What is drift detection at scale?
+Compare desired rendered manifests vs live state continuously.
+
+** Q153: What is Helm controller reconciliation difference?
+Helm CLI is imperative; GitOps controllers provide continuous reconciliation.
+
+** Q154: What is chart interface contract?
+Stable documented values keys/semantics consumed by teams.
+
+** Q155: Why treat values as API?
+Breaking values contracts disrupt many dependent pipelines/environments.
+
+** Q156: What is deprecation workflow for chart values?
+Warn, support transition window, remove in major version.
+
+** Q157: What is observability gold standard for Helm ops?
+Release events + deployment metrics + SLO impact in one timeline.
+
+** Q158: Key Helm SRE metrics?
+Upgrade success rate, rollback frequency, mean deploy time, failed hooks.
+
+** Q159: What is disaster recovery for Helm metadata?
+Back up cluster state and source-of-truth repos/registries; rehearse restore.
+
+** Q160: Why backup source charts/values?
+Cluster alone may not preserve intended declarative history.
+
+** Q161: What is compliance evidence for Helm releases?
+Who approved, which chart version, which values, when deployed.
+
+** Q162: What is separation of duties pattern?
+Different roles for chart authoring, approval, and production promotion.
+
+** Q163: What is advanced anti-pattern?
+Using Helm as ad-hoc scripting engine instead of package manager.
+
+** Q164: Better operating model?
+Helm charts as productized deployment contracts with lifecycle management.
+
+** Q165: What is platform team role for Helm?
+Provide standards, starter charts, lint/policy pipelines, and support.
+
+** Q166: What is team autonomy boundary?
+Teams own app values; platform owns guardrails and shared chart primitives.
+
+** Q167: What is cost optimization with Helm?
+Right-size resources defaults and environment-specific overrides thoughtfully.
+
+** Q168: What is performance pitfall in huge charts?
+Slow rendering/review complexity and harder troubleshooting.
+
+** Q169: Mitigation for huge chart complexity?
+Split domains, compose with dependencies carefully, document interfaces.
+
+** Q170: What is final reliability principle?
+Every Helm upgrade path must be tested, observable, and rollback-aware.
+
+** Q171: What is final security principle?
+Trust and verify chart sources, dependencies, and deployment identities.
+
+** Q172: What is final governance principle?
+Automate chart standards and policy checks in CI/CD.
+
+** Q173: What is final architecture principle?
+Design charts for clear contracts and minimal coupling.
+
+** Q174: What is final operations principle?
+Run releases with SLO-driven gates and incident-ready runbooks.
+
+** Q175: What is final scaling principle?
+Standardize chart patterns while preserving controlled configurability.
+
+** Q176: What is final collaboration principle?
+App and platform teams share ownership of release safety.
+
+** Q177: What is final migration principle?
+Evolve chart APIs semantically with explicit deprecation paths.
+
+** Q178: What is final GitOps principle?
+Prefer declarative reconciliation over manual imperative drift.
+
+** Q179: What is final performance principle?
+Keep templating simple and deployment feedback fast.
+
+** Q180: Final maturity principle?
+Helm excellence is predictable, secure, and governable Kubernetes delivery.
+
+
+* Bonus: Minimal Helm Chart Skeleton (Conceptual)
+
+#+BEGIN_SRC text
+myapp/
+  Chart.yaml
+  values.yaml
+  templates/
+    _helpers.tpl
+    deployment.yaml
+    service.yaml
+    ingress.yaml
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
+
