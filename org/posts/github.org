@@ -1,0 +1,598 @@
+#+title: Git
+#+date: 2026-08-08
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Git
+
+-----
+
+* Beginner
+
+** Q1: What is Git?
+Git is a distributed version control system for tracking source code changes.
+
+** Q2: Why use Git?
+It enables collaboration, history tracking, branching, and safe change integration.
+
+** Q3: What is a repository?
+A project directory containing files and Git metadata/history.
+
+** Q4: What does =git init= do?
+Creates a new local Git repository.
+
+** Q5: What does =git clone= do?
+Copies an existing repository (including history) to local machine.
+
+** Q6: What is a commit?
+Snapshot of staged changes with metadata (author, message, timestamp).
+
+** Q7: What is a branch?
+Movable pointer to a sequence of commits.
+
+** Q8: Why branches are useful?
+Isolate work streams (features, fixes, experiments) safely.
+
+** Q9: What is HEAD?
+Reference to current checked-out commit/branch pointer.
+
+** Q10: What is staging area (index)?
+Intermediate area where changes are prepared before commit.
+
+** Q11: Working tree vs staging area?
+Working tree has current file edits; staging contains selected changes for next commit.
+
+** Q12: What does =git status= show?
+State of working tree, staged files, and branch info.
+
+** Q13: What does =git add= do?
+Stages file changes for commit.
+
+** Q14: What does =git commit= do?
+Creates commit from staged changes.
+
+** Q15: What does =git log= do?
+Shows commit history.
+
+** Q16: What does =git diff= show?
+Line-by-line differences between states (working, staged, commits).
+
+** Q17: What does =git restore= do?
+Restores file content from index/commit (modern command family).
+
+** Q18: What does =git rm= do?
+Removes file from working tree and stages deletion.
+
+** Q19: What does =git mv= do?
+Moves/renames file and stages change.
+
+** Q20: What is =.gitignore=?
+File specifying untracked patterns Git should ignore.
+
+** Q21: Why use .gitignore?
+Avoid committing build artifacts, secrets, temp files.
+
+** Q22: What is remote in Git?
+Named reference to another repository URL (e.g., origin).
+
+** Q23: What does =git remote -v= show?
+Configured remotes and fetch/push URLs.
+
+** Q24: What does =git fetch= do?
+Downloads remote updates without merging into current branch.
+
+** Q25: What does =git pull= do?
+Fetches and integrates remote changes (merge/rebase depending config).
+
+** Q26: What does =git push= do?
+Uploads local commits to remote branch.
+
+** Q27: What is merge in Git?
+Combining histories from different branches into one.
+
+** Q28: What is merge conflict?
+Competing changes Git cannot automatically reconcile.
+
+** Q29: How resolve merge conflict?
+Edit conflicted files, mark resolved (=git add=), complete merge commit.
+
+** Q30: What is fast-forward merge?
+Branch pointer moves forward without creating merge commit.
+
+** Q31: What is non-fast-forward merge?
+Creates explicit merge commit preserving branch topology.
+
+** Q32: What is rebase?
+Reapplies commits on top of another base commit.
+
+** Q33: Rebase vs merge?
+Rebase rewrites commit lineage; merge preserves branch history with merge commit.
+
+** Q34: Why use rebase?
+Cleaner linear history for local feature branches.
+
+** Q35: What is cherry-pick?
+Apply specific commit(s) onto current branch.
+
+** Q36: What is tag?
+Named pointer to specific commit, often for releases.
+
+** Q37: Lightweight vs annotated tag?
+Annotated stores metadata/message/signature; lightweight is simple pointer.
+
+** Q38: What is =git show=?
+Displays object details (commit, tag, etc.).
+
+** Q39: What is =git branch=?
+Lists/manages branches.
+
+** Q40: What is =git switch=?
+Modern command to change/create branches.
+
+** Q41: What is detached HEAD?
+HEAD points directly to commit, not branch name.
+
+** Q42: Is detached HEAD always bad?
+No, useful for inspection/testing; commits may be hard to find later unless referenced.
+
+** Q43: What is =git stash=?
+Temporarily shelves uncommitted changes.
+
+** Q44: When use stash?
+Quick context switching without committing partial work.
+
+** Q45: What is =git stash pop=?
+Applies latest stash and removes it from stash list.
+
+** Q46: What is =git stash apply=?
+Applies stash without removing it.
+
+** Q47: What is =git reflog=?
+Local log of where HEAD/refs pointed over time.
+
+** Q48: Why reflog is powerful?
+Recover “lost” commits after resets/rebases/deletions.
+
+** Q49: What is =git reset=?
+Moves branch pointer and optionally index/working tree.
+
+** Q50: reset --soft vs --mixed vs --hard?
+Soft keeps index/worktree, mixed resets index only, hard resets both index/worktree.
+
+** Q51: What is =git revert=?
+Creates new commit undoing effects of an earlier commit.
+
+** Q52: Revert vs reset?
+Revert preserves public history; reset rewrites local history pointers.
+
+** Q53: What is origin?
+Default remote name created by clone.
+
+** Q54: What is upstream tracking branch?
+Default remote branch relationship for pull/push.
+
+** Q55: What is =git blame=?
+Shows last modifying commit/author per line.
+
+** Q56: What is =git grep=?
+Search text patterns in tracked files quickly.
+
+** Q57: Common beginner Git anti-pattern?
+Committing generated files and secrets accidentally.
+
+** Q58: Another beginner anti-pattern?
+Force-pushing shared branches without coordination.
+
+** Q59: Beginner commit message baseline?
+Short imperative summary + optional body explaining why.
+
+** Q60: Beginner branching baseline?
+One feature/fix per branch, small focused PRs.
+
+** Q61: Beginner safety baseline?
+Fetch often, pull before push, resolve conflicts carefully.
+
+** Q62: Beginner collaboration baseline?
+Use pull requests and code review before merging.
+
+** Q63: Beginner recovery baseline?
+Use reflog and revert instead of panic.
+
+** Q64: Beginner workflow principle?
+Commit early, commit logically, keep changes reviewable.
+
+** Q65: Beginner best practice?
+Treat Git history as communication, not just backup.
+
+* Intermediate
+
+** Q66: What is three-way merge?
+Merge using common ancestor + two branch tips.
+
+** Q67: What is octopus merge?
+Merge of multiple branches at once (limited conflict handling use cases).
+
+** Q68: What is squash merge?
+Combines branch commits into one commit at merge time.
+
+** Q69: Squash merge tradeoff?
+Cleaner main history but loses individual commit granularity on target branch.
+
+** Q70: What is rebase --interactive?
+Interactive history rewrite (reorder, squash, reword, drop, edit).
+
+** Q71: Common interactive rebase use?
+Clean up local commits before opening/updating PR.
+
+** Q72: What is fixup commit?
+Commit marked to auto-squash into target commit later.
+
+** Q73: What is autosquash?
+Automatically reorder/squash fixup!/squash! commits during rebase.
+
+** Q74: What is range-diff?
+Compares two commit series (helpful after rebase).
+
+** Q75: What is merge-base?
+Best common ancestor between branches.
+
+** Q76: Why merge-base matters?
+Determines diff/merge context and conflict scope.
+
+** Q77: What is =git bisect=?
+Binary search through history to find commit introducing bug.
+
+** Q78: Why use bisect?
+Fast root-cause isolation in large histories.
+
+** Q79: What is bisect run?
+Automates bisect steps with script/test command.
+
+** Q80: What is =git clean=?
+Removes untracked files (optionally directories/ignored files).
+
+** Q81: Why =git clean= dangerous?
+Can permanently delete local untracked work.
+
+** Q82: What is =git restore --staged=?
+Unstages changes from index without discarding file edits.
+
+** Q83: What is =git reset HEAD <file>= legacy equivalent?
+Older way to unstage file.
+
+** Q84: What is pathspec in Git?
+Pattern syntax selecting specific paths for commands.
+
+** Q85: What is partial staging?
+Stage selected hunks/lines rather than whole file.
+
+** Q86: Why partial staging useful?
+Create small logical commits from mixed edits.
+
+** Q87: What is =git add -p=?
+Interactive patch staging mode.
+
+** Q88: What is signed commit?
+Commit cryptographically signed (GPG/SSH/S/MIME).
+
+** Q89: Why sign commits/tags?
+Authenticity and provenance verification.
+
+** Q90: What is protected branch?
+Remote branch with policy rules (reviews, checks, no force push).
+
+** Q91: Why protect main branch?
+Prevents accidental or policy-violating direct changes.
+
+** Q92: What is required status check?
+CI/test checks that must pass before merge.
+
+** Q93: What is linear history enforcement?
+Policy requiring no merge commits on protected branch.
+
+** Q94: What is merge queue concept?
+Serializes validated PR merges to reduce main-branch breakage/races.
+
+** Q95: What is CODEOWNERS?
+File defining required reviewers for specific paths.
+
+** Q96: Why CODEOWNERS helps?
+Ensures domain experts review sensitive components.
+
+** Q97: What is fork workflow?
+Contributors work on personal fork and submit PR to upstream repo.
+
+** Q98: Fork vs branch workflow?
+Fork isolates permissions; branch workflow uses shared repo branches.
+
+** Q99: What is upstream remote in fork model?
+Reference to original repository for syncing changes.
+
+** Q100: What is =git remote prune=?
+Removes stale remote-tracking references deleted on remote.
+
+** Q101: What is =git gc=?
+Garbage collects and optimizes repository storage.
+
+** Q102: What is packfile?
+Compressed storage format aggregating Git objects efficiently.
+
+** Q103: What is shallow clone?
+Clone with truncated history depth.
+
+** Q104: Shallow clone tradeoff?
+Faster clone but limited history operations.
+
+** Q105: What is sparse checkout?
+Checkout only subset of repository paths.
+
+** Q106: Why sparse checkout?
+Improve performance in large monorepos when working on subset.
+
+** Q107: What is submodule?
+Repository embedded at specific commit inside another repository.
+
+** Q108: Submodule challenge?
+Operational complexity and sync pitfalls.
+
+** Q109: What is subtree approach?
+Vendor external repo content into subdirectory with merge support.
+
+** Q110: Subtree vs submodule?
+Subtree simpler consumption; submodule keeps strict repo separation.
+
+** Q111: What is LFS (Git Large File Storage)?
+Extension storing large binaries outside normal Git object store.
+
+** Q112: Why use Git LFS?
+Prevent repository bloat and improve clone/fetch performance for binaries.
+
+** Q113: What is intermediate anti-pattern?
+Rewriting shared history after others based work on it.
+
+** Q114: Safe rule for history rewrite?
+Only rewrite local/unshared branches unless team explicitly coordinates.
+
+** Q115: What is force-with-lease?
+Safer force push that checks remote wasn’t unexpectedly updated.
+
+** Q116: Why prefer force-with-lease over force?
+Prevents overwriting others’ new remote commits accidentally.
+
+** Q117: What is release tagging strategy?
+Create annotated version tags tied to release commits.
+
+** Q118: What is hotfix workflow?
+Patch critical issue from release/main branch and merge back appropriately.
+
+** Q119: What is backporting?
+Applying fix from newer branch to older maintained release branch.
+
+** Q120: What is intermediate troubleshooting flow?
+status -> log/graph -> reflog -> diff/merge-base -> targeted recovery.
+
+** Q121: What is semantic commit convention?
+Structured commit messages (feat/fix/chore...) aiding automation.
+
+** Q122: Why semantic commits useful?
+Changelog generation and release automation.
+
+** Q123: What is intermediate security baseline?
+Signed commits/tags, protected branches, secret scanning hooks.
+
+** Q124: What is intermediate reliability baseline?
+Small PRs, required checks, branch protection, rollback-ready tags.
+
+** Q125: What is intermediate performance baseline?
+Use shallow/sparse clones and LFS where appropriate.
+
+** Q126: Intermediate maturity signal?
+Team resolves conflicts/rebases confidently without losing history integrity.
+
+** Q127: What is intermediate collaboration principle?
+Optimize history for both humans (review) and machines (automation).
+
+** Q128: What is intermediate governance principle?
+Enforce workflow via branch rules and CI, not tribal memory.
+
+** Q129: What is intermediate release principle?
+Immutable signed tags as deployment source of truth.
+
+** Q130: Intermediate best practice?
+Prefer transparent, recoverable workflows over clever but fragile Git tricks.
+
+* Advanced
+
+** Q131: What is Git object model?
+Data stored as blobs, trees, commits, and tags addressed by hash IDs.
+
+** Q132: What is content-addressable storage in Git?
+Object identity derived from content hash for integrity/deduplication.
+
+** Q133: Why object model knowledge matters?
+Enables advanced recovery, performance tuning, and tooling design.
+
+** Q134: What is commit-graph optimization?
+Auxiliary structure speeding history walks and queries.
+
+** Q135: What are bitmaps in Git packs?
+Indexes accelerating clone/fetch object negotiation.
+
+** Q136: What is partial clone?
+Clone that defers some object downloads until needed.
+
+** Q137: Partial clone benefit?
+Reduced network/storage for huge repos.
+
+** Q138: What is promisor remote concept?
+Remote promising missing objects can be fetched on demand.
+
+** Q139: What is monorepo Git scaling challenge?
+Huge history/tree size impacts clone/status/diff performance.
+
+** Q140: Monorepo mitigation techniques?
+Sparse checkout, partial clone, repo maintenance, CI optimization.
+
+** Q141: What is background maintenance in modern Git?
+Automated gc/repack/commit-graph maintenance tasks.
+
+** Q142: What is receive-pack/update hook ecosystem?
+Server-side hooks enforcing policy on pushes.
+
+** Q143: Pre-receive hook use cases?
+Block secrets, enforce commit format, deny unsafe refs.
+
+** Q144: What is push option mechanism?
+Pass custom options to server-side hooks during push.
+
+** Q145: What is signed push concept?
+Cryptographically signed push certificates (workflow-dependent adoption).
+
+** Q146: What is trust-on-first-use risk with Git remotes?
+Initial remote authenticity assumptions can be exploited.
+
+** Q147: Mitigation for remote trust risk?
+Verified URLs, SSH host key validation, signed tags/releases.
+
+** Q148: What is dependency confusion relation to Git?
+Build pipelines trusting unverified refs/submodules can import malicious code.
+
+** Q149: What is branch protection bypass risk?
+Admin overrides or misconfigured rules can weaken guarantees.
+
+** Q150: Governance mitigation for bypass risk?
+Audit logs, limited admin rights, approval workflows.
+
+** Q151: What is Gerrit-style workflow concept?
+Review-centric model where changes are reviewed before landing, often rebase/cherry-pick based.
+
+** Q152: Trunk-based development in Git?
+Short-lived branches, frequent integration to main.
+
+** Q153: GitFlow model summary?
+Structured long-lived branches (develop/release/hotfix) with heavier process.
+
+** Q154: Trunk-based vs GitFlow tradeoff?
+Speed/simplicity vs explicit release branching control.
+
+** Q155: What is rebasing public history incident response?
+Coordinate freeze, identify divergence, recover via reflog/cherry-pick/revert plan.
+
+** Q156: What is repository corruption recovery concept?
+Use fsck, backups, alternate clones, object recovery methods.
+
+** Q157: What is =git fsck=?
+Verifies connectivity and validity of Git object database.
+
+** Q158: What is secret leak incident in Git history?
+Credential committed and propagated through clones/forks.
+
+** Q159: Secret leak response steps?
+Rotate secret immediately, purge history where required, notify stakeholders, add prevention controls.
+
+** Q160: Why rotation before history rewrite?
+Assume secret already compromised once exposed.
+
+** Q161: What is history rewriting tool for sensitive purge?
+Use specialized filtering tools (e.g., git-filter-repo) with coordination.
+
+** Q162: What is force-push blast radius at scale?
+Breaks clones/branches/PR refs and downstream automation assumptions.
+
+** Q163: What is advanced release provenance in Git?
+Signed commits/tags + attestations linking source to built artifacts.
+
+** Q164: What is reproducible source snapshot concept?
+Deterministic archive from exact commit/tag for audits.
+
+** Q165: What is code archaeology practice?
+Using blame/log/range-diff/bisect to understand why changes happened.
+
+** Q166: What is socio-technical value of clean history?
+Faster onboarding, debugging, and safer long-term maintenance.
+
+** Q167: What is merge strategy option example?
+recursive/ort behavior tuning, ours/theirs preferences for conflict cases.
+
+** Q168: What is rerere in Git?
+Reuse Recorded Resolution; remembers conflict resolutions for reuse.
+
+** Q169: Why rerere useful?
+Speeds repeated conflict resolution in long-running branches/backports.
+
+** Q170: What is advanced anti-pattern in Git?
+Treating Git as file sync tool while ignoring review/governance semantics.
+
+** Q171: What is platform engineering role for Git workflows?
+Define standards, templates, hooks, protections, and training.
+
+** Q172: What is policy-as-code for Git operations?
+Automated enforcement of branch, commit, and review rules.
+
+** Q173: What is auditability requirement in regulated teams?
+Traceable authorship, approvals, and release tag integrity.
+
+** Q174: What is data retention challenge in Git hosting?
+Balancing history permanence with legal/privacy deletion requirements.
+
+** Q175: What is disaster recovery for Git platforms?
+Repo backups, geo-replication, tested restore procedures.
+
+** Q176: What is final reliability principle?
+Make integration frequent, reversible, and policy-protected.
+
+** Q177: What is final security principle?
+Verify identity/integrity of commits, tags, remotes, and CI paths.
+
+** Q178: What is final performance principle?
+Use advanced clone/index strategies for large repos.
+
+** Q179: What is final collaboration principle?
+Optimize for small reviews and clear historical intent.
+
+** Q180: What is final governance principle?
+Automate guardrails; avoid manual enforcement dependency.
+
+** Q181: What is final incident-response principle?
+Prefer revertable workflows and rehearsed recovery playbooks.
+
+** Q182: What is final release principle?
+Deploy from signed immutable tags, not moving branch heads.
+
+** Q183: What is final scaling principle?
+Standardize workflows across repos while allowing bounded team autonomy.
+
+** Q184: What is final architecture principle?
+Align branching/release model with product delivery cadence.
+
+** Q185: Final maturity principle?
+Git excellence is trustworthy history, fast collaboration, and resilient recovery.
+
+* Bonus: Practical “Safe Daily Git Flow” Command Set
+
+#+BEGIN_SRC bash
+# update local main safely
+git switch main
+git pull --ff-only
+
+# start feature branch
+git switch -c feat/user-import
+
+# work, stage selectively, commit
+git add -p
+git commit -m "feat: add CSV parser for user import"
+
+# rebase on latest main before push
+git fetch origin
+git rebase origin/main
+
+# push branch and open PR
+git push -u origin feat/user-import
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
