@@ -1,0 +1,606 @@
+#+title: GitHub Actions
+#+date: 2026-08-08
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* GitHub Actions
+
+* Beginner
+
+** Q1: What is GitHub Actions?
+GitHub Actions is GitHub’s automation platform for CI/CD and repository workflows.
+
+** Q2: What can GitHub Actions automate?
+Builds, tests, releases, deployments, issue/PR workflows, and custom operational tasks.
+
+** Q3: What is a workflow?
+A YAML-defined automation process stored in =.github/workflows/=.
+
+** Q4: What is an event in Actions?
+A trigger that starts workflows (~push~, ~pull_request~, ~schedule~, ~workflow_dispatch~, etc.).
+
+** Q5: What is a job?
+A set of steps executed on the same runner.
+
+** Q6: What is a step?
+An individual task in a job (run command or use action).
+
+** Q7: What is an action?
+Reusable unit of automation logic used in workflow steps.
+
+** Q8: Where are workflow files stored?
+In repository path =.github/workflows/*.yml=.
+
+** Q9: What is a runner?
+Compute environment that executes workflow jobs.
+
+** Q10: Hosted vs self-hosted runner?
+GitHub-hosted is managed by GitHub; self-hosted is managed by your team.
+
+** Q11: What does =runs-on= specify?
+Runner environment label (e.g., ubuntu-latest).
+
+** Q12: Common GitHub-hosted runner images?
+Ubuntu, Windows, and macOS variants.
+
+** Q13: What is =workflow_dispatch=?
+Manual workflow trigger with optional inputs.
+
+** Q14: What is =schedule= trigger?
+Cron-based workflow execution.
+
+** Q15: What is =push= trigger?
+Runs workflow when commits are pushed to matching branches/tags.
+
+** Q16: What is =pull_request= trigger?
+Runs workflow on PR lifecycle events.
+
+** Q17: What is branch filter in workflow?
+Limits triggers to selected branches.
+
+** Q18: What is path filter?
+Triggers workflow only when specific files/paths change.
+
+** Q19: Why use path filters?
+Reduce unnecessary runs and CI cost.
+
+** Q20: What is matrix strategy?
+Runs a job across multiple variable combinations (OS, JDK, Node versions).
+
+** Q21: Why use matrix builds?
+Parallel cross-environment validation.
+
+** Q22: What is =needs= in jobs?
+Defines job dependencies and execution order.
+
+** Q23: What happens if dependency job fails?
+Dependent jobs are skipped unless configured otherwise.
+
+** Q24: What is =if:= condition?
+Conditional execution for jobs/steps.
+
+** Q25: What is context in Actions?
+Structured metadata available in expressions (github, env, job, steps, secrets, etc.).
+
+** Q26: What is environment variable in workflow?
+Key-value config defined via =env= at workflow/job/step scope.
+
+** Q27: What is secret in GitHub Actions?
+Encrypted value injected securely into workflows.
+
+** Q28: Where can secrets be defined?
+Repository, environment, or organization level.
+
+** Q29: What is GITHUB_TOKEN?
+Auto-generated token for workflow authentication to GitHub APIs.
+
+** Q30: Why limit GITHUB_TOKEN permissions?
+Principle of least privilege reduces blast radius.
+
+** Q31: What is =permissions:= block?
+Explicitly scopes token permissions for workflow/job.
+
+** Q32: What is artifact in Actions?
+File bundle uploaded from run for later download/use.
+
+** Q33: Artifact vs cache?
+Artifacts store run outputs; cache speeds dependency/tool reuse across runs.
+
+** Q34: What is cache action used for?
+Caching dependencies/build outputs to reduce runtime.
+
+** Q35: Common cache keys?
+Hash of lockfiles + OS/tool version identifiers.
+
+** Q36: What is checkout action?
+=actions/checkout= clones repository into runner workspace.
+
+** Q37: What is setup action example?
+=actions/setup-java=, =setup-node= install/configure toolchains.
+
+** Q38: What is workflow log?
+Step-by-step output for debugging runs.
+
+** Q39: How rerun failed jobs?
+Use GitHub UI rerun options (failed jobs/all jobs).
+
+** Q40: What is fail-fast in matrix?
+Cancel remaining matrix jobs when one fails (configurable).
+
+** Q41: What is timeout-minutes?
+Maximum allowed runtime for job before forced cancellation.
+
+** Q42: Why set timeouts?
+Prevent hung jobs and wasted runner cost.
+
+** Q43: What is concurrency group?
+Limits overlapping workflow/job runs for same key.
+
+** Q44: Why use concurrency control?
+Avoid duplicate deployments or conflicting operations.
+
+** Q45: What is cancel-in-progress?
+Cancels previous in-progress run in same concurrency group.
+
+** Q46: What is environment protection rule?
+Required reviewers/waits/secrets boundary before deployment jobs proceed.
+
+** Q47: What is manual approval in Actions?
+Environment protection requiring reviewer approval pre-deploy.
+
+** Q48: What is reusable workflow?
+Workflow invoked by other workflows via =workflow_call=.
+
+** Q49: What is composite action?
+Action bundling multiple steps into reusable local/remote unit.
+
+** Q50: Composite action vs reusable workflow?
+Composite runs as step; reusable workflow orchestrates full jobs.
+
+** Q51: What is beginner anti-pattern in Actions?
+Single huge workflow doing everything without modularity.
+
+** Q52: Another beginner anti-pattern?
+Using broad write permissions by default.
+
+** Q53: Beginner security baseline?
+Pin action versions, least-privilege tokens, protected secrets.
+
+** Q54: Why pin action versions?
+Prevent unexpected or malicious upstream changes from mutable tags.
+
+** Q55: What is immutable pin best practice?
+Pin to full commit SHA for strongest integrity.
+
+** Q56: Beginner reliability baseline?
+Separate build/test/deploy jobs with clear dependencies.
+
+** Q57: Beginner performance baseline?
+Use caching, path filters, and parallel matrix where useful.
+
+** Q58: What is CI vs CD in Actions context?
+CI validates code; CD automates delivery/deployment.
+
+** Q59: Beginner observability baseline?
+Track workflow duration, failure rate, flaky jobs, queue delays.
+
+** Q60: What is first workflow usually?
+Build + unit test on pull requests.
+
+** Q61: What is PR status check?
+Workflow result required before merge (branch protection integration).
+
+** Q62: Why require status checks?
+Prevents merging unvalidated/broken changes.
+
+** Q63: What is =continue-on-error=?
+Allows step/job failure without failing entire run (use carefully).
+
+** Q64: When use continue-on-error?
+Non-blocking experiments or optional checks, clearly labeled.
+
+** Q65: Beginner best practice?
+Start simple, secure defaults, and iterate with measurable improvements.
+
+* Intermediate
+
+** Q66: What is workflow_call input/output?
+Reusable workflow parameters and returned values to callers.
+
+** Q67: Why adopt reusable workflows?
+Standardization, DRY pipelines, centralized governance.
+
+** Q68: What is composite action best use case?
+Share repeated step sequences (setup/lint/package helper logic).
+
+** Q69: What is job output?
+Named value produced by a job for downstream jobs.
+
+** Q70: What is step output?
+Value set by step for use later in same job.
+
+** Q71: How set outputs in modern Actions?
+Write to =$GITHUB_OUTPUT= file.
+
+** Q72: What is environment file mechanism?
+Special files (=GITHUB_ENV=, =GITHUB_OUTPUT=, etc.) for workflow communication.
+
+** Q73: What is expression syntax in Actions?
+=${{ ..: }}= for evaluation of contexts/functions.
+
+** Q74: Common expression functions?
+=contains=, =startsWith=, =endsWith=, =hashFiles=, =always=, =failure=, =success=.
+
+** Q75: What is =always()= used for?
+Run cleanup/reporting even if previous steps failed.
+
+** Q76: What is =failure()= condition?
+Run step only when earlier failure occurred.
+
+** Q77: What is =hashFiles()= use case?
+Generate cache key segment from file contents.
+
+** Q78: What is dependency caching pitfall?
+Overly broad keys causing stale/incompatible cache restores.
+
+** Q79: Cache restore-keys purpose?
+Fallback matching when exact cache key not found.
+
+** Q80: What is artifact retention period?
+How long uploaded artifacts are stored before expiry.
+
+** Q81: What is self-hosted runner advantage?
+Custom hardware/network access and potentially lower cost at scale.
+
+** Q82: Self-hosted runner risk?
+Security hardening, maintenance, and secret exposure responsibility.
+
+** Q83: What is ephemeral self-hosted runner pattern?
+Short-lived runner instance per job for isolation.
+
+** Q84: Why ephemeral runners improve security?
+Reduce persistence of compromised state between jobs.
+
+** Q85: What is runner label?
+Tag used to route jobs to appropriate self-hosted runners.
+
+** Q86: What is service container in Actions?
+Sidecar container (e.g., DB/Redis) available during job.
+
+** Q87: Why use service containers?
+Integration tests with disposable dependencies in CI.
+
+** Q88: What is container job?
+Run job steps inside specified container image.
+
+** Q89: Container job benefit?
+Consistent runtime environment across runners.
+
+** Q90: What is strategy.max-parallel?
+Limits concurrent matrix job executions.
+
+** Q91: Why cap matrix parallelism?
+Control cost and avoid overloading external systems.
+
+** Q92: What is dependency graph of jobs?
+DAG defined by =needs= relationships.
+
+** Q93: What is required workflow concept?
+Org-level enforced workflows/controls (policy-dependent setup).
+
+** Q94: What is CODEOWNERS relation to Actions?
+Can require specific reviewers for workflow file changes.
+
+** Q95: Why protect workflow files specially?
+Pipeline changes can alter security/deployment behavior.
+
+** Q96: What is pull_request_target caution?
+Runs in base repo context; dangerous with untrusted code if misused.
+
+** Q97: Safe use principle for pull_request_target?
+Never execute untrusted PR code with elevated tokens/secrets.
+
+** Q98: What is OIDC in GitHub Actions?
+Federated identity to cloud providers without long-lived static secrets.
+
+** Q99: Why prefer OIDC over stored cloud keys?
+Short-lived credentials reduce secret leakage risk.
+
+** Q100: What is id-token permission?
+Required permission to request OIDC tokens.
+
+** Q101: What is environment URL in deployments?
+Link shown in GitHub deployment UI to target environment.
+
+** Q102: What is deployment job pattern?
+Build artifact once, then deploy immutable artifact across environments.
+
+** Q103: Why immutable artifact promotion?
+Consistency between tested and deployed binary.
+
+** Q104: What is monorepo CI challenge in Actions?
+Unnecessary runs for unaffected components.
+
+** Q105: Monorepo optimization strategy?
+Path-based workflows, selective matrices, reusable component pipelines.
+
+** Q106: What is workflow_run trigger?
+Trigger workflow based on completion of another workflow.
+
+** Q107: When use workflow_run?
+Pipeline chaining with privilege separation (build then deploy).
+
+** Q108: What is privilege separation in CI/CD?
+Untrusted build job separated from privileged deployment job.
+
+** Q109: What is SARIF upload use?
+Publish static analysis/security findings in GitHub code scanning.
+
+** Q110: What is problem matcher concept?
+Parse logs and annotate source lines in PR checks.
+
+** Q111: What is intermediate anti-pattern?
+Single workflow handles PR CI and production deploy with shared broad secrets.
+
+** Q112: Better pipeline architecture?
+Separate CI, release, and deploy workflows with scoped permissions.
+
+** Q113: What is flaky workflow symptom?
+Intermittent failures unrelated to code changes.
+
+** Q114: Common flake causes in Actions?
+Network instability, race conditions, shared external state, timeouts.
+
+** Q115: Flake mitigation baseline?
+Retries (targeted), deterministic tests, isolated environments, observability.
+
+** Q116: What is concurrency for deployments?
+Serialize per environment/service to avoid overlapping releases.
+
+** Q117: What is rollback workflow pattern?
+Manual/automated workflow to redeploy previous known-good version.
+
+** Q118: What is intermediate security baseline?
+SHA-pinned actions, OIDC, restricted permissions, protected environments.
+
+** Q119: What is intermediate reliability baseline?
+Deterministic builds, artifact promotion, guarded deploy gates.
+
+** Q120: What is intermediate observability baseline?
+DORA-ish metrics: lead time, deployment frequency, MTTR, change failure rate.
+
+** Q121: What is workflow performance bottleneck analysis?
+Identify longest critical-path jobs and cache misses.
+
+** Q122: What is intermediate cost optimization?
+Runner right-sizing, reduced duplicate runs, smarter matrix scope.
+
+** Q123: Intermediate maturity signal?
+Team can explain trust boundaries and token permissions for each workflow.
+
+** Q124: Intermediate governance principle?
+CI/CD templates with controlled extension points.
+
+** Q125: Intermediate DX principle?
+Fast PR feedback and clear failure diagnostics.
+
+** Q126: What is intermediate release principle?
+Tag-driven versioned releases with changelog and provenance.
+
+** Q127: What is release artifact signing?
+Cryptographically signing binaries/images during pipeline.
+
+** Q128: Why sign artifacts?
+Integrity verification and supply-chain trust.
+
+** Q129: What is intermediate compliance principle?
+Audit trail for who approved and deployed what, when.
+
+** Q130: Intermediate best practice?
+Design workflows as secure software systems, not just YAML scripts.
+
+* Advanced
+
+** Q131: What is CI/CD platform engineering with Actions?
+Providing centralized reusable workflows, runners, policies, and observability for many teams.
+
+** Q132: What is workflow template strategy?
+Org-standard starter workflows for common stacks/use cases.
+
+** Q133: What is reusable workflow versioning model?
+Pin callers to tagged/sha versions and roll out updates progressively.
+
+** Q134: Why avoid floating main reference for central workflows?
+Uncontrolled breaking changes across dependent repositories.
+
+** Q135: What is supply-chain risk in GitHub Actions?
+Compromised third-party actions, tampered dependencies, malicious workflow changes.
+
+** Q136: Core supply-chain mitigations?
+SHA pinning, action allowlists, artifact attestations, dependency scanning.
+
+** Q137: What is artifact attestation concept?
+Cryptographic metadata linking artifact to trusted build process/source.
+
+** Q138: Why provenance matters in CI/CD?
+Enables verification and incident response for released artifacts.
+
+** Q139: What is SLSA relevance to Actions?
+Framework for software supply-chain maturity and build integrity controls.
+
+** Q140: What is hardened runner baseline?
+Ephemeral instances, minimal tools, locked egress, patched OS, least privilege.
+
+** Q141: What is network egress control for runners?
+Restrict outbound destinations to reduce exfiltration risk.
+
+** Q142: What is secret zero challenge in CI/CD?
+Securely bootstrapping initial auth without exposing long-lived credentials.
+
+** Q143: OIDC trust policy hardening?
+Bind cloud role assumptions to repo, branch, workflow, and environment claims.
+
+** Q144: What is policy-as-code for workflows?
+Automated checks enforcing CI/CD security and compliance rules.
+
+** Q145: Example policy checks?
+No unpinned actions, no broad write perms, required approvals for prod deploy.
+
+** Q146: What is multi-tenant runner isolation issue?
+Jobs from different repos/teams may impact each other if isolation weak.
+
+** Q147: How isolate multi-tenant workloads?
+Ephemeral runners per trust boundary and strict credential separation.
+
+** Q148: What is large monorepo scaling pattern?
+Change detection graph -> targeted builds/tests -> aggregated required checks.
+
+** Q149: What is dynamic matrix generation?
+Compute matrix values at runtime from repo metadata/changed components.
+
+** Q150: Dynamic matrix risk?
+Complexity and harder debugging if generation logic opaque.
+
+** Q151: What is pipeline critical path optimization?
+Shorten longest dependency chain to reduce total lead time.
+
+** Q152: How reduce critical path?
+Parallelize independent jobs, prebuild caches, split heavy tests smartly.
+
+** Q153: What is remote cache/artifact proxy benefit?
+Faster dependency retrieval and reduced external outages impact.
+
+** Q154: What is deterministic pipeline principle?
+Same commit + inputs should produce same outputs/results.
+
+** Q155: Non-determinism sources in Actions?
+Floating versions, time-dependent tests, mutable external services.
+
+** Q156: What is deployment ring strategy?
+Progressive rollout stages (internal, canary, region subsets, full prod).
+
+** Q157: What is automated canary analysis concept?
+Promotion/rollback based on error/latency/SLO metrics.
+
+** Q158: What is progressive delivery with Actions?
+Workflows orchestrate staged rollouts with policy gates and observability checks.
+
+** Q159: What is rollback automation maturity?
+One-click or auto-triggered safe revert using immutable previous artifacts.
+
+** Q160: What is incident mode pipeline behavior?
+Freeze noncritical deploys, enable emergency fixes with tightened audit path.
+
+** Q161: What is break-glass workflow?
+Controlled emergency deployment path with extra approvals/logging.
+
+** Q162: What is compliance evidence in Actions?
+Run logs, approvals, artifact signatures, policy check results, deployment history.
+
+** Q163: What is retention strategy for CI evidence?
+Store logs/artifacts long enough for audit and incident investigations.
+
+** Q164: What is advanced observability stack for Actions?
+Workflow metrics, queue times, runner utilization, failure taxonomy, cost dashboards.
+
+** Q165: What is DORA metric mapping in Actions?
+Use workflow/deployment events to compute lead time, freq, MTTR, CFR.
+
+** Q166: What is flaky-test governance model?
+Ownership, quarantine SLA, and merge policy impacts.
+
+** Q167: Why quarantined tests must expire?
+Permanent quarantine hides quality debt and risk.
+
+** Q168: What is cross-repo orchestration pattern?
+Repository_dispatch/workflow_call/workflow_run to coordinate dependent releases.
+
+** Q169: Cross-repo orchestration risk?
+Token scope sprawl and event-loop complexity.
+
+** Q170: Mitigation for orchestration risk?
+Minimal scoped tokens, explicit contracts, idempotent triggers.
+
+** Q171: What is GitHub-hosted larger runners concept?
+Bigger managed runners for heavier workloads (availability by plan/region).
+
+** Q172: When use larger runners?
+Large builds/tests requiring higher CPU/RAM/disk throughput.
+
+** Q173: Cost control for larger runners?
+Use only on bottleneck jobs with measured ROI.
+
+** Q174: What is advanced anti-pattern in Actions?
+Embedding business-critical deploy logic in ad-hoc scripts with no tests/versioning.
+
+** Q175: Better architecture?
+Versioned deployment tooling/actions with tests and clear interfaces.
+
+** Q176: What is final reliability principle?
+Pipelines must be deterministic, observable, and rollback-capable.
+
+** Q177: What is final security principle?
+Treat workflows as privileged code with strict trust boundaries.
+
+** Q178: What is final performance principle?
+Continuously optimize critical path and cache effectiveness.
+
+** Q179: What is final governance principle?
+Central guardrails + reusable standards + auditable exceptions.
+
+** Q180: What is final operations principle?
+Measure pipeline health like production service health.
+
+** Q181: What is final developer-experience principle?
+Fast, actionable CI feedback with minimal noise.
+
+** Q182: What is final platform principle?
+Separate untrusted build from trusted deploy contexts.
+
+** Q183: What is final supply-chain principle?
+Verify origin and integrity of every dependency and artifact.
+
+** Q184: What is final scaling principle?
+Design workflows modularly for org-wide reuse and independent evolution.
+
+** Q185: Final maturity principle?
+GitHub Actions excellence is secure, governed, high-velocity delivery automation.
+
+* Bonus: Minimal CI Workflow Template (Java + Maven)
+
+#+BEGIN_SRC yaml
+name: ci
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build and test
+        run: mvn -B clean verify
+#+END_SRC
+
+-----
