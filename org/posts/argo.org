@@ -1,0 +1,595 @@
+#+title: Argo
+#+date: 2026-08-11
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Argo
+
+-----
+
+* Beginner
+
+** Q1: What is Argo?
+Argo is a CNCF ecosystem of Kubernetes-native tools for delivery and workflow orchestration.
+
+** Q2: What is Argo CD?
+A GitOps continuous delivery tool that syncs Kubernetes state from Git.
+
+** Q3: What is Argo Workflows?
+A workflow engine for defining DAG/step-based jobs as Kubernetes custom resources.
+
+** Q4: What problem does Argo CD solve?
+Configuration drift and manual deployment inconsistencies.
+
+** Q5: What problem does Argo Workflows solve?
+Reliable orchestration of multi-step batch/data/ML/CI processes on Kubernetes.
+
+** Q6: GitOps in one line?
+Git is the source of truth; controllers reconcile runtime state to match it.
+
+** Q7: Push vs pull CD model?
+Push applies changes from CI; pull (Argo CD) reconciles from Git inside cluster.
+
+** Q8: Why pull model can be safer?
+CI does not need broad direct cluster-admin deployment credentials.
+
+** Q9: What is an Argo CD Application?
+CRD representing source manifests and destination cluster/namespace.
+
+** Q10: What does OutOfSync mean in Argo CD?
+Live state differs from desired state in Git.
+
+** Q11: What does Synced mean?
+Live state matches desired source revision/config.
+
+** Q12: What does Healthy mean?
+Application resources pass health checks.
+
+** Q13: What is sync in Argo CD?
+Operation applying desired manifests to cluster.
+
+** Q14: What is auto-sync?
+Automatic reconciliation when source changes or drift appears.
+
+** Q15: What is prune in Argo CD?
+Delete resources removed from desired manifests.
+
+** Q16: What is self-heal?
+Revert manual cluster drift back to Git-defined state.
+
+** Q17: What is Argo CD project (AppProject)?
+Policy boundary controlling allowed sources, destinations, and RBAC scope.
+
+** Q18: Why AppProjects are important?
+Multi-team isolation and governance guardrails.
+
+** Q19: What is Argo CD sync policy?
+Rules for automated sync, prune, self-heal, and options.
+
+** Q20: What is sync wave?
+Ordering mechanism for resource apply sequencing.
+
+** Q21: Why ordering matters?
+Dependencies (CRDs/namespaces/secrets) must exist before dependent workloads.
+
+** Q22: What is a hook in Argo CD?
+Lifecycle resource/action at pre-sync/sync/post-sync phases.
+
+** Q23: Argo CD with Helm?
+Argo CD renders Helm charts and reconciles resulting manifests.
+
+** Q24: Argo CD with Kustomize?
+Argo CD builds overlays and reconciles output manifests.
+
+** Q25: What is Argo Workflows Workflow CR?
+Kubernetes resource defining workflow steps, DAG, and templates.
+
+** Q26: What is a template in Argo Workflows?
+Reusable task definition (container/script/resource/etc.).
+
+** Q27: What is DAG template?
+Workflow graph with explicit task dependencies.
+
+** Q28: Steps template vs DAG template?
+Steps are sequential/parallel step groups; DAG gives explicit dependency graph flexibility.
+
+** Q29: What is WorkflowTemplate?
+Reusable cluster/namespace-level workflow blueprint.
+
+** Q30: What is ClusterWorkflowTemplate?
+Cluster-scoped reusable workflow template.
+
+** Q31: What is CronWorkflow?
+Scheduled recurring workflow execution.
+
+** Q32: What is artifact in Argo Workflows?
+File/object output passed between steps (e.g., S3/GCS/MinIO-backed).
+
+** Q33: What is parameter in Argo Workflows?
+Typed/string input/output value passed between templates/tasks.
+
+** Q34: What is workflow archive?
+Stored workflow metadata/history for observability/compliance.
+
+** Q35: What is Argo UI used for?
+Visualizing applications/workflows, status, logs, and history.
+
+** Q36: What is Argo CLI?
+Command-line interaction for submit/get/watch/sync operations.
+
+** Q37: What is workflow retry strategy?
+Policy to retry failed steps/workflows under defined conditions.
+
+** Q38: Why retries need caution?
+Can duplicate side effects if tasks are not idempotent.
+
+** Q39: What is idempotency in workflow tasks?
+Safe repeated execution without unintended duplicate effects.
+
+** Q40: What is beginner anti-pattern in Argo CD?
+Letting teams deploy everywhere without project restrictions.
+
+** Q41: Beginner anti-pattern in Workflows?
+Single giant workflow with no modular templates/reuse.
+
+** Q42: Beginner security baseline?
+Least privilege service accounts and scoped repo credentials.
+
+** Q43: Beginner reliability baseline?
+Health checks, retries, and clear failure notifications.
+
+** Q44: Beginner observability baseline?
+Track sync status, workflow success rate, and duration.
+
+** Q45: What is desired vs live state?
+Declared config in Git vs actual cluster resources.
+
+** Q46: Why drift detection is valuable?
+Detects unauthorized/manual changes and config entropy.
+
+** Q47: What is manual sync?
+Operator explicitly triggers apply/reconcile.
+
+** Q48: What is sync window?
+Time-based allow/deny policy for sync operations.
+
+** Q49: Why use sync windows?
+Control production change timing and risk exposure.
+
+** Q50: What is namespace-scoped installation concept?
+Limiting tool impact and access to specific namespaces where possible.
+
+** Q51: What is service account role in Argo?
+Identity used by controllers/workflows to call Kubernetes APIs.
+
+** Q52: Why avoid cluster-admin by default?
+Minimize blast radius and privilege abuse risk.
+
+** Q53: What is workflow pod?
+Kubernetes pod created to execute a workflow task.
+
+** Q54: What is artifact repository in Workflows?
+External storage backend for step outputs/logs/artifacts.
+
+** Q55: Why external artifact store matters?
+Decouples workflow data from ephemeral pod lifecycle.
+
+** Q56: What is parallelism control in Workflows?
+Limits concurrent tasks/workflows for stability/cost control.
+
+** Q57: What is concurrencyPolicy in CronWorkflow?
+Rules for overlapping scheduled runs (Allow/Forbid/Replace).
+
+** Q58: What is suspend in workflow context?
+Pause execution for approvals/timing/manual intervention.
+
+** Q59: Beginner team workflow for Argo?
+PR-reviewed Git changes trigger controlled reconciliation/execution.
+
+** Q60: Beginner platform workflow?
+Standard templates/projects with documented boundaries.
+
+** Q61: Beginner cost baseline?
+Avoid over-parallelization and oversized workflow pods.
+
+** Q62: Beginner recovery baseline?
+Use rollback (CD) and retry/resubmit (workflows) runbooks.
+
+** Q63: Beginner architecture principle?
+Separate delivery concerns (Argo CD) from compute orchestration (Workflows).
+
+** Q64: Beginner governance principle?
+Protect Git branches and restrict production sync permissions.
+
+** Q65: Beginner best practice?
+Start with simple declarative patterns and tighten controls early.
+
+* Intermediate
+
+** Q66: What is ApplicationSet in Argo CD?
+Controller generating many Applications from templates/generators.
+
+** Q67: Why use ApplicationSet?
+Scalable multi-cluster/multi-tenant app onboarding and management.
+
+** Q68: Common ApplicationSet generators?
+Git, list, cluster, matrix, pull request (depending setup/version).
+
+** Q69: What is app-of-apps pattern?
+Parent application managing child Application manifests.
+
+** Q70: app-of-apps benefit?
+Bootstraps and organizes large platform/application fleets.
+
+** Q71: app-of-apps risk?
+Hierarchy complexity and accidental broad-impact changes.
+
+** Q72: What is progressive sync concept?
+Phased synchronization across groups/waves/environments.
+
+** Q73: What is selective sync?
+Sync subset of resources instead of full application.
+
+** Q74: Why selective sync carefully?
+Can introduce temporary inconsistency if overused.
+
+** Q75: What is diff customization?
+Ignore expected field drift/noise during comparison.
+
+** Q76: Why ignore differences sometimes?
+Controllers mutate fields (timestamps/order/defaults) causing noisy OutOfSync.
+
+** Q77: Risk of overly broad ignore rules?
+Masking real drift and configuration errors.
+
+** Q78: What is resource exclusion/inclusion strategy?
+Define which resource kinds/namespaces Argo CD manages.
+
+** Q79: What is orphaned resources monitoring?
+Detect untracked resources under app scope.
+
+** Q80: What is Argo CD RBAC model?
+Policy rules mapping users/groups to actions/resources/projects.
+
+** Q81: Why SSO integration is important?
+Centralized identity lifecycle and access governance.
+
+** Q82: What is repo credential template?
+Reusable authentication config for repository access.
+
+** Q83: What is private Helm/OCI repo integration?
+Authenticated chart source consumption in Argo CD.
+
+** Q84: What is manifest generation plugin (CMP) concept?
+Custom tooling pipeline for generating manifests before sync.
+
+** Q85: Why CMP/plugins need governance?
+Execution of custom code increases security/operational risk.
+
+** Q86: What is sync failure triage flow?
+Diff -> events -> controller logs -> resource health -> RBAC/network checks.
+
+** Q87: What is Argo Workflows DAG dependency expression?
+Task graph with =dependencies= and conditional execution.
+
+** Q88: What is when clause in Workflows?
+Conditionally run task/template based on parameters/results.
+
+** Q89: What is fan-out/fan-in in Workflows?
+Parallel task expansion then aggregation step.
+
+** Q90: What is withItems/withParam usage?
+Iterative task execution over list/JSON parameters.
+
+** Q91: What is memoization/work avoidance concept?
+Skipping already computed task outputs under deterministic conditions.
+
+** Q92: What is synchronization feature in Workflows?
+Mutex/semaphore limiting concurrency across workflows/tasks.
+
+** Q93: Why synchronization matters?
+Protect shared external systems and prevent race conditions.
+
+** Q94: What is podGC strategy?
+Cleanup completed workflow pods to reduce cluster pressure.
+
+** Q95: What is ttlStrategy in Workflows?
+Auto-delete workflow resources after completion window.
+
+** Q96: Why TTL helps?
+Controls resource bloat and API server load.
+
+** Q97: What is workflow-level parallelism?
+Cap concurrent pods/tasks within a workflow.
+
+** Q98: What is controller-level parallelism?
+Global cap across workflows managed by controller.
+
+** Q99: What is artifact passing pitfall?
+Large artifact movement can dominate runtime/cost.
+
+** Q100: Mitigation for large artifact overhead?
+Chunking, compression, locality-aware design, external data references.
+
+** Q101: What is exit handler in Workflows?
+Final template executed regardless of success/failure for cleanup/notify.
+
+** Q102: What is workflow event binding concept?
+Trigger workflows from external events/webhooks.
+
+** Q103: What is Argo Events relation?
+Event-driven framework to trigger workflows/K8s actions from many sources.
+
+** Q104: What is intermediate anti-pattern in Argo CD?
+Using mutable branch heads for production without promotion controls.
+
+** Q105: Better production revision strategy?
+Pin to tags/commits with promotion PR workflow.
+
+** Q106: What is intermediate anti-pattern in Workflows?
+Embedding secrets directly in workflow specs.
+
+** Q107: Better secret handling?
+Kubernetes secrets/external secret manager with scoped service accounts.
+
+** Q108: What is observability must-have for Argo CD?
+Sync latency, OutOfSync count, failed sync rate, health degradation trends.
+
+** Q109: Observability must-have for Workflows?
+Success rate, queue/wait time, task duration percentiles, retry/failure causes.
+
+** Q110: What is cost optimization in Workflows?
+Right-size resources, control parallelism, prune artifacts/TTL aggressively.
+
+** Q111: What is HA setup concept for Argo controllers?
+Multiple replicas with leader election and resilient backing services.
+
+** Q112: Why Redis/DB/backend considerations matter?
+State/cache/backing service issues can impact control-plane responsiveness.
+
+** Q113: What is multi-cluster Argo CD pattern?
+One control plane managing many destination clusters.
+
+** Q114: Multi-cluster risk?
+Credential sprawl and broad blast radius if misconfigured.
+
+** Q115: Mitigation for multi-cluster risk?
+Project boundaries, scoped cluster creds, per-env separation where needed.
+
+** Q116: What is promotion pipeline with Argo CD?
+PR-driven manifest/version change promoted across env repos/dirs.
+
+** Q117: What is rollback in GitOps model?
+Git revert to previous desired state then reconcile.
+
+** Q118: What is rollback caveat?
+External irreversible changes (DB/data) may need additional remediation.
+
+** Q119: Intermediate maturity signal?
+Teams can predict sync/workflow behavior and recover quickly from failures.
+
+** Q120: Intermediate reliability principle?
+All workflows and syncs should be idempotent and observable.
+
+** Q121: Intermediate security principle?
+Scoped identities, protected repos, and policy controls by default.
+
+** Q122: Intermediate governance principle?
+Standard templates/projects with documented exception process.
+
+** Q123: Intermediate platform principle?
+Separate tenant workloads from Argo control-plane components.
+
+** Q124: Intermediate architecture principle?
+Use Argo CD for state convergence, Workflows for execution logic.
+
+** Q125: Intermediate ops principle?
+Practice incident response for failed syncs and stuck workflows.
+
+** Q126: Intermediate collaboration principle?
+Platform team enables paved roads; app teams own app-specific configs.
+
+** Q127: Intermediate delivery principle?
+Promote immutable revisions, avoid mutable production targets.
+
+** Q128: Intermediate scaling principle?
+Automate app/workflow generation and lifecycle cleanup.
+
+** Q129: Intermediate compliance principle?
+Keep auditable trail from PR to sync/workflow execution.
+
+** Q130: Intermediate best practice?
+Optimize for controlled automation, not maximum automation.
+
+* Advanced
+
+** Q131: What is Argo control-plane architecture challenge?
+Balancing reconciliation speed, API load, and multi-tenant isolation.
+
+** Q132: What is reconciliation storm?
+Massive concurrent resync causing API/server pressure spikes.
+
+** Q133: Storm mitigation strategies?
+Backoff, rate limiting, sharding apps/projects, staggered sync windows.
+
+** Q134: What is sharding in Argo CD context?
+Partitioning app management across controller instances/projects.
+
+** Q135: Why shard at scale?
+Reduce blast radius and improve performance isolation.
+
+** Q136: What is app fleet topology strategy?
+Organize by env/domain/tenant/region for clearer ownership and risk control.
+
+** Q137: What is policy-as-code integration?
+OPA/Kyverno/Admission policies validating rendered/applied resources.
+
+** Q138: Why enforce policy before sync?
+Prevent insecure/noncompliant resources reaching cluster.
+
+** Q139: What is supply-chain risk in GitOps?
+Compromised repo, dependency, manifest generator, or controller credentials.
+
+** Q140: Supply-chain mitigations for Argo?
+Signed commits/tags, protected branches, verified sources, least privilege.
+
+** Q141: What is provenance relevance for Argo workflows?
+Trace execution inputs/artifacts to support trust and audits.
+
+** Q142: What is SLSA-style thinking in Argo pipelines?
+Strengthen integrity of source-to-deploy/source-to-workflow chain.
+
+** Q143: What is secret zero challenge in Argo?
+Secure bootstrap of first credentials for repo/cluster/artifact access.
+
+** Q144: Mitigation for secret zero?
+Workload identity, external secret operators, short-lived credentials.
+
+** Q145: What is zero-trust posture in Argo platforms?
+Authenticate every component interaction and minimize implicit trust.
+
+** Q146: What is multi-tenant hard isolation pattern?
+Per-tenant Argo instances/namespaces/clusters depending risk/compliance profile.
+
+** Q147: Soft vs hard multi-tenancy tradeoff?
+Efficiency vs stronger isolation/security guarantees.
+
+** Q148: What is DR strategy for Argo CD?
+Back up configs/projects/reposettings + Git state + cluster restore runbooks.
+
+** Q149: What is DR strategy for Workflows?
+Archive metadata/artifacts, backup controller config, rehearse replay/restart.
+
+** Q150: Why rehearse recovery?
+Unrehearsed backups often fail under real incident pressure.
+
+** Q151: What is workflow determinism challenge?
+Non-deterministic external dependencies/time/data can alter outcomes.
+
+** Q152: Determinism improvement tactics?
+Pinned images, explicit params, controlled inputs, reproducible environments.
+
+** Q153: What is long-running workflow reliability challenge?
+Node failures, token expiry, artifact retention, and retry semantics over time.
+
+** Q154: What is checkpointing pattern in workflows?
+Persist intermediate state to resume/retry safely.
+
+** Q155: What is exactly-once effect challenge?
+Retries can duplicate side effects in external systems.
+
+** Q156: Mitigation for side-effect duplication?
+Idempotency keys, transactional outbox/inbox, dedup logic.
+
+** Q157: What is workflow queue starvation?
+Low-priority/high-volume jobs blocking critical workflows.
+
+** Q158: Mitigation for starvation?
+Priority classes, quota pools, separate controllers/queues.
+
+** Q159: What is cluster autoscaling interplay with Workflows?
+Bursty workflow pods can drive rapid node scale events/cost spikes.
+
+** Q160: Cost guardrails for bursty workflows?
+Parallelism limits, quotas, budget alerts, preemption policies.
+
+** Q161: What is GitOps promotion at enterprise scale?
+Automated PR orchestration across env repos with policy gates.
+
+** Q162: What is progressive delivery integration?
+Argo CD + rollout controller + metric analysis for safe traffic shifts.
+
+** Q163: What is rollback intelligence?
+Using SLO/error signals to auto-halt/rollback rollout stages.
+
+** Q164: What is false rollback risk at scale?
+Noisy metrics trigger unnecessary reversions and churn.
+
+** Q165: Mitigation for noisy rollback?
+Baseline comparison, multi-window checks, human override policy.
+
+** Q166: What is compliance evidence model with Argo?
+Link identity, PR approval, commit, sync/workflow execution, and outcomes.
+
+** Q167: What is separation of duties with Argo?
+Different roles for config authors, approvers, and production operators.
+
+** Q168: What is advanced anti-pattern?
+Treating Argo as “set and forget” without SLOs and governance.
+
+** Q169: Better operating model?
+Dedicated platform ownership with roadmap, runbooks, and reliability targets.
+
+** Q170: What is Argo observability gold standard?
+Unified dashboards: reconcile lag, sync failures, workflow latency, cost, SLO impact.
+
+** Q171: What is event-driven platform pattern with Argo?
+Argo Events triggers Workflows while Argo CD manages persistent platform state.
+
+** Q172: What is control-plane blast radius principle?
+Separate critical platform apps from high-churn tenant apps.
+
+** Q173: What is migration strategy into Argo?
+Incremental onboarding by domain, with dual-run validation and rollback plan.
+
+** Q174: Why avoid big-bang GitOps migration?
+High risk of drift/conflict and operational overload.
+
+** Q175: What is final reliability principle?
+Automation must be observable, idempotent, and recoverable.
+
+** Q176: What is final security principle?
+Every Argo action path must enforce identity, integrity, and least privilege.
+
+** Q177: What is final governance principle?
+Standardize safe defaults, automate policy, and audit exceptions.
+
+** Q178: What is final performance principle?
+Optimize reconciliation/workflow throughput without sacrificing stability.
+
+** Q179: What is final architecture principle?
+Use Git for desired state, controllers for convergence, workflows for computation.
+
+** Q180: What is final operations principle?
+Practice incident/DR playbooks regularly across both CD and workflow planes.
+
+** Q181: What is final collaboration principle?
+Platform and application teams share ownership through clear boundaries/contracts.
+
+** Q182: What is final scaling principle?
+Shard and templatize early to avoid control-plane bottlenecks.
+
+** Q183: What is final delivery principle?
+Promote immutable, reviewed revisions across environments.
+
+** Q184: What is final data principle for workflows?
+Treat artifacts/parameters as governed assets with lifecycle controls.
+
+** Q185: Final maturity principle?
+Argo excellence is secure, scalable, policy-driven automation for delivery and orchestration.
+
+* Bonus: Minimal Conceptual Manifests
+
+** QArgo CD Application (conceptual)
+#+BEGIN_SRC yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/example/platform-config
+    path: apps/demo
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+#+END_SRC
