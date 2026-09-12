@@ -1,0 +1,584 @@
+#+title: Terraform
+#+date: 2026-08-15
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Terraform
+
+* Beginner
+
+** Q1. What is Terraform?
+Terraform is an infrastructure-as-code tool for provisioning and managing infrastructure declaratively.
+
+** Q2. Why use Terraform?
+It enables consistent, versioned, repeatable infrastructure changes across providers.
+
+** Q3. What is Infrastructure as Code (IaC)?
+Managing infrastructure through code definitions rather than manual console actions.
+
+** Q4. What language does Terraform use?
+HCL (HashiCorp Configuration Language).
+
+** Q5. What is a provider in Terraform?
+Plugin that translates Terraform resources into API calls for a platform/service.
+
+** Q6. What is a resource?
+A managed infrastructure object (VM, VPC, bucket, DNS record, etc.).
+
+** Q7. What is a data source?
+Read-only lookup of existing external information/resources.
+
+** Q8. Resource vs data source?
+Resource creates/manages objects; data source reads existing state.
+
+** Q9. What is a module?
+Reusable collection of Terraform configurations.
+
+** Q10. Why use modules?
+Reduce duplication and standardize infrastructure patterns.
+
+** Q11. What is root module?
+Top-level configuration in current working directory.
+
+** Q12. What is child module?
+Module called by another module.
+
+** Q13. What is variable in Terraform?
+Input parameter for configurable module behavior.
+
+** Q14. What is output in Terraform?
+Exposed value from a module for consumption elsewhere.
+
+** Q15. What is local value?
+Named expression for reuse within module.
+
+** Q16. What is terraform init?
+Initializes working directory, downloads providers/modules, configures backend.
+
+** Q17. What is terraform plan?
+Shows execution plan of proposed changes.
+
+** Q18. What is terraform apply?
+Executes approved plan to modify infrastructure.
+
+** Q19. What is terraform destroy?
+Deletes managed infrastructure resources.
+
+** Q20. What is state file?
+Terraform’s mapping of real resources to configuration metadata.
+
+** Q21. Why state is critical?
+Terraform uses it to calculate diffs and track managed objects.
+
+** Q22. What is default local state risk?
+Team conflicts and no central locking/history.
+
+** Q23. What is remote backend?
+Centralized state storage (S3, GCS, Terraform Cloud, etc.).
+
+** Q24. Why use remote state backend?
+Collaboration, locking, durability, and governance.
+
+** Q25. What is state locking?
+Prevents concurrent conflicting operations on same state.
+
+** Q26. Why locking matters?
+Avoids race conditions and state corruption.
+
+** Q27. What is drift?
+Real infrastructure diverges from Terraform state/configuration.
+
+** Q28. How detect drift?
+Run plan/refresh workflows and compare expected vs actual resources.
+
+** Q29. What is idempotency in Terraform?
+Repeated applies converge infrastructure toward same declared state.
+
+** Q30. What is dependency graph in Terraform?
+Directed graph determining resource creation/update/destroy order.
+
+** Q31. How dependencies are inferred?
+From attribute references between resources.
+
+** Q32. What is explicit depends_on?
+Manual dependency declaration when implicit reference is absent.
+
+** Q33. What is interpolation/expression?
+Dynamic value construction using references/functions.
+
+** Q34. What is count?
+Meta-argument to create multiple instances by numeric count.
+
+** Q35. What is for_each?
+Meta-argument creating instances from map/set keys (stable addressing).
+
+** Q36. count vs for_each quick rule?
+for_each preferred for keyed identity stability.
+
+** Q37. What is lifecycle block?
+Rules controlling create/destroy behavior (create_before_destroy, prevent_destroy, ignore_changes).
+
+** Q38. What is create_before_destroy?
+Attempts replacement creation before deleting old resource.
+
+** Q39. What is prevent_destroy?
+Blocks accidental resource destruction unless explicitly changed.
+
+** Q40. What is ignore_changes?
+Ignores selected attribute drift during diff/apply.
+
+** Q41. ignore_changes risk?
+Can hide important drift and configuration issues.
+
+** Q42. What is terraform fmt?
+Formats Terraform files consistently.
+
+** Q43. What is terraform validate?
+Checks configuration syntax/internal validity.
+
+** Q44. What is terraform output?
+Displays output values from state.
+
+** Q45. What is terraform show?
+Displays state or plan details in human-readable form.
+
+** Q46. What is tfvars file?
+Variable values file for environment-specific inputs.
+
+** Q47. Why separate tfvars by environment?
+Avoid accidental cross-environment parameter mixing.
+
+** Q48. What is workspace in Terraform?
+Named state isolation within same configuration (with caveats).
+
+** Q49. Workspace caveat?
+Not a full substitute for strong environment isolation architecture.
+
+** Q50. What is sensitive variable/output?
+Value flagged to reduce accidental display in CLI output.
+
+** Q51. Sensitive flag limitation?
+Doesn’t encrypt secrets inside state automatically.
+
+** Q52. What is beginner anti-pattern in Terraform?
+Putting many unrelated systems in one giant state.
+
+** Q53. Another beginner anti-pattern?
+Hardcoding secrets in .tf files.
+
+** Q54. Beginner security baseline?
+Remote encrypted state + least-privilege credentials + secret manager integration.
+
+** Q55. Beginner reliability baseline?
+Plan before apply and use locking-enabled backend.
+
+** Q56. Beginner governance baseline?
+Version control + pull request reviews for all IaC changes.
+
+** Q57. Beginner performance baseline?
+Keep modules focused and provider calls efficient.
+
+** Q58. Beginner workflow principle?
+Never apply unreviewed changes directly to production.
+
+** Q59. Beginner collaboration principle?
+Use shared conventions for naming, tagging, and module structure.
+
+** Q60. Beginner operations principle?
+Document rollback and break-glass procedures.
+
+** Q61. What is Terraform Cloud/Enterprise concept?
+Managed platform for runs, state, policy, and team governance.
+
+** Q62. Why IaC code review is essential?
+Infrastructure mistakes can have high blast radius/cost.
+
+** Q63. What is immutable infrastructure concept?
+Replace resources instead of mutating in place where practical.
+
+** Q64. Beginner testing baseline?
+Validate/fmt/plan in CI for every change.
+
+** Q65. Beginner best practice?
+Start small, modular, and state-safe from day one.
+
+* Intermediate
+
+** Q66. What is module interface design?
+Defining clear inputs/outputs and minimal assumptions.
+
+** Q67. Why stable module interfaces matter?
+Enables reuse without breaking downstream consumers.
+
+** Q68. What is module version pinning?
+Locking module versions to avoid unexpected behavior changes.
+
+** Q69. What is provider version constraint?
+Controlled version range for provider plugin compatibility/stability.
+
+** Q70. Why pin providers?
+Reproducible runs and safer upgrade management.
+
+** Q71. What is required_providers block?
+Declares provider sources and version requirements.
+
+** Q72. What is required_version?
+Constrains Terraform CLI versions for compatibility.
+
+** Q73. What is backend partial configuration?
+Keep sensitive/backend-specific values outside static code.
+
+** Q74. What is remote state data source?
+Reads outputs from another Terraform state snapshot.
+
+** Q75. remote_state risk?
+Tight coupling between stacks and hidden dependencies.
+
+** Q76. Better cross-stack contract pattern?
+Publish explicit outputs to registry/config systems where possible.
+
+** Q77. What is terraform import?
+Bring existing unmanaged resource under Terraform state.
+
+** Q78. Import caveat?
+State entry created, but config still must match resource attributes.
+
+** Q79. What is moved block?
+Declaratively map old addresses to new addresses during refactors.
+
+** Q80. Why moved blocks are useful?
+Safer refactoring without destructive recreation.
+
+** Q81. What is taint/untaint concept?
+Mark resource for forced recreation (modern workflows often prefer -replace).
+
+** Q82. What is -replace flag?
+Explicitly force replacement of selected resource instance during apply.
+
+** Q83. What is targeted apply (-target) caution?
+Useful for recovery, but can bypass full graph intent if overused.
+
+** Q84. What is refresh-only plan/apply?
+Update state to reflect real infra without proposing config changes.
+
+** Q85. What is plan file output (= -out=)?
+Saved immutable execution plan for later controlled apply.
+
+** Q86. Why apply saved plan in CI/CD?
+Ensures reviewed plan is exact plan executed.
+
+** Q87. What is drift remediation workflow?
+Detect drift, classify intentional/unintentional, reconcile via code.
+
+** Q88. What is conditional expression in Terraform?
+Ternary-style logic for dynamic values.
+
+** Q89. What is for expression?
+Construct complex collections/maps from iteration logic.
+
+** Q90. What is dynamic block?
+Programmatically generate nested blocks based on input collections.
+
+** Q91. dynamic block caution?
+Overuse can reduce readability/maintainability.
+
+** Q92. What is null value behavior?
+Often indicates unset/omitted semantics depending context/provider.
+
+** Q93. What is validation block for variables?
+Custom input constraints with error messages.
+
+** Q94. Why variable validation?
+Fail fast on invalid configuration input.
+
+** Q95. What is precondition/postcondition?
+Assertions for resources/outputs to enforce assumptions (version dependent).
+
+** Q96. What is check block concept?
+Non-blocking or configurable assertions for operational validation (version dependent).
+
+** Q97. What is sentinel/OPA policy-as-code concept?
+Enforce governance/security/compliance rules on Terraform runs.
+
+** Q98. Example policy checks?
+Mandatory tags, approved regions, restricted instance sizes, no public storage.
+
+** Q99. What is cost estimation integration?
+Forecast infra cost impact before apply.
+
+** Q100. Why cost checks in CI?
+Prevent budget surprises and improve design decisions.
+
+** Q101. What is terraform graph?
+Visual representation of resource dependency graph.
+
+** Q102. What is parallelism flag?
+Controls concurrent operations during apply.
+
+** Q103. Parallelism tradeoff?
+Faster applies vs API throttling/race sensitivity.
+
+** Q104. What is retry/backoff concern?
+Cloud APIs may throttle; provider logic handles retries variably.
+
+** Q105. What is state file security risk?
+Contains infrastructure metadata and potentially sensitive values.
+
+** Q106. State security controls?
+Encryption at rest, access control, audit logs, minimal exposure.
+
+** Q107. What is intermediate anti-pattern?
+Environment selection through many conditionals in one module.
+
+** Q108. Better environment strategy?
+Separate root stacks/workspaces with explicit tfvars and pipelines.
+
+** Q109. What is mono-repo vs multi-repo IaC tradeoff?
+Central consistency vs team autonomy and blast radius boundaries.
+
+** Q110. What is stack boundary principle?
+Group resources by lifecycle/ownership/blast-radius characteristics.
+
+** Q111. Why separate networking and app stacks often?
+Different change cadence and risk profile.
+
+** Q112. What is blue/green infra deployment concept?
+Provision parallel environment and switch traffic.
+
+** Q113. What is canary infra change concept?
+Apply change to subset resources/accounts/regions first.
+
+** Q114. What is intermediate observability baseline?
+Track run duration, failure causes, drift frequency, apply success rates.
+
+** Q115. What is intermediate reliability baseline?
+Automated plan checks + tested rollback/recovery paths.
+
+** Q116. What is intermediate security baseline?
+Ephemeral credentials, least privilege, secret manager integration.
+
+** Q117. What is intermediate governance baseline?
+Mandatory policy checks and approval gates for production applies.
+
+** Q118. Intermediate maturity signal?
+Teams can refactor modules/state safely without downtime surprises.
+
+** Q119. What is intermediate ops principle?
+Treat Terraform failures as production incidents with RCA.
+
+** Q120. What is intermediate architecture principle?
+Prefer composition of small modules over giant universal modules.
+
+** Q121. What is intermediate collaboration principle?
+Platform team curates modules; product teams consume with contracts.
+
+** Q122. What is intermediate scaling principle?
+Automate module testing, docs, and version publishing pipelines.
+
+** Q123. What is intermediate compliance principle?
+Keep immutable audit trail of plans/applies and approvals.
+
+** Q124. What is intermediate cost principle?
+Tagging + budget alerts + lifecycle cleanup automation.
+
+** Q125. What is intermediate resilience principle?
+Design state/backends for failure and recovery, not convenience.
+
+** Q126. What is intermediate migration principle?
+Incrementally import/adopt legacy resources with clear ownership transitions.
+
+** Q127. What is intermediate delivery principle?
+Promote reviewed plan artifacts across environments consistently.
+
+** Q128. What is intermediate quality principle?
+Enforce linting, formatting, validation, and policy tests by default.
+
+** Q129. What is intermediate security operations principle?
+Rotate credentials and minimize long-lived cloud keys.
+
+** Q130. Intermediate best practice?
+Optimize for safe repeatability over one-time provisioning speed.
+
+* Advanced
+
+** Q131. What is enterprise Terraform platform engineering?
+Building standardized modules, pipelines, policy controls, and self-service workflows at scale.
+
+** Q132. What is private module registry value?
+Controlled distribution/versioning of approved modules.
+
+** Q133. What is golden module concept?
+Curated module implementing best-practice defaults and guardrails.
+
+** Q134. Golden module risk?
+Excess abstraction can reduce flexibility and slow adoption.
+
+** Q135. Mitigation for module rigidity?
+Clear extension points and semantic versioning discipline.
+
+** Q136. What is state sharding strategy?
+Split state by domain/environment/ownership to reduce blast radius.
+
+** Q137. Why shard state?
+Faster plans, safer concurrency, clearer ownership boundaries.
+
+** Q138. What is orchestration across many stacks challenge?
+Dependency ordering and change coordination without tight coupling.
+
+** Q139. Orchestration mitigation?
+Pipeline DAGs, explicit contracts, event-driven promotion.
+
+** Q140. What is multi-account/multi-subscription landing zone with Terraform?
+Standardized baseline governance/network/security across many cloud accounts.
+
+** Q141. What is provider alias use case?
+Manage multiple regions/accounts/providers in same configuration safely.
+
+** Q142. What is advanced drift detection model?
+Scheduled plan/refresh analysis with automated triage classification.
+
+** Q143. What is drift auto-remediation risk?
+Blind remediation can revert intentional emergency hotfixes.
+
+** Q144. Mitigation for remediation risk?
+Approval workflows and drift reason annotation.
+
+** Q145. What is supply-chain risk in Terraform ecosystem?
+Compromised providers/modules or tampered pipeline artifacts.
+
+** Q146. Supply-chain mitigation?
+Provider checksums/signatures, trusted registries, pinned versions, artifact attestation.
+
+** Q147. What is state tampering risk?
+Unauthorized modifications can hide or force destructive actions.
+
+** Q148. State tampering mitigation?
+Strict backend IAM, versioning, lock enforcement, audit monitoring.
+
+** Q149. What is zero-trust IaC execution principle?
+No implicit trust: strongly authenticated, short-lived, scoped runtime identities.
+
+** Q150. What is secret zero challenge in Terraform pipelines?
+Securely obtaining initial auth for cloud/secret manager access.
+
+** Q151. Mitigation for secret zero?
+OIDC/workload identity federation with minimal static credentials.
+
+** Q152. What is policy layering strategy?
+Org-level mandatory policies + team-level contextual policies.
+
+** Q153. What is exception management in policy-as-code?
+Time-bound, approved, auditable waivers with renewal controls.
+
+** Q154. What is Terraform at massive scale bottleneck?
+Provider API limits, run queueing, and cross-stack dependency contention.
+
+** Q155. Performance scaling tactics?
+State sharding, targeted pipelines, parallel plans, provider rate-limit tuning.
+
+** Q156. What is blast radius simulation?
+Pre-apply analysis estimating impacted resources/services.
+
+** Q157. Why blast radius analysis matters?
+Prioritize review rigor and rollout sequencing for risky changes.
+
+** Q158. What is progressive delivery for infrastructure?
+Canary account/region rollout before global apply.
+
+** Q159. What is disaster recovery for Terraform platform?
+Back up state/backend metadata, module registry, and pipeline configs; rehearse restore.
+
+** Q160. Why restore rehearsal is essential?
+Recovery assumptions fail without tested end-to-end drills.
+
+** Q161. What is IaC incident response model?
+Freeze applies, assess state integrity, execute controlled rollback/forward fix.
+
+** Q162. What is state migration challenge?
+Backend/workspace/address changes without resource recreation.
+
+** Q163. Safe migration tools/patterns?
+moved blocks, state mv/rm/import with peer-reviewed runbooks.
+
+** Q164. What is compliance evidence in Terraform workflows?
+Versioned code, plan artifacts, approvals, policy results, apply logs.
+
+** Q165. What is segregation of duties in IaC?
+Different actors for code authoring, approval, and production execution.
+
+** Q166. What is advanced anti-pattern?
+Using Terraform to run imperative scripts as primary orchestration engine.
+
+** Q167. Better boundary principle?
+Use Terraform for declarative resource lifecycle; use config/orchestration tools for runtime config.
+
+** Q168. Terraform + Kubernetes advanced pattern?
+Provision cluster infrastructure with Terraform; deploy workloads via GitOps/Helm controllers.
+
+** Q169. Why separate infra and app delivery planes?
+Different cadence, ownership, and rollback mechanics.
+
+** Q170. What is FinOps integration with Terraform?
+Cost policy gates, tagging enforcement, and change-cost visibility in PRs.
+
+** Q171. What is reliability SLO for IaC platform?
+Targets for successful plan/apply rates and recovery times.
+
+** Q172. What is change failure rate in IaC context?
+Percent of applies causing incidents, rollbacks, or emergency fixes.
+
+** Q173. What is final reliability principle?
+Every infrastructure change must be testable, reviewable, and recoverable.
+
+** Q174. What is final security principle?
+Protect state, identity, and supply chain as critical control-plane assets.
+
+** Q175. What is final governance principle?
+Automate policy enforcement and track exceptions transparently.
+
+** Q176. What is final architecture principle?
+Design modules/states for ownership clarity and minimal blast radius.
+
+** Q177. What is final operations principle?
+Operate Terraform platform with runbooks, SLOs, and incident drills.
+
+** Q178. What is final collaboration principle?
+Shared contracts between platform and product teams enable safe self-service.
+
+** Q179. What is final scaling principle?
+Standardize interfaces, decentralize execution, centralize guardrails.
+
+** Q180. What is final cost principle?
+Treat cost impact as first-class output of every infrastructure change.
+
+** Q181. What is final compliance principle?
+Ensure reproducible audit trails from intent to applied infrastructure.
+
+** Q182. What is final resilience principle?
+Assume backend/provider failures and design graceful recovery paths.
+
+** Q183. What is final quality principle?
+Continuously test modules and policies like application software.
+
+** Q184. What is final strategy principle?
+Prioritize high-value, low-risk automation sequencing.
+
+** Q185. Final maturity principle?
+Terraform excellence is secure, governed, and scalable infrastructure delivery as code.
+
+* Bonus: Minimal Terraform Module Usage Example
+
+#+BEGIN_SRC hcl
+module "network" {
+  source  = "app/network/aws"
+  version = "1.4.2"
+
+  name            = "prod-core"
+  cidr_block      = "10.20.0.0/16"
+  public_subnets  = ["10.20.1.0/24", "10.20.2.0/24"]
+  private_subnets = ["10.20.11.0/24", "10.20.12.0/24"]
+}
+#+END_SRC
