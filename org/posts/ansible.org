@@ -1,0 +1,572 @@
+#+title: Ansible
+#+date: 2026-08-14
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Ansible
+
+-----
+
+* Beginner
+
+** Q1: What is Ansible?
+Ansible is an agentless IT automation tool for configuration management, provisioning, and orchestration.
+
+** Q2: Why use Ansible?
+It provides simple, declarative automation over SSH/WinRM with human-readable YAML.
+
+** Q3: What does agentless mean in Ansible?
+No persistent agent is required on managed nodes; controller connects remotely when needed.
+
+** Q4: What is a control node?
+Machine where Ansible is installed and automation is executed.
+
+** Q5: What is a managed node?
+Target host/device Ansible configures.
+
+** Q6: What is inventory in Ansible?
+List of hosts/groups Ansible can target.
+
+** Q7: Static vs dynamic inventory?
+Static is file-defined; dynamic is generated from APIs/cloud sources.
+
+** Q8: What is a playbook?
+YAML file defining one or more plays/tasks to run on target hosts.
+
+** Q9: What is a play?
+Mapping of hosts to tasks and execution settings.
+
+** Q10: What is a task?
+Single unit of automation calling an Ansible module.
+
+** Q11: What is a module?
+Reusable automation component performing specific operation (package, file, service, etc.).
+
+** Q12: What is a role?
+Structured reusable bundle of tasks, vars, handlers, templates, and files.
+
+** Q13: Why roles are useful?
+Promote reuse, standardization, and clean playbook organization.
+
+** Q14: What is idempotency in Ansible?
+Running automation repeatedly yields same final state without unintended changes.
+
+** Q15: Why idempotency matters?
+Safe re-runs, predictable outcomes, and reduced drift.
+
+** Q16: What is YAML in Ansible context?
+Data serialization format used for playbooks and vars files.
+
+** Q17: What is ansible.cfg?
+Configuration file controlling Ansible behavior (paths, defaults, plugins, etc.).
+
+** Q18: What is host pattern?
+Expression selecting target hosts/groups for play execution.
+
+** Q19: What is =all= in inventory targeting?
+Built-in group including all inventory hosts.
+
+** Q20: What is =localhost= use case?
+Run tasks on control node itself.
+
+** Q21: What is ad-hoc command?
+One-line Ansible command for quick single-task operations.
+
+** Q22: Example ad-hoc usage purpose?
+Ping all hosts, restart service, gather quick facts.
+
+** Q23: What is =ansible-playbook= command?
+Executes Ansible playbooks.
+
+** Q24: What is gather_facts?
+Collect system information via setup module before tasks.
+
+** Q25: Why facts are useful?
+Enable conditional logic based on OS/network/hardware properties.
+
+** Q26: What is variable in Ansible?
+Named value used to parameterize tasks/templates/logic.
+
+** Q27: What is precedence in variables?
+Rules determining which variable source wins when duplicates exist.
+
+** Q28: What is host_vars/group_vars?
+Per-host or per-group variable files.
+
+** Q29: What is template module?
+Renders Jinja2 templates into destination files on targets.
+
+** Q30: What is copy module?
+Copies file content from controller to managed host.
+
+** Q31: copy vs template?
+copy transfers static files; template renders dynamic variables.
+
+** Q32: What is command module?
+Runs command without shell interpretation features.
+
+** Q33: What is shell module?
+Runs commands through shell, enabling pipes/redirection (with more risk).
+
+** Q34: Why prefer command over shell when possible?
+Safer and more predictable execution.
+
+** Q35: What is file module?
+Manages file/directory state, ownership, permissions, links.
+
+** Q36: What is package module?
+Installs/removes packages using platform package manager abstraction.
+
+** Q37: What is service module?
+Manages services state (started/stopped/enabled).
+
+** Q38: What is handler?
+Task triggered by notify, typically for restart/reload actions.
+
+** Q39: Why use handlers?
+Avoid unnecessary service restarts; run only on change.
+
+** Q40: What is notify?
+Mechanism for tasks to trigger handlers when changed.
+
+** Q41: What is become?
+Privilege escalation (e.g., sudo) for tasks requiring elevated rights.
+
+** Q42: Why use become carefully?
+Limit privilege scope for security and auditability.
+
+** Q43: What is check mode?
+Dry-run estimation of changes without applying (module support dependent).
+
+** Q44: What is diff mode?
+Shows before/after differences for changed files (where supported).
+
+** Q45: What is tags in Ansible?
+Labels allowing selective task/role execution.
+
+** Q46: Why tags help?
+Faster targeted runs (e.g., only “config” or “deploy”).
+
+** Q47: What is register in Ansible?
+Stores task output for later conditions/logic.
+
+** Q48: What is when condition?
+Conditional task execution expression.
+
+** Q49: What is loop in Ansible?
+Repeat task over list of items.
+
+** Q50: What is with_items legacy pattern?
+Older loop syntax; modern =loop= is generally preferred.
+
+** Q51: Beginner anti-pattern in Ansible?
+Using many shell commands instead of purpose-built modules.
+
+** Q52: Another beginner anti-pattern?
+Hardcoding secrets in playbooks.
+
+** Q53: Beginner security baseline?
+Use Ansible Vault and least-privilege remote users.
+
+** Q54: Beginner reliability baseline?
+Write idempotent tasks and test in staging first.
+
+** Q55: Beginner performance baseline?
+Disable unnecessary fact gathering where not needed.
+
+** Q56: Beginner governance baseline?
+Version-control playbooks/roles and require peer review.
+
+** Q57: Beginner troubleshooting command?
+Increase verbosity with =-v/-vv/-vvv=.
+
+** Q58: What is inventory group hierarchy?
+Groups can contain hosts and child groups.
+
+** Q59: Beginner workflow principle?
+Model desired state, not imperative command sequences.
+
+** Q60: Beginner best practice?
+Keep playbooks simple, readable, and role-driven.
+
+* Intermediate
+
+** Q61: What is Ansible collections?
+Packaging format for modules, roles, and plugins with namespacing.
+
+** Q62: Why collections matter?
+Decouple content lifecycle from core and improve modularity.
+
+** Q63: What is ansible-galaxy?
+Tool to install/manage roles and collections.
+
+** Q64: What is role directory structure?
+tasks/, handlers/, templates/, files/, vars/, defaults/, meta/.
+
+** Q65: defaults vs vars in role?
+defaults are low precedence; vars are high precedence role-specific values.
+
+** Q66: Why avoid overusing role vars?
+High precedence can make overrides difficult.
+
+** Q67: What is include_tasks vs import_tasks?
+include is dynamic at runtime; import is static at parse time.
+
+** Q68: include_role vs import_role?
+Dynamic vs static role inclusion semantics similarly.
+
+** Q69: What is block in Ansible?
+Group tasks for shared directives and structured error handling.
+
+** Q70: What is rescue/always in block?
+Error recovery path and always-run cleanup section.
+
+** Q71: What is failed_when?
+Custom condition defining task failure logic.
+
+** Q72: What is changed_when?
+Custom condition controlling changed status reporting.
+
+** Q73: Why customize changed_when?
+Improve idempotency signal and handler correctness.
+
+** Q74: What is delegate_to?
+Execute task on different host than current inventory target.
+
+** Q75: delegate_to common use case?
+Run load balancer API calls from controller while deploying app hosts.
+
+** Q76: What is run_once?
+Execute task only once per play (often with delegation).
+
+** Q77: What is serial in plays?
+Limits batch size of hosts processed simultaneously.
+
+** Q78: Why use serial?
+Rolling updates and reduced blast radius.
+
+** Q79: What is strategy in Ansible?
+Task execution behavior across hosts (linear, free, etc.).
+
+** Q80: linear vs free strategy?
+linear keeps host step lockstep; free lets hosts progress independently.
+
+** Q81: What is forks setting?
+Max parallel host connections/tasks from controller.
+
+** Q82: Forks tradeoff?
+Higher speed vs greater controller/target load.
+
+** Q83: What is async + poll?
+Run long tasks asynchronously and optionally check completion later.
+
+** Q84: Why async tasks useful?
+Avoid SSH timeouts for lengthy operations.
+
+** Q85: What is wait_for module?
+Wait for port/file/timeout/condition before proceeding.
+
+** Q86: What is until/retries/delay pattern?
+Retry task until condition met.
+
+** Q87: What is Jinja2 in Ansible?
+Templating engine for variable interpolation and logic.
+
+** Q88: What is filter in Jinja2?
+Function transforming data in templates/expressions.
+
+** Q89: Common filter examples?
+default, to_yaml, from_json, dict2items, selectattr.
+
+** Q90: What is lookup plugin?
+Fetch data from external/local sources during playbook execution.
+
+** Q91: What is vars_prompt?
+Interactively ask user for variable input at runtime.
+
+** Q92: What is Ansible Vault?
+Encryption mechanism for sensitive vars/files.
+
+** Q93: Vault best practice?
+Encrypt only secrets, keep clear separation from non-secret config.
+
+** Q94: What is no_log?
+Suppress sensitive task output from logs.
+
+** Q95: Why no_log important?
+Prevent accidental secret leakage in CI/logging systems.
+
+** Q96: What is dynamic inventory source example?
+Cloud plugins for AWS/Azure/GCP/OpenStack, etc.
+
+** Q97: Why dynamic inventory in cloud?
+Automatically reflect ephemeral infrastructure changes.
+
+** Q98: What is fact caching?
+Persist gathered facts for faster subsequent runs.
+
+** Q99: Fact caching benefit?
+Reduces repeated collection overhead at scale.
+
+** Q100: What is ansible-lint?
+Static analysis tool enforcing quality and best practices in Ansible content.
+
+** Q101: Why ansible-lint in CI?
+Catch anti-patterns and style issues before runtime failures.
+
+** Q102: What is Molecule?
+Framework for testing Ansible roles/scenarios.
+
+** Q103: Molecule use cases?
+Role converge/idempotence/verification tests in isolated instances.
+
+** Q104: What is intermediate anti-pattern?
+Monolithic playbooks with environment logic scattered everywhere.
+
+** Q105: Better structure pattern?
+Composable roles + env vars files + clear orchestration playbooks.
+
+** Q106: What is inventory separation strategy?
+Separate inventories per environment (dev/stage/prod).
+
+** Q107: Why separate inventories?
+Reduce accidental cross-environment changes.
+
+** Q108: What is immutable infrastructure relation to Ansible?
+Use Ansible for image baking/provisioning rather than in-place mutable drift.
+
+** Q109: What is orchestrating across tiers?
+Coordinating db/app/lb changes with ordering and health checks.
+
+** Q110: What is service rolling update pattern?
+serial batches + health checks + traffic control.
+
+** Q111: What is canary deployment with Ansible?
+Apply changes to small subset first, validate, then expand.
+
+** Q112: What is rollback strategy in Ansible?
+Reapply previous known-good config/version with controlled playbooks.
+
+** Q113: What is intermediate observability baseline?
+Track run duration, changed count, failure rate, host coverage.
+
+** Q114: What is intermediate reliability baseline?
+Idempotence tests + staged rollout + rescue logic.
+
+** Q115: What is intermediate security baseline?
+Vault, no_log, scoped credentials, audited automation identities.
+
+** Q116: What is intermediate governance baseline?
+Code review, CI lint/test gates, change approval workflow.
+
+** Q117: Intermediate maturity signal?
+Team can run playbooks repeatedly with predictable results and low surprises.
+
+** Q118: Intermediate collaboration principle?
+Platform and app teams share reusable role contracts.
+
+** Q119: Intermediate performance principle?
+Tune forks/strategy/fact gathering based on measured bottlenecks.
+
+** Q120: Intermediate architecture principle?
+Separate configuration data from automation logic.
+
+** Q121: Intermediate ops principle?
+Treat playbook failures as product bugs with root-cause tracking.
+
+** Q122: Intermediate compliance principle?
+Keep auditable logs of who ran what, where, and when.
+
+** Q123: Intermediate cost principle?
+Optimize run frequency/scope to avoid unnecessary infrastructure churn.
+
+** Q124: Intermediate scaling principle?
+Standardize roles and inventories before host count explodes.
+
+** Q125: Intermediate best practice?
+Engineer Ansible content as tested, reusable automation software.
+
+* Advanced
+
+** Q126: What is enterprise Ansible control-plane challenge?
+Managing content quality, execution scale, and governance across many teams.
+
+** Q127: What is Ansible Automation Platform/AWX role?
+Centralized job templates, RBAC, credential management, and scheduling.
+
+** Q128: Why central automation controller?
+Operational visibility, policy enforcement, and delegated self-service.
+
+** Q129: What is execution environment (EE) in Ansible?
+Containerized runtime bundling ansible-core, collections, and dependencies.
+
+** Q130: Why execution environments matter?
+Reproducible automation runtime across dev/CI/prod.
+
+** Q131: What is content signing/provenance concern?
+Ensuring trusted origins of collections/roles and execution artifacts.
+
+** Q132: Supply-chain risk in Ansible ecosystem?
+Untrusted roles/plugins can execute privileged remote actions.
+
+** Q133: Mitigation for supply-chain risk?
+Curated internal content repos, pin versions, security scanning, signatures.
+
+** Q134: What is policy-as-code for Ansible?
+Automated rules enforcing security/compliance patterns in playbooks.
+
+** Q135: Example policy checks?
+No plain secrets, no unchecked shell usage, become scoping required.
+
+** Q136: What is zero-trust automation principle?
+Strong identity/authz boundaries for every automation action path.
+
+** Q137: What is secret zero challenge in automation?
+Secure bootstrap of first credential to access vault/secrets.
+
+** Q138: Mitigation for secret zero?
+Short-lived identity federation and tightly scoped machine credentials.
+
+** Q139: What is multi-tenant automation challenge?
+Prevent one team’s playbooks from impacting other environments.
+
+** Q140: Multi-tenant mitigation?
+RBAC boundaries, isolated inventories, separate execution nodes.
+
+** Q141: What is blast radius control in Ansible runs?
+Limit host scope/batch size and require approvals for high-risk changes.
+
+** Q142: What is progressive rollout at scale?
+Canary -> phased batches -> full rollout with health gates.
+
+** Q143: What is automation SLO concept?
+Reliability targets for run success rate, latency, and recovery times.
+
+** Q144: Why define SLOs for automation platform?
+Treat automation as critical service, not ad-hoc scripts.
+
+** Q145: What is drift remediation strategy?
+Scheduled compliance runs with controlled auto-remediation policies.
+
+** Q146: Auto-remediation risk?
+Bad playbook logic can propagate failures rapidly.
+
+** Q147: Mitigation for remediation risk?
+Dry-run checks, approvals, staged enforcement, circuit breakers.
+
+** Q148: What is event-driven Ansible concept?
+Trigger automation from monitoring/security/ITSM events.
+
+** Q149: Event-driven benefit?
+Faster response and reduced manual toil.
+
+** Q150: Event-driven caution?
+Prevent alert loops and uncontrolled repeated executions.
+
+** Q151: What is large inventory performance bottleneck?
+Connection setup, fact gathering, and serial task overhead.
+
+** Q152: Scale optimization tactics?
+Fact caching, targeted patterns, async ops, tuned forks, EE efficiency.
+
+** Q153: What is controller HA consideration?
+Redundant control components and shared persistent state for continuity.
+
+** Q154: What is disaster recovery for automation platform?
+Backup inventories/projects/credentials metadata and rehearse restore.
+
+** Q155: Why restore rehearsal is essential?
+Backups without tested recovery are unreliable during incidents.
+
+** Q156: What is compliance evidence in Ansible operations?
+Job logs, approvals, diffs, artifact versions, operator identity trails.
+
+** Q157: What is segregation of duties pattern?
+Separate content authors, approvers, and production executors.
+
+** Q158: What is change window enforcement?
+Allow high-risk job templates only during approved periods.
+
+** Q159: What is advanced anti-pattern?
+Using Ansible as generic shell runner without declarative state modeling.
+
+** Q160: Better long-term model?
+Module-first, idempotent, tested roles with controlled orchestration.
+
+** Q161: What is hybrid IaC relationship (Terraform + Ansible)?
+Provision infrastructure with Terraform; configure software/state with Ansible.
+
+** Q162: Why combine Terraform and Ansible?
+Clear separation of resource lifecycle vs configuration lifecycle concerns.
+
+** Q163: What is immutable image pipeline with Ansible?
+Use Ansible in image baking, then deploy immutable artifacts.
+
+** Q164: Why immutable pipelines improve reliability?
+Reduce in-place drift and simplify rollback mechanics.
+
+** Q165: What is advanced observability gold standard?
+Per-task telemetry, change impact correlation, and failure taxonomy dashboards.
+
+** Q166: What is run cost governance?
+Track automation runtime/resource consumption and optimize low-value jobs.
+
+** Q167: What is resilience game day for Ansible platform?
+Simulate credential failures, unreachable hosts, partial rollouts, and recovery.
+
+** Q168: What is final reliability principle?
+Automation must be idempotent, testable, and safely rerunnable.
+
+** Q169: What is final security principle?
+Every automation credential/action must be scoped, auditable, and ephemeral when possible.
+
+** Q170: What is final governance principle?
+Codify standards in CI and controller policies, not tribal knowledge.
+
+** Q171: What is final architecture principle?
+Design reusable role interfaces and isolate environment data cleanly.
+
+** Q172: What is final operations principle?
+Continuously measure run quality and eliminate recurring toil patterns.
+
+** Q173: What is final collaboration principle?
+Treat automation content as shared product with owners and SLAs.
+
+** Q174: What is final scaling principle?
+Standardize execution environments and role contracts before hyper-growth.
+
+** Q175: What is final compliance principle?
+Preserve immutable audit trails for all production automation runs.
+
+** Q176: What is final performance principle?
+Optimize for fast safe feedback, not maximum uncontrolled parallelism.
+
+** Q177: What is final recovery principle?
+Every critical playbook needs tested rollback and rescue paths.
+
+** Q178: What is final platform principle?
+Operate Ansible control plane as mission-critical infrastructure.
+
+** Q179: What is final strategy principle?
+Automate high-value repetitive operations first, then expand responsibly.
+
+** Q180: Final maturity principle?
+Ansible excellence is secure, predictable, and scalable automation engineering.
+
+* Bonus: Minimal Role-Oriented Playbook Example
+
+#+BEGIN_SRC yaml
+---
+- name: Configure web tier
+  hosts: web
+  become: true
+  vars:
+    app_port: 8080
+  roles:
+    - common
+    - nginx
+    - app_deploy
+#+END_SRC
