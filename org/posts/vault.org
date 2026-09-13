@@ -1,0 +1,569 @@
+#+title: Vault Interview Questions: Beginner to Advanced (180 Q&A)
+#+date: 2026-08-17
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Vault
+
+-----
+
+* Beginner
+
+** Q1: What is Vault?
+Vault is a secrets management platform for securely storing, accessing, and controlling sensitive data.
+
+** Q2: Why use Vault?
+It centralizes secret lifecycle, access control, auditing, and dynamic credential issuance.
+
+** Q3: What problem does Vault solve?
+Hardcoded/static secrets sprawl and weak secret rotation practices.
+
+** Q4: What is a secret in Vault context?
+Sensitive value like API key, password, token, cert, or encryption key material.
+
+** Q5: What is a secrets engine?
+Vault component that stores or generates secrets for a use case.
+
+** Q6: What is KV secrets engine?
+Key-value storage engine for static secrets.
+
+** Q7: KV v1 vs KV v2?
+KV v2 adds versioning and soft delete/undelete/destroy capabilities.
+
+** Q8: What is path in Vault?
+Hierarchical route addressing secrets, auth methods, and system endpoints.
+
+** Q9: What is policy in Vault?
+Rule set defining allowed capabilities on paths.
+
+** Q10: What are Vault capabilities?
+create, read, update, delete, list, sudo, patch (depending endpoint semantics).
+
+** Q11: What is token in Vault?
+Credential representing authenticated identity and attached policies.
+
+** Q12: What is token TTL?
+Lifetime before token expires unless renewed.
+
+** Q13: Why short TTL tokens?
+Reduce risk window for stolen credentials.
+
+** Q14: What is renewable token?
+Token eligible for lease renewal before expiry.
+
+** Q15: What is orphan token?
+Token without parent dependency chain for revocation behavior.
+
+** Q16: What is auth method in Vault?
+Mechanism clients use to authenticate (AppRole, Kubernetes, OIDC, etc.).
+
+** Q17: What is AppRole?
+Machine-oriented auth method using role_id + secret_id.
+
+** Q18: What is Kubernetes auth method?
+Authenticate workloads using service account JWT identity.
+
+** Q19: Why use workload identity auth?
+Avoid long-lived static credentials in apps/pipelines.
+
+** Q20: What is OIDC auth?
+Federated user authentication via identity provider.
+
+** Q21: What is userpass auth?
+Simple username/password auth method (often limited use in production).
+
+** Q22: What is mount in Vault?
+Enabled instance of a secrets or auth engine at a path.
+
+** Q23: What is lease in Vault?
+Time-bound grant for dynamic secrets or tokens.
+
+** Q24: Why leases matter?
+Enable automatic expiration and revocation.
+
+** Q25: What is dynamic secret?
+Credential generated on-demand with limited TTL and scoped privileges.
+
+** Q26: Example dynamic secret use case?
+Ephemeral database username/password per application instance/job.
+
+** Q27: What is transit secrets engine?
+Encryption-as-a-service without exposing raw key material.
+
+** Q28: Why use transit engine?
+Apps can encrypt/sign data while Vault controls key custody.
+
+** Q29: What is seal in Vault?
+Mechanism protecting master key access and encrypted data at rest.
+
+** Q30: What is unseal process?
+Providing key shares (or auto-unseal flow) to make Vault operational.
+
+** Q31: What is Shamir secret sharing in Vault?
+Splits unseal key into multiple shares requiring threshold to unseal.
+
+** Q32: What is auto-unseal?
+Using external KMS/HSM to unseal Vault automatically.
+
+** Q33: Why auto-unseal is useful?
+Improves operational recovery and reduces manual unseal burden.
+
+** Q34: What is root token?
+Highly privileged bootstrap token used for initial setup/emergency.
+
+** Q35: Why minimize root token usage?
+Extreme privilege; high compromise impact.
+
+** Q36: What is Vault audit log?
+Tamper-evident style log of API requests/responses metadata.
+
+** Q37: Why enable audit devices early?
+Critical for forensics, compliance, and incident response.
+
+** Q38: What is =vault kv get=?
+Read secret from KV engine path.
+
+** Q39: What is =vault kv put=?
+Write secret data to KV path.
+
+** Q40: What is =vault token lookup=?
+Inspect token metadata/policies/TTL.
+
+** Q41: What is =vault policy write=?
+Create/update policy from file.
+
+** Q42: What is namespace (Vault Enterprise concept)?
+Logical multi-tenant isolation boundary inside Vault deployment.
+
+** Q43: What is beginner anti-pattern in Vault?
+Using one broad policy for all apps.
+
+** Q44: Another beginner anti-pattern?
+Storing plaintext secrets in Git instead of retrieving from Vault at runtime.
+
+** Q45: Beginner security baseline?
+Least-privilege policies + short TTL tokens + audit enabled.
+
+** Q46: Beginner reliability baseline?
+HA deployment planning and backup of storage backend.
+
+** Q47: Beginner governance baseline?
+Secret ownership, rotation schedule, and access review process.
+
+** Q48: What is secret rotation?
+Replacing credentials/keys periodically or on-demand.
+
+** Q49: Why rotation is critical?
+Limits blast radius after potential credential exposure.
+
+** Q50: What is revocation in Vault?
+Immediate invalidation of leases/tokens/secrets.
+
+** Q51: What is response wrapping?
+Deliver secret via single-use short-lived wrapping token.
+
+** Q52: Why response wrapping helps?
+Reduces exposure of sensitive secret material in transit workflows.
+
+** Q53: What is secret zero problem?
+How to securely bootstrap first credential to access Vault.
+
+** Q54: Beginner mitigation for secret zero?
+Use trusted identity auth (Kubernetes/OIDC/AppRole workflows).
+
+** Q55: What is CLI vs API usage?
+Vault CLI is convenience over HTTP API operations.
+
+** Q56: Beginner performance baseline?
+Use local agent caching patterns where appropriate.
+
+** Q57: Beginner observability baseline?
+Monitor seal status, auth failures, request latency, lease counts.
+
+** Q58: Beginner ops principle?
+Document unseal/recovery and token emergency procedures.
+
+** Q59: Beginner architecture principle?
+Separate human auth paths from machine auth paths.
+
+** Q60: Beginner best practice?
+Treat Vault as critical security control plane from day one.
+
+* Intermediate
+
+** Q61: What is Vault Agent?
+Sidecar/daemon for auto-auth, token renewal, and secret templating/caching.
+
+** Q62: Why use Vault Agent with apps?
+Removes direct Vault auth logic from application code.
+
+** Q63: What is auto-auth in Vault Agent?
+Automatically authenticate via configured method and manage token lifecycle.
+
+** Q64: What is template rendering in Vault Agent?
+Render secrets into files/env-compatible outputs for app consumption.
+
+** Q65: Template rendering risk?
+Secrets on disk require strict file permission and lifecycle controls.
+
+** Q66: What is agent cache mode?
+Local caching/proxy of Vault responses to reduce latency/load.
+
+** Q67: Cache tradeoff?
+Performance gains vs potential stale secret window management.
+
+** Q68: What is AppRole secret_id delivery challenge?
+Secure distribution of secret_id to workload bootstrap process.
+
+** Q69: secret_id best-practice controls?
+Short TTL, one-time use, CIDR constraints where feasible.
+
+** Q70: What is token accessor?
+Reference identifier for token management without revealing token value.
+
+** Q71: What is periodic token?
+Token requiring periodic renewal and lacking max TTL ceiling behavior nuance.
+
+** Q72: What is token bound CIDR?
+Restricts token usage to allowed client network ranges.
+
+** Q73: What is identity entity in Vault?
+Canonical identity record linking multiple auth aliases.
+
+** Q74: What is identity group?
+Collection of entities for policy assignment at scale.
+
+** Q75: Why use identity groups?
+Centralized RBAC mapping across auth methods.
+
+** Q76: What is policy templating concept?
+Dynamic policy paths based on identity metadata.
+
+** Q77: What is Sentinel/OPA policy governance concept?
+Advanced policy enforcement workflows (environment/edition dependent).
+
+** Q78: What is database secrets engine?
+Generates dynamic DB credentials with controlled privileges and TTL.
+
+** Q79: Why dynamic DB creds beat static creds?
+Automatic expiration and per-client accountability.
+
+** Q80: What is revoke vs revoke-prefix?
+Revoke one lease vs all leases under path scope.
+
+** Q81: What is PKI secrets engine?
+Issues and manages TLS certificates from internal CA hierarchy.
+
+** Q82: PKI use cases?
+mTLS service identity, short-lived cert issuance, internal trust domains.
+
+** Q83: Why short-lived certificates?
+Reduce key compromise impact and simplify rotation posture.
+
+** Q84: What is CRL in PKI context?
+Certificate Revocation List for invalidated certificates.
+
+** Q85: What is intermediate CA pattern?
+Offline root CA + online intermediate CA for operational safety.
+
+** Q86: What is transit key rotation?
+Create new key version while supporting decrypt of old ciphertext.
+
+** Q87: What is rewrap in transit?
+Re-encrypt ciphertext under latest key version without exposing plaintext.
+
+** Q88: What is convergent encryption concept?
+Deterministic encryption mode for equality checks (with security tradeoffs).
+
+** Q89: What is transform engine concept?
+Format-preserving tokenization/encryption for structured sensitive data.
+
+** Q90: What is cubbyhole in Vault?
+Per-token private storage inaccessible by other tokens.
+
+** Q91: What is response wrapping + cubbyhole relation?
+Wrapped secrets stored retrievable once by unwrap token holder.
+
+** Q92: What is performance replication (Vault Enterprise)?
+Replicate data for read scalability and regional performance.
+
+** Q93: What is DR replication?
+Standby disaster-recovery cluster replication for failover scenarios.
+
+** Q94: Performance vs DR replication?
+Scale reads/latency vs disaster recovery continuity.
+
+** Q95: What is intermediate anti-pattern?
+Long-lived non-expiring tokens for applications.
+
+** Q96: Better token strategy?
+Short-lived renewable tokens via auto-auth workflows.
+
+** Q97: What is lease count quota concept?
+Limit number of active leases to protect system capacity.
+
+** Q98: What is rate limit quota concept?
+Throttle request rates to prevent abuse/saturation.
+
+** Q99: What is control group approval concept?
+Require multiple approvers for sensitive secret access (enterprise feature context).
+
+** Q100: What is MFA enforcement use case?
+Extra verification for high-privilege operations/human auth.
+
+** Q101: What is audit device type example?
+File, syslog, socket destinations (deployment dependent).
+
+** Q102: Audit log protection best practice?
+Immutable storage, restricted access, and retention policies.
+
+** Q103: What is seal wrap concept?
+Additional cryptographic protection using HSM/KMS integration paths.
+
+** Q104: What is storage backend role?
+Persistent data store for Vault metadata/secrets (integrated storage, etcd, etc.).
+
+** Q105: What is integrated storage (Raft) in Vault?
+Built-in HA storage/consensus backend managed by Vault nodes.
+
+** Q106: Why Raft integrated storage is popular?
+Operational simplicity and native HA clustering.
+
+** Q107: What is autopilot in Raft context?
+Automated cluster health and server stabilization features.
+
+** Q108: What is snapshot in Raft storage?
+Point-in-time backup of Vault data state.
+
+** Q109: Snapshot best practice?
+Automate encrypted backups and periodic restore testing.
+
+** Q110: What is intermediate observability baseline?
+Track auth latency, error rates, lease renewals, replication lag, seal events.
+
+** Q111: What is intermediate security baseline?
+Scoped policies, identity federation, audit everywhere, root token lockdown.
+
+** Q112: What is intermediate reliability baseline?
+HA clustering + auto-unseal + tested failover drills.
+
+** Q113: What is intermediate governance baseline?
+Secret classification and rotation SLA by secret type.
+
+** Q114: Intermediate maturity signal?
+Teams consume dynamic secrets by default, static secrets by exception.
+
+** Q115: What is intermediate ops principle?
+Treat auth failures and latency spikes as security-reliability incidents.
+
+** Q116: What is intermediate architecture principle?
+Separate mounts/policies per environment and trust boundary.
+
+** Q117: What is intermediate collaboration principle?
+Security platform team defines guardrails; app teams own integration quality.
+
+** Q118: What is intermediate compliance principle?
+Map Vault controls to regulatory requirements with evidence exports.
+
+** Q119: What is intermediate scaling principle?
+Use namespaces/mount segmentation and replication strategically.
+
+** Q120: What is intermediate performance principle?
+Prefer local agents/caching and minimize unnecessary secret reads.
+
+** Q121: What is intermediate migration principle?
+Rotate legacy static credentials into dynamic engine-backed workflows gradually.
+
+** Q122: What is intermediate resilience principle?
+Design for KMS outage, network partition, and partial cluster degradation.
+
+** Q123: What is intermediate trust principle?
+Continuously validate identity claims and policy scope assumptions.
+
+** Q124: What is intermediate quality principle?
+Test policy changes in lower environments with negative/positive cases.
+
+** Q125: Intermediate best practice?
+Engineer Vault integrations as reusable, audited platform patterns.
+
+* Advanced
+
+** Q126: What is Vault control-plane blast radius?
+Compromise/outage can impact authentication and secret delivery across many systems.
+
+** Q127: Blast-radius reduction strategy?
+Segmentation by namespace/cluster/environment and strict policy boundaries.
+
+** Q128: What is multi-cluster Vault strategy?
+Regional/domain-specific clusters with replication and clear trust separation.
+
+** Q129: What is federation challenge across Vault clusters?
+Identity/policy consistency vs local autonomy and risk containment.
+
+** Q130: What is secret brokerage pattern?
+Central platform brokering ephemeral credentials to workloads just-in-time.
+
+** Q131: Why just-in-time secrets improve posture?
+Minimizes standing privilege and credential exposure windows.
+
+** Q132: What is advanced secret zero solution pattern?
+Hardware/cloud identity attestation with short-lived bootstrap tokens.
+
+** Q133: What is workload identity integration frontier?
+SPIFFE/SPIRE, cloud workload identity, and Kubernetes projected identities.
+
+** Q134: What is cryptographic agility in Vault context?
+Ability to rotate algorithms/keys and migrate cryptographic posture safely.
+
+** Q135: What is key hierarchy design concern?
+Balancing compartmentalization, performance, and operational complexity.
+
+** Q136: What is HSM integration value?
+Strong key protection boundary and compliance alignment.
+
+** Q137: HSM integration tradeoff?
+Cost, latency, and operational complexity.
+
+** Q138: What is advanced policy sprawl problem?
+Excessive overlapping policies create hidden privilege paths.
+
+** Q139: Policy sprawl mitigation?
+Policy-as-code, linting, access graph review, periodic recertification.
+
+** Q140: What is entitlement review process?
+Scheduled verification that identities still need granted secret access.
+
+** Q141: What is break-glass access model in Vault?
+Emergency privileged access with strict approval, TTL, and audit trails.
+
+** Q142: Why break-glass must be short-lived?
+Reduce risk of privilege persistence after incident.
+
+** Q143: What is supply-chain risk for secret delivery?
+Compromised CI/CD or sidecars exfiltrating retrieved secrets.
+
+** Q144: Mitigation for delivery supply-chain risk?
+Hardened runtimes, egress controls, secret scoping, runtime detection.
+
+** Q145: What is memory exposure risk in apps?
+Secrets loaded into process memory can leak via dumps/logs.
+
+** Q146: Mitigation for in-memory secret risk?
+Minimize secret lifetime, avoid verbose dumps, isolate sensitive processes.
+
+** Q147: What is token exfiltration detection strategy?
+Anomaly detection on token usage patterns, source IP, and access paths.
+
+** Q148: What is canary secret concept?
+Honeytoken credential to detect unauthorized secret usage.
+
+** Q149: What is replication lag risk?
+Delayed secret/policy propagation impacts consistency across regions.
+
+** Q150: Replication lag mitigation?
+Topology design, monitoring, and locality-aware auth/reads.
+
+** Q151: What is DR failover runbook critical step?
+Validate unseal/auth methods/policies/application connectivity post-failover.
+
+** Q152: Why failback planning matters?
+Returning to primary without data loss or policy drift is non-trivial.
+
+** Q153: What is operational SLO for Vault?
+Availability, auth latency, and secret issuance success objectives.
+
+** Q154: What is error budget for Vault platform?
+Allowed unreliability guiding change pace and hardening priorities.
+
+** Q155: What is advanced anti-pattern?
+Using Vault as simple static secret store without dynamic engines/rotation.
+
+** Q156: Better maturity model?
+Default dynamic credentials + automated rotation + policy-driven governance.
+
+** Q157: What is compliance evidence model for Vault?
+Traceable logs of who accessed what, when, under which policy.
+
+** Q158: What is segregation of duties in secret platforms?
+Separate policy authors, approvers, and platform operators.
+
+** Q159: What is data residency concern?
+Secret metadata/log replication may cross regulated boundaries.
+
+** Q160: Mitigation for residency constraints?
+Regional cluster boundaries and scoped replication policies.
+
+** Q161: What is performance tuning frontier?
+Token/lease churn optimization, auth backend efficiency, storage I/O tuning.
+
+** Q162: What is lease churn?
+High volume issuance/renewal/revocation causing platform load.
+
+** Q163: How reduce lease churn safely?
+Tune TTLs, reuse agent sessions, optimize app secret read patterns.
+
+** Q164: What is chaos engineering for Vault?
+Simulate seal events, backend latency, node loss, and KMS disruption.
+
+** Q165: Why chaos tests for Vault?
+Validate resilience before real incidents.
+
+** Q166: What is final reliability principle?
+Secrets platform must remain available during broader infrastructure incidents.
+
+** Q167: What is final security principle?
+Assume credential compromise is possible; minimize TTL and privilege continuously.
+
+** Q168: What is final governance principle?
+Every secret path needs clear ownership, policy intent, and review cadence.
+
+** Q169: What is final architecture principle?
+Design trust boundaries first, then map mounts/auth/policies accordingly.
+
+** Q170: What is final operations principle?
+Rehearse unseal, failover, and rotation runbooks regularly.
+
+** Q171: What is final scalability principle?
+Segment tenants/workloads before growth forces risky migrations.
+
+** Q172: What is final compliance principle?
+Capture immutable audit evidence without exposing secret payloads.
+
+** Q173: What is final performance principle?
+Optimize auth/secret retrieval paths to keep security controls low-friction.
+
+** Q174: What is final collaboration principle?
+Platform security and application teams co-own secret lifecycle quality.
+
+** Q175: What is final incident principle?
+Rapid revoke/rotate capabilities define real-world resilience.
+
+** Q176: What is final trust principle?
+Prefer identity-based ephemeral auth over shared static credentials.
+
+** Q177: What is final platform principle?
+Operate Vault as mission-critical security infrastructure with SLOs.
+
+** Q178: What is final strategy principle?
+Automate secret governance end-to-end, not just storage.
+
+** Q179: What is final resilience principle?
+Design for regional failures and dependency outages explicitly.
+
+** Q180: Final maturity principle?
+Vault excellence is dynamic, least-privileged, auditable secret delivery at scale.
+
+* Bonus: Minimal Policy Example (Conceptual)
+
+#+BEGIN_SRC hcl
+path "kv/data/apps/payments/*" {
+  capabilities = ["read"]
+}
+
+path "database/creds/payments-ro" {
+  capabilities = ["read"]
+}
+#+END_SRC
