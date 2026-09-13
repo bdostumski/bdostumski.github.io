@@ -1,0 +1,557 @@
+#+title: Vim
+#+date: 2026-07-04
+#+TAGS: Emacs
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Vim
+
+-----
+
+* Beginner
+
+** Q1: What is Vim?
+Vim is a highly configurable modal text editor (“Vi IMproved”).
+
+** Q2: Why use Vim?
+Fast keyboard-centric editing, composable commands, and low-resource remote usability.
+
+** Q3: What is modal editing?
+Different modes separate text insertion from navigation and command execution.
+
+** Q4: Main Vim modes?
+Normal, Insert, Visual, Command-line, Select, Ex (practical core: first four).
+
+** Q5: What is Normal mode?
+Default mode for navigation, operators, and text manipulation commands.
+
+** Q6: What is Insert mode?
+Mode where typed keys insert text.
+
+** Q7: What is Visual mode?
+Mode for selecting text ranges for subsequent operations.
+
+** Q8: What is Command-line mode?
+Ex command entry using =:=, =/=, =?= prompts.
+
+** Q9: How enter Insert mode quickly?
+=i= (before cursor), =a= (after), =o= (new line below), etc.
+
+** Q10: How return to Normal mode?
+Press =Esc=.
+
+** Q11: How save file?
+=:w=
+
+** Q12: How quit Vim?
+=:q=
+
+** Q13: Save and quit?
+=:wq= or =ZZ=.
+
+** Q14: Quit without saving?
+=:q!=
+
+** Q15: Basic cursor movement keys?
+=h= left, =j= down, =k= up, =l= right.
+
+** Q16: Move by words forward?
+=w= (start), =e= (end).
+
+** Q17: Move backward by word?
+=b=
+
+** Q18: Start/end of line motions?
+=0= (start), =$= (end).
+
+** Q19: Go to first/last file line?
+=gg= and =G=.
+
+** Q20: Jump to line number?
+={N}G= or =:N=.
+
+** Q21: Delete character under cursor?
+=x=
+
+** Q22: Delete current line?
+=dd=
+
+** Q23: Copy (yank) current line?
+=yy=
+
+** Q24: Paste after/before cursor?
+=p= / =P=.
+
+** Q25: Undo command?
+=u=
+
+** Q26: Redo command?
+=Ctrl-r=.
+
+** Q27: Repeat last change?
+=.=
+
+** Q28: Why dot command is powerful?
+Turns one edit into many with minimal keystrokes.
+
+** Q29: Search forward?
+=/pattern=
+
+** Q30: Search backward?
+=?pattern=
+
+** Q31: Next/previous match?
+=n= / =N=.
+
+** Q32: Replace one character?
+=r<char>=.
+
+** Q33: Change word quickly?
+=ciw= (change inner word).
+
+** Q34: Delete word quickly?
+=dw= or =daw= depending context.
+
+** Q35: What is operator in Vim grammar?
+Action like delete/change/yank applied to motion/text object.
+
+** Q36: What is motion?
+Cursor movement defining range for operators.
+
+** Q37: What is text object?
+Semantic unit like word, sentence, quotes, brackets.
+
+** Q38: Example operator+motion?
+=d$= delete to end of line.
+
+** Q39: Example operator+text object?
+=di"= delete inside quotes.
+
+** Q40: What is count prefix?
+Number before command repeats it (e.g., =5j=).
+
+** Q41: What is register?
+Named storage for yanks/deletes/macros.
+
+** Q42: Default register behavior?
+Most yank/delete operations use unnamed register.
+
+** Q43: What is Visual Line mode?
+=V= selects whole lines.
+
+** Q44: What is Visual Block mode?
+=Ctrl-v= rectangular/block selection.
+
+** Q45: What is indentation shift?
+=>>= and =<<= (or =>= / =<= with selections/motions).
+
+** Q46: What is :set number?
+Show absolute line numbers.
+
+** Q47: What is :set relativenumber?
+Show relative line numbers for efficient jumps.
+
+** Q48: Why relative numbers help?
+Count-based vertical motions become faster and more accurate.
+
+** Q49: What is :help?
+Built-in documentation system.
+
+** Q50: Beginner anti-pattern in Vim?
+Using Insert mode for most navigation/editing.
+
+** Q51: Another beginner anti-pattern?
+Relying only on arrow keys and mouse.
+
+** Q52: Beginner productivity baseline?
+Learn motions + operators + text objects + dot repeat.
+
+** Q53: Beginner reliability baseline?
+Write often and understand undo/redo confidently.
+
+** Q54: Beginner ergonomics baseline?
+Map Caps Lock to Esc (common optimization).
+
+** Q55: Beginner configuration baseline?
+Keep simple .vimrc with only essential settings.
+
+** Q56: Beginner search baseline?
+Use /, n/N, and simple substitutions.
+
+** Q57: Beginner workflow principle?
+Think in transformations, not character-by-character edits.
+
+** Q58: Beginner collaboration principle?
+Keep shared configs portable across machines.
+
+** Q59: Beginner learning principle?
+Practice core commands daily before adding plugins.
+
+** Q60: Beginner best practice?
+Master Normal mode fluency first.
+
+* Intermediate
+
+** Q61: What is :%s/old/new/g?
+Substitute all matches in file.
+
+** Q62: Add confirmation to substitute?
+Use =c= flag: =:%s/old/new/gc=.
+
+** Q63: Restrict substitute to visual selection?
+Select text then use =:s/.../.../= range.
+
+** Q64: What is very magic regex mode?
+=\v= simplifies regex escaping syntax.
+
+** Q65: What are marks in Vim?
+Named bookmarks to jump back to positions.
+
+** Q66: Set and jump to mark?
+=m{a-z}= then ='a= or =`a=.
+
+** Q67: `'a` vs `` `a ``?
+Single quote jumps line; backtick jumps exact column.
+
+** Q68: What is jumplist?
+History of major cursor jumps.
+
+** Q69: Navigate jumplist?
+=Ctrl-o= back, =Ctrl-i= forward.
+
+** Q70: What is changelist?
+History of edit locations.
+
+** Q71: Navigate changelist?
+=g;= and =g,=.
+
+** Q72: What is macro recording?
+Capture key sequence into register for replay.
+
+** Q73: Record/stop macro?
+=q{reg}= start, =q= stop.
+
+** Q74: Replay macro?
+=@{reg}=, repeat with count.
+
+** Q75: Macro safety tip?
+Design deterministic cursor position and idempotent edits where possible.
+
+** Q76: What is black hole register?
+="_= discard deletions without overwriting yank registers.
+
+** Q77: Why use black hole register?
+Preserve valuable yanked content while deleting.
+
+** Q78: What is system clipboard register?
+Usually ="+= (and/or =*= depending platform).
+
+** Q79: What is :global command?
+Run Ex command on lines matching pattern.
+
+** Q80: Example global usage?
+=:g/error/d= delete lines containing “error”.
+
+** Q81: What is :v command?
+Inverse global (operate on non-matching lines).
+
+** Q82: What is buffer in Vim?
+In-memory file content object.
+
+** Q83: Buffer vs window?
+Buffer is content; window is viewport to a buffer.
+
+** Q84: What is tab page in Vim?
+Collection/layout of windows (not synonymous with file).
+
+** Q85: Split window commands?
+=:split= and =:vsplit= (or Ctrl-w shortcuts).
+
+** Q86: Navigate between splits?
+=Ctrl-w h/j/k/l=.
+
+** Q87: Resize split quickly?
+=Ctrl-w +=, =Ctrl-w -=, =Ctrl-w >=, =Ctrl-w <=.
+
+** Q88: What is quickfix list?
+Global list of locations (compiler/grep/lint results).
+
+** Q89: What is location list?
+Window-local variant of quickfix.
+
+** Q90: Why quickfix/location lists matter?
+Fast iterative navigation through errors/matches.
+
+** Q91: What is :grep integration?
+Populate quickfix with search tool results.
+
+** Q92: What is :make integration?
+Run build command and parse errors into quickfix.
+
+** Q93: What is :cdo / :cfdo?
+Execute command over quickfix entries/files.
+
+** Q94: What is folding?
+Collapse/expand code regions.
+
+** Q95: Common fold toggles?
+=za= toggle, =zR= open all, =zM= close all.
+
+** Q96: What is persistent undo?
+Undo history survives editor restart (when enabled).
+
+** Q97: What is session file?
+Saved workspace (windows/tabs/buffers) restorable later.
+
+** Q98: What is modeline?
+File-embedded editor settings (use cautiously for security).
+
+** Q99: What is :set hidden?
+Allow buffer switching without forcing saves.
+
+** Q100: What is autocommand?
+Trigger actions on editor events (BufWrite, FileType, etc.).
+
+** Q101: What is mapping?
+Custom keybinding to commands/sequences.
+
+** Q102: nnoremap vs nmap?
+Non-recursive normal-map vs recursive map behavior.
+
+** Q103: Why prefer non-recursive mappings?
+Prevents accidental remap loops/chains.
+
+** Q104: What is leader key?
+Custom prefix key for personal mappings.
+
+** Q105: What is localleader?
+Secondary prefix usually for filetype-specific mappings.
+
+** Q106: What is plugin manager role?
+Install/update/load Vim plugins.
+
+** Q107: Plugin anti-pattern?
+Adding many plugins without measurable workflow benefit.
+
+** Q108: Better plugin strategy?
+Introduce one plugin at a time for clear pain points.
+
+** Q109: What is intermediate anti-pattern?
+Complex .vimrc without comments/structure/version control.
+
+** Q110: Better config structure?
+Group settings by purpose and modularize logically.
+
+** Q111: What is intermediate performance baseline?
+Profile startup and lazy-load heavy plugins.
+
+** Q112: What is intermediate security baseline?
+Audit plugins/scripts and avoid untrusted modelines.
+
+** Q113: What is intermediate reliability baseline?
+Keep reproducible config and backup of dotfiles.
+
+** Q114: What is intermediate observability baseline?
+Track recurring manual edits and convert to mappings/macros.
+
+** Q115: Intermediate maturity signal?
+Most edits are composable commands, not repetitive keystrokes.
+
+** Q116: Intermediate collaboration principle?
+Share minimal editor-agnostic conventions for team scripts/tooling.
+
+** Q117: Intermediate architecture principle?
+Treat editor config like software project.
+
+** Q118: Intermediate learning principle?
+Deliberately practice text objects and macro workflows.
+
+** Q119: Intermediate scaling principle?
+Use quickfix-driven multi-file edit patterns.
+
+** Q120: Intermediate ops principle?
+Test config changes incrementally to avoid workflow breakage.
+
+** Q121: Intermediate portability principle?
+Ensure terminal and GUI Vim behaviors are aligned where possible.
+
+** Q122: Intermediate documentation principle?
+Document non-obvious mappings and workflow decisions.
+
+** Q123: Intermediate quality principle?
+Prefer clarity and predictability over clever key tricks.
+
+** Q124: Intermediate productivity principle?
+Optimize highest-frequency editing paths first.
+
+** Q125: Intermediate best practice?
+Build a small, stable, high-leverage command toolkit.
+
+* Advanced
+
+** Q126: What is Vimscript?
+Vim’s scripting language for automation, plugins, and configuration logic.
+
+** Q127: What is Lua in Vim ecosystem context?
+Neovim commonly uses Lua for modern plugin/config performance ergonomics.
+
+** Q128: Why script editor behavior?
+Encode repeatable editing workflows as commands/functions.
+
+** Q129: What is custom text object design?
+Defining domain-specific semantic edit ranges.
+
+** Q130: What is operator-pending mode?
+State waiting for motion/text object after an operator key.
+
+** Q131: Why operator-pending understanding matters?
+Enables creation of powerful composable custom operators.
+
+** Q132: What is expression mapping?
+Keymap evaluating expression at runtime for context-aware behavior.
+
+** Q133: What is :normal and :normal! difference?
+:normal uses mappings; :normal! bypasses mappings.
+
+** Q134: What is :argdo/:bufdo/:windo/:tabdo?
+Batch execute commands across arglist/buffers/windows/tabs.
+
+** Q135: What is large-scale refactor pattern in Vim?
+Search -> quickfix list -> scripted edits -> verification passes.
+
+** Q136: What is ripgrep integration value?
+Fast project-wide search feeding quickfix/location workflows.
+
+** Q137: What is LSP integration in Vim/Neovim?
+Language-aware navigation, diagnostics, rename, references, code actions.
+
+** Q138: Why LSP + modal editing is powerful?
+Combines semantic code intelligence with fast text transformations.
+
+** Q139: What is treesitter relevance (Neovim)?
+Syntax tree parsing enabling richer highlighting/text objects/motions.
+
+** Q140: What is asynchronous job control?
+Run external commands without blocking UI responsiveness.
+
+** Q141: Why async tooling matters?
+Maintains flow during lint/build/test operations.
+
+** Q142: What is startup-time budget concept?
+Set max acceptable launch latency to protect iteration speed.
+
+** Q143: Startup optimization tactics?
+Profile, remove redundant plugins, defer filetype-specific loads.
+
+** Q144: What is keymap namespace strategy?
+Organize mappings under leader prefixes by domain/action.
+
+** Q145: What is cognitive load management in keymaps?
+Prefer consistent mnemonic patterns over arbitrary shortcuts.
+
+** Q146: What is register-driven advanced workflow?
+Use named registers/macros deliberately for structured transformations.
+
+** Q147: What is advanced macro anti-pattern?
+Macros dependent on fragile cursor positions without guards.
+
+** Q148: Macro robustness techniques?
+Anchored searches, sanity checks, and repeat-safe edit logic.
+
+** Q149: What is deterministic editing?
+Same command sequence yields predictable output regardless minor context.
+
+** Q150: Why deterministic edits matter in teams?
+Improves reproducibility for shared demos/pairing/runbooks.
+
+** Q151: What is remote-first Vim advantage?
+Reliable SSH editing without heavy GUI dependencies.
+
+** Q152: What is terminal compatibility challenge?
+Keycode/clipboard/color behavior differences across terminals/OS.
+
+** Q153: Mitigation for terminal inconsistencies?
+Standardize TERM settings, test mappings, and fallback keybinds.
+
+** Q154: What is clipboard security concern?
+Accidental copying of secrets into global clipboard history.
+
+** Q155: Secret-handling mitigation in editor workflows?
+Use dedicated registers/temporary buffers and avoid persistent clipboard for secrets.
+
+** Q156: What is plugin supply-chain risk?
+Malicious or compromised plugin code execution.
+
+** Q157: Plugin security mitigation?
+Pin versions, use trusted sources, review update diffs/changelogs.
+
+** Q158: What is dotfiles CI concept?
+Automated checks ensuring config validity/format/smoke startup.
+
+** Q159: Why test editor config in CI?
+Prevents broken setup across machines.
+
+** Q160: What is advanced anti-pattern?
+Over-customizing until default Vim knowledge no longer applies.
+
+** Q161: Better long-term approach?
+Minimal, documented customizations preserving core Vim grammar.
+
+** Q162: What is knowledge transfer pattern for teams?
+Cheatsheets + recorded macros/workflows + pair-editing sessions.
+
+** Q163: What is accessibility/ergonomics advanced concern?
+Prevent repetitive strain with balanced keymaps and typing posture.
+
+** Q164: Ergonomic optimization tactics?
+Reduce pinky strain, remap frequent combos, leverage home-row motions.
+
+** Q165: What is final reliability principle?
+Every powerful edit should be undoable and verifiable.
+
+** Q166: What is final performance principle?
+Low-latency editing loop beats feature overload.
+
+** Q167: What is final security principle?
+Treat plugins/config/scripts as executable code requiring trust controls.
+
+** Q168: What is final governance principle?
+Version, review, and document editor automation artifacts.
+
+** Q169: What is final architecture principle?
+Compose primitives (motions/operators/text objects) into scalable workflows.
+
+** Q170: What is final collaboration principle?
+Share portable practices, not environment-specific lock-in.
+
+** Q171: What is final scaling principle?
+Automate repetitive edits across files via quickfix + scripted commands.
+
+** Q172: What is final learning principle?
+Depth in fundamentals outperforms endless shortcut accumulation.
+
+** Q173: What is final productivity principle?
+Measure success by reduced friction and faster accurate edits.
+
+** Q174: What is final ops principle?
+Continuously prune config complexity that no longer pays value.
+
+** Q175: What is final tooling principle?
+Integrate LSP/search/build tools without sacrificing modal fluency.
+
+** Q176: What is final resilience principle?
+Be effective in minimal environments (remote shells, rescue systems).
+
+** Q177: What is final quality principle?
+Prefer explicit readable mappings over clever hidden magic.
+
+** Q178: What is final strategy principle?
+Evolve config intentionally with measurable workflow gains.
+
+** Q179: What is final mastery indicator?
+You describe edits as language constructs, not key memorization.
+
+** Q180: Final maturity principle?
+Vim excellence is composable, repeatable, and disciplined editing fluency.
