@@ -1,0 +1,579 @@
+#+title: Kong
+#+date: 2026-08-20
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kong
+
+-----
+
+* Beginner
+
+** Q1: What is Kong?
+Kong is an API gateway platform for routing, securing, and observing API traffic.
+
+** Q2: Why use Kong?
+Centralizes API access control, authentication, rate limiting, and traffic policies.
+
+** Q3: What problem does API gateway solve?
+Provides a single controlled entry point for many backend services.
+
+** Q4: Kong Gateway open-source vs enterprise?
+OSS provides core gateway features; enterprise adds advanced governance/analytics features.
+
+** Q5: What is data plane in Kong?
+Proxy nodes handling live API traffic.
+
+** Q6: What is control plane in Kong?
+Management/configuration plane distributing policies/routes to data planes (mode dependent).
+
+** Q7: What is a Service in Kong?
+Represents an upstream API/service abstraction.
+
+** Q8: What is a Route in Kong?
+Defines how incoming requests match and map to a Service.
+
+** Q9: Route matching criteria examples?
+Host, path, method, headers, SNI (depending protocol/config).
+
+** Q10: What is an Upstream in Kong?
+Logical load-balanced pool of backend targets.
+
+** Q11: What is Target in Kong?
+Individual backend endpoint (IP/host:port) inside an Upstream.
+
+** Q12: Why separate Service/Route/Upstream concepts?
+Clear decoupling of traffic entry, policy, and backend resolution.
+
+** Q13: What is a Plugin in Kong?
+Reusable policy/filter extending gateway behavior.
+
+** Q14: Common Kong plugin examples?
+Rate limiting, key-auth, JWT, OIDC, ACL, CORS, request-transformer, logging.
+
+** Q15: What is Consumer in Kong?
+Identity entity representing API client/app/user.
+
+** Q16: Why use Consumers?
+Attach credentials, ACLs, and per-client policies.
+
+** Q17: What is credential in Kong?
+Auth material linked to consumer (API key, JWT secret, cert, etc.).
+
+** Q18: What is declarative config in Kong?
+YAML/JSON config defining gateway state (DB-less workflows common).
+
+** Q19: DB mode vs DB-less mode?
+DB mode stores config in database; DB-less loads full declarative state directly.
+
+** Q20: Why DB-less mode?
+Simplicity, GitOps friendliness, and immutable config patterns.
+
+** Q21: What is Kong Admin API?
+API for managing gateway configuration and entities.
+
+** Q22: Why secure Admin API strictly?
+It controls traffic/security policies for entire gateway.
+
+** Q23: What is Kong Manager?
+Web UI for managing Kong entities (edition/feature availability varies).
+
+** Q24: What is TLS termination in Kong?
+Kong handles HTTPS and forwards to upstream over configured protocol.
+
+** Q25: What is SNI in Kong/TLS context?
+Select certificate based on requested server name.
+
+** Q26: What is mTLS at gateway?
+Require client certificates for strong mutual authentication.
+
+** Q27: What is CORS plugin use?
+Manage browser cross-origin request policies centrally.
+
+** Q28: What is rate limiting plugin use?
+Throttle requests per consumer/ip/credential/window.
+
+** Q29: Why rate limit?
+Protect upstreams from abuse and accidental overload.
+
+** Q30: What is request transformation plugin use?
+Modify headers/body/path/query before upstream forwarding.
+
+** Q31: What is response transformation use?
+Adjust outbound responses for compatibility/security needs.
+
+** Q32: What is logging plugin use?
+Export request/response metadata to observability systems.
+
+** Q33: What is upstream timeout?
+Max connect/read/write time before gateway aborts request.
+
+** Q34: Why timeout tuning matters?
+Prevents hung connections and preserves gateway capacity.
+
+** Q35: What is retry behavior?
+Gateway retries failed upstream requests under configured rules.
+
+** Q36: Retry risk?
+Can amplify load during partial failures if misconfigured.
+
+** Q37: What is circuit breaker concept (upstream health)?
+Avoid routing to repeatedly failing targets (implementation/plugin/pattern dependent).
+
+** Q38: What is health check in Kong upstreams?
+Active/passive checks determining target availability.
+
+** Q39: Why health checks are important?
+Route traffic only to healthy backends.
+
+** Q40: What is load balancing strategy examples?
+Round-robin, least-connections, consistent-hashing (capabilities vary by setup/version).
+
+** Q41: What is sticky session pattern?
+Use hashing/cookies to keep client routed consistently.
+
+** Q42: Sticky session tradeoff?
+Session continuity vs uneven distribution risk.
+
+** Q43: Beginner anti-pattern with Kong?
+Putting all APIs/routes/plugins in one unmanaged shared namespace.
+
+** Q44: Another beginner anti-pattern?
+Exposing Admin API publicly.
+
+** Q45: Beginner security baseline?
+Private admin plane, TLS everywhere, least-privilege credentials.
+
+** Q46: Beginner reliability baseline?
+Multiple gateway replicas and upstream health checks.
+
+** Q47: Beginner observability baseline?
+Track latency, status codes, throughput, auth failures.
+
+** Q48: Beginner governance baseline?
+Standard route naming/plugin baseline templates.
+
+** Q49: What is decK in Kong ecosystem?
+Tool for declarative config sync/diff for Kong state management.
+
+** Q50: Why use decK?
+GitOps-style versioned, repeatable gateway configuration workflows.
+
+** Q51: What is Konnect (Kong platform concept)?
+Managed control-plane/SaaS style management offering (feature availability dependent).
+
+** Q52: Why managed control plane can help?
+Operational simplification and centralized governance.
+
+** Q53: What is workspace concept (edition-dependent)?
+Logical configuration isolation for teams/tenants.
+
+** Q54: Why workspace isolation?
+Reduce multi-team blast radius and config collisions.
+
+** Q55: Beginner workflow principle?
+Treat gateway config as code with PR reviews.
+
+** Q56: Beginner architecture principle?
+Separate ingress traffic concerns from service business logic.
+
+** Q57: Beginner collaboration principle?
+Platform team defines guardrails, app teams onboard via templates.
+
+** Q58: Beginner incident principle?
+Document 401/403/429/5xx gateway triage playbooks.
+
+** Q59: Beginner scaling principle?
+Start simple with standardized plugin bundles.
+
+** Q60: Beginner best practice?
+Run Kong as critical edge infrastructure, not just proxy middleware.
+
+* Intermediate
+
+** Q61: What is plugin execution order concern?
+Multiple plugins can interact; order affects final behavior.
+
+** Q62: Why plugin order matters?
+Auth, transform, and rate-limit precedence changes outcomes/security.
+
+** Q63: What is global plugin vs scoped plugin?
+Global applies to all traffic; scoped applies to service/route/consumer.
+
+** Q64: Scoped plugin benefit?
+Fine-grained policy without unintended platform-wide impact.
+
+** Q65: What is consumer group concept (if available)?
+Group-based policy assignment for multiple consumers.
+
+** Q66: What is ACL plugin?
+Allow/deny API access based on consumer group membership.
+
+** Q67: What is key-auth vs JWT auth difference?
+API key lookup vs token signature/claims validation.
+
+** Q68: What is OIDC plugin role?
+Delegate authentication/authorization to identity provider via OIDC flows.
+
+** Q69: OIDC gateway benefit?
+Centralized auth integration for many APIs.
+
+** Q70: OIDC caution?
+Token validation/caching/introspection settings must match risk and scale.
+
+** Q71: What is request size limiting?
+Block oversized payloads to protect upstreams/resources.
+
+** Q72: What is bot/abuse mitigation at gateway?
+Rate limits, IP reputation, auth hardening, anomaly controls.
+
+** Q73: What is canary release using Kong?
+Route subset traffic to new upstream targets by weights/headers.
+
+** Q74: What is blue/green via Kong?
+Switch routes/upstream targets from old to new environment.
+
+** Q75: What is traffic mirroring concept?
+Send copy of traffic to shadow upstream for validation.
+
+** Q76: Why traffic mirroring useful?
+Test new versions without affecting client responses.
+
+** Q77: What is upstream mTLS?
+Gateway authenticates to upstream with client certs.
+
+** Q78: Why upstream TLS/mTLS matters?
+Protect service-to-service data and identity, not just edge traffic.
+
+** Q79: What is certificate rotation challenge?
+Avoid downtime while renewing many certs/keys.
+
+** Q80: Rotation best practice?
+Automate issuance, staged deployment, and expiry alerting.
+
+** Q81: What is intermediate anti-pattern?
+Per-route custom plugins without standard baseline controls.
+
+** Q82: Better policy model?
+Global minimum security baseline + scoped additive overrides.
+
+** Q83: What is declarative drift?
+Live gateway config differs from Git-declared desired state.
+
+** Q84: Drift mitigation with decK?
+Regular diff/sync and CI policy checks before apply.
+
+** Q85: What is Kong Ingress Controller (KIC)?
+Kubernetes controller translating Ingress/Gateway resources into Kong config.
+
+** Q86: Why use Kong with Kubernetes?
+Unified gateway policies with K8s-native declarative workflows.
+
+** Q87: KIC vs standalone Kong config?
+KIC derives from K8s resources; standalone often direct Admin API/declarative config.
+
+** Q88: What is CRD-based config in Kong K8s?
+Custom resources expressing plugins/consumers/routes beyond basic Ingress.
+
+** Q89: What is Gateway API relation with Kong?
+Modern K8s traffic API often supported via controller integration patterns.
+
+** Q90: What is DB migration concern in Kong DB mode?
+Versioned schema migrations must be coordinated during upgrades.
+
+** Q91: What is hybrid mode concept in Kong?
+Separated control plane and data plane communication architecture.
+
+** Q92: Hybrid mode benefit?
+Central config governance with distributed low-latency data planes.
+
+** Q93: Hybrid mode security concern?
+Control/data plane mTLS and cert lifecycle must be robust.
+
+** Q94: What is rate limit storage strategy impact?
+Local vs central counters affect consistency/performance tradeoffs.
+
+** Q95: What is auth cache tuning concern?
+Cache improves latency but affects revocation immediacy.
+
+** Q96: What is intermediate observability baseline?
+Per-route latency percentiles, plugin error rates, upstream health trends.
+
+** Q97: What is distributed tracing integration?
+Propagate trace context and export spans for end-to-end visibility.
+
+** Q98: Why trace gateway hops?
+Identify edge vs upstream latency contributors quickly.
+
+** Q99: What is log redaction need at gateway?
+Prevent sensitive headers/tokens/PII leakage to logs.
+
+** Q100: What is intermediate security baseline?
+Private admin/control plane, strong authN plugins, mTLS where needed.
+
+** Q101: What is intermediate reliability baseline?
+HA gateway clusters, health checks, tested failover.
+
+** Q102: What is intermediate governance baseline?
+Config-as-code, policy linting, approval workflows.
+
+** Q103: Intermediate maturity signal?
+Teams onboard APIs through standardized templates with low incident rate.
+
+** Q104: What is intermediate cost principle?
+Optimize plugin usage and logging volume to control overhead.
+
+** Q105: What is intermediate scaling principle?
+Segment traffic domains and avoid one massive shared gateway when needed.
+
+** Q106: What is intermediate operations principle?
+Use canary config rollouts for high-risk gateway changes.
+
+** Q107: What is intermediate architecture principle?
+Separate external, partner, and internal API gateway lanes.
+
+** Q108: What is intermediate collaboration principle?
+Platform team owns paved road; API teams own service contracts.
+
+** Q109: What is intermediate compliance principle?
+Audit API access policy changes and credential lifecycle events.
+
+** Q110: What is intermediate resilience principle?
+Design upstream fallback and timeout budgets explicitly.
+
+** Q111: What is intermediate migration principle?
+Move legacy edge logic incrementally into gateway policies.
+
+** Q112: What is intermediate quality principle?
+Automated tests for route matching and auth/rate-limit behavior.
+
+** Q113: What is intermediate delivery principle?
+Promote gateway config from dev to prod with immutable artifacts.
+
+** Q114: What is intermediate trust principle?
+Treat every plugin/config update as security-relevant change.
+
+** Q115: What is intermediate tenancy principle?
+Use workspaces/projects/namespaces for team isolation.
+
+** Q116: What is intermediate incident principle?
+Classify failures by edge auth, routing, upstream, or platform layer.
+
+** Q117: What is intermediate SLO principle?
+Define latency/error objectives per API class at gateway edge.
+
+** Q118: What is intermediate policy principle?
+Enforce minimum TLS and auth requirements by default.
+
+** Q119: What is intermediate capacity principle?
+Load test peak traffic with plugin stack enabled.
+
+** Q120: What is intermediate backlog principle?
+Continuously remove one-off route exceptions.
+
+** Q121: What is intermediate platform principle?
+Document golden plugin combinations and anti-patterns.
+
+** Q122: What is intermediate safety principle?
+Restrict who can modify global plugins/routes.
+
+** Q123: What is intermediate lifecycle principle?
+Automate cert/key/client credential rotation schedules.
+
+** Q124: What is intermediate telemetry principle?
+Correlate gateway metrics with upstream app SLOs.
+
+** Q125: Intermediate best practice?
+Build Kong as a governed API platform, not ad-hoc proxy config.
+
+* Advanced
+
+** Q126: What is Kong at enterprise scale challenge?
+Balancing central governance with team autonomy across many APIs and regions.
+
+** Q127: What is multi-region Kong architecture pattern?
+Regional data planes with centralized or federated control planes.
+
+** Q128: What is active-active gateway strategy?
+Serve traffic simultaneously from multiple regions for resilience/performance.
+
+** Q129: What is active-passive strategy?
+Primary region handles traffic; secondary takes over on failure.
+
+** Q130: What is global traffic steering relation?
+DNS/GSLB/CDN directs clients to healthy/nearest gateway region.
+
+** Q131: What is control-plane blast radius?
+Misconfiguration can affect every connected data plane/API.
+
+** Q132: Blast-radius mitigation?
+Scoped workspaces, staged rollouts, policy validation, regional segmentation.
+
+** Q133: What is plugin supply-chain risk?
+Compromised custom/community plugin can execute at critical edge path.
+
+** Q134: Plugin supply-chain mitigation?
+Signed artifacts, code review, restricted plugin allowlist, runtime hardening.
+
+** Q135: What is zero-trust API gateway posture?
+Strong identity verification and least privilege for every request path.
+
+** Q136: What is fine-grained authorization pattern?
+Gateway enforces coarse authN; services enforce domain-specific authZ.
+
+** Q137: Why not only gateway authorization?
+Business-context authorization often requires service-local logic/data.
+
+** Q138: What is token exchange/delegation concern?
+Improper downstream token propagation can widen privilege exposure.
+
+** Q139: Mitigation for token propagation risk?
+Audience scoping, token minimization, short TTL, secure header handling.
+
+** Q140: What is data privacy risk at gateway?
+Sensitive payload/header logging and transformation leakage.
+
+** Q141: Privacy mitigation?
+Redaction, field-level masking, minimal log retention, encrypted transport/storage.
+
+** Q142: What is API product governance with Kong?
+Cataloging APIs, plans, quotas, and lifecycle controls (tooling/edition dependent).
+
+** Q143: What is monetization/plan enforcement concept?
+Rate/quota tiers and consumer entitlements for partner/public APIs.
+
+** Q144: What is noisy-neighbor issue in shared gateway?
+One tenant/API consumes disproportionate resources affecting others.
+
+** Q145: Noisy-neighbor mitigation?
+Isolation pools, resource limits, per-tenant quotas, dedicated gateways.
+
+** Q146: What is gateway capacity planning key metrics?
+RPS, p95/p99 latency, connection counts, plugin CPU overhead, error budget burn.
+
+** Q147: Why plugin overhead benchmarking is critical?
+Complex chains can significantly increase latency/cost.
+
+** Q148: What is chaos testing for gateways?
+Inject upstream failures, latency spikes, cert issues, and CP/DP disconnects.
+
+** Q149: Why chaos tests matter for Kong?
+Validate resilience and fail-safe behavior under realistic faults.
+
+** Q150: What is CP/DP partition behavior concern?
+Data planes continue with last-known config; drift/change propagation pauses.
+
+** Q151: Operational mitigation for CP/DP partitions?
+Alerting, config freeze policies, reconnection runbooks.
+
+** Q152: What is disaster recovery for Kong platform?
+Backup config/state, restore control plane, verify data plane sync and cert trust.
+
+** Q153: Why DR rehearsal is mandatory?
+Edge outages affect all APIs; untested recovery is high risk.
+
+** Q154: What is policy-as-code for Kong?
+Automated checks ensuring route/plugin/security compliance before deployment.
+
+** Q155: Example policy checks?
+No public route without auth, TLS required, no unsafe plugins globally.
+
+** Q156: What is canary config rollout pattern?
+Apply changes to subset gateway nodes/routes before fleet-wide rollout.
+
+** Q157: What is rollback trigger for gateway config?
+SLO degradation or auth/routing error spike after release.
+
+** Q158: What is observability gold standard for Kong?
+Unified metrics/logs/traces with per-route, per-consumer, per-plugin visibility.
+
+** Q159: What is DORA/SRE relevance for API gateways?
+Measure change safety/velocity and operational reliability of edge platform.
+
+** Q160: What is compliance evidence in gateway operations?
+Audit trail of policy changes, credential issuance, access decisions, incident actions.
+
+** Q161: What is segregation of duties pattern?
+Separate platform admins, security policy approvers, API publishers.
+
+** Q162: What is advanced anti-pattern?
+Embedding excessive business transformations in gateway layer.
+
+** Q163: Better boundary principle?
+Gateway handles cross-cutting concerns; business logic stays in services.
+
+** Q164: What is hybrid cloud Kong challenge?
+Consistent policy and identity across heterogeneous networking environments.
+
+** Q165: Mitigation for hybrid inconsistency?
+Standardized config pipelines and environment-specific controlled overlays.
+
+** Q166: What is final reliability principle?
+Gateway must fail predictably and preserve core API availability under stress.
+
+** Q167: What is final security principle?
+Every edge path must enforce strong auth, transport security, and least privilege.
+
+** Q168: What is final governance principle?
+Standardize API onboarding with automated guardrails and auditable exceptions.
+
+** Q169: What is final architecture principle?
+Design for isolation domains matching risk, tenancy, and traffic profile.
+
+** Q170: What is final operations principle?
+Continuously test upgrades, failover, and rollback at platform scale.
+
+** Q171: What is final collaboration principle?
+Platform and API teams co-own consumer experience and security posture.
+
+** Q172: What is final scaling principle?
+Segment gateways before shared-control complexity becomes bottleneck.
+
+** Q173: What is final compliance principle?
+Retain tamper-evident logs for auth, policy, and admin actions.
+
+** Q174: What is final performance principle?
+Optimize plugin chains and upstream interactions using real traffic data.
+
+** Q175: What is final trust principle?
+Protect control plane and config pipeline as crown-jewel assets.
+
+** Q176: What is final product principle?
+Treat gateway capabilities as internal product with roadmap and SLAs.
+
+** Q177: What is final migration principle?
+Move legacy edge controls incrementally with measurable safety gates.
+
+** Q178: What is final resilience principle?
+Plan for region, control-plane, and upstream dependency failures explicitly.
+
+** Q179: What is final strategy principle?
+Prefer declarative, tested, Git-driven gateway operations.
+
+** Q180: Final maturity principle?
+Kong excellence is secure, observable, and governable API traffic control at scale.
+
+* Bonus: Minimal decK-Style Declarative Snippet (Conceptual)
+
+#+BEGIN_SRC yaml
+_format_version: "3.0"
+services:
+  - name: payments
+    url: http://payments.default.svc.cluster.local:8080
+    routes:
+      - name: payments-route
+        paths: ["/payments"]
+plugins:
+  - name: rate-limiting
+    service: payments
+    config:
+      minute: 300
+      policy: local
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
