@@ -1,0 +1,546 @@
+#+title: Rancher
+#+date: 2026-08-17
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Rancher
+
+-----
+
+* Beginner
+
+** Q1: What is Rancher?
+Rancher is a Kubernetes management platform for operating multiple clusters centrally.
+
+** Q2: Why use Rancher?
+It provides unified cluster lifecycle management, access control, policy, and observability integrations.
+
+** Q3: Is Rancher a Kubernetes distribution?
+Rancher itself is a management platform; it can provision/manage Kubernetes distributions.
+
+** Q4: What is Rancher Server?
+Central management plane (UI/API/controllers) for downstream clusters.
+
+** Q5: What is a downstream cluster?
+A Kubernetes cluster imported into or provisioned by Rancher for management.
+
+** Q6: What is a local cluster in Rancher?
+Cluster where Rancher is installed (management cluster).
+
+** Q7: Why separate management and workload clusters?
+Improves isolation, reliability, and operational boundaries.
+
+** Q8: What is cluster provisioning in Rancher?
+Creating Kubernetes clusters via infrastructure drivers/providers.
+
+** Q9: What is cluster import?
+Registering an existing Kubernetes cluster into Rancher management.
+
+** Q10: What is RKE?
+Rancher Kubernetes Engine (upstream/original provisioning approach lineage).
+
+** Q11: What is RKE2?
+Hardened Kubernetes distribution focused on security and operations.
+
+** Q12: What is K3s relation to Rancher?
+Lightweight Kubernetes distribution often managed through Rancher.
+
+** Q13: What is a node role in Kubernetes clusters?
+Control plane, etcd, and worker responsibilities (distribution-dependent design).
+
+** Q14: What is Rancher project?
+Logical grouping of namespaces with shared RBAC/quotas/policies.
+
+** Q15: Why use projects in Rancher?
+Multi-team organization and delegated access control.
+
+** Q16: What is namespace in Rancher context?
+Standard Kubernetes namespace managed with Rancher UX/policy overlays.
+
+** Q17: What is Rancher RBAC?
+Role-based access model for clusters/projects/resources.
+
+** Q18: What is global role?
+Platform-wide permissions in Rancher manager scope.
+
+** Q19: What is cluster role (Rancher context)?
+Permissions scoped to specific downstream cluster.
+
+** Q20: What is project role?
+Permissions scoped to a Rancher project/namespaces.
+
+** Q21: Why least privilege matters in Rancher?
+Limits blast radius across many clusters/teams.
+
+** Q22: What is authentication integration in Rancher?
+External identity providers (LDAP/AD/SAML/OIDC/GitHub etc.) for SSO.
+
+** Q23: Why SSO integration is valuable?
+Centralized identity lifecycle and access governance.
+
+** Q24: What is kubeconfig from Rancher?
+Cluster access config generated with scoped permissions/tokens.
+
+** Q25: What is cluster explorer?
+Rancher UI view to inspect Kubernetes resources and workloads.
+
+** Q26: What is app deployment in Rancher?
+Deploy workloads via manifests, Helm charts, or GitOps integrations.
+
+** Q27: What is Helm chart in Rancher workflows?
+Packaged Kubernetes app deployable via catalog/apps UX.
+
+** Q28: What is monitoring integration concept?
+Prometheus/Grafana stack deployment/management via Rancher apps/extensions.
+
+** Q29: What is logging integration concept?
+Centralized log collection integrations for downstream clusters.
+
+** Q30: What is Fleet in Rancher ecosystem?
+GitOps engine for managing Kubernetes resources across cluster fleets.
+
+** Q31: Why GitOps with Rancher/Fleet?
+Declarative, versioned, and scalable multi-cluster configuration rollout.
+
+** Q32: What is cluster registration token?
+Credential/mechanism to securely attach cluster/agents to Rancher.
+
+** Q33: What is Rancher agent?
+Component enabling communication between downstream cluster and Rancher server.
+
+** Q34: Why agents are needed?
+State reporting, orchestration actions, and policy/application delivery.
+
+** Q35: What is beginner anti-pattern with Rancher?
+Using admin-level access for all users and automation.
+
+** Q36: Another beginner anti-pattern?
+Managing production changes manually in UI without Git/audit workflow.
+
+** Q37: Beginner security baseline?
+SSO + RBAC least privilege + TLS everywhere.
+
+** Q38: Beginner reliability baseline?
+HA Rancher setup and backup strategy for management state.
+
+** Q39: Beginner governance baseline?
+Projects per team with quota and policy defaults.
+
+** Q40: Beginner observability baseline?
+Cluster health dashboards, alerts, and audit log visibility.
+
+** Q41: What is cluster health indicator?
+Status signals for node/control plane/component readiness.
+
+** Q42: What is upgrade in Rancher context?
+Upgrading Rancher server and/or downstream Kubernetes clusters.
+
+** Q43: Why controlled upgrades matter?
+Prevent compatibility issues and downtime across managed fleets.
+
+** Q44: What is maintenance window use?
+Schedule disruptive operations with reduced business impact.
+
+** Q45: What is backup target in Rancher?
+Management plane state (including cluster definitions/settings) and related datastore.
+
+** Q46: Why backups are critical?
+Management-plane failure can affect operations across many clusters.
+
+** Q47: What is restore drill?
+Practice restoring Rancher and validating managed-cluster operations.
+
+** Q48: What is drift in multi-cluster operations?
+Actual cluster config diverges from intended standards.
+
+** Q49: How Rancher helps reduce drift?
+Central policy/templates and GitOps-driven reconciliation.
+
+** Q50: What is template/catalog value?
+Standardized reusable app/platform definitions.
+
+** Q51: What is beginner workflow principle?
+Separate platform admin duties from app-team namespace operations.
+
+** Q52: Beginner collaboration principle?
+Use shared platform standards with team-level autonomy boundaries.
+
+** Q53: Beginner cost principle?
+Right-size clusters/nodes and remove idle environments.
+
+** Q54: Beginner incident principle?
+Document break-glass access and cluster recovery steps.
+
+** Q55: Beginner architecture principle?
+Keep management plane stable and isolated from noisy workloads.
+
+** Q56: Beginner compliance principle?
+Enable audit logs and track administrative actions.
+
+** Q57: Beginner scaling principle?
+Standardize onboarding patterns before cluster count grows.
+
+** Q58: Beginner best practice?
+Treat Rancher as critical platform infrastructure, not just a UI.
+
+* Intermediate
+
+** Q59: What is Rancher HA deployment?
+Multiple Rancher server replicas behind load balancer with resilient datastore/K8s backend.
+
+** Q60: Why HA Rancher is important?
+Management-plane outages affect many teams/clusters simultaneously.
+
+** Q61: What is certificate management in Rancher?
+Managing TLS certs for server ingress and downstream trust chains.
+
+** Q62: Certificate anti-pattern?
+Letting certs expire without rotation automation/alerts.
+
+** Q63: What is cluster template concept?
+Reusable configuration blueprint for provisioning similar clusters.
+
+** Q64: Why cluster templates help?
+Consistency, compliance, and faster environment creation.
+
+** Q65: What is node template/pool strategy?
+Standardized machine profiles and scaling groups per workload type.
+
+** Q66: What is autoscaling relation in Rancher-managed clusters?
+Leverage Kubernetes/cloud autoscalers with policy guardrails.
+
+** Q67: What is Pod Security/PSA governance via platform?
+Enforcing namespace/workload security posture consistently.
+
+** Q68: What is network policy governance?
+Standard east-west traffic restrictions across tenant namespaces.
+
+** Q69: Why centralized policy is useful?
+Prevents inconsistent security controls across clusters.
+
+** Q70: What is OPA/Gatekeeper/Kyverno integration concept?
+Policy-as-code admission controls in managed clusters.
+
+** Q71: What is CIS benchmark relation to Rancher ecosystem?
+Security hardening guidance and assessment workflows for Kubernetes clusters.
+
+** Q72: Why run benchmark scans?
+Identify misconfigurations and track remediation progress.
+
+** Q73: What is project quota in Rancher?
+Resource limits scoped to project/namespaces for fairness and control.
+
+** Q74: Why quotas matter?
+Prevent noisy teams from exhausting shared cluster capacity.
+
+** Q75: What is limit range/default resource policy?
+Enforce per-pod/container request/limit defaults in namespaces.
+
+** Q76: What is Fleet bundle?
+Unit of GitOps content deployed to target clusters.
+
+** Q77: What is Fleet target customization?
+Per-cluster/group value overrides for shared bundles.
+
+** Q78: Fleet anti-pattern?
+Too many ad-hoc overrides undermining standardization.
+
+** Q79: Better GitOps layering pattern?
+Base platform bundle + environment overlay + minimal cluster-specific overrides.
+
+** Q80: What is multi-cluster app deployment challenge?
+Version coordination and dependency consistency across environments.
+
+** Q81: Mitigation for multi-cluster rollout risk?
+Phased ring deployments with health gates.
+
+** Q82: What is ring deployment strategy?
+Progressively deploy to dev->staging->canary->prod groups.
+
+** Q83: What is cluster group concept in fleet ops?
+Logical grouping for policy/app targeting.
+
+** Q84: What is drift detection in Fleet?
+Identify when cluster resources differ from Git desired state.
+
+** Q85: What is reconciliation interval tradeoff?
+Faster correction vs increased controller/API load.
+
+** Q86: What is imported cluster trust concern?
+Validating cluster identity and registration security posture.
+
+** Q87: What is token lifecycle best practice?
+Short-lived/rotated registration and API tokens.
+
+** Q88: What is API key governance in Rancher?
+Scope, rotate, and audit machine/user credentials.
+
+** Q89: What is intermediate anti-pattern?
+Single shared project for many teams with weak boundaries.
+
+** Q90: Better tenancy model?
+Project-per-team or environment with explicit RBAC and quotas.
+
+** Q91: What is logging architecture consideration?
+Centralized vs per-cluster logging tradeoffs (cost/isolation/compliance).
+
+** Q92: What is monitoring federation consideration?
+Global visibility while preserving cluster-level granularity.
+
+** Q93: What is alert routing design?
+Team-based routing with severity and ownership mapping.
+
+** Q94: What is upgrade orchestration for many clusters?
+Wave-based upgrades with compatibility checks and rollback plans.
+
+** Q95: Why avoid simultaneous fleet-wide upgrades?
+Large blast radius if incompatibility appears.
+
+** Q96: What is backup scope beyond Rancher app?
+Include downstream cluster critical data/etcd snapshots per policy.
+
+** Q97: What is restore dependency mapping?
+Understand order: management plane, identity, DNS/certs, cluster agents.
+
+** Q98: What is incident triage flow in Rancher platform?
+Mgmt plane health -> agent connectivity -> cluster component health -> workload impact.
+
+** Q99: What is performance bottleneck in Rancher at scale?
+API saturation, controller reconciliation load, and etcd/control-plane limits.
+
+** Q100: Mitigation for scale bottlenecks?
+Right-size management cluster, tune controllers, shard operational domains.
+
+** Q101: What is audit logging in Rancher?
+Record administrative/user actions for forensics/compliance.
+
+** Q102: Why audit retention policy matters?
+Supports investigations and regulatory evidence requirements.
+
+** Q103: What is intermediate security baseline?
+SSO+MFA, strict RBAC, network segmentation, secret management integration.
+
+** Q104: What is intermediate reliability baseline?
+HA management plane, tested backups, staged upgrade runbooks.
+
+** Q105: What is intermediate governance baseline?
+GitOps-managed platform config with policy checks.
+
+** Q106: What is intermediate observability baseline?
+SLOs for management API latency, agent health, reconciliation success.
+
+** Q107: Intermediate maturity signal?
+Platform team can onboard clusters/teams predictably with low friction.
+
+** Q108: What is intermediate collaboration principle?
+Clear contract: platform guardrails vs team workload ownership.
+
+** Q109: What is intermediate cost principle?
+Cluster rightsizing, workload placement, and lifecycle cleanup automation.
+
+** Q110: What is intermediate compliance principle?
+Separation of duties for platform admin vs app deploy approvals.
+
+** Q111: What is intermediate architecture principle?
+Separate management services from tenant workload clusters when feasible.
+
+** Q112: What is intermediate operations principle?
+Run game days for control-plane outage and cluster disconnect scenarios.
+
+** Q113: What is intermediate migration principle?
+Adopt legacy clusters incrementally with baseline policy conformance checks.
+
+** Q114: What is intermediate resilience principle?
+Design for temporary agent disconnect and eventual consistency workflows.
+
+** Q115: What is intermediate quality principle?
+Version and test platform bundles/charts before broad rollout.
+
+** Q116: What is intermediate delivery principle?
+Promote platform changes across environments via pull requests.
+
+** Q117: What is intermediate trust principle?
+Minimize long-lived credentials and verify integration endpoints.
+
+** Q118: What is intermediate scaling principle?
+Automate cluster bootstrap and policy attachment.
+
+** Q119: What is intermediate support principle?
+Document operational runbooks and ownership escalation paths.
+
+** Q120: Intermediate best practice?
+Platformize repeatable patterns, not one-off cluster exceptions.
+
+* Advanced
+
+** Q121: What is Rancher enterprise platform architecture goal?
+Provide secure, governed self-service Kubernetes across many teams/regions.
+
+** Q122: What is management-plane blast radius?
+Failure/compromise can impact governance and operations for entire fleet.
+
+** Q123: Blast-radius mitigation strategy?
+HA, isolation, least privilege, and regional/domain segmentation.
+
+** Q124: What is multi-region Rancher strategy?
+Separate or federated management patterns depending latency/compliance/risk.
+
+** Q125: What is fleet sharding concept?
+Partition cluster management domains to scale and isolate failures.
+
+** Q126: Why shard operational domains?
+Limit controller load and reduce organization-wide outage scope.
+
+** Q127: What is supply-chain risk in Rancher ecosystem?
+Compromised charts/images/extensions/pipelines affecting many clusters.
+
+** Q128: Supply-chain mitigation?
+Signed artifacts, trusted registries, image policies, provenance checks.
+
+** Q129: What is SBOM relevance for platform components?
+Track dependencies/vulnerabilities across management and cluster add-ons.
+
+** Q130: What is zero-trust principle for cluster management?
+Authenticate/authorize every API and network path explicitly.
+
+** Q131: What is secret zero challenge in platform bootstrap?
+Securely establishing first trust credentials for management plane components.
+
+** Q132: Secret zero mitigation?
+Hardware-backed secrets, external secret managers, short-lived bootstrap creds.
+
+** Q133: What is advanced RBAC pitfall?
+Role sprawl leading to unclear privilege inheritance and audit gaps.
+
+** Q134: RBAC sprawl mitigation?
+Role catalog, periodic access reviews, automated entitlement checks.
+
+** Q135: What is policy drift at fleet scale?
+Cluster policies diverge from approved baseline over time.
+
+** Q136: Policy drift mitigation?
+Continuous reconciliation + conformance reporting + exception expiration.
+
+** Q137: What is exception governance model?
+Time-bound documented waivers with owner and renewal workflow.
+
+** Q138: What is SLO for platform management plane?
+Availability/latency/reconciliation targets for Rancher APIs/controllers.
+
+** Q139: Why define platform SLOs?
+Treat platform as product with measurable reliability expectations.
+
+** Q140: What is noisy-neighbor issue in shared clusters?
+One tenant workload degrades others via resource contention.
+
+** Q141: Mitigation for noisy neighbors?
+Quotas, priority classes, dedicated node pools/clusters, policy controls.
+
+** Q142: What is hard multi-tenancy in Rancher environments?
+Separate clusters/accounts/networks for strong isolation requirements.
+
+** Q143: Soft vs hard tenancy tradeoff?
+Efficiency and simplicity vs stricter security/compliance isolation.
+
+** Q144: What is cluster lifecycle automation maturity?
+Provision, patch, upgrade, decommission pipelines with approval gates.
+
+** Q145: What is decommissioning risk?
+Orphaned resources/credentials and lingering compliance exposure.
+
+** Q146: Safe decommission checklist?
+Revoke access, archive logs, backup critical data, confirm resource teardown.
+
+** Q147: What is fleet-wide upgrade readiness check?
+Compatibility matrix validation for Kubernetes versions, addons, policies.
+
+** Q148: Why compatibility matrices matter?
+Prevent cascading failures from version skew.
+
+** Q149: What is disaster recovery for Rancher platform?
+Rebuild management plane + restore state + reconnect/validate downstream clusters.
+
+** Q150: Why DR rehearsal is mandatory?
+Unpracticed recovery paths often fail under incident pressure.
+
+** Q151: What is compliance evidence model in Rancher ops?
+Traceable approvals, policy states, access logs, and deployment history.
+
+** Q152: What is segregation of duties pattern?
+Distinct roles for platform admin, security approver, and app operator.
+
+** Q153: What is advanced anti-pattern?
+Treating Rancher as only GUI while bypassing declarative Git workflows.
+
+** Q154: Better operating model?
+GitOps-first platform operations with UI for visibility and controlled exceptions.
+
+** Q155: What is platform API automation strategy?
+Use Rancher APIs/Terraform providers for reproducible provisioning/governance.
+
+** Q156: Why API-driven ops improve quality?
+Repeatable, testable changes with audit trail and rollback patterns.
+
+** Q157: What is observability gold standard for Rancher platforms?
+Unified dashboards for API health, reconciliation lag, cluster compliance, incident metrics.
+
+** Q158: What is DORA relevance for platform teams?
+Measure delivery speed/stability of platform changes impacting developer productivity.
+
+** Q159: What is cost governance at cluster fleet scale?
+Chargeback/showback, resource quotas, and lifecycle cleanup enforcement.
+
+** Q160: What is sustainability/capacity planning principle?
+Forecast cluster growth and control-plane capacity before saturation.
+
+** Q161: What is advanced incident response pattern?
+Runbooks for control-plane outage, cert expiration, auth failure, and etcd degradation.
+
+** Q162: What is break-glass access policy?
+Emergency privileged access path with strict logging and post-incident review.
+
+** Q163: Why break-glass controls matter?
+Balance rapid recovery with security/compliance accountability.
+
+** Q164: What is platform product mindset?
+Treat internal platform users as customers with roadmap and support SLAs.
+
+** Q165: What is final reliability principle?
+Management plane and fleet operations must be resilient and tested regularly.
+
+** Q166: What is final security principle?
+Identity, policy, and supply chain controls must be enforced end-to-end.
+
+** Q167: What is final governance principle?
+Standardize guardrails while making exceptions explicit and auditable.
+
+** Q168: What is final architecture principle?
+Design for isolation boundaries that match risk and organizational structure.
+
+** Q169: What is final operations principle?
+Automate lifecycle workflows and continuously validate recovery procedures.
+
+** Q170: What is final collaboration principle?
+Platform, security, and app teams co-own cluster safety and velocity.
+
+** Q171: What is final scaling principle?
+Shard responsibly and templatize platform patterns early.
+
+** Q172: What is final compliance principle?
+Preserve immutable evidence for access, policy, and change events.
+
+** Q173: What is final performance principle?
+Continuously tune control-plane and reconciliation paths under real load.
+
+** Q174: What is final strategy principle?
+Prefer declarative, Git-driven operations over manual click-ops.
+
+** Q175: Final maturity principle?
+Rancher excellence is secure, governed, and scalable multi-cluster platform operations.
+
+-----
+
+#+INCLUDE: "../footer.org"
