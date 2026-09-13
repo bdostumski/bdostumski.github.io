@@ -1,0 +1,586 @@
+#+title: Kubernetes Ingress
+#+date: 2026-08-19
+#+TAGS: DevOps
+#+options: toc:2 num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes Ingress
+
+-----
+
+* Beginner
+
+** Q1: What is Kubernetes Ingress?
+Ingress is a Kubernetes API resource that defines external HTTP/HTTPS routing to services.
+
+** Q2: What problem does Ingress solve?
+Centralizes Layer 7 routing rules (host/path/TLS) instead of exposing many LoadBalancers.
+
+** Q3: Is Ingress a load balancer itself?
+No, Ingress is configuration; an Ingress Controller implements it.
+
+** Q4: What is an Ingress Controller?
+Software that watches Ingress resources and configures a proxy/load balancer accordingly.
+
+** Q5: Common Ingress Controllers?
+NGINX Ingress, Traefik, HAProxy, cloud-specific controllers, etc.
+
+** Q6: What is =ingressClassName=?
+Field selecting which controller should process the Ingress resource.
+
+** Q7: Why ingress class matters?
+Multiple controllers may exist; class avoids ambiguous ownership.
+
+** Q8: What does an Ingress rule contain?
+Host, path, backend service name, and service port mapping.
+
+** Q9: Host-based routing?
+Route by HTTP Host header (e.g., app.example.com).
+
+** Q10: Path-based routing?
+Route by URL path prefix/exact match (e.g., /api, /admin).
+
+** Q11: What backend does Ingress point to?
+Kubernetes Service, which forwards traffic to Pods.
+
+** Q12: Service vs Ingress?
+Service exposes internal app endpoints; Ingress governs external HTTP(S) entry routing.
+
+** Q13: What is default backend?
+Fallback service for unmatched requests (controller-dependent behavior/config).
+
+** Q14: What is TLS in Ingress?
+HTTPS termination configuration using certificate secret references.
+
+** Q15: What does TLS secret contain?
+Certificate and private key (typically type kubernetes.io/tls).
+
+** Q16: Can one Ingress handle multiple hosts?
+Yes, multiple rules/hosts can be defined.
+
+** Q17: What is pathType?
+Defines path matching behavior (Exact, Prefix, ImplementationSpecific).
+
+** Q18: Prefix vs Exact pathType?
+Prefix matches path prefix tree; Exact matches full path exactly.
+
+** Q19: What is wildcard host in Ingress?
+Host pattern matching subdomains (controller support/constraints apply).
+
+** Q20: What is rewrite target concept?
+Modify request path before proxying to backend.
+
+** Q21: Why path rewrite is used?
+Align external URL structure with backend app routes.
+
+** Q22: What are annotations in Ingress?
+Controller-specific configuration extensions on metadata.
+
+** Q23: Annotation risk?
+Portability loss and misconfig due to controller-specific semantics.
+
+** Q24: What is ingress status address?
+External IP/hostname exposed by controller for DNS mapping.
+
+** Q25: Why DNS is required with Ingress?
+Public hostnames must resolve to controller’s external endpoint.
+
+** Q26: What is HTTP vs HTTPS handling?
+HTTP can redirect to HTTPS or serve directly depending config.
+
+** Q27: What is SSL redirect?
+Automatic redirection of HTTP requests to HTTPS.
+
+** Q28: What is SNI relevance?
+TLS host-based certificate selection for multi-domain ingress endpoints.
+
+** Q29: What is 404 from Ingress usually mean?
+No matching host/path rule or backend unavailable/misconfigured.
+
+** Q30: What is 502/503 from Ingress often indicate?
+Backend service/pod not reachable or unhealthy.
+
+** Q31: What is readiness probe relation to Ingress?
+Only ready pods should receive traffic via Service endpoints.
+
+** Q32: What is externalTrafficPolicy relation (Service LB)?
+Affects source IP preservation and routing behavior at service edge.
+
+** Q33: Can Ingress route TCP/UDP by default spec?
+Ingress API is primarily HTTP/HTTPS; TCP/UDP often controller-specific extensions.
+
+** Q34: What is beginner anti-pattern with Ingress?
+One giant shared Ingress with unmanaged rule sprawl.
+
+** Q35: Another beginner anti-pattern?
+Exposing apps over HTTP without TLS in production.
+
+** Q36: Beginner security baseline?
+TLS everywhere, minimal exposed paths, and controlled DNS.
+
+** Q37: Beginner reliability baseline?
+Health probes and multiple backend replicas.
+
+** Q38: Beginner observability baseline?
+Access logs, error logs, request latency and status metrics.
+
+** Q39: Beginner governance baseline?
+Standard naming and ingress class usage conventions.
+
+** Q40: What is kubectl describe ingress useful for?
+Inspect rules, events, backend mappings, and controller feedback.
+
+** Q41: What is ingress event troubleshooting value?
+Surface config errors like missing service/secret/class mismatch.
+
+** Q42: What is canary concept (ingress-level)?
+Route subset of requests to alternate backend version.
+
+** Q43: Why canary routing helps?
+Validate changes with limited user impact.
+
+** Q44: What is sticky session concept?
+Route same client repeatedly to same backend (cookie/IP strategies).
+
+** Q45: Sticky session tradeoff?
+Session affinity convenience vs uneven load distribution risk.
+
+** Q46: What is timeout setting in ingress proxy?
+Controls connect/read/send request timeout behavior.
+
+** Q47: Why timeout tuning matters?
+Prevents hanging connections and aligns with app response profiles.
+
+** Q48: What is body size limit setting?
+Max request payload allowed by ingress proxy.
+
+** Q49: Why body limit is important?
+Protects resources and prevents unexpected upload failures.
+
+** Q50: What is CORS handling relation?
+Often configured at app or ingress layer for browser cross-origin control.
+
+** Q51: What is rate limiting at ingress?
+Throttle requests per client/key to reduce abuse.
+
+** Q52: Why rate limiting?
+Protect backend capacity and mitigate simple attack traffic.
+
+** Q53: What is IP allow/deny listing?
+Restrict ingress access to specific client ranges.
+
+** Q54: Beginner workflow principle?
+Keep routing rules explicit and minimal.
+
+** Q55: Beginner architecture principle?
+Separate public and internal traffic entry patterns.
+
+** Q56: Beginner collaboration principle?
+Platform team defines ingress guardrails; app teams define routes.
+
+** Q57: Beginner incident principle?
+Document common 4xx/5xx ingress triage playbook.
+
+** Q58: Beginner scaling principle?
+Start with one controller pattern per environment before diversification.
+
+** Q59: Beginner compliance principle?
+Track certificate ownership and renewal responsibilities.
+
+** Q60: Beginner best practice?
+Treat ingress config as production-critical code.
+
+* Intermediate
+
+** Q61: What is controller deployment topology?
+Ingress controller runs as Deployment/DaemonSet with service exposure pattern.
+
+** Q62: Why multiple controller replicas?
+High availability and throughput scaling.
+
+** Q63: What is leader election in controllers?
+Coordinates active reconciliation responsibilities among replicas.
+
+** Q64: What is config map role for ingress controller?
+Global controller tuning (timeouts, buffers, headers, etc.).
+
+** Q65: Config sprawl risk?
+Global settings can affect all tenants unexpectedly.
+
+** Q66: What is dedicated ingress controller per tenant/domain?
+Isolation pattern for security/performance/governance boundaries.
+
+** Q67: Why isolate controllers?
+Reduce blast radius and noisy-neighbor effects.
+
+** Q68: What is internal ingress pattern?
+Controller exposed privately for internal-only traffic.
+
+** Q69: What is external ingress pattern?
+Internet-facing endpoint for public applications.
+
+** Q70: Split-horizon DNS relation?
+Different DNS responses/endpoints for internal vs external clients.
+
+** Q71: What is cert-manager integration?
+Automates certificate issuance/renewal for ingress TLS.
+
+** Q72: Why automate cert lifecycle?
+Avoid outages from expired certificates.
+
+** Q73: What is ACME HTTP-01 challenge relation?
+Ingress serves validation path for certificate issuance.
+
+** Q74: What is wildcard certificate tradeoff?
+Operational simplicity vs broader blast radius if key compromised.
+
+** Q75: What is mTLS at ingress?
+Require/validate client certificates at edge.
+
+** Q76: mTLS use case?
+B2B/private API access with strong client identity.
+
+** Q77: What is auth at ingress layer?
+External auth, basic auth, OIDC integration (controller-specific patterns).
+
+** Q78: Why edge auth can help?
+Centralized access policy for many services.
+
+** Q79: Edge auth pitfall?
+Over-centralization may hide app-specific authorization needs.
+
+** Q80: What is WebSocket support concern?
+Requires proper upgrade headers/timeouts in ingress proxy.
+
+** Q81: What is gRPC ingress requirement?
+HTTP/2-aware proxy configuration and backend compatibility.
+
+** Q82: What is canary routing methods?
+Header-based, cookie-based, weight-based (controller features vary).
+
+** Q83: What is blue/green via ingress?
+Switch routing from old to new service version quickly.
+
+** Q84: What is traffic shadowing/mirroring?
+Duplicate real requests to shadow backend without impacting responses.
+
+** Q85: Why traffic mirroring useful?
+Validate backend behavior under production-like load safely.
+
+** Q86: What is backend protocol setting?
+Tell ingress how to talk to service (HTTP/HTTPS/gRPC etc.).
+
+** Q87: Misconfigured backend protocol symptom?
+TLS handshake errors, 502/503, unexpected connection failures.
+
+** Q88: What is upstream keepalive tuning?
+Reuse backend connections for lower latency/resource efficiency.
+
+** Q89: What is proxy buffer tuning?
+Controls response buffering impacting memory/performance/latency tradeoffs.
+
+** Q90: What is intermediate anti-pattern?
+Heavy business logic embedded in ingress annotations.
+
+** Q91: Better pattern?
+Use ingress for routing/policy edge concerns, keep app logic in services.
+
+** Q92: What is WAF integration with ingress?
+Web application firewall protections at edge/controller or upstream LB.
+
+** Q93: Why WAF matters?
+Mitigates common web exploit traffic patterns.
+
+** Q94: What is DDoS mitigation relation?
+Ingress alone insufficient; combine with upstream network protections/CDN.
+
+** Q95: What is source IP preservation concern?
+Needed for security policies/logging; depends on LB/service/controller setup.
+
+** Q96: What is X-Forwarded-* header importance?
+Conveys original client/proto/host context to backends.
+
+** Q97: Header trust risk?
+Spoofed headers if trust boundaries not configured correctly.
+
+** Q98: What is ingress metrics baseline?
+Request rate, latency percentiles, response codes, active connections, retries.
+
+** Q99: What is log correlation strategy?
+Propagate request IDs from edge to backend for tracing.
+
+** Q100: What is OpenTelemetry relation?
+Instrument ingress/controller and apps for trace/metric integration.
+
+** Q101: What is retry policy concern?
+Retries can amplify load during backend partial failure.
+
+** Q102: Retry mitigation?
+Bounded retries, circuit breaking, timeout harmonization.
+
+** Q103: What is circuit breaker concept at edge/proxy?
+Stop forwarding to failing upstreams based on failure thresholds (implementation dependent).
+
+** Q104: What is outlier detection concept?
+Eject unhealthy upstream instances from load balancing pool (proxy-specific).
+
+** Q105: What is intermediate reliability baseline?
+HA controllers + health checks + controlled rollout patterns.
+
+** Q106: What is intermediate security baseline?
+Automated TLS, authN/Z integration, rate limits, WAF strategy.
+
+** Q107: What is intermediate governance baseline?
+Policy templates for allowed annotations/hostnames/TLS requirements.
+
+** Q108: What is intermediate observability baseline?
+SLO dashboards and alerting for ingress error/latency anomalies.
+
+** Q109: Intermediate maturity signal?
+Teams can safely rollout ingress changes with measurable impact control.
+
+** Q110: What is intermediate ops principle?
+Treat ingress config changes as high-risk with staged deployment.
+
+** Q111: What is intermediate architecture principle?
+Standardize edge patterns across services/environments.
+
+** Q112: What is intermediate collaboration principle?
+Clear ownership split: platform edge controls vs service route definitions.
+
+** Q113: What is intermediate compliance principle?
+Audit who changed ingress exposure and certificate settings.
+
+** Q114: What is intermediate cost principle?
+Optimize controller sizing and avoid redundant public load balancers.
+
+** Q115: What is intermediate scaling principle?
+Use class-based segmentation for traffic domains.
+
+** Q116: What is intermediate resilience principle?
+Plan for DNS/LB/controller failure scenarios explicitly.
+
+** Q117: What is intermediate migration principle?
+Move legacy ingress rules to standardized policy-driven templates.
+
+** Q118: What is intermediate quality principle?
+Validate manifests with policy/lint before apply.
+
+** Q119: What is intermediate delivery principle?
+Use canary ingress changes before full traffic cutover.
+
+** Q120: What is intermediate trust principle?
+Constrain privileged annotations and admin-only ingress features.
+
+** Q121: What is intermediate tenancy principle?
+Per-team namespaces/projects with bounded ingress permissions.
+
+** Q122: What is intermediate incident principle?
+Fast rollback path for edge config regressions.
+
+** Q123: What is intermediate performance principle?
+Tune timeouts/keepalive/buffers with real traffic profiling.
+
+** Q124: What is intermediate platform principle?
+Document golden ingress patterns and anti-patterns.
+
+** Q125: Intermediate best practice?
+Engineer ingress as shared edge platform, not per-app improvisation.
+
+* Advanced
+
+** Q126: What is ingress at scale core challenge?
+Balancing security, performance, and multi-tenant governance across many apps/clusters.
+
+** Q127: What is control-plane vs data-plane distinction?
+Controller reconciles config; proxy instances handle live traffic.
+
+** Q128: Why data-plane scaling is critical?
+Traffic load growth directly impacts latency and availability.
+
+** Q129: What is multi-controller architecture?
+Different ingress classes/controllers for public, private, and regulated workloads.
+
+** Q130: Multi-controller tradeoff?
+Isolation and flexibility vs operational complexity.
+
+** Q131: What is global load balancing pattern?
+Geo/latency-based DNS or global LB distributing across regional ingress endpoints.
+
+** Q132: What is active-active ingress strategy?
+Serve traffic from multiple regions simultaneously for resilience/performance.
+
+** Q133: What is active-passive strategy?
+Primary region serves traffic, failover to secondary on outage.
+
+** Q134: What is failover challenge with ingress?
+DNS TTL, session state, and certificate/key consistency.
+
+** Q135: What is zero-downtime ingress migration?
+Gradual DNS/traffic shift with parallel controller operation.
+
+** Q136: What is gateway API relation to ingress?
+Newer Kubernetes API model offering richer, role-oriented traffic management.
+
+** Q137: Ingress vs Gateway API future view?
+Ingress is simple/common; Gateway API provides more expressive extensible control.
+
+** Q138: What is service mesh relation to ingress?
+Ingress handles north-south edge; mesh handles east-west and advanced traffic policy.
+
+** Q139: Edge + mesh integration benefit?
+Consistent security/telemetry/policy across external and internal traffic paths.
+
+** Q140: What is advanced WAF strategy?
+Risk-based managed rules + custom signatures + false-positive tuning lifecycle.
+
+** Q141: What is bot management at edge?
+Detect/challenge/block abusive automated traffic patterns.
+
+** Q142: What is API security gateway pattern?
+JWT validation, schema enforcement, rate plans, and auth at ingress edge.
+
+** Q143: What is TLS policy hardening?
+Modern cipher suites, protocol minimums, HSTS, perfect forward secrecy posture.
+
+** Q144: What is certificate key custody concern?
+Protect private keys with strict secret management and rotation controls.
+
+** Q145: What is secret distribution risk in ingress?
+Compromised TLS secrets can expose multiple domains/services.
+
+** Q146: Mitigation for TLS secret risk?
+Scoped secrets, short-lived certs, automated rotation, strong RBAC.
+
+** Q147: What is supply-chain risk for ingress controllers?
+Compromised controller images/charts affect entire traffic edge.
+
+** Q148: Supply-chain mitigation?
+Signed images, trusted registries, SBOM scanning, rapid patch cadence.
+
+** Q149: What is noisy-neighbor issue in shared ingress?
+One tenant’s traffic spikes degrade others on same controller.
+
+** Q150: Mitigation for noisy neighbors?
+Resource isolation, rate limits, dedicated controllers, autoscaling.
+
+** Q151: What is autoscaling signal for ingress controllers?
+CPU/memory plus request rate/latency/connection metrics.
+
+** Q152: What is benchmarking requirement for edge changes?
+Load-test config/controller versions before production rollout.
+
+** Q153: What is config drift at edge?
+Live controller behavior diverges from declared manifests/policies.
+
+** Q154: Drift mitigation?
+GitOps reconciliation, policy enforcement, restricted manual changes.
+
+** Q155: What is policy-as-code for ingress?
+Admission controls enforcing TLS, host naming, annotation allowlists.
+
+** Q156: Why annotation allowlists?
+Prevent dangerous controller features from broad tenant usage.
+
+** Q157: What is SLO model for ingress platform?
+Availability, latency, and error-rate objectives for edge traffic.
+
+** Q158: What is error budget use at edge?
+Guide release pace and risk decisions for ingress/controller changes.
+
+** Q159: What is chaos testing for ingress?
+Inject controller/node/LB faults to validate resilience and failover.
+
+** Q160: Why chaos tests matter?
+Expose hidden dependencies before real incidents.
+
+** Q161: What is disaster recovery for ingress layer?
+Rebuild controllers, restore configs/secrets, and validate DNS/LB paths quickly.
+
+** Q162: Why rehearse ingress DR?
+Edge failures have immediate customer impact.
+
+** Q163: What is compliance evidence for ingress operations?
+Audit trails of exposure changes, cert rotations, and access controls.
+
+** Q164: What is segregation of duties pattern?
+Platform manages edge policy; app teams manage bounded route definitions.
+
+** Q165: What is advanced anti-pattern?
+Treating ingress as static “set once” config without lifecycle ownership.
+
+** Q166: Better operating model?
+Ingress as product: versioned standards, SLOs, and on-call ownership.
+
+** Q167: What is final reliability principle?
+Edge routing must remain resilient during backend and infrastructure failures.
+
+** Q168: What is final security principle?
+Default-deny exposure, strong TLS/auth, and strict policy governance.
+
+** Q169: What is final governance principle?
+Standardize ingress patterns and enforce them automatically.
+
+** Q170: What is final architecture principle?
+Segment edge planes by risk, tenancy, and performance profile.
+
+** Q171: What is final operations principle?
+Continuously test upgrades, failover, and rollback paths.
+
+** Q172: What is final collaboration principle?
+Platform and app teams share responsibility through clear contracts.
+
+** Q173: What is final scaling principle?
+Scale data plane independently and isolate high-risk/high-load tenants.
+
+** Q174: What is final compliance principle?
+Maintain auditable records for all external exposure changes.
+
+** Q175: What is final performance principle?
+Tune and benchmark edge configs with real traffic characteristics.
+
+** Q176: What is final trust principle?
+Minimize privileged ingress features and verify all identity signals.
+
+** Q177: What is final resilience principle?
+Design for regional/LB/controller failure without total outage.
+
+** Q178: What is final strategy principle?
+Adopt Gateway API/service mesh where complexity justifies capability gains.
+
+** Q179: What is final product principle?
+Measure ingress platform success by user latency, availability, and safe change velocity.
+
+** Q180: Final maturity principle?
+Ingress excellence is secure, observable, and governable edge traffic engineering at scale.
+
+* Bonus: Minimal Ingress Example (Conceptual)
+
+#+BEGIN_SRC yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [ "app.example.com" ]
+      secretName: app-example-com-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
