@@ -1,0 +1,913 @@
+#+TITLE: Doom Emacs for IntelliJ
+#+DATE: 2026-07-04
+#+TAGS: Emacs
+#+DESCRIPTION: A comprehensive Doom Emacs guide from beginner to advanced.
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Doom Emacs for IntelliJ
+
+-----
+
+#+BEGIN_SRC vim
+
+" ============================================================
+" IdeaVim configuration — Doom Emacs workflow for IntelliJ IDEA
+" ============================================================
+"
+" REQUIRED IDE PLUGINS (Settings > Plugins > Marketplace):
+"   * IdeaVim                     <- Vim like keybindings
+"   * Which-Key                   <- The whole point of a Doom layout
+"   * AceJump                     <- SPC j jump motions
+"   * IdeaVim-EasyMotion          <- Optional, needs AceJump
+"
+" If a plugin is missing, IdeaVim logs "unknown option" on startup.
+"
+" ------------------------------------------------------------
+" LEADER
+" ------------------------------------------------------------
+" NOTE: localleader is "," (was SPC — identical leaders make every <localleader> map dead weight).
+let mapleader=" "
+let maplocalleader=","
+
+
+" ------------------------------------------------------------
+" PLUGINS
+" ------------------------------------------------------------
+
+set surround                " ys / cs / ds
+set commentary              " gcc, gc{motion}
+set ReplaceWithRegister     " gr{motion}, grr
+set exchange                " cx{motion}, cxx
+set argtextobj              " ia / aa
+set textobj-entire          " ie / ae
+set textobj-indent          " ii / ai
+set matchit                 " % over tags/keywords
+set vim-paragraph-motion    " { } over whitespace-only lines
+set highlightedyank
+set multiple-cursors        " <A-n> / <A-x> / <A-p>
+set sneak                   " s{char}{char} / S{char}{char}
+set NERDTree                " :NERDTree drives the Project view
+set which-key
+let g:EasyMotion_do_mapping = 0   " no default <leader><leader> maps (clashes with SPC SPC)
+set easymotion
+let g:argtextobj_pairs="[:],(:),<:>"
+let g:highlightedyank_highlight_duration = "200"
+
+ 
+" ------------------------------------------------------------
+" GENERAL OPTIONS
+" ------------------------------------------------------------
+
+set number
+set relativenumber
+
+set ignorecase
+set smartcase
+set hlsearch
+set incsearch
+
+set scrolloff=8
+set sidescrolloff=8
+
+set visualbell
+set showmode
+set showcmd
+
+" which-key needs a long/absent timeout or the popup races you
+set notimeout
+set timeoutlen=5000
+
+set clipboard=unnamedplus,unnamed,ideaput
+
+ 
+" ------------------------------------------------------------
+" IDEAVIM-SPECIFIC OPTIONS
+" ------------------------------------------------------------
+ 
+set ideajoin                " J uses IntelliJ's smart join
+set ideamarks               " vim marks <-> IDE bookmarks
+set idearefactormode=keep   " stay in normal mode during refactors
+set ideastatusicon=gray
+set ideawrite=all           " :w triggers Save All (runs IDE save hooks)
+
+" Which-Key appearance
+let g:WhichKey_FontSize = 18
+let g:WhichKey_CommandColor = "#41ead4"
+let g:WhichKey_PrefixColor = "#f335b2"
+let g:WhichKey_SortOrder = "by_key_prefix_first"
+let g:WhichKey_ShowVimActions = "true"
+let g:WhichKey_ShowTypedSequence = "true"
+
+ 
+" ------------------------------------------------------------
+" KEY OWNERSHIP (sethandler) — who gets the keystroke, vim or IDE
+" ------------------------------------------------------------
+
+sethandler <C-H> a:vim
+sethandler <C-J> a:vim
+sethandler <C-K> a:vim
+sethandler <C-L> a:vim
+sethandler <C-W> a:vim
+sethandler <C-O> a:vim
+sethandler <C-I> a:vim
+sethandler <C-D> a:vim
+sethandler <C-U> a:vim
+sethandler <C-E> a:vim
+sethandler <C-Y> a:vim
+sethandler <C-R> a:vim
+sethandler <C-A> a:vim
+sethandler <C-6> a:vim
+sethandler <C-V> a:ide
+sethandler <C-C> a:ide
+sethandler <C-S> a:ide
+sethandler <C-F> a:ide
+" multiple-cursors owns these
+sethandler <C-N> a:vim
+sethandler <C-P> a:vim
+sethandler <C-X> a:vim
+
+ 
+" ============================================================
+" EDITING QUALITY OF LIFE
+" ============================================================
+
+inoremap jk <Esc>
+inoremap jj <Esc>
+ 
+" Q was mapped to gq, which IdeaVim does not implement. Replay @q instead.
+nnoremap Q @q
+
+" Yank to end of line, like D and C
+nnoremap Y y$
+
+" Keep the cursor parked while scrolling / searching / joining
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap n nzzzv
+nnoremap N Nzzzv
+nnoremap J mzJ`z
+
+" x and single-char deletes must not clobber the yank register
+nnoremap x "_x
+
+" Visual mode
+vnoremap < <gv
+vnoremap > >gv
+xnoremap p "_dP
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Blank lines around the cursor (vim-unimpaired style)
+nnoremap [<Space> O<Esc>j
+nnoremap ]<Space> o<Esc>k
+
+ 
+" ============================================================
+" DOOM-STYLE LEADER MAP
+"
+" SPC SPC  M-x / search everywhere      SPC h   help
+" SPC .    find file                    SPC i   insert
+" SPC ,    switch buffer                SPC j   jump
+" SPC `    last editor                  SPC m   major mode (Java/Maven)
+" SPC /    search project               SPC n   bookmarks / notes
+" SPC :    find action                  SPC o   open (tool windows)
+" SPC b    buffer                       SPC p   project
+" SPC c    code + refactor              SPC q   quit / session
+" SPC d    debug                        SPC r   run
+" SPC e    errors                       SPC s   search
+" SPC f    file                         SPC t   test   (Doom uses toggle)
+" SPC g    git                          SPC T   toggle
+"                                       SPC w   window
+" ============================================================
+
+ 
+" ------------------------------------------------------------
+" TOP LEVEL
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_mx       = "<leader><leader> M-x search everywhere"
+let g:WhichKeyDesc_findfile = "<leader>. find file"
+let g:WhichKeyDesc_bufswitch= "<leader>, switch buffer"
+let g:WhichKeyDesc_lastbuf  = "<leader>` last editor"
+let g:WhichKeyDesc_searchprj= "<leader>/ search project"
+let g:WhichKeyDesc_action   = "<leader>: find action"
+let g:WhichKeyDesc_resume   = "<leader>' resume last search"
+
+nnoremap <leader><leader> :action SearchEverywhere<CR>
+nnoremap <leader>. :action GotoFile<CR>
+nnoremap <leader>, :action Switcher<CR>
+nnoremap <leader>` :action Switcher<CR>
+nnoremap <leader>/ :action FindInPath<CR>
+nnoremap <leader>: :action GotoAction<CR>
+nnoremap <leader>' :action ActivateFindToolWindow<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC b  BUFFERS  (IntelliJ editor tabs)
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_buffer      = "<leader>b +buffer"
+let g:WhichKeyDesc_buffer_b    = "<leader>bb switch buffer"
+let g:WhichKeyDesc_buffer_i    = "<leader>bi recent files"
+let g:WhichKeyDesc_buffer_m    = "<leader>bm recently changed"
+let g:WhichKeyDesc_buffer_d    = "<leader>bd kill buffer"
+let g:WhichKeyDesc_buffer_k    = "<leader>bk kill other buffers"
+let g:WhichKeyDesc_buffer_K    = "<leader>bK kill all buffers"
+let g:WhichKeyDesc_buffer_u    = "<leader>bu undo kill buffer"
+let g:WhichKeyDesc_buffer_n    = "<leader>bn next buffer"
+let g:WhichKeyDesc_buffer_p    = "<leader>bp previous buffer"
+let g:WhichKeyDesc_buffer_s    = "<leader>bs save buffer"
+let g:WhichKeyDesc_buffer_S    = "<leader>bS save all"
+let g:WhichKeyDesc_buffer_r    = "<leader>br revert from disk"
+let g:WhichKeyDesc_buffer_z    = "<leader>bz pin/unpin tab"
+
+nnoremap <leader>bb :action Switcher<CR>
+nnoremap <leader>bi :action RecentFiles<CR>
+nnoremap <leader>bm :action RecentChangedFiles<CR>
+nnoremap <leader>bd :action CloseContent<CR>
+nnoremap <leader>bk :action CloseAllEditorsButActive<CR>
+nnoremap <leader>bK :action CloseAllEditors<CR>
+nnoremap <leader>bu :action ReopenClosedTab<CR>
+nnoremap <leader>bn :action NextTab<CR>
+nnoremap <leader>bp :action PreviousTab<CR>
+nnoremap <leader>bs :action SaveDocument<CR>
+nnoremap <leader>bS :action SaveAll<CR>
+nnoremap <leader>br :action Synchronize<CR>
+nnoremap <leader>bz :action PinActiveTabToggle<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC f  FILES
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_file     = "<leader>f +file"
+let g:WhichKeyDesc_file_f   = "<leader>ff find file"
+let g:WhichKeyDesc_file_r   = "<leader>fr recent files"
+let g:WhichKeyDesc_file_s   = "<leader>fs save file"
+let g:WhichKeyDesc_file_S   = "<leader>fS save all"
+let g:WhichKeyDesc_file_n   = "<leader>fn new file"
+let g:WhichKeyDesc_file_R   = "<leader>fR rename file"
+let g:WhichKeyDesc_file_D   = "<leader>fD delete file (safe)"
+let g:WhichKeyDesc_file_m   = "<leader>fm move file"
+let g:WhichKeyDesc_file_y   = "<leader>fy yank absolute path"
+let g:WhichKeyDesc_file_Y   = "<leader>fY yank reference (FQN)"
+let g:WhichKeyDesc_file_p   = "<leader>fp show file path"
+let g:WhichKeyDesc_file_t   = "<leader>ft reveal in project tree"
+let g:WhichKeyDesc_file_e   = "<leader>fe reveal in explorer"
+let g:WhichKeyDesc_file_c   = "<leader>fc close file"
+
+nnoremap <leader>ff :action GotoFile<CR>
+nnoremap <leader>fr :action RecentFiles<CR>
+nnoremap <leader>fs :action SaveDocument<CR>
+nnoremap <leader>fS :action SaveAll<CR>
+nnoremap <leader>fn :action NewElement<CR>
+nnoremap <leader>fR :action RenameFile<CR>
+nnoremap <leader>fD :action SafeDelete<CR>
+nnoremap <leader>fm :action Move<CR>
+nnoremap <leader>fy :action CopyAbsolutePath<CR>
+nnoremap <leader>fY :action CopyReference<CR>
+nnoremap <leader>fp :action ShowFilePath<CR>
+nnoremap <leader>ft :action SelectInProjectView<CR>
+nnoremap <leader>fe :action RevealIn<CR>
+nnoremap <leader>fc :action CloseContent<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC p  PROJECT
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_project    = "<leader>p +project"
+let g:WhichKeyDesc_project_p  = "<leader>pp switch project"
+let g:WhichKeyDesc_project_f  = "<leader>pf find project file"
+let g:WhichKeyDesc_project_t  = "<leader>pt project tree"
+let g:WhichKeyDesc_project_s  = "<leader>ps search project"
+let g:WhichKeyDesc_project_r  = "<leader>pr replace in project"
+let g:WhichKeyDesc_project_S  = "<leader>pS project structure"
+let g:WhichKeyDesc_project_i  = "<leader>pi inspect code"
+let g:WhichKeyDesc_project_b  = "<leader>pb build project"
+let g:WhichKeyDesc_project_R  = "<leader>pR rebuild project"
+
+nnoremap <leader>pp :action ManageRecentProjects<CR>
+nnoremap <leader>pf :action GotoFile<CR>
+nnoremap <leader>pt :action ActivateProjectToolWindow<CR>
+nnoremap <leader>ps :action FindInPath<CR>
+nnoremap <leader>pr :action ReplaceInPath<CR>
+nnoremap <leader>pS :action ShowProjectStructureSettings<CR>
+nnoremap <leader>pi :action InspectCode<CR>
+nnoremap <leader>pb :action CompileDirty<CR>
+nnoremap <leader>pR :action CompileProject<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC s  SEARCH
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_search    = "<leader>s +search"
+let g:WhichKeyDesc_search_s  = "<leader>ss search in project"
+let g:WhichKeyDesc_search_f  = "<leader>sf search in file"
+let g:WhichKeyDesc_search_r  = "<leader>sr replace in project"
+let g:WhichKeyDesc_search_R  = "<leader>sR replace in file"
+let g:WhichKeyDesc_search_a  = "<leader>sa search everywhere"
+let g:WhichKeyDesc_search_c  = "<leader>sc clear highlight"
+let g:WhichKeyDesc_search_i  = "<leader>si file structure"
+let g:WhichKeyDesc_search_j  = "<leader>sj goto symbol"
+let g:WhichKeyDesc_search_t  = "<leader>st goto class/type"
+let g:WhichKeyDesc_search_u  = "<leader>su find usages"
+let g:WhichKeyDesc_search_U  = "<leader>sU show usages popup"
+let g:WhichKeyDesc_search_h  = "<leader>sh highlight in file"
+let g:WhichKeyDesc_search_l  = "<leader>sl recent locations"
+
+nnoremap <leader>ss :action FindInPath<CR>
+nnoremap <leader>sf :action Find<CR>
+nnoremap <leader>sr :action ReplaceInPath<CR>
+nnoremap <leader>sR :action Replace<CR>
+nnoremap <leader>sa :action SearchEverywhere<CR>
+nnoremap <leader>sc :nohlsearch<CR>
+nnoremap <leader>si :action FileStructurePopup<CR>
+nnoremap <leader>sj :action GotoSymbol<CR>
+nnoremap <leader>st :action GotoClass<CR>
+nnoremap <leader>su :action FindUsages<CR>
+nnoremap <leader>sU :action ShowUsages<CR>
+nnoremap <leader>sh :action HighlightUsagesInFile<CR>
+nnoremap <leader>sl :action RecentLocations<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC c  CODE + REFACTOR
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_code      = "<leader>c +code"
+let g:WhichKeyDesc_code_a    = "<leader>ca intention actions"
+let g:WhichKeyDesc_code_f    = "<leader>cf reformat"
+let g:WhichKeyDesc_code_F    = "<leader>cF reformat dialog"
+let g:WhichKeyDesc_code_o    = "<leader>co optimize imports"
+let g:WhichKeyDesc_code_i    = "<leader>ci implement methods"
+let g:WhichKeyDesc_code_O    = "<leader>cO override methods"
+let g:WhichKeyDesc_code_g    = "<leader>cg generate"
+let g:WhichKeyDesc_code_s    = "<leader>cs surround with"
+let g:WhichKeyDesc_code_S    = "<leader>cS surround w/ live template"
+let g:WhichKeyDesc_code_c    = "<leader>cc comment line"
+let g:WhichKeyDesc_code_b    = "<leader>cb comment block"
+let g:WhichKeyDesc_code_d    = "<leader>cd quick documentation"
+let g:WhichKeyDesc_code_D    = "<leader>cD external documentation"
+let g:WhichKeyDesc_code_t    = "<leader>ct expression type"
+let g:WhichKeyDesc_code_p    = "<leader>cp parameter info"
+let g:WhichKeyDesc_code_x    = "<leader>cx show error description"
+
+nnoremap <leader>ca :action ShowIntentionActions<CR>
+nnoremap <leader>cf :action ReformatCode<CR>
+vnoremap <leader>cf :action ReformatCode<CR>
+nnoremap <leader>cF :action ShowReformatFileDialog<CR>
+nnoremap <leader>co :action OptimizeImports<CR>
+nnoremap <leader>ci :action ImplementMethods<CR>
+nnoremap <leader>cO :action OverrideMethods<CR>
+nnoremap <leader>cg :action Generate<CR>
+nnoremap <leader>cs :action SurroundWith<CR>
+vnoremap <leader>cs :action SurroundWith<CR>
+nnoremap <leader>cS :action SurroundWithLiveTemplate<CR>
+nnoremap <leader>cc :action CommentByLineComment<CR>
+vnoremap <leader>cc :action CommentByLineComment<CR>
+nnoremap <leader>cb :action CommentByBlockComment<CR>
+vnoremap <leader>cb :action CommentByBlockComment<CR>
+nnoremap <leader>cd :action QuickJavaDoc<CR>
+nnoremap <leader>cD :action ExternalJavaDoc<CR>
+nnoremap <leader>ct :action ExpressionTypeInfo<CR>
+nnoremap <leader>cp :action ParameterInfo<CR>
+nnoremap <leader>cx :action ShowErrorDescription<CR>
+
+" -- SPC c r : refactor sub-menu --
+let g:WhichKeyDesc_code_refactor    = "<leader>cr +refactor"
+let g:WhichKeyDesc_code_refactor_r  = "<leader>crr rename"
+let g:WhichKeyDesc_code_refactor_m  = "<leader>crm extract method"
+let g:WhichKeyDesc_code_refactor_v  = "<leader>crv introduce variable"
+let g:WhichKeyDesc_code_refactor_c  = "<leader>crc introduce constant"
+let g:WhichKeyDesc_code_refactor_f  = "<leader>crf introduce field"
+let g:WhichKeyDesc_code_refactor_p  = "<leader>crp introduce parameter"
+let g:WhichKeyDesc_code_refactor_s  = "<leader>crs change signature"
+let g:WhichKeyDesc_code_refactor_i  = "<leader>cri inline"
+let g:WhichKeyDesc_code_refactor_M  = "<leader>crM move"
+let g:WhichKeyDesc_code_refactor_d  = "<leader>crd safe delete"
+let g:WhichKeyDesc_code_refactor_e  = "<leader>cre extract interface"
+let g:WhichKeyDesc_code_refactor_u  = "<leader>cru extract superclass"
+let g:WhichKeyDesc_code_refactor_SPC= "<leader>cr<Space> refactor this"
+
+nnoremap <leader>crr :action RenameElement<CR>
+vnoremap <leader>crm :action ExtractMethod<CR>
+nnoremap <leader>crm :action ExtractMethod<CR>
+vnoremap <leader>crv :action IntroduceVariable<CR>
+nnoremap <leader>crv :action IntroduceVariable<CR>
+vnoremap <leader>crc :action IntroduceConstant<CR>
+nnoremap <leader>crc :action IntroduceConstant<CR>
+vnoremap <leader>crf :action IntroduceField<CR>
+nnoremap <leader>crf :action IntroduceField<CR>
+vnoremap <leader>crp :action IntroduceParameter<CR>
+nnoremap <leader>crp :action IntroduceParameter<CR>
+nnoremap <leader>crs :action ChangeSignature<CR>
+nnoremap <leader>cri :action Inline<CR>
+nnoremap <leader>crM :action Move<CR>
+nnoremap <leader>crd :action SafeDelete<CR>
+nnoremap <leader>cre :action ExtractInterface<CR>
+nnoremap <leader>cru :action ExtractSuperclass<CR>
+nnoremap <leader>cr<Space> :action Refactorings.QuickListPopupAction<CR>
+
+" -- SPC c h : hierarchy --
+let g:WhichKeyDesc_code_hier   = "<leader>ch +hierarchy"
+let g:WhichKeyDesc_code_hier_t = "<leader>cht type hierarchy"
+let g:WhichKeyDesc_code_hier_m = "<leader>chm method hierarchy"
+let g:WhichKeyDesc_code_hier_c = "<leader>chc call hierarchy"
+
+nnoremap <leader>cht :action TypeHierarchy<CR>
+nnoremap <leader>chm :action MethodHierarchy<CR>
+nnoremap <leader>chc :action CallHierarchy<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC g  GIT
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_git     = "<leader>g +git"
+let g:WhichKeyDesc_git_g   = "<leader>gg git tool window"
+let g:WhichKeyDesc_git_s   = "<leader>gs commit tool window"
+let g:WhichKeyDesc_git_c   = "<leader>gc commit"
+let g:WhichKeyDesc_git_p   = "<leader>gp push"
+let g:WhichKeyDesc_git_u   = "<leader>gu update / pull"
+let g:WhichKeyDesc_git_f   = "<leader>gf fetch"
+let g:WhichKeyDesc_git_b   = "<leader>gb branches"
+let g:WhichKeyDesc_git_l   = "<leader>gl log"
+let g:WhichKeyDesc_git_h   = "<leader>gh file history"
+let g:WhichKeyDesc_git_a   = "<leader>ga annotate / blame"
+let g:WhichKeyDesc_git_d   = "<leader>gd diff current file"
+let g:WhichKeyDesc_git_r   = "<leader>gr rollback changes"
+let g:WhichKeyDesc_git_z   = "<leader>gz stash"
+let g:WhichKeyDesc_git_Z   = "<leader>gZ unstash"
+let g:WhichKeyDesc_git_x   = "<leader>gx resolve conflicts"
+let g:WhichKeyDesc_git_SPC = "<leader>g<Space> vcs quick popup"
+
+nnoremap <leader>gg :action ActivateVersionControlToolWindow<CR>
+nnoremap <leader>gs :action ActivateCommitToolWindow<CR>
+nnoremap <leader>gc :action CheckinProject<CR>
+nnoremap <leader>gp :action Vcs.Push<CR>
+nnoremap <leader>gu :action Vcs.UpdateProject<CR>
+nnoremap <leader>gf :action Git.Fetch<CR>
+nnoremap <leader>gb :action Git.Branches<CR>
+nnoremap <leader>gl :action Vcs.Show.Log<CR>
+nnoremap <leader>gh :action Vcs.ShowTabbedFileHistory<CR>
+nnoremap <leader>ga :action Annotate<CR>
+nnoremap <leader>gd :action Compare.SameVersion<CR>
+nnoremap <leader>gr :action ChangesView.Revert<CR>
+nnoremap <leader>gz :action Git.Stash<CR>
+nnoremap <leader>gZ :action Git.Unstash<CR>
+nnoremap <leader>gx :action Git.ResolveConflicts<CR>
+nnoremap <leader>g<Space> :action Vcs.QuickListPopupAction<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC r  RUN
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_run    = "<leader>r +run"
+let g:WhichKeyDesc_run_r  = "<leader>rr run last configuration"
+let g:WhichKeyDesc_run_c  = "<leader>rc run at caret"
+let g:WhichKeyDesc_run_e  = "<leader>re rerun"
+let g:WhichKeyDesc_run_s  = "<leader>rs stop"
+let g:WhichKeyDesc_run_S  = "<leader>rS stop background process"
+let g:WhichKeyDesc_run_l  = "<leader>rl choose configuration"
+let g:WhichKeyDesc_run_E  = "<leader>rE edit configurations"
+let g:WhichKeyDesc_run_w  = "<leader>rw run tool window"
+ 
+nnoremap <leader>rr :action Run<CR>
+nnoremap <leader>rc :action RunClass<CR>
+nnoremap <leader>re :action Rerun<CR>
+nnoremap <leader>rs :action Stop<CR>
+nnoremap <leader>rS :action StopBackgroundProcesses<CR>
+nnoremap <leader>rl :action ChooseRunConfiguration<CR>
+nnoremap <leader>rE :action editRunConfigurations<CR>
+nnoremap <leader>rw :action ActivateRunToolWindow<CR>
+
+
+" ------------------------------------------------------------
+" SPC d  DEBUG
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_debug    = "<leader>d +debug"
+let g:WhichKeyDesc_debug_d  = "<leader>dd debug last configuration"
+let g:WhichKeyDesc_debug_c  = "<leader>dc debug at caret"
+let g:WhichKeyDesc_debug_b  = "<leader>db toggle breakpoint"
+let g:WhichKeyDesc_debug_B  = "<leader>dB conditional breakpoint"
+let g:WhichKeyDesc_debug_v  = "<leader>dv view breakpoints"
+let g:WhichKeyDesc_debug_m  = "<leader>dm mute breakpoints"
+let g:WhichKeyDesc_debug_X  = "<leader>dX remove all breakpoints"
+let g:WhichKeyDesc_debug_r  = "<leader>dr resume"
+let g:WhichKeyDesc_debug_p  = "<leader>dp pause"
+let g:WhichKeyDesc_debug_q  = "<leader>dq stop"
+let g:WhichKeyDesc_debug_o  = "<leader>do step over"
+let g:WhichKeyDesc_debug_i  = "<leader>di step into"
+let g:WhichKeyDesc_debug_I  = "<leader>dI smart step into"
+let g:WhichKeyDesc_debug_u  = "<leader>du step out"
+let g:WhichKeyDesc_debug_t  = "<leader>dt run to cursor"
+let g:WhichKeyDesc_debug_e  = "<leader>de evaluate expression"
+let g:WhichKeyDesc_debug_w  = "<leader>dw add to watches"
+let g:WhichKeyDesc_debug_W  = "<leader>dW debug tool window"
+
+nnoremap <leader>dd :action Debug<CR>
+nnoremap <leader>dc :action DebugClass<CR>
+nnoremap <leader>db :action ToggleLineBreakpoint<CR>
+nnoremap <leader>dB :action AddConditionalBreakpoint<CR>
+nnoremap <leader>dv :action ViewBreakpoints<CR>
+nnoremap <leader>dm :action XDebugger.MuteBreakpoints<CR>
+nnoremap <leader>dX :action Debugger.RemoveAllBreakpoints<CR>
+nnoremap <leader>dr :action Resume<CR>
+nnoremap <leader>dp :action Pause<CR>
+nnoremap <leader>dq :action Stop<CR>
+nnoremap <leader>do :action StepOver<CR>
+nnoremap <leader>di :action StepInto<CR>
+nnoremap <leader>dI :action SmartStepInto<CR>
+nnoremap <leader>du :action StepOut<CR>
+nnoremap <leader>dt :action RunToCursor<CR>
+nnoremap <leader>de :action EvaluateExpression<CR>
+vnoremap <leader>de :action EvaluateExpression<CR>
+nnoremap <leader>dw :action Debugger.AddToWatch<CR>
+nnoremap <leader>dW :action ActivateDebugToolWindow<CR>
+ 
+" ------------------------------------------------------------
+" SPC t  TEST
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_test    = "<leader>t +test"
+let g:WhichKeyDesc_test_t  = "<leader>tt run test at caret"
+let g:WhichKeyDesc_test_r  = "<leader>tr rerun last test"
+let g:WhichKeyDesc_test_d  = "<leader>td debug test at caret"
+let g:WhichKeyDesc_test_f  = "<leader>tf rerun failed tests"
+let g:WhichKeyDesc_test_g  = "<leader>tg goto test / subject"
+let g:WhichKeyDesc_test_n  = "<leader>tn create new test"
+let g:WhichKeyDesc_test_c  = "<leader>tc run with coverage"
+let g:WhichKeyDesc_test_w  = "<leader>tw test tool window"
+ 
+nnoremap <leader>tt :action RunClass<CR>
+nnoremap <leader>tr :action Rerun<CR>
+nnoremap <leader>td :action DebugClass<CR>
+nnoremap <leader>tf :action RerunFailedTests<CR>
+nnoremap <leader>tg :action GotoTest<CR>
+nnoremap <leader>tn :action CreateTestAction<CR>
+nnoremap <leader>tc :action RunCoverage<CR>
+nnoremap <leader>tw :action ActivateRunToolWindow<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC T  TOGGLES
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_toggle    = "<leader>T +toggle"
+let g:WhichKeyDesc_toggle_n  = "<leader>Tn relative numbers"
+let g:WhichKeyDesc_toggle_N  = "<leader>TN line numbers"
+let g:WhichKeyDesc_toggle_h  = "<leader>Th search highlight"
+let g:WhichKeyDesc_toggle_w  = "<leader>Tw soft wrap"
+let g:WhichKeyDesc_toggle_z  = "<leader>Tz zen mode"
+let g:WhichKeyDesc_toggle_d  = "<leader>Td distraction free"
+let g:WhichKeyDesc_toggle_f  = "<leader>Tf full screen"
+let g:WhichKeyDesc_toggle_p  = "<leader>Tp presentation mode"
+let g:WhichKeyDesc_toggle_b  = "<leader>Tb mute breakpoints"
+let g:WhichKeyDesc_toggle_s  = "<leader>Ts power save mode"
+let g:WhichKeyDesc_toggle_v  = "<leader>Tv vim emulator"
+
+nnoremap <leader>Tn :set relativenumber!<CR>
+nnoremap <leader>TN :set number!<CR>
+nnoremap <leader>Th :set hlsearch!<CR>
+nnoremap <leader>Tw :action EditorToggleUseSoftWraps<CR>
+nnoremap <leader>Tz :action ToggleZenMode<CR>
+nnoremap <leader>Td :action ToggleDistractionFreeMode<CR>
+nnoremap <leader>Tf :action ToggleFullScreen<CR>
+nnoremap <leader>Tp :action TogglePresentationMode<CR>
+nnoremap <leader>Tb :action XDebugger.MuteBreakpoints<CR>
+nnoremap <leader>Ts :action TogglePowerSave<CR>
+nnoremap <leader>Tv :action VimPluginToggle<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC w  WINDOWS
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_window    = "<leader>w +window"
+let g:WhichKeyDesc_window_h  = "<leader>wh window left"
+let g:WhichKeyDesc_window_j  = "<leader>wj window down"
+let g:WhichKeyDesc_window_k  = "<leader>wk window up"
+let g:WhichKeyDesc_window_l  = "<leader>wl window right"
+let g:WhichKeyDesc_window_w  = "<leader>ww next splitter"
+let g:WhichKeyDesc_window_W  = "<leader>wW previous splitter"
+let g:WhichKeyDesc_window_v  = "<leader>wv split vertical"
+let g:WhichKeyDesc_window_s  = "<leader>ws split horizontal"
+let g:WhichKeyDesc_window_c  = "<leader>wc close split"
+let g:WhichKeyDesc_window_o  = "<leader>wo close other splits"
+let g:WhichKeyDesc_window_x  = "<leader>wx move to opposite group"
+let g:WhichKeyDesc_window_m  = "<leader>wm maximize editor"
+let g:WhichKeyDesc_window_u  = "<leader>wu hide all tool windows"
+let g:WhichKeyDesc_window_d  = "<leader>wd close buffer"
+
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+nnoremap <leader>wl <C-w>l
+nnoremap <leader>ww :action NextSplitter<CR>
+nnoremap <leader>wW :action PrevSplitter<CR>
+nnoremap <leader>wv :action SplitVertically<CR>
+nnoremap <leader>ws :action SplitHorizontally<CR>
+nnoremap <leader>wc :action Unsplit<CR>
+nnoremap <leader>wo :action UnsplitAll<CR>
+nnoremap <leader>wx :action MoveEditorToOppositeTabGroup<CR>
+nnoremap <leader>wm :action MaximizeEditorInSplit<CR>
+nnoremap <leader>wu :action HideAllWindows<CR>
+nnoremap <leader>wd :action CloseContent<CR>
+
+" Raw Ctrl-hjkl window motion (sethandler above keeps these from the IDE)
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+ 
+" ------------------------------------------------------------
+" SPC o  OPEN (tool windows)
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_open    = "<leader>o +open"
+let g:WhichKeyDesc_open_p  = "<leader>op project"
+let g:WhichKeyDesc_open_t  = "<leader>ot terminal"
+let g:WhichKeyDesc_open_T  = "<leader>oT terminal here"
+let g:WhichKeyDesc_open_g  = "<leader>og git"
+let g:WhichKeyDesc_open_e  = "<leader>oe problems"
+let g:WhichKeyDesc_open_s  = "<leader>os structure"
+let g:WhichKeyDesc_open_r  = "<leader>or run"
+let g:WhichKeyDesc_open_d  = "<leader>od debug"
+let g:WhichKeyDesc_open_f  = "<leader>of find"
+let g:WhichKeyDesc_open_m  = "<leader>om maven"
+let g:WhichKeyDesc_open_v  = "<leader>ov services"
+let g:WhichKeyDesc_open_b  = "<leader>ob database"
+let g:WhichKeyDesc_open_n  = "<leader>on notifications"
+let g:WhichKeyDesc_open_B  = "<leader>oB bookmarks"
+
+nnoremap <leader>op :action ActivateProjectToolWindow<CR>
+nnoremap <leader>ot :action ActivateTerminalToolWindow<CR>
+nnoremap <leader>oT :action Terminal.OpenInTerminal<CR>
+nnoremap <leader>og :action ActivateVersionControlToolWindow<CR>
+nnoremap <leader>oe :action ActivateProblemsViewToolWindow<CR>
+nnoremap <leader>os :action ActivateStructureToolWindow<CR>
+nnoremap <leader>or :action ActivateRunToolWindow<CR>
+nnoremap <leader>od :action ActivateDebugToolWindow<CR>
+nnoremap <leader>of :action ActivateFindToolWindow<CR>
+nnoremap <leader>om :action ActivateMavenToolWindow<CR>
+nnoremap <leader>ov :action ActivateServicesToolWindow<CR>
+nnoremap <leader>ob :action ActivateDatabaseToolWindow<CR>
+nnoremap <leader>on :action ActivateNotificationsToolWindow<CR>
+nnoremap <leader>oB :action ActivateBookmarksToolWindow<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC e  ERRORS
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_err    = "<leader>e +errors"
+let g:WhichKeyDesc_err_e  = "<leader>ee problems view"
+let g:WhichKeyDesc_err_n  = "<leader>en next error"
+let g:WhichKeyDesc_err_p  = "<leader>ep previous error"
+let g:WhichKeyDesc_err_a  = "<leader>ea quick fix"
+let g:WhichKeyDesc_err_d  = "<leader>ed describe error"
+let g:WhichKeyDesc_err_i  = "<leader>ei inspect code"
+
+nnoremap <leader>ee :action ActivateProblemsViewToolWindow<CR>
+nnoremap <leader>en :action GotoNextError<CR>
+nnoremap <leader>ep :action GotoPreviousError<CR>
+nnoremap <leader>ea :action ShowIntentionActions<CR>
+nnoremap <leader>ed :action ShowErrorDescription<CR>
+nnoremap <leader>ei :action InspectCode<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC j  JUMP
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_jump    = "<leader>j +jump"
+let g:WhichKeyDesc_jump_j  = "<leader>jj jump to char"
+let g:WhichKeyDesc_jump_w  = "<leader>jw jump to word"
+let g:WhichKeyDesc_jump_l  = "<leader>jl jump to line"
+let g:WhichKeyDesc_jump_t  = "<leader>jt jump to target (declaration)"
+let g:WhichKeyDesc_jump_b  = "<leader>jb back"
+let g:WhichKeyDesc_jump_f  = "<leader>jf forward"
+let g:WhichKeyDesc_jump_e  = "<leader>je last edit location"
+let g:WhichKeyDesc_jump_r  = "<leader>jr recent locations"
+
+" AceJump action (no EasyMotion equivalent)
+nnoremap <leader>jt :action AceTargetAction<CR>
+
+" EasyMotion motions (AceJump-backed)
+map <leader>jj <Plug>(easymotion-s)
+map <leader>jw <Plug>(easymotion-bd-w)
+map <leader>jl <Plug>(easymotion-bd-jk)
+
+nnoremap <leader>jb :action Back<CR>
+nnoremap <leader>jf :action Forward<CR>
+nnoremap <leader>je :action JumpToLastChange<CR>
+nnoremap <leader>jr :action RecentLocations<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC n  BOOKMARKS / NOTES
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_note    = "<leader>n +bookmarks"
+let g:WhichKeyDesc_note_n  = "<leader>nn toggle bookmark"
+let g:WhichKeyDesc_note_m  = "<leader>nm bookmark with mnemonic"
+let g:WhichKeyDesc_note_l  = "<leader>nl list bookmarks"
+let g:WhichKeyDesc_note_w  = "<leader>nw bookmarks tool window"
+let g:WhichKeyDesc_note_j  = "<leader>nj next bookmark"
+let g:WhichKeyDesc_note_k  = "<leader>nk previous bookmark"
+let g:WhichKeyDesc_note_t  = "<leader>nt TODO tool window"
+
+nnoremap <leader>nn :action ToggleBookmark<CR>
+nnoremap <leader>nm :action ToggleBookmarkWithMnemonic<CR>
+nnoremap <leader>nl :action ShowBookmarks<CR>
+nnoremap <leader>nw :action ActivateBookmarksToolWindow<CR>
+nnoremap <leader>nj :action GotoNextBookmark<CR>
+nnoremap <leader>nk :action GotoPreviousBookmark<CR>
+nnoremap <leader>nt :action ActivateTODOToolWindow<CR>
+
+ 
+" ------------------------------------------------------------
+" SPC i  INSERT
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_insert    = "<leader>i +insert"
+let g:WhichKeyDesc_insert_s  = "<leader>is live template"
+let g:WhichKeyDesc_insert_g  = "<leader>ig generate"
+let g:WhichKeyDesc_insert_y  = "<leader>iy paste from history"
+let g:WhichKeyDesc_insert_i  = "<leader>ii implement methods"
+let g:WhichKeyDesc_insert_o  = "<leader>io override methods"
+
+nnoremap <leader>is :action InsertLiveTemplate<CR>
+nnoremap <leader>ig :action Generate<CR>
+nnoremap <leader>iy :action PasteMultiple<CR>
+nnoremap <leader>ii :action ImplementMethods<CR>
+nnoremap <leader>io :action OverrideMethods<CR>
+ 
+
+" ------------------------------------------------------------
+" SPC m  MAJOR MODE — Java / Maven / Spring
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_major    = "<leader>m +java/maven"
+let g:WhichKeyDesc_major_m  = "<leader>mm maven tool window"
+let g:WhichKeyDesc_major_r  = "<leader>mr reload maven project"
+let g:WhichKeyDesc_major_x  = "<leader>mx execute maven goal"
+let g:WhichKeyDesc_major_c  = "<leader>mc compile file"
+let g:WhichKeyDesc_major_b  = "<leader>mb build project"
+let g:WhichKeyDesc_major_g  = "<leader>mg generate"
+let g:WhichKeyDesc_major_t  = "<leader>mt goto test"
+let g:WhichKeyDesc_major_s  = "<leader>ms goto super method"
+let g:WhichKeyDesc_major_i  = "<leader>mi goto implementation"
+let g:WhichKeyDesc_major_d  = "<leader>md show dependencies"
+
+nnoremap <leader>mm :action ActivateMavenToolWindow<CR>
+nnoremap <leader>mr :action Maven.Reimport<CR>
+nnoremap <leader>mx :action Maven.ExecuteGoal<CR>
+nnoremap <leader>mc :action CompileDirty<CR>
+nnoremap <leader>mb :action CompileProject<CR>
+nnoremap <leader>mg :action Generate<CR>
+nnoremap <leader>mt :action GotoTest<CR>
+nnoremap <leader>ms :action GotoSuperMethod<CR>
+nnoremap <leader>mi :action GotoImplementation<CR>
+nnoremap <leader>md :action ShowPackageDeps<CR>
+ 
+
+" ------------------------------------------------------------
+" SPC h  HELP
+" ------------------------------------------------------------
+ 
+let g:WhichKeyDesc_help    = "<leader>h +help"
+let g:WhichKeyDesc_help_a  = "<leader>ha find action"
+let g:WhichKeyDesc_help_k  = "<leader>hk find IDE action id (for .ideavimrc)"
+
+let g:WhichKeyDesc_help_i  = "<leader>hi IDE settings"
+let g:WhichKeyDesc_help_p  = "<leader>hp plugins"
+let g:WhichKeyDesc_help_d  = "<leader>hd quick documentation"
+let g:WhichKeyDesc_help_m  = "<leader>hm vim :map list"
+let g:WhichKeyDesc_help_s  = "<leader>hs vim :set list"
+let g:WhichKeyDesc_help_r  = "<leader>hr vim registers"
+
+nnoremap <leader>ha :action GotoAction<CR>
+nnoremap <leader>hk :action VimFindActionId<CR>
+nnoremap <leader>hi :action ShowSettings<CR>
+nnoremap <leader>hp :action WelcomeScreen.Plugins<CR>
+nnoremap <leader>hd :action QuickJavaDoc<CR>
+nnoremap <leader>hm :map<CR>
+nnoremap <leader>hs :set<CR>
+nnoremap <leader>hr :registers<CR>
+
+
+" ------------------------------------------------------------
+" SPC q  QUIT / SESSION
+" ------------------------------------------------------------
+
+let g:WhichKeyDesc_quit    = "<leader>q +quit/session"
+let g:WhichKeyDesc_quit_q  = "<leader>qq quit IDE"
+let g:WhichKeyDesc_quit_p  = "<leader>qp close project"
+let g:WhichKeyDesc_quit_s  = "<leader>qs save all"
+let g:WhichKeyDesc_quit_r  = "<leader>qr reload .ideavimrc"
+let g:WhichKeyDesc_quit_R  = "<leader>qR restart IDE"
+
+nnoremap <leader>qq :action Exit<CR>
+nnoremap <leader>qp :action CloseProject<CR>
+nnoremap <leader>qs :action SaveAll<CR>
+nnoremap <leader>qr :action IdeaVim.ReloadVimRc.reload<CR>
+nnoremap <leader>qR :action RestartIde<CR>
+ 
+
+" ============================================================
+" GOTO — plain `g` prefix (no leader, Doom/LSP style)
+" ============================================================
+
+" gd declaration
+nnoremap gd :action GotoDeclaration<CR>
+
+" gy type decl
+nnoremap gy :action GotoTypeDeclaration<CR>
+
+" gi implementation
+nnoremap gi :action GotoImplementation<CR>
+
+" gr usages
+nnoremap gr :action FindUsages<CR>
+
+" gh docs
+nnoremap gh :action QuickJavaDoc<CR>
+
+" gs super method
+nnoremap gs :action GotoSuperMethod<CR>
+ 
+" gt/gT stay as vim tab motion
+nnoremap gI :action QuickImplementations<CR>
+
+ 
+" ============================================================
+" UNIMPAIRED-STYLE PAIRS
+" ============================================================
+
+" errors / diagnostics
+nnoremap ]e :action GotoNextError<CR>
+nnoremap [e :action GotoPreviousError<CR>
+nnoremap ]d :action GotoNextError<CR>
+nnoremap [d :action GotoPreviousError<CR>
+
+" methods
+nnoremap ]m :action MethodDown<CR>
+nnoremap [m :action MethodUp<CR>
+
+" VCS change hunks
+nnoremap ]c :action VcsShowNextChangeMarker<CR>
+nnoremap [c :action VcsShowPrevChangeMarker<CR>
+
+" buffers / tabs
+nnoremap ]b :action NextTab<CR>
+nnoremap [b :action PreviousTab<CR>
+
+" occurrences of the symbol under the caret
+nnoremap ]u :action GotoNextElementUnderCaretUsage<CR>
+nnoremap [u :action GotoPrevElementUnderCaretUsage<CR>
+
+" bookmarks
+nnoremap ]n :action GotoNextBookmark<CR>
+nnoremap [n :action GotoPreviousBookmark<CR>
+ 
+
+" ============================================================
+" FOLDING
+" ============================================================
+
+nnoremap zc :action CollapseRegion<CR>
+nnoremap zo :action ExpandRegion<CR>
+nnoremap zM :action CollapseAllRegions<CR>
+nnoremap zR :action ExpandAllRegions<CR>
+
+
+" ============================================================
+" MULTIPLE CURSORS  (set multiple-cursors)
+" ============================================================
+
+map <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+map g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+map <C-x> <Plug>SkipOccurrence
+xmap <C-x> <Plug>SkipOccurrence
+map <C-p> <Plug>RemoveOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+nmap <S-C-n> <Plug>AllWholeOccurrences
+xmap <S-C-n> <Plug>AllWholeOccurrences
+
+#+END_SRC
+
+-----
+
+#+INCLUDE: "../footer.org"
+
