@@ -1,0 +1,629 @@
+#+TITLE: Java Cryptography
+#+DATE: 2026-10-03
+#+TAGS: Java
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Java Cryptography
+
+-----
+
+* Beginner
+
+** Q1: What is cryptography?
+Cryptography is the science of securing information by transforming it into a form that only authorized parties can read or verify.
+
+** Q2: Why is cryptography needed in Java applications?
+Java applications often need to protect passwords, secrets, API tokens, data in transit, and sensitive information at rest.
+
+** Q3: What is encryption?
+Encryption converts plaintext into ciphertext so unauthorized parties cannot read it.
+
+** Q4: What is decryption?
+Decryption converts ciphertext back into plaintext using the correct key.
+
+** Q5: What is plaintext?
+Plaintext is readable, unencrypted data.
+
+** Q6: What is ciphertext?
+Ciphertext is encrypted data that is not readable without the proper key.
+
+** Q7: What is a key?
+A key is secret material used to encrypt, decrypt, sign, or verify data.
+
+** Q8: What is a symmetric key?
+A symmetric key is the same key used for both encryption and decryption.
+
+** Q9: What is an asymmetric key?
+An asymmetric key pair contains a public key and a private key.
+
+** Q10: What is the Java Cryptography Architecture (JCA)?
+JCA is the standard API in Java for cryptographic services such as key generation, message digests, signatures, and ciphers.
+
+** Q11: What is the Java Cryptography Extension (JCE)?
+JCE extends JCA with stronger cryptographic services, including ciphers and key generation for encryption.
+
+** Q12: What is the provider model in Java?
+The provider model allows Java to plug in different cryptographic implementations, such as SunJCE, BouncyCastle, or others.
+
+** Q13: What is a security provider?
+A security provider implements cryptographic algorithms and services for the JCA/JCE APIs.
+
+** Q14: What is a message digest?
+A message digest is a fixed-size hash computed from data, typically used for integrity checks.
+
+** Q15: What is hashing?
+Hashing is the process of transforming input into a deterministic, fixed-size digest.
+
+** Q16: What is SHA-256?
+SHA-256 is a common cryptographic hash function producing a 256-bit digest.
+
+** Q17: What is MD5?
+MD5 is a legacy hash function with known vulnerabilities and should not be used in new systems.
+
+** Q18: What is SHA-1?
+SHA-1 is deprecated for security-sensitive use because it is no longer collision-resistant.
+
+** Q19: What is a collision?
+A collision occurs when two different inputs produce the same hash value.
+
+** Q20: Why are collisions dangerous?
+They can allow attackers to create alternative inputs with the same hash and bypass integrity checks.
+
+** Q21: What is a digital signature?
+A digital signature proves that a message was created by a private key holder and has not been altered.
+
+** Q22: What is asymmetric signing?
+Asymmetric signing uses a private key to sign data and a public key to verify it.
+
+** Q23: What is public-key cryptography?
+Public-key cryptography uses separate keys for encryption and decryption or signing and verification.
+
+** Q24: What is key generation?
+Key generation is the process of creating cryptographic keys for use in algorithms.
+
+** Q25: What is key size?
+Key size is the length of the cryptographic key in bits, such as 128-bit or 2048-bit.
+
+** Q26: What is a cipher?
+A cipher is an algorithm for encrypting and decrypting data.
+
+** Q27: What is a block cipher?
+A block cipher encrypts data in fixed-size blocks, such as 128 bits.
+
+** Q28: What is a stream cipher?
+A stream cipher encrypts data one bit or byte at a time.
+
+** Q29: What is AES?
+AES (Advanced Encryption Standard) is a widely used symmetric encryption algorithm.
+
+** Q30: What is the default AES key size?
+AES commonly uses 128, 192, or 256-bit keys.
+
+** Q31: What is RSA?
+RSA is a widely used asymmetric algorithm for encryption and digital signatures.
+
+** Q32: What is a certificate?
+A certificate binds a public key to an identity and is signed by a trusted authority.
+
+** Q33: What is a keystore?
+A keystore stores keys and certificates, often in a protected file format.
+
+** Q34: What is a truststore?
+A truststore contains trusted certificates used to validate peers.
+
+** Q35: What is a key pair?
+A key pair consists of a private key and a matching public key.
+
+** Q36: What is Java KeyStore?
+Java KeyStore (JKS) is a password-protected repository used for keys and certificates.
+
+** Q37: What is PKCS#12?
+PKCS#12 is a standard file format for storing keys and certificates, often used for export/import.
+
+** Q38: What is JCEKS?
+JCEKS is a Java Keystore type that supports stronger encryption for keystore entries than JKS.
+
+** Q39: What is the JCA API entry point?
+The main JCA API entry points include classes such as ~KeyGenerator~, ~KeyPairGenerator~, ~MessageDigest~, and ~Signature~.
+
+** Q40: What is a SecretKey?
+~SecretKey~ is the Java interface representing a symmetric key.
+
+** Q41: What is a PublicKey?
+~PublicKey~ represents a public key in Java.
+
+** Q42: What is a PrivateKey?
+~PrivateKey~ represents a private key in Java.
+
+** Q43: What is a certificate factory?
+A certificate factory creates certificates from encoded data in Java.
+
+** Q44: What is the purpose of javax.crypto?
+~javax.crypto~ contains classes for encryption, decryption, and secure key handling in Java.
+
+** Q45: What is the purpose of java.security?
+~java.security~ contains core security primitives, providers, permissions, and key infrastructure.
+
+** Q46: Why is secure random important?
+Secure random generates unpredictable values needed for IVs, salts, and secrets.
+
+** Q47: What is SecureRandom?
+~SecureRandom~ is Java’s class for strong randomness.
+
+** Q48: What is an IV?
+An IV (Initialization Vector) is a random value used to ensure identical plaintext blocks encrypt differently.
+
+** Q49: What is a salt?
+A salt is random data used to protect password hashes and make them less susceptible to precomputation attacks.
+
+** Q50: What is PBKDF2?
+PBKDF2 is a password-based key derivation function designed to slow brute-force attacks.
+
+** Q51: What is password hashing?
+Password hashing is the process of turning a password into a non-reversible value suitable for verification.
+
+** Q52: What is a MAC?
+A MAC (Message Authentication Code) verifies the authenticity and integrity of a message.
+
+** Q53: What is HMAC?
+HMAC is a keyed hash used to verify both integrity and authenticity.
+
+** Q54: What is an authenticated cipher?
+An authenticated cipher provides both confidentiality and integrity.
+
+** Q55: What is GCM?
+GCM is an authenticated encryption mode commonly used with AES in modern Java applications.
+
+** Q56: What is CBC mode?
+CBC is an older block cipher mode that requires padding and can be vulnerable if used incorrectly.
+
+** Q57: What is ECB mode?
+ECB mode encrypts each block independently and is often discouraged because it leaks patterns.
+
+** Q58: What is padding?
+Padding adds extra bytes so a block cipher operates on full blocks.
+
+** Q59: Why is proper padding important?
+Improper or weak padding can lead to vulnerabilities and decryption failures.
+
+** Q60: What is OAEP?
+OAEP is a modern padding scheme for RSA encryption that improves security over raw RSA.
+
+** Q61: What is PKCS#1 v1.5?
+PKCS#1 v1.5 is a legacy RSA padding scheme with known weaknesses compared to OAEP.
+
+** Q62: What is a key agreement?
+Key agreement enables two parties to derive a shared secret without explicitly transmitting it.
+
+** Q63: What is Diffie-Hellman?
+Diffie-Hellman is a key agreement protocol widely used in real-world secure systems.
+
+** Q64: What is ECDH?
+ECDH is elliptic-curve Diffie-Hellman used for modern key agreement.
+
+** Q65: What is a Java provider?
+A Java provider implements cryptographic algorithms used by the JCA/JCE APIs.
+
+** Q66: What is standard algorithm naming in Java?
+Java algorithms are often requested with names such as "AES/GCM/NoPadding" or "SHA-256".
+
+** Q67: What is the difference between JKS and PKCS12?
+JKS is Java-specific. PKCS12 is a standard portable format.
+
+** Q68: Why is PKCS12 preferred today?
+It is standard, cross-platform, and widely supported by Java tools and libraries.
+
+** Q69: What is SecretKeySpec?
+~SecretKeySpec~ creates a key from raw bytes for a specific algorithm.
+
+** Q70: What is IvParameterSpec?
+~IvParameterSpec~ provides an IV for block cipher modes requiring one.
+
+** Q71: What is PBEKeySpec?
+~PBEKeySpec~ is used for password-based encryption and derivation.
+
+** Q72: What is PBEWithHmacSHA256AndAES_256?
+It is a password-based encryption algorithm that combines PBKDF and AES.
+
+** Q73: What is a Java KeyStore password?
+A keystore password protects the keystore and its entries.
+
+** Q74: What is a certificate alias?
+A certificate alias is a name used to reference a certificate or key in a keystore.
+
+** Q75: What is the purpose of ~java.security.Security~?
+It manages security providers and providers configuration.
+
+** Q76: What is BouncyCastle?
+BouncyCastle is a widely used Java cryptography library that adds algorithms and formats beyond the default JCA provider.
+
+** Q77: What is a keystore entry?
+A keystore entry is a key or certificate stored under an alias.
+
+** Q78: What is certificate chain import?
+Importing a certificate chain means adding a certificate and intermediates to a keystore or truststore.
+
+** Q79: What is Java TLS and how is it related to JCA?
+Java TLS uses JCA/JCE providers and JSSE for secure socket communication.
+
+** Q80: What is JSSE?
+JSSE (Java Secure Socket Extension) provides SSL/TLS support for Java applications.
+
+** Q81: What is the default key manager?
+The key manager handles the private key and certificate during TLS client/server authentication.
+
+** Q82: What is the default trust manager?
+The trust manager validates remote certificates during TLS handshakes.
+
+** Q83: What is a trust manager factory?
+It produces a trust manager implementation for certificate validation.
+
+** Q84: What is a KeyManagerFactory?
+It produces a key manager for cert-based client or server authentication.
+
+** Q85: What is SSL/TLS handshake in Java?
+The Java runtime performs handshake negotiation, certificate validation, and secure session establishment.
+
+** Q86: Why can Java cryptography be confusing?
+Because there are multiple layers: JCA, JCE, JSSE, providers, keystore formats, and algorithms.
+
+** Q87: What is a bug in cryptography often caused by?
+Poor key handling, insecure default algorithms, weak providers, or ignoring algorithm limits.
+
+** Q88: What is key rotation?
+Key rotation is the periodic replacement of cryptographic keys to limit exposure.
+
+** Q89: Why rotate keys?
+Compromised or long-lived keys increase risk over time.
+
+** Q90: Why should secrets not be hardcoded?
+Hardcoded secrets are easy to discover in source code, logs, or dumps.
+
+** Q91: What is external secret management?
+External secret management stores secrets in a secure vault or KMS service rather than in code.
+
+** Q92: What is a KMS?
+A KMS (Key Management Service) manages encryption keys and access policies.
+
+** Q93: What is the difference between encryption and hashing?
+Encryption is reversible; hashing is one-way and meant for integrity or password verification.
+
+** Q94: What is a checksum?
+A checksum is data used to verify integrity, but it is not necessarily cryptographic unless based on a secure hash.
+
+** Q95: What is a digital certificate chain in Java?
+It is the hierarchy used to trust a certificate presented by a peer.
+
+** Q96: What is a secure env var?
+A secure environment variable is a way to inject secrets without committing them to source control.
+
+** Q97: What is secret leakage?
+Secret leakage is when confidential keys or credentials end up in logs, stack traces, or version control.
+
+** Q98: Why is logging sensitive data dangerous?
+Because logs can be read by operators, attackers, or third-party log providers.
+
+** Q99: What is a cryptographic exception?
+A cryptographic exception indicates an error in key generation, algorithm use, certificate validation, or provider configuration.
+
+** Q100: What is a provider selection issue?
+A provider selection issue happens when the code asks for an unsupported algorithm or a provider doesn't implement it.
+
+* Intermediate
+
+** Q101: What is Java’s default provider?
+The default provider is usually the SunJCE/SunJSSE provider included with the JDK.
+
+** Q102: How do you request an algorithm in Java?
+For example:
+~Cipher.getInstance("AES/GCM/NoPadding")~
+or
+~MessageDigest.getInstance("SHA-256")~
+
+** Q103: What is the difference between algorithm name and provider name?
+The algorithm name identifies the cryptographic function; the provider is the implementation behind it.
+
+** Q104: Why do providers matter?
+Different providers may implement algorithm variants differently, with different performance or security guarantees.
+
+** Q105: What is a security policy in Java?
+A Java security policy defines permissions and access rules for code.
+
+** Q106: What is a JCE Unlimited Strength policy?
+It allows stronger cryptographic algorithms and longer keys than the default policy.
+
+** Q107: Why did Java limit key sizes historically?
+To comply with export control restrictions in older Java versions and legal requirements.
+
+** Q108: Why is AES-GCM favored in Java?
+AES-GCM provides confidentiality and integrity in one algorithm and is efficient in modern hardware.
+
+** Q109: What is a nonce?
+A nonce is a unique, non-repeating value used in cryptographic protocols to prevent replay and repeated encryption patterns.
+
+** Q110: Why is a unique IV important in CBC or GCM?
+Repeated IVs can leak patterns or enable attacks on encryption.
+
+** Q111: What is a random IV generation pattern?
+A secure random IV should be generated for every encryption operation unless a protocol explicitly says otherwise.
+
+** Q112: What is an encrypted key?
+An encrypted key is a key encrypted with another key, often used to protect keys at rest.
+
+** Q113: What is a key wrap?
+Key wrap is the encryption of a symmetric key with another key for transport or storage.
+
+** Q114: What is symmetric key storage with JCEKS?
+It stores symmetric keys in a keystore, usually protected by a password.
+
+** Q115: What is strong key generation?
+Strong key generation uses a secure random source and supported key lengths.
+
+** Q116: Why are weak keys dangerous?
+Weak keys may be brute-forced or vulnerable to cryptanalytic attacks.
+
+** Q117: What is a known plaintext attack?
+A known plaintext attack uses known plaintext-ciphertext pairs to recover keys or encryption logic.
+
+** Q118: Why does IV reuse matter?
+IV reuse can make encryption patterns visible and enable chosen-ciphertext or known-plaintext analysis.
+
+** Q119: What is a stream cipher vulnerability?
+Some stream ciphers will repeat keystream if nonce reuse occurs, allowing attackers to recover plaintexts.
+
+** Q120: What is authenticated encryption?
+Authenticated encryption provides both confidentiality and integrity.
+
+** Q121: Which Java ciphers are modern and recommended?
+AES-GCM, ChaCha20-Poly1305 when available, and modern authenticated schemes are generally preferred.
+
+** Q122: Why are ECB and static IV patterns discouraged?
+Because repeated block patterns can reveal information about the underlying plaintext.
+
+** Q123: What is CBC mode padding oracle?
+CBC padding oracles can leak information through decryption error timing, causing side-channel vulnerabilities.
+
+** Q124: What is a decryption oracle?
+A decryption oracle is a service that decrypts data and returns outputs or errors that reveal information.
+
+** Q125: What is the difference between encryption and signing?
+Encryption hides the content.
+Signing verifies the authenticity and integrity of the content.
+
+** Q126: What is a digital envelope?
+A digital envelope encrypts a symmetric key with an asymmetric public key, then encrypts the actual data with the symmetric key.
+
+** Q127: What is the purpose of hybrid encryption?
+Hybrid encryption combines the speed of symmetric encryption with the convenience and trust of asymmetric encryption.
+
+** Q128: What is RSA key wrapping?
+RSA key wrapping encrypts a symmetric key using a public key so it can be safely transferred.
+
+** Q129: What is the role of provider-specific algorithm names?
+Some algorithms are only available with specific providers, such as BouncyCastle.
+
+** Q130: What is a KeyGenerator?
+~KeyGenerator~ generates symmetric keys.
+
+** Q131: What is a KeyPairGenerator?
+~KeyPairGenerator~ generates asymmetric key pairs.
+
+** Q132: What is a CipherOutputStream?
+~CipherOutputStream~ wraps output streams so encryption is applied transparently.
+
+** Q133: What is a CipherInputStream?
+~CipherInputStream~ wraps input streams so decryption is applied transparently.
+
+** Q134: What is Java’s algorithm restriction?
+The algorithm restriction is a security feature that limits which algorithms and key sizes are accepted.
+
+** Q135: What is an X509Certificate?
+~X509Certificate~ is the Java class representing an X.509 certificate.
+
+** Q136: What is CertificateFactory?
+~CertificateFactory~ parses certificate data into Java certificate objects.
+
+** Q137: What is a certificate path?
+A certificate path is the chain from the leaf certificate to a trusted root.
+
+** Q138: What is a trust manager?
+A trust manager determines whether a presented certificate is trusted.
+
+** Q139: What is a key manager?
+A key manager provides private keys and certificate chains for the local side of a TLS connection.
+
+** Q140: What is a password-based key derivation?
+Password-based key derivation derives a secret key from a password and salt, often with PBKDF2.
+
+** Q141: Why is PBKDF2 used for passwords?
+Because it is intentionally slow and resistant to brute-force attacks.
+
+** Q142: What is JCA vs JSSE?
+JCA handles cryptographic primitives.
+JSSE handles SSL/TLS sockets and certificates.
+
+** Q143: What is a secure random source in Java?
+Usually it is obtained from the OS or a provider-backed secure random implementation.
+
+** Q144: What is a salt and why is it unique?
+A unique salt ensures two identical passwords do not hash to the same value.
+
+** Q145: What is a pepper?
+A pepper is a secret value added to password hashing, often stored separately from the password hash.
+
+** Q146: What is a password hash function recommendation?
+Use PBKDF2, bcrypt, scrypt, or Argon2, not plain MD5 or SHA-1.
+
+** Q147: What is the difference between password hashing and encryption?
+Password hashing is non-reversible.
+Encryption is reversible and intended for data protection.
+
+** Q148: What is a key derivation function?
+A key derivation function derives a key from a password, salt, and iterations.
+
+** Q149: What is iteration count?
+The iteration count in PBKDF2 determines how many times hashing is repeated to slow brute-force attempts.
+
+** Q150: What is a byte array in Java cryptography?
+Many JCA API methods work with raw bytes, so serialization and conversion are important.
+
+** Q151: What is Base64 encoding?
+Base64 converts binary data into ASCII for safe transport or storage.
+
+** Q152: Why is Base64 not encryption?
+Base64 is reversible but not cryptographic; it does not provide confidentiality.
+
+** Q153: What is a secret in Java?
+A secret can be a symmetric key, API token, password, or generated credential.
+
+** Q154: Why store secrets outside the codebase?
+Because source code is often visible to developers, system backups, and source control systems.
+
+** Q155: What is a vault?
+A vault is a system for storing and retrieving sensitive secrets securely.
+
+** Q156: What is a JCA provider installation?
+It is the process of registering a provider with the Java security framework.
+
+** Q157: What is a Java runtime security exception?
+It occurs when the runtime cannot find a required provider or algorithm is disallowed.
+
+** Q158: What is the Java cryptography extension provider list?
+It is the set of registered providers available to code via the JCA security framework.
+
+** Q159: What is a provider ordering issue?
+It matters when multiple providers implement the same algorithm; the order may affect which one is selected.
+
+** Q160: What is strong algorithm selection?
+Choosing robust algorithms and secure defaults is essential to real cryptographic safety.
+
+** Q161: What is certificate trust chain building?
+It is the process of linking a leaf certificate to a trusted root through intermediates.
+
+** Q162: What is certificate path validation?
+It ensures the chain is valid, signatures verify, the cert is not expired, and the purpose matches the intended use.
+
+** Q163: What is a peer certificate?
+A peer certificate is the certificate presented by the remote endpoint in TLS or SSL.
+
+** Q164: What is a key store alias collision?
+It happens when two entries in a keystore use the same alias, causing ambiguity.
+
+** Q165: What is a key usage mismatch?
+It occurs when a certificate is used for a purpose not allowed by its key usage or EKU constraints.
+
+** Q166: What is Java default trust manager behavior?
+It validates certificates against the local truststore and trusted root certificates.
+
+** Q167: What is a certificate validation exception?
+It is a Java exception indicating trust, hostname, or path validation problems.
+
+** Q168: What is cryptographic agility?
+Cryptographic agility is the ability to change algorithms, keys, or providers without major redesign.
+
+** Q169: Why does algorithm agility matter?
+Because cryptographic standards evolve and older algorithms are eventually deprecated.
+
+** Q170: What is the impact of weak algorithms on compliance?
+Weak algorithms can fail security reviews, audits, and regulatory requirements.
+
+** Q171: What is a security review in Java?
+It often checks algorithms, key sizes, provider usage, password handling, and certificate management.
+
+** Q172: What is a key leak?
+A key leak is the exposure of a private key or secret material to unauthorized parties.
+
+** Q173: What is a certificate leak?
+A certificate leak often includes private keys or chain material that should be protected.
+
+** Q174: What is the difference between encryption at rest and in transit?
+At rest means data is stored on disk or a database.
+In transit means data moves over networks.
+
+** Q175: What is the role of TLS in Java microservices?
+TLS secures HTTP traffic between services and prevents secrets from being exposed during network transit.
+
+** Q176: What is symmetric key distribution?
+Symmetric key distribution is the challenge of safely delivering a shared key to both parties.
+
+** Q177: Why is asymmetric crypto helpful for key distribution?
+It allows public keys to be shared openly while only private keys remain secret.
+
+** Q178: What is key exchange in TLS?
+Key exchange establishes a shared session secret used for encrypted communication.
+
+** Q179: What is the difference between encryption and key agreement?
+Encryption uses keys to transform plaintext.
+Key agreement derives shared secrets between parties.
+
+** Q180: What is the risk of keeping secrets in environment variables?
+They can still be exposed through process dumps, CI logs, or developer tools if not protected.
+
+* Advanced / Expert
+
+** Q181: What is a side-channel attack?
+A side-channel attack uses timing, power, cache behavior, or other indirect signals to extract secrets.
+
+** Q182: Why are constant-time implementations important?
+They reduce timing leaks that can reveal secret data or key material.
+
+** Q183: What is timing attack resistance?
+Timing attack resistance means the algorithm runs in roughly constant time regardless of secret values.
+
+** Q184: What is memory zeroization?
+Memory zeroization clears secret data from memory to reduce the chance of recovery after use.
+
+** Q185: Why is secure cleanup important in Java?
+Java objects may remain in memory or heap dumps if secrets are not properly handled.
+
+** Q186: What is a heap dump leak?
+A heap dump can reveal sensitive passwords, tokens, or keys if they are kept in memory.
+
+** Q187: What is a provider attack?
+A provider attack occurs when a malicious or misconfigured provider is substituted and alters crypto behavior.
+
+** Q188: Why must providers be trusted?
+Because the provider implementation defines algorithm behavior and key handling.
+
+** Q189: What is JCA security manager?
+The Java security manager historically controlled permissions for crypto operations, though modern Java uses more application-level controls.
+
+** Q190: What is cryptographic agility in Java?
+It means code should abstract algorithms, avoid hardcoded providers, and allow easier future upgrades.
+
+** Q191: What is a key derivation from password and salt?
+This is typically done with PBKDF2, bcrypt, scrypt, or Argon2, not simple SHA-256.
+
+** Q192: What is Argon2?
+Argon2 is a modern password hashing function designed to resist brute-force and GPU attacks.
+
+** Q193: What is scrypt?
+scrypt is a password hashing function designed to be memory-hard and resistant to ASIC/GPU attacks.
+
+** Q194: What is bcrypt?
+bcrypt is a password hashing algorithm designed for slow, costly brute-force attacks.
+
+** Q195: Why are password hashes intentionally slow?
+Because attackers guess passwords offline and slow hashing makes guessing more expensive.
+
+** Q196: What is a password cracker?
+A password cracker attempts to recover passwords by brute-force or dictionary attacks.
+
+** Q197: What is a brute-force attack?
+A brute-force attack tries many candidate passwords or keys until the correct one is found.
+
+** Q198: What is a dictionary attack?
+A dictionary attack tests likely passwords from a list rather than all possibilities.
+
+** Q199: What is an adaptive chosen-ciphertext attack?
+A chosen-ciphertext attack allows the attacker to submit ciphertexts and analyze the outputs to recover secrets.
+
+** Q200: What is the most important lesson in Java cryptography?
+Use standard APIs, strong algorithms, secure key handling, and proper key lifecycle management; cryptography is not just about “encryption,” but about trust, identity, algorithms, and secure operational practices.
+
+-----
+
+#+INCLUDE: "../footer.org"
