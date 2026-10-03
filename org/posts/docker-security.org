@@ -1,0 +1,621 @@
+#+TITLE: Docker Security
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Docker Security
+
+-----
+
+* Beginner
+
+** Q1: What is Docker security?
+Docker security is the set of practices, controls, and configurations used to protect containers, images, hosts, and the workloads they run.
+
+** Q2: Why is Docker security important?
+Containers can expose vulnerabilities, secrets, and attack surfaces if they are not carefully designed and managed.
+
+** Q3: What is a container escape?
+A container escape is a vulnerability or misconfiguration that allows an attacker to break out of the container isolation boundary.
+
+** Q4: Why is container isolation important?
+It prevents a compromised container from affecting the host or other containers.
+
+** Q5: What is the host kernel?
+The host kernel is the Linux kernel running on the Docker host, shared by containers in many setups.
+
+** Q6: What is a container attack surface?
+The container attack surface is the set of things an attacker could exploit, such as exposed ports, running processes, network access, and filesystems.
+
+** Q7: What is a Docker image?
+A Docker image is a read-only filesystem snapshot used as the basis for running containers.
+
+** Q8: Why are image vulnerabilities important?
+Because vulnerable base images and application dependencies can be exploited once a container is running.
+
+** Q9: What is a vulnerable dependency?
+A vulnerable dependency is a library, package, or binary that contains a known security flaw.
+
+** Q10: What is a CVE?
+A CVE (Common Vulnerabilities and Exposures) is a publicly known software vulnerability.
+
+** Q11: What is a security scan?
+A security scan inspects container images, filesystems, and packages for known vulnerabilities.
+
+** Q12: What is Trivy?
+Trivy is a common image scanner used to detect vulnerabilities in container images and filesystems.
+
+** Q13: What is Anchore?
+Anchore is a container image scanning and policy engine used for security validation.
+
+** Q14: Why scan Docker images?
+Because vulnerable base images and packages can become the entry point for container compromise.
+
+** Q15: What is a minimal image?
+A minimal image contains only the runtime dependencies necessary to run the application.
+
+** Q16: Why do minimal images help security?
+They reduce the number of packages and libraries an attacker can exploit.
+
+** Q17: What is a distroless image?
+A distroless image contains only runtime artifacts and not a shell, package manager, or other developer tools.
+
+** Q18: Why remove shell binaries from containers?
+Because shells can make privilege escalation and post-exploitation easier for attackers.
+
+** Q19: What is the root user?
+The root user has full privileges on the system and can perform almost any action.
+
+** Q20: Why should containers avoid running as root?
+Because a compromised process running as root can access the full container filesystem and potentially more.
+
+** Q21: What is a non-root user?
+A non-root user has restricted privileges and reduces the blast radius of compromise.
+
+** Q22: What is a Docker USER instruction?
+The ~USER~ instruction sets the user that will run commands in the container.
+
+** Q23: What is a security best practice for Dockerfiles?
+Prefer small, minimal, patched images and avoid running as root whenever possible.
+
+** Q24: What is a public Docker image risk?
+Public images may contain malicious content or outdated, vulnerable software if not curated.
+
+** Q25: Why use trusted base images?
+Trusted base images are often patched, maintained, and verified more regularly.
+
+** Q26: What is a private registry?
+A private registry hosts images inside an internal network or organization-controlled environment.
+
+** Q27: What is a public registry?
+A public registry hosts images publicly, such as Docker Hub.
+
+** Q28: What is image provenance?
+Image provenance is the record of where the image came from, how it was built, and whether it is trusted.
+
+** Q29: What is image signing?
+Image signing allows a system to verify the authenticity and integrity of a container image.
+
+** Q30: What is Cosign?
+Cosign is a tool for signing and verifying container images using cryptographic signatures.
+
+** Q31: What is Sigstore?
+Sigstore is a project used to sign, verify, and store software artifact signatures securely.
+
+** Q32: What is a registry scan?
+A registry scan checks images pushed into a registry for vulnerabilities and policy violations.
+
+** Q33: What is a Docker daemon?
+The Docker daemon is the service that manages container runtime and image operations on the host.
+
+** Q34: Why are Docker daemon privileges sensitive?
+Because a compromised daemon can issue malicious container commands and affect the host.
+
+** Q35: What is Docker socket?
+The Docker socket is the Unix socket used by Docker clients to talk to the Docker daemon.
+
+** Q36: Why is the Docker socket risky?
+If exposed or misused, it can allow control of the host or other containers.
+
+** Q37: What does container escape via Docker socket mean?
+A process inside a container could potentially use the Docker socket to manage other containers or the host if misconfigured.
+
+** Q38: What is the Docker socket mount?
+It is a bind mount of the Docker socket into a container, often used in CI/CD or dev tools but risky.
+
+** Q39: Why is mounting the Docker socket dangerous?
+Because it effectively gives the container privileged access to Docker daemon operations.
+
+** Q40: What is a rootless container?
+A rootless container runs without requiring root privileges in the host namespace.
+
+** Q41: What is the security benefit of rootless mode?
+It reduces the risk of host-level privilege escalation if the container is compromised.
+
+** Q42: What is Linux namespaces?
+Namespaces isolate container processes, networks, mounts, and users from the host OS.
+
+** Q43: What is cgroups?
+cgroups limit CPU, memory, and process usage for containers.
+
+** Q44: Why are cgroups important for security?
+They prevent a compromised app from consuming all host resources and causing denial-of-service.
+
+** Q45: What is seccomp?
+Seccomp is a Linux kernel security feature that restricts the system calls a process can make.
+
+** Q46: Why does seccomp matter?
+It reduces the system-call surface available to a compromised container.
+
+** Q47: What is AppArmor?
+AppArmor is a Linux Mandatory Access Control (MAC) system that restricts what applications can do.
+
+** Q48: What is SELinux?
+SELinux is another MAC system commonly used to enforce containment and policy.
+
+** Q49: What is the difference between namespaces and cgroups?
+Namespaces isolate visibility; cgroups limit resource use.
+
+** Q50: What is network isolation?
+Network isolation prevents containers from accessing or reaching unwanted networks or services.
+
+** Q51: What is Docker bridge network security?
+Bridge networks isolate containers on the same host, but they still require firewall or policy rules for strict segmentation.
+
+** Q52: Why do containers use network policies?
+Network policies restrict traffic between workloads, reducing unintended lateral movement.
+
+** Q53: What is a microservice security boundary?
+A microservice security boundary is the point where one service is isolated from another by network or policy boundaries.
+
+** Q54: What is a Docker secret?
+A Docker secret is a secure mechanism to inject sensitive data such as passwords or TLS keys into services in a controlled way.
+
+** Q55: Why use Docker secrets instead of environment variables?
+Environment variables can leak in logs, process lists, or debugging tools, while secrets are handled more securely.
+
+** Q56: What are container secrets?
+Container secrets are sensitive values stored as files or secret objects and injected at runtime.
+
+** Q57: What are environment variables?
+Environment variables are values passed to a process, but they may be exposed in process inspection and logs.
+
+** Q58: Why avoid secrets in image layers?
+Image layers are stored in the image filesystem and can be inspected or extracted later.
+
+** Q59: What is a compromised image?
+A compromised image includes malicious code, backdoors, or unsafe configuration.
+
+** Q60: What is a trusted image pipeline?
+A trusted image pipeline includes scanning, signing, and validation before the image reaches production.
+
+** Q61: What is a Docker registry vulnerability?
+A registry vulnerability may let malicious images or tampered content get published or pulled.
+
+** Q62: Why use private registries?
+Private registries give you control over who can pull and push images and how they are scanned.
+
+** Q63: What is Docker content trust?
+Docker Content Trust verifies signed images before the client pulls them.
+
+** Q64: What is image tag trust?
+Image tag trust means trusting the image tag and associated signature, not just the name.
+
+** Q65: What is a malicious Dockerfile?
+A malicious Dockerfile may add scripts or dependencies that perform unauthorized actions at build or run time.
+
+** Q66: Why should build contexts be restricted?
+The Docker build context may expose local secrets or files that get embedded into the image if not filtered with .dockerignore.
+
+** Q67: What is .dockerignore?
+~.dockerignore~ excludes files from the Docker build context to avoid leaking secrets or large directories.
+
+** Q68: Why is .dockerignore security-sensitive?
+Because leaked files may be placed into the image or build cache.
+
+** Q69: What is a runtime secret file?
+A runtime secret file is mounted into the container for sensitive information such as TLS private keys.
+
+** Q70: Why mount secrets as files?
+Some workloads, like TLS, expect files rather than environment variables.
+
+** Q71: What is a Docker health check?
+A health check asks whether a container is alive and working properly.
+
+** Q72: Why is health checking relevant to security?
+Healthy services are less likely to be compromised or in a failed state, and health checks can reduce accidental exposure of broken systems.
+
+** Q73: What is Docker logging?
+Docker logs capture container output, which may include secrets if mishandled.
+
+** Q74: Why avoid logging sensitive data?
+Because logs may be accessible to operators or centralized monitoring systems beyond the container.
+
+** Q75: What is a container debugging risk?
+Debugging containers often requires shell access, which can increase risk if the container is not hardened.
+
+** Q76: Why restrict exec into containers?
+Because shell access can help an attacker inspect and manipulate files, secrets, and system state.
+
+** Q77: What is the principle of least privilege?
+The principle of least privilege means giving only the minimum permissions needed for a task.
+
+** Q78: Why is least privilege important in Docker?
+It reduces the ability of a compromised container or service to do damage.
+
+** Q79: What is container resource limits?
+Resource limits constrain CPU, memory, and PIDs to reduce abuse and denial-of-service opportunities.
+
+** Q80: What is a Docker memory limit?
+A memory limit restricts how much RAM a container can consume.
+
+** Q81: What is a CPU limit?
+A CPU limit prevents a container from monopolizing host CPU resources.
+
+** Q82: What is a PID limit?
+A PID limit restricts how many processes a container can create.
+
+** Q83: Why limit resources?
+Resource limits reduce the impact of runaway or malicious workloads.
+
+** Q84: What is docker run --cap-drop?
+~--cap-drop~ removes Linux capabilities from a container to reduce privilege.
+
+** Q85: What are Linux capabilities?
+Capabilities are fine-grained privileges beyond the traditional root/non-root split.
+
+** Q86: Why drop capabilities?
+Because a container may need fewer privileges than a full root process.
+
+** Q87: What is seccomp profile?
+A seccomp profile restricts which system calls are allowed.
+
+** Q88: What is AppArmor profile?
+An AppArmor profile restricts a container to an allowed set of file operations and capabilities.
+
+** Q89: What is a read-only root filesystem?
+A read-only root filesystem prevents tampering with the container’s filesystem and helps enforce integrity.
+
+** Q90: Why use read-only filesystem?
+It reduces the chance of malicious writes and makes the filesystem more predictable.
+
+** Q91: What is a tmpfs mount?
+A tmpfs mount keeps temporary data in memory, reducing writes to disk and making state more ephemeral.
+
+** Q92: What is a Docker kill signal?
+A signal sent to a container can terminate processes and affect containers if an attacker can send or abuse them.
+
+** Q93: What is a user namespace?
+A user namespace maps host UIDs to container UIDs and can reduce privilege escalation risk.
+
+** Q94: What is a privileged container?
+A privileged container runs with extra Linux capabilities and has broad access to the host and devices.
+
+** Q95: Why avoid privileged mode?
+Because it weakens isolation and gives the container near-host capabilities.
+
+** Q96: What is Docker CapAdd?
+~--cap-add~ adds Linux capabilities to a container and should be used sparingly.
+
+** Q97: What is a container breakout?
+A breakout is the exploitation of a vulnerability to escape the containment boundary.
+
+** Q98: What is a host compromise?
+A host compromise occurs when an attacker gains access to the underlying Docker host.
+
+** Q99: What is a lateral movement risk?
+Lateral movement is when a compromised container is used to access other containers or host systems.
+
+** Q100: What is the difference between safe and unsafe Docker networking?
+Unsafe Docker networking exposes more services and routes than necessary; safe networks enforce segmentation and firewalling.
+
+* Intermediate
+
+** Q101: What is Docker network segmentation?
+It means separating container workloads into distinct networks and trust zones.
+
+** Q102: Why is network segmentation important?
+It reduces the chance that a compromised container can reach unrelated services.
+
+** Q103: What is a Docker bridge network?
+A Docker bridge network is a default internal network for containers on the same host.
+
+** Q104: Why should not all containers share the same bridge?
+Because a compromised container on the same network may discover or attack others.
+
+** Q105: What is a user-defined network?
+A user-defined network allows better naming, DNS, and isolation than the default bridge.
+
+** Q106: Why use custom networks?
+They help enforce traffic boundaries and manage service discovery more intentionally.
+
+** Q107: What is a container firewall?
+A firewall restricts which network ports or destinations a container may use.
+
+** Q108: What is iptables with Docker?
+Docker uses iptables rules to implement port publishing and firewalling.
+
+** Q109: Why is firewall configuration important?
+Without it, attackers may probe or reach unintended ports from other containers or external networks.
+
+** Q110: What is a Docker security group concept?
+It is an abstraction in some environments that acts like a firewall policy for container traffic.
+
+** Q111: What is a Docker engine security concern?
+The daemon, privileges, and host environment are among the highest-risk parts of the Docker stack.
+
+** Q112: Why patch Docker regularly?
+Because vulnerabilities in the engine, runtime, or kernel can affect the host.
+
+** Q113: What is host hardening?
+Host hardening includes patching, disabling unnecessary services, setting secure kernel settings, and limiting access.
+
+** Q114: What is a Docker user namespace?
+It remaps container root to an unprivileged user on the host, reducing the privilege of the container.
+
+** Q115: What is a rootless Docker installation?
+Rootless Docker avoids root on the host by running the daemon and containers as a non-root user.
+
+** Q116: Why use rootless mode?
+It reduces the impact of a compromised runtime process.
+
+** Q117: What is the security concern of Docker Compose?
+Compose can be used to run many containers with broad network access and sharing if not designed carefully.
+
+** Q118: What is a Docker threat model?
+A threat model identifies who may attack the system, how they might do so, and what controls reduce the risk.
+
+** Q119: Why is threat modeling useful?
+It forces engineers to think systematically about privilege boundaries and threat paths.
+
+** Q120: What is dependency vulnerability scanning?
+It detects vulnerable libraries, packages, or OS-level dependencies in images.
+
+** Q121: What is a package manager in the final image?
+A package manager, such as apt or apk, increases the set of tools an attacker could use if the container is compromised.
+
+** Q122: Why remove apt/apk caches?
+Because they can make the image larger and may contain metadata or installed packages not needed by the app.
+
+** Q123: What is a multi-stage Docker build for security?
+A multi-stage build can build the app in one stage and ship only the runtime artifact in a separate stage.
+
+** Q124: Why do multi-stage builds help security?
+They reduce final image size and can eliminate compilers and package managers from the production image.
+
+** Q125: What is image signing policy?
+A signing policy defines which images are trusted, who can sign them, and under which conditions.
+
+** Q126: What is a registry admission policy?
+It controls what images can be pushed or pulled based on scan results, signatures, or tags.
+
+** Q127: Why is admission control useful?
+It prevents insecure or untrusted images from entering a cluster or deployment workflow.
+
+** Q128: What is a container policy engine?
+A policy engine evaluates images or runtime manifests against security rules before deployment.
+
+** Q129: What is a security baseline?
+A security baseline is a set of minimum controls, such as no root, no privileged mode, scan passes, and signed images.
+
+** Q130: What is a "no root" policy?
+It requires containers to run as non-root users whenever possible.
+
+** Q131: What is "read-only root filesystem" policy?
+It enforces a writable layer only for needed runtime state, reducing mutable attack surface.
+
+** Q132: What is "no new privileged capabilities" policy?
+It forbids containers from requesting extra Linux capabilities beyond the minimum required.
+
+** Q133: What is image provenance enforcement?
+It ensures images originate from approved registries, builds, or signing identities.
+
+** Q134: Why use a restricted registry mirror?
+It reduces the chance of pulling malicious or outdated images from untrusted public registries.
+
+** Q135: What is a Docker configuration drift?
+Configuration drift is when the security settings of containers or hosts diverge from approved standards over time.
+
+** Q136: What is a hardened Docker baseline?
+A hardened baseline includes patched OS, minimum privileges, network restrictions, and limited external exposure.
+
+** Q137: Why is runtime monitoring important?
+It helps detect suspicious processes, unauthorized network connections, and unexpected privilege changes.
+
+** Q138: What is docker events?
+Docker events report lifecycle changes to containers, images, and networks.
+
+** Q139: What is container-level forensics?
+It is the process of investigating a container compromise by looking at filesystem, logs, network, and process state.
+
+** Q140: What is a malicious container image inside a registry?
+It is a tampered or malicious image stored in a registry and pulled by a system without validation.
+
+** Q141: What is a secret in an image layer?
+A secret placed in an image layer may be recoverable by anyone with access to the image.
+
+** Q142: Why avoid embedding TLS keys in images?
+Because they become part of the image history and may be copied into many environments.
+
+** Q143: Why avoid storing credentials in Dockerfile?
+Because they are embedded in image layers and viewable through image history.
+
+** Q144: How should secrets be supplied to containers?
+Use Docker secrets, mounted volumes, or a secret manager with controlled access.
+
+** Q145: What is a Dockerfile best practice to reduce secret leakage?
+Use build arguments carefully and never bake secrets directly into the final image unless absolutely required.
+
+** Q146: What is "builder stage should not ship secrets"?
+The build stage can use secrets during compilation, but they should not remain in the final image.
+
+** Q147: Why are package manager caches sensitive?
+They may include metadata and dependencies from internal registries or secret-laden build layers.
+
+** Q148: Why is shell history relevant?
+A shell in the container may retain commands and secrets if used in debugging or build processes.
+
+** Q149: What is a malicious dependency injection?
+An attacker can influence dependency resolution or package installation steps to add malicious code.
+
+** Q150: What is a reproducible build?
+A reproducible build gives the same output for the same source and environment, reducing attack vectors from nondeterministic builds.
+
+** Q151: What is a vulnerability feed?
+A vulnerability feed is the database or service that provides known issues and patch information.
+
+** Q152: What is a CVE scanning policy?
+It may block images with critical or high vulnerabilities before deployment.
+
+** Q153: What is a security gate in CI/CD?
+A security gate checks the image or artifact before it is allowed to proceed to deployment.
+
+** Q154: What is a Docker compliance policy?
+It defines security expectations such as scan results, signed images, and runtime constraints.
+
+** Q155: Why monitor for suspicious outbound traffic from containers?
+Because compromised containers often call home or exfiltrate data to an attacker-controlled endpoint.
+
+** Q156: Why restrict egress traffic?
+It limits the damage a compromised container can do externally.
+
+** Q157: What is egress control?
+Egress control restricts outbound network connections from containers.
+
+** Q158: Why is egress filtering important?
+It protects against malware beaconing, data exfiltration, and command-and-control traffic.
+
+** Q159: What is container break-out prevention?
+It includes kernel hardening, seccomp, AppArmor, namespaces, user namespaces, and minimal privileges.
+
+** Q160: What is kernel hardening?
+Kernel hardening reduces known vulnerabilities and increases the difficulty of exploitation.
+
+** Q161: What is unprivileged container mode?
+It ensures containers do not run with host-root-like privileges or capabilities.
+
+** Q162: Why is Docker daemon security critical?
+Because if the daemon is compromised, the entire host is at risk.
+
+** Q163: What is host-level isolation for Docker?
+It includes separate hosts, VMs, or hypervisors for workloads with different trust levels.
+
+** Q164: What is a trusted execution boundary?
+It is a level of isolation that prevents unauthorized access across workload boundaries.
+
+** Q165: What is a dedicated host for sensitive workloads?
+It isolates high-risk or high-value systems away from other containers or services.
+
+** Q166: How does Docker security differ from VM security?
+VMs provide stronger isolation at the hypervisor layer; Docker containers rely more on kernel and process isolation.
+
+** Q167: Why do some organizations use VM-based isolation for critical containers?
+To reduce the risk of cross-container or host compromise when high security is required.
+
+** Q168: What is Docker daemon socket protection?
+It means restricting access to the Docker socket to only trusted users or automation agents.
+
+** Q169: Why is mandatory access control helpful?
+It enforces policy beyond simple file permissions and reduces the chance of privilege abuse.
+
+** Q170: What is process isolation?
+Process isolation means one container’s processes are not directly visible to others.
+
+** Q171: What is file system isolation?
+Filesystem isolation keeps each container’s file system separate from the host and other containers.
+
+** Q172: What is user-level networking policy?
+It limits which destinations a container can reach over the network.
+
+** Q173: What is the relationship between Docker security and observability?
+Good observability helps detect suspicious activity, abnormal process launch, or unexpected network access.
+
+** Q174: What is Docker audit logging?
+It logs actions performed by the Docker daemon and system administrators.
+
+** Q175: Why are audit logs useful?
+They help reconstruct what happened during a security incident or policy violation.
+
+** Q176: What is a service account in Docker?
+A service account or service identity is used to grant controlled access to registries or secret stores.
+
+** Q177: What is RBAC for Docker registries?
+RBAC (Role-Based Access Control) restricts registry access by role and identity.
+
+** Q178: What is image provenance after build?
+It is the chain showing where the image came from, who built it, and whether it was signed.
+
+** Q179: What is signing validation before deployment?
+It ensures the image signature matches a trusted identity before it can be deployed.
+
+** Q180: Why are artifactory or registry policy checks important?
+They prevent untrusted or outdated images from being used in production.
+
+* Advanced / Expert
+
+** Q181: What is Kubernetes pod security policy?
+A pod security policy imposes security constraints on workloads, often relevant when Docker is part of a Kubernetes deployment.
+
+** Q182: What is security context in Kubernetes?
+A security context configures user ID, capabilities, seccomp, and privilege settings for containers.
+
+** Q183: Why is Docker security tied to the host kernel?
+Because many container security boundaries ultimately depend on kernel features such as namespaces, seccomp, and cgroups.
+
+** Q184: What is a kernel exploit?
+A kernel exploit can allow attackers to escape container isolation and access host-level resources.
+
+** Q185: Why is patching the host crucial?
+Because a kernel vulnerability may undermine all container isolation.
+
+** Q186: What is a container breakout via kernel bug?
+It is an exploit that takes advantage of a kernel defect to escape the container and reach the host.
+
+** Q187: What is seccomp bypass?
+A seccomp bypass is a method to evade Linux seccomp restrictions and perform disallowed actions.
+
+** Q188: What is AppArmor bypass?
+An AppArmor bypass is a policy evasion that allows behavior beyond the intended confinement.
+
+** Q189: Why do advanced Docker security setups use multiple controls?
+Because single controls alone are not enough; defense-in-depth is essential.
+
+** Q190: What is defense-in-depth?
+Defense-in-depth uses multiple layers of protection, such as image scanning, privileged restrictions, network segmentation, and runtime monitoring.
+
+** Q191: What is runtime threat detection?
+Runtime threat detection looks for suspicious process execution, malformed network traffic, or unexpected file changes.
+
+** Q192: What is eBPF security monitoring?
+eBPF can inspect system calls, network behavior, and process activity with low overhead for security monitoring.
+
+** Q193: What is container forensics?
+Container forensics analyzes the container filesystem, process list, logs, and network artifacts after an incident.
+
+** Q194: What is static analysis of Dockerfiles?
+Static analysis checks Dockerfile instructions for risky patterns such as insecure base images or unrestricted privileges.
+
+** Q195: What is image lifecycle security?
+It includes build, scan, sign, promote, deploy, and retire stages, each with security controls.
+
+** Q196: What is artifact promotion security?
+It ensures only scanned, signed, and compliant images move from dev to staging to production.
+
+** Q197: Why are container registry policies important?
+Because registries are often the single point where malicious or policy-violating images can be introduced.
+
+** Q198: What is attacker persistence in containers?
+Attackers may leave malicious binaries, cron jobs, or scripts in a compromised container to persist beyond the immediate session.
+
+** Q199: What is a dangerous container configuration?
+Examples include privileged mode, host networking, Docker socket mounts, and broad host port exposure.
+
+** Q200: What is the main lesson in Docker security?
+Docker security is not just about the container runtime; it spans image provenance, privilege boundaries, network isolation, secrets handling, registry policy, and host hardening.
+
+-----
+
+#+INCLUDE: "../footer.org"
