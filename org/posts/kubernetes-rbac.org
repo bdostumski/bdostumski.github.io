@@ -1,0 +1,629 @@
+#+TITLE: Kubernetes RBAC
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes RBAC
+
+-----
+
+* Beginner
+
+** Q1: What is Kubernetes RBAC?
+RBAC (Role-Based Access Control) is the Kubernetes authorization model that controls who can do what inside the cluster.
+
+** Q2: Why is RBAC needed?
+Without RBAC, users and workloads could perform any action they wanted against Kubernetes resources.
+
+** Q3: What is an authorization model?
+An authorization model defines how permissions are granted and enforced.
+
+** Q4: What is an identity in Kubernetes?
+An identity is the user, service account, or system account that requests access to an API.
+
+** Q5: What is a user in Kubernetes?
+A user is an identity recognized by the cluster, often through external authentication systems such as OIDC, LDAP, or certificates.
+
+** Q6: What is a service account?
+A service account is an identity used by pods or workloads to access Kubernetes resources.
+
+** Q7: What is a Role?
+A Role grants permissions within a single namespace.
+
+** Q8: What is a ClusterRole?
+A ClusterRole grants permissions across the entire cluster, not just one namespace.
+
+** Q9: What is a RoleBinding?
+A RoleBinding associates a Role with one or more subjects within a namespace.
+
+** Q10: What is a ClusterRoleBinding?
+A ClusterRoleBinding associates a ClusterRole with one or more subjects cluster-wide.
+
+** Q11: What is a subject in RBAC?
+A subject is a user, group, or service account that is granted access via a Role/RoleBinding or ClusterRole/Binding.
+
+** Q12: What is a RoleRef?
+A RoleRef points from a RoleBinding or ClusterRoleBinding to the actual Role or ClusterRole.
+
+** Q13: What are Kubernetes API resources?
+Resources include Pods, Services, Secrets, Deployments, ConfigMaps, and many others.
+
+** Q14: What is a verb in RBAC?
+A verb is the action allowed on a resource, such as get, list, create, update, delete, patch, or watch.
+
+** Q15: What is a resource in RBAC?
+A resource is the Kubernetes API object that the permission applies to.
+
+** Q16: What is a resource name?
+A resource name may restrict access to a specific object instance.
+
+** Q17: Why is RBAC usually easiest to reason about?
+Because permissions are expressed as “who can do what and on which resources.”
+
+** Q18: What is least privilege?
+Least privilege means giving only the permissions required for a task.
+
+** Q19: Why is least privilege important?
+It reduces damage if an account or workload is compromised.
+
+** Q20: What is a default admin in Kubernetes?
+Cluster-admin is a highly privileged ClusterRole that can do almost anything.
+
+** Q21: Why is cluster-admin risky?
+Because it grants wide control over the cluster and its workloads.
+
+** Q22: What is a read-only role?
+A read-only role allows observation but not modification of resources.
+
+** Q23: What is a namespace-scoped user?
+A namespace-scoped user has permissions inside a single namespace or a limited set of namespaces.
+
+** Q24: What is cluster-scoped access?
+Cluster-scoped access applies across all namespaces or cluster-level resources.
+
+** Q25: What is the Kubernetes API server?
+The API server is the central control plane component responsible for authorization, authentication, and resource handling.
+
+** Q26: What is authentication?
+Authentication confirms who the caller is.
+
+** Q27: What is authorization?
+Authorization decides whether the caller is allowed to perform the requested action.
+
+** Q28: What is the authentication boundary?
+The boundary where the caller is identified before RBAC is applied.
+
+** Q29: Why are authn and authz separate?
+Because a caller may be authenticated but still not authorized for a specific action.
+
+** Q30: What is a service account token?
+A service account token is the credential used by pods or controllers to authenticate to the Kubernetes API.
+
+** Q31: What is a default service account?
+Every namespace gets a default service account unless a different one is specified.
+
+** Q32: Why is default service account access a risk?
+It may grant unnecessary permissions or be used by workloads without explicit credentials.
+
+** Q33: What is a RoleBinding subject type?
+The subject type can be a user, group, or service account.
+
+** Q34: What is a group in RBAC?
+A group is a set of users or identities with shared permissions.
+
+** Q35: What is a namespace user?
+A namespace user is usually an identity associated with that namespace via a service account or admin-managed auth.
+
+** Q36: What is a token review?
+Token review verifies a token presented by a caller and extracts its identity.
+
+** Q37: What is admission control?
+Admission control is the API layer that can reject or mutate requests before they are stored.
+
+** Q38: Why is RBAC related to admission control?
+Because authorization and policy enforcement happen around the same API traffic lifecycle.
+
+** Q39: What is a ResourceName restriction?
+It limits a permission to a specific named resource instance rather than all resources of a type.
+
+** Q40: What is a wildcard resource pattern?
+Some permission rules can be broader, though Kubernetes RBAC usually uses clear resource and verb sets.
+
+** Q41: Why is RBAC usually explicit?
+Because the cluster should not allow broad, unclear permissions by default.
+
+** Q42: What is the API group?
+The API group is the logical grouping of resources, like apps, batch, networking.k8s.io, etc.
+
+** Q43: What is a resource kind?
+A resource kind is the Kubernetes object type, such as Pod, Deployment, Secret, ConfigMap.
+
+** Q44: What is subresource access?
+A subresource is a smaller part of a resource, such as /status or /scale.
+
+** Q45: Why are subresources relevant in RBAC?
+Because a user may need access to a pod status or scale endpoint but not the whole resource.
+
+** Q46: What is a verb watch?
+A watch permission grants the ability to watch resource changes over time.
+
+** Q47: What is a list permission?
+A list permission grants the ability to enumerate resources.
+
+** Q48: What is a get permission?
+A get permission allows reading a specific resource.
+
+** Q49: What is a create permission?
+A create permission allows creating new objects of a specific type.
+
+** Q50: What is update permission?
+Update permission allows replacing or modifying an existing resource.
+
+** Q51: What is delete permission?
+Delete permission permits deleting resources.
+
+** Q52: What is patch permission?
+Patch permission allows partial updates to a resource.
+
+** Q53: What is impersonation?
+Impersonation lets one identity act as another identity for debugging or testing permissions.
+
+** Q54: Why is impersonation important?
+It helps administrators test what a user or service account can do without changing their credentials.
+
+** Q55: What is an RBAC audit?
+An RBAC audit reviews who has what permissions and whether those permissions are still necessary.
+
+** Q56: Why audit RBAC?
+Because over-broad permissions accumulate over time and can be a major security risk.
+
+** Q57: What is a deny-by-default model?
+A deny-by-default model gives no permission unless explicitly granted.
+
+** Q58: Why is deny-by-default useful?
+It reinforces least privilege and makes permission design more intentional.
+
+** Q59: What is a cluster-admin user?
+It is the most privileged cluster-level role and should be tightly restricted.
+
+** Q60: What is a pod reader role?
+A pod reader role might allow listing and getting pods but not creating or deleting them.
+
+** Q61: What is a deployer role?
+A deployer role might allow create/update/delete on Deployments and related resources.
+
+** Q62: What is a secrets reader role?
+It may allow reading Secret objects, which is highly sensitive and should be limited.
+
+** Q63: Why are Secret permissions particularly sensitive?
+Because Secret data can expose credentials, certificates, and tokens.
+
+** Q64: What is the role of RBAC in security?
+RBAC is one of the main policy controls that restricts what users and workloads can access.
+
+** Q65: Why are namespaces important to RBAC?
+Because many permissions are namespaced and should not reach beyond a limited boundary.
+
+** Q66: What is a namespace-scoped cluster role binding?
+It binds a ClusterRole to a subject only inside a namespace, creating a limited but cluster-wide logical role.
+
+** Q67: What is a RoleBinding subject example?
+An example subject is a user, a group, or a service account in a namespace.
+
+** Q68: What is a ClusterRoleBinding subject example?
+A service account in another namespace or a group of administrators.
+
+** Q69: What is a default admin access risk?
+It may create hidden privileges and overbroad access if not monitored.
+
+** Q70: What is the principle of separation of duties?
+Different identities handle different parts of cluster operations to reduce blast radius and insider risk.
+
+** Q71: What is an operator?
+An operator is an application controller that watches Kubernetes resources and performs cluster-level actions.
+
+** Q72: Why is operator RBAC important?
+Because operators often need broad permissions to reconcile resources and maintain cluster state.
+
+** Q73: What is a controller manager?
+A controller manager is part of the Kubernetes control plane and may require elevated permissions to manage resources.
+
+** Q74: Why do control plane components have special privileges?
+Because they coordinate cluster behavior and health.
+
+** Q75: What is a kubeconfig?
+A kubeconfig is a file that stores cluster connection parameters and user credentials.
+
+** Q76: Why is kubeconfig security important?
+Because it can grant broad cluster access if stolen.
+
+** Q77: What is an authentication provider?
+An authentication provider is an external identity source such as OIDC, LDAP, or certificate-based auth.
+
+** Q78: Why use external identity providers?
+Because they centralize identity management and support stronger security policies.
+
+** Q79: What is OIDC?
+OIDC is an identity protocol widely used to authenticate users to Kubernetes via external identity providers.
+
+** Q80: Why is RBAC usually paired with identity providers?
+Because an authorization system needs trusted identities to make decisions.
+
+** Q81: What is a user certificate?
+A user certificate is a client certificate used for Kubernetes API authentication.
+
+** Q82: Why is TLS important for the Kubernetes API?
+The API is usually served via TLS so credentials are not exposed in transit.
+
+** Q83: What is a Kubernetes authn chain?
+The chain includes identity discovery, token or certificate validation, and RBAC authorization.
+
+** Q84: Why is just “having a token” not enough?
+Because the token is only the identity; authorization still evaluates allowed API actions.
+
+** Q85: What is a failure mode of bad RBAC?
+Users can accidentally create or delete resources or read secrets they should not access.
+
+** Q86: What is the impact of reading a Secret?
+A Secret may expose credentials, certificates, tokens, or private keys.
+
+** Q87: What is privilege escalation?
+Privilege escalation is when a compromised or lower-privileged identity gains wider access.
+
+** Q88: Why is RBAC a major defense against privilege escalation?
+Because it constrains which identities can grant or acquire more permissions.
+
+** Q89: What is a RoleBinding to a service account?
+It grants a workload running as a service account the permissions in that Role.
+
+** Q90: Why is service account scoping important?
+Because it limits a workload to only the API actions that its Role allows.
+
+** Q91: What is a pod using a service account token?
+The pod may use this token to authenticate to the API server for tasks like discovery or secret access.
+
+** Q92: Why should service account tokens be short-lived?
+Short-lived tokens reduce the risk of misuse if they are leaked.
+
+** Q93: What is token audience?
+The token audience identifies which service or API the token is intended for.
+
+** Q94: What is the role of kubelet credentials?
+The kubelet uses credentials to communicate with the API server and manage pods.
+
+** Q95: What is a cluster-admin with default role binding?
+This is a common high-risk pattern if misconfigured or overused.
+
+** Q96: Why are RoleBindings easier to reason about than cluster-level grants?
+Because they are namespaced and more limited.
+
+** Q97: What are common RBAC mistakes?
+- granting cluster-admin too broadly
+- over-permissive service accounts
+- using broad verbs like * on Secrets
+- binding roles to the wrong subjects
+- not reviewing permissions over time
+
+** Q98: What is the effect of wildcard verbs?
+A wildcard may grant create, update, delete, get, list, watch, and patch broadly.
+
+** Q99: Why are wildcards risky in RBAC?
+They can unintentionally grant more access than intended.
+
+** Q100: What is the key idea behind RBAC?
+It ties authorization to identity and resource access, not just API exposure.
+
+* Intermediate
+
+** Q101: What is the Kubernetes authorization API?
+The authorization API decides whether a request is allowed based on role and policy rules.
+
+** Q102: What is a policy decision?
+A policy decision is the result of an authorization query: allow or deny.
+
+** Q103: What is a deny decision?
+The cluster denies the request if no matching permission is found.
+
+** Q104: What is the order of evaluation in RBAC?
+A request is authenticated, then authorized by checking the relevant Role/ClusterRole bindings.
+
+** Q105: What is a request context?
+The request context includes the user, group, API method, resource, namespace, and subresource.
+
+** Q106: Why is the request context important?
+Because the same identity can have different access depending on the request.
+
+** Q107: What is a resource API path?
+It is the URL path to the API object, such as /api/v1/namespaces/default/pods.
+
+** Q108: What is a subresource path?
+It is a more specific part of an object, such as /pods/{name}/log or /pods/{name}/exec.
+
+** Q109: Why is subresource access important?
+Because some actions, like streaming logs or executing in a container, should be tightly controlled.
+
+** Q110: What is pod log access?
+Reading pod logs may expose application output and debugging information.
+
+** Q111: What is pod exec access?
+Pod exec lets a user execute commands inside a container, which is a high-risk action.
+
+** Q112: Why should pod exec be restricted?
+Because it can compromise the application or expose secrets inside the container.
+
+** Q113: What is a Role that allows pod logs?
+A Role can allow get on pods/log but not exec or delete.
+
+** Q114: Why are logs security-sensitive?
+Because logs may contain plaintext secrets, API keys, or sensitive request data.
+
+** Q115: What is a SecurityContext?
+A SecurityContext can impose restrictions on the pod or container, such as running as non-root.
+
+** Q116: How is SecurityContext related to RBAC?
+They complement each other: RBAC controls API access; SecurityContext controls runtime privileges within the pod.
+
+** Q117: What is a PodSecurityPolicy?
+A PodSecurityPolicy is an older admission control mechanism used to restrict pod behavior.
+
+** Q118: What is Pod Security Admission?
+Pod Security Admission is a newer policy framework that enforces restricted security levels.
+
+** Q119: Why is Pod Security Admission related to RBAC?
+Because both are security controls over workloads, but they govern different aspects.
+
+** Q120: What is a user or group binding?
+A RoleBinding or ClusterRoleBinding can target a user or group rather than a service account.
+
+** Q121: Why use groups in RBAC?
+Groups simplify management by granting the same permissions to a set of users.
+
+** Q122: What is an admin group?
+An admin group often receives ClusterRole-binding permissions to manage cluster operations.
+
+** Q123: Why is group-based permission easier to manage?
+Because adding or removing a user from a group changes permissions centrally.
+
+** Q124: What is a cluster-wide Role?
+A ClusterRole can apply across namespaces to support shared operational functions.
+
+** Q125: What is a namespaced Role?
+A Role is limited to one namespace and often easier to reason about.
+
+** Q126: Why prefer namespaced Roles when possible?
+Because they reduce scope and risk compared with cluster-wide grants.
+
+** Q127: What is a not-found error in RBAC?
+It often means the caller lacks permission or the object may not exist.
+
+** Q128: Why can RBAC errors look like resource errors?
+Because the API server enforces access control before returning data.
+
+** Q129: What is `kubectl auth can-i`?
+It is a tool to check whether a subject can perform a given action.
+
+** Q130: Why is `kubectl auth can-i` useful?
+It helps validate and test RBAC permissions without changing the configuration.
+
+** Q131: What is a policy review?
+A policy review examines if the current RBAC rules align with expected operations and least privilege.
+
+** Q132: What is a namespaced admin pattern?
+Teams may get admin access within their own namespace but not cluster-wide.
+
+** Q133: What is a cluster operator role?
+A cluster operator role may manage nodes, workloads, and cluster-level services.
+
+** Q134: What is a secrets manager role?
+A secrets manager role may read or rotate secrets but should be tightly scoped and audited.
+
+** Q135: Why does Kubernetes RBAC often interact with infrastructure tools?
+Because tools like ArgoCD, Flux, Helm, and service meshes need specific permissions.
+
+** Q136: What is GitOps RBAC?
+It is the set of permissions given to GitOps controllers to reconcile cluster resources.
+
+** Q137: Why is GitOps controller RBAC important?
+Because it can create, update, and delete cluster objects based on Git changes.
+
+** Q138: What is operator RBAC example?
+An operator may need get/list/watch on CustomResourceDefinitions, Deployments, and Secrets.
+
+** Q139: What is `aggregateClusterRoles`?
+It is a mechanism to compose roles using multiple policy fragments.
+
+** Q140: Why might cluster roles be aggregated?
+To build reusable permission sets for multiple operators or teams.
+
+** Q141: What is the challenge of extending RBAC?
+Authorization policy grows over time, making review and auditing essential.
+
+** Q142: What is a user access matrix?
+It is a matrix of identities and the resources/verbs they can access.
+
+** Q143: What is an RBAC drift?
+It is the accumulation of permission changes that no longer reflect current operational needs.
+
+** Q144: Why are periodic RBAC reviews important?
+Because teams change, workloads evolve, and unnecessary permissions accumulate over time.
+
+** Q145: What is a service account token expiry?
+Many token systems allow tokens to expire or rotate automatically.
+
+** Q146: Why is token rotation important?
+Because leaked tokens are less useful after expiry, and they can be rotated without full identity changes.
+
+** Q147: What is API server token audience?
+It can restrict which services accept a token as valid.
+
+** Q148: What is namespace isolation and RBAC?
+Namespace isolation is a broader design principle supported by RBAC and network controls.
+
+** Q149: Why use namespaced roles?
+Because they reduce cross-namespace blast radius and make ops safer.
+
+** Q150: What is a cluster-level role used for secrets?
+A ClusterRole that reads Secrets across namespaces is a high-risk privilege and should be audited carefully.
+
+** Q151: Why are read-only roles sometimes enough for support users?
+Because support users may need to inspect resources without changing them.
+
+** Q152: What is a read/write role?
+It allows both observation and modification, typically for operators or application teams.
+
+** Q153: What is a custom role?
+A custom role is a Role or ClusterRole created specifically for the organization’s operational needs.
+
+** Q154: Why avoid `*` in verbs and resources?
+Because it grants too broad a scope and can create operational or security hazards.
+
+** Q155: What is RBAC for custom resources?
+Custom resources can also be protected by Roles and ClusterRoles like built-in resources.
+
+** Q156: Why are custom resource permissions important?
+Because operators and controllers often manage CRDs with custom logic and resources.
+
+** Q157: What is the impact of wide resource permissions on controllers?
+A controller with broad permissions may accidentally mutate or delete more than intended.
+
+** Q158: What is a security review for role definitions?
+It verifies whether the role is necessary and whether the verbs and resources are as narrow as possible.
+
+** Q159: Why is refactoring RBAC not just a config task?
+Because it affects identity and trust across the cluster and the workloads that depend on it.
+
+** Q160: What is the relation between RBAC and service accounts?
+Service accounts are the common identity for workloads, and RBAC grants them permissions through RoleBindings.
+
+** Q161: Why do pods need service accounts?
+So they can authenticate to APIs such as the Kubernetes API and other internal systems.
+
+** Q162: Why is default service account access often reviewed?
+Because many workloads run under it by default unless explicitly assigned.
+
+** Q163: What is a separate service account per workload?
+It is a common best practice to avoid sharing service accounts across unrelated workloads.
+
+** Q164: Why is a separate service account valuable?
+It reduces blast radius and allows fine-grained permission assignments.
+
+** Q165: What is a RoleBinding for a given deployment?
+A specific deployment or app gets a service account and a RoleBinding with only the necessary permissions.
+
+** Q166: What is a cluster dashboard access model?
+It may use a specific group or service account to grant read-only access to observability tools.
+
+** Q167: What is an observability user role?
+A monitoring or dashboard user might need list/watch/read access but not create/delete powers.
+
+** Q168: Why should operators avoid broad `list` on Secrets?
+Because secret enumeration exposes names and may lead to further attacks.
+
+** Q169: What is the value of namespaced roles for platform teams?
+It allows platform operators to maintain cluster-level tools while keeping user workloads isolated.
+
+** Q170: Should RBAC be paired with PodSecurity and NetworkPolicy?
+Yes. RBAC restricts API access, while PodSecurity and NetworkPolicy restrict runtime and network behavior.
+
+** Q171: What is network reachability vs RBAC reachability?
+Network reachability is about packet flow; RBAC reachability is about API actions and policy decisions.
+
+** Q172: Why is the Kubernetes API an attack surface?
+Because it is a central control plane and a high-value target.
+
+** Q173: Why use mTLS or external auth for the API?
+Because the API server must authenticate callers securely and trust them appropriately.
+
+** Q174: What is API authn challenge?
+It is how the K8s environment verifies identity before RBAC evaluation.
+
+** Q175: What is a request subject from the Admission layer?
+It includes the user details and group metadata used for policy decisions.
+
+** Q176: What is a cluster operator security cut line?
+It is the separation between those who manage infrastructure and those who manage application workloads.
+
+** Q177: Why do platform engineers care deeply about RBAC?
+Because they are responsible for keeping the API control plane secure and stable.
+
+** Q178: What is a security posture principle:
+- explicit identity
+- narrow permissions
+- strong auth
+- regular review
+
+** Q179: What is an RBAC drift detection process?
+It detects permissions that remain but are no longer used or required.
+
+** Q180: Why is RBAC often part of compliance assessments?
+Because privileged access and secret access are key concerns in regulated or enterprise environments.
+
+* Advanced / Expert
+
+** Q181: What is ABAC?
+ABAC (Attribute-Based Access Control) is an alternative or supplement to RBAC that uses attributes to decide access.
+
+** Q182: What is Node authorization?
+Kubernetes node authorization gives nodes limited access to API resources relevant to their operation.
+
+** Q183: Why is node authorization separate from user RBAC?
+Because nodes are not general users but workload hosts with special operational permissions.
+
+** Q184: What is controller authorization?
+Controllers use special service accounts with limited but specific permissions to reconcile resources.
+
+** Q185: What is a bound service account token?
+A bound token is associated with a specific identity and can be short-lived or audience-scoped.
+
+** Q186: Why is token audience important?
+It reduces misuse if a token is used against the wrong API or service.
+
+** Q187: What is a token review API?
+It verifies tokens and extracts identity information, used in external auth flows.
+
+** Q188: What is impersonation and how is it used in security testing?
+It allows administrators to test access decisions as another subject without changing credentials.
+
+** Q189: Why is impersonation sensitive?
+Because it can be used to test or bypass assumptions if not tightly controlled.
+
+** Q190: What is an audit log?
+An audit log records API calls and access decisions, making RBAC actions traceable.
+
+** Q191: Why do audit logs matter for RBAC?
+Because they help investigate suspicious behavior and prove what happened.
+
+** Q192: What is a policy engine?
+A policy engine applies additional rules beyond RBAC, such as admission policies or custom policy checks.
+
+** Q193: What is policy-as-code?
+Policy-as-code defines access rules and security policies declaratively and version controllably.
+
+** Q194: Why pair RBAC with policy-as-code?
+Because policy-as-code can enforce organizational guardrails beyond simple RBAC roles.
+
+** Q195: What is a custom admission controller?
+A custom admission controller can inspect or reject API requests based on custom security policy.
+
+** Q196: Why are admission policies useful?
+They catch unsafe configurations before they reach the cluster.
+
+** Q197: What is the difference between RBAC and admission policy?
+RBAC decides whether access is allowed.
+Admission policy decides whether a resource configuration is acceptable.
+
+** Q198: What is a privileged workload?
+A privileged workload is one with broad access or trust and thus higher risk if compromised.
+
+** Q199: Why is RBAC critical in multi-tenant clusters?
+Because different teams or workloads should not see or modify each other’s resources.
+
+** Q200: What is the main lesson of Kubernetes RBAC?
+RBAC enforces identity, scope, and least privilege at the Kubernetes API boundary; the right design is explicit, namespaced, reviewed, and tied to real operational needs.
+
+-----
+
+#+INCLUDE: "../footer.org"
