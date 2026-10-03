@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kubernetes Probes</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Kubernetes Probes</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org02e0b44" class="outline-2">
+<h2 id="org02e0b44">Kubernetes Probes</h2>
+<div class="outline-text-2" id="text-org02e0b44">
+<hr>
+</div>
+</div>
+<div id="outline-container-org1a2b4c5" class="outline-2">
+<h2 id="org1a2b4c5">Beginner</h2>
+<div class="outline-text-2" id="text-org1a2b4c5">
+</div>
+<div id="outline-container-orga1b0884" class="outline-3">
+<h3 id="orga1b0884">Q1: What is a Kubernetes probe?</h3>
+<div class="outline-text-3" id="text-orga1b0884">
+<p>
+A Kubernetes probe is a health check that tells the kubelet whether a container is alive, healthy, and ready to receive traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc582328" class="outline-3">
+<h3 id="orgc582328">Q2: Why do we need probes?</h3>
+<div class="outline-text-3" id="text-orgc582328">
+<p>
+Probes help Kubernetes decide when to restart a container, when to route traffic to it, and whether it is healthy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc5244e7" class="outline-3">
+<h3 id="orgc5244e7">Q3: What is the kubelet?</h3>
+<div class="outline-text-3" id="text-orgc5244e7">
+<p>
+The kubelet is the node agent that runs inside each node and manages the containers in Pods.
+</p>
+</div>
+</div>
+<div id="outline-container-org8fcf0c4" class="outline-3">
+<h3 id="org8fcf0c4">Q4: What is a container lifecycle?</h3>
+<div class="outline-text-3" id="text-org8fcf0c4">
+<p>
+The container lifecycle includes startup, running, readiness, and termination.
+</p>
+</div>
+</div>
+<div id="outline-container-org75bdf83" class="outline-3">
+<h3 id="org75bdf83">Q5: What is a readiness probe?</h3>
+<div class="outline-text-3" id="text-org75bdf83">
+<p>
+A readiness probe checks whether a container is ready to accept traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c1cfa3" class="outline-3">
+<h3 id="org0c1cfa3">Q6: What is a liveness probe?</h3>
+<div class="outline-text-3" id="text-org0c1cfa3">
+<p>
+A liveness probe checks whether a container is alive and should be restarted if it is unhealthy.
+</p>
+</div>
+</div>
+<div id="outline-container-orge12d8dc" class="outline-3">
+<h3 id="orge12d8dc">Q7: What is a startup probe?</h3>
+<div class="outline-text-3" id="text-orge12d8dc">
+<p>
+A startup probe checks whether the application has completed startup before liveness and readiness checks begin.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc6d0815" class="outline-3">
+<h3 id="orgc6d0815">Q8: Why are readiness probes important?</h3>
+<div class="outline-text-3" id="text-orgc6d0815">
+<p>
+They prevent traffic from reaching containers that are not yet ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org8aa8aa0" class="outline-3">
+<h3 id="org8aa8aa0">Q9: Why are liveness probes important?</h3>
+<div class="outline-text-3" id="text-org8aa8aa0">
+<p>
+They allow Kubernetes to restart containers that have become stuck or unhealthy.
+</p>
+</div>
+</div>
+<div id="outline-container-org8e4d575" class="outline-3">
+<h3 id="org8e4d575">Q10: Why are startup probes important?</h3>
+<div class="outline-text-3" id="text-org8e4d575">
+<p>
+They help slow-starting applications avoid being restarted prematurely by liveness probes.
+</p>
+</div>
+</div>
+<div id="outline-container-org8741584" class="outline-3">
+<h3 id="org8741584">Q11: What is a probe action?</h3>
+<div class="outline-text-3" id="text-org8741584">
+<p>
+A probe action is how Kubernetes checks health, such as HTTP, TCP, or command execution.
+</p>
+</div>
+</div>
+<div id="outline-container-orga74a8a8" class="outline-3">
+<h3 id="orga74a8a8">Q12: What is an HTTP probe?</h3>
+<div class="outline-text-3" id="text-orga74a8a8">
+<p>
+An HTTP probe sends an HTTP request to a specific path and expects a status code response.
+</p>
+</div>
+</div>
+<div id="outline-container-org8aab407" class="outline-3">
+<h3 id="org8aab407">Q13: What is a TCP probe?</h3>
+<div class="outline-text-3" id="text-org8aab407">
+<p>
+A TCP probe checks whether a port is open and accepting connections.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf4a39d9" class="outline-3">
+<h3 id="orgf4a39d9">Q14: What is an exec probe?</h3>
+<div class="outline-text-3" id="text-orgf4a39d9">
+<p>
+An exec probe runs a command inside the container and succeeds or fails based on exit code.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e6bd9d" class="outline-3">
+<h3 id="org2e6bd9d">Q15: What is the probe failure threshold?</h3>
+<div class="outline-text-3" id="text-org2e6bd9d">
+<p>
+The threshold is the number of consecutive failures before a probe is considered failed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbd247e0" class="outline-3">
+<h3 id="orgbd247e0">Q16: What is probe period?</h3>
+<div class="outline-text-3" id="text-orgbd247e0">
+<p>
+The period is how often the kubelet runs the probe.
+</p>
+</div>
+</div>
+<div id="outline-container-org3126292" class="outline-3">
+<h3 id="org3126292">Q17: What is probe timeout?</h3>
+<div class="outline-text-3" id="text-org3126292">
+<p>
+The timeout is how long the probe waits before considering the check failed.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d8cd25" class="outline-3">
+<h3 id="org5d8cd25">Q18: What is initial delay?</h3>
+<div class="outline-text-3" id="text-org5d8cd25">
+<p>
+Initial delay is how long the kubelet waits before starting the first probe.
+</p>
+</div>
+</div>
+<div id="outline-container-org1896854" class="outline-3">
+<h3 id="org1896854">Q19: What is failure threshold?</h3>
+<div class="outline-text-3" id="text-org1896854">
+<p>
+Failure threshold is how many consecutive failures are required before a probe transitions to failure.
+</p>
+</div>
+</div>
+<div id="outline-container-org5fee70e" class="outline-3">
+<h3 id="org5fee70e">Q20: What is success threshold?</h3>
+<div class="outline-text-3" id="text-org5fee70e">
+<p>
+Success threshold is how many consecutive successful checks are required before a probe is considered successful again.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf85d9f7" class="outline-3">
+<h3 id="orgf85d9f7">Q21: Why does a readiness probe matter for Services?</h3>
+<div class="outline-text-3" id="text-orgf85d9f7">
+<p>
+Because Services only route traffic to ready Pods.
+</p>
+</div>
+</div>
+<div id="outline-container-org85142ba" class="outline-3">
+<h3 id="org85142ba">Q22: What is a Pod condition?</h3>
+<div class="outline-text-3" id="text-org85142ba">
+<p>
+A Pod condition reflects the current state of readiness, liveness, or startup.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd4256ca" class="outline-3">
+<h3 id="orgd4256ca">Q23: What is a ready condition?</h3>
+<div class="outline-text-3" id="text-orgd4256ca">
+<p>
+A Pod is marked ready when all readiness probes pass and the pod is ready to receive traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org7e5b9b5" class="outline-3">
+<h3 id="org7e5b9b5">Q24: What does it mean if a Pod is not ready?</h3>
+<div class="outline-text-3" id="text-org7e5b9b5">
+<p>
+It means Kubernetes will not send traffic to it via a Service unless special routing rules apply.
+</p>
+</div>
+</div>
+<div id="outline-container-org729397e" class="outline-3">
+<h3 id="org729397e">Q25: What happens when a liveness probe fails?</h3>
+<div class="outline-text-3" id="text-org729397e">
+<p>
+The container is restarted by the kubelet unless the container is not restartable.
+</p>
+</div>
+</div>
+<div id="outline-container-orgff4db97" class="outline-3">
+<h3 id="orgff4db97">Q26: Why should liveness probes be careful?</h3>
+<div class="outline-text-3" id="text-orgff4db97">
+<p>
+A liveness probe that is too aggressive can restart healthy containers unnecessarily.
+</p>
+</div>
+</div>
+<div id="outline-container-org725c771" class="outline-3">
+<h3 id="org725c771">Q27: What is a probe target path?</h3>
+<div class="outline-text-3" id="text-org725c771">
+<p>
+In an HTTP probe, the target path is the URL path to request, such as /healthz or /ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org27bd8bf" class="outline-3">
+<h3 id="org27bd8bf">Q28: What is a probe port?</h3>
+<div class="outline-text-3" id="text-org27bd8bf">
+<p>
+The probe port is the port the kubelet uses to connect for HTTP or TCP probes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb40e415" class="outline-3">
+<h3 id="orgb40e415">Q29: Why use /healthz or /ready?</h3>
+<div class="outline-text-3" id="text-orgb40e415">
+<p>
+These are conventional endpoints often implemented by apps to report internal health.
+</p>
+</div>
+</div>
+<div id="outline-container-org63d86cf" class="outline-3">
+<h3 id="org63d86cf">Q30: What is app health?</h3>
+<div class="outline-text-3" id="text-org63d86cf">
+<p>
+App health is whether the application is functioning correctly and able to serve traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org41fa7ee" class="outline-3">
+<h3 id="org41fa7ee">Q31: What is a process health check?</h3>
+<div class="outline-text-3" id="text-org41fa7ee">
+<p>
+A process health check checks whether the main process is alive and responding.
+</p>
+</div>
+</div>
+<div id="outline-container-org20d21a8" class="outline-3">
+<h3 id="org20d21a8">Q32: What is a dependency check?</h3>
+<div class="outline-text-3" id="text-org20d21a8">
+<p>
+A dependency check verifies that an app can reach required databases, caches, or other services.
+</p>
+</div>
+</div>
+<div id="outline-container-org9763211" class="outline-3">
+<h3 id="org9763211">Q33: Why should readiness include dependencies?</h3>
+<div class="outline-text-3" id="text-org9763211">
+<p>
+If the app cannot reach a database, it may not be ready even though the process is running.
+</p>
+</div>
+</div>
+<div id="outline-container-org65afcef" class="outline-3">
+<h3 id="org65afcef">Q34: What is a startup check for slow boot?</h3>
+<div class="outline-text-3" id="text-org65afcef">
+<p>
+It ensures the app has enough time to initialize before liveness begins.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f9e6fb" class="outline-3">
+<h3 id="org3f9e6fb">Q35: Why do some workloads need startup probes?</h3>
+<div class="outline-text-3" id="text-org3f9e6fb">
+<p>
+Because their initialization can take minutes, and liveness would otherwise restart them.
+</p>
+</div>
+</div>
+<div id="outline-container-org959293e" class="outline-3">
+<h3 id="org959293e">Q36: What is a probe configuration example?</h3>
+<div class="outline-text-3" id="text-org959293e">
+<p>
+Example:
+</p>
+<ul class="org-ul">
+<li>readinessProbe: HTTP GET on /ready</li>
+<li>livenessProbe: TCP port 8080</li>
+<li>startupProbe: HTTP GET on /startup</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org26d52c7" class="outline-3">
+<h3 id="org26d52c7">Q37: What is a rapid restart loop?</h3>
+<div class="outline-text-3" id="text-org26d52c7">
+<p>
+A rapid restart loop occurs when a container keeps failing health checks and being restarted.
+</p>
+</div>
+</div>
+<div id="outline-container-org446f186" class="outline-3">
+<h3 id="org446f186">Q38: Why is a rapid restart loop dangerous?</h3>
+<div class="outline-text-3" id="text-org446f186">
+<p>
+It can create instability and hide the underlying problem.
+</p>
+</div>
+</div>
+<div id="outline-container-org363a4e1" class="outline-3">
+<h3 id="org363a4e1">Q39: What is a production probe?</h3>
+<div class="outline-text-3" id="text-org363a4e1">
+<p>
+A production probe is a health check designed for live traffic and operational reliability.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b21f7f" class="outline-3">
+<h3 id="org4b21f7f">Q40: Why can probes be wrong?</h3>
+<div class="outline-text-3" id="text-org4b21f7f">
+<p>
+Because a probe may test the wrong thing or use logic that doesn’t reflect actual readiness.
+</p>
+</div>
+</div>
+<div id="outline-container-org67d50f5" class="outline-3">
+<h3 id="org67d50f5">Q41: What is a false positive probe?</h3>
+<div class="outline-text-3" id="text-org67d50f5">
+<p>
+A false positive means the probe says healthy when the application is actually broken.
+</p>
+</div>
+</div>
+<div id="outline-container-org864f897" class="outline-3">
+<h3 id="org864f897">Q42: What is a false negative probe?</h3>
+<div class="outline-text-3" id="text-org864f897">
+<p>
+A false negative means the probe says unhealthy when the application is actually working.
+</p>
+</div>
+</div>
+<div id="outline-container-org1573dfd" class="outline-3">
+<h3 id="org1573dfd">Q43: Why must probes be accurate?</h3>
+<div class="outline-text-3" id="text-org1573dfd">
+<p>
+Because they affect traffic routing and restarts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc440abf" class="outline-3">
+<h3 id="orgc440abf">Q44: What is a health endpoint?</h3>
+<div class="outline-text-3" id="text-orgc440abf">
+<p>
+A health endpoint is an HTTP URL that returns status to indicate app health.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b8f2b2" class="outline-3">
+<h3 id="org9b8f2b2">Q45: What is a readiness endpoint?</h3>
+<div class="outline-text-3" id="text-org9b8f2b2">
+<p>
+A readiness endpoint indicates the application is ready to accept real traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf2e7b63" class="outline-3">
+<h3 id="orgf2e7b63">Q46: What is a liveness endpoint?</h3>
+<div class="outline-text-3" id="text-orgf2e7b63">
+<p>
+A liveness endpoint indicates the process is alive, even if it is not ready for traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc35a7e" class="outline-3">
+<h3 id="orgbc35a7e">Q47: Why separate readiness and liveness?</h3>
+<div class="outline-text-3" id="text-orgbc35a7e">
+<p>
+Because being alive is not the same as being ready to serve requests.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e2f03c" class="outline-3">
+<h3 id="org1e2f03c">Q48: What is a slow-starting app?</h3>
+<div class="outline-text-3" id="text-org1e2f03c">
+<p>
+An app whose startup takes longer than a few seconds and needs delayed liveness checks.
+</p>
+</div>
+</div>
+<div id="outline-container-orge44251e" class="outline-3">
+<h3 id="orge44251e">Q49: What is a long-running job?</h3>
+<div class="outline-text-3" id="text-orge44251e">
+<p>
+A long-running job may not be a web service and may not need normal readiness semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org834b61c" class="outline-3">
+<h3 id="org834b61c">Q50: What is an init container?</h3>
+<div class="outline-text-3" id="text-org834b61c">
+<p>
+An init container runs before app containers start and can perform setup or dependency checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a61c6c" class="outline-3">
+<h3 id="org8a61c6c">Q51: Why do init containers sometimes help with startup probes?</h3>
+<div class="outline-text-3" id="text-org8a61c6c">
+<p>
+They can do one-time setup before the main app starts.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b2e91e" class="outline-3">
+<h3 id="org4b2e91e">Q52: What is readiness gating?</h3>
+<div class="outline-text-3" id="text-org4b2e91e">
+<p>
+Readiness gating prevents traffic from reaching a pod until it is ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org216e6eb" class="outline-3">
+<h3 id="org216e6eb">Q53: What is a Pod being ready?</h3>
+<div class="outline-text-3" id="text-org216e6eb">
+<p>
+It means the app has passed readiness checks and is included in Service endpoints.
+</p>
+</div>
+</div>
+<div id="outline-container-org19e8198" class="outline-3">
+<h3 id="org19e8198">Q54: What is a readiness check for dependencies?</h3>
+<div class="outline-text-3" id="text-org19e8198">
+<p>
+It may test DB connectivity, cache connectivity, or external service availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org90ab546" class="outline-3">
+<h3 id="org90ab546">Q55: What is an HTTP status code threshold?</h3>
+<div class="outline-text-3" id="text-org90ab546">
+<p>
+A probe may expect 200-399 as success, and other codes as failure.
+</p>
+</div>
+</div>
+<div id="outline-container-org2460f8e" class="outline-3">
+<h3 id="org2460f8e">Q56: What is a TCP port readiness check?</h3>
+<div class="outline-text-3" id="text-org2460f8e">
+<p>
+It only checks socket availability, not application correctness.
+</p>
+</div>
+</div>
+<div id="outline-container-org35b1f3e" class="outline-3">
+<h3 id="org35b1f3e">Q57: Why is TCP-only readiness sometimes insufficient?</h3>
+<div class="outline-text-3" id="text-org35b1f3e">
+<p>
+Because the app could accept connections but still fail deeper logic or user requests.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc7e14fd" class="outline-3">
+<h3 id="orgc7e14fd">Q58: What is command-based readiness?</h3>
+<div class="outline-text-3" id="text-orgc7e14fd">
+<p>
+It runs a shell command inside the container and expects a zero exit code.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c3f039" class="outline-3">
+<h3 id="org0c3f039">Q59: Why are exec probes sometimes problematic?</h3>
+<div class="outline-text-3" id="text-org0c3f039">
+<p>
+They use shell execution inside the container, which adds complexity and performance overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-orga826057" class="outline-3">
+<h3 id="orga826057">Q60: What is the kubelet probe loop?</h3>
+<div class="outline-text-3" id="text-orga826057">
+<p>
+It is the periodic sequence in which the kubelet runs configured probes.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f58aad" class="outline-3">
+<h3 id="org3f58aad">Q61: What is a probe serialization?</h3>
+<div class="outline-text-3" id="text-org3f58aad">
+<p>
+It is the sequential execution of health checks on the node.
+</p>
+</div>
+</div>
+<div id="outline-container-orgca932b5" class="outline-3">
+<h3 id="orgca932b5">Q62: What is a probe lifecycle event?</h3>
+<div class="outline-text-3" id="text-orgca932b5">
+<p>
+It is the moment a container transitions through startup, ready, and alive states according to checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org1beb2e3" class="outline-3">
+<h3 id="org1beb2e3">Q63: What is a readiness probe vs liveness probe difference?</h3>
+<div class="outline-text-3" id="text-org1beb2e3">
+<p>
+Readiness controls if traffic is routed to the pod.
+Liveness controls if the pod should be restarted.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaa83c26" class="outline-3">
+<h3 id="orgaa83c26">Q64: What does CPU impact from probes look like?</h3>
+<div class="outline-text-3" id="text-orgaa83c26">
+<p>
+Probes add small overhead but generally are lightweight compared with the application itself.
+</p>
+</div>
+</div>
+<div id="outline-container-org295561e" class="outline-3">
+<h3 id="org295561e">Q65: Why should probe handlers be efficient?</h3>
+<div class="outline-text-3" id="text-org295561e">
+<p>
+Because a misconfigured or heavy probe can affect node performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ad459b" class="outline-3">
+<h3 id="org1ad459b">Q66: What is a health endpoint that returns 503?</h3>
+<div class="outline-text-3" id="text-org1ad459b">
+<p>
+A 503 often indicates the app is not ready or not healthy.
+</p>
+</div>
+</div>
+<div id="outline-container-org59af33d" class="outline-3">
+<h3 id="org59af33d">Q67: Why is 200 OK common for readiness?</h3>
+<div class="outline-text-3" id="text-org59af33d">
+<p>
+It clearly signals the app is ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org10cf18d" class="outline-3">
+<h3 id="org10cf18d">Q68: Why use 204 No Content for health endpoints?</h3>
+<div class="outline-text-3" id="text-org10cf18d">
+<p>
+It may be a lightweight health response with no payload.
+</p>
+</div>
+</div>
+<div id="outline-container-org7037d71" class="outline-3">
+<h3 id="org7037d71">Q69: What is failure tolerance?</h3>
+<div class="outline-text-3" id="text-org7037d71">
+<p>
+Failure tolerance describes how many probe failures are allowed before the app is considered dead or unready.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce860fb" class="outline-3">
+<h3 id="orgce860fb">Q70: What is an app that never becomes ready?</h3>
+<div class="outline-text-3" id="text-orgce860fb">
+<p>
+This can happen if the app waits on a dependency or a bad startup path.
+</p>
+</div>
+</div>
+<div id="outline-container-org68920ff" class="outline-3">
+<h3 id="org68920ff">Q71: Why is restart loop a symptom of bad probes?</h3>
+<div class="outline-text-3" id="text-org68920ff">
+<p>
+Because the app may be failing the liveness probe repeatedly even though it is not truly stuck.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb3f4d46" class="outline-3">
+<h3 id="orgb3f4d46">Q72: What is a startupProbe + readinessProbe combination?</h3>
+<div class="outline-text-3" id="text-orgb3f4d46">
+<p>
+This is often used when the app takes a while to start, but should be handled gracefully.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbd956c2" class="outline-3">
+<h3 id="orgbd956c2">Q73: What is a Pod not ready event?</h3>
+<div class="outline-text-3" id="text-orgbd956c2">
+<p>
+It indicates the pod is not included in Service endpoints because readiness checks are failing.
+</p>
+</div>
+</div>
+<div id="outline-container-org8e85e79" class="outline-3">
+<h3 id="org8e85e79">Q74: What is pinging an app with a health endpoint?</h3>
+<div class="outline-text-3" id="text-org8e85e79">
+<p>
+It means the probe is checking the app is accepting requests.
+</p>
+</div>
+</div>
+<div id="outline-container-org299b62d" class="outline-3">
+<h3 id="org299b62d">Q75: What is a `httpGet` probe?</h3>
+<div class="outline-text-3" id="text-org299b62d">
+<p>
+It is an HTTP probe in Kubernetes manifest syntax.
+</p>
+</div>
+</div>
+<div id="outline-container-org7dd6ae2" class="outline-3">
+<h3 id="org7dd6ae2">Q76: What is a `tcpSocket` probe?</h3>
+<div class="outline-text-3" id="text-org7dd6ae2">
+<p>
+It is a TCP socket probe in Kubernetes manifest syntax.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9d10a5" class="outline-3">
+<h3 id="orgb9d10a5">Q77: What is a `exec` probe?</h3>
+<div class="outline-text-3" id="text-orgb9d10a5">
+<p>
+It is a command-based probe in Kubernetes manifest syntax.
+</p>
+</div>
+</div>
+<div id="outline-container-org6b1954c" class="outline-3">
+<h3 id="org6b1954c">Q78: What is a probe port field?</h3>
+<div class="outline-text-3" id="text-org6b1954c">
+<p>
+It denotes which container port is used for the probe.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf440a65" class="outline-3">
+<h3 id="orgf440a65">Q79: What is a `host` field in a probe?</h3>
+<div class="outline-text-3" id="text-orgf440a65">
+<p>
+Host is not commonly used for probes, but some special wiring may target host-level addresses in advanced scenarios.
+</p>
+</div>
+</div>
+<div id="outline-container-org79d8ff0" class="outline-3">
+<h3 id="org79d8ff0">Q80: What is a scheme field in HTTP probe?</h3>
+<div class="outline-text-3" id="text-org79d8ff0">
+<p>
+The scheme selects HTTP or HTTPS for the probe request.
+</p>
+</div>
+</div>
+<div id="outline-container-org916a914" class="outline-3">
+<h3 id="org916a914">Q81: What is `initialDelaySeconds`?</h3>
+<div class="outline-text-3" id="text-org916a914">
+<p>
+How long the kubelet waits before performing the first probe check.
+</p>
+</div>
+</div>
+<div id="outline-container-org1dc8aa5" class="outline-3">
+<h3 id="org1dc8aa5">Q82: What is `periodSeconds`?</h3>
+<div class="outline-text-3" id="text-org1dc8aa5">
+<p>
+How often the probe runs.
+</p>
+</div>
+</div>
+<div id="outline-container-org51249da" class="outline-3">
+<h3 id="org51249da">Q83: What is `timeoutSeconds`?</h3>
+<div class="outline-text-3" id="text-org51249da">
+<p>
+How long the probe waits before considering the check failed.
+</p>
+</div>
+</div>
+<div id="outline-container-org01337d1" class="outline-3">
+<h3 id="org01337d1">Q84: What is `failureThreshold`?</h3>
+<div class="outline-text-3" id="text-org01337d1">
+<p>
+The number of consecutive failures before the kubelet marks it unhealthy or unready.
+</p>
+</div>
+</div>
+<div id="outline-container-org746be0e" class="outline-3">
+<h3 id="org746be0e">Q85: What is `successThreshold`?</h3>
+<div class="outline-text-3" id="text-org746be0e">
+<p>
+The number of successes required before a failed probe becomes successful.
+</p>
+</div>
+</div>
+<div id="outline-container-org00fdd5e" class="outline-3">
+<h3 id="org00fdd5e">Q86: Why is kubelet behavior important to understand?</h3>
+<div class="outline-text-3" id="text-org00fdd5e">
+<p>
+Because the kind of probe and thresholds determine traffic behavior and restarts.
+</p>
+</div>
+</div>
+<div id="outline-container-orge8aedf8" class="outline-3">
+<h3 id="orge8aedf8">Q87: What is a probe that checks only process liveness?</h3>
+<div class="outline-text-3" id="text-orge8aedf8">
+<p>
+It can work but often misses application-level problems like database unavailability.
+</p>
+</div>
+</div>
+<div id="outline-container-org58fdc6e" class="outline-3">
+<h3 id="org58fdc6e">Q88: Why should probes be aligned with app semantics?</h3>
+<div class="outline-text-3" id="text-org58fdc6e">
+<p>
+Because the app may be alive but still unable to serve user traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ee4389" class="outline-3">
+<h3 id="org7ee4389">Q89: What is a container that exits fast?</h3>
+<div class="outline-text-3" id="text-org7ee4389">
+<p>
+A container that exits quickly may not be caught by readiness or liveness if the process dies.
+</p>
+</div>
+</div>
+<div id="outline-container-org5698347" class="outline-3">
+<h3 id="org5698347">Q90: What is a crash loop?</h3>
+<div class="outline-text-3" id="text-org5698347">
+<p>
+A crash loop is when a container repeatedly exits and restarts, often due to a failure.
+</p>
+</div>
+</div>
+<div id="outline-container-org9c88099" class="outline-3">
+<h3 id="org9c88099">Q91: What is a restart policy?</h3>
+<div class="outline-text-3" id="text-org9c88099">
+<p>
+Restart policy determines whether Kubernetes restarts the container after failure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc38a61f" class="outline-3">
+<h3 id="orgc38a61f">Q92: Why do readiness and liveness rely on restart policy?</h3>
+<div class="outline-text-3" id="text-orgc38a61f">
+<p>
+Because restart policy defines what happens when the container fails.
+</p>
+</div>
+</div>
+<div id="outline-container-org4a8c6ad" class="outline-3">
+<h3 id="org4a8c6ad">Q93: What is a pod restart due to liveness?</h3>
+<div class="outline-text-3" id="text-org4a8c6ad">
+<p>
+When the app fails liveness, kubelet restarts the container.
+</p>
+</div>
+</div>
+<div id="outline-container-org74c726e" class="outline-3">
+<h3 id="org74c726e">Q94: What is a Pod phase?</h3>
+<div class="outline-text-3" id="text-org74c726e">
+<p>
+A Pod phase includes Pending, Running, Succeeded, Failed, and Unknown.
+</p>
+</div>
+</div>
+<div id="outline-container-org97538ff" class="outline-3">
+<h3 id="org97538ff">Q95: Why is readiness distinct from pod phase?</h3>
+<div class="outline-text-3" id="text-org97538ff">
+<p>
+A Pod can be Running but not Ready.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce52b50" class="outline-3">
+<h3 id="orgce52b50">Q96: What is the difference between Running and Ready?</h3>
+<div class="outline-text-3" id="text-orgce52b50">
+<p>
+Running means the process exists.
+Ready means traffic can be routed to it.
+</p>
+</div>
+</div>
+<div id="outline-container-org4b23c15" class="outline-3">
+<h3 id="org4b23c15">Q97: What is traffic routing to ready Pods?</h3>
+<div class="outline-text-3" id="text-org4b23c15">
+<p>
+This is the core function of readiness in Kubernetes Services.
+</p>
+</div>
+</div>
+<div id="outline-container-orgef859eb" class="outline-3">
+<h3 id="orgef859eb">Q98: What is ingress and readiness?</h3>
+<div class="outline-text-3" id="text-orgef859eb">
+<p>
+Ingress traffic is routed through Services to ready Pods.
+</p>
+</div>
+</div>
+<div id="outline-container-org5783a9e" class="outline-3">
+<h3 id="org5783a9e">Q99: Why do probes matter for external traffic?</h3>
+<div class="outline-text-3" id="text-org5783a9e">
+<p>
+Because external systems often rely on the Service and Ingress to route to the correct Pods.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeb299d0" class="outline-3">
+<h3 id="orgeb299d0">Q100: What is the primary goal of probes?</h3>
+<div class="outline-text-3" id="text-orgeb299d0">
+<p>
+To ensure the app is alive, ready, and actually able to serve traffic.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcf694a6" class="outline-2">
+<h2 id="orgcf694a6">Intermediate</h2>
+<div class="outline-text-2" id="text-orgcf694a6">
+</div>
+<div id="outline-container-orgd7ee502" class="outline-3">
+<h3 id="orgd7ee502">Q101: What is the difference between readiness and startup probe semantics?</h3>
+<div class="outline-text-3" id="text-orgd7ee502">
+<p>
+Readiness is about traffic eligibility.
+Startup is about not treating a still-starting app as failed too early.
+</p>
+</div>
+</div>
+<div id="outline-container-org99d6f7d" class="outline-3">
+<h3 id="org99d6f7d">Q102: Why use startupProbe for applications with long startup?</h3>
+<div class="outline-text-3" id="text-org99d6f7d">
+<p>
+Because liveness could restart the process before it finishes initialization.
+</p>
+</div>
+</div>
+<div id="outline-container-org47a376f" class="outline-3">
+<h3 id="org47a376f">Q103: What is a start-up dependency check?</h3>
+<div class="outline-text-3" id="text-org47a376f">
+<p>
+It may check that required databases or caches are reachable before the app becomes ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org777b762" class="outline-3">
+<h3 id="org777b762">Q104: What is a readiness check for database connection?</h3>
+<div class="outline-text-3" id="text-org777b762">
+<p>
+It checks that the app can connect to the DB before accepting requests.
+</p>
+</div>
+</div>
+<div id="outline-container-orga591e6a" class="outline-3">
+<h3 id="orga591e6a">Q105: What is a readiness check for external dependencies?</h3>
+<div class="outline-text-3" id="text-orga591e6a">
+<p>
+It verifies the app can reach required external services or APIs.
+</p>
+</div>
+</div>
+<div id="outline-container-org94ad682" class="outline-3">
+<h3 id="org94ad682">Q106: What is an HTTP readiness endpoint that checks DB connection?</h3>
+<div class="outline-text-3" id="text-org94ad682">
+<p>
+It might return 503 if DB connectivity is broken even though the app process is running.
+</p>
+</div>
+</div>
+<div id="outline-container-org8338e11" class="outline-3">
+<h3 id="org8338e11">Q107: Why can liveness be based on process health alone?</h3>
+<div class="outline-text-3" id="text-org8338e11">
+<p>
+It is often enough for CPU-bound processes that either run or not.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdbd5928" class="outline-3">
+<h3 id="orgdbd5928">Q108: Why can liveness be too aggressive for network-heavy apps?</h3>
+<div class="outline-text-3" id="text-orgdbd5928">
+<p>
+Network or dependency outages may not be the app’s fault but can make it appear unhealthy.
+</p>
+</div>
+</div>
+<div id="outline-container-org87f5bec" class="outline-3">
+<h3 id="org87f5bec">Q109: What is a probe for slow app initialization?</h3>
+<div class="outline-text-3" id="text-org87f5bec">
+<p>
+A startupProbe can give the app enough time before liveness becomes active.
+</p>
+</div>
+</div>
+<div id="outline-container-org13164f6" class="outline-3">
+<h3 id="org13164f6">Q110: Why do some apps use /healthz and /ready endpoints differently?</h3>
+<div class="outline-text-3" id="text-org13164f6">
+<p>
+Because /healthz often means “process alive”; /ready means “can serve traffic”.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc16e42" class="outline-3">
+<h3 id="orgfc16e42">Q111: What is a custom health status body?</h3>
+<div class="outline-text-3" id="text-orgfc16e42">
+<p>
+Apps can return JSON or plain text describing health to help debugging.
+</p>
+</div>
+</div>
+<div id="outline-container-org069b260" class="outline-3">
+<h3 id="org069b260">Q112: Why are probe endpoints often small and cheap?</h3>
+<div class="outline-text-3" id="text-org069b260">
+<p>
+Because they are called frequently by kubelet and should not be expensive.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd216c3f" class="outline-3">
+<h3 id="orgd216c3f">Q113: What is a health endpoint with dependencies?</h3>
+<div class="outline-text-3" id="text-orgd216c3f">
+<p>
+It can combine DB ping, cache ping, and response readiness checks.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e18a41" class="outline-3">
+<h3 id="org1e18a41">Q114: Why avoid heavy dependency checks in readiness?</h3>
+<div class="outline-text-3" id="text-org1e18a41">
+<p>
+Because they may become expensive or cause cascading failures if dependencies are slow.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb2e6348" class="outline-3">
+<h3 id="orgb2e6348">Q115: What is a shallow readiness check?</h3>
+<div class="outline-text-3" id="text-orgb2e6348">
+<p>
+A shallow readiness check confirms the process is ready to accept traffic without doing deep dependencies.
+</p>
+</div>
+</div>
+<div id="outline-container-orga08af66" class="outline-3">
+<h3 id="orga08af66">Q116: What is a deep readiness check?</h3>
+<div class="outline-text-3" id="text-orga08af66">
+<p>
+A deep readiness check validates the app can talk to critical dependencies and is fully functional.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaf7dcd1" class="outline-3">
+<h3 id="orgaf7dcd1">Q117: Why must readiness logic match business expectations?</h3>
+<div class="outline-text-3" id="text-orgaf7dcd1">
+<p>
+Because a pod should only receive traffic when the app is truly usable.
+</p>
+</div>
+</div>
+<div id="outline-container-org740c7a5" class="outline-3">
+<h3 id="org740c7a5">Q118: What is a liveness case where the app is deadlocked?</h3>
+<div class="outline-text-3" id="text-org740c7a5">
+<p>
+A liveness probe can detect this by failing repeatedly and restarting the container.
+</p>
+</div>
+</div>
+<div id="outline-container-org8e02509" class="outline-3">
+<h3 id="org8e02509">Q119: Why does deadlock sometimes require liveness?</h3>
+<div class="outline-text-3" id="text-org8e02509">
+<p>
+Because the process may appear alive but is hung.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc537e6e" class="outline-3">
+<h3 id="orgc537e6e">Q120: What is a probe that runs against a local port?</h3>
+<div class="outline-text-3" id="text-orgc537e6e">
+<p>
+This is a common pattern for apps exposing management or health endpoints locally.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fda7a0" class="outline-3">
+<h3 id="org1fda7a0">Q121: What is the kubelet probe and service behavior interplay?</h3>
+<div class="outline-text-3" id="text-org1fda7a0">
+<p>
+The kubelet updates pod readiness, which then updates Service endpoints.
+</p>
+</div>
+</div>
+<div id="outline-container-org906b998" class="outline-3">
+<h3 id="org906b998">Q122: What does readiness influence in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org906b998">
+<p>
+It influences inclusion in Service endpoints and external routing.
+</p>
+</div>
+</div>
+<div id="outline-container-org2161746" class="outline-3">
+<h3 id="org2161746">Q123: What is a PodDefault readiness state?</h3>
+<div class="outline-text-3" id="text-org2161746">
+<p>
+The pod is not ready until readiness checks pass.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb3a1df9" class="outline-3">
+<h3 id="orgb3a1df9">Q124: What is a readiness false positive risk?</h3>
+<div class="outline-text-3" id="text-orgb3a1df9">
+<p>
+The app might look ready but not actually be able to serve all traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e431aa" class="outline-3">
+<h3 id="org9e431aa">Q125: What is a readiness false negative risk?</h3>
+<div class="outline-text-3" id="text-org9e431aa">
+<p>
+The app might be healthy but kept out of Service traffic due to a probe bug.
+</p>
+</div>
+</div>
+<div id="outline-container-org6197bcc" class="outline-3">
+<h3 id="org6197bcc">Q126: What is an HTTP probe expecting 2xx?</h3>
+<div class="outline-text-3" id="text-org6197bcc">
+<p>
+Many health checks treat 2xx as success.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdeae803" class="outline-3">
+<h3 id="orgdeae803">Q127: What is an HTTP probe expecting a non-2xx response?</h3>
+<div class="outline-text-3" id="text-orgdeae803">
+<p>
+Some apps intentionally use 503 or 500 to signal not ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org15e82c4" class="outline-3">
+<h3 id="org15e82c4">Q128: Why is it useful to return 503 during readiness?</h3>
+<div class="outline-text-3" id="text-org15e82c4">
+<p>
+Because it tells the kubelet and the load balancer that the app is not ready for traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgde64923" class="outline-3">
+<h3 id="orgde64923">Q129: What is a TCP probe?</h3>
+<div class="outline-text-3" id="text-orgde64923">
+<p>
+It checks if the port accepts a TCP connection.
+</p>
+</div>
+</div>
+<div id="outline-container-org88f285f" class="outline-3">
+<h3 id="org88f285f">Q130: Why is TCP probe less semantic than HTTP?</h3>
+<div class="outline-text-3" id="text-org88f285f">
+<p>
+Because it says “port is open,” not “app is healthy”.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcae3887" class="outline-3">
+<h3 id="orgcae3887">Q131: What is an exec probe with `curl &#x2013;fail`?</h3>
+<div class="outline-text-3" id="text-orgcae3887">
+<p>
+It executes `curl` inside the container and fails the probe if the HTTP call is not successful.
+</p>
+</div>
+</div>
+<div id="outline-container-org3d832b2" class="outline-3">
+<h3 id="org3d832b2">Q132: Why do many apps prefer HTTP probes?</h3>
+<div class="outline-text-3" id="text-org3d832b2">
+<p>
+Because HTTP semantics map well to app health and readiness.
+</p>
+</div>
+</div>
+<div id="outline-container-org301f80f" class="outline-3">
+<h3 id="org301f80f">Q133: Why avoid exec probes when possible?</h3>
+<div class="outline-text-3" id="text-org301f80f">
+<p>
+Because they are heavier and more complex to manage within containers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd39a54a" class="outline-3">
+<h3 id="orgd39a54a">Q134: What is a liveness check with `cat /tmp/healthy`?</h3>
+<div class="outline-text-3" id="text-orgd39a54a">
+<p>
+It is an exec-based check for a file signifying health.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e8fa99" class="outline-3">
+<h3 id="org2e8fa99">Q135: Why use file-based health checks?</h3>
+<div class="outline-text-3" id="text-org2e8fa99">
+<p>
+For some applications, a health file or lock file indicates whether to continue serving.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ae9dc0" class="outline-3">
+<h3 id="org8ae9dc0">Q136: Why are probes affected by initialization time?</h3>
+<div class="outline-text-3" id="text-org8ae9dc0">
+<p>
+Because the container may need time to warm caches or connect to external services.
+</p>
+</div>
+</div>
+<div id="outline-container-org4166b01" class="outline-3">
+<h3 id="org4166b01">Q137: Why are delays configurable?</h3>
+<div class="outline-text-3" id="text-org4166b01">
+<p>
+Because startup time varies across deployments and frameworks.
+</p>
+</div>
+</div>
+<div id="outline-container-org6bbbbc9" class="outline-3">
+<h3 id="org6bbbbc9">Q138: What is a startup probe example in manifests?</h3>
+<div class="outline-text-3" id="text-org6bbbbc9">
+<p>
+Example pattern:
+</p>
+<ul class="org-ul">
+<li>startupProbe: httpGet /startup</li>
+<li>livenessProbe: httpGet /healthz</li>
+<li>readinessProbe: httpGet /ready</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org71bb65a" class="outline-3">
+<h3 id="org71bb65a">Q139: Why is ordering subtle in manifests?</h3>
+<div class="outline-text-3" id="text-org71bb65a">
+<p>
+Startup must start first, then readiness/liveness become active after startup completes.
+</p>
+</div>
+</div>
+<div id="outline-container-org8939f22" class="outline-3">
+<h3 id="org8939f22">Q140: Why is the lack of a startupProbe a common cause of restart loops?</h3>
+<div class="outline-text-3" id="text-org8939f22">
+<p>
+Because a slow app may fail the liveness probe before it has fully initialized.
+</p>
+</div>
+</div>
+<div id="outline-container-org1711eb8" class="outline-3">
+<h3 id="org1711eb8">Q141: What is a default probe failure behavior?</h3>
+<div class="outline-text-3" id="text-org1711eb8">
+<p>
+Once a failure threshold is reached, kubelet marks the container unhealthy or unready.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb165b7a" class="outline-3">
+<h3 id="orgb165b7a">Q142: What is a readiness probe on Pod termination?</h3>
+<div class="outline-text-3" id="text-orgb165b7a">
+<p>
+A readiness probe may show failures during teardown to stop new traffic before shutdown.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd36952a" class="outline-3">
+<h3 id="orgd36952a">Q143: Why do operators care about readiness state?</h3>
+<div class="outline-text-3" id="text-orgd36952a">
+<p>
+It is a direct signal of whether production traffic should be routed to a pod.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc413fe3" class="outline-3">
+<h3 id="orgc413fe3">Q144: What are common probe anti-patterns?</h3>
+<div class="outline-text-3" id="text-orgc413fe3">
+<ul class="org-ul">
+<li>using liveness as readiness</li>
+<li>no probes at all</li>
+<li>overly aggressive thresholds</li>
+<li>testing the wrong dependency</li>
+<li>using heavy checks in every loop</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org9c6e810" class="outline-3">
+<h3 id="org9c6e810">Q145: Why is “liveness = readiness” a common mistake?</h3>
+<div class="outline-text-3" id="text-org9c6e810">
+<p>
+Because a pod can be alive but not able to serve traffic; restarting it is not always the solution.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd04c0e1" class="outline-3">
+<h3 id="orgd04c0e1">Q146: Why use a dedicated /ready endpoint?</h3>
+<div class="outline-text-3" id="text-orgd04c0e1">
+<p>
+Because it can check a narrower set of conditions than /healthz.
+</p>
+</div>
+</div>
+<div id="outline-container-org7fdbf9e" class="outline-3">
+<h3 id="org7fdbf9e">Q147: Why use a dedicated /live endpoint?</h3>
+<div class="outline-text-3" id="text-org7fdbf9e">
+<p>
+Because it can check just whether the process is alive and not in a hung or broken state.
+</p>
+</div>
+</div>
+<div id="outline-container-orge1e06bc" class="outline-3">
+<h3 id="orge1e06bc">Q148: What is a startup endpoint used for startup probe?</h3>
+<div class="outline-text-3" id="text-orge1e06bc">
+<p>
+It can confirm the app finished initialization, such as migrations or warm-up.
+</p>
+</div>
+</div>
+<div id="outline-container-org376d827" class="outline-3">
+<h3 id="org376d827">Q149: What is a probe and ingress interplay?</h3>
+<div class="outline-text-3" id="text-org376d827">
+<p>
+Ingress and service routing rely on readiness to avoid sending traffic to unready pods.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e9298f" class="outline-3">
+<h3 id="org6e9298f">Q150: What is a readiness outage?</h3>
+<div class="outline-text-3" id="text-org6e9298f">
+<p>
+It means a pod is running but not receiving traffic because readiness checks fail.
+</p>
+</div>
+</div>
+<div id="outline-container-org42e5a46" class="outline-3">
+<h3 id="org42e5a46">Q151: Why is a pod with failing readiness bad for service availability?</h3>
+<div class="outline-text-3" id="text-org42e5a46">
+<p>
+Because it is effectively removed from the routing pool even though the process may still be alive.
+</p>
+</div>
+</div>
+<div id="outline-container-org75d24d0" class="outline-3">
+<h3 id="org75d24d0">Q152: What is a health endpoint that returns empty or 200?</h3>
+<div class="outline-text-3" id="text-org75d24d0">
+<p>
+This is often used for a very simple probe.
+</p>
+</div>
+</div>
+<div id="outline-container-org86aa895" class="outline-3">
+<h3 id="org86aa895">Q153: What are common frameworks with built-in health endpoints?</h3>
+<div class="outline-text-3" id="text-org86aa895">
+<p>
+Many frameworks expose /health, /healthz, /actuator/health, /ready, or equivalent.
+</p>
+</div>
+</div>
+<div id="outline-container-org2448502" class="outline-3">
+<h3 id="org2448502">Q154: Why do probes need to match the app framework?</h3>
+<div class="outline-text-3" id="text-org2448502">
+<p>
+Because a probe endpoint must be supported by the application logic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd1ce53d" class="outline-3">
+<h3 id="orgd1ce53d">Q155: How do probes impact rolling updates?</h3>
+<div class="outline-text-3" id="text-orgd1ce53d">
+<p>
+Ready pods receive traffic; unready ones are removed from endpoints while new versions roll out.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e1fc32" class="outline-3">
+<h3 id="org2e1fc32">Q156: Why do rollout strategies rely on readiness?</h3>
+<div class="outline-text-3" id="text-org2e1fc32">
+<p>
+Because the Service should route only to stable and ready versions.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf6ee912" class="outline-3">
+<h3 id="orgf6ee912">Q157: What is a deployment strategy and probe relationship?</h3>
+<div class="outline-text-3" id="text-orgf6ee912">
+<p>
+The rollout strategy uses readiness to decide when a new pod is eligible for traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org84cc032" class="outline-3">
+<h3 id="org84cc032">Q158: Why is health monitoring from probes useful in debugging?</h3>
+<div class="outline-text-3" id="text-org84cc032">
+<p>
+Because kubelet events and pod conditions reveal why a pod isn’t ready or keeps restarting.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c247bb" class="outline-3">
+<h3 id="org5c247bb">Q159: Why should probes be tracked in resources and events?</h3>
+<div class="outline-text-3" id="text-org5c247bb">
+<p>
+Because they indicate bottlenecks or configuration mistakes in the application lifecycle.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f4cde7" class="outline-3">
+<h3 id="org3f4cde7">Q160: What is a pod lifecycle event log?</h3>
+<div class="outline-text-3" id="text-org3f4cde7">
+<p>
+It records readiness transitions, deaths, restarts, and liveness failures.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ee14ba" class="outline-3">
+<h3 id="org9ee14ba">Q161: What is a probe with an exec command using shell?</h3>
+<div class="outline-text-3" id="text-org9ee14ba">
+<p>
+Example: `["/bin/sh", "-c", "curl -f <a href="http://localhost:8080/ready">http://localhost:8080/ready</a> || exit 1"]`
+</p>
+</div>
+</div>
+<div id="outline-container-org0e29cdf" class="outline-3">
+<h3 id="org0e29cdf">Q162: Which probe type is usually best?</h3>
+<div class="outline-text-3" id="text-org0e29cdf">
+<p>
+HTTP probes are usually the most readable and maintainable for web services.
+</p>
+</div>
+</div>
+<div id="outline-container-org1dd7a76" class="outline-3">
+<h3 id="org1dd7a76">Q163: Why is TCP probe not enough for service readiness?</h3>
+<div class="outline-text-3" id="text-org1dd7a76">
+<p>
+Because it says the port is reachable, not that the application is fully ready to respond.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f4dd97" class="outline-3">
+<h3 id="org4f4dd97">Q164: Why should startup and readiness differ?</h3>
+<div class="outline-text-3" id="text-org4f4dd97">
+<p>
+Because startup often includes initialization work while readiness indicates actual service availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org11456cc" class="outline-3">
+<h3 id="org11456cc">Q165: What is a readiness signal from an application’s framework?</h3>
+<div class="outline-text-3" id="text-org11456cc">
+<p>
+It could be an actuator health check or a custom endpoint.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd8505c" class="outline-3">
+<h3 id="orgdd8505c">Q166: What is a kubelet event when probe fails?</h3>
+<div class="outline-text-3" id="text-orgdd8505c">
+<p>
+The kubelet may emit warnings or events describing failed readiness or liveness.
+</p>
+</div>
+</div>
+<div id="outline-container-org3b52c66" class="outline-3">
+<h3 id="org3b52c66">Q167: How do operators use probe logs?</h3>
+<div class="outline-text-3" id="text-org3b52c66">
+<p>
+They inspect them while debugging restarts or unready pods.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfdf6c72" class="outline-3">
+<h3 id="orgfdf6c72">Q168: Why is a too-short probe period a problem?</h3>
+<div class="outline-text-3" id="text-orgfdf6c72">
+<p>
+It can generate excessive checks and load on the app or node.
+</p>
+</div>
+</div>
+<div id="outline-container-org61c9436" class="outline-3">
+<h3 id="org61c9436">Q169: Why is a too-long period a problem?</h3>
+<div class="outline-text-3" id="text-org61c9436">
+<p>
+It delays detection of failure or readiness changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org37c4b15" class="outline-3">
+<h3 id="org37c4b15">Q170: What is a good default probe strategy?</h3>
+<div class="outline-text-3" id="text-org37c4b15">
+<p>
+Use modest intervals, clear paths, and a meaningful readiness condition aligned to app behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org83167b7" class="outline-3">
+<h3 id="org83167b7">Q171: Why do apps need to control readiness carefully?</h3>
+<div class="outline-text-3" id="text-org83167b7">
+<p>
+Because readiness determines business traffic routing and user impact.
+</p>
+</div>
+</div>
+<div id="outline-container-org50ffffc" class="outline-3">
+<h3 id="org50ffffc">Q172: What is a probe for database migration?</h3>
+<div class="outline-text-3" id="text-org50ffffc">
+<p>
+It might wait until migrations are complete before readiness becomes true.
+</p>
+</div>
+</div>
+<div id="outline-container-org976d20a" class="outline-3">
+<h3 id="org976d20a">Q173: What is a probe for cache warmup?</h3>
+<div class="outline-text-3" id="text-org976d20a">
+<p>
+It waits until the cache is warmed before allowing traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbda204b" class="outline-3">
+<h3 id="orgbda204b">Q174: What is a probe for certificate loading?</h3>
+<div class="outline-text-3" id="text-orgbda204b">
+<p>
+It waits until TLS certificates and keys are loaded before becoming ready.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ebbf57" class="outline-3">
+<h3 id="org9ebbf57">Q175: What is a probe for network dependencies?</h3>
+<div class="outline-text-3" id="text-org9ebbf57">
+<p>
+It waits until required external services are reachable before the service accepts traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf3a5566" class="outline-3">
+<h3 id="orgf3a5566">Q176: Why do startup and readiness often combine?</h3>
+<div class="outline-text-3" id="text-orgf3a5566">
+<p>
+Because some apps need both time to initialize and a precise signal that the app can handle requests.
+</p>
+</div>
+</div>
+<div id="outline-container-org72f58dd" class="outline-3">
+<h3 id="org72f58dd">Q177: What is a probe returning 500 while startup completes?</h3>
+<div class="outline-text-3" id="text-org72f58dd">
+<p>
+That is usually a sign the app is not ready yet or the dependency is still failing.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdf62813" class="outline-3">
+<h3 id="orgdf62813">Q178: Why do readiness and liveness values often differ in real apps?</h3>
+<div class="outline-text-3" id="text-orgdf62813">
+<p>
+Because readiness is user-service oriented while liveness is process health oriented.
+</p>
+</div>
+</div>
+<div id="outline-container-org5ab12c5" class="outline-3">
+<h3 id="org5ab12c5">Q179: What is the relationship between probes and service endpoint updates?</h3>
+<div class="outline-text-3" id="text-org5ab12c5">
+<p>
+Service endpoints are updated based on readiness. Unready pods are removed from traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org5820591" class="outline-3">
+<h3 id="org5820591">Q180: Why does a healthy Service depend on good probes?</h3>
+<div class="outline-text-3" id="text-org5820591">
+<p>
+Because traffic routing is only as good as the readiness and liveness signals.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0f08bf7" class="outline-2">
+<h2 id="org0f08bf7">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-org0f08bf7">
+</div>
+<div id="outline-container-org6ae80b0" class="outline-3">
+<h3 id="org6ae80b0">Q181: What is a liveness probe after startup?</h3>
+<div class="outline-text-3" id="text-org6ae80b0">
+<p>
+It becomes the ongoing signal that the process is still alive and functioning.
+</p>
+</div>
+</div>
+<div id="outline-container-orge454689" class="outline-3">
+<h3 id="orge454689">Q182: Why use startup probes for JVM apps with long warmup?</h3>
+<div class="outline-text-3" id="text-orge454689">
+<p>
+Because Java apps may take time to start, and liveness should not kill them too early.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdf6c433" class="outline-3">
+<h3 id="orgdf6c433">Q183: What is a startup probe statement?</h3>
+<div class="outline-text-3" id="text-orgdf6c433">
+<p>
+A startup probe usually runs until success and then liveness and readiness checks become active.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbe3bdf5" class="outline-3">
+<h3 id="orgbe3bdf5">Q184: What is probe gating in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgbe3bdf5">
+<p>
+Probe gating means the kubelet only checks the readiness and liveness signals at the appropriate lifecycle stage.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd700700" class="outline-3">
+<h3 id="orgd700700">Q185: What is a failure to transition from startup to ready?</h3>
+<div class="outline-text-3" id="text-orgd700700">
+<p>
+It usually indicates the app remains broken or is taking too long to initialize.
+</p>
+</div>
+</div>
+<div id="outline-container-org7f62e28" class="outline-3">
+<h3 id="org7f62e28">Q186: Why should readiness not be based only on process presence?</h3>
+<div class="outline-text-3" id="text-org7f62e28">
+<p>
+Because a process can be alive while dysfunctional.
+</p>
+</div>
+</div>
+<div id="outline-container-org8204105" class="outline-3">
+<h3 id="org8204105">Q187: What is an app-level health contract?</h3>
+<div class="outline-text-3" id="text-org8204105">
+<p>
+It is the contract between app and platform: e.g. "200 means healthy and ready, 503 means not ready".
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8266ae" class="outline-3">
+<h3 id="orgf8266ae">Q188: Why is a health contract helpful?</h3>
+<div class="outline-text-3" id="text-orgf8266ae">
+<p>
+It gives operators and developers a clear signal for infrastructure behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org487cdd4" class="outline-3">
+<h3 id="org487cdd4">Q189: What is a probe and latency trade-off?</h3>
+<div class="outline-text-3" id="text-org487cdd4">
+<p>
+Tighter probes detect issues faster but can create noise and false positives; slower probes are less noisy but delay detection.
+</p>
+</div>
+</div>
+<div id="outline-container-org960cf14" class="outline-3">
+<h3 id="org960cf14">Q190: What is a failure threshold tuning strategy?</h3>
+<div class="outline-text-3" id="text-org960cf14">
+<p>
+It balances how many failures are tolerated before making the container unhealthy or unready.
+</p>
+</div>
+</div>
+<div id="outline-container-org2154c63" class="outline-3">
+<h3 id="org2154c63">Q191: What is a success threshold tuning strategy?</h3>
+<div class="outline-text-3" id="text-org2154c63">
+<p>
+It defines how much evidence is needed before a previously failing probe is considered healthy again.
+</p>
+</div>
+</div>
+<div id="outline-container-org13923d3" class="outline-3">
+<h3 id="org13923d3">Q192: Why do readiness and liveness thresholds differ?</h3>
+<div class="outline-text-3" id="text-org13923d3">
+<p>
+Because readiness may recover more quickly while liveness may need a stronger signal before restart.
+</p>
+</div>
+</div>
+<div id="outline-container-orga375ba5" class="outline-3">
+<h3 id="orga375ba5">Q193: What is a probe for dependency outage?</h3>
+<div class="outline-text-3" id="text-orga375ba5">
+<p>
+It may check a critical dependency such as a database or message broker.
+</p>
+</div>
+</div>
+<div id="outline-container-org92fda18" class="outline-3">
+<h3 id="org92fda18">Q194: Why should dependency checks be selective?</h3>
+<div class="outline-text-3" id="text-org92fda18">
+<p>
+Because checking every downstream dependency may make readiness too sensitive or too expensive.
+</p>
+</div>
+</div>
+<div id="outline-container-org7f10808" class="outline-3">
+<h3 id="org7f10808">Q195: What is a readiness endpoint with connection pooling?</h3>
+<div class="outline-text-3" id="text-org7f10808">
+<p>
+It can ensure the app has established necessary connections before being routed.
+</p>
+</div>
+</div>
+<div id="outline-container-org08f6eb7" class="outline-3">
+<h3 id="org08f6eb7">Q196: Why can probe design be an operational policy?</h3>
+<div class="outline-text-3" id="text-org08f6eb7">
+<p>
+Because it reflects how the platform expects the application to behave under failure.
+</p>
+</div>
+</div>
+<div id="outline-container-org677df31" class="outline-3">
+<h3 id="org677df31">Q197: What is a probe bug in production?</h3>
+<div class="outline-text-3" id="text-org677df31">
+<p>
+It can lead to pods being marked unready or restarted unexpectedly, causing outage or flapping.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c367aa" class="outline-3">
+<h3 id="org4c367aa">Q198: What is flapping?</h3>
+<div class="outline-text-3" id="text-org4c367aa">
+<p>
+Flapping is when a pod repeatedly transitions between healthy and unhealthy states.
+</p>
+</div>
+</div>
+<div id="outline-container-org1044795" class="outline-3">
+<h3 id="org1044795">Q199: Why is flapping dangerous?</h3>
+<div class="outline-text-3" id="text-org1044795">
+<p>
+It causes unstable traffic routing and complicates investigations.
+</p>
+</div>
+</div>
+<div id="outline-container-org7ed1c59" class="outline-3">
+<h3 id="org7ed1c59">Q200: What is the main lesson of Kubernetes probes?</h3>
+<div class="outline-text-3" id="text-org7ed1c59">
+<p>
+Probes are the operational contract between Kubernetes and the application: they define health, readiness, and recovery behavior, and they must reflect real service semantics to avoid outages and premature restarts.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

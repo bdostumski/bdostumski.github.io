@@ -1,0 +1,634 @@
+#+TITLE: Kubernetes Probes
+#+DATE: 2026-10-03
+#+TAGS: Kubernetes, Probes, Health Checks, DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes Probes
+
+-----
+
+* Beginner
+
+** Q1: What is a Kubernetes probe?
+A Kubernetes probe is a health check that tells the kubelet whether a container is alive, healthy, and ready to receive traffic.
+
+** Q2: Why do we need probes?
+Probes help Kubernetes decide when to restart a container, when to route traffic to it, and whether it is healthy.
+
+** Q3: What is the kubelet?
+The kubelet is the node agent that runs inside each node and manages the containers in Pods.
+
+** Q4: What is a container lifecycle?
+The container lifecycle includes startup, running, readiness, and termination.
+
+** Q5: What is a readiness probe?
+A readiness probe checks whether a container is ready to accept traffic.
+
+** Q6: What is a liveness probe?
+A liveness probe checks whether a container is alive and should be restarted if it is unhealthy.
+
+** Q7: What is a startup probe?
+A startup probe checks whether the application has completed startup before liveness and readiness checks begin.
+
+** Q8: Why are readiness probes important?
+They prevent traffic from reaching containers that are not yet ready.
+
+** Q9: Why are liveness probes important?
+They allow Kubernetes to restart containers that have become stuck or unhealthy.
+
+** Q10: Why are startup probes important?
+They help slow-starting applications avoid being restarted prematurely by liveness probes.
+
+** Q11: What is a probe action?
+A probe action is how Kubernetes checks health, such as HTTP, TCP, or command execution.
+
+** Q12: What is an HTTP probe?
+An HTTP probe sends an HTTP request to a specific path and expects a status code response.
+
+** Q13: What is a TCP probe?
+A TCP probe checks whether a port is open and accepting connections.
+
+** Q14: What is an exec probe?
+An exec probe runs a command inside the container and succeeds or fails based on exit code.
+
+** Q15: What is the probe failure threshold?
+The threshold is the number of consecutive failures before a probe is considered failed.
+
+** Q16: What is probe period?
+The period is how often the kubelet runs the probe.
+
+** Q17: What is probe timeout?
+The timeout is how long the probe waits before considering the check failed.
+
+** Q18: What is initial delay?
+Initial delay is how long the kubelet waits before starting the first probe.
+
+** Q19: What is failure threshold?
+Failure threshold is how many consecutive failures are required before a probe transitions to failure.
+
+** Q20: What is success threshold?
+Success threshold is how many consecutive successful checks are required before a probe is considered successful again.
+
+** Q21: Why does a readiness probe matter for Services?
+Because Services only route traffic to ready Pods.
+
+** Q22: What is a Pod condition?
+A Pod condition reflects the current state of readiness, liveness, or startup.
+
+** Q23: What is a ready condition?
+A Pod is marked ready when all readiness probes pass and the pod is ready to receive traffic.
+
+** Q24: What does it mean if a Pod is not ready?
+It means Kubernetes will not send traffic to it via a Service unless special routing rules apply.
+
+** Q25: What happens when a liveness probe fails?
+The container is restarted by the kubelet unless the container is not restartable.
+
+** Q26: Why should liveness probes be careful?
+A liveness probe that is too aggressive can restart healthy containers unnecessarily.
+
+** Q27: What is a probe target path?
+In an HTTP probe, the target path is the URL path to request, such as /healthz or /ready.
+
+** Q28: What is a probe port?
+The probe port is the port the kubelet uses to connect for HTTP or TCP probes.
+
+** Q29: Why use /healthz or /ready?
+These are conventional endpoints often implemented by apps to report internal health.
+
+** Q30: What is app health?
+App health is whether the application is functioning correctly and able to serve traffic.
+
+** Q31: What is a process health check?
+A process health check checks whether the main process is alive and responding.
+
+** Q32: What is a dependency check?
+A dependency check verifies that an app can reach required databases, caches, or other services.
+
+** Q33: Why should readiness include dependencies?
+If the app cannot reach a database, it may not be ready even though the process is running.
+
+** Q34: What is a startup check for slow boot?
+It ensures the app has enough time to initialize before liveness begins.
+
+** Q35: Why do some workloads need startup probes?
+Because their initialization can take minutes, and liveness would otherwise restart them.
+
+** Q36: What is a probe configuration example?
+Example:
+- readinessProbe: HTTP GET on /ready
+- livenessProbe: TCP port 8080
+- startupProbe: HTTP GET on /startup
+
+** Q37: What is a rapid restart loop?
+A rapid restart loop occurs when a container keeps failing health checks and being restarted.
+
+** Q38: Why is a rapid restart loop dangerous?
+It can create instability and hide the underlying problem.
+
+** Q39: What is a production probe?
+A production probe is a health check designed for live traffic and operational reliability.
+
+** Q40: Why can probes be wrong?
+Because a probe may test the wrong thing or use logic that doesn’t reflect actual readiness.
+
+** Q41: What is a false positive probe?
+A false positive means the probe says healthy when the application is actually broken.
+
+** Q42: What is a false negative probe?
+A false negative means the probe says unhealthy when the application is actually working.
+
+** Q43: Why must probes be accurate?
+Because they affect traffic routing and restarts.
+
+** Q44: What is a health endpoint?
+A health endpoint is an HTTP URL that returns status to indicate app health.
+
+** Q45: What is a readiness endpoint?
+A readiness endpoint indicates the application is ready to accept real traffic.
+
+** Q46: What is a liveness endpoint?
+A liveness endpoint indicates the process is alive, even if it is not ready for traffic.
+
+** Q47: Why separate readiness and liveness?
+Because being alive is not the same as being ready to serve requests.
+
+** Q48: What is a slow-starting app?
+An app whose startup takes longer than a few seconds and needs delayed liveness checks.
+
+** Q49: What is a long-running job?
+A long-running job may not be a web service and may not need normal readiness semantics.
+
+** Q50: What is an init container?
+An init container runs before app containers start and can perform setup or dependency checks.
+
+** Q51: Why do init containers sometimes help with startup probes?
+They can do one-time setup before the main app starts.
+
+** Q52: What is readiness gating?
+Readiness gating prevents traffic from reaching a pod until it is ready.
+
+** Q53: What is a Pod being ready?
+It means the app has passed readiness checks and is included in Service endpoints.
+
+** Q54: What is a readiness check for dependencies?
+It may test DB connectivity, cache connectivity, or external service availability.
+
+** Q55: What is an HTTP status code threshold?
+A probe may expect 200-399 as success, and other codes as failure.
+
+** Q56: What is a TCP port readiness check?
+It only checks socket availability, not application correctness.
+
+** Q57: Why is TCP-only readiness sometimes insufficient?
+Because the app could accept connections but still fail deeper logic or user requests.
+
+** Q58: What is command-based readiness?
+It runs a shell command inside the container and expects a zero exit code.
+
+** Q59: Why are exec probes sometimes problematic?
+They use shell execution inside the container, which adds complexity and performance overhead.
+
+** Q60: What is the kubelet probe loop?
+It is the periodic sequence in which the kubelet runs configured probes.
+
+** Q61: What is a probe serialization?
+It is the sequential execution of health checks on the node.
+
+** Q62: What is a probe lifecycle event?
+It is the moment a container transitions through startup, ready, and alive states according to checks.
+
+** Q63: What is a readiness probe vs liveness probe difference?
+Readiness controls if traffic is routed to the pod.
+Liveness controls if the pod should be restarted.
+
+** Q64: What does CPU impact from probes look like?
+Probes add small overhead but generally are lightweight compared with the application itself.
+
+** Q65: Why should probe handlers be efficient?
+Because a misconfigured or heavy probe can affect node performance.
+
+** Q66: What is a health endpoint that returns 503?
+A 503 often indicates the app is not ready or not healthy.
+
+** Q67: Why is 200 OK common for readiness?
+It clearly signals the app is ready.
+
+** Q68: Why use 204 No Content for health endpoints?
+It may be a lightweight health response with no payload.
+
+** Q69: What is failure tolerance?
+Failure tolerance describes how many probe failures are allowed before the app is considered dead or unready.
+
+** Q70: What is an app that never becomes ready?
+This can happen if the app waits on a dependency or a bad startup path.
+
+** Q71: Why is restart loop a symptom of bad probes?
+Because the app may be failing the liveness probe repeatedly even though it is not truly stuck.
+
+** Q72: What is a startupProbe + readinessProbe combination?
+This is often used when the app takes a while to start, but should be handled gracefully.
+
+** Q73: What is a Pod not ready event?
+It indicates the pod is not included in Service endpoints because readiness checks are failing.
+
+** Q74: What is pinging an app with a health endpoint?
+It means the probe is checking the app is accepting requests.
+
+** Q75: What is a `httpGet` probe?
+It is an HTTP probe in Kubernetes manifest syntax.
+
+** Q76: What is a `tcpSocket` probe?
+It is a TCP socket probe in Kubernetes manifest syntax.
+
+** Q77: What is a `exec` probe?
+It is a command-based probe in Kubernetes manifest syntax.
+
+** Q78: What is a probe port field?
+It denotes which container port is used for the probe.
+
+** Q79: What is a `host` field in a probe?
+Host is not commonly used for probes, but some special wiring may target host-level addresses in advanced scenarios.
+
+** Q80: What is a scheme field in HTTP probe?
+The scheme selects HTTP or HTTPS for the probe request.
+
+** Q81: What is `initialDelaySeconds`?
+How long the kubelet waits before performing the first probe check.
+
+** Q82: What is `periodSeconds`?
+How often the probe runs.
+
+** Q83: What is `timeoutSeconds`?
+How long the probe waits before considering the check failed.
+
+** Q84: What is `failureThreshold`?
+The number of consecutive failures before the kubelet marks it unhealthy or unready.
+
+** Q85: What is `successThreshold`?
+The number of successes required before a failed probe becomes successful.
+
+** Q86: Why is kubelet behavior important to understand?
+Because the kind of probe and thresholds determine traffic behavior and restarts.
+
+** Q87: What is a probe that checks only process liveness?
+It can work but often misses application-level problems like database unavailability.
+
+** Q88: Why should probes be aligned with app semantics?
+Because the app may be alive but still unable to serve user traffic.
+
+** Q89: What is a container that exits fast?
+A container that exits quickly may not be caught by readiness or liveness if the process dies.
+
+** Q90: What is a crash loop?
+A crash loop is when a container repeatedly exits and restarts, often due to a failure.
+
+** Q91: What is a restart policy?
+Restart policy determines whether Kubernetes restarts the container after failure.
+
+** Q92: Why do readiness and liveness rely on restart policy?
+Because restart policy defines what happens when the container fails.
+
+** Q93: What is a pod restart due to liveness?
+When the app fails liveness, kubelet restarts the container.
+
+** Q94: What is a Pod phase?
+A Pod phase includes Pending, Running, Succeeded, Failed, and Unknown.
+
+** Q95: Why is readiness distinct from pod phase?
+A Pod can be Running but not Ready.
+
+** Q96: What is the difference between Running and Ready?
+Running means the process exists.
+Ready means traffic can be routed to it.
+
+** Q97: What is traffic routing to ready Pods?
+This is the core function of readiness in Kubernetes Services.
+
+** Q98: What is ingress and readiness?
+Ingress traffic is routed through Services to ready Pods.
+
+** Q99: Why do probes matter for external traffic?
+Because external systems often rely on the Service and Ingress to route to the correct Pods.
+
+** Q100: What is the primary goal of probes?
+To ensure the app is alive, ready, and actually able to serve traffic.
+
+* Intermediate
+
+** Q101: What is the difference between readiness and startup probe semantics?
+Readiness is about traffic eligibility.
+Startup is about not treating a still-starting app as failed too early.
+
+** Q102: Why use startupProbe for applications with long startup?
+Because liveness could restart the process before it finishes initialization.
+
+** Q103: What is a start-up dependency check?
+It may check that required databases or caches are reachable before the app becomes ready.
+
+** Q104: What is a readiness check for database connection?
+It checks that the app can connect to the DB before accepting requests.
+
+** Q105: What is a readiness check for external dependencies?
+It verifies the app can reach required external services or APIs.
+
+** Q106: What is an HTTP readiness endpoint that checks DB connection?
+It might return 503 if DB connectivity is broken even though the app process is running.
+
+** Q107: Why can liveness be based on process health alone?
+It is often enough for CPU-bound processes that either run or not.
+
+** Q108: Why can liveness be too aggressive for network-heavy apps?
+Network or dependency outages may not be the app’s fault but can make it appear unhealthy.
+
+** Q109: What is a probe for slow app initialization?
+A startupProbe can give the app enough time before liveness becomes active.
+
+** Q110: Why do some apps use /healthz and /ready endpoints differently?
+Because /healthz often means “process alive”; /ready means “can serve traffic”.
+
+** Q111: What is a custom health status body?
+Apps can return JSON or plain text describing health to help debugging.
+
+** Q112: Why are probe endpoints often small and cheap?
+Because they are called frequently by kubelet and should not be expensive.
+
+** Q113: What is a health endpoint with dependencies?
+It can combine DB ping, cache ping, and response readiness checks.
+
+** Q114: Why avoid heavy dependency checks in readiness?
+Because they may become expensive or cause cascading failures if dependencies are slow.
+
+** Q115: What is a shallow readiness check?
+A shallow readiness check confirms the process is ready to accept traffic without doing deep dependencies.
+
+** Q116: What is a deep readiness check?
+A deep readiness check validates the app can talk to critical dependencies and is fully functional.
+
+** Q117: Why must readiness logic match business expectations?
+Because a pod should only receive traffic when the app is truly usable.
+
+** Q118: What is a liveness case where the app is deadlocked?
+A liveness probe can detect this by failing repeatedly and restarting the container.
+
+** Q119: Why does deadlock sometimes require liveness?
+Because the process may appear alive but is hung.
+
+** Q120: What is a probe that runs against a local port?
+This is a common pattern for apps exposing management or health endpoints locally.
+
+** Q121: What is the kubelet probe and service behavior interplay?
+The kubelet updates pod readiness, which then updates Service endpoints.
+
+** Q122: What does readiness influence in Kubernetes?
+It influences inclusion in Service endpoints and external routing.
+
+** Q123: What is a PodDefault readiness state?
+The pod is not ready until readiness checks pass.
+
+** Q124: What is a readiness false positive risk?
+The app might look ready but not actually be able to serve all traffic.
+
+** Q125: What is a readiness false negative risk?
+The app might be healthy but kept out of Service traffic due to a probe bug.
+
+** Q126: What is an HTTP probe expecting 2xx?
+Many health checks treat 2xx as success.
+
+** Q127: What is an HTTP probe expecting a non-2xx response?
+Some apps intentionally use 503 or 500 to signal not ready.
+
+** Q128: Why is it useful to return 503 during readiness?
+Because it tells the kubelet and the load balancer that the app is not ready for traffic.
+
+** Q129: What is a TCP probe?
+It checks if the port accepts a TCP connection.
+
+** Q130: Why is TCP probe less semantic than HTTP?
+Because it says “port is open,” not “app is healthy”.
+
+** Q131: What is an exec probe with `curl --fail`?
+It executes `curl` inside the container and fails the probe if the HTTP call is not successful.
+
+** Q132: Why do many apps prefer HTTP probes?
+Because HTTP semantics map well to app health and readiness.
+
+** Q133: Why avoid exec probes when possible?
+Because they are heavier and more complex to manage within containers.
+
+** Q134: What is a liveness check with `cat /tmp/healthy`?
+It is an exec-based check for a file signifying health.
+
+** Q135: Why use file-based health checks?
+For some applications, a health file or lock file indicates whether to continue serving.
+
+** Q136: Why are probes affected by initialization time?
+Because the container may need time to warm caches or connect to external services.
+
+** Q137: Why are delays configurable?
+Because startup time varies across deployments and frameworks.
+
+** Q138: What is a startup probe example in manifests?
+Example pattern:
+- startupProbe: httpGet /startup
+- livenessProbe: httpGet /healthz
+- readinessProbe: httpGet /ready
+
+** Q139: Why is ordering subtle in manifests?
+Startup must start first, then readiness/liveness become active after startup completes.
+
+** Q140: Why is the lack of a startupProbe a common cause of restart loops?
+Because a slow app may fail the liveness probe before it has fully initialized.
+
+** Q141: What is a default probe failure behavior?
+Once a failure threshold is reached, kubelet marks the container unhealthy or unready.
+
+** Q142: What is a readiness probe on Pod termination?
+A readiness probe may show failures during teardown to stop new traffic before shutdown.
+
+** Q143: Why do operators care about readiness state?
+It is a direct signal of whether production traffic should be routed to a pod.
+
+** Q144: What are common probe anti-patterns?
+- using liveness as readiness
+- no probes at all
+- overly aggressive thresholds
+- testing the wrong dependency
+- using heavy checks in every loop
+
+** Q145: Why is “liveness = readiness” a common mistake?
+Because a pod can be alive but not able to serve traffic; restarting it is not always the solution.
+
+** Q146: Why use a dedicated /ready endpoint?
+Because it can check a narrower set of conditions than /healthz.
+
+** Q147: Why use a dedicated /live endpoint?
+Because it can check just whether the process is alive and not in a hung or broken state.
+
+** Q148: What is a startup endpoint used for startup probe?
+It can confirm the app finished initialization, such as migrations or warm-up.
+
+** Q149: What is a probe and ingress interplay?
+Ingress and service routing rely on readiness to avoid sending traffic to unready pods.
+
+** Q150: What is a readiness outage?
+It means a pod is running but not receiving traffic because readiness checks fail.
+
+** Q151: Why is a pod with failing readiness bad for service availability?
+Because it is effectively removed from the routing pool even though the process may still be alive.
+
+** Q152: What is a health endpoint that returns empty or 200?
+This is often used for a very simple probe.
+
+** Q153: What are common frameworks with built-in health endpoints?
+Many frameworks expose /health, /healthz, /actuator/health, /ready, or equivalent.
+
+** Q154: Why do probes need to match the app framework?
+Because a probe endpoint must be supported by the application logic.
+
+** Q155: How do probes impact rolling updates?
+Ready pods receive traffic; unready ones are removed from endpoints while new versions roll out.
+
+** Q156: Why do rollout strategies rely on readiness?
+Because the Service should route only to stable and ready versions.
+
+** Q157: What is a deployment strategy and probe relationship?
+The rollout strategy uses readiness to decide when a new pod is eligible for traffic.
+
+** Q158: Why is health monitoring from probes useful in debugging?
+Because kubelet events and pod conditions reveal why a pod isn’t ready or keeps restarting.
+
+** Q159: Why should probes be tracked in resources and events?
+Because they indicate bottlenecks or configuration mistakes in the application lifecycle.
+
+** Q160: What is a pod lifecycle event log?
+It records readiness transitions, deaths, restarts, and liveness failures.
+
+** Q161: What is a probe with an exec command using shell?
+Example: `["/bin/sh", "-c", "curl -f http://localhost:8080/ready || exit 1"]`
+
+** Q162: Which probe type is usually best?
+HTTP probes are usually the most readable and maintainable for web services.
+
+** Q163: Why is TCP probe not enough for service readiness?
+Because it says the port is reachable, not that the application is fully ready to respond.
+
+** Q164: Why should startup and readiness differ?
+Because startup often includes initialization work while readiness indicates actual service availability.
+
+** Q165: What is a readiness signal from an application’s framework?
+It could be an actuator health check or a custom endpoint.
+
+** Q166: What is a kubelet event when probe fails?
+The kubelet may emit warnings or events describing failed readiness or liveness.
+
+** Q167: How do operators use probe logs?
+They inspect them while debugging restarts or unready pods.
+
+** Q168: Why is a too-short probe period a problem?
+It can generate excessive checks and load on the app or node.
+
+** Q169: Why is a too-long period a problem?
+It delays detection of failure or readiness changes.
+
+** Q170: What is a good default probe strategy?
+Use modest intervals, clear paths, and a meaningful readiness condition aligned to app behavior.
+
+** Q171: Why do apps need to control readiness carefully?
+Because readiness determines business traffic routing and user impact.
+
+** Q172: What is a probe for database migration?
+It might wait until migrations are complete before readiness becomes true.
+
+** Q173: What is a probe for cache warmup?
+It waits until the cache is warmed before allowing traffic.
+
+** Q174: What is a probe for certificate loading?
+It waits until TLS certificates and keys are loaded before becoming ready.
+
+** Q175: What is a probe for network dependencies?
+It waits until required external services are reachable before the service accepts traffic.
+
+** Q176: Why do startup and readiness often combine?
+Because some apps need both time to initialize and a precise signal that the app can handle requests.
+
+** Q177: What is a probe returning 500 while startup completes?
+That is usually a sign the app is not ready yet or the dependency is still failing.
+
+** Q178: Why do readiness and liveness values often differ in real apps?
+Because readiness is user-service oriented while liveness is process health oriented.
+
+** Q179: What is the relationship between probes and service endpoint updates?
+Service endpoints are updated based on readiness. Unready pods are removed from traffic.
+
+** Q180: Why does a healthy Service depend on good probes?
+Because traffic routing is only as good as the readiness and liveness signals.
+
+* Advanced / Expert
+
+** Q181: What is a liveness probe after startup?
+It becomes the ongoing signal that the process is still alive and functioning.
+
+** Q182: Why use startup probes for JVM apps with long warmup?
+Because Java apps may take time to start, and liveness should not kill them too early.
+
+** Q183: What is a startup probe statement? 
+A startup probe usually runs until success and then liveness and readiness checks become active.
+
+** Q184: What is probe gating in Kubernetes?
+Probe gating means the kubelet only checks the readiness and liveness signals at the appropriate lifecycle stage.
+
+** Q185: What is a failure to transition from startup to ready?
+It usually indicates the app remains broken or is taking too long to initialize.
+
+** Q186: Why should readiness not be based only on process presence?
+Because a process can be alive while dysfunctional.
+
+** Q187: What is an app-level health contract?
+It is the contract between app and platform: e.g. "200 means healthy and ready, 503 means not ready".
+
+** Q188: Why is a health contract helpful?
+It gives operators and developers a clear signal for infrastructure behavior.
+
+** Q189: What is a probe and latency trade-off?
+Tighter probes detect issues faster but can create noise and false positives; slower probes are less noisy but delay detection.
+
+** Q190: What is a failure threshold tuning strategy?
+It balances how many failures are tolerated before making the container unhealthy or unready.
+
+** Q191: What is a success threshold tuning strategy?
+It defines how much evidence is needed before a previously failing probe is considered healthy again.
+
+** Q192: Why do readiness and liveness thresholds differ?
+Because readiness may recover more quickly while liveness may need a stronger signal before restart.
+
+** Q193: What is a probe for dependency outage?
+It may check a critical dependency such as a database or message broker.
+
+** Q194: Why should dependency checks be selective?
+Because checking every downstream dependency may make readiness too sensitive or too expensive.
+
+** Q195: What is a readiness endpoint with connection pooling?
+It can ensure the app has established necessary connections before being routed.
+
+** Q196: Why can probe design be an operational policy?
+Because it reflects how the platform expects the application to behave under failure.
+
+** Q197: What is a probe bug in production?
+It can lead to pods being marked unready or restarted unexpectedly, causing outage or flapping.
+
+** Q198: What is flapping?
+Flapping is when a pod repeatedly transitions between healthy and unhealthy states.
+
+** Q199: Why is flapping dangerous?
+It causes unstable traffic routing and complicates investigations.
+
+** Q200: What is the main lesson of Kubernetes probes?
+Probes are the operational contract between Kubernetes and the application: they define health, readiness, and recovery behavior, and they must reflect real service semantics to avoid outages and premature restarts.
+
+-----
+
+#+INCLUDE: "../footer.org"
