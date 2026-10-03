@@ -1,0 +1,639 @@
+#+TITLE: Docker Volumes
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Docker Volumes
+
+-----
+
+* Beginner
+
+** Q1: What is a Docker volume?
+A Docker volume is a persistent storage mechanism for containers that allows data to survive container restarts and removals.
+
+** Q2: Why do containers need persistent storage?
+Containers are ephemeral by design, and their writable filesystem is usually lost when the container is removed.
+
+** Q3: What is the writable layer in Docker?
+The writable layer is the filesystem layer added on top of the read-only image layers, where container changes are stored.
+
+** Q4: What is the problem with storing data only in the writable layer?
+Data can be lost when the container is recreated, restarted without preserving the filesystem, or removed.
+
+** Q5: What is a volume mount?
+A volume mount attaches a persistent Docker volume or host path to a container directory.
+
+** Q6: What is a bind mount?
+A bind mount mounts a file or directory from the host filesystem into a container.
+
+** Q7: What is the difference between a volume and a bind mount?
+A volume is managed by Docker, while a bind mount maps an explicit host path into the container.
+
+** Q8: What is a named volume?
+A named volume is a Docker-managed volume with a user-defined or auto-generated name.
+
+** Q9: What is data persistence?
+Data persistence means the data remains available across container lifecycles.
+
+** Q10: What is the docker volume command?
+The main Docker volume commands include:
+- docker volume ls
+- docker volume inspect
+- docker volume create
+- docker volume rm
+
+** Q11: What is docker run -v?
+The -v option mounts a volume or bind mount into a container.
+
+** Q12: What is the syntax of a named volume mount?
+Example:
+~docker run -v mydata:/app/data image~
+
+** Q13: What is the syntax of a bind mount?
+Example:
+~docker run -v /host/path:/container/path image~
+
+** Q14: What is a container path?
+A container path is the filesystem path inside the container where the volume is mounted.
+
+** Q15: What is a host path?
+A host path is the file or directory path on the Docker host that is mounted into the container.
+
+** Q16: What is the difference between read-only and read-write mounts?
+A read-only mount prevents writes from the container to that mount.
+A read-write mount allows data to be modified by the container.
+
+** Q17: What is a read-only volume mount?
+A read-only mount is used for immutable configuration, certificates, or source code.
+
+** Q18: What is a read-write volume mount?
+A read-write mount is used for application state, logs, databases, or cache storage.
+
+** Q19: What is data volume?
+A data volume is a Docker-managed storage volume used to persist data independently of the container filesystem.
+
+** Q20: What is a volume driver?
+A volume driver is a plugin or implementation that creates and manages volumes.
+
+** Q21: What is the default storage driver?
+Docker often uses the local driver by default for volumes on a single host.
+
+** Q22: Why are volumes useful for databases?
+Databases need durable storage for data files, journal files, and transaction logs.
+
+** Q23: What is a container data directory?
+A data directory is a folder inside the container where application data is stored.
+
+** Q24: Why not store data in the container image?
+Because image layers are meant to be immutable and not for writable application state.
+
+** Q25: What happens when a container is deleted?
+If data is stored only in the writable layer, it is typically lost when the container is deleted.
+
+** Q26: What is the benefit of a named volume?
+A named volume provides a stable storage identifier that persists across container recreation.
+
+** Q27: What is a bind mount advantage?
+It allows direct access to a directory on the host filesystem, useful for development and debugging.
+
+** Q28: What is a bind mount disadvantage?
+It tightly couples the container to the host filesystem layout and can create portability issues.
+
+** Q29: What is the volume lifecycle?
+A volume is created, attached to one or more containers, used, and later removed manually or with cleanup policies.
+
+** Q30: What is a dangling volume?
+A dangling volume is an unused Docker volume not attached to a running container.
+
+** Q31: What is docker volume prune?
+~docker volume prune~ removes unused volumes.
+
+** Q32: Why prune unused volumes?
+To reclaim disk space from old or abandoned data.
+
+** Q33: What is a volume mount in Compose?
+Compose can declare volumes in the YAML specification and mount them into services.
+
+** Q34: What is the compose syntax for a named volume?
+Example:
+~volumes: mydata:~ in a service definition.
+
+** Q35: What is the compose syntax for a bind mount?
+Example:
+~volumes: - ./data:/var/lib/app/data~
+
+** Q36: What is the difference between a data volume and a bind mount in Compose?
+A data volume is managed by Docker; a bind mount is tied to a host path.
+
+** Q37: Why should database files be persisted?
+To prevent losing data on container rebuilds or crashes.
+
+** Q38: What is application cache in Docker?
+A cache is temporary data used to speed up builds or runtime operations, but sometimes needs persistence.
+
+** Q39: What is file-based storage?
+File-based storage means data is stored as files in a filesystem, such as logs, uploads, or configuration files.
+
+** Q40: What is block storage?
+Block storage exposes storage as blocks that can be used by filesystems or databases, often more appropriate for high-performance workloads.
+
+** Q41: What is volume driver plugin?
+A volume driver plugin adds custom volume behavior or external storage backends.
+
+** Q42: What is a local driver?
+The local driver uses disk space on the host machine.
+
+** Q43: What is an NFS-backed volume?
+An NFS-backed volume stores data on a remote filesystem shared across multiple hosts.
+
+** Q44: What is an external storage driver?
+An external storage driver integrates Docker with cloud or SAN/NAS storage.
+
+** Q45: What is a host path volume?
+A host path volume is essentially a bind mount from the Docker host.
+
+** Q46: What is a tmpfs mount?
+A tmpfs mount stores data in memory instead of on disk.
+
+** Q47: What is a volume mount and ownership issue?
+The mounted directory may have incorrect UID/GID ownership, causing permission errors in the container.
+
+** Q48: What is the risk of root-owned mounted directories?
+The container process may not have permission to write to the mounted content.
+
+** Q49: What is a mounted file permission problem?
+It occurs when files or folders are mounted with restrictive permissions or wrong ownership.
+
+** Q50: What is Docker volume backup?
+Backing up a Docker volume means copying the data for restore or disaster recovery.
+
+** Q51: Why is volume backup important?
+Because losing a volume can lose application data.
+
+** Q52: What is volume restore?
+Volume restore recreates a volume from a backup or snapshot.
+
+** Q53: What is a Docker data directory backup?
+A backup of the persisted directory or volume used by the application.
+
+** Q54: What is the difference between ephemeral and persistent data?
+Ephemeral data is lost when the container is deleted; persistent data survives.
+
+** Q55: What is a log volume?
+A log volume stores logs outside the container filesystem so they survive restarts.
+
+** Q56: What is an upload directory?
+An upload directory stores files uploaded by users or external systems.
+
+** Q57: What is a configuration file mount?
+It mounts configuration files from the host or a secret source into the container.
+
+** Q58: What is a secrets mount?
+A secrets mount injects sensitive values as files or environment variables without baking them into the image.
+
+** Q59: What is Docker volume vs bind mount in production?
+Volumes are generally preferred for container-managed data storage; bind mounts are common for development work.
+
+** Q60: Why is using volumes better for database persistence?
+Because they isolate application data from image layers and survive container lifecycle events.
+
+* Intermediate
+
+** Q61: What are Docker volume types?
+Common types include:
+- named volumes
+- bind mounts
+- tmpfs mounts
+- NFS or external driver-backed volumes
+
+** Q62: What is the docker volume create command?
+Example:
+~docker volume create myvolume~
+
+** Q63: What is docker volume inspect?
+It shows the details of a volume, including mountpoint and driver.
+
+** Q64: What is the mountpoint of a Docker volume?
+The mountpoint is the physical path on the Docker host where the volume data is stored.
+
+** Q65: What is the default volume location on Linux?
+Usually under /var/lib/docker/volumes/...
+
+** Q66: What is a Docker volume driver backend?
+It is the underlying implementation that stores and manages the data, such as local, NFS, or cloud storage.
+
+** Q67: What is a volume option?
+A volume option provides settings such as driver, o=..., or mount configuration.
+
+** Q68: What is the -o option for Docker volumes?
+The -o option passes driver-specific options to the volume driver.
+
+** Q69: What is a local volume driver?
+The local volume driver stores data on the local filesystem, often on the host.
+
+** Q70: What is a remote volume?
+A remote volume stores data on a remote filesystem or storage system, such as NFS or cloud storage.
+
+** Q71: What is the difference between a local and remote volume?
+A local volume is on the host filesystem; a remote volume is on a network filesystem or remote backend.
+
+** Q72: What is a volume plugin?
+A volume plugin implements a storage backend for Docker volumes beyond the default local driver.
+
+** Q73: What is an NFS driver for Docker?
+NFS allows multiple hosts to share the same persistent storage across containers.
+
+** Q74: What is a shared volume?
+A shared volume is mounted by more than one container or host, often for shared files or clusters.
+
+** Q75: What is a Docker Compose volume declaration?
+Example:
+~volumes: dbdata:~ inside a Compose file.
+
+** Q76: What is a bind mount relative path in Compose?
+Example:
+~./app-data:/var/lib/app/data~
+
+** Q77: What is absolute host path bind mount?
+Example:
+~/data:/container/data~
+
+** Q78: Why is bind mount sometimes used in development?
+It allows live code changes on the host to be visible inside the container without rebuilding the image.
+
+** Q79: What is the risk of using bind mounts in production?
+It tightly couples the container runtime to host paths and may expose host files outside the intended boundary.
+
+** Q80: What is data migration?
+Data migration is moving data from one storage backend to another without losing information.
+
+** Q81: What is a volume snapshot?
+A snapshot is a point-in-time copy of a volume, useful for backups or rollback.
+
+** Q82: What is copy-on-write?
+Copy-on-write snapshots only copy blocks when writing changes, saving space and time.
+
+** Q83: What is a container filesystem overlay?
+The container filesystem is a layered union of the image layers plus the writable layer.
+
+** Q84: Why are volumes not part of the image layer?
+Because volumes are meant to hold state outside the immutable image layers.
+
+** Q85: What is a Docker image layer?
+A Docker image is composed of read-only layers stacked on top of each other.
+
+** Q86: Why should logs be on volumes?
+Logs can be inspected after the container stops, and storing them outside the writable layer helps with retention.
+
+** Q87: What is a data volume container?
+A data volume container is an older Docker pattern where a container exists only to hold shared volumes.
+
+** Q88: Why are data volume containers legacy?
+They are older patterns and less favored compared to named volumes and modern orchestrator storage abstractions.
+
+** Q89: What is volume ownership in Docker?
+Ownership of a mounted volume determines which user and group can read or write the files.
+
+** Q90: What is UID/GID mapping?
+UID/GID mapping matches host user IDs and container user IDs so files are accessible without permission issues.
+
+** Q91: What is container permissions with bind mounts?
+Permissions can become problematic when host files are mounted with restrictive ownership or modes.
+
+** Q92: What is user namespace remapping?
+User namespace remapping can isolate host and container UIDs to reduce the risk of privilege escalation.
+
+** Q93: What is a mount propagation?
+Mount propagation controls whether changes in one mount are shared with other mounts in the same namespace.
+
+** Q94: What is rshared, rslave, rprivate?
+These are Linux mount propagation modes controlling how mounts propagate between containers and hosts.
+
+** Q95: What is a bind mount propagation issue?
+It can unexpectedly share or hide host directories due to propagation settings.
+
+** Q96: What is a volume cache?
+A volume can be used to store caches or build artifacts across container runs.
+
+** Q97: What is temporary data?
+Temporary data is short-lived and may not need persistence.
+
+** Q98: What is a data-only container?
+A data-only container is a container designed to store shared data and is often not running services.
+
+** Q99: Why not use data-only containers in modern Docker?
+Because named volumes and orchestrator storage abstractions are clearer and more maintainable.
+
+** Q100: What is a volume’s physical storage backend?
+It can be the local filesystem, a network filesystem, a cloud disk, or a storage driver backend.
+
+** Q101: What is docker volume ls output?
+It lists all Docker-managed volumes available on the host.
+
+** Q102: What is docker volume rm?
+It removes a specific Docker volume.
+
+** Q103: What is the effect of removing a volume?
+It deletes the underlying contents associated with that volume.
+
+** Q104: Why is volume deletion dangerous?
+Because it can permanently destroy application data if not backed up correctly.
+
+** Q105: What is the importance of volume naming?
+A meaningful volume name helps operations, backup, and cleanup processes.
+
+** Q106: What is a volume label in Docker?
+A label can help group or identify volumes for management and automation.
+
+** Q107: Why keep one service per volume?
+Separation of concerns helps isolate state, simplify backups, and increase resilience.
+
+** Q108: What is data scoping?
+Data scoping is the practice of defining which service or environment owns a volume.
+
+** Q109: What is a volume for configuration?
+Configuration files stored in a volume can be changed without rebuilding the application image.
+
+** Q110: What is a secret volume?
+A secret volume may mount sensitive files like TLS certificates or keys into a container.
+
+** Q111: Why mount secrets as files rather than environment variables?
+Because some systems handle certificates and keys more securely as files.
+
+** Q112: What is a docker secret?
+Docker secrets are a secure way to inject sensitive data to services, especially in Swarm mode.
+
+** Q113: What is a Docker volume vs Docker secret?
+A volume stores data for general persistence; a secret is meant for confidential configuration and is managed securely.
+
+** Q114: What is the difference between a config and a volume?
+A config is typically metadata or static config; a volume is persistent data or state.
+
+** Q115: What is database data directory?
+The database data directory often contains tables, indexes, and metadata and must persist.
+
+** Q116: What is log volume retention?
+Retention policies determine how long logs remain on persistent storage.
+
+** Q117: What is file ownership mismatch in volumes?
+It occurs when host files are mounted with owner IDs that do not match the container’s runtime user.
+
+** Q118: Why is volume cleanup important?
+It avoids disk exhaustion and stale data accumulation.
+
+** Q119: What is volume backup automation?
+Automated scripts or orchestrators can snapshot or archive volumes regularly.
+
+** Q120: What is restore verification?
+Restore verification ensures a backup can actually be used to bring the system back.
+
+* Advanced / Expert
+
+** Q121: What is Docker storage driver?
+The storage driver is the system used by Docker to manage image layers and container write layers.
+
+** Q122: What is overlayfs?
+Overlayfs is a union filesystem used by Docker for layered filesystem management.
+
+** Q123: Why is overlayfs relevant to volumes?
+Because it affects how writable layers and mount points behave along with persistent storage.
+
+** Q124: What is filesystem performance impact?
+Persistent volumes may have different latency, throughput, and IOPS characteristics depending on the backend.
+
+** Q125: What is IOPS?
+IOPS (Input/Output Operations Per Second) is a measure of storage performance.
+
+** Q126: What is block-level storage?
+Block-level storage exposes raw storage blocks, common in cloud volumes and SAN arrays.
+
+** Q127: What is file-level storage?
+File-level storage exposes a filesystem tree, common in NFS and network-shared directories.
+
+** Q128: What is volume performance tuning?
+Performance tuning may involve choosing the correct storage backend, using SSDs, and monitoring latency.
+
+** Q129: What is volume snapshot strategy?
+It defines how and when backups or snapshots are taken and retained.
+
+** Q130: What is a parent-child filesystem relationship?
+Some filesystems allow snapshots or clones to be created from base volumes with efficient copy-on-write semantics.
+
+** Q131: What is storage replication?
+Replication copies volume data across nodes or storage systems for resilience.
+
+** Q132: What is volume consistency?
+Consistency means the stored data matches the intended state without partial writes or corruption.
+
+** Q133: What is crash consistency?
+Crash consistency ensures data remains usable after unexpected stops or power failures.
+
+** Q134: What is fsync?
+~fsync~ ensures data is flushed to stable storage before acknowledgment.
+
+** Q135: Why is fsync important for database data?
+Databases rely on it to safely persist writes and recover after crashes.
+
+** Q136: What is journaling?
+Journaling is the process of logging writes so a system can recover cleanly after a crash.
+
+** Q137: What is a write-ahead log?
+A WAL is a log that records changes before the final data is written, common in databases.
+
+** Q138: Why do databases care about volume mounts?
+Because database consistency and durability depend heavily on storage performance and crash safety.
+
+** Q139: What is Postgres data persistence?
+Postgres stores database files on persistent storage so data is retained across restarts.
+
+** Q140: What is a volume for application state?
+An application state volume stores user data, uploads, generated files, and caches.
+
+** Q141: What is a stateful workload?
+A stateful workload depends on persistent storage to retain information across restarts.
+
+** Q142: What is a stateless workload?
+A stateless workload is fine with ephemeral data and can be recreated easily.
+
+** Q143: What is ephemeral storage in containers?
+It is storage that exists only for the lifetime of the container or pod.
+
+** Q144: Why is stateful vs stateless design important?
+It determines how deployments handle persistence, backups, scaling, and disaster recovery.
+
+** Q145: What is volume access mode?
+Volume access mode defines whether a volume is read-write by one node or multiple nodes, such as RWO or RWX.
+
+** Q146: What is RWO?
+RWO (ReadWriteOnce) means the volume can be mounted by one node in read-write mode.
+
+** Q147: What is RWX?
+RWX (ReadWriteMany) means the volume can be mounted by multiple nodes in read-write mode.
+
+** Q148: What is volume topology?
+Volume topology describes which nodes or availability zones can access a volume.
+
+** Q149: What is a storage class?
+A storage class is a policy describing the type of storage backend and performance profile to use.
+
+** Q150: What is cluster storage?
+Cluster storage provides durable storage shared across nodes in distributed systems.
+
+** Q151: What is persistent volume?
+A persistent volume is storage that outlives individual container or pod lifecycles.
+
+** Q152: What is a persistent volume claim?
+A PVC requests storage from the cluster with required capacity and access mode.
+
+** Q153: What is dynamic provisioning?
+Dynamic provisioning creates persistent volumes automatically when a PVC is requested.
+
+** Q154: What is volume scheduler?
+A storage scheduler decides which underlying storage backend should satisfy a volume request.
+
+** Q155: What is volume binding?
+Binding is the association of a PVC to a matching persistent volume.
+
+** Q156: Why are volumes tricky in orchestrators?
+Because multiple nodes, replicas, PVCs, and storage backends increase complexity and failure modes.
+
+** Q157: What is a remote volume mount under Kubernetes?
+A Kubernetes pod can mount a persistent volume provided by a cloud disk, NFS, or CSI driver.
+
+** Q158: What is a container storage interface (CSI)?
+CSI is a standard interface for storage drivers in Kubernetes and container orchestrators.
+
+** Q159: What is storage backend compatibility?
+It means the chosen storage system works with the container runtime and orchestration tools.
+
+** Q160: What is data locality?
+Data locality means storing data close to the compute that needs it to reduce latency and network overhead.
+
+** Q161: What is volume performance contention?
+It occurs when many workloads share the same storage backend and compete for bandwidth or IOPS.
+
+** Q162: What is snapshot retention policy?
+It defines how long snapshots are kept and their rotation schedule.
+
+** Q163: What is encryption at rest for volumes?
+It encrypts stored data so that it remains protected even if the underlying storage is compromised.
+
+** Q164: What is volume encryption key management?
+It includes where the keys are stored, how they are rotated, and how access is controlled.
+
+** Q165: What is secret injection for volume data?
+It often uses secrets or config maps to mount credentials or sensitive files into containers securely.
+
+** Q166: Why is volume security important?
+Because data stored in Docker volumes may include sensitive application data, logs, certificates, or DB contents.
+
+** Q167: What is volume-level access control?
+It restricts which containers, hosts, or users can read or write a volume.
+
+** Q168: What is a read-only bind mount for certificates?
+A certificate volume is often mounted read-only so the app can read the cert without modifying it.
+
+** Q169: What is a config-volume pattern?
+It is where configuration files are injected via mounts rather than baked into the image.
+
+** Q170: What is a log rotation strategy?
+It determines how long logs remain and when they are archived or cleaned up.
+
+** Q171: What is volume garbage collection?
+It removes stale or abandoned data volumes that are no longer in use.
+
+** Q172: What is a volume leak?
+A volume leak happens when data remains in a volume after a service or environment is removed.
+
+** Q173: What is storage lifecycle management?
+It is the process of creating, retaining, backing up, rotating, and deleting storage over time.
+
+** Q174: Why does data placement matter?
+Because correct placement affects performance, durability, and disaster recovery capabilities.
+
+** Q175: What is backup verification test?
+It confirms the backup can be restored successfully and contains valid data.
+
+** Q176: What is volume deduplication?
+Deduplication reduces storage space by removing duplicate data blocks across volumes or snapshots.
+
+** Q177: What is data retention compliance?
+It ensures data is retained for required periods and then properly deleted or archived.
+
+** Q178: What is the super important operational rule about volumes?
+Volumes are the persistence boundary of a containerized workload; if the state is important, it must be on a deliberately managed volume or external storage system.
+
+** Q179: What is the risk of ignoring Docker volumes?
+Ignoring volumes leads to data loss, unstable deployments, brittle backups, and poor recovery workflows.
+
+** Q180: What is the difference between persistence and backup?
+Persistence keeps data alive through container lifecycle.
+Backup protects against loss, corruption, and disasters.
+
+** Q181: What is importance of monitoring volume health?
+Storage latency, full disks, and failed mounts can silently break applications.
+
+** Q182: Why do developers often need to monitor Docker volume consumption?
+Because volume growth can cause outages, broken deployments, and performance degradation.
+
+** Q183: What is volume expansion?
+Volume expansion increases the storage size of an existing volume without data loss.
+
+** Q184: What is storage quota?
+A storage quota limits how much data a volume or workload can consume.
+
+** Q185: What is the relationship between Docker volumes and application resilience?
+Good volume design improves resiliency by allowing services to recover, scale, and restore without losing their state.
+
+** Q186: What is the role of volumes in microservices?
+Volumes help persist database data, user uploads, caches, generated content, and application state independently of service churn.
+
+** Q187: What is a stateful service pattern?
+It involves persistent storage, explicit backup schemes, and careful recovery procedures.
+
+** Q188: What is a stateless service pattern?
+It favors immutable images and ephemeral state, making scaling simpler and safer.
+
+** Q189: What is operational complexity in storage?
+The more volume backends and drivers you add, the more complexity and failure modes appear.
+
+** Q190: What is the most common Docker storage mistake?
+Using the container filesystem for persistent application data instead of a defined Docker volume.
+
+** Q191: What is the second most common mistake?
+Using bind mounts where managed volumes or external storage would be safer and more portable.
+
+** Q192: What is a recommended volume design pattern?
+Use named volumes or external storage for data, bind mounts for development convenience, and secrets/configs as specialized mounts.
+
+** Q193: What is a good backup strategy for Docker volumes?
+Regular snapshots, verification, retention policy, and tested restore procedures.
+
+** Q194: What is safe volume deletion?
+Only delete a volume after verifying that no service still depends on it and a backup exists.
+
+** Q195: What is the long-term value of learning Docker volumes?
+It teaches the difference between application state and immutable images and helps build deployable, durable systems.
+
+** Q196: What is the “state boundary” concept?
+The state boundary is the part of the system that persists across lifecycle events; volumes define that boundary.
+
+** Q197: Why are volumes a core part of Docker operations?
+Because operational reliability depends on understanding what survives container restarts and what does not.
+
+** Q198: What is volume observability?
+It is the visibility into capacity, attached services, mount health, and storage performance.
+
+** Q199: What is the final engineering principle?
+If the data matters, it should not live only in the container writable layer. Use volumes or external storage intentionally.
+
+** Q200: What is the core lesson of Docker volumes?
+Docker volumes are how you separate ephemeral runtime from durable state, which is essential for dependable containerized workloads.
+
+-----
+
+#+INCLUDE: "../footer.org"
