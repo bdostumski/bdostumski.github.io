@@ -1,0 +1,622 @@
+#+TITLE: TLS & Certificates
+#+DATE: 2026-10-02
+#+TAGS: Network
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* TLS & Certificates
+
+-----
+
+* Beginner
+
+** Q1: What is TLS?
+TLS (Transport Layer Security) is a cryptographic protocol used to secure network communication between clients and servers.
+
+** Q2: What is HTTPS?
+HTTPS is HTTP sent over TLS, which encrypts traffic and authenticates the server.
+
+** Q3: Why do we need TLS?
+TLS protects data in transit from eavesdropping, tampering, and impersonation.
+
+** Q4: What is a certificate?
+A certificate is a digital document that binds an identity to a public key.
+
+** Q5: What is a public key?
+A public key can be shared openly and is used to verify signatures or encrypt data.
+
+** Q6: What is a private key?
+A private key is kept secret and is used to decrypt or sign data.
+
+** Q7: What is asymmetric cryptography?
+Asymmetric cryptography uses a pair of keys: a public key and a private key.
+
+** Q8: What is symmetric cryptography?
+Symmetric cryptography uses one shared secret key for both encryption and decryption.
+
+** Q9: What is the difference between symmetric and asymmetric encryption?
+Asymmetric encryption is slower and used for trust and key exchange.
+Symmetric encryption is faster and used for bulk data encryption.
+
+** Q10: Why use both in TLS?
+TLS uses asymmetric cryptography to establish trust and exchange a session key, then symmetric cryptography for data transfer.
+
+** Q11: What is the TLS handshake?
+The TLS handshake is the process by which a client and server agree on encryption settings and establish a secure connection.
+
+** Q12: What is the server certificate?
+A server certificate proves the identity of the server and contains the public key used in the TLS handshake.
+
+** Q13: What is a certificate authority?
+A certificate authority (CA) is a trusted entity that issues digital certificates.
+
+** Q14: What is a root CA?
+A root CA is a trusted top-level certificate authority used as the foundation of trust in a certificate chain.
+
+** Q15: What is a certificate chain?
+A certificate chain is the sequence of certificates from the server certificate up to a trusted root CA.
+
+** Q16: What is a certificate intermediate?
+An intermediate certificate sits between the server certificate and the root certificate and helps distribute trust.
+
+** Q17: Why use intermediate certificates?
+They reduce the risk of root key compromise and improve operational flexibility.
+
+** Q18: What is certificate validation?
+Certificate validation checks whether the certificate is trusted, not expired, and valid for the requested hostname.
+
+** Q19: What is hostname validation?
+Hostname validation confirms that the certificate is valid for the server name the client is trying to reach.
+
+** Q20: What is a SAN certificate?
+A SAN (Subject Alternative Name) certificate includes multiple valid hostnames for a single certificate.
+
+** Q21: What is wildcard certificate?
+A wildcard certificate can cover multiple subdomains under one domain, such as *.example.com.
+
+** Q22: What is a self-signed certificate?
+A self-signed certificate is signed by itself instead of by a trusted certificate authority.
+
+** Q23: Why are self-signed certificates risky?
+Because clients cannot trust them unless explicitly configured to do so.
+
+** Q24: What is a trust store?
+A trust store is the set of certificates a system trusts as CAs.
+
+** Q25: What is a keystore?
+A keystore is a container for private keys and certificates used by applications or services.
+
+** Q26: What is a truststore?
+A truststore stores trusted CA certificates used to validate remote certificates.
+
+** Q27: What does PKI mean?
+PKI (Public Key Infrastructure) is the entire framework for issuing, managing, and validating digital certificates.
+
+** Q28: What is a certificate subject?
+A certificate subject is the identity information encoded in the certificate, such as common name or organization.
+
+** Q29: What is a common name?
+The common name is a field in a certificate that traditionally identifies the certificate owner or hostname.
+
+** Q30: What is a certificate issuer?
+The issuer is the entity that signed the certificate, usually a CA.
+
+** Q31: What is a digital signature?
+A digital signature proves that data was signed by a private key and has not been modified.
+
+** Q32: What is a hash?
+A hash is a one-way function that produces a fixed-size digest of data for integrity checks.
+
+** Q33: Why are hashes used in TLS?
+Hashes help verify data integrity and support digital signatures.
+
+** Q34: What is certificate expiration?
+A certificate expires at a predefined date, after which it should no longer be trusted.
+
+** Q35: What is certificate renewal?
+Certificate renewal is the process of replacing an expiring certificate with a new one.
+
+** Q36: What is certificate revocation?
+Certificate revocation invalidates a certificate before its expiration, often because it was compromised or no longer valid.
+
+** Q37: What is CRL?
+CRL (Certificate Revocation List) is a list of certificates that have been revoked by a CA.
+
+** Q38: What is OCSP?
+OCSP (Online Certificate Status Protocol) allows clients to query a CA about the real-time revocation status of a certificate.
+
+** Q39: What is OCSP stapling?
+OCSP stapling allows the server to provide revocation status during the TLS handshake to reduce latency and improve privacy.
+
+** Q40: What is a certificate chain validation failure?
+It happens when the certificate cannot be validated to a trusted root, or the chain is incomplete or expired.
+
+** Q41: What does certificate pinning do?
+Certificate pinning binds a client to a specific certificate or public key to reduce MITM risk.
+
+** Q42: What is a certificate mismatch?
+A certificate mismatch happens when the hostname in the URL does not match the names in the certificate.
+
+** Q43: What is authentication in TLS?
+Authentication in TLS means verifying the identity of the server (and sometimes the client) using certificates.
+
+** Q44: What is confidentiality in TLS?
+Confidentiality means the contents of the communication are encrypted and not readable by attackers.
+
+** Q45: What is integrity in TLS?
+Integrity ensures that the message was not changed in transit.
+
+** Q46: What is a MITM attack?
+A MITM (Man-in-the-Middle) attack intercepts traffic and pretends to be the intended endpoint.
+
+** Q47: How does TLS protect against MITM?
+It verifies the server identity and encrypts the channel so traffic cannot be read or altered without detection.
+
+** Q48: What is a TLS session?
+A TLS session is a negotiated secure connection between two endpoints.
+
+** Q49: What is the role of the cipher suite?
+A cipher suite defines the key exchange, encryption algorithm, and message authentication method used in TLS.
+
+** Q50: What is a cipher?
+A cipher is an algorithm used to encrypt and decrypt data.
+
+** Q51: What is the TLS record layer?
+The record layer handles the encryption, fragmentation, and transmission of TLS data.
+
+** Q52: What is the TLS alert protocol?
+TLS alerts communicate warnings and errors during a TLS session.
+
+** Q53: What is a TLS alert "handshake_failure"?
+It indicates a problem during the handshake, such as incompatible algorithms or rejected certificate validation.
+
+** Q54: What is an X.509 certificate?
+X.509 is the standard format used for digital certificates, especially in TLS and PKI.
+
+** Q55: What is PEM format?
+PEM is a text-based certificate format using ASCII-armored base64 content.
+
+** Q56: What is DER format?
+DER is a binary encoding for certificates and keys.
+
+** Q57: What is PFX or PKCS#12?
+PKCS#12 is a common binary format for storing certificates and private keys, often used in Windows environments.
+
+** Q58: What is OpenSSL?
+OpenSSL is a widely used toolkit for working with TLS, certificates, keys, and certificate authorities.
+
+** Q59: What is keytool?
+~keytool~ is the Java tool used for generating and managing Java keystores and certificates.
+
+** Q60: What is the default HTTPS port?
+The default HTTPS port is 443.
+
+** Q61: What is port 8443?
+Port 8443 is a common alternative HTTPS port used by applications or reverse proxies.
+
+** Q62: What is certificate issuance?
+Certificate issuance is the process by which a CA creates and signs a certificate.
+
+** Q63: What is certificate enrollment?
+Certificate enrollment is the process by which an entity requests and receives a certificate.
+
+** Q64: What is a CSR?
+A CSR (Certificate Signing Request) is a request sent to a CA containing the public key and identity information.
+
+** Q65: What is a private key generation?
+Private key generation creates a secret key pair used for authentication or encryption.
+
+** Q66: What is key strength?
+Key strength refers to the cryptographic difficulty of breaking a key, such as 2048-bit or 4096-bit RSA.
+
+** Q67: What is RSA?
+RSA is an asymmetric algorithm widely used for key exchange and signatures.
+
+** Q68: What is ECDSA?
+ECDSA is an elliptic-curve-based digital signature algorithm commonly used in modern TLS.
+
+** Q69: What is Ed25519?
+Ed25519 is a modern, efficient signature algorithm widely used for SSH and some TLS applications.
+
+** Q70: What is ECDHE?
+ECDHE is an ephemeral Diffie-Hellman key exchange used in modern TLS to provide forward secrecy.
+
+** Q71: What is DH?
+DH (Diffie-Hellman) is a key exchange algorithm that allows two parties to derive a shared secret without transmitting it.
+
+** Q72: What is forward secrecy?
+Forward secrecy ensures past session keys remain protected even if a long-term key is later compromised.
+
+** Q73: What is an ephemeral key?
+An ephemeral key is generated for a single session and discarded afterward.
+
+** Q74: What is TLS version negotiation?
+TLS version negotiation allows client and server to agree on the highest mutually supported protocol version.
+
+** Q75: What is secure renegotiation?
+Secure renegotiation prevents insecure or unsafe renegotiation of TLS sessions.
+
+** Q76: What is the role of ALPN?
+ALPN (Application-Layer Protocol Negotiation) negotiates protocols such as HTTP/1.1 or HTTP/2 during the TLS handshake.
+
+** Q77: What is SNI?
+SNI (Server Name Indication) allows the client to indicate which hostname it is connecting to during TLS setup.
+
+** Q78: Why do certificates include SANs?
+SANs allow one certificate to cover multiple hostnames, which is common in modern deployments.
+
+** Q79: What is a certificate subject alternative name?
+A SAN extension lists alternative names such as DNS names, IP addresses, or URIs.
+
+** Q80: What is a CA bundle?
+A CA bundle is a group of trusted root and intermediate certificates used by clients or servers.
+
+** Q81: Why do servers need a certificate chain?
+Clients need the chain to establish trust from the server certificate to a known root CA.
+
+** Q82: What is a trust anchor?
+A trust anchor is a trusted root certificate or key used as the starting point for validating a certificate path.
+
+** Q83: What is a leaf certificate?
+A leaf certificate is the end-entity certificate presented by the server or client.
+
+** Q84: What is a private key passphrase?
+A private key passphrase encrypts the key file so it cannot be used without the passphrase.
+
+** Q85: What is a key pair?
+A key pair is a public key and matching private key.
+
+** Q86: What is certificate fingerprint?
+A certificate fingerprint is a hash of the certificate used for quick verification and comparison.
+
+** Q87: What is certificate transparency?
+Certificate transparency makes public certificates visible in a public log to detect misissuance or tampering.
+
+** Q88: What is CT log?
+A CT log is a public log of issued certificates used in certificate transparency systems.
+
+** Q89: Why is certificate transparency useful?
+It helps detect spoofed or malicious certificates and improves public trust.
+
+** Q90: What is HSTS?
+HSTS (HTTP Strict Transport Security) tells browsers to only connect to a site over HTTPS.
+
+** Q91: What is a downgrade attack?
+A downgrade attack tries to force clients to use an older or weaker protocol version.
+
+** Q92: How does TLS mitigate downgrade attacks?
+Modern TLS implementations prevent insecure fallback and enforce secure protocols.
+
+** Q93: What is certificate pinning in practice?
+It may pin a public key or certificate hash to a trusted application configuration to prevent MITM attacks.
+
+** Q94: What is a trust-on-first-use model?
+TOFU accepts the first observed certificate as trusted and warns on future changes.
+
+** Q95: Why is TOFU not ideal for production?
+Because it is vulnerable to malicious server impersonation on the first connection unless manually verified.
+
+** Q96: What is a certificate policy?
+A certificate policy specifies how certificates are issued, validated, and used in a given environment.
+
+** Q97: What is a certificate profile?
+A certificate profile defines the fields, extensions, and constraints for a certificate issuance process.
+
+** Q98: What is a key algorithm?
+A key algorithm defines how a key pair is generated and used, such as RSA, ECDSA, or Ed25519.
+
+** Q99: What is the role of entropy?
+Entropy is randomness used in key generation and cryptographic security.
+
+** Q100: Why is secure randomness important?
+Poor randomness can make keys predictable and drastically reduce security.
+
+* Intermediate
+
+** Q101: What is the difference between TLS 1.2 and TLS 1.3?
+TLS 1.3 removed many legacy algorithms, simplified the handshake, and improved security and performance.
+
+** Q102: Why is TLS 1.3 preferred?
+It is faster, simpler, and stronger than earlier TLS versions.
+
+** Q103: What is TLS 1.0?
+TLS 1.0 is an older protocol version with known weaknesses and limited modern support.
+
+** Q104: What is TLS 1.1?
+TLS 1.1 is also deprecated and should not be used in modern deployments.
+
+** Q105: What is TLS 1.2?
+TLS 1.2 is widely supported and still common but is being phased out in favor of TLS 1.3.
+
+** Q106: What is TLS 1.3?
+TLS 1.3 is the modern version with reduced handshake complexity and stronger defaults.
+
+** Q107: What is the TLS 1.3 handshake flow?
+The client sends supported versions and parameters, the server selects them, and a series of key exchanges establishes secure session keys.
+
+** Q108: Why is TLS 1.3 faster?
+It reduces handshake round trips and removes many legacy cryptographic modes.
+
+** Q109: What is a zero-RTT connection?
+Zero-RTT allows the client to send early application data in a resumed connection without a full handshake.
+
+** Q110: What is the risk of 0-RTT?
+It may replay data if not carefully handled, which is why it is limited in practice.
+
+** Q111: What is the TLS record layer in 1.3?
+In TLS 1.3, the record layer is simplified and uses authenticated encryption with associated data.
+
+** Q112: What is AEAD?
+AEAD (Authenticated Encryption with Associated Data) provides confidentiality and integrity simultaneously.
+
+** Q113: What is ChaCha20-Poly1305?
+ChaCha20-Poly1305 is a modern AEAD cipher often used in TLS 1.3 for performance.
+
+** Q114: What is AES-GCM?
+AES-GCM is a common AEAD cipher in modern TLS implementations.
+
+** Q115: What is the TLS key schedule?
+The TLS key schedule derives session keys from the handshake secrets.
+
+** Q116: What is the master secret?
+The master secret is the shared secret used to derive session keys in older TLS versions.
+
+** Q117: What is the resumption secret?
+Resumption secret allows quick resumption of a TLS session without a full handshake.
+
+** Q118: What is session resumption?
+Session resumption reuses an earlier TLS session instead of repeating the full handshake.
+
+** Q119: What is ticket resumption?
+Ticket resumption allows the server to store session state and issue a ticket to the client.
+
+** Q120: What is PSK?
+PSK (Pre-Shared Key) is a shared secret used in some secure sessions, especially in TLS and related protocols.
+
+** Q121: What is a certificate renewal process?
+The process includes generating a new CSR, obtaining a new certificate, deploying it, and removing the old one.
+
+** Q122: What is a certificate lifecycle?
+The lifecycle includes issuance, validation, renewal, revocation, and expiration.
+
+** Q123: What is certificate automation?
+Certificate automation is the process of issuing, deploying, and renewing certificates without manual intervention.
+
+** Q124: Why is automation important for certificates?
+Because certificates expire and manual renewal is error-prone.
+
+** Q125: What is ACME?
+ACME (Automatic Certificate Management Environment) is a protocol used by certificate authorities to automate TLS certificate issuance and renewal.
+
+** Q126: What is Let’s Encrypt?
+Let’s Encrypt is a free, widely used CA that provides automated TLS certificate issuance via ACME.
+
+** Q127: What is a CSR generation tool?
+A CSR generation tool creates the material that is sent to a CA for certificate issuance.
+
+** Q128: What is certificate ordering?
+Certificate ordering refers to the sequence of certificates in a chain from leaf to root for correct validation.
+
+** Q129: What is a private key encryption format?
+Common formats include PKCS#1, PKCS#8, and PEM/DER encodings.
+
+** Q130: What is key wrapping?
+Key wrapping protects encryption keys when stored or transported.
+
+** Q131: What is a certificate bundle?
+A certificate bundle contains multiple certificates used together, usually leaf + intermediates.
+
+** Q132: What is certificate authority trust distribution?
+It is the method by which clients know which CAs to trust, typically through OS/browser trust stores.
+
+** Q133: What is a root program?
+A root program is the set of trusted roots included in a platform or browser.
+
+** Q134: What is public key infrastructure governance?
+It is the set of policies and procedures for managing trust, issuance, and revocation across a PKI.
+
+** Q135: What is certificate issuance policy?
+It defines requirements for validation, identity proofing, and issuance.
+
+** Q136: What is key usage extension?
+The key usage extension defines how a certificate’s public key may be used, such as signing or encryption.
+
+** Q137: What is extended key usage?
+Extended Key Usage (EKU) further constrains the purpose of the certificate, such as server auth or client auth.
+
+** Q138: What is Basic Constraints?
+Basic Constraints restrict whether a certificate is a CA and the maximum path length.
+
+** Q139: What is certificate authority constraint?
+A CA constraint defines whether a certificate can sign other certificates.
+
+** Q140: Why are certificate extensions important?
+They define how the certificate is intended to be used and how it should be validated.
+
+** Q141: What is a certificate subject DN?
+The subject DN is the distinguished name identifying the entity that owns the certificate.
+
+** Q142: What is an issuer DN?
+The issuer DN identifies the CA that signed the certificate.
+
+** Q143: What is a certificate serial number?
+A certificate serial number uniquely identifies the certificate issued by a CA.
+
+** Q144: What is a validity period?
+The validity period is the time range when the certificate is considered valid.
+
+** Q145: What is a CA compromise?
+A CA compromise means the CA’s private key or issuance process is compromised, which can lead to widespread trust loss.
+
+** Q146: Why is CA compromise dangerous?
+Because certificates issued by a compromised CA may be trusted by clients globally.
+
+** Q147: What is key escrow?
+Key escrow stores private keys with a trusted third party so they can be recovered in emergencies.
+
+** Q148: Why is escrow risky?
+Because it increases the risk of unauthorized key access.
+
+** Q149: What is a hardware security module?
+An HSM is a secure device used to generate, store, and protect cryptographic keys.
+
+** Q150: What is key rotation?
+Key rotation is the process of replacing old keys with new ones to reduce exposure and support security hygiene.
+
+** Q151: What is certificate rotation in production?
+It is the deployment of new certs and keys while preserving service uptime and smooth fallover.
+
+** Q152: What is a certificate incident response?
+It involves identifying compromised certs, revoking them, replacing them, and assessing exposure.
+
+** Q153: What is chain of trust?
+Chain of trust is the sequence by which trust is established from a leaf certificate to a root certificate.
+
+** Q154: What is certificate caching?
+Certificate caching avoids repeated and expensive certificate validation operations.
+
+** Q155: What is session reuse?
+Session reuse allows a client to reconnect without doing a full handshake if the server supports resumption.
+
+** Q156: What is DANE?
+DANE binds DNS records to TLS certificates for stronger certificate verification.
+
+** Q157: What is DNSSEC?
+DNSSEC secures DNS records and can be used alongside certificate validation for stronger identity proofing.
+
+** Q158: What is mTLS authentication?
+mTLS provides mutual identity verification by requiring both sides to present valid certificates.
+
+** Q159: Why is mTLS valuable in service-to-service communications?
+It gives strong identity assurance and protects internal traffic from unauthorized access.
+
+** Q160: What are certificate policies for internal systems?
+They often include short lifetimes, strong algorithms, HSM-backed keys, and rotation automation.
+
+** Q161: What is static key vs ephemeral key?
+Static keys are long-lived; ephemeral keys are created for a single message or session.
+
+** Q162: What is a key agreement protocol?
+It allows two parties to derive a shared secret without exposing it in transit.
+
+** Q163: What is the role of the certificate in TLS authentication?
+It proves possession of a private key and binds that key to an identity.
+
+** Q164: What is certificate revocation checking?
+It determines whether a certificate has been revoked before it is accepted.
+
+** Q165: What is OCSP responder latency?
+It is the time taken by the service to answer revocation status checks and affects connection performance.
+
+** Q166: What is certificate freshness?
+Freshness means the certificate is not expired and has valid issuance and revocation status.
+
+** Q167: What is certificate validation failure cause?
+Common causes include expired certs, hostname mismatch, missing intermediate chain, or untrusted roots.
+
+** Q168: What is a certificate chain ordering issue?
+It occurs when certificates are delivered in the wrong order, causing chain validation to fail.
+
+** Q169: What is secure cookie protection?
+Cookies over HTTPS with secure and HttpOnly flags reduce risk of interception or JavaScript access.
+
+** Q170: What is a TLS intercept proxy?
+A TLS intercept proxy decrypts and re-encrypts traffic, often used in enterprise inspection environments.
+
+** Q171: Why are intercept proxies tricky?
+They create a trust boundary and can break certificate validation unless properly managed.
+
+** Q172: What is a man-in-the-middle certificate?
+A malicious certificate may be injected by an intercepting proxy or hostile network actor.
+
+** Q173: What is the difference between trust and encryption alone?
+Encryption without trust does not guarantee you are talking to the intended server.
+
+** Q174: What is certificate trust in browsers?
+Browsers trust a predefined set of CAs and enforce certificate validation rules before accepting a site as secure.
+
+** Q175: What is a subdomain certificate?
+A certificate may be issued to a single subdomain or a set of subdomains with SANs or wildcard coverage.
+
+** Q176: What is a server certificate mismatch?
+It occurs when the cert is valid but for a different hostname than the client is connecting to.
+
+** Q177: What is client certificate authentication?
+Client certificate authentication uses a certificate presented by the client to prove identity to the server.
+
+** Q178: What is mutual TLS?
+Mutual TLS means both parties authenticate each other using certificates.
+
+** Q179: What is client auth in API gateways?
+It is used to authenticate internal services or trusted clients with certificates instead of username/password.
+
+** Q180: What is mTLS reusability?
+It allows secure service-to-service communication in clusters and internal networks without per-request credentials.
+
+* Advanced / Expert
+
+** Q181: What is the purpose of PKCS#11?
+PKCS#11 defines an API for cryptographic hardware tokens and HSM interaction.
+
+** Q182: What is HSM-backed certificate usage?
+It means the private key is securely stored and used by hardware, reducing compromise risk.
+
+** Q183: What is ECDSA vs RSA trade-off?
+ECDSA is often more performant and smaller in key size; RSA is widely supported but bigger and slower for some workloads.
+
+** Q184: Why are elliptic curve algorithms common today?
+They provide strong security with shorter keys and efficient operations.
+
+** Q185: What is a post-quantum cryptography concern?
+Future quantum computers may break widely used public-key systems like RSA and ECC, so post-quantum algorithms are being explored.
+
+** Q186: Why is hybrid key exchange used?
+Hybrid schemes combine classical and post-quantum algorithms to provide transitional security.
+
+** Q187: What is a certificate transparency log suppression?
+It means a CT log may not include certain certificates for policy or operational reasons, which can affect trust.
+
+** Q188: What is a certificate policy OID?
+An OID (Object Identifier) identifies a certificate policy and helps classify usage or compliance requirements.
+
+** Q189: What is an X.509 v3 extension?
+X.509 v3 extensions add features such as SANs, key usage, EKU, and constraints.
+
+** Q190: What is a certificate path building problem?
+It is the process of constructing the chain from the leaf certificate to a trust anchor, which can fail if intermediates are missing.
+
+** Q191: What is a path validation algorithm?
+Path validation confirms the chain is valid, not expired, not revoked, and rooted in trusted trust anchors.
+
+** Q192: Why do some CAs require domain validation?
+Because they need to verify the requestor controls the domain before issuing the certificate.
+
+** Q193: What is DNS validation?
+DNS validation confirms domain control by creating a DNS record that the CA checks.
+
+** Q194: What is HTTP validation?
+HTTP validation confirms domain control by creating a token in a known HTTP endpoint.
+
+** Q195: What is TLS validation?
+TLS validation confirms domain control by establishing a TLS connection and receiving a challenge.
+
+** Q196: What is a challenge token?
+A challenge token is a random value a ACME or validation service checks to confirm control over a domain.
+
+** Q197: What is a certificate revocation strategy?
+It includes CRL, OCSP, or newer mechanisms to check whether certificates are still valid before acceptance.
+
+** Q198: What is the risk of revocation checking failures?
+If revocation checks fail or are unavailable, clients may accept certificates that should no longer be trusted.
+
+** Q199: What is certificate preloading?
+Preloading is the process of including a certificate or CA in a browser or operating system trust store to reduce validation friction.
+
+** Q200: What is the key lesson of TLS and certificates?
+TLS is not just encryption; it is the combination of secure algorithms, strong key management, certificate validation, and trust infrastructure that makes secure communication possible at internet scale.
+
+-----
+
+#+INCLUDE: "../footer.org"
