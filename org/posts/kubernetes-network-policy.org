@@ -1,0 +1,621 @@
+#+TITLE: Kubernetes NetworkPolicy
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes NetworkPolicy
+
+-----
+
+* Beginner
+
+** Q1: What is a Kubernetes NetworkPolicy?
+A NetworkPolicy is a Kubernetes resource that controls how Pods can communicate with each other and with network endpoints.
+
+** Q2: Why do we need NetworkPolicies?
+They provide network-level isolation and enforce who can talk to whom inside the cluster.
+
+** Q3: What is network segmentation?
+Network segmentation divides network traffic into trust zones or boundaries to reduce lateral movement.
+
+** Q4: Why is segmentation important?
+It helps restrict blast radius if a workload is compromised.
+
+** Q5: What is a Pod policy?
+A Pod policy defines network traffic rules for a set of Pods.
+
+** Q6: What are ingress rules?
+Ingress rules define which connections are allowed into a Pod.
+
+** Q7: What are egress rules?
+Egress rules define which connections a Pod is allowed to initiate outbound.
+
+** Q8: What is default-deny?
+Default-deny means no traffic is allowed unless a specific policy allows it.
+
+** Q9: Why is default-deny a common secure posture?
+It reduces accidental or malicious network access to a workload.
+
+** Q10: What does NetworkPolicy apply to?
+A NetworkPolicy applies to Pods selected by labels and optional namespace selectors.
+
+** Q11: What is a `podSelector`?
+A `podSelector` selects the Pods that the policy applies to.
+
+** Q12: What is a `policyTypes` field?
+It defines whether the policy applies to ingress, egress, or both.
+
+** Q13: What is an ingress rule?
+An ingress rule allows incoming connections to matching Pods.
+
+** Q14: What is an egress rule?
+An egress rule allows outgoing connections from matching Pods.
+
+** Q15: What are `from` rules?
+`from` rules specify who may connect to the selected Pods in ingress policies.
+
+** Q16: What are `to` rules?
+`to` rules specify what destinations are allowed for egress traffic.
+
+** Q17: What is a namespace selector?
+A namespace selector matches Pods in specific namespaces.
+
+** Q18: What is a pod selector in a network policy?
+A pod selector can select specific workloads in the same or other namespaces.
+
+** Q19: What is an IPBlock?
+An IPBlock allows or denies traffic to and from specific CIDR ranges.
+
+** Q20: What is a CIDR?
+A CIDR is a network range such as 10.0.0.0/8 or 192.168.1.0/24.
+
+** Q21: Why use IPBlock?
+It allows policies to permit or deny traffic to known external networks or internal ranges.
+
+** Q22: What is a namespace + pod selector combination?
+It selects Pods in specific namespaces that match labels, useful for multi-tenant policies.
+
+** Q23: Why are NetworkPolicies namespaced?
+A NetworkPolicy is created in a namespace and applies only to Pods in that namespace unless cross-namespace selectors are used.
+
+** Q24: What is a Pod not selected by any policy?
+If no policies apply, the default pod network behavior depends on the cluster CNI and default policy settings.
+
+** Q25: What is the default network behavior without NetworkPolicies?
+Many clusters allow unrestricted pod-to-pod communication unless a CNI or security policy restricts it.
+
+** Q26: What is a CNI?
+CNI (Container Network Interface) is the network plugin standard for Kubernetes networking.
+
+** Q27: Why does CNI matter for NetworkPolicies?
+Because NetworkPolicy support depends on the CNI plugin implementing the policy enforcement.
+
+** Q28: What is a network plugin with NetworkPolicy support?
+Examples include Calico, Cilium, Antrea, and others.
+
+** Q29: What is an ingress allowlist?
+An ingress allowlist is a set of allowed sources for incoming traffic to a service or pod.
+
+** Q30: What is an egress allowlist?
+An egress allowlist is a set of allowed destinations for outbound traffic.
+
+** Q31: What is a default allow policy?
+A default allow policy allows traffic unless specifically denied by other rules.
+
+** Q32: Why is default allow often discouraged?
+Because it exposes workloads to more network access than needed.
+
+** Q33: What is pod-to-pod communication?
+Traffic between different Pods in the same or different namespaces.
+
+** Q34: Why do security teams care about pod-to-pod communication?
+Because compromised workloads can otherwise talk to many other workloads.
+
+** Q35: What is cluster egress?
+Traffic leaving the cluster to external systems or services.
+
+** Q36: Why restrict cluster egress?
+Because it helps prevent data exfiltration or communication with malicious endpoints.
+
+** Q37: What is cluster ingress?
+Traffic entering the cluster from outside or from another namespace.
+
+** Q38: Why restrict ingress?
+Because the same principle applies: reduce the attack surface and lateral movement.
+
+** Q39: What is a network policy match label?
+A label is used to group Pods and match them to a NetworkPolicy.
+
+** Q40: What is a `namespaceSelector` match?
+It selects Pods or namespaces by label rather than by exact namespace name.
+
+** Q41: What is a `podSelector` match in the same namespace?
+It selects pods in the same namespace as the policy.
+
+** Q42: What is a `podSelector` match in a different namespace?
+It can select Pods from other namespaces using a namespace selector and pod selector combination.
+
+** Q43: What is a `ports` list in NetworkPolicy?
+It lists the destination ports allowed by an ingress or egress rule.
+
+** Q44: Why list ports explicitly?
+Because policies should permit only the required ports and protocols.
+
+** Q45: What is protocol in a NetworkPolicy?
+It is usually TCP, UDP, or SCTP.
+
+** Q46: Why are protocols important?
+Because a policy may allow HTTP on TCP but not UDP on the same port.
+
+** Q47: Why might a workload need both ingress and egress policies?
+Because some apps must accept inbound traffic and also initiate outbound connections to dependencies.
+
+** Q48: What is a database policy?
+A database policy may allow only the application tier to reach the database port.
+
+** Q49: What is an application tier policy?
+It may allow inbound traffic only from the frontend or API tier.
+
+** Q50: What is an ingress from a namespace?
+A policy may allow ingress from pods in a specific namespace.
+
+** Q51: What is egress to a DNS service?
+Pods often need egress to DNS services on UDP/TCP port 53 for name resolution.
+
+** Q52: Why allow DNS in egress policies?
+Without DNS, pods may not resolve service names or external hostnames.
+
+** Q53: Why do network policies often include DNS exceptions?
+Because many workloads still need to resolve names but should not contact arbitrary external endpoints.
+
+** Q54: What is a `service` port and a network policy port?
+The port in a policy is typically a destination port on the target pod or destination address.
+
+** Q55: Why is policy portability important?
+Because the same app should behave consistently across dev, test, and prod.
+
+** Q56: What is a namespace boundary for network policy?
+A namespace is a security boundary for policies, even when the network plugin supports cross-namespace rules.
+
+** Q57: What is a selected Pod?
+A selected Pod is one that matches the policy selectors.
+
+** Q58: Why is label design critical for policies?
+Because labels are how policies select Pods and groups.
+
+** Q59: What is a label pattern for service tiers?
+Examples: `app: frontend`, `app: api`, `db: postgres`.
+
+** Q60: What is a `NetworkPolicy` YAML object?
+It has metadata, spec, podSelector, policyTypes, ingress, and egress.
+
+** Q61: What is a Kubernetes network plugin model?
+The plugin implements enforcement of NetworkPolicies and low-level networking.
+
+** Q62: Why are some policies ignored if the CNI lacks support?
+NetworkPolicy enforcement depends on the CNI plugin and cluster configuration.
+
+** Q63: Why should network policies be reviewed with the cluster architecture?
+Because some features require special CNI or network settings.
+
+** Q64: What is a cluster-managed firewall?
+It is the network policy system enforced by the CNI plugin.
+
+** Q65: What is an inbound deny by default?
+No traffic enters the pod unless allowed.
+
+** Q66: What is an outbound deny by default?
+No traffic leaves the pod unless allowed.
+
+** Q67: Why do not all policies deny by default?
+Because some workloads need to talk to public APIs or dependencies.
+
+** Q68: Why is it easier to reason about policies when selectors are explicit?
+Because every allowed path is tied to specific labels or CIDR ranges.
+
+** Q69: What is a network policy for a database?
+It may permit ingress only from app pods on database port 5432.
+
+** Q70: What is a network policy for a web server?
+It may allow ingress from the ingress controller or load balancer on HTTP/HTTPS ports.
+
+** Q71: What is a network policy for a worker job?
+It may allow egress to a queue or database while restricting inbound traffic.
+
+** Q72: Why is network policy a control for lateral movement?
+Because compromised workloads cannot easily reach or use other workloads.
+
+** Q73: What is a security boundary in Kubernetes?
+It is a boundary such as namespace, pod group, or trust zone used to isolate workloads.
+
+** Q74: Why is namespace-based isolation useful?
+It separates workloads, teams, or environments and makes policy simpler.
+
+** Q75: What is `policyTypes: [Ingress]`?
+It means the policy only applies to ingress traffic.
+
+** Q76: What is `policyTypes: [Egress]`?
+It means the policy only applies to egress traffic.
+
+** Q77: What is `policyTypes: [Ingress, Egress]`?
+It applies both ingress and egress rules.
+
+** Q78: Why should egress policies be used carefully?
+Because apps may require outbound calls to databases, APIs, or DNS.
+
+** Q79: What is a egress network policy for DNS?
+Usually allow UDP/TCP 53 to the cluster DNS service or upstream DNS resolvers.
+
+** Q80: What is an ingress network policy for a load balancer?
+It allows traffic from the load balancer or ingress controller only on relevant ports.
+
+** Q81: What is a namespace label used in policies?
+It selects namespaces by labels such as `team: payments` or `environment: prod`.
+
+** Q82: Why are namespace labels useful in policy design?
+They allow team- or environment-specific traffic rules.
+
+** Q83: What is a multi-tenant cluster?
+A cluster where multiple teams or workloads share the same infrastructure but require isolation.
+
+** Q84: Why are network policies common in multi-tenant clusters?
+Because they provide strong isolation between teams and workloads.
+
+** Q85: What is a service mesh vs NetworkPolicy?
+A service mesh handles L7 routing and security, while NetworkPolicy works at L3/L4 network enforcement.
+
+** Q86: What is a cluster-level network policy default?
+It may be implemented for all workloads in a namespace or across namespaces.
+
+** Q87: Why monitor network policy behavior in troubleshooting?
+Because policy violations may show as connection resets or timeouts without obvious application errors.
+
+** Q88: Why does debugging network policy require pod labels and selectors?
+Because the policy is based on labels, namespace selectors, and IP rules.
+
+** Q89: What is a policy mismatch?
+It happens when a pod is selected incorrectly or a label is not matching the expected pattern.
+
+** Q90: Why do network policies often need coordination with ingress controllers?
+Because ingress controllers need to be allowed to reach the service ports.
+
+** Q91: What is an ingress controller source?
+It is usually the ingress controller pod or service IPs or a CIDR range.
+
+** Q92: Why is egress to database important?
+Application pods need to reach their database service, often on a specific port.
+
+** Q93: Why might a policy block a startup dependency?
+If a pod depends on a database or external API and the policy is too restrictive.
+
+** Q94: Why are policies usually tested in staging before production?
+Because connectivity mistakes can create outages or unexpected service breakage.
+
+** Q95: Why is performance not the main concern in NetworkPolicies?
+Security and traffic control are primary; performance is secondary but still matters.
+
+** Q96: What is a network policy path to an external service?
+It may allow egress to a specific external IP or CIDR and port.
+
+** Q97: What is a DNS or metadata endpoint egress rule?
+Some systems need egress to cloud metadata endpoints or internal DNS services.
+
+** Q98: What is a port 443 outbound API call?
+A policy may allow HTTPS to certain endpoints while blocking all others.
+
+** Q99: Why allow only necessary ports?
+It reduces the number of possible attack paths from a workload.
+
+** Q100: What is a `podSelector` and a namespace selector combination used for?
+To allow traffic only from selected pods in specific namespaces.
+
+* Intermediate
+
+** Q101: What is a network policy precedence?
+Kubernetes evaluates policies based on matching pods and the selected rules; traffic allowed must match at least one allowed policy.
+
+** Q102: What is implied deny?
+If no matching ingress or egress policy allows traffic, the traffic is denied.
+
+** Q103: Why is a default deny policy easiest to reason about?
+Because it creates a clean list of allowed communications.
+
+** Q104: What is a `deny` rule in NetworkPolicy?
+Kubernetes does not have a direct deny rule object; instead, you define allow rules and default deny by omission.
+
+** Q105: What is zero-trust network design?
+It assumes no workload is trusted by default and restricts communication tightly.
+
+** Q106: Why is zero-trust relevant in Kubernetes?
+Because container-to-container communication often occurs within the same cluster with no natural trust boundary.
+
+** Q107: What is an anti-affinity pattern in network policy?
+It uses specific selectors and policies to ensure workloads do not talk to each other when they should not.
+
+** Q108: What is a pod-to-pod trust boundary?
+It is a logical boundary such as app tier, data tier, or external exposure layer.
+
+** Q109: Why should database tier not accept all inbound traffic?
+Because only application services should reach the database on its proper port.
+
+** Q110: What is a frontend/backend isolation pattern?
+It restricts frontend ingress to public traffic but blocks backend communication except from allowed APIs.
+
+** Q111: Why is the ingress controller allowed through policies?
+Because it handles external traffic into application services.
+
+** Q112: What is a service-to-service isolation pattern?
+It isolates different service groups to reduce lateral movement.
+
+** Q113: What is a queue consumer policy?
+A worker or consumer may only egress to the queue, database, and DNS while denying all else.
+
+** Q114: What is a DNS egress exception?
+It allows DNS lookup to cluster or upstream resolvers while restricting other egress.
+
+** Q115: What is TLS and NetworkPolicy interaction?
+A NetworkPolicy does not inspect HTTPS payload; it only controls traffic paths and ports.
+
+** Q116: Why does NetworkPolicy not replace app security?
+Because an app still needs to validate inputs, APIs, and access control.
+
+** Q117: What is a port 80 and 443 service policy?
+A frontend might allow ingress from the world to HTTP/HTTPS but not to internal management ports.
+
+** Q118: Why is it better to keep management ports private?
+Because management or admin ports should not be publicly reachable.
+
+** Q119: What is `namespaceSelector` and `podSelector` cross-namespace policy?
+It allows a Pod in namespace A to allow traffic from selected Pods in namespace B.
+
+** Q120: Why is cross-namespace policy useful?
+For shared services or multi-team architectures that need controlled communication.
+
+** Q121: What is a policy for external monitoring?
+Monitoring daemons may need egress to metrics systems or collecting endpoints while all other egress is denied.
+
+** Q122: Why does traffic selection depend on labels?
+Labels are the stable identity used by selectors in policy rules.
+
+** Q123: What is a pod label mismatch issue?
+It occurs when labels do not match the intended policy and the Pod ends up with blocked or missing traffic.
+
+** Q124: What is a debug command for policies?
+It often involves checking the pod labels, the NetworkPolicy manifest, and the CNI plugin logs.
+
+** Q125: Why do policy debug issues sometimes look like app failures?
+Because the app may be unreachable or unable to talk to dependencies even though the workload is running.
+
+** Q126: What is a cluster CNI log?
+It can show policy evaluation, packet drops, or agent decisions.
+
+** Q127: Why do some CNI plugins implement egress and ingress differently?
+Because the plugin-specific data plane has different support and semantics.
+
+** Q128: What is application traffic timing and NetworkPolicy?
+Policy checks happen in the data plane, so configuration changes may take effect after a short delay.
+
+** Q129: What is an ingress rule with `ipBlock`?
+It can explicitly allow traffic from a CIDR while denying everything else.
+
+** Q130: Why use `ipBlock` for external dependencies?
+Because the service may be a specific internal or vendor network range.
+
+** Q131: What is traffic allowed by default when no policies exist?
+This depends on the CNI plugin and cluster setup.
+
+** Q132: Why is default behavior before policy often not enough for security?
+Because it does not enforce least privilege or allowlist communication.
+
+** Q133: What is a “deny all by default” posture?
+It is the set of policies that only allows explicitly permitted traffic paths.
+
+** Q134: Why is explicit allow-listing better than broad access?
+It reduces misconfiguration and prevents unvetted access.
+
+** Q135: What is a service dependency policy?
+It restricts which workloads can reach a service, like only the API tier to the database.
+
+** Q136: What is a health check policy?
+Some CNI or load balancers need allowed ingress for health probes or liveness checks.
+
+** Q137: Why should health probes be considered in policy design?
+Because if the health check port is blocked, the workload may appear unhealthy or unready.
+
+** Q138: What is the relation between NetworkPolicy and Service ports?
+Policies usually allow traffic to Service ports and Pod ports, which are often the same or mapped.
+
+** Q139: What is a pod port requirement?
+The policy’s `ports` field should reflect the application’s listening port.
+
+** Q140: Why use port restrictions?
+Because allowing all ports would expose unnecessary application functionality.
+
+** Q141: What is a malicious lateral movement path?
+It is an unintended path between compromised and valuable workloads.
+
+** Q142: Why is namespace policy important for team isolation?
+Because it prevents teams from inadvertently reaching each other’s services in a shared cluster.
+
+** Q143: What is a multi-namespace policy?
+It allows one namespace’s workloads to communicate with selected workloads in another namespace.
+
+** Q144: Why is egress restriction sometimes the source of application failures?
+Because a workload may need to talk to a database, a cloud service, or a queue.
+
+** Q145: Why should policies be tested at runtime?
+Because policy can block traffic even when an app appears to start correctly.
+
+** Q146: Why is logging and monitoring needed with policies?
+To identify dropped connections or unreachable dependencies.
+
+** Q147: What is `kubectl describe networkpolicy`?
+It displays the details and intent of NetworkPolicies in the cluster.
+
+** Q148: Why is `kubectl get networkpolicy` useful?
+It helps validate the actual policy set applied to a namespace.
+
+** Q149: What is a pod service account and network policy relation?
+Service accounts are identity-level controls, while NetworkPolicies control network reachability.
+
+** Q150: Why is a zero-trust posture a good default for Kubernetes?
+Because it requires explicit traffic decisions rather than assuming trust.
+
+** Q151: What is a default deny plus explicit allow pattern?
+It is a security approach where only permitted traffic is allowed.
+
+** Q152: Why use explicit allow-lists for DBs and queues?
+Because they are mission-critical and should be reachable only by expected workloads.
+
+** Q153: What is a worker egress restriction?
+A worker may only egress to the queue and internal APIs while everything else is blocked.
+
+** Q154: Why are CNI plugins so important for NetworkPolicies?
+The plugin is the actual enforcement point, and different plugins may behave differently.
+
+** Q155: Why do some policies appear not to apply?
+Because the workload might not be selected by the policy, or the CNI may not support the feature.
+
+** Q156: What is a policy-limited external dependency?
+A pod may have explicit rules to permit egress to a specific CIDR or DNS endpoint.
+
+** Q157: Why should egress policies consider DNS resolution?
+Because DNS is required for service discovery and name-based access.
+
+** Q158: What is introspection of dropped connections?
+It often uses logs, packet analysis, or CNI diagnostic outputs to find traffic that is being denied.
+
+** Q159: What is a network policy for cronjobs?
+A cron job may need outbound access to a database or external API but does not need inbound traffic.
+
+** Q160: What is a network policy for sidecars?
+Sidecars may need specific traffic rules based on whether they serve metrics, proxy traffic, or act as a security agent.
+
+** Q161: Why is network policy design often part of platform hardening?
+Because it reduces the risk of attack paths within a cluster.
+
+** Q162: What is an identity and network boundary?
+An identity is the workload or user; a network boundary restricts traffic between identities.
+
+** Q163: Why is cluster CNI support a prerequisite?
+Without support, network policies cannot be enforced.
+
+** Q164: What is control plane vs data plane in NetworkPolicy?
+The control plane manages policy objects; the data plane enforces packet filtering.
+
+** Q165: Why is policy enforcement at the data plane important?
+Because it stops traffic as it moves between pods rather than only at the app layer.
+
+** Q166: Why do teams often start with default-deny in dev/test?
+It uncovers app dependencies early and avoids hidden network assumptions.
+
+** Q167: Why is policy allowlist generation important?
+Because it ensures all required communication paths are explicitly accounted for.
+
+** Q168: What is a pod port for metrics scraping?
+Monitoring or metrics systems often need a policy exception to reach metrics endpoints.
+
+** Q169: Why allow only required ports to monitoring systems?
+Because metrics endpoints are often not security-sensitive, but they still should be controlled.
+
+** Q170: Why should internal service traffic be explicit?
+Because internal service names and ports can otherwise be used in unexpected ways.
+
+** Q171: What is a Pod traffic map?
+It is a diagram or inventory of which pods can talk to which workloads.
+
+** Q172: Why is traffic mapping useful for policy design?
+Because it makes security design easier to reason about.
+
+** Q173: What is a network policy for a queue consumer?
+It could allow ingress from the queue service and egress to the database and internal APIs.
+
+** Q174: What is a network policy for a service mesh sidecar?
+It may allow inbound traffic from the mesh and outbound to backend services.
+
+** Q175: What is a network policy for a logging agent?
+It may allow egress to logging endpoints while denying inbound access.
+
+** Q176: What is the typical pattern for web applications?
+Allow ingress from ingress controllers or external ranges, egress to dependencies and DNS, deny all else.
+
+** Q177: What is a policy design challenge?
+It must be strict enough for security but flexible enough for the app to function.
+
+** Q178: What is a liveness and readiness check effect on policy?
+If probes or monitoring systems are blocked, the service may appear unhealthy or fail health checks.
+
+** Q179: Why is K8s network policy considered a control plane and data plane element?
+Because the policy exists in Kubernetes but is enforced in the network data plane by the CNI.
+
+** Q180: What is the core lesson of NetworkPolicy?
+NetworkPolicy is the Kubernetes mechanism for network isolation: it defines allowed ingress and egress paths so workloads can communicate only on explicitly permitted paths.
+
+* Advanced / Expert
+
+** Q181: What is packet filtering in the CNI?
+The CNI plugin filters packets based on source/destination labels, namespaces, and ports.
+
+** Q182: What is L3/L4 enforcement in NetworkPolicy?
+It enforces at the IP and port layer, not application content layer.
+
+** Q183: Why is L3/L4 not enough for all security?
+Because it does not inspect HTTP paths, bodies, or application-level semantics.
+
+** Q184: What is a service mesh for L7 policy?
+A service mesh provides L7-aware routing, authorization, and observability.
+
+** Q185: Why use both NetworkPolicy and service mesh?
+Because NetworkPolicy controls pod-to-pod network reachability while service mesh can control HTTP semantics and mTLS.
+
+** Q186: What is mTLS and NetworkPolicy interaction?
+mTLS secures service-to-service traffic; NetworkPolicy restricts which endpoints can talk to each other.
+
+** Q187: What is policy enforcement drift?
+It happens when policy rules no longer match the actual network design or workload labels.
+
+** Q188: Why do labels matter for policy stability?
+Because if labels change, the policy may inadvertently select or stop selecting workloads.
+
+** Q189: What is policy-based segmentation?
+It is the use of NetworkPolicies to define boundaries and controls between workloads.
+
+** Q190: Why is policy at the cluster boundary important?
+Because it reduces cross-namespace blast radius and helps maintain multi-tenant isolation.
+
+** Q191: What is cross-namespace policy design?
+It allows controlled communication between namespaces without fully open traffic.
+
+** Q192: Why are cross-namespace policies security-sensitive?
+Because they intentionally allow traffic across namespace boundaries and should be reviewed carefully.
+
+** Q193: What is egress to internet or external services?
+It requires explicit IPBlock or external endpoint policy, often with DNS exceptions.
+
+** Q194: What is the challenge of restricting internet egress?
+Because many workloads legitimately need outbound access to external APIs or package managers.
+
+** Q195: What is a restricted egress model?
+It allows only specific destinations and protocols and blocks all others.
+
+** Q196: Why do some clusters restrict egress by default?
+To prevent compromised workloads from contacting command-and-control endpoints or exfiltrating data.
+
+** Q197: What is a trusted subnet?
+A trusted subnet is a CIDR range allowed for internal service access.
+
+** Q198: Why is IPBlock used for trusted subnet policies?
+Because internal networks or service ranges are often more trusted and can be explicitly allowed.
+
+** Q199: Why are NetworkPolicies often paired with kube-proxy or CNI observability?
+Because they help diagnose whether traffic is being dropped or allowed unexpectedly.
+
+** Q200: What is the ultimate point of NetworkPolicy?
+It is Kubernetes’ way to control the network trust boundaries between workloads, enforcing least privilege and reducing lateral movement risk inside the cluster.
+
+-----
+
+#+INCLUDE: "../footer.org"

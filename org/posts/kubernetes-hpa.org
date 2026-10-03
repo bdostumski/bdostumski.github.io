@@ -1,0 +1,627 @@
+#+TITLE: Kubernetes HPA
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes HPA
+
+-----
+
+* Beginner
+
+** Q1: What is Kubernetes HPA?
+HPA (Horizontal Pod Autoscaler) automatically scales the number of Pods in a workload based on observed resource usage or custom metrics.
+
+** Q2: Why do we need autoscaling?
+Autoscaling helps applications handle variable load without manual intervention.
+
+** Q3: What is horizontal scaling?
+Horizontal scaling adds more Pod replicas to handle more traffic or work.
+
+** Q4: What is vertical scaling?
+Vertical scaling changes the resource size of a Pod, such as increasing CPU or memory.
+
+** Q5: Why is HPA called horizontal autoscaling?
+Because it scales the number of replicas horizontally.
+
+** Q6: What kinds of workloads does HPA work with?
+HPA typically works with Deployments, ReplicaSets, StatefulSets, and similar scalable workloads.
+
+** Q7: What is a target utilization?
+A target utilization is the desired percentage of resource usage that HPA tries to maintain.
+
+** Q8: What is CPU utilization in HPA?
+CPU utilization is the ratio of current CPU usage to the requested CPU for a Pod.
+
+** Q9: What is a target CPU utilization?
+It is the CPU percentage HPA aims to achieve for the workload.
+
+** Q10: What is average utilization?
+Average utilization is the average of resource usage across Pods in a scalable workload.
+
+** Q11: What is a minReplicaCount?
+The minimum number of Pods allowed by the HPA.
+
+** Q12: What is a maxReplicaCount?
+The maximum number of Pods allowed by the HPA.
+
+** Q13: What is a currentReplicaCount?
+The current number of Pods in the workload.
+
+** Q14: What is desiredReplicaCount?
+The target number of Pods that HPA intends to scale the workload to.
+
+** Q15: What is the HPA controller?
+The HPA controller continuously evaluates metrics and updates the replica count.
+
+** Q16: Why is HPA implemented as a controller?
+Because it continuously reconciles desired scale with observed metrics.
+
+** Q17: What is scale-out?
+Scale-out means increasing Pod replicas to handle more load.
+
+** Q18: What is scale-in?
+Scale-in means decreasing Pod replicas when demand drops.
+
+** Q19: Why is scaling important for cost and performance?
+It helps keep services responsive while avoiding excessive wasted capacity.
+
+** Q20: What is a Deployment in Kubernetes?
+A Deployment manages a ReplicaSet and maintains a desired number of replicas.
+
+** Q21: Why does HPA usually target a Deployment?
+Because a Deployment is the common workload pattern for stateless apps.
+
+** Q22: What does HPA update?
+HPA updates the replica count of the target workload.
+
+** Q23: How does HPA decide to scale?
+It compares observed metrics to targets and calculates the desired replica count.
+
+** Q24: What is metric aggregation?
+Metric aggregation combines values from multiple Pods to compute a workload-level metric.
+
+** Q25: What is a metrics server?
+The Metrics Server collects resource metrics like CPU and memory for pods and nodes.
+
+** Q26: What is a custom metric?
+A custom metric is a business or application-specific metric, such as queue depth or request rate.
+
+** Q27: What is an external metric?
+An external metric originates outside the cluster, such as a cloud service or queue in another system.
+
+** Q28: Why do custom and external metrics matter?
+Because CPU-only scaling is not always enough for real workload decisions.
+
+** Q29: What is an HPA target type?
+The target type describes what kind of metric or resource HPA uses, such as CPU utilization or a custom metric.
+
+** Q30: What is a `deployment` or `HorizontalPodAutoscaler` resource?
+It is the Kubernetes object representing the HPA configuration.
+
+** Q31: What is `apiVersion: autoscaling/v2`?
+It is a newer HPA API version used for richer scaling behavior and multiple metrics.
+
+** Q32: Why is autoscaling useful with microservices?
+Because different services experience different traffic patterns and need different scale behavior.
+
+** Q33: Why is having a stable pod request important?
+HPA relies on CPU request and other metrics to estimate whether the workload is under or over capacity.
+
+** Q34: Why are resource requests critical to HPA?
+Because HPA compares current utilization to target utilization based on workload requests.
+
+** Q35: What is a Pod request for CPU?
+It is the amount of CPU the pod expects to use and that the scheduler reserves for it.
+
+** Q36: Why is an adequate CPU request important for HPA?
+If the request is too low, HPA may think the pod is “overutilized” or scale unpredictably.
+
+** Q37: Why is a too-high CPU request a problem?
+It can make HPA scale too conservatively or create unschedulable capacity issues.
+
+** Q38: Why do poor requests cause poor scaling?
+Because HPA computes utilization based on request values and observed usage.
+
+** Q39: What is a scaling event?
+A scaling event is a change to the desired pod count triggered by metrics.
+
+** Q40: Why do scaling events matter?
+They directly affect cost, availability, and response time.
+
+** Q41: What is average CPU usage?
+The average CPU used across the replicas in the workload.
+
+** Q42: What is CPU utilization formula?
+Utilization is roughly current CPU / requested CPU * 100%.
+
+** Q43: Why does HPA compare to target utilization?
+It seeks to maintain the workload near the target value to balance responsiveness and cost.
+
+** Q44: What is the default HPA behavior?
+The default HPA behavior is to scale based on CPU utilization when configured.
+
+** Q45: What is a target value for custom metrics?
+The target value is the desired metric value HPA tries to maintain.
+
+** Q46: What is a metric average value?
+For some metric types, HPA calculates the average across Pods or a selected set of workloads.
+
+** Q47: What is `behavior` in HPA?
+Behavior defines scaling policies for scaling up and down such as stabilization windows and policy rules.
+
+** Q48: Why is scaling behavior important?
+It prevents rapid flapping or oscillation as metrics move.
+
+** Q49: What is `scaleUp` policy?
+It defines how aggressive HPA should be when scaling up.
+
+** Q50: What is `scaleDown` policy?
+It defines how conservative HPA should be when scaling down.
+
+** Q51: What is a stabilization window?
+A stabilization window prevents HPA from reacting too quickly to short-term metric spikes.
+
+** Q52: Why is stabilization important?
+It reduces churn and makes scale decisions more stable.
+
+** Q53: What is HPA `selectPolicy`?
+It chooses how HPA picks the desired replicas under multiple scaling metrics.
+
+** Q54: What is `maxReplicas` and `minReplicas`?
+The minimum and maximum replicas allowed in the HPA range.
+
+** Q55: Why do HPA policies matter in production?
+Because aggressive scaling can cause thrash or poor cost control.
+
+** Q56: What is demand-based scaling?
+It increases or decreases replicas based on actual traffic or workload.
+
+** Q57: What is a scale-down delay?
+It is a delay or stabilization period that prevents quick scale-in after a brief spike.
+
+** Q58: What is a scale-up delay?
+It is a delay or stabilization policy used to avoid too-frequent scale-out events.
+
+** Q59: Why do scale-up and scale-down differ?
+Because scaling out often needs to be faster than scaling in, especially for latency-sensitive applications.
+
+** Q60: What is a custom metric example?
+Examples include queue length, requests per second, or a business metric like active users.
+
+** Q61: What is an external metric example?
+A message queue depth in a cloud service or a third-party API throughput measure.
+
+** Q62: What is the role of metrics adapters?
+Metrics adapters provide custom and external metrics to the HPA controller.
+
+** Q63: Why are adapters needed?
+Because HPA does not directly know every custom metric source.
+
+** Q64: What is Prometheus Adapter?
+Prometheus Adapter is a common adapter that exposes Prometheus metrics as custom metrics for HPA.
+
+** Q65: Why is Prometheus popular for HPA?
+Because it is widely used for application-level metrics and system observability.
+
+** Q66: What is a queue depth metric?
+Queue depth is the number of pending tasks in a queue, which can indicate demand.
+
+** Q67: Why use queue depth for HPA?
+Because CPU may not reflect actual demand for async processing workloads.
+
+** Q68: What is a request-rate metric?
+It measures incoming requests per second and can be a strong indicator for web workloads.
+
+** Q69: Why is queue depth better than CPU for some workloads?
+Because some workloads are I/O or queue-based and CPU usage may not track demand well.
+
+** Q70: Why is application-level scaling sometimes better than CPU scaling?
+Because CPU utilization may not correlate to user-visible demand or business capacity.
+
+** Q71: What is a scaling threshold?
+A threshold is a metric value that triggers scale-out or scale-in.
+
+** Q72: What is a pod count formula?
+HPA calculates a new desired replica count using the target metric and current metric.
+
+** Q73: Why should pods have requests set before using HPA?
+Without requests, CPU utilization calculations may not make sense or can be misleading.
+
+** Q74: What is a HPA cooldown?
+A cooldown is a delay period before another scaling action occurs.
+
+** Q75: What does `apiVersion: autoscaling/v2beta2` mean?
+It is an older HPA API version; newer clusters typically use v2 or v2beta2 depending on version.
+
+** Q76: What is a target value for CPU percent?
+Often 50, 60, or 70 percent is used.
+
+** Q77: Why is 80% a common target?
+Because it balances utilization and cushion but varies by workload type.
+
+** Q78: What is the risk of using too-high target utilization?
+It may allow pods to saturate or become slow before scaling happens.
+
+** Q79: What is the risk of using too-low target utilization?
+It may over-scale and increase costs without enough gain.
+
+** Q80: Why is scaling policy tuning important?
+It avoids oscillation or poor cost/performance balance.
+
+** Q81: What is a `behaviour` policy example?
+For example: scaleUp in steps, scaleDown slower than scaleUp.
+
+** Q82: Why do scaleDown policies often differ from scaleUp?
+Because scale-down is usually more conservative to avoid thrashing or disruption.
+
+** Q83: What is `selectPolicy: Max` in HPA?
+It chooses the maximum of multiple metric calculations when multiple metrics are used.
+
+** Q84: What is `selectPolicy: Min`?
+It chooses the minimum required replica count under multiple metrics.
+
+** Q85: Why do multiple metrics matter?
+Because some workloads may be limited by CPU, memory, or queue depth at different times.
+
+** Q86: What is a custom metric threshold used for HPA?
+It defines the target queue depth, latency, or throughput value.
+
+** Q87: What is a multi-metric HPA?
+A multi-metric HPA bases decisions on more than one metric.
+
+** Q88: Why is multi-metric HPA useful?
+Because real workloads may need several signals, such as CPU and queue depth.
+
+** Q89: What is a workload-specific metric?
+A metric unique to the application or service, like business transactions per second.
+
+** Q90: Why is `kubectl get hpa` important?
+It lets you check current HPA status and scaling decisions.
+
+** Q91: What is HPA status in Kubernetes?
+It includes current metrics, desired replicas, and the scaling event history.
+
+** Q92: Why is HPA status valuable?
+It gives insight into whether autoscaling is functioning as expected.
+
+** Q93: What are common reasons HPA does not scale?
+- missing metrics-server
+- no resource requests
+- custom metrics not configured
+- low target or wrong thresholds
+- pods not ready
+- workload not scalable
+
+** Q94: Why is missing metrics-server a common issue?
+Because HPA depends on metrics to know current utilization.
+
+** Q95: Why is readiness important to HPA scaling?
+Because HPA should only scale based on active and ready pods.
+
+** Q96: What is a slow or under-served user experience due to HPA?
+It occurs when the workload scales too slowly or not at all under demand.
+
+** Q97: What is over-scaling due to HPA?
+It occurs when the workload scales too aggressively and increases cost without benefit.
+
+** Q98: What is a high target utilization?
+It tends to scale later and thus may delay handling bursts.
+
+** Q99: What is a low target utilization?
+It tends to scale earlier, leading to more replicas and higher cost.
+
+** Q100: Why is HPA not a replacement for good capacity planning?
+Because autoscaling still needs a solid baseline of app sizing and resource requirements.
+
+* Intermediate
+
+** Q101: What is a `metrics.k8s.io` API?
+It is the standard metrics API for CPU and memory metrics used by HPA.
+
+** Q102: What is the Metrics API server deployment?
+It is often deployed as `metrics-server` in the cluster.
+
+** Q103: Why is metrics-server not always present?
+It is an optional cluster component and must be installed.
+
+** Q104: What is a custom metrics API?
+It is an API that exposes application-specific or external metrics to the HPA.
+
+** Q105: What is a custom metrics adapter?
+It adapts external metrics to the Kubernetes autoscaling API.
+
+** Q106: Why do custom metrics support more realistic scaling?
+Because some apps do not scale directly with CPU or memory.
+
+** Q107: What is a queue depth metric in HPA?
+A queue depth metric can indicate backlog or pending work to scale based on demand.
+
+** Q108: What is transaction rate scaling?
+Scaling based on application transactions or requests per second.
+
+** Q109: Why is API request rate a good HPA signal?
+Because it often correlates directly with user demand.
+
+** Q110: What is the relationship between HPA and Service load balancers?
+The Service load balancer receives traffic, and HPA changes pod count to absorb it.
+
+** Q111: Why is ingress traffic relevant to HPA?
+Ingress traffic is often a strong driver for scale-out events.
+
+** Q112: What is a KEDA?
+KEDA (Kubernetes Event-Driven Autoscaling) is a scaler framework for event-driven workloads using custom metrics and queue-based scaling.
+
+** Q113: What is KEDA for?
+It helps scale workloads based on events, message queues, and external systems.
+
+** Q114: Why is KEDA often used with HPA?
+Because queue-based or event-driven workloads often do not scale well on CPU alone.
+
+** Q115: What is a Prometheus adapter?
+It exposes Prometheus metrics to HPA as custom metrics.
+
+** Q116: Why is Prometheus common in HPA environments?
+Because many clusters already gather Prometheus metrics of application performance and load.
+
+** Q117: What is an external metric source?
+It is usually a metric not in the cluster itself, like cloud queue length or an API usage counter.
+
+** Q118: What is a targetAverageValue?
+It is the target value for average custom metrics in an HPA.
+
+** Q119: Why are target values often set to a business threshold?
+Because they reflect actual working capacity rather than generic resource percentages.
+
+** Q120: What is a `currentMetricValue`?
+It is the current observed value of the metric used by HPA.
+
+** Q121: Why is actual metric value important?
+Because the scale decision depends on current vs target.
+
+** Q122: What is a desired replica formula roughly?
+Desired replicas ≈ current replicas * (current metric / target metric)
+
+** Q123: Why does the formula matter?
+Because it shows how HPA scales in proportion to observed demand.
+
+** Q124: What is a scaling event with stabilization?
+The HPA may delay a decision until a period of stable metrics or until the same value persists.
+
+** Q125: Why do changes in metrics cause scale churn?
+Because if metrics fluctuate too much, HPA might quickly scale up and down.
+
+** Q126: What is an HPA overreacting to a short burst?
+This occurs when the stabilization window is too short or target thresholds are too aggressive.
+
+** Q127: What is underversizing or oversizing a workload?
+Undersizing means too few replicas for demand.
+Oversizing means too many replicas for actual need.
+
+** Q128: Why do HPA and resource limits interact?
+Because HPA uses resource utilization information, which is affected by pod requests and CPU limits.
+
+** Q129: What is a CPU request mismatch?
+If the CPU request is too low or too high, HPA may scale wrongly.
+
+** Q130: Why does readiness matter to HPA?
+Pods that are not ready should not count toward the metric or traffic serving.
+
+** Q131: What is a pod readiness metric?
+It ensures HPA only uses eligible pods in the scale decision.
+
+** Q132: What is a delay before scale-out?
+Some clusters or policies intentionally wait to avoid reacting to brief spikes.
+
+** Q133: What is a delay before scale-in?
+Scale-in is often delayed to avoid churn after a brief drop in demand.
+
+** Q134: Why do scale-in policies differ from scale-out?
+Because cluster cost and service stability make slow scale-down more cautious.
+
+** Q135: What is a scaling decision under multi-metric HPA?
+It picks the replica count required by all relevant metrics according to the policy.
+
+** Q136: What is a `math` formula in HPA?
+It is the calculation used to determine the desired replica count under certain metric types.
+
+** Q137: Why is scaling not purely deterministic?
+Because metrics, polls, and workloads vary over time, so HPA uses a controller loop.
+
+** Q138: What is resource utilization calibration?
+It is the tuning process of setting requests and targets to align with actual workload behavior.
+
+** Q139: Why do operators add custom metrics for queue depth?
+Because queue depth can be a better backlog indicator than CPU.
+
+** Q140: What is app throughput scaling?
+It uses requests per second or transaction rate as the scaling signal.
+
+** Q141: Why is throughput sometimes better than CPU?
+Because throughput is directly tied to user demand.
+
+** Q142: Why is HPA sometimes paired with VPA?
+VPA (Vertical Pod Autoscaler) can adjust pod resource requests and limits while HPA handles replicas.
+
+** Q143: What is the difference between HPA and VPA?
+HPA changes pod count; VPA changes pod size.
+
+** Q144: Why do they sometimes work together?
+They handle different dimensions of scaling: count and size.
+
+** Q145: What is `HorizontalPodAutoscaler` object definition?
+It includes scale target, metrics, min/max replicas, and behavior.
+
+** Q146: Why are HPA objects declarative?
+Because they describe desired scaling behavior in YAML and are reconciled by the controller.
+
+** Q147: Why do cluster operators care about scaling policy?
+Because it affects cloud cost, latency, and cluster stability.
+
+** Q148: What is a scaling threshold tuning failure?
+It happens when thresholds are set too low or too high and do not match workload behavior.
+
+** Q149: How do you debug HPA issues?
+Check metrics-server, resource requests, target values, pod readiness, and custom metrics.
+
+** Q150: What is a misconfigured HPA?
+It may never scale, scale too aggressively, or scale based on the wrong metric.
+
+** Q151: Why should target metrics be realistic?
+Because unrealistic metrics create noisy and unstable scaling decisions.
+
+** Q152: What is an application metric like `requests_per_second`?
+It directly reflects user demand and can be more meaningful than CPU.
+
+** Q153: What is `maxReplicas` used for?
+It prevents runaway cost or over-scaling under heavy load.
+
+** Q154: What is `minReplicas` used for?
+It keeps a baseline number of replicas available even during low traffic.
+
+** Q155: Why does low traffic often still need a baseline?
+Some workloads require a minimum footprint for responsiveness or warm-up.
+
+** Q156: What is a no-scaling condition?
+It occurs when metrics are stable and within the target bands.
+
+** Q157: Why do some clusters disable HPA by default?
+Because some workloads are not well-suited for autoscaling or need custom metrics and tuning.
+
+** Q158: What is capacity headroom?
+It is spare capacity beyond current load that allows good scaling behavior and latency.
+
+** Q159: What can happen during scaling up?
+New pods take time to start, so scaling may lag behind traffic.
+
+** Q160: Why is startup time important for HPA?
+Because HPA must account for the time to create new replicas before demand spikes too much.
+
+** Q161: What is a bursty workload?
+A workload with sudden spikes in traffic or processing demand.
+
+** Q162: Why does HPA need a stabilization window?
+Because short-lived bursts should not immediately trigger large or oscillating scale changes.
+
+** Q163: What is a scale event and how is it observed?
+It is visible via HPA status and the workload replica count.
+
+** Q164: Why do custom metrics often require adapters?
+Because Kubernetes core metrics do not cover application-specific business metrics.
+
+** Q165: What is scale-to-zero?
+Some serverless or event-driven systems can scale to zero when idle.
+
+** Q166: Why is scale-to-zero not universal for Kubernetes?
+Because many workloads must remain warm or ready to respond quickly.
+
+** Q167: What is a cold start?
+A cold start is the delay before a new replica becomes ready to handle traffic.
+
+** Q168: Why do cold starts matter?
+Because they affect user latency and the speed needed for HPA to react.
+
+** Q169: What is a user-facing latency problem due to HPA lag?
+It occurs when traffic increases faster than pods can scale.
+
+** Q170: Why do target thresholds need to reflect real traffic?
+Because otherwise autoscaling may be too slow or too aggressive.
+
+** Q171: What is a queue backlog?
+It is the amount of work waiting to be processed.
+
+** Q172: Why is queue backlog a strong HPA metric?
+Because it can often predict service saturation even when CPU is not high.
+
+** Q173: What is SLO?
+SLO (Service Level Objective) is a target for acceptable application performance or reliability.
+
+** Q174: Why tie HPA to SLOs?
+Because scaling decisions should preserve service quality, not just maximize capacity.
+
+** Q175: What is HPA-driven cost optimization?
+It reduces idle spend by scaling down during low traffic, while satisfying SLOs.
+
+** Q176: What is HPA for background jobs?
+It can scale workers based on queue depth or processing backlog.
+
+** Q177: What is a threshold for background job queue depth?
+It determines when additional workers should be created.
+
+** Q178: Why are HPA decisions often tuned for specific app types?
+Because web traffic, async workers, and databases behave differently.
+
+** Q179: Why are application-level metrics more useful than raw CPU?
+Because CPU is a generic measure, not necessarily the real bottleneck.
+
+** Q180: What is the goal of HPA?
+To keep the workload close to the desired demand and maintain service quality while minimizing wasted capacity.
+
+* Advanced / Expert
+
+** Q181: What is the HPA control loop?
+It is the periodic controller reconciliation loop that compares metrics to targets and updates replica counts.
+
+** Q182: Why is the HPA control loop important?
+Because it defines the cadence and responsiveness of scaling behavior.
+
+** Q183: What is a scale-out step policy?
+It is a policy setting how much to increase replicas per scaling event.
+
+** Q184: What is a scale-down step policy?
+It determines how many replicas to remove per scale-down event.
+
+** Q185: Why are step policies useful?
+They prevent sudden large swings or overreactive adjustments.
+
+** Q186: What is a `stabilizationWindowSeconds`?
+It is the amount of time HPA waits before recognizing a new scaling trend.
+
+** Q187: Why are stabilization windows important in dynamic workloads?
+Because metrics can fluctuate and produce noisy scale decisions.
+
+** Q188: What is a policy `changePercent`?
+It defines the percent change allowed per scaling event.
+
+** Q189: How is custom scaling computed?
+It depends on the custom metric target and the current metric value for the workload.
+
+** Q190: Why are custom metrics important for stateful or event-driven systems?
+Because CPU is not always a direct signal of demand or backlog.
+
+** Q191: What is KEDA’s architectural relationship with HPA?
+KEDA extends HPA by providing scaling based on external or event-driven metrics.
+
+** Q192: Why is KEDA often preferred for Kafka or queue-based systems?
+Because such systems often scale according to queue depth or backlog length more than CPU.
+
+** Q193: What is an external metric adapter?
+It bridges a third-party metric source to the HPA API.
+
+** Q194: Why is metric adapter reliability critical?
+Because an unstable metric source can lead to wrong or dangerous scale decisions.
+
+** Q195: What is a metric-source failure?
+It happens when the metrics adapter or backend cannot provide valid data to HPA.
+
+** Q196: Why does HPA need healthy metrics?
+Because without them, it cannot compute a correct replica count.
+
+** Q197: What is the relation between HPA and SLOs?
+HPA should be tuned to keep service-level objectives within target thresholds while optimizing cost.
+
+** Q198: What is a scale-out safety check?
+It is a policy or condition ensuring scaling does not exceed safe or cost-effective limits.
+
+** Q199: What is a scale-down safety check?
+It ensures scaling down does not reduce capacity below acceptable service levels.
+
+** Q200: What is the main lesson of Kubernetes HPA?
+HPA is the cluster’s automatic capacity controller: it measures demand, compares it to policy and target values, and adjusts replica counts to balance performance, cost, and resilience.
+
+-----
+
+#+INCLUDE: "../footer.org"

@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kubernetes HPA</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Kubernetes HPA</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-org595bedf" class="outline-2">
+<h2 id="org595bedf">Kubernetes HPA</h2>
+<div class="outline-text-2" id="text-org595bedf">
+<hr>
+</div>
+</div>
+<div id="outline-container-org390952e" class="outline-2">
+<h2 id="org390952e">Beginner</h2>
+<div class="outline-text-2" id="text-org390952e">
+</div>
+<div id="outline-container-org517cfdb" class="outline-3">
+<h3 id="org517cfdb">Q1: What is Kubernetes HPA?</h3>
+<div class="outline-text-3" id="text-org517cfdb">
+<p>
+HPA (Horizontal Pod Autoscaler) automatically scales the number of Pods in a workload based on observed resource usage or custom metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org62bb6df" class="outline-3">
+<h3 id="org62bb6df">Q2: Why do we need autoscaling?</h3>
+<div class="outline-text-3" id="text-org62bb6df">
+<p>
+Autoscaling helps applications handle variable load without manual intervention.
+</p>
+</div>
+</div>
+<div id="outline-container-org4752e34" class="outline-3">
+<h3 id="org4752e34">Q3: What is horizontal scaling?</h3>
+<div class="outline-text-3" id="text-org4752e34">
+<p>
+Horizontal scaling adds more Pod replicas to handle more traffic or work.
+</p>
+</div>
+</div>
+<div id="outline-container-org5562241" class="outline-3">
+<h3 id="org5562241">Q4: What is vertical scaling?</h3>
+<div class="outline-text-3" id="text-org5562241">
+<p>
+Vertical scaling changes the resource size of a Pod, such as increasing CPU or memory.
+</p>
+</div>
+</div>
+<div id="outline-container-org9d20bf3" class="outline-3">
+<h3 id="org9d20bf3">Q5: Why is HPA called horizontal autoscaling?</h3>
+<div class="outline-text-3" id="text-org9d20bf3">
+<p>
+Because it scales the number of replicas horizontally.
+</p>
+</div>
+</div>
+<div id="outline-container-org054f3e7" class="outline-3">
+<h3 id="org054f3e7">Q6: What kinds of workloads does HPA work with?</h3>
+<div class="outline-text-3" id="text-org054f3e7">
+<p>
+HPA typically works with Deployments, ReplicaSets, StatefulSets, and similar scalable workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org7cba0cc" class="outline-3">
+<h3 id="org7cba0cc">Q7: What is a target utilization?</h3>
+<div class="outline-text-3" id="text-org7cba0cc">
+<p>
+A target utilization is the desired percentage of resource usage that HPA tries to maintain.
+</p>
+</div>
+</div>
+<div id="outline-container-org5f605f7" class="outline-3">
+<h3 id="org5f605f7">Q8: What is CPU utilization in HPA?</h3>
+<div class="outline-text-3" id="text-org5f605f7">
+<p>
+CPU utilization is the ratio of current CPU usage to the requested CPU for a Pod.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb166b76" class="outline-3">
+<h3 id="orgb166b76">Q9: What is a target CPU utilization?</h3>
+<div class="outline-text-3" id="text-orgb166b76">
+<p>
+It is the CPU percentage HPA aims to achieve for the workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org8db6ffc" class="outline-3">
+<h3 id="org8db6ffc">Q10: What is average utilization?</h3>
+<div class="outline-text-3" id="text-org8db6ffc">
+<p>
+Average utilization is the average of resource usage across Pods in a scalable workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e033e4" class="outline-3">
+<h3 id="org6e033e4">Q11: What is a minReplicaCount?</h3>
+<div class="outline-text-3" id="text-org6e033e4">
+<p>
+The minimum number of Pods allowed by the HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-orgef6a778" class="outline-3">
+<h3 id="orgef6a778">Q12: What is a maxReplicaCount?</h3>
+<div class="outline-text-3" id="text-orgef6a778">
+<p>
+The maximum number of Pods allowed by the HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-org8201258" class="outline-3">
+<h3 id="org8201258">Q13: What is a currentReplicaCount?</h3>
+<div class="outline-text-3" id="text-org8201258">
+<p>
+The current number of Pods in the workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org6c3f84a" class="outline-3">
+<h3 id="org6c3f84a">Q14: What is desiredReplicaCount?</h3>
+<div class="outline-text-3" id="text-org6c3f84a">
+<p>
+The target number of Pods that HPA intends to scale the workload to.
+</p>
+</div>
+</div>
+<div id="outline-container-org9ae0a80" class="outline-3">
+<h3 id="org9ae0a80">Q15: What is the HPA controller?</h3>
+<div class="outline-text-3" id="text-org9ae0a80">
+<p>
+The HPA controller continuously evaluates metrics and updates the replica count.
+</p>
+</div>
+</div>
+<div id="outline-container-org38cd11d" class="outline-3">
+<h3 id="org38cd11d">Q16: Why is HPA implemented as a controller?</h3>
+<div class="outline-text-3" id="text-org38cd11d">
+<p>
+Because it continuously reconciles desired scale with observed metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org952761b" class="outline-3">
+<h3 id="org952761b">Q17: What is scale-out?</h3>
+<div class="outline-text-3" id="text-org952761b">
+<p>
+Scale-out means increasing Pod replicas to handle more load.
+</p>
+</div>
+</div>
+<div id="outline-container-org32251ec" class="outline-3">
+<h3 id="org32251ec">Q18: What is scale-in?</h3>
+<div class="outline-text-3" id="text-org32251ec">
+<p>
+Scale-in means decreasing Pod replicas when demand drops.
+</p>
+</div>
+</div>
+<div id="outline-container-org460beb1" class="outline-3">
+<h3 id="org460beb1">Q19: Why is scaling important for cost and performance?</h3>
+<div class="outline-text-3" id="text-org460beb1">
+<p>
+It helps keep services responsive while avoiding excessive wasted capacity.
+</p>
+</div>
+</div>
+<div id="outline-container-org93547b1" class="outline-3">
+<h3 id="org93547b1">Q20: What is a Deployment in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org93547b1">
+<p>
+A Deployment manages a ReplicaSet and maintains a desired number of replicas.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ee991f" class="outline-3">
+<h3 id="org1ee991f">Q21: Why does HPA usually target a Deployment?</h3>
+<div class="outline-text-3" id="text-org1ee991f">
+<p>
+Because a Deployment is the common workload pattern for stateless apps.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ccad32" class="outline-3">
+<h3 id="org1ccad32">Q22: What does HPA update?</h3>
+<div class="outline-text-3" id="text-org1ccad32">
+<p>
+HPA updates the replica count of the target workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org4190461" class="outline-3">
+<h3 id="org4190461">Q23: How does HPA decide to scale?</h3>
+<div class="outline-text-3" id="text-org4190461">
+<p>
+It compares observed metrics to targets and calculates the desired replica count.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf9de5bd" class="outline-3">
+<h3 id="orgf9de5bd">Q24: What is metric aggregation?</h3>
+<div class="outline-text-3" id="text-orgf9de5bd">
+<p>
+Metric aggregation combines values from multiple Pods to compute a workload-level metric.
+</p>
+</div>
+</div>
+<div id="outline-container-org2d63410" class="outline-3">
+<h3 id="org2d63410">Q25: What is a metrics server?</h3>
+<div class="outline-text-3" id="text-org2d63410">
+<p>
+The Metrics Server collects resource metrics like CPU and memory for pods and nodes.
+</p>
+</div>
+</div>
+<div id="outline-container-org8783e3a" class="outline-3">
+<h3 id="org8783e3a">Q26: What is a custom metric?</h3>
+<div class="outline-text-3" id="text-org8783e3a">
+<p>
+A custom metric is a business or application-specific metric, such as queue depth or request rate.
+</p>
+</div>
+</div>
+<div id="outline-container-org589efd3" class="outline-3">
+<h3 id="org589efd3">Q27: What is an external metric?</h3>
+<div class="outline-text-3" id="text-org589efd3">
+<p>
+An external metric originates outside the cluster, such as a cloud service or queue in another system.
+</p>
+</div>
+</div>
+<div id="outline-container-org5076d2e" class="outline-3">
+<h3 id="org5076d2e">Q28: Why do custom and external metrics matter?</h3>
+<div class="outline-text-3" id="text-org5076d2e">
+<p>
+Because CPU-only scaling is not always enough for real workload decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org8294fa4" class="outline-3">
+<h3 id="org8294fa4">Q29: What is an HPA target type?</h3>
+<div class="outline-text-3" id="text-org8294fa4">
+<p>
+The target type describes what kind of metric or resource HPA uses, such as CPU utilization or a custom metric.
+</p>
+</div>
+</div>
+<div id="outline-container-orga848758" class="outline-3">
+<h3 id="orga848758">Q30: What is a `deployment` or `HorizontalPodAutoscaler` resource?</h3>
+<div class="outline-text-3" id="text-orga848758">
+<p>
+It is the Kubernetes object representing the HPA configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd16b0a5" class="outline-3">
+<h3 id="orgd16b0a5">Q31: What is `apiVersion: autoscaling/v2`?</h3>
+<div class="outline-text-3" id="text-orgd16b0a5">
+<p>
+It is a newer HPA API version used for richer scaling behavior and multiple metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-orga5f80b5" class="outline-3">
+<h3 id="orga5f80b5">Q32: Why is autoscaling useful with microservices?</h3>
+<div class="outline-text-3" id="text-orga5f80b5">
+<p>
+Because different services experience different traffic patterns and need different scale behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org8869274" class="outline-3">
+<h3 id="org8869274">Q33: Why is having a stable pod request important?</h3>
+<div class="outline-text-3" id="text-org8869274">
+<p>
+HPA relies on CPU request and other metrics to estimate whether the workload is under or over capacity.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb040ece" class="outline-3">
+<h3 id="orgb040ece">Q34: Why are resource requests critical to HPA?</h3>
+<div class="outline-text-3" id="text-orgb040ece">
+<p>
+Because HPA compares current utilization to target utilization based on workload requests.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3002e7" class="outline-3">
+<h3 id="orgd3002e7">Q35: What is a Pod request for CPU?</h3>
+<div class="outline-text-3" id="text-orgd3002e7">
+<p>
+It is the amount of CPU the pod expects to use and that the scheduler reserves for it.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb0910b" class="outline-3">
+<h3 id="orgbb0910b">Q36: Why is an adequate CPU request important for HPA?</h3>
+<div class="outline-text-3" id="text-orgbb0910b">
+<p>
+If the request is too low, HPA may think the pod is “overutilized” or scale unpredictably.
+</p>
+</div>
+</div>
+<div id="outline-container-org7a7a340" class="outline-3">
+<h3 id="org7a7a340">Q37: Why is a too-high CPU request a problem?</h3>
+<div class="outline-text-3" id="text-org7a7a340">
+<p>
+It can make HPA scale too conservatively or create unschedulable capacity issues.
+</p>
+</div>
+</div>
+<div id="outline-container-org0d1d3d3" class="outline-3">
+<h3 id="org0d1d3d3">Q38: Why do poor requests cause poor scaling?</h3>
+<div class="outline-text-3" id="text-org0d1d3d3">
+<p>
+Because HPA computes utilization based on request values and observed usage.
+</p>
+</div>
+</div>
+<div id="outline-container-org9f0c578" class="outline-3">
+<h3 id="org9f0c578">Q39: What is a scaling event?</h3>
+<div class="outline-text-3" id="text-org9f0c578">
+<p>
+A scaling event is a change to the desired pod count triggered by metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org2828157" class="outline-3">
+<h3 id="org2828157">Q40: Why do scaling events matter?</h3>
+<div class="outline-text-3" id="text-org2828157">
+<p>
+They directly affect cost, availability, and response time.
+</p>
+</div>
+</div>
+<div id="outline-container-org1429854" class="outline-3">
+<h3 id="org1429854">Q41: What is average CPU usage?</h3>
+<div class="outline-text-3" id="text-org1429854">
+<p>
+The average CPU used across the replicas in the workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org47fcebc" class="outline-3">
+<h3 id="org47fcebc">Q42: What is CPU utilization formula?</h3>
+<div class="outline-text-3" id="text-org47fcebc">
+<p>
+Utilization is roughly current CPU / requested CPU * 100%.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc49001b" class="outline-3">
+<h3 id="orgc49001b">Q43: Why does HPA compare to target utilization?</h3>
+<div class="outline-text-3" id="text-orgc49001b">
+<p>
+It seeks to maintain the workload near the target value to balance responsiveness and cost.
+</p>
+</div>
+</div>
+<div id="outline-container-org09ce376" class="outline-3">
+<h3 id="org09ce376">Q44: What is the default HPA behavior?</h3>
+<div class="outline-text-3" id="text-org09ce376">
+<p>
+The default HPA behavior is to scale based on CPU utilization when configured.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8d208d" class="outline-3">
+<h3 id="orgc8d208d">Q45: What is a target value for custom metrics?</h3>
+<div class="outline-text-3" id="text-orgc8d208d">
+<p>
+The target value is the desired metric value HPA tries to maintain.
+</p>
+</div>
+</div>
+<div id="outline-container-org317bcb0" class="outline-3">
+<h3 id="org317bcb0">Q46: What is a metric average value?</h3>
+<div class="outline-text-3" id="text-org317bcb0">
+<p>
+For some metric types, HPA calculates the average across Pods or a selected set of workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc00ab91" class="outline-3">
+<h3 id="orgc00ab91">Q47: What is `behavior` in HPA?</h3>
+<div class="outline-text-3" id="text-orgc00ab91">
+<p>
+Behavior defines scaling policies for scaling up and down such as stabilization windows and policy rules.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf983552" class="outline-3">
+<h3 id="orgf983552">Q48: Why is scaling behavior important?</h3>
+<div class="outline-text-3" id="text-orgf983552">
+<p>
+It prevents rapid flapping or oscillation as metrics move.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbe44c0d" class="outline-3">
+<h3 id="orgbe44c0d">Q49: What is `scaleUp` policy?</h3>
+<div class="outline-text-3" id="text-orgbe44c0d">
+<p>
+It defines how aggressive HPA should be when scaling up.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ad32b8" class="outline-3">
+<h3 id="org1ad32b8">Q50: What is `scaleDown` policy?</h3>
+<div class="outline-text-3" id="text-org1ad32b8">
+<p>
+It defines how conservative HPA should be when scaling down.
+</p>
+</div>
+</div>
+<div id="outline-container-org284dcbc" class="outline-3">
+<h3 id="org284dcbc">Q51: What is a stabilization window?</h3>
+<div class="outline-text-3" id="text-org284dcbc">
+<p>
+A stabilization window prevents HPA from reacting too quickly to short-term metric spikes.
+</p>
+</div>
+</div>
+<div id="outline-container-org363575d" class="outline-3">
+<h3 id="org363575d">Q52: Why is stabilization important?</h3>
+<div class="outline-text-3" id="text-org363575d">
+<p>
+It reduces churn and makes scale decisions more stable.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf508d44" class="outline-3">
+<h3 id="orgf508d44">Q53: What is HPA `selectPolicy`?</h3>
+<div class="outline-text-3" id="text-orgf508d44">
+<p>
+It chooses how HPA picks the desired replicas under multiple scaling metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org769f2c9" class="outline-3">
+<h3 id="org769f2c9">Q54: What is `maxReplicas` and `minReplicas`?</h3>
+<div class="outline-text-3" id="text-org769f2c9">
+<p>
+The minimum and maximum replicas allowed in the HPA range.
+</p>
+</div>
+</div>
+<div id="outline-container-orge35900a" class="outline-3">
+<h3 id="orge35900a">Q55: Why do HPA policies matter in production?</h3>
+<div class="outline-text-3" id="text-orge35900a">
+<p>
+Because aggressive scaling can cause thrash or poor cost control.
+</p>
+</div>
+</div>
+<div id="outline-container-org9471bc3" class="outline-3">
+<h3 id="org9471bc3">Q56: What is demand-based scaling?</h3>
+<div class="outline-text-3" id="text-org9471bc3">
+<p>
+It increases or decreases replicas based on actual traffic or workload.
+</p>
+</div>
+</div>
+<div id="outline-container-orgacfa200" class="outline-3">
+<h3 id="orgacfa200">Q57: What is a scale-down delay?</h3>
+<div class="outline-text-3" id="text-orgacfa200">
+<p>
+It is a delay or stabilization period that prevents quick scale-in after a brief spike.
+</p>
+</div>
+</div>
+<div id="outline-container-org11719d5" class="outline-3">
+<h3 id="org11719d5">Q58: What is a scale-up delay?</h3>
+<div class="outline-text-3" id="text-org11719d5">
+<p>
+It is a delay or stabilization policy used to avoid too-frequent scale-out events.
+</p>
+</div>
+</div>
+<div id="outline-container-org55fd648" class="outline-3">
+<h3 id="org55fd648">Q59: Why do scale-up and scale-down differ?</h3>
+<div class="outline-text-3" id="text-org55fd648">
+<p>
+Because scaling out often needs to be faster than scaling in, especially for latency-sensitive applications.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf6378d" class="outline-3">
+<h3 id="orgbf6378d">Q60: What is a custom metric example?</h3>
+<div class="outline-text-3" id="text-orgbf6378d">
+<p>
+Examples include queue length, requests per second, or a business metric like active users.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d25926" class="outline-3">
+<h3 id="org7d25926">Q61: What is an external metric example?</h3>
+<div class="outline-text-3" id="text-org7d25926">
+<p>
+A message queue depth in a cloud service or a third-party API throughput measure.
+</p>
+</div>
+</div>
+<div id="outline-container-org950edf4" class="outline-3">
+<h3 id="org950edf4">Q62: What is the role of metrics adapters?</h3>
+<div class="outline-text-3" id="text-org950edf4">
+<p>
+Metrics adapters provide custom and external metrics to the HPA controller.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb414446" class="outline-3">
+<h3 id="orgb414446">Q63: Why are adapters needed?</h3>
+<div class="outline-text-3" id="text-orgb414446">
+<p>
+Because HPA does not directly know every custom metric source.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f71c7e" class="outline-3">
+<h3 id="org4f71c7e">Q64: What is Prometheus Adapter?</h3>
+<div class="outline-text-3" id="text-org4f71c7e">
+<p>
+Prometheus Adapter is a common adapter that exposes Prometheus metrics as custom metrics for HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-org91d144d" class="outline-3">
+<h3 id="org91d144d">Q65: Why is Prometheus popular for HPA?</h3>
+<div class="outline-text-3" id="text-org91d144d">
+<p>
+Because it is widely used for application-level metrics and system observability.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd84a10" class="outline-3">
+<h3 id="orgdd84a10">Q66: What is a queue depth metric?</h3>
+<div class="outline-text-3" id="text-orgdd84a10">
+<p>
+Queue depth is the number of pending tasks in a queue, which can indicate demand.
+</p>
+</div>
+</div>
+<div id="outline-container-org9eedf90" class="outline-3">
+<h3 id="org9eedf90">Q67: Why use queue depth for HPA?</h3>
+<div class="outline-text-3" id="text-org9eedf90">
+<p>
+Because CPU may not reflect actual demand for async processing workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org39a48b7" class="outline-3">
+<h3 id="org39a48b7">Q68: What is a request-rate metric?</h3>
+<div class="outline-text-3" id="text-org39a48b7">
+<p>
+It measures incoming requests per second and can be a strong indicator for web workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org3db1f7b" class="outline-3">
+<h3 id="org3db1f7b">Q69: Why is queue depth better than CPU for some workloads?</h3>
+<div class="outline-text-3" id="text-org3db1f7b">
+<p>
+Because some workloads are I/O or queue-based and CPU usage may not track demand well.
+</p>
+</div>
+</div>
+<div id="outline-container-org2be3fb2" class="outline-3">
+<h3 id="org2be3fb2">Q70: Why is application-level scaling sometimes better than CPU scaling?</h3>
+<div class="outline-text-3" id="text-org2be3fb2">
+<p>
+Because CPU utilization may not correlate to user-visible demand or business capacity.
+</p>
+</div>
+</div>
+<div id="outline-container-org0f8e72c" class="outline-3">
+<h3 id="org0f8e72c">Q71: What is a scaling threshold?</h3>
+<div class="outline-text-3" id="text-org0f8e72c">
+<p>
+A threshold is a metric value that triggers scale-out or scale-in.
+</p>
+</div>
+</div>
+<div id="outline-container-org944fb47" class="outline-3">
+<h3 id="org944fb47">Q72: What is a pod count formula?</h3>
+<div class="outline-text-3" id="text-org944fb47">
+<p>
+HPA calculates a new desired replica count using the target metric and current metric.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb6d65e8" class="outline-3">
+<h3 id="orgb6d65e8">Q73: Why should pods have requests set before using HPA?</h3>
+<div class="outline-text-3" id="text-orgb6d65e8">
+<p>
+Without requests, CPU utilization calculations may not make sense or can be misleading.
+</p>
+</div>
+</div>
+<div id="outline-container-org9561913" class="outline-3">
+<h3 id="org9561913">Q74: What is a HPA cooldown?</h3>
+<div class="outline-text-3" id="text-org9561913">
+<p>
+A cooldown is a delay period before another scaling action occurs.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd738b76" class="outline-3">
+<h3 id="orgd738b76">Q75: What does `apiVersion: autoscaling/v2beta2` mean?</h3>
+<div class="outline-text-3" id="text-orgd738b76">
+<p>
+It is an older HPA API version; newer clusters typically use v2 or v2beta2 depending on version.
+</p>
+</div>
+</div>
+<div id="outline-container-org270796c" class="outline-3">
+<h3 id="org270796c">Q76: What is a target value for CPU percent?</h3>
+<div class="outline-text-3" id="text-org270796c">
+<p>
+Often 50, 60, or 70 percent is used.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb79545f" class="outline-3">
+<h3 id="orgb79545f">Q77: Why is 80% a common target?</h3>
+<div class="outline-text-3" id="text-orgb79545f">
+<p>
+Because it balances utilization and cushion but varies by workload type.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeb1abbe" class="outline-3">
+<h3 id="orgeb1abbe">Q78: What is the risk of using too-high target utilization?</h3>
+<div class="outline-text-3" id="text-orgeb1abbe">
+<p>
+It may allow pods to saturate or become slow before scaling happens.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8aef0b" class="outline-3">
+<h3 id="orgf8aef0b">Q79: What is the risk of using too-low target utilization?</h3>
+<div class="outline-text-3" id="text-orgf8aef0b">
+<p>
+It may over-scale and increase costs without enough gain.
+</p>
+</div>
+</div>
+<div id="outline-container-org906107d" class="outline-3">
+<h3 id="org906107d">Q80: Why is scaling policy tuning important?</h3>
+<div class="outline-text-3" id="text-org906107d">
+<p>
+It avoids oscillation or poor cost/performance balance.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ce9dfb" class="outline-3">
+<h3 id="org2ce9dfb">Q81: What is a `behaviour` policy example?</h3>
+<div class="outline-text-3" id="text-org2ce9dfb">
+<p>
+For example: scaleUp in steps, scaleDown slower than scaleUp.
+</p>
+</div>
+</div>
+<div id="outline-container-org00af84d" class="outline-3">
+<h3 id="org00af84d">Q82: Why do scaleDown policies often differ from scaleUp?</h3>
+<div class="outline-text-3" id="text-org00af84d">
+<p>
+Because scale-down is usually more conservative to avoid thrashing or disruption.
+</p>
+</div>
+</div>
+<div id="outline-container-org1907d52" class="outline-3">
+<h3 id="org1907d52">Q83: What is `selectPolicy: Max` in HPA?</h3>
+<div class="outline-text-3" id="text-org1907d52">
+<p>
+It chooses the maximum of multiple metric calculations when multiple metrics are used.
+</p>
+</div>
+</div>
+<div id="outline-container-org83fea3c" class="outline-3">
+<h3 id="org83fea3c">Q84: What is `selectPolicy: Min`?</h3>
+<div class="outline-text-3" id="text-org83fea3c">
+<p>
+It chooses the minimum required replica count under multiple metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org053a6ea" class="outline-3">
+<h3 id="org053a6ea">Q85: Why do multiple metrics matter?</h3>
+<div class="outline-text-3" id="text-org053a6ea">
+<p>
+Because some workloads may be limited by CPU, memory, or queue depth at different times.
+</p>
+</div>
+</div>
+<div id="outline-container-org15f070e" class="outline-3">
+<h3 id="org15f070e">Q86: What is a custom metric threshold used for HPA?</h3>
+<div class="outline-text-3" id="text-org15f070e">
+<p>
+It defines the target queue depth, latency, or throughput value.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc556fdb" class="outline-3">
+<h3 id="orgc556fdb">Q87: What is a multi-metric HPA?</h3>
+<div class="outline-text-3" id="text-orgc556fdb">
+<p>
+A multi-metric HPA bases decisions on more than one metric.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a13730" class="outline-3">
+<h3 id="org8a13730">Q88: Why is multi-metric HPA useful?</h3>
+<div class="outline-text-3" id="text-org8a13730">
+<p>
+Because real workloads may need several signals, such as CPU and queue depth.
+</p>
+</div>
+</div>
+<div id="outline-container-org4d4806a" class="outline-3">
+<h3 id="org4d4806a">Q89: What is a workload-specific metric?</h3>
+<div class="outline-text-3" id="text-org4d4806a">
+<p>
+A metric unique to the application or service, like business transactions per second.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2f5cc1" class="outline-3">
+<h3 id="orgd2f5cc1">Q90: Why is `kubectl get hpa` important?</h3>
+<div class="outline-text-3" id="text-orgd2f5cc1">
+<p>
+It lets you check current HPA status and scaling decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org75b329a" class="outline-3">
+<h3 id="org75b329a">Q91: What is HPA status in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org75b329a">
+<p>
+It includes current metrics, desired replicas, and the scaling event history.
+</p>
+</div>
+</div>
+<div id="outline-container-org7c1a2b0" class="outline-3">
+<h3 id="org7c1a2b0">Q92: Why is HPA status valuable?</h3>
+<div class="outline-text-3" id="text-org7c1a2b0">
+<p>
+It gives insight into whether autoscaling is functioning as expected.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e9485d" class="outline-3">
+<h3 id="org1e9485d">Q93: What are common reasons HPA does not scale?</h3>
+<div class="outline-text-3" id="text-org1e9485d">
+<ul class="org-ul">
+<li>missing metrics-server</li>
+<li>no resource requests</li>
+<li>custom metrics not configured</li>
+<li>low target or wrong thresholds</li>
+<li>pods not ready</li>
+<li>workload not scalable</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2efadbc" class="outline-3">
+<h3 id="org2efadbc">Q94: Why is missing metrics-server a common issue?</h3>
+<div class="outline-text-3" id="text-org2efadbc">
+<p>
+Because HPA depends on metrics to know current utilization.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc73db2c" class="outline-3">
+<h3 id="orgc73db2c">Q95: Why is readiness important to HPA scaling?</h3>
+<div class="outline-text-3" id="text-orgc73db2c">
+<p>
+Because HPA should only scale based on active and ready pods.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea126ac" class="outline-3">
+<h3 id="orgea126ac">Q96: What is a slow or under-served user experience due to HPA?</h3>
+<div class="outline-text-3" id="text-orgea126ac">
+<p>
+It occurs when the workload scales too slowly or not at all under demand.
+</p>
+</div>
+</div>
+<div id="outline-container-orgde24405" class="outline-3">
+<h3 id="orgde24405">Q97: What is over-scaling due to HPA?</h3>
+<div class="outline-text-3" id="text-orgde24405">
+<p>
+It occurs when the workload scales too aggressively and increases cost without benefit.
+</p>
+</div>
+</div>
+<div id="outline-container-orge857ee7" class="outline-3">
+<h3 id="orge857ee7">Q98: What is a high target utilization?</h3>
+<div class="outline-text-3" id="text-orge857ee7">
+<p>
+It tends to scale later and thus may delay handling bursts.
+</p>
+</div>
+</div>
+<div id="outline-container-org52fd7dc" class="outline-3">
+<h3 id="org52fd7dc">Q99: What is a low target utilization?</h3>
+<div class="outline-text-3" id="text-org52fd7dc">
+<p>
+It tends to scale earlier, leading to more replicas and higher cost.
+</p>
+</div>
+</div>
+<div id="outline-container-org9d82b70" class="outline-3">
+<h3 id="org9d82b70">Q100: Why is HPA not a replacement for good capacity planning?</h3>
+<div class="outline-text-3" id="text-org9d82b70">
+<p>
+Because autoscaling still needs a solid baseline of app sizing and resource requirements.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcf850ad" class="outline-2">
+<h2 id="orgcf850ad">Intermediate</h2>
+<div class="outline-text-2" id="text-orgcf850ad">
+</div>
+<div id="outline-container-org67561d7" class="outline-3">
+<h3 id="org67561d7">Q101: What is a `metrics.k8s.io` API?</h3>
+<div class="outline-text-3" id="text-org67561d7">
+<p>
+It is the standard metrics API for CPU and memory metrics used by HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-orge1e7e3e" class="outline-3">
+<h3 id="orge1e7e3e">Q102: What is the Metrics API server deployment?</h3>
+<div class="outline-text-3" id="text-orge1e7e3e">
+<p>
+It is often deployed as `metrics-server` in the cluster.
+</p>
+</div>
+</div>
+<div id="outline-container-org772ae7f" class="outline-3">
+<h3 id="org772ae7f">Q103: Why is metrics-server not always present?</h3>
+<div class="outline-text-3" id="text-org772ae7f">
+<p>
+It is an optional cluster component and must be installed.
+</p>
+</div>
+</div>
+<div id="outline-container-orga27b5a3" class="outline-3">
+<h3 id="orga27b5a3">Q104: What is a custom metrics API?</h3>
+<div class="outline-text-3" id="text-orga27b5a3">
+<p>
+It is an API that exposes application-specific or external metrics to the HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c25f89" class="outline-3">
+<h3 id="org5c25f89">Q105: What is a custom metrics adapter?</h3>
+<div class="outline-text-3" id="text-org5c25f89">
+<p>
+It adapts external metrics to the Kubernetes autoscaling API.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd910b75" class="outline-3">
+<h3 id="orgd910b75">Q106: Why do custom metrics support more realistic scaling?</h3>
+<div class="outline-text-3" id="text-orgd910b75">
+<p>
+Because some apps do not scale directly with CPU or memory.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd9df625" class="outline-3">
+<h3 id="orgd9df625">Q107: What is a queue depth metric in HPA?</h3>
+<div class="outline-text-3" id="text-orgd9df625">
+<p>
+A queue depth metric can indicate backlog or pending work to scale based on demand.
+</p>
+</div>
+</div>
+<div id="outline-container-org31d51af" class="outline-3">
+<h3 id="org31d51af">Q108: What is transaction rate scaling?</h3>
+<div class="outline-text-3" id="text-org31d51af">
+<p>
+Scaling based on application transactions or requests per second.
+</p>
+</div>
+</div>
+<div id="outline-container-org5bb5c90" class="outline-3">
+<h3 id="org5bb5c90">Q109: Why is API request rate a good HPA signal?</h3>
+<div class="outline-text-3" id="text-org5bb5c90">
+<p>
+Because it often correlates directly with user demand.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc48b3e" class="outline-3">
+<h3 id="orgdc48b3e">Q110: What is the relationship between HPA and Service load balancers?</h3>
+<div class="outline-text-3" id="text-orgdc48b3e">
+<p>
+The Service load balancer receives traffic, and HPA changes pod count to absorb it.
+</p>
+</div>
+</div>
+<div id="outline-container-orga842df3" class="outline-3">
+<h3 id="orga842df3">Q111: Why is ingress traffic relevant to HPA?</h3>
+<div class="outline-text-3" id="text-orga842df3">
+<p>
+Ingress traffic is often a strong driver for scale-out events.
+</p>
+</div>
+</div>
+<div id="outline-container-org8fd4f13" class="outline-3">
+<h3 id="org8fd4f13">Q112: What is a KEDA?</h3>
+<div class="outline-text-3" id="text-org8fd4f13">
+<p>
+KEDA (Kubernetes Event-Driven Autoscaling) is a scaler framework for event-driven workloads using custom metrics and queue-based scaling.
+</p>
+</div>
+</div>
+<div id="outline-container-org008d8a5" class="outline-3">
+<h3 id="org008d8a5">Q113: What is KEDA for?</h3>
+<div class="outline-text-3" id="text-org008d8a5">
+<p>
+It helps scale workloads based on events, message queues, and external systems.
+</p>
+</div>
+</div>
+<div id="outline-container-orga643a79" class="outline-3">
+<h3 id="orga643a79">Q114: Why is KEDA often used with HPA?</h3>
+<div class="outline-text-3" id="text-orga643a79">
+<p>
+Because queue-based or event-driven workloads often do not scale well on CPU alone.
+</p>
+</div>
+</div>
+<div id="outline-container-org306b645" class="outline-3">
+<h3 id="org306b645">Q115: What is a Prometheus adapter?</h3>
+<div class="outline-text-3" id="text-org306b645">
+<p>
+It exposes Prometheus metrics to HPA as custom metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-org05b1c19" class="outline-3">
+<h3 id="org05b1c19">Q116: Why is Prometheus common in HPA environments?</h3>
+<div class="outline-text-3" id="text-org05b1c19">
+<p>
+Because many clusters already gather Prometheus metrics of application performance and load.
+</p>
+</div>
+</div>
+<div id="outline-container-org57a86ff" class="outline-3">
+<h3 id="org57a86ff">Q117: What is an external metric source?</h3>
+<div class="outline-text-3" id="text-org57a86ff">
+<p>
+It is usually a metric not in the cluster itself, like cloud queue length or an API usage counter.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb402b9b" class="outline-3">
+<h3 id="orgb402b9b">Q118: What is a targetAverageValue?</h3>
+<div class="outline-text-3" id="text-orgb402b9b">
+<p>
+It is the target value for average custom metrics in an HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ac0832" class="outline-3">
+<h3 id="org8ac0832">Q119: Why are target values often set to a business threshold?</h3>
+<div class="outline-text-3" id="text-org8ac0832">
+<p>
+Because they reflect actual working capacity rather than generic resource percentages.
+</p>
+</div>
+</div>
+<div id="outline-container-org150acbd" class="outline-3">
+<h3 id="org150acbd">Q120: What is a `currentMetricValue`?</h3>
+<div class="outline-text-3" id="text-org150acbd">
+<p>
+It is the current observed value of the metric used by HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-org240d37f" class="outline-3">
+<h3 id="org240d37f">Q121: Why is actual metric value important?</h3>
+<div class="outline-text-3" id="text-org240d37f">
+<p>
+Because the scale decision depends on current vs target.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce91090" class="outline-3">
+<h3 id="orgce91090">Q122: What is a desired replica formula roughly?</h3>
+<div class="outline-text-3" id="text-orgce91090">
+<p>
+Desired replicas ≈ current replicas * (current metric / target metric)
+</p>
+</div>
+</div>
+<div id="outline-container-org416734a" class="outline-3">
+<h3 id="org416734a">Q123: Why does the formula matter?</h3>
+<div class="outline-text-3" id="text-org416734a">
+<p>
+Because it shows how HPA scales in proportion to observed demand.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc12cb6" class="outline-3">
+<h3 id="orgbc12cb6">Q124: What is a scaling event with stabilization?</h3>
+<div class="outline-text-3" id="text-orgbc12cb6">
+<p>
+The HPA may delay a decision until a period of stable metrics or until the same value persists.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a7222a" class="outline-3">
+<h3 id="org6a7222a">Q125: Why do changes in metrics cause scale churn?</h3>
+<div class="outline-text-3" id="text-org6a7222a">
+<p>
+Because if metrics fluctuate too much, HPA might quickly scale up and down.
+</p>
+</div>
+</div>
+<div id="outline-container-org44e4631" class="outline-3">
+<h3 id="org44e4631">Q126: What is an HPA overreacting to a short burst?</h3>
+<div class="outline-text-3" id="text-org44e4631">
+<p>
+This occurs when the stabilization window is too short or target thresholds are too aggressive.
+</p>
+</div>
+</div>
+<div id="outline-container-org9f8aeec" class="outline-3">
+<h3 id="org9f8aeec">Q127: What is underversizing or oversizing a workload?</h3>
+<div class="outline-text-3" id="text-org9f8aeec">
+<p>
+Undersizing means too few replicas for demand.
+Oversizing means too many replicas for actual need.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd7ab1a5" class="outline-3">
+<h3 id="orgd7ab1a5">Q128: Why do HPA and resource limits interact?</h3>
+<div class="outline-text-3" id="text-orgd7ab1a5">
+<p>
+Because HPA uses resource utilization information, which is affected by pod requests and CPU limits.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbb31ee1" class="outline-3">
+<h3 id="orgbb31ee1">Q129: What is a CPU request mismatch?</h3>
+<div class="outline-text-3" id="text-orgbb31ee1">
+<p>
+If the CPU request is too low or too high, HPA may scale wrongly.
+</p>
+</div>
+</div>
+<div id="outline-container-org3d168d3" class="outline-3">
+<h3 id="org3d168d3">Q130: Why does readiness matter to HPA?</h3>
+<div class="outline-text-3" id="text-org3d168d3">
+<p>
+Pods that are not ready should not count toward the metric or traffic serving.
+</p>
+</div>
+</div>
+<div id="outline-container-org8a75224" class="outline-3">
+<h3 id="org8a75224">Q131: What is a pod readiness metric?</h3>
+<div class="outline-text-3" id="text-org8a75224">
+<p>
+It ensures HPA only uses eligible pods in the scale decision.
+</p>
+</div>
+</div>
+<div id="outline-container-org1994db0" class="outline-3">
+<h3 id="org1994db0">Q132: What is a delay before scale-out?</h3>
+<div class="outline-text-3" id="text-org1994db0">
+<p>
+Some clusters or policies intentionally wait to avoid reacting to brief spikes.
+</p>
+</div>
+</div>
+<div id="outline-container-org278d527" class="outline-3">
+<h3 id="org278d527">Q133: What is a delay before scale-in?</h3>
+<div class="outline-text-3" id="text-org278d527">
+<p>
+Scale-in is often delayed to avoid churn after a brief drop in demand.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c04f51" class="outline-3">
+<h3 id="org1c04f51">Q134: Why do scale-in policies differ from scale-out?</h3>
+<div class="outline-text-3" id="text-org1c04f51">
+<p>
+Because cluster cost and service stability make slow scale-down more cautious.
+</p>
+</div>
+</div>
+<div id="outline-container-org6fec3e2" class="outline-3">
+<h3 id="org6fec3e2">Q135: What is a scaling decision under multi-metric HPA?</h3>
+<div class="outline-text-3" id="text-org6fec3e2">
+<p>
+It picks the replica count required by all relevant metrics according to the policy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcdf504e" class="outline-3">
+<h3 id="orgcdf504e">Q136: What is a `math` formula in HPA?</h3>
+<div class="outline-text-3" id="text-orgcdf504e">
+<p>
+It is the calculation used to determine the desired replica count under certain metric types.
+</p>
+</div>
+</div>
+<div id="outline-container-org971fd4d" class="outline-3">
+<h3 id="org971fd4d">Q137: Why is scaling not purely deterministic?</h3>
+<div class="outline-text-3" id="text-org971fd4d">
+<p>
+Because metrics, polls, and workloads vary over time, so HPA uses a controller loop.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ca9334" class="outline-3">
+<h3 id="org1ca9334">Q138: What is resource utilization calibration?</h3>
+<div class="outline-text-3" id="text-org1ca9334">
+<p>
+It is the tuning process of setting requests and targets to align with actual workload behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org3df8eb8" class="outline-3">
+<h3 id="org3df8eb8">Q139: Why do operators add custom metrics for queue depth?</h3>
+<div class="outline-text-3" id="text-org3df8eb8">
+<p>
+Because queue depth can be a better backlog indicator than CPU.
+</p>
+</div>
+</div>
+<div id="outline-container-orge16534b" class="outline-3">
+<h3 id="orge16534b">Q140: What is app throughput scaling?</h3>
+<div class="outline-text-3" id="text-orge16534b">
+<p>
+It uses requests per second or transaction rate as the scaling signal.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb387b05" class="outline-3">
+<h3 id="orgb387b05">Q141: Why is throughput sometimes better than CPU?</h3>
+<div class="outline-text-3" id="text-orgb387b05">
+<p>
+Because throughput is directly tied to user demand.
+</p>
+</div>
+</div>
+<div id="outline-container-org40be645" class="outline-3">
+<h3 id="org40be645">Q142: Why is HPA sometimes paired with VPA?</h3>
+<div class="outline-text-3" id="text-org40be645">
+<p>
+VPA (Vertical Pod Autoscaler) can adjust pod resource requests and limits while HPA handles replicas.
+</p>
+</div>
+</div>
+<div id="outline-container-org3379c0a" class="outline-3">
+<h3 id="org3379c0a">Q143: What is the difference between HPA and VPA?</h3>
+<div class="outline-text-3" id="text-org3379c0a">
+<p>
+HPA changes pod count; VPA changes pod size.
+</p>
+</div>
+</div>
+<div id="outline-container-org831b963" class="outline-3">
+<h3 id="org831b963">Q144: Why do they sometimes work together?</h3>
+<div class="outline-text-3" id="text-org831b963">
+<p>
+They handle different dimensions of scaling: count and size.
+</p>
+</div>
+</div>
+<div id="outline-container-org382b12e" class="outline-3">
+<h3 id="org382b12e">Q145: What is `HorizontalPodAutoscaler` object definition?</h3>
+<div class="outline-text-3" id="text-org382b12e">
+<p>
+It includes scale target, metrics, min/max replicas, and behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org93a298a" class="outline-3">
+<h3 id="org93a298a">Q146: Why are HPA objects declarative?</h3>
+<div class="outline-text-3" id="text-org93a298a">
+<p>
+Because they describe desired scaling behavior in YAML and are reconciled by the controller.
+</p>
+</div>
+</div>
+<div id="outline-container-org9382209" class="outline-3">
+<h3 id="org9382209">Q147: Why do cluster operators care about scaling policy?</h3>
+<div class="outline-text-3" id="text-org9382209">
+<p>
+Because it affects cloud cost, latency, and cluster stability.
+</p>
+</div>
+</div>
+<div id="outline-container-org7893098" class="outline-3">
+<h3 id="org7893098">Q148: What is a scaling threshold tuning failure?</h3>
+<div class="outline-text-3" id="text-org7893098">
+<p>
+It happens when thresholds are set too low or too high and do not match workload behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org7289de7" class="outline-3">
+<h3 id="org7289de7">Q149: How do you debug HPA issues?</h3>
+<div class="outline-text-3" id="text-org7289de7">
+<p>
+Check metrics-server, resource requests, target values, pod readiness, and custom metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-orge038c03" class="outline-3">
+<h3 id="orge038c03">Q150: What is a misconfigured HPA?</h3>
+<div class="outline-text-3" id="text-orge038c03">
+<p>
+It may never scale, scale too aggressively, or scale based on the wrong metric.
+</p>
+</div>
+</div>
+<div id="outline-container-org6391ba6" class="outline-3">
+<h3 id="org6391ba6">Q151: Why should target metrics be realistic?</h3>
+<div class="outline-text-3" id="text-org6391ba6">
+<p>
+Because unrealistic metrics create noisy and unstable scaling decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org746aa9b" class="outline-3">
+<h3 id="org746aa9b">Q152: What is an application metric like `requests<sub>per</sub><sub>second</sub>`?</h3>
+<div class="outline-text-3" id="text-org746aa9b">
+<p>
+It directly reflects user demand and can be more meaningful than CPU.
+</p>
+</div>
+</div>
+<div id="outline-container-org15417ea" class="outline-3">
+<h3 id="org15417ea">Q153: What is `maxReplicas` used for?</h3>
+<div class="outline-text-3" id="text-org15417ea">
+<p>
+It prevents runaway cost or over-scaling under heavy load.
+</p>
+</div>
+</div>
+<div id="outline-container-org18c0539" class="outline-3">
+<h3 id="org18c0539">Q154: What is `minReplicas` used for?</h3>
+<div class="outline-text-3" id="text-org18c0539">
+<p>
+It keeps a baseline number of replicas available even during low traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org69a304e" class="outline-3">
+<h3 id="org69a304e">Q155: Why does low traffic often still need a baseline?</h3>
+<div class="outline-text-3" id="text-org69a304e">
+<p>
+Some workloads require a minimum footprint for responsiveness or warm-up.
+</p>
+</div>
+</div>
+<div id="outline-container-org4ec2866" class="outline-3">
+<h3 id="org4ec2866">Q156: What is a no-scaling condition?</h3>
+<div class="outline-text-3" id="text-org4ec2866">
+<p>
+It occurs when metrics are stable and within the target bands.
+</p>
+</div>
+</div>
+<div id="outline-container-org9e2259b" class="outline-3">
+<h3 id="org9e2259b">Q157: Why do some clusters disable HPA by default?</h3>
+<div class="outline-text-3" id="text-org9e2259b">
+<p>
+Because some workloads are not well-suited for autoscaling or need custom metrics and tuning.
+</p>
+</div>
+</div>
+<div id="outline-container-org305f961" class="outline-3">
+<h3 id="org305f961">Q158: What is capacity headroom?</h3>
+<div class="outline-text-3" id="text-org305f961">
+<p>
+It is spare capacity beyond current load that allows good scaling behavior and latency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaac44c7" class="outline-3">
+<h3 id="orgaac44c7">Q159: What can happen during scaling up?</h3>
+<div class="outline-text-3" id="text-orgaac44c7">
+<p>
+New pods take time to start, so scaling may lag behind traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org1dce0aa" class="outline-3">
+<h3 id="org1dce0aa">Q160: Why is startup time important for HPA?</h3>
+<div class="outline-text-3" id="text-org1dce0aa">
+<p>
+Because HPA must account for the time to create new replicas before demand spikes too much.
+</p>
+</div>
+</div>
+<div id="outline-container-org76fdf5a" class="outline-3">
+<h3 id="org76fdf5a">Q161: What is a bursty workload?</h3>
+<div class="outline-text-3" id="text-org76fdf5a">
+<p>
+A workload with sudden spikes in traffic or processing demand.
+</p>
+</div>
+</div>
+<div id="outline-container-org05ff9d2" class="outline-3">
+<h3 id="org05ff9d2">Q162: Why does HPA need a stabilization window?</h3>
+<div class="outline-text-3" id="text-org05ff9d2">
+<p>
+Because short-lived bursts should not immediately trigger large or oscillating scale changes.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c3661b" class="outline-3">
+<h3 id="org5c3661b">Q163: What is a scale event and how is it observed?</h3>
+<div class="outline-text-3" id="text-org5c3661b">
+<p>
+It is visible via HPA status and the workload replica count.
+</p>
+</div>
+</div>
+<div id="outline-container-org2714255" class="outline-3">
+<h3 id="org2714255">Q164: Why do custom metrics often require adapters?</h3>
+<div class="outline-text-3" id="text-org2714255">
+<p>
+Because Kubernetes core metrics do not cover application-specific business metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb79ccbe" class="outline-3">
+<h3 id="orgb79ccbe">Q165: What is scale-to-zero?</h3>
+<div class="outline-text-3" id="text-orgb79ccbe">
+<p>
+Some serverless or event-driven systems can scale to zero when idle.
+</p>
+</div>
+</div>
+<div id="outline-container-orgea68f3a" class="outline-3">
+<h3 id="orgea68f3a">Q166: Why is scale-to-zero not universal for Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgea68f3a">
+<p>
+Because many workloads must remain warm or ready to respond quickly.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb0f1aaa" class="outline-3">
+<h3 id="orgb0f1aaa">Q167: What is a cold start?</h3>
+<div class="outline-text-3" id="text-orgb0f1aaa">
+<p>
+A cold start is the delay before a new replica becomes ready to handle traffic.
+</p>
+</div>
+</div>
+<div id="outline-container-org47d86be" class="outline-3">
+<h3 id="org47d86be">Q168: Why do cold starts matter?</h3>
+<div class="outline-text-3" id="text-org47d86be">
+<p>
+Because they affect user latency and the speed needed for HPA to react.
+</p>
+</div>
+</div>
+<div id="outline-container-org8ac4935" class="outline-3">
+<h3 id="org8ac4935">Q169: What is a user-facing latency problem due to HPA lag?</h3>
+<div class="outline-text-3" id="text-org8ac4935">
+<p>
+It occurs when traffic increases faster than pods can scale.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd72e590" class="outline-3">
+<h3 id="orgd72e590">Q170: Why do target thresholds need to reflect real traffic?</h3>
+<div class="outline-text-3" id="text-orgd72e590">
+<p>
+Because otherwise autoscaling may be too slow or too aggressive.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f3dec7" class="outline-3">
+<h3 id="org3f3dec7">Q171: What is a queue backlog?</h3>
+<div class="outline-text-3" id="text-org3f3dec7">
+<p>
+It is the amount of work waiting to be processed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc806ed3" class="outline-3">
+<h3 id="orgc806ed3">Q172: Why is queue backlog a strong HPA metric?</h3>
+<div class="outline-text-3" id="text-orgc806ed3">
+<p>
+Because it can often predict service saturation even when CPU is not high.
+</p>
+</div>
+</div>
+<div id="outline-container-org3aeb4f0" class="outline-3">
+<h3 id="org3aeb4f0">Q173: What is SLO?</h3>
+<div class="outline-text-3" id="text-org3aeb4f0">
+<p>
+SLO (Service Level Objective) is a target for acceptable application performance or reliability.
+</p>
+</div>
+</div>
+<div id="outline-container-org3e787ab" class="outline-3">
+<h3 id="org3e787ab">Q174: Why tie HPA to SLOs?</h3>
+<div class="outline-text-3" id="text-org3e787ab">
+<p>
+Because scaling decisions should preserve service quality, not just maximize capacity.
+</p>
+</div>
+</div>
+<div id="outline-container-org2bb3f74" class="outline-3">
+<h3 id="org2bb3f74">Q175: What is HPA-driven cost optimization?</h3>
+<div class="outline-text-3" id="text-org2bb3f74">
+<p>
+It reduces idle spend by scaling down during low traffic, while satisfying SLOs.
+</p>
+</div>
+</div>
+<div id="outline-container-org574f309" class="outline-3">
+<h3 id="org574f309">Q176: What is HPA for background jobs?</h3>
+<div class="outline-text-3" id="text-org574f309">
+<p>
+It can scale workers based on queue depth or processing backlog.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0e5bdd" class="outline-3">
+<h3 id="orgf0e5bdd">Q177: What is a threshold for background job queue depth?</h3>
+<div class="outline-text-3" id="text-orgf0e5bdd">
+<p>
+It determines when additional workers should be created.
+</p>
+</div>
+</div>
+<div id="outline-container-org60c314f" class="outline-3">
+<h3 id="org60c314f">Q178: Why are HPA decisions often tuned for specific app types?</h3>
+<div class="outline-text-3" id="text-org60c314f">
+<p>
+Because web traffic, async workers, and databases behave differently.
+</p>
+</div>
+</div>
+<div id="outline-container-org14255e4" class="outline-3">
+<h3 id="org14255e4">Q179: Why are application-level metrics more useful than raw CPU?</h3>
+<div class="outline-text-3" id="text-org14255e4">
+<p>
+Because CPU is a generic measure, not necessarily the real bottleneck.
+</p>
+</div>
+</div>
+<div id="outline-container-org495ea22" class="outline-3">
+<h3 id="org495ea22">Q180: What is the goal of HPA?</h3>
+<div class="outline-text-3" id="text-org495ea22">
+<p>
+To keep the workload close to the desired demand and maintain service quality while minimizing wasted capacity.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org8e6904a" class="outline-2">
+<h2 id="org8e6904a">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-org8e6904a">
+</div>
+<div id="outline-container-orgbfdccf2" class="outline-3">
+<h3 id="orgbfdccf2">Q181: What is the HPA control loop?</h3>
+<div class="outline-text-3" id="text-orgbfdccf2">
+<p>
+It is the periodic controller reconciliation loop that compares metrics to targets and updates replica counts.
+</p>
+</div>
+</div>
+<div id="outline-container-org933673c" class="outline-3">
+<h3 id="org933673c">Q182: Why is the HPA control loop important?</h3>
+<div class="outline-text-3" id="text-org933673c">
+<p>
+Because it defines the cadence and responsiveness of scaling behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-org23271c1" class="outline-3">
+<h3 id="org23271c1">Q183: What is a scale-out step policy?</h3>
+<div class="outline-text-3" id="text-org23271c1">
+<p>
+It is a policy setting how much to increase replicas per scaling event.
+</p>
+</div>
+</div>
+<div id="outline-container-org28d45a5" class="outline-3">
+<h3 id="org28d45a5">Q184: What is a scale-down step policy?</h3>
+<div class="outline-text-3" id="text-org28d45a5">
+<p>
+It determines how many replicas to remove per scale-down event.
+</p>
+</div>
+</div>
+<div id="outline-container-org4a36041" class="outline-3">
+<h3 id="org4a36041">Q185: Why are step policies useful?</h3>
+<div class="outline-text-3" id="text-org4a36041">
+<p>
+They prevent sudden large swings or overreactive adjustments.
+</p>
+</div>
+</div>
+<div id="outline-container-org19337c3" class="outline-3">
+<h3 id="org19337c3">Q186: What is a `stabilizationWindowSeconds`?</h3>
+<div class="outline-text-3" id="text-org19337c3">
+<p>
+It is the amount of time HPA waits before recognizing a new scaling trend.
+</p>
+</div>
+</div>
+<div id="outline-container-org8dc6a4b" class="outline-3">
+<h3 id="org8dc6a4b">Q187: Why are stabilization windows important in dynamic workloads?</h3>
+<div class="outline-text-3" id="text-org8dc6a4b">
+<p>
+Because metrics can fluctuate and produce noisy scale decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ac5201" class="outline-3">
+<h3 id="org2ac5201">Q188: What is a policy `changePercent`?</h3>
+<div class="outline-text-3" id="text-org2ac5201">
+<p>
+It defines the percent change allowed per scaling event.
+</p>
+</div>
+</div>
+<div id="outline-container-org44a0562" class="outline-3">
+<h3 id="org44a0562">Q189: How is custom scaling computed?</h3>
+<div class="outline-text-3" id="text-org44a0562">
+<p>
+It depends on the custom metric target and the current metric value for the workload.
+</p>
+</div>
+</div>
+<div id="outline-container-orga6b911c" class="outline-3">
+<h3 id="orga6b911c">Q190: Why are custom metrics important for stateful or event-driven systems?</h3>
+<div class="outline-text-3" id="text-orga6b911c">
+<p>
+Because CPU is not always a direct signal of demand or backlog.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc98fd00" class="outline-3">
+<h3 id="orgc98fd00">Q191: What is KEDA’s architectural relationship with HPA?</h3>
+<div class="outline-text-3" id="text-orgc98fd00">
+<p>
+KEDA extends HPA by providing scaling based on external or event-driven metrics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfeab14e" class="outline-3">
+<h3 id="orgfeab14e">Q192: Why is KEDA often preferred for Kafka or queue-based systems?</h3>
+<div class="outline-text-3" id="text-orgfeab14e">
+<p>
+Because such systems often scale according to queue depth or backlog length more than CPU.
+</p>
+</div>
+</div>
+<div id="outline-container-org284467d" class="outline-3">
+<h3 id="org284467d">Q193: What is an external metric adapter?</h3>
+<div class="outline-text-3" id="text-org284467d">
+<p>
+It bridges a third-party metric source to the HPA API.
+</p>
+</div>
+</div>
+<div id="outline-container-org6f182a0" class="outline-3">
+<h3 id="org6f182a0">Q194: Why is metric adapter reliability critical?</h3>
+<div class="outline-text-3" id="text-org6f182a0">
+<p>
+Because an unstable metric source can lead to wrong or dangerous scale decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org89a4e05" class="outline-3">
+<h3 id="org89a4e05">Q195: What is a metric-source failure?</h3>
+<div class="outline-text-3" id="text-org89a4e05">
+<p>
+It happens when the metrics adapter or backend cannot provide valid data to HPA.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c31070" class="outline-3">
+<h3 id="org0c31070">Q196: Why does HPA need healthy metrics?</h3>
+<div class="outline-text-3" id="text-org0c31070">
+<p>
+Because without them, it cannot compute a correct replica count.
+</p>
+</div>
+</div>
+<div id="outline-container-org20ce95c" class="outline-3">
+<h3 id="org20ce95c">Q197: What is the relation between HPA and SLOs?</h3>
+<div class="outline-text-3" id="text-org20ce95c">
+<p>
+HPA should be tuned to keep service-level objectives within target thresholds while optimizing cost.
+</p>
+</div>
+</div>
+<div id="outline-container-org75850d4" class="outline-3">
+<h3 id="org75850d4">Q198: What is a scale-out safety check?</h3>
+<div class="outline-text-3" id="text-org75850d4">
+<p>
+It is a policy or condition ensuring scaling does not exceed safe or cost-effective limits.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc32e46" class="outline-3">
+<h3 id="orgdc32e46">Q199: What is a scale-down safety check?</h3>
+<div class="outline-text-3" id="text-orgdc32e46">
+<p>
+It ensures scaling down does not reduce capacity below acceptable service levels.
+</p>
+</div>
+</div>
+<div id="outline-container-orga6aecd4" class="outline-3">
+<h3 id="orga6aecd4">Q200: What is the main lesson of Kubernetes HPA?</h3>
+<div class="outline-text-3" id="text-orga6aecd4">
+<p>
+HPA is the cluster’s automatic capacity controller: it measures demand, compares it to policy and target values, and adjusts replica counts to balance performance, cost, and resilience.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
