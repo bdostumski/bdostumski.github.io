@@ -1,0 +1,627 @@
+#+TITLE: Docker Networking
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Docker Networking
+
+-----
+
+* Beginner
+
+** Q1: What is Docker networking?
+Docker networking is the mechanism that allows containers to communicate with each other, with the host, and with external networks.
+
+** Q2: Why do containers need networking?
+Containers are isolated processes, and without networking they cannot communicate or expose services.
+
+** Q3: What is a container network?
+A container network is a virtual network that connects containers and controls how traffic flows between them.
+
+** Q4: What is the default Docker network?
+Docker creates a default bridge network for new containers unless another network is specified.
+
+** Q5: What is a bridge network?
+A bridge network is an internal virtual network that allows connected containers to communicate with each other.
+
+** Q6: What is Docker bridge?
+Docker bridge is the default Linux bridge device used by Docker to connect containers on the same host.
+
+** Q7: What is a Docker network driver?
+A Docker network driver defines how container networking is implemented, such as bridge, host, overlay, macvlan, ipvlan, and none.
+
+** Q8: What is the host network mode?
+Host network mode makes a container share the host network namespace directly.
+
+** Q9: What is the none network mode?
+None mode disables networking inside the container entirely.
+
+** Q10: What is container-to-container communication?
+It is communication between two or more containers over a Docker-managed network.
+
+** Q11: What is port publishing?
+Port publishing maps a container port to a host port so external clients can reach the container.
+
+** Q12: What is port mapping?
+Port mapping is another term for port publishing, often written as host:container.
+
+** Q13: What is the Docker CLI network command?
+The main Docker networking commands include:
+- docker network ls
+- docker network inspect
+- docker network create
+- docker network rm
+
+** Q14: What is a Docker container IP address?
+Each container on a Docker network can have an IP address assigned to its interface.
+
+** Q15: What is Docker network namespace?
+A network namespace provides an isolated networking stack for a container, separate from the host.
+
+** Q16: What is a veth pair?
+A veth pair connects a container network interface to the Docker bridge or another network device.
+
+** Q17: What is a Docker bridge interface?
+It is the bridge device that acts as a virtual switch for containers on the same host.
+
+** Q18: What is a Docker-generated container name?
+Docker automatically assigns a name to a container, which can be used for communication in custom networks.
+
+** Q19: What is container DNS in Docker?
+Docker provides internal DNS resolution so containers can resolve service names on user-defined networks.
+
+** Q20: What is service discovery in Docker?
+Service discovery is the ability to resolve container names and service names to IP addresses.
+
+** Q21: What is docker-compose networking?
+Docker Compose creates a default network for the services in a compose project and connects them automatically.
+
+** Q22: Why do containers on the same bridge network talk to each other?
+Because they are attached to the same virtual bridge and share the same layer-2 segment.
+
+** Q23: What is a Docker user-defined network?
+A user-defined network is a custom Docker bridge network created by the user for better isolation and DNS.
+
+** Q24: What is the difference between default bridge and user-defined bridge?
+User-defined bridge networks provide better DNS, automatic service discovery, and better isolation than the default bridge.
+
+** Q25: What does Docker use for host networking?
+Docker can put a container directly on the host network namespace using --network host.
+
+** Q26: What is the purpose of --network none?
+It isolates a container completely from all networking.
+
+** Q27: What is a container port?
+A container port is an application port exposed inside the container, such as 8080 or 5432.
+
+** Q28: What is a host port?
+A host port is a port on the physical or VM host that forwards traffic to a container.
+
+** Q29: What is -p 8080:80?
+This Docker command publishes port 80 inside the container to port 8080 on the host.
+
+** Q30: What is the difference between publishing and exposing?
+Exposing declares a port in the image metadata, while publishing publishes it to the host.
+
+** Q31: Why are ports not exposed by default?
+Containers are isolated; a port is only reachable externally if explicitly published or attached to an accessible network.
+
+** Q32: What is IPAM?
+IPAM (IP Address Management) assigns IP addresses within Docker networks.
+
+** Q33: What is docker network create?
+It creates a new Docker network with a chosen driver and options.
+
+** Q34: What is docker network inspect?
+It shows details about a network, such as subnets, gateways, and attached containers.
+
+** Q35: What is a subnet?
+A subnet is a range of IP addresses assigned to a Docker network.
+
+** Q36: What is a gateway?
+A gateway is the device or IP used as the default route for traffic leaving a network.
+
+** Q37: What is a Docker MAC address?
+A MAC address identifies a container network interface on the local network segment.
+
+** Q38: What is a bridge IP range?
+It is the address range used by a Docker bridge network, such as 172.17.0.0/16.
+
+** Q39: What is the Docker bridge gateway?
+It is the gateway IP assigned to the bridge for traffic leaving the network.
+
+** Q40: What is network isolation?
+Network isolation restricts traffic between container groups or networks.
+
+** Q41: What is an internal Docker network?
+An internal Docker network prevents external access to the containers on that network.
+
+** Q42: What is a Docker network alias?
+A Docker network alias is an alternate name used for a container on a user-defined network.
+
+** Q43: What is the difference between a container name and a Docker hostname?
+The container name is used by Docker; the hostname is the system hostname inside the container.
+
+** Q44: What is Docker DNS resolution for container names?
+Docker automatically resolves a container name to its IP on a user-defined network.
+
+** Q45: Why use custom networks in Docker?
+They improve discovery, isolation, and easier service interaction than relying on random default bridge networking.
+
+** Q46: What is container-to-host communication?
+It is traffic from a container to the host machine through the bridge or host network.
+
+** Q47: What is host-to-container communication?
+It is traffic from the host to a published port of a container.
+
+** Q48: What is external network access?
+It is communication between a container and systems outside the Docker host.
+
+** Q49: What is a Docker network driver plugin?
+A plugin extends Docker networking with custom implementations beyond built-in drivers.
+
+** Q50: What is a Docker network create command example?
+Example:
+~docker network create mynet~
+
+** Q51: What is a worker node in Docker Swarm?
+A worker node runs workloads and participates in the Swarm overlay network.
+
+** Q52: What is a manager node in Docker Swarm?
+A manager node coordinates the services and cluster state in Swarm.
+
+** Q53: Why does Swarm need overlay networking?
+Because services run on different Docker hosts and need inter-host connectivity.
+
+** Q54: What is overlay networking?
+Overlay networking creates a virtual network across multiple hosts, often used in Swarm or Kubernetes.
+
+** Q55: What is a Docker swarm service?
+A swarm service is a container task managed by Docker Swarm and connected via an overlay network.
+
+** Q56: What is service discovery in Swarm?
+Swarm provides service name resolution to load balance traffic across tasks.
+
+** Q57: What is a Docker ingress network?
+Ingress in Swarm is an overlay network used to publish ports and route incoming traffic to service tasks.
+
+** Q58: What is a service published port?
+A published port exposes a service externally across the cluster.
+
+** Q59: What is a service task?
+A task is one instance of a service running on a node.
+
+** Q60: How do containers get IPs in Swarm?
+Docker assigns IPs from the overlay network and manages reachability across nodes.
+
+* Intermediate
+
+** Q61: What are the built-in Docker network drivers?
+Common built-in drivers include bridge, host, overlay, macvlan, ipvlan, and none.
+
+** Q62: What is the bridge driver?
+The bridge driver creates an isolated internal network for containers on a single host.
+
+** Q63: What is the overlay driver?
+The overlay driver creates a network spanning multiple hosts for swarm or other overlay-based deployments.
+
+** Q64: What is the host driver?
+The host driver makes the container share the host network directly.
+
+** Q65: What is the none driver?
+The none driver completely disables networking.
+
+** Q66: What is macvlan?
+macvlan attaches a container directly to a physical network interface using its own MAC address.
+
+** Q67: What is ipvlan?
+ipvlan attaches containers to a parent interface while preserving the L2 or L3 semantics of the host network.
+
+** Q68: What is the difference between macvlan and ipvlan?
+macvlan exposes a distinct MAC per container; ipvlan usually shares the parent MAC while separating L3 identities.
+
+** Q69: What is network namespace isolation?
+It creates an isolated networking stack so container interfaces and routing are not visible to other containers or the host.
+
+** Q70: What is Linux bridge?
+Linux bridge is a software switch used by Docker bridge networks to virtualize layer-2 communication.
+
+** Q71: What is veth pair usage in Docker?
+Docker creates a veth peer for each container, connecting the container namespace to a bridge or network device.
+
+** Q72: Why are personal network namespaces needed?
+They keep container networking separate from the host and other containers.
+
+** Q73: What is DNAT?
+DNAT (Destination Network Address Translation) is the mechanism that changes the destination of packets as they pass through Docker port publishing.
+
+** Q74: What is SNAT?
+SNAT (Source Network Address Translation) changes the source address of packets leaving a network segment, commonly used for outbound connections.
+
+** Q75: What is iptables in Docker networking?
+Docker uses iptables rules to implement port publishing, NAT, filtering, and communication policies.
+
+** Q76: What is nftables?
+nftables is a modern replacement for iptables and may be used by newer Docker and Linux networking stacks.
+
+** Q77: Why does Docker use iptables?
+To enforce NAT, port publishing, and traffic filtering between containers and the host.
+
+** Q78: What is container traffic filtering?
+Traffic filtering controls which network connections are allowed between containers or between a container and the outside world.
+
+** Q79: What is a network policy?
+A network policy restricts which containers can communicate with each other, commonly used in orchestrators like Kubernetes.
+
+** Q80: What is a Docker network label?
+A label is metadata associated with a network used to identify or configure it.
+
+** Q81: What is a Docker network driver option?
+Driver options are extra parameters used when creating a network, such as subnet, gateway, or internal.
+
+** Q82: What is a subnet option?
+A subnet option defines the address range assigned to a network.
+
+** Q83: What is a gateway option?
+A gateway option sets the default gateway for a Docker network.
+
+** Q84: What is an internal network option?
+An internal network prevents the network from being routed to the outside world.
+
+** Q85: What is a Docker embedded DNS?
+Docker’s embedded DNS resolves service names inside user-defined networks.
+
+** Q86: What is the Docker hostname resolution model?
+The hostname of a container is usually the container name; resolvers can resolve it inside a Docker network.
+
+** Q87: What is DNS aliasing?
+DNS aliasing means the same service can be reached via multiple names.
+
+** Q88: Why is user-defined bridge preferred over default bridge?
+Because default bridge lacks modern service-discovery and isolation features.
+
+** Q89: What is the default bridge network name?
+It is usually ~bridge~.
+
+** Q90: What is the docker0 bridge?
+~docker0~ is the Linux bridge created by Docker for the default bridge network.
+
+** Q91: What is a bridge MTU?
+MTU is the maximum transmission unit; Docker networks may use host-default MTU values.
+
+** Q92: Why does MTU matter?
+Incorrect MTU values can cause fragmentation or connectivity issues, especially with VPNs or overlays.
+
+** Q93: What is Docker DNS config?
+Docker can inject DNS servers, search domains, and options into containers via the network config.
+
+** Q94: What is a network attach?
+A network attach is the act of connecting a container to a specific Docker network.
+
+** Q95: What is a multi-network container?
+A container attached to more than one Docker network can communicate with all attached networks.
+
+** Q96: What is a container interface?
+A container interface is the virtual network device attached inside the container’s network namespace.
+
+** Q97: What is a network namespace share?
+Two containers can share a network namespace if they use host mode or a custom setup.
+
+** Q98: What is container discovery by name?
+Docker networks allow containers to resolve each other by hostname or name.
+
+** Q99: What is service interdependence?
+Two services may rely on network connectivity to communicate between containers or services.
+
+** Q100: What is service mesh vs container network?
+A service mesh is an application-level control plane on top of network connectivity; Docker networking is the lower-level connectivity layer.
+
+** Q101: What is the relationship between Docker and Linux networking?
+Docker relies heavily on Linux networking primitives: bridge devices, veth pairs, iptables, namespaces, and routes.
+
+** Q102: What is a routed container network?
+A routed network sends traffic as L3 traffic between hosts or networks rather than L2 broadcast domains.
+
+** Q103: What is L2 vs L3 in Docker networking?
+L2 is link-layer switching; L3 is IP routing between networks.
+
+** Q104: What is a Docker overlay network across hosts?
+It creates a virtual network spanning multiple Docker hosts and uses VXLAN or similar encapsulation.
+
+** Q105: What is VXLAN?
+VXLAN is a tunneling protocol often used by Docker overlay and SDN solutions to carry layer-2 traffic over layer-3 networks.
+
+** Q106: What is encapsulation in overlay networking?
+Encapsulation wraps the original packet in another packet for transport across hosts or networks.
+
+** Q107: Why is overlay networking needed?
+Because containers on different hosts cannot talk directly without network-level virtualization.
+
+** Q108: What is a network controller?
+A network controller manages and configures the virtual network in a distributed environment.
+
+** Q109: What is a vSwitch?
+A virtual switch is a software bridge or switching component that forwards layer-2 traffic in a network.
+
+** Q110: What is a virtual network?
+A virtual network is an abstract network layer created in software to isolate or connect workloads.
+
+** Q111: What is the difference between user-defined bridge and overlay?
+A bridge network is local to a host.
+An overlay network spans across multiple hosts.
+
+** Q112: What is a Docker network plugin requirement?
+Some drivers require extra packages or agent processes to work across hosts.
+
+** Q113: What is a cluster network?
+A cluster network connects workloads across multiple nodes in an orchestrated environment.
+
+** Q114: What is a swarm overlay network?
+A Swarm overlay network connects containers from different nodes in the same cluster.
+
+** Q115: What is publish mode in Swarm?
+Publish mode defines how a service port is exposed, such as ingress or host mode.
+
+** Q116: What is ingress mode?
+Ingress mode routes traffic through the Swarm ingress network to reach the correct service task.
+
+** Q117: What is host mode in Swarm?
+Host mode lets a service bind directly to the host network rather than through ingress.
+
+** Q118: What is a local Docker network?
+A local network is a Docker network that does not extend across cluster nodes.
+
+** Q119: Why can external ports conflict?
+Multiple services on the same host cannot bind the same host port unless using special network configurations.
+
+** Q120: What is container port conflict?
+It happens when two containers attempt to use the same exposed internal port without a conflicting mapping.
+
+** Q121: How do you debug network issues in Docker?
+Use docker ps, docker inspect, docker logs, ip addr, ip route, ping, and tcpdump.
+
+** Q122: What is docker exec?
+~docker exec~ allows executing commands inside a running container for network debugging.
+
+** Q123: What is docker logs?
+~docker logs~ shows application and networking-related logs from a container.
+
+** Q124: What is docker inspect network?
+It shows details like IP addresses, gateway, network options, and connected containers.
+
+** Q125: What is IP forwarding?
+IP forwarding allows packets to move between interfaces and networks, usually enabled in Linux for routing.
+
+** Q126: Why is ip forwarding important?
+Without it, containers may not reach external networks or other network segments.
+
+** Q127: What is a NAT rule?
+A NAT rule rewrites source or destination addresses or ports for routing and address conservation.
+
+** Q128: What is DNAT with Docker?
+Docker uses DNAT to map host ports to container ports.
+
+** Q129: What is port allocation?
+Port allocation is how Docker chooses host ports when a container publishes a port automatically.
+
+** Q130: What is random host port?
+If no host port is specified, Docker may pick an available random port for publishing.
+
+** Q131: What is published port to container port mapping?
+It is the mapping of host:container, such as 0.0.0.0:8080->80/tcp.
+
+** Q132: What is 0.0.0.0 binding?
+Binding to 0.0.0.0 means listening on all interfaces on the host, not just localhost.
+
+** Q133: What is localhost binding?
+Binding to localhost means the service is only reachable from the local machine, not remote hosts.
+
+** Q134: What is a Docker network driver mismatch?
+It happens when a container or service tries to connect to a network with a driver that does not support the required topology.
+
+** Q135: What is container network namespace cleanup?
+Docker removes the container network namespace when the container is deleted.
+
+** Q136: What is network stack teardown?
+It is the process of removing interfaces, routes, IPAM state, and firewall rules after a container stops.
+
+** Q137: What is the effect of restarting Docker?
+Restarting Docker can temporarily disrupt container traffic while networks and daemons reinitialize.
+
+** Q138: What is a container network state?
+It includes IP assignment, veth links, iptables rules, routes, and DNS metadata.
+
+** Q139: What is network plugin lifecycle?
+It includes driver startup, network creation, attach/detach, and cleanup.
+
+** Q140: What is Docker Compose network alias behavior?
+Compose automatically creates a network and aliases service names so containers can discover each other by service name.
+
+** Q141: What is inter-container DNS?
+Inter-container DNS is name resolution between containers on the same Docker network.
+
+** Q142: What is DNS search domain?
+The DNS search domain adds suffixes to short names so they can be resolved as FQDNs.
+
+** Q143: What is user-defined bridge DNS resolution?
+User-defined bridge networks provide container name resolution, unlike legacy bridge networks.
+
+** Q144: Why do service names matter in Docker networks?
+They provide stable names for application clients rather than ephemeral IP addresses.
+
+** Q145: What is service discovery in Compose?
+Compose service names are automatically resolvable on the project network.
+
+** Q146: What is a docker compose project network?
+A Compose project network is a Docker network created for a project’s services.
+
+** Q147: Why do containers need routing?
+Because packets need to know where to go to reach other containers, services, or external networks.
+
+** Q148: What is container routing table?
+It is the routing table inside the container namespace showing destinations and gateways.
+
+** Q149: What is the host routing table?
+It is the host OS routing table used to route packets between Docker bridges and other networks.
+
+** Q150: What is a local route?
+A local route is a route to a directly connected network or interface.
+
+** Q151: What is a default route?
+A default route sends traffic not matching a specific route to a gateway or network border.
+
+** Q152: What is network segmentation?
+Network segmentation divides container traffic into separate network boundaries for isolation and security.
+
+** Q153: What is a Docker subnet conflict?
+It occurs if two networks use overlapping IP ranges, causing routing or connectivity problems.
+
+** Q154: What is network overlap?
+Network overlap refers to two networks assigning the same or conflicting IP ranges.
+
+** Q155: What is docker network prune?
+~docker network prune~ removes unused or dangling Docker networks.
+
+** Q156: What is a dangling network?
+A dangling network is a Docker network not currently attached to any container.
+
+** Q157: What is a Docker network driver compatibility issue?
+It happens when a chosen driver depends on Linux features or host configuration that is not available.
+
+** Q158: What is a custom bridge subnet?
+It is a user-defined IP range for a Docker bridge network, configured when the network is created.
+
+** Q159: What is bridge isolation?
+Bridge isolation restricts traffic between containers attached to the same bridge or between specific networks.
+
+** Q160: What is IPv4-only Docker network?
+It uses IPv4 addressing only.
+
+** Q161: What is IPv6 Docker network?
+It uses IPv6 addressing, often requiring additional host configuration and kernel support.
+
+** Q162: Why is IPv6 in Docker less common?
+Because many deployments still use IPv4 and dual-stack support is more complex.
+
+** Q163: What is Docker DNS and NAT interaction?
+Docker resolves internal names while iptables handles external translation and forwarding.
+
+** Q164: What is container traffic capture?
+It is packet capture inside a container or on the host to analyze network behavior.
+
+** Q165: What is tcpdump in Docker?
+~tcpdump~ can be run inside or outside a container to inspect packets and diagnose networking issues.
+
+** Q166: What is health check networking?
+Health checks can verify a service is listening on a port before traffic is routed to it.
+
+** Q167: Why are health checks important in container networks?
+They help ensure backends are actually reachable before routing traffic.
+
+** Q168: What is a load balancing layer in Docker?
+It may be handled by a reverse proxy, Swarm ingress, or a cloud load balancer.
+
+** Q169: What is a sidecar proxy?
+A sidecar proxy runs alongside a container and can handle networking, service mesh, or policy enforcement.
+
+** Q170: What is a Docker network dependency?
+A service may depend on a specific network being created or connected before it starts.
+
+** Q171: What is network startup order?
+Containers may need the network to be up before they start or before dependencies are reachable.
+
+** Q172: What is a container startup race?
+A startup race occurs when services try to connect before a dependent container or network is ready.
+
+** Q173: What is service readiness?
+A service is ready when it can accept traffic and respond successfully to health checks.
+
+** Q174: What is a network restart policy?
+Docker restart policies control whether containers restart after network-related failures.
+
+** Q175: What is a network timeout?
+A timeout is the duration before a connection or request fails due to no response.
+
+** Q176: Why do containers need stable DNS names?
+Stable names allow the app, proxy, and service discovery layer to find backends without hardcoded IPs.
+
+** Q177: What is a service registry?
+A service registry maintains service addresses and metadata for dynamic discovery.
+
+** Q178: What is Docker service discovery in a cluster?
+It is the mechanism for locating other services or tasks by name, often via DNS.
+
+** Q179: What is ephemeral IP churn?
+Ephemeral IP churn is when container IPs change due to recreation, which is why names are better than raw IPs.
+
+** Q180: Why should apps avoid hardcoded container IPs?
+Because container IPs can change when containers restart or move.
+
+* Advanced / Expert
+
+** Q181: What is overlay networking under the hood?
+Overlay networking often uses VXLAN encapsulation and a distributed control plane to connect hosts.
+
+** Q182: What is VXLAN underlay?
+The underlay is the physical or routed infrastructure carrying the overlay tunnel traffic.
+
+** Q183: What is underlay network in container clusters?
+It is the real network fabric that carries container traffic across hosts or cloud environments.
+
+** Q184: What is overlay encryption?
+Overlay encryption secures traffic between hosts in an overlay network.
+
+** Q185: What is network policy enforcement in orchestrators?
+It controls allowed traffic patterns between pods or services and is often enforced by CNI plugins.
+
+** Q186: What is CNI?
+CNI (Container Network Interface) is a specification for configuring container networking in orchestrators like Kubernetes.
+
+** Q187: What is Docker CNI integration?
+Docker uses its own networking model, but similar concepts appear in CNI-based runtimes like Kubernetes.
+
+** Q188: What is eBPF in networking?
+eBPF enables programmable packet processing in the Linux kernel for filtering, observability, and custom routing.
+
+** Q189: What is network observability in Docker?
+It includes metrics, packet capture, logs, DNS resolution traces, and topology inspection.
+
+** Q190: What is packet capture in a container?
+It is the act of seeing the raw packets flowing through a network namespace for troubleshooting.
+
+** Q191: What is a network loop?
+A networking loop occurs when packets are continuously forwarded in a cycle, often due to misconfiguration.
+
+** Q192: What is a routing leak?
+A routing leak occurs when traffic is advertised or forwarded beyond the intended network boundary.
+
+** Q193: What is ARP in Docker networking?
+ARP resolves layer-2 neighbors for containers on the same network segment.
+
+** Q194: Why is ARP relevant in Docker bridge networks?
+Because containers on the same Linux bridge need to resolve each other’s MAC addresses.
+
+** Q195: What is a multicast network?
+A multicast network sends data to a defined group of listeners rather than to every host.
+
+** Q196: What is traffic mirroring?
+Traffic mirroring duplicates packets to a monitoring or security system for analysis.
+
+** Q197: What is a network premium or segmentation policy?
+It is a business or security policy that separates traffic by trust level or application boundary.
+
+** Q198: What is a firewall rule on Docker host?
+It may be implemented via iptables and restrict traffic entering or leaving containers and host ports.
+
+** Q199: What is a container network attack surface?
+It is the set of networking interfaces, ports, and exposure points available to a container.
+
+** Q200: What is the main lesson in Docker networking?
+Docker networking is not just about connectivity; it is about isolation, traffic control, name resolution, topology, and secure communication between containers and hosts.
+
+-----
+
+#+INCLUDE: "../footer.org"
