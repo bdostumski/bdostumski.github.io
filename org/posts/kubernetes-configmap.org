@@ -1,0 +1,636 @@
+#+TITLE: Kubernetes ConfigMaps & Secrets Fundamentals
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes ConfigMaps & Secrets
+
+-----
+
+* Beginner
+
+** Q1: What is a Kubernetes ConfigMap?
+A ConfigMap is a Kubernetes API object used to store non-sensitive configuration data for pods.
+
+** Q2: Why use ConfigMaps?
+ConfigMaps allow you to decouple configuration from application code and images.
+
+** Q3: What is a Secret in Kubernetes?
+A Secret is a Kubernetes API object used to store sensitive information such as passwords, tokens, or TLS keys.
+
+** Q4: Why use Secrets?
+Secrets help keep sensitive data out of source code and container images.
+
+** Q5: What is configuration in Kubernetes?
+Configuration is the environment-specific or runtime-specific settings an application needs to run properly.
+
+** Q6: What is runtime configuration?
+Runtime configuration includes environment variables, settings files, and dynamic data used while the app runs.
+
+** Q7: What is a pod in Kubernetes?
+A pod is the smallest deployable unit in Kubernetes and usually contains one or more tightly-coupled containers.
+
+** Q8: How do pods consume ConfigMaps?
+Pods can consume ConfigMaps through environment variables, command-line arguments, or mounted files.
+
+** Q9: How do pods consume Secrets?
+Pods consume Secrets similarly to ConfigMaps: as environment variables, mounted files, or projected volumes.
+
+** Q10: What is the difference between ConfigMap and Secret?
+A ConfigMap is for non-sensitive config.
+A Secret is for sensitive config and is stored in a way that is handled more securely.
+
+** Q11: Why are Secrets not plain text in the API?
+Kubernetes stores Secret data base64-encoded in the API, and in many setups additional protections such as encryption are enabled at rest.
+
+** Q12: What is a Secret object?
+A Secret object is a Kubernetes resource containing sensitive data stored as key-value pairs.
+
+** Q13: What is a key-value pair?
+A key-value pair maps a name to a value, often used in ConfigMaps and Secrets.
+
+** Q14: What is a ConfigMap key?
+A ConfigMap key is the name of a data item, similar to a property name.
+
+** Q15: What is a Secret key?
+A Secret key is the name of a sensitive data item stored inside a Secret object.
+
+** Q16: What is a ConfigMap file mount?
+A ConfigMap file mount injects ConfigMap data as files in a container filesystem.
+
+** Q17: What is a Secret file mount?
+A Secret file mount injects Secret data into a mounted volume as files.
+
+** Q18: What is environment variable injection?
+Environment variable injection absorbs ConfigMap or Secret data and exposes it as environment variables inside a container.
+
+** Q19: What is a volume projection?
+A projected volume takes data from multiple sources such as ConfigMaps and Secrets and mounts them as files.
+
+** Q20: What is the kubectl apply command?
+The ~kubectl apply~ command creates or updates Kubernetes resources declaratively.
+
+** Q21: What is the kubectl create configmap command?
+It creates a ConfigMap from literal values, files, or directories.
+
+** Q22: What is the kubectl create secret command?
+It creates a Secret from a literal, file, or generated data.
+
+** Q23: What is a ConfigMap YAML manifest?
+A ConfigMap YAML manifest declares the object and includes its data.
+
+** Q24: What is a Secret YAML manifest?
+A Secret YAML manifest declares the secret and its data.
+
+** Q25: What is the structure of a ConfigMap?
+A ConfigMap usually has:
+- apiVersion
+- kind: ConfigMap
+- metadata
+- data
+
+** Q26: What is the structure of a Secret?
+A Secret usually has:
+- apiVersion
+- kind: Secret
+- metadata
+- type
+- data or stringData
+
+** Q27: Why are ConfigMaps used for app settings?
+Because they let configuration be changeable without rebuilding the container image.
+
+** Q28: Why are Secrets used for credentials?
+Because credentials should not be embedded in container images or source repositories.
+
+** Q29: What is a config file injected into a container?
+A config file mount allows an application to read configuration from a filesystem path rather than environment variables.
+
+** Q30: What is a secret file injected into a container?
+A secret file is mounted into a container’s filesystem as a protected file.
+
+** Q31: What is the default behavior of ConfigMap updates?
+By default, updates to ConfigMap data are propagated to mounted files and env vars in a way that depends on mount and refresh behavior.
+
+** Q32: Why is ConfigMap key naming important?
+Because environment variable names or file names must be valid and stable for the application.
+
+** Q33: What is a mounted config volume?
+A mounted config volume places ConfigMap data in a directory inside the container.
+
+** Q34: What is the difference between env var and file injection?
+Environment variables are exposed as process variables.
+File injection makes configuration available as files on disk.
+
+** Q35: Why might file-based config be preferable?
+Some applications read config files rather than environment variables.
+
+** Q36: Why might env vars be preferable?
+They are easy to consume in many traditional apps and containers.
+
+** Q37: What is a secret volume?
+A secret volume is a filesystem mount that contains secret data files.
+
+** Q38: What is a projection volume?
+A projection volume combines multiple data sources into a single mount path.
+
+** Q39: What is a ConfigMap as command-line arguments?
+A pod can pass ConfigMap values as command-line arguments to a container entrypoint.
+
+** Q40: What is a Secret as command-line arguments?
+A Secret can also be used as an argument if the application expects it, though file-based or env var approaches are more common.
+
+** Q41: What is a mount path?
+A mount path is the container filesystem location where a volume is mounted.
+
+** Q42: What is a volume mount in a pod spec?
+A volume mount is a field inside a container definition that connects a volume to a path.
+
+** Q43: What is a Kubernetes volume?
+A volume is a directory or file mount provided to containers in a pod.
+
+** Q44: What is a pod spec?
+A pod spec is the Kubernetes manifest describing the pod, containers, volumes, and other runtime properties.
+
+** Q45: What is a config file from a Kubernetes ConfigMap?
+It is a file inside a mounted volume or environment variable whose contents come from the ConfigMap data.
+
+** Q46: What is a mirrored config?
+A mirrored config is a common pattern where the application reads configuration files from a mounted volume.
+
+** Q47: How does a Secret differ from a ConfigMap in API semantics?
+ConfigMap is intended for non-sensitive data.
+Secret uses special handling and often more restricted access semantics.
+
+** Q48: What is the effect of a Secret data value being base64-encoded?
+The stored value is not a plain string in the object, although it is decoded by clients when they read it.
+
+** Q49: What is ~stringData~ in a Secret?
+~stringData~ is a convenient field for writing plaintext values in a Secret manifest, which Kubernetes then converts internally.
+
+** Q50: What is the risk of using ~stringData~ in manifests?
+It can accidentally expose secrets in YAML files and shell history if not handled carefully.
+
+** Q51: What is a Kubernetes secret type?
+A Secret type indicates the intended purpose of the secret, such as Opaque, kubernetes.io/tls, or Docker config.
+
+** Q52: What is an Opaque Secret?
+An Opaque Secret is the default form, used for arbitrary key-value pairs.
+
+** Q53: What is a TLS Secret?
+A TLS Secret contains a TLS certificate and private key for ingress or internal TLS use.
+
+** Q54: Why are TLS secrets special?
+Because they often contain certificate and key files that applications or ingress controllers expect.
+
+** Q55: What is a Docker registry Secret?
+A Docker registry Secret stores credentials for pulling private images from a registry.
+
+** Q56: What is the difference between ConfigMaps and environment variables?
+ConfigMaps and Secrets are Kubernetes resources; environment variables are the process-level view of their data.
+
+** Q57: What is the role of ConfigMap in DevOps?
+It allows environment-specific configuration without altering the base image or code.
+
+** Q58: What is the role of Secrets in DevOps?
+It keeps credentials and keys separate from source code and deployment manifests where possible.
+
+** Q59: What is a Kubelet?
+The Kubelet is the node agent that ensures the pods and containers described in the API are running correctly.
+
+** Q60: Why is the Kubelet relevant to ConfigMaps and Secrets?
+It is responsible for mounting ConfigMaps and Secrets into pods as files or environment variables.
+
+** Q61: What does Kubernetes do with a Secret at runtime?
+It mounts or injects the Secret data into the pod, while taking steps to restrict access.
+
+** Q62: Why can reading Secret data be security-sensitive?
+Because it may expose credentials or certificates to processes inside the container.
+
+** Q63: What is a mounted Secret file permission model?
+Secrets are often mounted with restricted permissions to reduce accidental exposure.
+
+** Q64: What is a ConfigMap update propagation?
+It refers to how modified ConfigMap data is refreshed in running pods.
+
+** Q65: What is a Secret update propagation?
+It refers to how Secret values are rotated and reflected in running pods.
+
+** Q66: What is a volume update strategy?
+It determines whether updated ConfigMap or Secret data is refreshed automatically or requires a pod restart.
+
+** Q67: Why are ConfigMaps and Secrets often combined with Kubernetes deployment strategies?
+Because configuration and secret changes may need rollout or restart coordination.
+
+** Q68: What is a rolling update?
+A rolling update gradually replaces old pods with new ones, often used for config or secret changes.
+
+** Q69: What is a pod restart?
+A pod restart recreates the container so it picks up updated config or secret values.
+
+** Q70: Why do some config changes require rolling restart?
+Because certain mounts and env vars are set at pod startup and may not change live without restart.
+
+** Q71: What is a subPath mount?
+A subPath mount is a mount of only a specific file or directory from a volume into the container.
+
+** Q72: How can ConfigMap and Secret data be used via subPath?
+A file from a mounted ConfigMap or Secret may be placed into a specific destination inside the container.
+
+** Q73: What is a projected volume?
+A projected volume creates a single directory containing files from multiple ConfigMaps and Secrets.
+
+** Q74: Why use projected volumes?
+It simplifies the configuration of multiple data sources into one place.
+
+** Q75: What is a ConfigMap update in a pod?
+It means a running pod sees the updated data, either via file refresh or by restart depending on Kubernetes behavior.
+
+** Q76: Why is Kubernetes configuration decoupled from apps?
+Because infrastructure and app behavior can vary across environments without recompiling the app.
+
+** Q77: What is an environment-specific config?
+A config that differs across dev, staging, and prod, such as database URLs or log levels.
+
+** Q78: What is a non-sensitive config example?
+Hostnames, feature flags, service URLs, or log levels.
+
+** Q79: What is a secret config example?
+Passwords, certificates, tokens, or private keys.
+
+** Q80: What are common Kubernetes objects used with ConfigMaps?
+Pods, Deployments, DaemonSets, Jobs, and CronJobs commonly consume ConfigMaps.
+
+** Q81: What are common Kubernetes objects used with Secrets?
+Pods, Deployments, StatefulSets, and Ingress often consume Secrets.
+
+** Q82: Why separate ConfigMaps and Secrets?
+This separation encourages a security-sensitive workflow and easier configuration management.
+
+** Q83: What is a kubelet-managed volume?
+A kubelet-managed volume is mounted by the Kubelet and exists as part of the pod runtime.
+
+** Q84: What is the annotation-based secret injection pattern?
+Annotations can trigger sidecars or controllers to populate secrets or config into pods.
+
+** Q85: What is the API object lifecycle?
+A ConfigMap or Secret can be created, updated, read, used by pods, and eventually deleted.
+
+** Q86: Why are ConfigMaps often created before workloads?
+Because workloads reference them and may fail if the config source does not exist.
+
+** Q87: Why are Secrets often created before app deployment?
+Because the pod may fail to start if required secret files or env vars are missing.
+
+** Q88: What is a stale configuration?
+A stale configuration is an old or outdated config value still being used by the application.
+
+** Q89: What is a stale secret?
+A stale secret is an old credential that remains active or still mounted when it should be rotated.
+
+** Q90: What is secret rotation?
+Secret rotation is replacing old credentials or tokens with new ones and updating workloads to use them.
+
+** Q91: Why is rotation important?
+Because old secrets may be exposed or expire and need regular replacement.
+
+** Q92: What is the difference between a mounted secret and a secret in env var?
+Mounted secret files are persisted on disk.
+Env vars are present in process environment and easier to read via process inspection.
+
+** Q93: Why prefer file mounts for secrets sometimes?
+Because some tools and runtimes expect files, and file permissions can be restricted.
+
+** Q94: Why prefer env vars for some secrets?
+Because they are simple to pass into applications and CI/CD automation.
+
+** Q95: What is a Kubernetes secret manager?
+A secret manager is an external service or controller that manages secrets and integrates with Kubernetes.
+
+** Q96: What is External Secrets Operator?
+External Secrets Operator syncs external secrets from systems such as AWS Secrets Manager or HashiCorp Vault into Kubernetes Secrets.
+
+** Q97: What is Vault?
+Vault is a secret manager used to securely store and manage secrets.
+
+** Q98: Why do teams use external secret management?
+Because K8s Secrets are helpful but may be complemented by centralized secret lifecycle management.
+
+** Q99: What is the purpose of encryption at rest for Secrets?
+To protect Secrets data even if the underlying storage or etcd is compromised.
+
+** Q100: What is etcd in Kubernetes?
+etcd is the key-value store used by Kubernetes to persist cluster state and object data.
+
+* Intermediate
+
+** Q101: Why is etcd security important for ConfigMaps and Secrets?
+Because it stores Kubernetes resources, including Secrets, and therefore must be protected.
+
+** Q102: What is Kubernetes Secret encryption at rest?
+It is a feature that encrypts Secret values before they are stored in etcd.
+
+** Q103: What is KMS?
+KMS (Key Management Service) is often used to store the encryption key used for Kubernetes Secret encryption.
+
+** Q104: Why is Secret encryption necessary?
+Because etcd can be a high-value target and should not expose raw secret data if compromised.
+
+** Q105: What is a Secret permission model?
+It defines which users, controllers, or workloads can access or modify the Secret.
+
+** Q106: What is RBAC in Kubernetes?
+RBAC (Role-Based Access Control) restricts who can create, read, update, or delete Kubernetes resources.
+
+** Q107: What is a Role?
+A Role grants permissions within a namespace.
+
+** Q108: What is a ClusterRole?
+A ClusterRole grants permissions across the whole cluster.
+
+** Q109: Why is RBAC relevant to ConfigMaps and Secrets?
+Because not everyone should be able to read or modify sensitive configuration.
+
+** Q110: What is a service account?
+A service account is an identity used by pods to interact with the Kubernetes API or other services.
+
+** Q111: Why is service account access relevant to Secrets?
+A pod may need permissions to read secrets or config sources depending on the environment.
+
+** Q112: What is a Secret volume mount permission?
+Secret-mounted files often have mode 0444 or similar settings so they are readable but not writable.
+
+** Q113: What is a secret file mode?
+The file mode determines read/write access permissions of the mounted secret files.
+
+** Q114: What is a ConfigMap volume permission?
+ConfigMap volumes are often mounted with read-only permissions as well.
+
+** Q115: What is a Secret refresh mechanism?
+It is how Kubernetes updates mounted or injected Secret values in a running pod.
+
+** Q116: What is a ConfigMap refresh mechanism?
+It is how Kubernetes updates config files or env vars from ConfigMaps in a running pod.
+
+** Q117: Why do some config and secret values not refresh automatically?
+Because Kubernetes may require a pod restart or rely on specific volume or env var behavior.
+
+** Q118: What is a projected volume combined with Secrets?
+A projected volume can include multiple source objects, like ConfigMaps and Secrets, in one mount.
+
+** Q119: What is a Symmetric Secret?
+A Symmetric Secret is a secret used by a single app or workload and is often created as a generic Opaque secret.
+
+** Q120: What is a TLS Secret structure?
+A TLS Secret commonly contains:
+- tls.crt
+- tls.key
+
+** Q121: Why do TLS Secrets have names like tls.crt and tls.key?
+Because ingress controllers and TLS clients expect those standard file names.
+
+** Q122: What is the role of a Secret in ingress?
+Ingress controllers use TLS Secrets to terminate TLS and serve certificates.
+
+** Q123: What is a Secret for image pull credentials?
+A Docker config Secret stores credentials for a private registry used by the Kubernetes runtime to pull images.
+
+** Q124: Why are image pull secrets important?
+Because private registries require authentication and should not expose credentials in publicly visible manifests.
+
+** Q125: What is a config map with binary data?
+ConfigMaps can also contain binary-like data, though the common pattern is textual key-value data.
+
+** Q126: What is a Secret with binary data?
+A Secret can store binary data as base64-encoded values.
+
+** Q127: Why are ConfigMaps and Secrets often created separately from app manifests?
+This modularity keeps config reusable and allows config changes without altering deployment logic.
+
+** Q128: What is a values file?
+A values file often contains environment-specific parameter values used by Helm or other templating tools.
+
+** Q129: What is Helm?
+Helm is a package manager for Kubernetes that often manages ConfigMaps and Secrets via templates.
+
+** Q130: Why is Helm related to ConfigMaps and Secrets?
+Because Helm charts frequently generate ConfigMap and Secret manifests for application deployment.
+
+** Q131: What is a kustomization?
+Kustomize is a Kubernetes manifest customization tool used to merge config overlays and generate ConfigMaps/Secrets.
+
+** Q132: What is the unmanaged value of config manifest data?
+Config and secret values are often version-controlled, but sensitive content should not be stored in plain text without safeguards.
+
+** Q133: What is a GitOps workflow?
+GitOps uses Git as the source of truth for declarative infrastructure and app configuration, which often includes ConfigMaps and Secrets.
+
+** Q134: Why is GitOps sensitive for Secrets?
+Because plain text Secrets in Git repositories can leak credentials if not managed carefully.
+
+** Q135: What is external secret syncing?
+It moves secret material from external systems into Kubernetes Secrets without storing it directly in Git.
+
+** Q136: What should be avoided in Git for Secrets?
+Avoid committing plaintext credentials, certificate private keys, or other sensitive values.
+
+** Q137: What is Secret templating?
+It is the rendering of Secret values from environment variables or templates before applying to Kubernetes.
+
+** Q138: Why is secret templating risky?
+Because plaintext values may end up in logs, shell history, or source-control artifacts.
+
+** Q139: What is a Kubernetes secret generator?
+A secret generator can create secret data dynamically during deployment, often via tools like Kustomize or external systems.
+
+** Q140: What is a config generator?
+A config generator creates ConfigMaps from files or environment values for application settings.
+
+** Q141: What is a mounted ConfigMap vs env var ConfigMap?
+Mounted ConfigMap files are more suitable for file-based applications; env var injection is easier for simple config values.
+
+** Q142: What is a ConfigMap file suffix?
+The filename is often derived from the key and can be used by applications directly.
+
+** Q143: What is config file reloading?
+Some applications can reload config when the files or directories are updated.
+
+** Q144: What is the difference between ephemeral and persistent configuration?
+Ephemeral config may be built into images or generated at runtime; persistent config is typically managed through ConfigMaps or external stores.
+
+** Q145: What is dynamic secret injection?
+Dynamic secret injection uses controllers or sidecars to make secrets available without static manifests.
+
+** Q146: What is a projected Secret volume with multiple keys?
+It can expose several Secret keys to a single mount directory in a structured way.
+
+** Q147: What is an app configuration file like application.properties?
+This is common in Java and other frameworks and maps naturally to ConfigMap file mounts.
+
+** Q148: What is a YAML config map example?
+A ConfigMap may hold keys representing config settings, such as ~database.url~, ~log.level~, or ~feature.x.enabled~.
+
+** Q149: What is a Secret remount?
+A Secret remount is when Kubernetes updates the mounted Secret and the pod’s filesystem reflects the new values.
+
+** Q150: What is a kubelet token?
+A kubelet token is used by the node to authenticate to the API server.
+
+** Q151: Why is app configuration often externalized?
+Because the app should not be tightly coupled to environment-specific values or private keys.
+
+** Q152: What is a network policy impact on ConfigMap/Secret access?
+Network policy can restrict which pods can talk to which services, but it does not replace RBAC for API access.
+
+** Q153: What is a namespace boundary?
+A namespace defines a logical boundary for resources, including ConfigMaps and Secrets.
+
+** Q154: Why separate namespaces?
+To isolate teams, workloads, and environments and control access to config and secret resources.
+
+** Q155: What is a pod-level secret access?
+A pod can access secret volumes or env vars only if configured in the pod spec and permitted by policy.
+
+** Q156: What is a cluster-wide secret?
+A cluster-wide secret is available across namespaces or at a cluster scope when defined accordingly.
+
+** Q157: What is a namespaced Secret?
+A namespaced Secret is created in a specific namespace and visible only within it unless further exposed.
+
+** Q158: What is a default service account token?
+A service account token is automatically mounted into pods and can be used to access the Kubernetes API, making it sensitive.
+
+** Q159: Why is the default service account token a security risk?
+Because if abused, it can be used by a compromised pod to interact with the cluster.
+
+** Q160: What is a service account token secret?
+It is a Secret containing the token used by the pod to authenticate with the cluster API.
+
+** Q161: Why should service account tokens be scoped and limited?
+Because broad token access can allow unauthorized cluster actions.
+
+** Q162: What is a pod security context?
+A security context can restrict privileges and filesystem access inside the pod.
+
+** Q163: What is a readiness probe and config reload?
+A readiness probe can help ensure the app is starting with the latest ConfigMap values before traffic is routed to it.
+
+** Q164: What is a rolling restart due to config change?
+A deployment may restart pods to refresh config when mounted ConfigMaps or Secrets are updated.
+
+** Q165: What is config hot reload?
+Some apps can reload configuration files without restarting, but this is application-specific.
+
+** Q166: Why are Secret rotations often coupled with deployments?
+Because applications may need to re-read or use new credentials after rotation.
+
+** Q167: What is secret rotation automation?
+It automates the creation of new secrets and updates workloads or applications to use them.
+
+** Q168: What is secret versioning?
+Secret versioning tracks multiple versions of a secret so workloads can transition smoothly between old and new values.
+
+** Q169: Why is immutable config useful?
+Immutable config avoids surprise drift and makes changes explicit and reviewable.
+
+** Q170: What is a config change strategy?
+It defines how config is updated, what triggers rollout, and how to validate the new values.
+
+** Q171: What is a Secret create flow?
+It usually includes generating the value, storing it securely, creating the Secret object, and updating the workload to consume it.
+
+** Q172: Why should secret generation be secure?
+Because generating secrets with low entropy or in unsafe contexts can produce weak credentials.
+
+** Q173: What is a generated Secret?
+A generated Secret is created automatically by tools or controllers, often with strong randomness.
+
+** Q174: What is a config checksum?
+A checksum can be used to trigger a pod restart when ConfigMap or Secret content changes.
+
+** Q175: What is config hash annotation?
+It is a common pattern where a deployment annotation includes the hash of config to trigger rollout.
+
+** Q176: Why is config hashing useful?
+Because it ensures workloads restart after config changes that require reloading.
+
+** Q177: What is the value of declarative config management?
+It provides reproducibility, reviewability, and operational consistency for K8s objects.
+
+** Q178: What is the value of declarative Secrets management?
+It improves consistency and integration with GitOps while still requiring secure handling of the actual secret data.
+
+** Q179: Why are ConfigMaps and Secrets fundamental in Kubernetes?
+Because they decouple environment-specific behavior from the image and provide the data plane needed for reliable, configurable, and secure workloads.
+
+** Q180: What is the most important rule for Secrets in Kubernetes?
+Do not store private data in plain text in Git, build pipelines, or image history when a more secure secret workflow is available.
+
+* Advanced / Expert
+
+** Q181: What is Kubernetes Secret encryption at rest in detail?
+It encrypts Secret data before persisting it in etcd, using a configured KMS or encryption provider.
+
+** Q182: What is etcd encryption provider?
+It is the plugin or service that provides the actual encryption and decryption for API object data.
+
+** Q183: Why is etcd security crucial for Secret integrity?
+Because if etcd is compromised, Secrets may be accessible unless encryption at rest is enabled.
+
+** Q184: What is a Secret access path?
+It is the chain from Secret object storage to the kubelet to the mounted file or env var seen by the container.
+
+** Q185: Why is the Kubelet a trust boundary?
+Because it handles mounted data and thus must be trusted to preserve secret confidentiality and correctness.
+
+** Q186: What is Secret projection validation?
+It validates that a projected Secret or ConfigMap is mounted and any referenced data keys exist.
+
+** Q187: What is a Secret key mismatch?
+It occurs when an application expects a file or env var that does not exist in the mounted Secret.
+
+** Q188: What is a Secret file permission vulnerability?
+It occurs when mounted Secret files are readable by unintended processes or users.
+
+** Q189: What is a secret injection attack?
+It is a malicious process or actor attempting to manipulate config or secret values in a pod or cluster.
+
+** Q190: What is a ConfigMap injection attack?
+It is an attempt to alter config content in ways that change runtime behavior or exploit assumptions in the app.
+
+** Q191: Why do security policies matter for ConfigMaps and Secrets?
+Because they constrain who can read, create, or update configuration and sensitive values.
+
+** Q192: What is pod security admission?
+Pod security admission enforces baseline security restrictions on pod creation based on policy.
+
+** Q193: What is a restricted pod security level?
+It enforces more stringent controls such as no privilege escalation, no root, and restricted capability usage.
+
+** Q194: Why is no-root important for secret handling?
+Because apps running as root can access more sensitive files and may have broader privilege over mounted Secrets.
+
+** Q195: Why do config values and secrets often need different lifecycle policies?
+Because configuration changes may be routine and low-risk, while secret changes require rotation and stricter governance.
+
+** Q196: What is secret rotation without app restart?
+Some patterns use reloading and hot updates, but many applications still require a restart or reload hook.
+
+** Q197: What is the challenge of secret rotation in Kubernetes?
+Because running pods may hold stale in-memory copies of secret data and need coordinated reloading.
+
+** Q198: What is the risk of stale secrets?
+Stale or forgotten secrets can remain valid longer than intended, increasing exposure.
+
+** Q199: What is a centralized secret management integration?
+It integrates Kubernetes Secrets with platforms like Vault, AWS Secrets Manager, or GCP Secret Manager.
+
+** Q200: What is the ultimate principle of Kubernetes ConfigMaps and Secrets?
+Configuration should be externalized and Governed; secrets should be isolated, protected, rotated, and tightly controlled, while ConfigMaps stay flexible and environment-driven.
+
+-----
+
+#+INCLUDE: "../footer.org"
