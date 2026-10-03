@@ -1,0 +1,628 @@
+#+TITLE: Kubernetes Resource Limits
+#+DATE: 2026-10-03
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes Resource Limits
+
+-----
+
+* Beginner
+
+** Q1: What are Kubernetes resource limits?
+Resource limits are constraints placed on CPU and memory usage for containers or Pods.
+
+** Q2: Why do we need resource limits?
+To avoid a single pod consuming too much cluster or node resources and degrading other workloads.
+
+** Q3: What is CPU in Kubernetes?
+CPU is the compute processing capacity available to a container or Pod.
+
+** Q4: What is memory in Kubernetes?
+Memory is the RAM available to a container or Pod.
+
+** Q5: What is a request in Kubernetes?
+A request is the minimum amount of CPU or memory reserved for a container.
+
+** Q6: What is a limit in Kubernetes?
+A limit is the maximum amount of CPU or memory a container can use.
+
+** Q7: What is the difference between request and limit?
+Request is guaranteed allocation; limit is the maximum cap.
+
+** Q8: Why do requests matter for scheduling?
+The scheduler uses requests to decide which node can run the Pod.
+
+** Q9: Why do limits matter for protection?
+Limits prevent runaway processes from exhausting node resources.
+
+** Q10: What is the `resources` block in a Pod spec?
+The `resources` block contains `requests` and `limits` for CPU and memory.
+
+** Q11: What is CPU request?
+CPU request is the amount of CPU the scheduler tries to reserve for the Pod.
+
+** Q12: What is CPU limit?
+CPU limit is the upper bound on CPU the container can consume.
+
+** Q13: What is memory request?
+Memory request is the amount of memory guaranteed to the Pod by the scheduler.
+
+** Q14: What is memory limit?
+Memory limit is the maximum memory the container can use before it is killed or throttled.
+
+** Q15: What happens when a container exceeds memory limit?
+Usually the container is killed by the kernel OOM killer or the runtime enforces the limit.
+
+** Q16: What happens when a container exceeds CPU limit?
+The container may be throttled or slowed, but it is not usually killed immediately.
+
+** Q17: What is QoS in Kubernetes?
+QoS (Quality of Service) classifies Pods based on request and limit values to determine eviction priority.
+
+** Q18: What are the Kubernetes QoS classes?
+- Guaranteed
+- Burstable
+- BestEffort
+
+** Q19: What is Guaranteed QoS?
+Guaranteed QoS means requests and limits are equal for all containers.
+
+** Q20: What is Burstable QoS?
+Burstable QoS means requests and limits are set, but not equal.
+
+** Q21: What is BestEffort QoS?
+BestEffort means no requests or limits are set.
+
+** Q22: Why are QoS classes important?
+They affect eviction priority and cluster behavior during resource pressure.
+
+** Q23: What is node pressure?
+Node pressure means the node is short on compute, memory, or disk and Kubernetes starts evicting workloads.
+
+** Q24: Why are limits important for cluster stability?
+Because without limits, one workload can starve others or trigger node instability.
+
+** Q25: What is CPU throttling?
+CPU throttling slows a process when it exceeds the assigned CPU quota.
+
+** Q26: What is OOM kill?
+OOM kill means the kernel kills a process because it exceeded memory limits or system memory pressure.
+
+** Q27: Why do memory limits often need careful tuning?
+Because memory limit too low causes crashes; too high can starve other pods.
+
+** Q28: What is a request-to-limit ratio?
+It is the relationship between reserved and allowed resources, affecting burst capacity.
+
+** Q29: What is the scheduler?
+The scheduler decides which node can run a Pod based on resource requests and the cluster state.
+
+** Q30: What is node allocatable capacity?
+It is the CPU and memory available for scheduling after system overhead and reservation.
+
+** Q31: Why does the scheduler care about requests?
+Because the Pod can only schedule if the node has enough resource requests for the workload.
+
+** Q32: Why might a pod stay Pending?
+A pod can stay pending if no node has enough available resources matching its requests.
+
+** Q33: What is a Pending pod?
+A Pending pod is waiting to be scheduled or bound to a node.
+
+** Q34: What is `cpu: "500m"`?
+500m means 0.5 CPU (half a CPU core).
+
+** Q35: What is `memory: "512Mi"`?
+512Mi means 512 mebibytes of memory.
+
+** Q36: What is the difference between Ki, Mi, Gi, and m values in Kubernetes?
+They are units for memory and CPU, where m means millicpu and Ki/Mi/Gi are binary memory units.
+
+** Q37: Why is CPU usually measured in millicores?
+Because CPU is often fractional and expressed as thousandths of a core.
+
+** Q38: What is a resource unit for memory?
+Common memory units include bytes, Ki, Mi, Gi, and similar binary units.
+
+** Q39: Why should workloads set requests?
+Because without requests, the scheduler may place workloads unpredictably and overload nodes.
+
+** Q40: Why should workloads set limits?
+Because it enforces a ceiling and reduces the chance of noisy neighbor behavior.
+
+** Q41: What is a noisy neighbor?
+A noisy neighbor is a workload using excessive resources and impacting other workloads on the same node.
+
+** Q42: What is a node-level resource pressure event?
+It is when the node is running out of CPU, memory, or disk and Kubernetes starts corrective actions.
+
+** Q43: What is eviction?
+Eviction is the process Kubernetes uses to terminate pods when the node can no longer support them.
+
+** Q44: Why do evictions matter?
+Evictions can disrupt workloads if their resource requests and limits are poorly configured.
+
+** Q45: What is a resource quota?
+A ResourceQuota limits the total amount of resources a namespace can consume.
+
+** Q46: Why is a ResourceQuota useful?
+It prevents a single namespace from consuming too much cluster capacity.
+
+** Q47: What is a LimitRange?
+A LimitRange defines default or maximum resource values for pods in a namespace.
+
+** Q48: Why use a LimitRange?
+To enforce a baseline and default resources for workloads in a namespace.
+
+** Q49: What is a default request or default limit?
+Kubernetes can apply defaults to pods that omit resource values based on the LimitRange.
+
+** Q50: What is a resource request for a Deployment?
+A Deployment’s pod template can include resource requests and limits for all pod replicas.
+
+** Q51: How do limits affect autoscaling?
+Autoscaling decisions may depend on observed pod resource utilization and requests.
+
+** Q52: What is HPA?
+HPA (Horizontal Pod Autoscaler) scales pods based on metrics such as CPU utilization.
+
+** Q53: Why are correct limits important for HPA?
+Because HPA uses resource utilization to decide when to scale, and bad limits can distort the metrics.
+
+** Q54: What is a CPU utilization metric?
+It is the average CPU percentage used by the pod relative to its request or limit.
+
+** Q55: Why is utilization not the same as absolute usage?
+Because the same percentage may correspond to different load depending on the pod’s request size.
+
+** Q56: What is a memory usage metric?
+It is the actual memory measured by the pod or node.
+
+** Q57: What is a container crash due to OOM?
+It happens when the process attempts to use more memory than allowed and is killed.
+
+** Q58: What is `resources: {}` in a pod spec?
+It means no explicit requests or limits are set for the container.
+
+** Q59: Why is setting nothing risky?
+Because the pod may be scheduled without guarantees and may starve or be starved by others.
+
+** Q60: Why should limits be realistic?
+Because unrealistic limits create throttling, crashes, or overprovisioning.
+
+** Q61: What is a memory leak?
+A memory leak is a bug causing a program to consume memory continuously without releasing it.
+
+** Q62: Why do memory limits help with memory leaks?
+They cap damage and can trigger restarts when a workload becomes unhealthy.
+
+** Q63: What is a CPU hog?
+A CPU hog is a process or workload consuming excessive CPU time.
+
+** Q64: Why do CPU limits matter for CPU hogs?
+They prevent a single workload from monopolizing all compute on a node.
+
+** Q65: What is resource pressure in a cluster?
+It is when the cluster experiences shortage relative to requests and usage.
+
+** Q66: What is scheduler placement?
+It is the decision of which node should run a pod based on resources, labels, and constraints.
+
+** Q67: What is a node selector?
+A node selector constrains which nodes a pod may be scheduled onto.
+
+** Q68: Why are node selectors relevant to resource limits?
+Because workloads may need to be placed onto nodes with the right capacity or hardware.
+
+** Q69: What is a taint and toleration?
+Taints and tolerations allow pods to schedule onto specific nodes or avoid others.
+
+** Q70: Why do taints and tolerations affect resources?
+Because they influence where workloads run and how resources are shared.
+
+** Q71: What is a pod disruption budget?
+It limits how many pods can be disrupted during voluntary or involuntary disruptions.
+
+** Q72: Why are resource limits tied to resilience?
+Because if a node is overloaded, more pods may be evicted and disruption increases.
+
+** Q73: What is a resource threshold?
+A threshold is a limit or alerting point that flags unusual resource consumption.
+
+** Q74: What is a request vs limit best practice?
+Use requests for scheduling and guarantees, and limits for safe caps based on real workload needs.
+
+** Q75: What is a memory request for a Java app?
+It often includes heap and runtime overhead plus some buffer for GC and OS memory.
+
+** Q76: Why is Java memory tuning tricky?
+Java uses heap, object overhead, native memory, and GC behavior that affect actual memory consumption.
+
+** Q77: Why are CPU limits sometimes not suitable for all workloads?
+Some workloads benefit from bursting or using idle CPU when available.
+
+** Q78: What is a CPU burst?
+A CPU burst is temporary additional CPU usage above the requested amount, if allowed by the node.
+
+** Q79: Why do strict limits lower burst capacity?
+Because limits cap the maximum average throughput a process can use.
+
+** Q80: What is a kill due to OOM in Kubernetes?
+A pod can be restarted when the container exceeds its memory limit and is terminated.
+
+** Q81: What is a memory limit plus cgroup behavior?
+Kubernetes uses Linux cgroups to enforce memory limits.
+
+** Q82: Why do Linux cgroups matter?
+They are the underlying mechanism used by Kubernetes to enforce limits.
+
+** Q83: What is `cgroup` memory enforcement?
+It restricts memory usage to the configured limit and may kill the process when exceeded.
+
+** Q84: Why should you monitor node usage?
+Because a cluster can look healthy until one node saturates and causes evictions.
+
+** Q85: What is a node starvation condition?
+It is when a node does not have enough resources left to satisfy workloads.
+
+** Q86: What is a resource leak?
+A resource leak is an application bug that gradually consumes resources.
+
+** Q87: Why do resource limits not fix all app bugs?
+They can mask failures by causing restarts rather than correcting the root cause.
+
+** Q88: What is a request or limit mismatch?
+It happens when the numbers do not reflect actual runtime behavior, causing poor scheduling or failures.
+
+** Q89: What is a noisy neighbor in a Kubernetes cluster?
+A workload with misconfigured or greedy limits can starve others on the same node.
+
+** Q90: What is capacity planning?
+Capacity planning estimates how much CPU and memory the cluster must provide for current and future workloads.
+
+** Q91: What is a resource reservation?
+A reservation is a guarantee that some resources are left for system daemons or critical workloads.
+
+** Q92: Why reserve resources for the system?
+Because system services also need CPU and memory, and they should not be starved.
+
+** Q93: What is a resource request for the kubelet or system daemons?
+These system-level resources are important for node health and should not be fully consumed by user workloads.
+
+** Q94: What is cluster overcommit?
+Overcommit happens when total requested resources exceed total cluster capacity.
+
+** Q95: Why is cluster overcommit risky?
+It can lead to node pressure and pod eviction under load.
+
+** Q96: Why is pod sizing important?
+Poor pod sizing causes poor utilization, unexpected throttling, or crash loops.
+
+** Q97: What is a resource utilization baseline?
+It is the typical amount of CPU and memory a workload uses in production.
+
+** Q98: What is performance tuning for resources?
+It means tuning requests and limits based on real load and throughput observations.
+
+** Q99: What is autoscaling vs manual resource tuning?
+Autoscaling responds to traffic dynamics; tuning sets a baseline for pod sizing and resource allocation.
+
+** Q100: What are common resource misconfigurations?
+- no requests
+- no limits
+- requests too low
+- limits too low
+- limits too high
+- ignoring node capacity
+
+* Intermediate
+
+** Q101: What is a `requests` value used by scheduler?
+The scheduler uses requests to find a suitable node and reserve space.
+
+** Q102: What is a `limits` value used by runtime?
+The runtime uses limits to enforce maximum cgroup usage.
+
+** Q103: Why do requests and limits differ in practice?
+Because the runtime and scheduler use them differently: one is soft reserved capacity, the other is enforcement.
+
+** Q104: Why do requests matter more than limits for scheduling?
+Because the scheduler can only place pods on nodes with enough available requests.
+
+** Q105: Why are requests sometimes set equal to limits?
+When you want predictable behavior and consistent capacity planning.
+
+** Q106: Why are requests sometimes lower than limits?
+To allow burst capacity without starving the node.
+
+** Q107: What is the CPU burst model?
+It allows short spikes above the request when there is available node capacity.
+
+** Q108: What is a CPU throttle threshold?
+It is the point at which the runtime limits or throttles CPU usage.
+
+** Q109: Why is memory overcommit dangerous?
+Because it can cause OOM kills and disruption when multiple pods compete for memory.
+
+** Q110: Why can high memory limits cause poor utilization?
+Because the cluster may reserve memory that is not actually needed, reducing scheduling density.
+
+** Q111: What is `EmptyDir` and resource use?
+It is local ephemeral storage, not CPU or memory, but may still affect disk usage.
+
+** Q112: What is the resource use of system daemons?
+The kubelet, kernel, and control plane components also consume CPU and memory.
+
+** Q113: What is node allocatable memory?
+The actual memory left for application workloads after system reservations.
+
+** Q114: What is a pressure condition on a node?
+It occurs when memory or disk is under heavy strain and Kubernetes starts eviction or scheduling restrictions.
+
+** Q115: What is a `PriorityClass`?
+A PriorityClass gives a pod higher or lower scheduling and eviction priority.
+
+** Q116: Why do priorities matter with resource limits?
+Because under pressure, Kubernetes may evict lower-priority pods first.
+
+** Q117: Why are cluster-level quotas useful?
+They help control the total resources users or namespaces can consume.
+
+** Q118: What is a quota object?
+A quota object defines total requests and limits for a namespace.
+
+** Q119: Why use `LimitRange` plus quotas together?
+Because LimitRange sets defaults and bounds, while quota limits total usage.
+
+** Q120: What is a resource-level namespace boundary?
+It is the namespace-level total for CPU, memory, and storage.
+
+** Q121: What is a cluster autoscaler?
+The cluster autoscaler adds or removes nodes based on pending pods and cluster load.
+
+** Q122: Why is autoscaler relevant to resource limits?
+Because I/O and CPU pressure dictate whether more nodes are needed.
+
+** Q123: What is a node pool?
+A node pool is a group of nodes with similar size or characteristics, often for scheduling CPU/memory workloads.
+
+** Q124: Why do some clusters create node pools for different workload types?
+Because different apps have different CPU, memory, and capacity needs.
+
+** Q125: What is a memory request vs memory usage metric?
+Request is the reserved baseline; usage is actual observed allocation.
+
+** Q126: Why is usage monitoring important?
+Because pods can exceed requests or limits without the platform realizing it.
+
+** Q127: What is a dashboard or metrics server?
+It shows pod resource usage over time and helps tune requests and limits.
+
+** Q128: What is a CPU saturation event?
+A saturation event happens when the node or pod is at or near its CPU capacity.
+
+** Q129: What is memory saturation?
+It is when memory usage is close to limit or near the node’s total capacity.
+
+** Q130: Why are resource requests important for cluster capacity?
+They are the basis for scheduling and future node scaling.
+
+** Q131: Why are limits sometimes omitted for sidecars?
+Because sidecars may not need a strict cap or may be designed to burst.
+
+** Q132: What is a sidecar container?
+A sidecar is a helper container in the same pod that shares resources with the main app.
+
+** Q133: Why are sidecars relevant to resource budgeting?
+Because sidecars compete for the same pod-level resource pool.
+
+** Q134: What is a pod-level resource sum?
+The sum of all containers’ requests and limits in a pod.
+
+** Q135: Why is pod-level sum relevant?
+Because pod scheduling and resource enforcement happen at the pod/container aggregate level.
+
+** Q136: What is a memory request for a sidecar?
+It may be lower than the main app, but the total still matters.
+
+** Q137: Why should service and sidecar resources be considered together?
+Because they share the pod’s total and can affect each other.
+
+** Q138: What is a “too low limit” problem?
+It can cause the app to be throttled or killed even though the node has enough overall capacity.
+
+** Q139: What is a “too high limit” problem?
+It can starve other pods or reduce cluster density, leading to poor scheduling.
+
+** Q140: Why does resource tuning require experimentation?
+Because real workloads differ by runtime, concurrency, and traffic patterns.
+
+** Q141: What is a container OOM with restart policy?
+A container can restart after OOM, which can cause a crash loop if limits are set too low.
+
+** Q142: Why do well-sized limits reduce restarts?
+Because memory and CPU constraints remain aligned with actual workload behavior.
+
+** Q143: What is a memory headroom?
+Headroom is the extra memory left after requests and limits to absorb bursts and system activity.
+
+** Q144: Why is headroom important?
+It helps avoid unnecessary evictions and OOM kills.
+
+** Q145: What is a CPU headroom?
+The extra CPU capacity in the node that allows bursts without system starvation.
+
+** Q146: Why are node-level limits smaller than total node capacity?
+Because operating system daemons and Kubernetes components also need resources.
+
+** Q147: What is a scheduling score?
+Kubernetes uses scoring to pick the best node based on many factors, including resource fit.
+
+** Q148: What are generic resource names?
+CPU and memory are the standard ones, but custom resources can also be used in some clusters.
+
+** Q149: What is a custom resource for GPU?
+GPUs can be requested and limited as custom resources in some clusters.
+
+** Q150: What is a GPU resource limit?
+It caps how much accelerator capacity a pod can use and is often modeled separately from CPU and memory.
+
+** Q151: What are node resource reservations?
+They keep some CPU and memory available for system-critical tasks.
+
+** Q152: Why is node reservation important?
+Because the node still needs to run kubelet, container runtime, and OS tasks.
+
+** Q153: What is a service-level resource plan?
+It is the policy and sizing model for each production service based on expected traffic and workload characteristics.
+
+** Q154: Why is baseline usage important?
+Because it informs safe requests and limits, which impact scheduling and reliability.
+
+** Q155: What is cluster capacity planning?
+It is the process of understanding total available CPU and memory and how much is consumed by workloads.
+
+** Q156: What is load testing and resource measurement?
+It is the process of measuring a workload under realistic conditions to determine good limits.
+
+** Q157: What is a canary resource test?
+It measures whether a new workload version fits its resource budget before full rollout.
+
+** Q158: What is resource observability?
+It is the visibility into actual CPU, memory, and process behavior of workloads.
+
+** Q159: What is a resource alert?
+An alert signals abnormal usage above expected thresholds.
+
+** Q160: What is a resource usage trend?
+A trend shows whether a workload grows over time and may require tuning or scaling.
+
+** Q161: Why is resource tuning an iterative process?
+Because workloads evolve and traffic changes over time.
+
+** Q162: What is a pod left with no requests and limits?
+It receives no scheduling guarantee and can be noisy or starved on a node.
+
+** Q163: Why is overprovisioning dangerous?
+It reduces scheduling efficiency and can create unanticipated contention.
+
+** Q164: What is garbage collection and resources?
+Garbage collection may generate temporary CPU and memory use that is not always visible in baseline app metrics.
+
+** Q165: What is the relation between resource requests and evictions?
+Under resource pressure, pods with lower QoS or lower priority are more likely to be evicted.
+
+** Q166: What is a resource pressure event in a cluster?
+It is when the cluster experiences insufficient CPU or memory relative to current demand.
+
+** Q167: Why is QoS a key concept?
+Because it affects eviction order and resilience under stress.
+
+** Q168: What is the bounded usage model?
+It is the idea that workloads use only the resources they are allowed to use based on limits and requests.
+
+** Q169: What is a slow or starved pod?
+A pod starved of CPU or memory can behave erratically or fail under load.
+
+** Q170: What is memory pressure?
+Memory pressure increases the risk of OOM kills and performance degradation.
+
+** Q171: What is CPU pressure?
+CPU pressure makes the process slow or queued behind resource limits.
+
+** Q172: Why do both CPU and memory matter?
+Because one can cause slowness while the other can cause failures or restarts.
+
+** Q173: What is a pod quality-of-service policy?
+It determines which pods are sacrificed first during node pressure events.
+
+** Q174: Why is resource-aware scheduling crucial?
+Because it ensures workloads land on suitable nodes and avoids chaotic contention.
+
+** Q175: Why should operators prefer explicit requests and limits?
+It improves reliability, predictability, and cluster health.
+
+** Q176: What is a baseline setting for app resources?
+It is the initial request and limit values set based on profiling and expected load.
+
+** Q177: What is cluster-level resource fairness?
+It ensures users or namespaces do not overwhelm the shared cluster resources.
+
+** Q178: What is request aggregation?
+It is the total requests across all pods in a namespace or cluster.
+
+** Q179: What is a resource utilization ratio?
+It is the actual usage relative to request or limit values.
+
+** Q180: Why is measuring real usage crucial for resource tuning?
+Because good resource limits are derived from actual workload behavior, not guesses.
+
+* Advanced / Expert
+
+** Q181: What is cgroup v1 vs cgroup v2?
+They are different Linux cgroup versions used by the runtime to enforce resource limits.
+
+** Q182: Why is cgroup version relevant?
+Because some tools and kernels behave differently depending on the cgroup version.
+
+** Q183: What is resource accounting?
+It is the tracking of CPU and memory consumed by containers and processes.
+
+** Q184: Why is accounting needed?
+Because it provides the raw input for scheduling, alerting, autoscaling, and tuning.
+
+** Q185: What is `top` or `kubectl top`?
+They show current resource usage of nodes or pods for operational observability.
+
+** Q186: Why is `kubectl top` valuable?
+It helps estimate whether requests and limits are realistic and whether workloads are saturating the cluster.
+
+** Q187: What is kernel OOM killer behavior?
+The OOM killer may kill the highest-memory container or process when memory is exhausted.
+
+** Q188: Why does OOM kill matter in Kubernetes?
+Because it can restart a pod abruptly and cause service disruption.
+
+** Q189: What is a memory burst beyond request?
+Pods may temporarily use more memory than their request if there is free node memory.
+
+** Q190: Why is burst possible but limited?
+Because the node can allow short spikes if capacity remains available.
+
+** Q191: What is a scheduler fit problem?
+It happens when a pod cannot be scheduled because no node has enough requested resources.
+
+** Q192: Why is careful CPU request budgeting important?
+Because mis-sized CPU requests can cause under-scheduling or overutilization.
+
+** Q193: What is a high-concurrency app?
+An app with many parallel workers or requests that may use bursts of CPU and memory.
+
+** Q194: Why do bursty apps need careful limits?
+Because they can be starved or killed if limits are too low and not aligned with traffic spikes.
+
+** Q195: What is a latency-sensitive workload?
+It depends on low response time and stable resource availability.
+
+** Q196: Why do latency-sensitive apps need better resource reservations?
+Because if they do not have enough resources, they may queue or throttle and increase latency.
+
+** Q197: What is a low-latency memory profile?
+It often requires more predictability and less aggressive overcommit.
+
+** Q198: Why is CPU limit too low a common production issue?
+Because apps can degrade under load and appear “slow” even though they are still running.
+
+** Q199: What is the relationship between resource limits and autoscaling?
+Autoscaling decides scale-out based on load, while limits decide how much each pod can consume before throttling or OOM.
+
+** Q200: What is the main lesson of Kubernetes resource limits?
+Resource limits are about safety, scheduling correctness, and cluster health; requests reserve capacity, limits cap usage, and both must be based on real workload behavior to keep the cluster stable and the app reliable.
+
+-----
+
+#+INCLUDE: "../footer.org"
