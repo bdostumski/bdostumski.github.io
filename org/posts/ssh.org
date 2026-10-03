@@ -1,0 +1,749 @@
+#+TITLE: SSH
+#+DATE: 2026-10-02
+#+TAGS: Network
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* SSH Fundamentals
+
+-----
+
+* Beginner
+
+** Q1: What is SSH?
+SSH (Secure Shell) is a network protocol used to securely access and manage remote systems over an unsecured network.
+
+** Q2: Why is SSH needed?
+SSH provides encrypted communication and secure remote authentication, which is safer than telnet and other insecure alternatives.
+
+** Q3: What does SSH typically secure?
+SSH commonly secures remote terminal access, file transfer, tunneling, and port forwarding.
+
+** Q4: What is the default SSH port?
+The default SSH port is 22.
+
+** Q5: What is the SSH client?
+The SSH client is the application that connects to a remote SSH server, such as ~ssh~ on Linux or PuTTY on Windows.
+
+** Q6: What is the SSH server?
+The SSH server is the daemon listening for incoming SSH connections, often ~sshd~.
+
+** Q7: What does SSH encrypt?
+SSH encrypts the communication channel between the client and the remote server, including terminal sessions and data transfers.
+
+** Q8: What is the difference between SSH and SSL/TLS?
+SSH is designed mainly for remote shell access and secure command execution.
+TLS is commonly used for securing HTTP, mail, and other application protocols.
+
+** Q9: What is the purpose of a key pair?
+A key pair is used to authenticate securely without sending a password over the network.
+
+** Q10: What is a private key?
+A private key is kept secret on the client machine and used to prove identity.
+
+** Q11: What is a public key?
+A public key is shared with the server and used to verify the private key without exposing it.
+
+** Q12: What is asymmetric encryption?
+Asymmetric encryption uses a pair of keys: public and private.
+Data encrypted with one key can only be decrypted with the other.
+
+** Q13: What is authentication in SSH?
+Authentication is the process of proving the identity of the client to the server.
+
+** Q14: What are common SSH authentication methods?
+Common methods include:
+- password authentication
+- public key authentication
+- host-based authentication
+- keyboard-interactive authentication
+
+** Q15: What is password authentication?
+Password authentication sends a password to the server and verifies it against the system account.
+
+** Q16: What is public key authentication?
+Public key authentication verifies that the client owns a matching private key, without sending a password.
+
+** Q17: Why is public key authentication preferred?
+It is more secure and more convenient than password login, especially for automation and remote administration.
+
+** Q18: What is ssh-agent?
+~ssh-agent~ stores private keys in memory so they do not need to be entered repeatedly.
+
+** Q19: What is ssh-add?
+~ssh-add~ loads private keys into the SSH agent for reuse.
+
+** Q20: What is the SSH config file?
+The SSH config file allows predefined connection settings such as host aliases, ports, and identity files.
+
+** Q21: What is the typical SSH config path?
+On Linux/macOS: ~/.ssh/config
+
+** Q22: What is ~known_hosts~?
+~known_hosts~ stores the host public keys previously seen by the client, helping detect MITM attacks.
+
+** Q23: What is host key verification?
+Host key verification confirms the server is the same server the client expects, based on known host fingerprints.
+
+** Q24: What is a fingerprint?
+A fingerprint is a cryptographic hash of a public key used to quickly compare keys.
+
+** Q25: What is SSH port forwarding?
+SSH port forwarding creates a tunnel that redirects traffic through an encrypted SSH connection.
+
+** Q26: What is local port forwarding?
+Local port forwarding sends traffic from a local port to a remote destination through the SSH tunnel.
+
+** Q27: What is remote port forwarding?
+Remote port forwarding sends traffic from a remote SSH server port to a local destination.
+
+** Q28: What is dynamic port forwarding?
+Dynamic port forwarding uses SSH as a SOCKS proxy for many outgoing connections.
+
+** Q29: What is an SSH tunnel?
+An SSH tunnel creates a secure communication path between endpoints using SSH as the transport.
+
+** Q30: What is SOCKS?
+SOCKS is a proxy protocol used by clients to send traffic through a tunnel, often for browsing or application-level routing.
+
+** Q31: What is scp?
+~scp~ copies files securely between hosts over SSH.
+
+** Q32: What is sftp?
+~sftp~ provides secure file transfer using the SSH protocol.
+
+** Q33: What is rsync over SSH?
+~rsync~ can use SSH as the transport for encrypted backup and synchronization.
+
+** Q34: What is the SSH command syntax?
+A common form is:
+~ssh user@hostname~
+
+** Q35: What is the SSH command for a custom port?
+Example:
+~ssh -p 2222 user@host~
+
+** Q36: What is the command to specify an identity file?
+Example:
+~ssh -i ~/.ssh/id_rsa user@host~
+
+** Q37: What does ~-v~ do in ssh?
+It enables verbose output, helping diagnose SSH connection issues.
+
+** Q38: What is a key fingerprint check?
+It compares the server’s public key fingerprint with a trusted value to verify identity.
+
+** Q39: What is the SSH daemon?
+The SSH daemon is the service running on the server that accepts incoming client connections.
+
+** Q40: What is ~sshd_config~?
+~sshd_config~ is the SSH server configuration file.
+
+** Q41: What is ~ssh_config~?
+~ssh_config~ is the client configuration file.
+
+** Q42: What is a remote shell?
+A remote shell is a command-line interface opened on a remote machine through SSH.
+
+** Q43: What is remote administration?
+Remote administration means managing a server through network commands, often over SSH.
+
+** Q44: What is passwordless authentication?
+Passwordless authentication uses keys instead of passwords for login.
+
+** Q45: What is a challenge-response authentication?
+A server can challenge the client for proof of possession of a key or credentials without sending a password.
+
+** Q46: What is shell escaping?
+Shell escaping ensures special characters are correctly passed to the remote shell.
+
+** Q47: Why does SSH not send data in plain text?
+Because SSH encrypts the session, protecting sensitive credentials and command output.
+
+** Q48: What is the SSH protocol family?
+SSH is a secure remote access protocol, not to be confused with SFTP or SCP, which are higher-level utilities.
+
+** Q49: Can SSH also be used for tunneling databases or web traffic?
+Yes. SSH can tunnel app traffic, making it useful for secure access to internal resources.
+
+** Q50: What is a bastion host?
+A bastion host is a hardened server used as an entry point to a private network.
+
+** Q51: Why often use SSH through a bastion host?
+It provides controlled access to private environments without exposing all services publicly.
+
+** Q52: What is a jump host?
+A jump host is another term for a bastion or intermediate host used to reach private servers.
+
+** Q53: What is a private key passphrase?
+A passphrase protects the private key with an additional encryption layer.
+
+** Q54: Why use a passphrase?
+It adds another layer of protection if the private key file is stolen.
+
+** Q55: What is an SSH agent with passphrase?
+The SSH agent can unlock a private key once and reuse it without repeated password prompts.
+
+** Q56: What is a shell prompt?
+A shell prompt is the command-line interface shown after login.
+
+** Q57: What is ssh-keygen?
+~ssh-keygen~ generates SSH key pairs.
+
+** Q58: What are common key types?
+Common SSH key types include:
+- RSA
+- ED25519
+- ECDSA
+
+** Q59: Why is ED25519 popular?
+It is fast, secure, and efficient, and is widely recommended for modern systems.
+
+** Q60: What is an authorized_keys file?
+The ~authorized_keys~ file contains public keys allowed to log in to a user account.
+
+** Q61: What is the default SSH key location?
+By default on Linux/macOS:
+~/.ssh/id_rsa~
+or
+~/.ssh/id_ed25519~
+
+** Q62: What is the purpose of permission settings on SSH keys?
+Proper file permissions prevent unauthorized access to private keys.
+
+** Q63: What is the recommended permission for private keys?
+Typically 600 (or 400 if stricter).
+
+** Q64: What is the typical permission for ~/.ssh directory?
+Usually 700.
+
+** Q65: What is shell access via SSH?
+Shell access means the user can run commands on the remote system through an interactive session.
+
+** Q66: What is command execution over SSH?
+A non-interactive SSH session can run a single command remotely.
+
+** Q67: What is ~ssh user@host command~?
+This runs a remote command without opening an interactive shell.
+
+** Q68: What is "remote execution"?
+Remote execution means running commands on a machine over SSH.
+
+** Q69: What is the purpose of SSH in automation?
+SSH is widely used by automation tooling to deploy, configure, and manage systems.
+
+** Q70: What is SSH in DevOps?
+SSH is commonly used to provision servers, run scripts, and orchestrate infrastructure.
+
+** Q71: What is the difference between telnet and SSH?
+Telnet sends data in clear text; SSH encrypts it.
+
+** Q72: Why is telnet considered insecure?
+Because credentials and commands can be intercepted.
+
+** Q73: What is the use of ssh-copy-id?
+~ssh-copy-id~ uploads a public key to a remote server’s authorized keys.
+
+** Q74: What is an SSH fingerprint mismatch?
+A fingerprint mismatch usually means the server key changed or a MITM attack is occurring.
+
+** Q75: What does "remote host identification has changed" mean?
+It means the SSH server key on that host differs from the one stored in known_hosts.
+
+** Q76: What is the impact of a changed host key?
+It may indicate a server rebuild, impersonation attempt, or configuration issue.
+
+** Q77: What is the purpose of the SSH server host key?
+The host key identifies the server to clients and prevents impersonation.
+
+** Q78: What is a server host key pair?
+A server has a private host key and a public host key used for SSH identity verification.
+
+** Q79: What is the user authentication key?
+This is the key pair the user uses to authenticate to the server.
+
+** Q80: What is the difference between host keys and user keys?
+Host keys identify the server.
+User keys identify the client.
+
+** Q81: What is GSSAPI authentication?
+GSSAPI authentication uses Kerberos or similar mechanisms for identity management.
+
+** Q82: Why is SSH used for backups?
+It provides encrypted transport for remote copy operations and secure automation.
+
+** Q83: What is a remote exec command?
+Example:
+~ssh host "uptime"~
+
+** Q84: What is SSH session multiplexing?
+SSH multiplexing reuses an existing SSH connection to run multiple commands more efficiently.
+
+** Q85: What is ControlMaster in SSH?
+~ControlMaster~ allows multiplexing multiple SSH sessions over one master connection.
+
+** Q86: What is X11 forwarding?
+X11 forwarding allows a remote graphical application to display locally through SSH.
+
+** Q87: Why is X11 forwarding less preferred today?
+It has security implications and is less commonly used than remote CLI tools.
+
+** Q88: What is SSH tunneling for database access?
+You can create a tunnel through SSH to access a database on a private network securely.
+
+** Q89: What is reverse SSH?
+Reverse SSH connects from a machine behind NAT back to a reachable SSH server, allowing remote access.
+
+** Q90: What is secure file transfer?
+Secure file transfer means copying files without exposing them to sniffing or tampering.
+
+** Q91: What is sftp vs scp?
+Both are secure file transfer protocols over SSH.
+~sftp~ is more feature-rich and interactive; ~scp~ is simpler.
+
+** Q92: What is the role of SSH in cloud infrastructure?
+SSH is frequently used to access EC2, VM, and container hosts securely.
+
+** Q93: What is SSH access to a container?
+A container runtime may expose a shell over SSH for remote administration or debugging.
+
+** Q94: Why is SSH disabled by default on some systems?
+Because it increases attack surface unless properly secured and monitored.
+
+** Q95: What is SSH security hardening?
+Hardening means limiting access, disabling root login, enforcing key-based auth, and restricting users.
+
+** Q96: What is the impact of disabling root login?
+It reduces direct administrative attack paths and enforces least privilege.
+
+** Q97: What is least privilege?
+Least privilege means granting the minimum required permissions to a user or service.
+
+** Q98: What is the principle of least privilege in SSH?
+Only allow the users who need SSH access and restrict them to required commands or hosts.
+
+** Q99: What is a locked-down SSH policy?
+A locked-down policy may include:
+- key-only auth
+- no password login
+- no root login
+- firewall restrictions
+- two-factor authentication
+
+** Q100: What is two-factor authentication for SSH?
+It requires something you know and something you have, such as a password and a hardware token.
+
+* Intermediate
+
+** Q101: What is the SSH protocol version?
+SSH commonly uses version 2, known as SSH-2, which is the modern secure implementation.
+
+** Q102: What is the SSH transport layer?
+The SSH transport layer provides encryption, integrity, and host authentication.
+
+** Q103: What is the SSH userauth layer?
+This layer handles user authentication after the secure transport channel is established.
+
+** Q104: What is the SSH connection layer?
+The connection layer multiplexes multiple channels, such as shell, SFTP, ports, and forwarding.
+
+** Q105: What are SSH channels?
+SSH channels are multiplexed logical communication streams over a single connection.
+
+** Q106: Why is SSH connection multiplexing valuable?
+It allows one SSH connection to carry multiple independent streams efficiently.
+
+** Q107: What does ~ssh -N -L port:host:port user@host~ do?
+It creates a local tunnel without opening an interactive shell.
+
+** Q108: What does ~ssh -R remoteport:host:localport user@host~ do?
+It creates a remote port forwarding tunnel.
+
+** Q109: What is the difference between TCP and SSH tunneling?
+TCP tunneling wraps TCP traffic inside an SSH connection; SSH is the transport for the tunnel.
+
+** Q110: What is port binding?
+Port binding creates a listening socket at a local or remote endpoint for forwarded traffic.
+
+** Q111: What is local bind address?
+It is the address used to listen on local forwarded ports, often 127.0.0.1.
+
+** Q112: What is remote bind address?
+It is the address used on the remote SSH server for a remote port-forwarded port.
+
+** Q113: Why use loopback in tunnels?
+Loopback restricts access to the local machine, reducing external exposure.
+
+** Q114: What is SOCKS5?
+SOCKS5 is a common proxy protocol that supports dynamic port forwarding and authentication.
+
+** Q115: What is sshuttle?
+~sshuttle~ is a tool that creates VPN-like tunnels through SSH for routing traffic.
+
+** Q116: What is the role of ~/.ssh/known_hosts?
+It stores trusted server host keys and prevents naive man-in-the-middle attacks.
+
+** Q117: How is host key verification protected?
+The client compares the host key fingerprint to the stored expected key.
+
+** Q118: What is a host key rotation?
+Host key rotation means generating a new server host key and updating clients’ ~known_hosts~ entries.
+
+** Q119: What is SSH key rotation?
+SSH key rotation means replacing user or host keys after a compromise or policy change.
+
+** Q120: Why rotate SSH keys?
+Because stale keys may be exposed or become outdated.
+
+** Q121: What is a bastion jump using SSH config?
+Example:
+~Host prod-hop~
+~  HostName bastion.example.com~
+~  User ubuntu~
+~  IdentityFile ~/.ssh/bastion_key~
+~Host prod-server~
+~  HostName 10.0.0.10~
+~  User admin~
+~  ProxyJump prod-hop~
+
+** Q122: What is ProxyJump?
+~ProxyJump~ allows SSH to connect through an intermediate host automatically.
+
+** Q123: Why use ProxyCommand?
+It allows custom tunneling or jump logic when ProxyJump is insufficient.
+
+** Q124: What is SSH agent forwarding?
+SSH agent forwarding allows the remote server to use your local SSH agent for further SSH connections.
+
+** Q125: What are the security trade-offs of agent forwarding?
+It is powerful but can be dangerous if the remote host is compromised.
+
+** Q126: How do you disable agent forwarding?
+Use:
+~ssh -A~ to enable
+and omit ~-A~ or set ~ForwardAgent no~ in config.
+
+** Q127: What is the SSH config ~Host~ stanza?
+It groups connection settings for hosts matching a pattern.
+
+** Q128: What is the purpose of ~StrictHostKeyChecking~?
+It controls behavior when the host key is unknown or changed.
+
+** Q129: What are valid values for StrictHostKeyChecking?
+Common values:
+- yes
+- no
+- accept-new
+
+** Q130: Why should StrictHostKeyChecking be set to yes in production?
+It enforces validation instead of accepting unknown or changed hosts silently.
+
+** Q131: What is ~UserKnownHostsFile~?
+It specifies a custom file for known host keys.
+
+** Q132: What is the purpose of compression in SSH?
+Compression reduces payload size, which may help performance for slower links.
+
+** Q133: Why is compression sometimes a security concern?
+Because it may hide characteristics or add CPU overhead, but it is not usually a major security problem.
+
+** Q134: What is SSH session logging?
+SSH session logging records connection metadata and terminal output for auditing and troubleshooting.
+
+** Q135: What is SSH auditing?
+Auditing reviews SSH access, keys, logs, and configuration for security compliance.
+
+** Q136: What is SSH access control by user?
+You can restrict which users can log in via SSH through minimal ACLs and OS-level permissions.
+
+** Q137: What is SSH command restriction?
+You can restrict an SSH key to run only a specific command on a remote server.
+
+** Q138: What is forced command in authorized_keys?
+The server can define a command that must run after successful key authentication, even if the user requests another command.
+
+** Q139: What is a restricted key?
+A restricted key is a key that can only perform some permitted operations.
+
+** Q140: Why is restricted command use valuable?
+It reduces risk when a key is compromised or misused.
+
+** Q141: What is SSH key passphrase caching?
+It stores a passphrase in the agent to avoid repeated prompts.
+
+** Q142: What is an SSH jump box?
+A jump box is a machine that a user connects through before reaching more restricted systems.
+
+** Q143: What is server-side authentication policy?
+Examples:
+- disable password login
+- require key-based auth
+- restrict to selected users
+- require MFA
+
+** Q144: What is MFA for SSH?
+Multi-factor authentication adds another verification step beyond the key or password.
+
+** Q145: What is PAM in SSH?
+PAM (Pluggable Authentication Modules) allows SSH to integrate with system authentication frameworks.
+
+** Q146: What is the role of SELinux or AppArmor with SSH?
+They can restrict what the SSH process and users can do after login.
+
+** Q147: What is the difference between interactive and non-interactive SSH?
+Interactive SSH opens a remote shell.
+Non-interactive SSH runs one command or script and exits.
+
+** Q148: What does SSH use for encryption?
+SSH uses symmetric encryption for data and asymmetric crypto for key exchange and authentication.
+
+** Q149: What is key exchange?
+Key exchange is the process of agreeing on a shared secret used to encrypt the session.
+
+** Q150: What is Diffie-Hellman?
+Diffie-Hellman is a widely used key exchange algorithm used to establish a shared secret securely.
+
+** Q151: What is a symmetric session key?
+A symmetric session key is generated and shared by both sides to encrypt traffic after key exchange.
+
+** Q152: Why are symmetric keys used for session traffic?
+They are faster and more efficient than asymmetric encryption for bulk data.
+
+** Q153: What is MAC in SSH?
+MAC (Message Authentication Code) ensures integrity and authenticity of transmitted data.
+
+** Q154: Why are SSH connections considered secure?
+Because they provide confidentiality, integrity, and authenticity.
+
+** Q155: What is an SSH session ID?
+The session ID is a unique identifier for the authenticated session, used for tracking and debugging.
+
+** Q156: What is the SSH channel open/close lifecycle?
+A client opens a channel, performs traffic, then closes it when done.
+
+** Q157: What is a shell session?
+A shell session is the interactive remote terminal.
+
+** Q158: What is remote execution from CI pipelines?
+CI systems often use SSH to deploy services or run scripts on remote machines.
+
+** Q159: What is command injection risk in SSH?
+If commands are not properly escaped, harmful remote commands can execute.
+
+** Q160: Why should scripts avoid passing user input directly to SSH commands?
+Because user input may contain shell metacharacters or unintended commands.
+
+** Q161: What is SSH escaping in shell syntax?
+It ensures strings are interpreted literally and not as shell code.
+
+** Q162: What is a secure remote admin model?
+It means using minimal privilege, strong identity, monitored access, and encrypted channels.
+
+** Q163: What is remote management of Linux machines?
+SSH is the standard method for remote Linux system administration.
+
+** Q164: What is privileged access management?
+It is a framework for controlling who can access sensitive systems and what they may do.
+
+** Q165: What is sshd_config PermitRootLogin?
+This directive controls whether root logins are allowed over SSH.
+
+** Q166: What is PasswordAuthentication in sshd_config?
+This controls whether password-based SSH login is allowed.
+
+** Q167: What is PubkeyAuthentication in sshd_config?
+This controls whether public key authentication is enabled.
+
+** Q168: What is X11Forwarding?
+This forwards GUI windows for remote applications through SSH.
+
+** Q169: What does AllowUsers do?
+~AllowUsers~ restricts SSH access to a specific set of usernames.
+
+** Q170: What does DenyUsers do?
+~DenyUsers~ blocks SSH access for specific users.
+
+** Q171: What does AllowGroups do?
+~AllowGroups~ restricts SSH logins to members of selected groups.
+
+** Q172: What does PermitEmptyPasswords do?
+This defines whether empty passwords may be used; it should usually be disabled.
+
+** Q173: What is port knocking?
+Port knocking is a technique to hide a service by making it appear only after a sequence of connection attempts.
+
+** Q174: Why is SSH often used with firewall rules?
+To restrict access to only trusted IPs, VLANs, or bastion hosts.
+
+** Q175: What is host allow list?
+A host allow list is a list of clients or subnets allowed to connect to SSH.
+
+** Q176: What is a jump host pattern?
+Use a bastion host to enter private networks, then SSH from there to internal servers.
+
+** Q177: Why is SSH not a complete security solution by itself?
+Because configuration, user management, key hygiene, and network controls are equally important.
+
+** Q178: What is the risk of reusing SSH keys across systems?
+If one system is compromised, the attacker may access multiple systems.
+
+** Q179: What is a proper SSH key hygiene policy?
+- unique keys per system or purpose
+- short key lifetimes
+- regular rotation
+- revocation policies
+- safe storage
+
+** Q180: What is the purpose of revoking keys?
+Revocation invalidates compromised or stale credentials.
+
+* Advanced / Expert
+
+** Q181: What are modern SSH cryptographic algorithms?
+Modern SSH uses strong algorithms like:
+- curve25519-sha256
+- chacha20-poly1305
+- aes-256-gcm
+- Ed25519 keys
+
+** Q182: Why is ED25519 preferred?
+It offers strong security with good performance and compact keys.
+
+** Q183: What is the role of the KEX algorithm?
+KEX (Key Exchange) establishes the shared session secret securely.
+
+** Q184: What is the role of the cipher algorithm?
+The cipher encrypts the actual session payload.
+
+** Q185: What is the role of the MAC algorithm?
+The MAC ensures message integrity and authentication.
+
+** Q186: What is the difference between integrity and confidentiality?
+Confidentiality hides the content.
+Integrity ensures data was not modified.
+
+** Q187: How does SSH verify message integrity?
+It uses MACs over encrypted packets.
+
+** Q188: What is CBC mode and why is it avoided in SSH?
+Some CBC-based encryption modes are susceptible to padding oracle and side-channel issues; modern SSH uses better authenticated modes.
+
+** Q189: Why are authenticated encryption modes preferred?
+They provide confidentiality and integrity simultaneously while reducing implementation errors.
+
+** Q190: What is post-quantum cryptography?
+Post-quantum cryptography refers to cryptographic algorithms designed to be resistant to quantum attacks.
+
+** Q191: Is SSH impacted by quantum computing?
+It may be eventually affected, so migrations to quantum-resistant algorithms may matter in the future.
+
+** Q192: What is the risk of weak key exchange?
+Weak key exchange can allow passive attackers to recover session secrets in some attack models.
+
+** Q193: What is a timing attack?
+A timing attack exploits differences in execution time to infer secret information.
+
+** Q194: How does SSH reduce timing exposure?
+By using well-hardened libraries and constant-time operations where relevant.
+
+** Q195: What is host key pinning?
+Host key pinning ensures a client trusts a specific host key or set of keys instead of just any matching key.
+
+** Q196: What is a MITM attack?
+A man-in-the-middle attack intercepts communication between the client and server and impersonates each side.
+
+** Q197: How does SSH prevent MITM attacks?
+It verifies server host keys against known trusted values.
+
+** Q198: What is key trust establishment?
+Trust establishment means verifying an SSH public key is authentic and belongs to the intended server or user.
+
+** Q199: What are cryptographic libraries used by SSH?
+OpenSSH is the most common, but many libraries and clients implement SSH using robust cryptographic primitives.
+
+** Q200: Why is SSH considered fundamental to secure infrastructure?
+Because it is one of the main secure administrative channels for servers, devices, and remote systems in modern infrastructure.
+
+** Q201: What is the main challenge in SSH hardening?
+Balancing operational convenience against security policy, without creating friction or breaking automation.
+
+** Q202: What is secure remote access architecture?
+A secure remote access architecture often includes:
+- bastion hosts
+- user keys only
+- no root login
+- MFA
+- logging and alerting
+- source IP restrictions
+
+** Q203: What is SSH privilege separation?
+Privilege separation isolates the privileged SSH process from user session execution to reduce impact if it is compromised.
+
+** Q204: What is chroot jail in SSH?
+A chroot jail can isolate a user session to a restricted filesystem.
+
+** Q205: What is SSH lockdown in enterprise environments?
+SSH lockdown often includes centralized identity providers, key management, MFA, and controlled auditing.
+
+** Q206: What is SSH key management?
+SSH key management includes generation, storage, rotation, distribution, revocation, and auditing.
+
+** Q207: Why centralize SSH key management?
+Centralization reduces key sprawl, makes rotation manageable, and improves auditability.
+
+** Q208: What is passwordless access and why is it attractive?
+Passwordless login improves security and automation but requires careful key handling and monitoring.
+
+** Q209: What is SSH access via identity provider?
+Some enterprises integrate SSH with LDAP, Kerberos, or IAM systems to centralize access control.
+
+** Q210: What is least privilege in SSH administration?
+It means only allowing the exact users and commands needed for a role, not broad unrestricted shell access.
+
+** Q211: What is SSH session recording?
+Recording terminal sessions provides accountability and helps with security investigations.
+
+** Q212: Why is auditing SSH sessions important?
+Because administrative access is high risk and should be traceable.
+
+** Q213: What are common SSH misconfigurations?
+Examples:
+- password login enabled
+- root login allowed
+- weak algorithms enabled
+- too-broad authorized_keys permissions
+- open SSH to the internet without IP restrictions
+
+** Q214: What is the security impact of allowing password SSH?
+It raises risk of credential guessing, brute-force attacks, and password leakage.
+
+** Q215: Why is brute-force common against SSH?
+Because port 22 is exposed on many internet-connected systems and attackers scan continuously.
+
+** Q216: What is fail2ban?
+~fail2ban~ can block clients after repeated failed SSH login attempts.
+
+** Q217: How do hardened SSH setups guard against brute force?
+By disabling passwords, restricting users, using firewalls, and limiting login sources.
+
+** Q218: What is a honeypot in SSH context?
+An SSH honeypot is a decoy system designed to attract attackers and collect evidence.
+
+** Q219: What is a layered security model for SSH?
+It combines access restrictions, strong auth, network segmentation, and auditing.
+
+** Q220: Why is SSH still central after decades?
+Because it remains the most reliable and secure standard for remote machine administration and automation.
+
+** Q221: What is the future of SSH?
+The future brings stronger defaults, stricter policies, better key management, and continued integration with identity and policy systems.
+
+** Q222: What is the main engineering lesson in SSH?
+Remote access is a critical trust boundary.
+SSH must be designed with strong authentication, least privilege, and careful monitoring.
+
+-----
+
+#+INCLUDE: "../footer.org"
