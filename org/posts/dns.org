@@ -1,0 +1,873 @@
+#+TITLE: DNS
+#+DATE: 2026-10-02
+#+TAGS: Network
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* DNS (Domain Name System)
+
+-----
+
+* Beginner
+
+** Q1: What is DNS?
+DNS (Domain Name System) is the system that translates human-readable domain names like example.com into machine-readable IP addresses.
+
+** Q2: Why do we need DNS?
+Without DNS, users would need to remember numeric IP addresses instead of names like google.com or github.com.
+
+** Q3: What is a domain name?
+A domain name is a human-friendly name used to identify a resource on the internet, such as example.com.
+
+** Q4: What is a hostname?
+A hostname is a label used to identify a host, often part of a domain, such as web01.example.com.
+
+** Q5: What is an IP address?
+An IP address is a numeric address used to identify a device on a network, such as 192.168.1.10 or 2001:db8::1.
+
+** Q6: What does DNS resolve?
+DNS resolves names to addresses, such as converting example.com to 93.184.216.34.
+
+** Q7: What is a DNS resolver?
+A DNS resolver is a server or client component that resolves domain names by querying DNS servers.
+
+** Q8: What is a recursive DNS query?
+A recursive query asks a DNS server to answer the full resolution on behalf of the client.
+
+** Q9: What is a recursive resolver?
+A recursive resolver is the server that resolves queries by consulting authoritative servers and caches.
+
+** Q10: What is an authoritative DNS server?
+An authoritative server is the source of truth for a given domain or zone.
+
+** Q11: What is a DNS zone?
+A DNS zone is a portion of the DNS namespace managed by a specific authority.
+
+** Q12: What is a forward lookup?
+A forward lookup resolves a domain name to an IP address.
+
+** Q13: What is a reverse lookup?
+A reverse lookup resolves an IP address to a domain name.
+
+** Q14: What is a PTR record?
+A PTR record maps an IP address back to a hostname in reverse DNS.
+
+** Q15: What is an A record?
+An A record maps a hostname to an IPv4 address.
+
+** Q16: What is an AAAA record?
+An AAAA record maps a hostname to an IPv6 address.
+
+** Q17: What is a CNAME record?
+A CNAME record creates an alias from one domain name to another.
+
+** Q18: What is an MX record?
+An MX record tells mail servers where to deliver email for a domain.
+
+** Q19: What is a TXT record?
+A TXT record stores text data and is commonly used for verification and SPF/DKIM/DMARC.
+
+** Q20: What is a NS record?
+A NS record declares which nameservers are authoritative for a zone.
+
+** Q21: What is a SOA record?
+A SOA record contains metadata for the zone, such as serial number and refresh interval.
+
+** Q22: What is a root domain?
+The root domain is the top-level of the DNS hierarchy and is represented by a trailing dot (.).
+
+** Q23: What is a TLD?
+A TLD (Top-Level Domain) is the highest level of a domain name such as .com, .org, or .net.
+
+** Q24: What is a second-level domain?
+A second-level domain is the part directly under the TLD, such as example in example.com.
+
+** Q25: What is a subdomain?
+A subdomain is a domain that sits beneath another domain, such as blog.example.com.
+
+** Q26: What is a FQDN?
+An FQDN (Fully Qualified Domain Name) is a complete domain name with all labels, e.g. web.example.com.
+
+** Q27: What is a wildcard record?
+A wildcard record matches multiple subdomains, such as *.example.com.
+
+** Q28: What is a record TTL?
+TTL (Time To Live) determines how long a DNS record can be cached before refresh.
+
+** Q29: Why is caching important in DNS?
+Caching reduces query latency and lowers the load on authoritative servers.
+
+** Q30: What is a cache miss?
+A cache miss occurs when the resolver does not already know the answer and must query upstream servers.
+
+** Q31: What is a cache hit?
+A cache hit occurs when a resolver finds the answer in its cache.
+
+** Q32: What is a stub resolver?
+A stub resolver is a lightweight client resolver used by operating systems and devices.
+
+** Q33: What is a recursive resolver used by clients?
+It is typically the local DNS server configured on the network that handles recursive lookups.
+
+** Q34: What is a nameserver?
+A nameserver is a server that serves DNS records and answers queries.
+
+** Q35: What is a forwarder?
+A forwarder is a DNS server that forwards queries to another server instead of resolving them independently.
+
+** Q36: What is DNS propagation?
+DNS propagation is the time it takes for DNS changes across the internet to become visible.
+
+** Q37: What is DNS poisoning?
+DNS poisoning is the malicious corruption of DNS data to redirect traffic to the wrong place.
+
+** Q38: What is DNS hijacking?
+DNS hijacking alters DNS settings to redirect users or systems to malicious destinations.
+
+** Q39: Why is DNS important for web browsing?
+Most users access websites by domain name, and DNS converts those names to IP addresses before the browser connects.
+
+** Q40: What happens when you type a URL in the browser?
+The browser asks the system resolver for the domain’s IP, then connects to the server over HTTP or HTTPS.
+
+** Q41: What is a domain registrar?
+A domain registrar is an organization that sells and manages domain names.
+
+** Q42: What is a registrar vs registry?
+The registry manages the top-level domain database, while the registrar sells domain names to customers.
+
+** Q43: What is a DNS lookup?
+A DNS lookup is the process of querying DNS to obtain information about a domain.
+
+** Q44: What is a root server?
+A root server is a server at the top of the DNS hierarchy that helps locate authoritative TLD servers.
+
+** Q45: How many root servers exist?
+There are multiple root name servers around the world, operated by various organizations.
+
+** Q46: What is the root zone?
+The root zone is the top-level namespace from which all domain names are derived.
+
+** Q47: What is a TLD server?
+A TLD server knows the authoritative nameservers for domains under a top-level domain like .com or .org.
+
+** Q48: What is the role of glue records?
+Glue records provide the IP addresses of nameservers in a delegated zone so resolvers can reach them.
+
+** Q49: What is a delegation?
+A delegation is the transfer of authority from a parent zone to a child zone.
+
+** Q50: What is the DNS hierarchy?
+DNS is hierarchical: root -> TLD -> domain -> subdomain -> host.
+
+** Q51: What is a nameserver chain?
+A nameserver chain is the sequence of servers consulted while resolving a domain.
+
+** Q52: What is a negative cache?
+A negative cache stores the fact that a domain name does not exist to reduce repeated lookups.
+
+** Q53: What is NXDOMAIN?
+NXDOMAIN means a domain name does not exist.
+
+** Q54: What is a DNS response code?
+DNS response codes indicate success or failure conditions, such as NOERROR, NXDOMAIN, or SERVFAIL.
+
+** Q55: What does NOERROR mean?
+It means the name exists and the query was answered successfully.
+
+** Q56: What is a DNS query type?
+A query type tells the server what kind of record is being requested, such as A, AAAA, MX, TXT.
+
+** Q57: What is a UDP port in DNS?
+DNS commonly uses UDP port 53 for quick queries and smaller responses.
+
+** Q58: What is TCP port 53 used for?
+TCP port 53 is used for larger DNS messages, zone transfers, and some queries that exceed UDP size limits.
+
+** Q59: What is a DNS packet?
+A DNS packet is the message exchanged between clients and servers carrying query or response data.
+
+** Q60: What is a UDP truncation?
+A large DNS response may be truncated over UDP, requiring the client to retry over TCP.
+
+** Q61: What is recursion?
+Recursion is the process where a resolver continues querying on behalf of the client until it receives an answer.
+
+** Q62: What is iterative resolution?
+Iterative resolution is when a server returns the best-known answer or referral instead of resolving the full name itself.
+
+** Q63: What is a referral?
+A referral is a response from a DNS server telling the client which server to query next.
+
+** Q64: What is a local DNS cache?
+A local DNS cache stores prior lookups to speed up repeated queries.
+
+** Q65: What is an operating system stub resolver?
+It is the local DNS client component used by the OS, such as systemd-resolved or nscd.
+
+** Q66: What is the difference between a resolver and an authoritative server?
+A resolver answers queries for clients and can query other servers.
+An authoritative server provides definitive answers for a domain.
+
+** Q67: What is domain ownership?
+Domain ownership is the administrative control over a registered domain name.
+
+** Q68: What is a zone transfer?
+A zone transfer copies the complete DNS zone data from one authoritative nameserver to another.
+
+** Q69: What is AXFR?
+AXFR is the full-zone transfer protocol used for transferring an entire DNS zone.
+
+** Q70: What is IXFR?
+IXFR is an incremental zone transfer that only sends changes since the last version.
+
+** Q71: What does DNSSEC do?
+DNSSEC adds digital signatures to DNS records to authenticate the data and prevent tampering.
+
+** Q72: Why is DNSSEC important?
+It helps protect against spoofing and cache poisoning by validating record authenticity.
+
+** Q73: What is a DNSSEC signature?
+A DNSSEC signature is a digital signature that verifies the authenticity of DNS data.
+
+** Q74: What is a DS record?
+A DS record is used in parent zones to link to a child zone’s DNSSEC key.
+
+** Q75: What is a KSK?
+A KSK (Key Signing Key) signs the DNSKEY RRset and is used in DNSSEC.
+
+** Q76: What is a ZSK?
+A ZSK (Zone Signing Key) signs zone data in DNSSEC.
+
+** Q77: What is a DNSKEY record?
+A DNSKEY record contains the public key used to verify DNSSEC signatures.
+
+** Q78: What is an RRSIG record?
+An RRSIG record is the cryptographic signature for a DNS RRset.
+
+** Q79: What is a trust anchor?
+A trust anchor is a trusted DNSSEC key used to validate signed DNS data.
+
+** Q80: What is DNS over HTTPS?
+DNS over HTTPS (DoH) sends DNS queries over HTTPS to hide them from local network observers.
+
+** Q81: What is DNS over TLS?
+DNS over TLS (DoT) encrypts DNS queries using TLS.
+
+** Q82: Why is encrypted DNS used?
+It increases privacy and prevents local interception of DNS traffic.
+
+** Q83: What is a split-horizon DNS?
+Split-horizon DNS returns different responses depending on the querying source or network location.
+
+** Q84: What is a CDN and how does DNS relate to it?
+CDNs use DNS to route users to the closest or healthiest edge server.
+
+** Q85: What is Anycast DNS?
+Anycast DNS routes a single IP address to multiple servers in different locations, typically the nearest one.
+
+** Q86: What is a round-robin DNS?
+Round-robin DNS rotates multiple A or AAAA records in response to queries for load distribution.
+
+** Q87: What is load balancing via DNS?
+DNS can distribute traffic across multiple server IPs using responses like round-robin or health-aware routing.
+
+** Q88: What is a health check in DNS?
+Health checks can be used by DNS providers to remove unhealthy endpoints from responses.
+
+** Q89: What is geolocation-based DNS?
+Geolocation DNS routes users differently based on their geographic location.
+
+** Q90: What is latency-based routing?
+Latency-based routing directs clients to the endpoint with the fastest or lowest-latency path.
+
+** Q91: What is an SRV record?
+An SRV record identifies the hostname and port of a service, such as SIP or XMPP.
+
+** Q92: What is a CAA record?
+A CAA record restricts which certificate authorities may issue certificates for a domain.
+
+** Q93: What is a DMARC record?
+DMARC helps prevent email spoofing by specifying how receivers should handle email that fails SPF/DKIM checks.
+
+** Q94: What is an SPF record?
+SPF records list which mail servers are authorized to send email for a domain.
+
+** Q95: What is DKIM?
+DKIM signs outgoing email so receivers can verify the sender’s identity.
+
+** Q96: What is a record set?
+A record set is a group of DNS records with the same name and type.
+
+** Q97: What is record ordering?
+DNS servers may return records in different orders for load distribution or redundancy.
+
+** Q98: What is DNS response caching?
+Resolvers store query results so repeated requests can be answered faster.
+
+** Q99: What does "cache poisoning" mean in plain terms?
+It means an attacker tricks a resolver into storing fake DNS data and sending users to malicious destinations.
+
+** Q100: What is negative caching?
+A resolver stores the fact that a name does not exist, so it does not re-query repeatedly.
+
+** Q101: What is a nameserver hierarchy?
+The hierarchy is root -> TLD -> authoritative -> resolver -> client.
+
+** Q102: What is a domain delegation chain?
+It is the sequence of NS records establishing which server is authoritative for a subdomain.
+
+** Q103: What is wildcard expansion?
+Wildcard expansion allows a single DNS rule to match many names under a domain.
+
+** Q104: What is a domain apex?
+The domain apex is the bare domain without any subdomain, such as example.com.
+
+** Q105: What is a zone apex record?
+A zone apex record is a DNS record at the top of a zone, such as example.com A/AAAA records.
+
+** Q106: What is an alias record?
+An alias record is a DNS record that points to another record without changing the ownership of the domain name.
+
+** Q107: What is a domain suffix?
+A domain suffix is the trailing part of a domain such as .com or .co.uk.
+
+** Q108: What is a root hint?
+A root hint file tells recursive resolvers where the root servers are.
+
+** Q109: What is a resolver chain?
+It is the cascade of queries that a resolver uses to eventually answer a client request.
+
+** Q110: Why is DNS sometimes called the phonebook of the internet?
+Because it maps names to addresses like a phonebook maps names to phone numbers.
+
+** Q111: What is a query packet?
+A query packet is a DNS message sent to ask for some record information.
+
+** Q112: What is a reply packet?
+A reply packet contains the answer or referral returned by a DNS server.
+
+** Q113: What is a DNS server response time?
+It is the time a server takes to answer a query.
+
+** Q114: What is a DNS timeout?
+A timeout occurs when a query takes too long and the client gives up or retries.
+
+** Q115: What is a resolver loop?
+A resolver loop happens when name resolution repeats recursively without progress.
+
+** Q116: What is recursion depth?
+Recursion depth is how many levels a resolver goes through during a query chain.
+
+** Q117: What is an EDNS extension?
+EDNS adds extra data to DNS queries, such as larger payload support and client-subnet information.
+
+** Q118: What is EDNS0?
+EDNS0 is the standard DNS extension mechanism that allows larger packets and additional options.
+
+** Q119: What is a DNS over TCP fallback?
+When UDP responses are too large, the client retries over TCP.
+
+** Q120: Why do DNS queries sometimes use TCP?
+Because some responses are too large to fit in UDP payloads, and zone transfers require TCP.
+
+* Intermediate
+
+** Q121: What is DNS query path resolution?
+It is the process from client stub resolver to recursive server to authoritative nameservers.
+
+** Q122: What does a recursive resolver do when it gets a query?
+It checks its cache, then issues iterative queries to upstream servers until the answer is known.
+
+** Q123: What is iterative resolution in practice?
+The resolver asks a nameserver for the next authoritative server rather than resolving the whole chain alone.
+
+** Q124: What is the root zone file?
+The root zone file contains the list of current root servers and their metadata.
+
+** Q125: How does DNS handle load balancing?
+It can return different A or AAAA records in different order, or use specialized DNS providers with health-based routing.
+
+** Q126: What is a split-brain DNS setup?
+Split-brain DNS returns different answers to internal and external clients, often for security or testing.
+
+** Q127: What is hidden master DNS?
+A hidden master is an authoritative nameserver not exposed publicly but used internally for zone updates.
+
+** Q128: What is a slave nameserver?
+A slave nameserver receives transferred zone data from a master server.
+
+** Q129: What is a master/slave architecture in DNS?
+One nameserver acts as the source of truth; others replicate the zone data from it.
+
+** Q130: What is a DNS provider?
+A DNS provider manages nameservers and DNS records for domains.
+
+** Q131: What is domain transfer?
+Domain transfer is the transfer of domain ownership from one registrar to another.
+
+** Q132: Why are multiple nameservers important?
+Multiple nameservers improve resilience, performance, and availability.
+
+** Q133: What is a zone file?
+A zone file is a text representation of DNS records for a zone.
+
+** Q134: What is a serial number in SOA?
+The serial number helps secondary servers detect whether a zone has changed.
+
+** Q135: What is a refresh interval?
+The refresh interval is how often secondary servers check whether the zone has changed.
+
+** Q136: What is a retry interval?
+The retry interval defines how long secondary servers wait before retrying after a failed refresh.
+
+** Q137: What is an expiry time?
+The expiry time is the maximum time a secondary server will continue to serve an outdated zone before giving up.
+
+** Q138: What is minimum TTL?
+Minimum TTL is a value associated with the zone, often used in older DNS implementations.
+
+** Q139: What is DNS record priority?
+Some records, such as MX, include a preference value indicating priority.
+
+** Q140: What is DNS record weight?
+Some record types use weight to balance traffic among equal priority options.
+
+** Q141: What is weighted load balancing?
+Weighted load balancing sends more traffic to preferred endpoints by assigning them more weight.
+
+** Q142: What is failover in DNS?
+Failover changes the answer to a healthy record when a primary endpoint is unavailable.
+
+** Q143: What is a dead server record?
+A dead server record is a compromised or unhealthy target removed or deprioritized by DNS logic.
+
+** Q144: What is a wildcard certificate and how does DNS fit?
+A wildcard certificate protects multiple subdomains and requires DNS validation or domain ownership proof.
+
+** Q145: What is a CAA record used for?
+CAA records restrict which certificate authorities can issue certificates for a domain.
+
+** Q146: What is a DNSSEC validation chain?
+It is the chain that connects trust anchors to the signed zone data.
+
+** Q147: What is a trust store?
+A trust store holds trusted certificates or keys used to validate signed DNS data.
+
+** Q148: Why does DNSSEC help against tampering?
+Because the signatures ensure that records have not been modified in transit.
+
+** Q149: What are validating resolvers?
+Validating resolvers check DNSSEC signatures before accepting records.
+
+** Q150: What is an unsigned zone?
+An unsigned zone is a zone that has not been signed with DNSSEC.
+
+** Q151: What is a signed zone?
+A signed zone includes DNSSEC metadata and signatures.
+
+** Q152: What is a DNSSEC rollover?
+A DNSSEC rollover is the process of replacing or rotating signing keys in a secure way.
+
+** Q153: What is a stale cache?
+A stale cache contains expired data that may still be used until refreshed.
+
+** Q154: What is negative caching TTL?
+Negative cache TTL controls how long a resolver remembers a non-existent domain before retrying.
+
+** Q155: What is a DNS cache hit ratio?
+It measures how often a resolver answers from cache instead of querying upstream servers.
+
+** Q156: Why is cache hit ratio important?
+It indicates efficiency and helps show whether a resolver is doing enough local caching.
+
+** Q157: What is DNS over HTTPS privacy trade-off?
+DoH increases privacy but can hide DNS traffic from local security controls.
+
+** Q158: What is a recursive resolver security risk?
+If compromised, a recursive resolver can be used to redirect users, collect traffic patterns, or perform malicious resolution.
+
+** Q159: What is DNS rebinding?
+DNS rebinding attacks exploit the trust relationship between browsers and DNS to redirect internal services.
+
+** Q160: What is DNS tunneling?
+DNS tunneling hides data in DNS queries and responses, often as a covert channel.
+
+** Q161: What is DNS exfiltration?
+DNS exfiltration sends sensitive data outside a network via DNS queries or responses.
+
+** Q162: Why is DNS security monitoring important?
+Because DNS is often used as an illicit command and control or exfiltration channel.
+
+** Q163: What is malware beaconing over DNS?
+Malware uses DNS to call back home or communicate with command and control infrastructure.
+
+** Q164: What is a sinkhole?
+A sinkhole redirects malicious domain traffic to a safe server for containment or investigation.
+
+** Q165: What is a DNS firewall?
+A DNS firewall filters malicious or suspicious lookups for security enforcement.
+
+** Q166: What is a resolver policy?
+A resolver policy defines rules about which records, domains, or clients are allowed.
+
+** Q167: What is a split resolver?
+A split resolver answers queries differently for internal and external clients.
+
+** Q168: What is a DNS search domain?
+A search domain allows users to omit part of a hostname when resolving locally.
+
+** Q169: What is a search list?
+A search list is the list of suffixes used when resolving short hostnames.
+
+** Q170: What is a local domain resolution path?
+It may involve /etc/hosts, local multicast DNS, or local DNS cache before external servers.
+
+** Q171: What is /etc/hosts?
+A local hosts file that resolves names to addresses without DNS.
+
+** Q172: What is mDNS?
+mDNS (multicast DNS) provides local name resolution in small networks without centralized DNS.
+
+** Q173: What is LLMNR?
+LLMNR is a local name resolution protocol that can cause confusion and security issues in some Windows networks.
+
+** Q174: Why is LLMNR sometimes problematic?
+Because it may leak or resolve names in insecure ways if not controlled.
+
+** Q175: What is DNS client side caching?
+DNS data cached on the client or resolver reduces repeated network traffic.
+
+** Q176: What is TTL in practice?
+TTLs influence how quickly DNS changes propagate and how long stale answers are kept.
+
+** Q177: How does DNS affect application latency?
+Slow DNS resolution can delay requests, especially during cold starts or failover.
+
+** Q178: What is a DNS prefetcher?
+A prefetcher resolves names before the user actually needs them, reducing perceived latency.
+
+** Q179: What is a DNS storm?
+A DNS storm occurs when a massive number of clients query a single domain concurrently.
+
+** Q180: What is a lookup storm mitigation?
+It includes caching, load balancing, resolver scaling, and low TTL strategy based on needs.
+
+** Q181: What is latency-sensitive DNS?
+It is the need to resolve names very quickly for user-facing systems and edge services.
+
+** Q182: What is a DNS-based API gateway?
+Some systems use DNS to route to API endpoints or compute healthy backends in real time.
+
+** Q183: What is the main purpose of DNS in distributed systems?
+It provides naming, discovery, and routing for services and endpoints across networks.
+
+** Q184: What is service discovery?
+Service discovery is the process of finding the endpoints for services, often via DNS or service registries.
+
+** Q185: How does DNS interact with load balancers?
+DNS can direct clients to a load balancer IP or across regional endpoints.
+
+** Q186: What are the practical effects of DNS delays?
+They can affect app startup, failover time, and even outage detection.
+
+** Q187: What is DNS churn?
+DNS churn is frequent record changes, often caused by autoscaling or frequent health changes.
+
+** Q188: Why is DNS important in cloud environments?
+Cloud workloads frequently scale up and down, and DNS provides dynamic service discovery and routing.
+
+** Q189: What is service endpoint registration?
+It is the process of publishing a service name and address into DNS or a dynamic registry.
+
+** Q190: What is internal DNS?
+Internal DNS is used within a private network for service discovery and internal application routing.
+
+** Q191: What is external DNS?
+External DNS resolves names publicly on the internet.
+
+** Q192: Why do enterprises often use private DNS zones?
+Private DNS keeps internal service names isolated and avoids exposing internal topology.
+
+** Q193: Why is split-horizon common in enterprises?
+Because internal and external resolution often need different answers for security and service access.
+
+** Q194: What is a DNS record update workflow?
+Typical workflow:
+- update records in authoritative zone
+- validate syntax
+- publish
+- allow propagation through TTL
+- monitor queries
+
+** Q195: What does DNS monitoring involve?
+Monitoring includes resolver health, latency, propagation, errors, and suspicious or malicious lookups.
+
+** Q196: How do you troubleshoot DNS issues?
+Check resolver path, configuration, TTL, zone records, propagation, firewall rules, and server health.
+
+** Q197: What is a DNS trace?
+A DNS trace shows the resolution steps from client to nameserver to authoritative server.
+
+** Q198: What is a resolver debug log?
+It records queries, answers, cache hits, and upstream server behavior.
+
+** Q199: What are common DNS problems?
+- stale cache
+- misconfigured A/AAAA records
+- expired TTL
+- firewall blocked UDP/TCP 53
+- zone not authoritative
+- broken delegation
+- failed DNSSEC validation
+
+** Q200: What is the main lesson about DNS?
+DNS is the naming and discovery layer of the internet; without it, the web, services, and applications would be nearly impossible to use reliably and securely.
+
+* Advanced / Expert
+
+** Q201: What is DNSSEC validation?
+DNSSEC validation ensures that DNS answers are authentic and unmodified by cryptographic verification.
+
+** Q202: What is the DNSSEC chain of trust?
+It is the chain from the root zone down to the specific signed zone that validates all record sets.
+
+** Q203: What is key rollover in DNSSEC?
+It is the process of replacing old signing keys with new ones while maintaining trust continuity.
+
+** Q204: What are the security concerns of DNSSEC key management?
+Improper key management can lead to outage or loss of trust if keys are rotated incorrectly.
+
+** Q205: What is a denial-of-existence response in DNSSEC?
+It proves that a name does not exist using NSEC/NSEC3 records, rather than a plain NXDOMAIN.
+
+** Q206: What is NSEC?
+NSEC proves the non-existence of a name by showing the next name in the zone.
+
+** Q207: What is NSEC3?
+NSEC3 hashes names for privacy and prevents simple enumeration of zone data.
+
+** Q208: What is the purpose of DNS cookie support?
+DNS cookies help mitigate reflection and spoofing attacks against DNS servers.
+
+** Q209: What is resolver-side DNSSEC verification?
+It is where recursive resolvers verify DNSSEC signatures before returning data to clients.
+
+** Q210: What is a DNS amplification attack?
+A DNS amplification attack floods a target by sending small queries that trigger large responses.
+
+** Q211: Why is UDP-based DNS vulnerable to reflection attacks?
+Because attackers can spoof the source IP and force responses toward a victim.
+
+** Q212: What is rate limiting in DNS servers?
+It restricts how many queries or responses a server will process from a source to mitigate abuse.
+
+** Q213: What is authoritative server hardening?
+Hardening includes limiting recursion, restricting zone transfers, enforcing DNSSEC, and monitoring anomalies.
+
+** Q214: What is recursion restriction?
+It prevents a nameserver from answering recursive queries for unauthorized clients.
+
+** Q215: What is BIND?
+BIND is one of the most widely used DNS server implementations.
+
+** Q216: What is Unbound?
+Unbound is a validating, recursive DNS resolver often used for security-focused deployments.
+
+** Q217: What is Knot DNS?
+Knot DNS is a modern DNS server implementation known for performance and DNSSEC support.
+
+** Q218: What is CoreDNS?
+CoreDNS is a flexible DNS server often used in Kubernetes and cloud-native systems.
+
+** Q219: What is DNS in Kubernetes?
+Kubernetes often uses CoreDNS for service discovery and internal name resolution.
+
+** Q220: What is cluster-local DNS?
+Cluster-local DNS resolves service names within a Kubernetes cluster.
+
+** Q221: What is a headless service in Kubernetes DNS?
+A headless service exposes pod IPs directly for DNS-based discovery instead of a single service IP.
+
+** Q222: What is a service record in Kubernetes DNS?
+A service record maps a service name to its IP or pod endpoints.
+
+** Q223: What is internal DNS architecture in large organizations?
+It often includes multiple resolver layers, private zones, and centralized naming governance.
+
+** Q224: What is DNS as part of zero-trust architecture?
+DNS can be used to restrict access, control internal service discovery, and feed security analytics.
+
+** Q225: What is DNS filtering?
+DNS filtering blocks or redirects suspicious or unwanted domains before connections are attempted.
+
+** Q226: What is DNS-based blocking?
+It redirects or denies domain queries based on policy or threat intelligence.
+
+** Q227: What is the role of DNS in endpoint security?
+It can stop malware from reaching its command and control infrastructure or block dangerous lookups.
+
+** Q228: What is DNS provider outage risk?
+If a provider goes down or is misconfigured, domains may stop resolving globally.
+
+** Q229: What is a DNS failover architecture?
+It routes traffic to alternate IPs or regions when a primary service fails.
+
+** Q230: What is a health-checked DNS endpoint?
+A DNS endpoint that only returns responses when it is healthy and available.
+
+** Q231: What is provider-level DNS resilience?
+It includes multiple nameservers, geographic redundancy, and monitoring against outages.
+
+** Q232: What is DNS analytics?
+DNS analytics inspects query patterns, anomalies, and volume to understand traffic and security events.
+
+** Q233: What is DNS query logging?
+DNS query logging captures requests for troubleshooting, compliance, and security investigation.
+
+** Q234: What is query name minimization?
+It reduces leakage by sending only the minimum necessary part of a query to upstream authoritative servers.
+
+** Q235: Why is query name minimization useful?
+It reduces privacy exposure by not revealing the full domain name to every server in the chain.
+
+** Q236: What is DNS privacy?
+DNS privacy aims to hide the domain names users query from local network observers and unauthorized intermediaries.
+
+** Q237: Why do encrypted DNS variants matter?
+Because traditional DNS queries are transmitted in plain text, which can be inspected or manipulated.
+
+** Q238: What is ECH?
+Encrypted Client Hello (ECH) is a protocol feature related to privacy in encrypted DNS and HTTPS environments.
+
+** Q239: What is the relationship between DNS and TLS?
+DNS often resolves the address of the service that TLS will later connect to securely.
+
+** Q240: What is DNS delegation in a multi-zone environment?
+It spreads authority across multiple DNS zones and nameservers for scalability and governance.
+
+** Q241: What is zone scoping?
+Zone scoping limits how and where a DNS zone is served or delegated.
+
+** Q242: What is a stale delegation?
+A stale delegation points to outdated nameservers that no longer serve valid data.
+
+** Q243: What is a “broken delegation” problem?
+It occurs when parent NS records refer to nameservers that are not actually serving the child zone.
+
+** Q244: Why is DNS usually a single point of failure in legacy setups?
+Because a domain can fail if all authoritative or recursive servers are misconfigured or unstable.
+
+** Q245: What is latency-aware regional routing?
+It directs clients to regionally nearest endpoints to improve user experience and reduce response times.
+
+** Q246: What is geofencing in DNS?
+Geofencing routes or blocks clients based on region or policy.
+
+** Q247: What is DNS in mobile and edge environments?
+DNS helps direct users to nearby services and supports mobile user movement and app connectivity.
+
+** Q248: What is the relationship between DNS and CDN failover?
+CDNs often use DNS to detect health and direct traffic to alternative edge nodes or regions.
+
+** Q249: What is DNS caching invalidation?
+It is the process of making stale data expire or be refreshed quickly after a change.
+
+** Q250: What is a TTL strategy?
+TTL strategy decides how long records should live in caches to balance freshness and performance.
+
+** Q251: What is DNS performance tuning?
+It involves adjusting resolver placement, caching, TTLs, and backend nameserver topology.
+
+** Q252: What is the role of EDNS client subnet?
+EDNS client subnet allows resolvers to share approximate client network information to improve geolocation-aware answers.
+
+** Q253: Why is client subnet sometimes controversial?
+Because it can expose location information or violate privacy expectations.
+
+** Q254: What is DNS as a distributed naming system?
+It is distributed across hundreds of nameservers and resolvers operated by many organizations worldwide.
+
+** Q255: What is DNS root trust?
+The root trust foundation ensures that TLD and authoritative namespaces are globally coherent.
+
+** Q256: What is a zone cut?
+A zone cut marks a boundary where a parent zone delegates authority to a child zone.
+
+** Q257: Why are DNS records versioned?
+Versioning helps track changes and supports safe updates, especially when using dynamic DNS systems.
+
+** Q258: What is dynamic DNS?
+Dynamic DNS automatically updates DNS records when an IP address changes.
+
+** Q259: What is authoritative update propagation?
+It is the way records move from the authoritative server to secondary servers and then to recursive caches.
+
+** Q260: What is load shedding in DNS?
+It is a strategy to reduce query load or answer fewer requests during overload or attack conditions.
+
+** Q261: What is the role of DNS in multi-region failover?
+It selects healthy service endpoints and reroutes client traffic when regions fail.
+
+** Q262: What is DNS-based policy enforcement?
+It enforces routing or access decisions based on domain, subdomain, geolocation, or client identity.
+
+** Q263: What is the relation between DNS and certificates?
+DNS records are often used for domain ownership verification when requesting TLS certificates.
+
+** Q264: What is ACME?
+ACME is the protocol used by certificate authorities to automate certificate issuance and validation.
+
+** Q265: What is DNS-based challenge validation?
+The CA validates the domain by checking a DNS record before issuing a certificate.
+
+** Q266: Why is DNS important for zero-downtime deployments?
+Because changing service IPs, endpoints, or load balancers often relies on controlled DNS updates.
+
+** Q267: What is a canary deployment and how does DNS help?
+DNS can direct part of the traffic to a new version while leaving the rest on the previous deployment.
+
+** Q268: What is a phased rollout?
+It is a controlled migration strategy often supported by DNS-based routing or weighted responses.
+
+** Q269: What is the difference between DNS and service mesh discovery?
+DNS is a general-purpose naming system; service mesh discovery often adds runtime service awareness and dynamic routing.
+
+** Q270: What is the role of DNS in observability?
+It helps map application endpoints, edge routes, and service dependencies to actual infrastructure.
+
+** Q271: What is DNS observability data?
+It includes query metrics, cache usage, latency, cache misses, and abnormal patterns.
+
+** Q272: Why is DNS still a critical security boundary?
+Because a compromised DNS layer can redirect user traffic, hide malicious activity, and break trust in the broader network.
+
+** Q273: What is a domain takeover?
+A domain takeover occurs when an attacker gains control of a domain or subdomain without the proper ownership.
+
+** Q274: What is DNS typosquatting?
+It occurs when attackers register domain names similar to legitimate domains to capture traffic.
+
+** Q275: How do registrars and DNS providers reduce typosquatting risk?
+Using protective measures, monitoring suspicious registrations, and offering domain monitoring services.
+
+** Q276: What is DNS abuse?
+DNS abuse includes phishing, malware infrastructure, spam domains, and malicious domain registration practices.
+
+** Q277: What is reputation-based DNS filtering?
+It blocks or warns on domains with known malicious or abusive behavior.
+
+** Q278: Why is DNS governance important?
+Because organizations rely on DNS for routing and identity, and misconfiguration can globally disrupt service availability.
+
+** Q279: What is a DNS incident response plan?
+It includes identifying broken delegation, stale records, malicious lookups, and compromised nameservers.
+
+** Q280: What is the deepest truth about DNS?
+DNS is not just a lookup system; it is the naming fabric of the internet, the trust layer for service discovery, and a key security and reliability boundary for modern systems.
+
+-----
+
+#+INCLUDE: "../footer.org"
