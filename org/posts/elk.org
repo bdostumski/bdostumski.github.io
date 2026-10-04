@@ -1,0 +1,627 @@
+#+TITLE: ELK Fundamentals
+#+DATE: 2026-09-01
+#+TAGS: ELK, Elasticsearch, Logstash, Kibana, Logging
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* ELK Fundamentals
+
+-----
+
+* Beginner
+
+** Q1: What is ELK?
+ELK is a popular stack consisting of Elasticsearch, Logstash, and Kibana used for log collection, indexing, searching, and visualization.
+
+** Q2: What is Elasticsearch?
+Elasticsearch is a distributed search and analytics engine that stores data in JSON documents and supports full-text and structured queries.
+
+** Q3: What is Logstash?
+Logstash is a data processing pipeline that collects, transforms, and forwards logs or events to Elasticsearch.
+
+** Q4: What is Kibana?
+Kibana is the visualization and exploration layer for Elasticsearch data.
+
+** Q5: What is an ELK stack used for?
+It is commonly used for centralized logging, operational analytics, metrics exploration, and troubleshooting.
+
+** Q6: Why use ELK?
+Because it provides a scalable, queryable way to store and inspect large amounts of logs and events.
+
+** Q7: What is an Elasticsearch index?
+An index is a logical collection of documents in Elasticsearch.
+
+** Q8: What is a document?
+A document is a JSON object stored in Elasticsearch.
+
+** Q9: What is a field?
+A field is a key in a JSON document, such as timestamp, status, or message.
+
+** Q10: What is a shard?
+A shard is a partition of an index used to distribute data across nodes.
+
+** Q11: What is a replica?
+A replica is a copy of a shard used for redundancy and availability.
+
+** Q12: Why are replicas important?
+They improve fault tolerance and allow failover if a node goes down.
+
+** Q13: What is a cluster in Elasticsearch?
+A cluster is a set of Elasticsearch nodes that work together to store and index data.
+
+** Q14: What is a node in Elasticsearch?
+A node is a single Elasticsearch instance running in a cluster.
+
+** Q15: What is a master node?
+A master node is responsible for cluster state management and orchestration.
+
+** Q16: What is a data node?
+A data node stores and indexes the actual data.
+
+** Q17: What is ingestion?
+Ingestion is the process of sending data into Elasticsearch.
+
+** Q18: What is indexing?
+Indexing is the process of parsing, storing, and making documents searchable.
+
+** Q19: What is searching?
+Searching means querying Elasticsearch for documents or aggregations.
+
+** Q20: What is an analyzer?
+An analyzer is a component that tokenizes and normalizes text before indexing or searching.
+
+** Q21: What is full-text search?
+Full-text search indexes text and enables keyword matching, relevance scoring, and tokenization.
+
+** Q22: What is a mapping?
+A mapping defines the fields and data types in an index.
+
+** Q23: What is a type in Elasticsearch?
+Earlier versions used document types, but newer versions use indices and mappings without types.
+
+** Q24: Why is mapping important?
+Because it defines how fields are indexed and searched.
+
+** Q25: What is a string field?
+A string field usually uses text or keyword mappings.
+
+** Q26: What is a keyword field?
+A keyword field is used for exact-match filtering and aggregations.
+
+** Q27: What is a text field?
+A text field is analyzed for full-text search.
+
+** Q28: What is a numeric field?
+A numeric field stores numbers such as integer, float, or long.
+
+** Q29: What is a date field?
+A date field stores timestamps and supports date range queries.
+
+** Q30: What is a boolean field?
+A boolean field stores true/false values.
+
+** Q31: What is a nested field?
+A nested field stores arrays of objects with independent query semantics.
+
+** Q32: What is a geo field?
+A geo field stores geographic coordinates or shapes.
+
+** Q33: What is a query?
+A query is a request for documents that match certain conditions.
+
+** Q34: What is a filter?
+A filter is usually a query that can be cached and used for exact matching.
+
+** Q35: What is a bool query?
+A bool query combines clauses like must, should, must_not, and filter.
+
+** Q36: What is a match query?
+A match query performs full-text matching on a field.
+
+** Q37: What is a term query?
+A term query matches exact values, often used for keyword fields.
+
+** Q38: What is a range query?
+A range query matches values between lower and upper bounds, often used for timestamps and numeric fields.
+
+** Q39: What is a wildcard query?
+A wildcard query matches text patterns using wildcards like * or ?.
+
+** Q40: What is a regex query?
+A regex query matches data with regular-expression patterns.
+
+** Q41: What is a sort?
+Sorting controls the order of search results.
+
+** Q42: What is a score?
+A score is the relevance score assigned to a document by Elasticsearch.
+
+** Q43: What is relevance?
+Relevance is how well a document matches a query relative to others.
+
+** Q44: What is a composite aggregation?
+A composite aggregation combines bucket results from multiple dimensions.
+
+** Q45: What is a bucket aggregation?
+A bucket aggregation groups documents by certain criteria.
+
+** Q46: What is a metric aggregation?
+A metric aggregation computes statistics like average, sum, min, max, or percentiles.
+
+** Q47: What is a histogram?
+A histogram groups documents by a time or value interval.
+
+** Q48: What is a date histogram?
+A date histogram groups data into time buckets such as minute, hour, or day.
+
+** Q49: What is a term aggregation?
+A term aggregation groups documents by a field value.
+
+** Q50: What is a stats aggregation?
+A stats aggregation calculates count, min, max, sum, and average for a field.
+
+** Q51: What is a percentile aggregation?
+A percentile aggregation shows thresholds like p95 or p99 of a metric.
+
+** Q52: What is a log event?
+A log event is a single record of an event or log message.
+
+** Q53: What is structured logging?
+Structured logging stores logs as structured JSON rather than plain text.
+
+** Q54: Why is structured logging useful?
+It makes log filtering and analysis easier and more precise.
+
+** Q55: What is Logstash pipeline?
+A Logstash pipeline is a sequence of inputs, filters, and outputs.
+
+** Q56: What is an input plugin?
+An input plugin reads data from a source, such as file, syslog, beats, Kafka, or HTTP.
+
+** Q57: What is a filter plugin?
+A filter plugin transforms or enriches the event.
+
+** Q58: What is an output plugin?
+An output plugin sends data to a destination such as Elasticsearch.
+
+** Q59: What is a Beats agent?
+Beats is a lightweight data shipper used to collect logs and metrics from hosts or applications.
+
+** Q60: What is Filebeat?
+Filebeat ships log files to Logstash or Elasticsearch.
+
+** Q61: What is Metricbeat?
+Metricbeat ships system and application metrics.
+
+** Q62: What is Heartbeat?
+Heartbeat checks service availability and liveness.
+
+** Q63: What is Packetbeat?
+Packetbeat captures network packet data.
+
+** Q64: Why use Beats with ELK?
+Because Beats are lightweight, agent-based log shippers.
+
+** Q65: What is an Elasticsearch index pattern?
+An index pattern tells Kibana which indices to search and visualize.
+
+** Q66: What is Kibana Discover?
+Kibana Discover lets users search and inspect log data interactively.
+
+** Q67: What is Kibana Dashboard?
+A Dashboard is a set of visualizations showing metrics, logs, and trends.
+
+** Q68: What is Kibana Visualization?
+A Visualization is a chart or graph built from Elasticsearch queries.
+
+** Q69: What is Kibana Search?
+Search in Kibana is based on Elasticsearch queries and filters.
+
+** Q70: What is a logstash input?
+It is how Logstash collects log streams, such as file input or Beats input.
+
+** Q71: What is a logstash codec?
+A codec defines how data is encoded or decoded in the pipeline.
+
+** Q72: What is a grok filter?
+A grok filter parses unstructured text using patterns to extract fields.
+
+** Q73: Why is grok important?
+Because many logs are human-readable text and need structured extraction.
+
+** Q74: What is a mutate filter?
+A mutate filter changes fields, adds, renames, or removes values.
+
+** Q75: What is a date filter?
+A date filter parses dates into proper timestamp fields.
+
+** Q76: What is a geoip filter?
+A geoip filter enriches events with geographic metadata based on IP addresses.
+
+** Q77: What is a drop filter?
+A drop filter can drop certain events based on conditions.
+
+** Q78: What is a condition in Logstash?
+A condition often uses if or else blocks based on field values.
+
+** Q79: What is an output to Elasticsearch?
+The output plugin sends processed log data to Elasticsearch for indexing.
+
+** Q80: Why is ELK often paired with Docker or Kubernetes?
+Because containers and clusters create huge volumes of logs and metrics that need centralized processing.
+
+** Q81: What are common log sources?
+Application logs, system logs, access logs, error logs, and security logs.
+
+** Q82: Why centralize logs?
+Because distributed systems produce logs across many hosts and containers.
+
+** Q83: What is log volume?
+Log volume is the amount of log data generated by services and infrastructure.
+
+** Q84: What is log retention?
+Retention is how long logs are kept before being deleted or archived.
+
+** Q85: Why do logs need retention policies?
+Because keeping all logs indefinitely is expensive and may violate compliance needs.
+
+** Q86: What is a log pipeline?
+A log pipeline is the path from source to storage and visualization.
+
+** Q87: What is indexing performance?
+It is the speed at which Elasticsearch can ingest and make data searchable.
+
+** Q88: What is cluster health?
+Cluster health indicates whether the Elasticsearch cluster is green, yellow, or red.
+
+** Q89: What is a green cluster?
+All primary shards are assigned and available.
+
+** Q90: What is a yellow cluster?
+All primary shards are assigned but some replicas are unassigned.
+
+** Q91: What is a red cluster?
+At least one primary shard is unassigned, meaning some data is unavailable.
+
+** Q92: Why is cluster health important?
+It indicates whether the cluster is healthy and data is being indexed safely.
+
+** Q93: What is a shard allocation?
+It is the assignment of shards to nodes in the cluster.
+
+** Q94: Why is shard balancing important?
+To spread load across nodes and maximize availability.
+
+** Q95: What is a hot/warm/cold architecture?
+It describes tiered storage strategies for different service levels or retention needs.
+
+** Q96: What is an index template?
+An index template defines default mappings and settings for new indices.
+
+** Q97: Why use index templates?
+They reduce mistakes and keep indices consistent.
+
+** Q98: What is a rollover index?
+A rollover index is a new index created when an existing one reaches size or time thresholds.
+
+** Q99: Why rollover indices?
+To keep indices manageable and improve search performance.
+
+** Q100: What is a time-based index pattern?
+A name pattern such as logs-2026.10.* organizes documents by time.
+
+* Intermediate
+
+** Q101: What is Elasticsearch bulk indexing?
+Bulk indexing sends many documents in one request for better performance.
+
+** Q102: Why do bulk requests matter?
+They improve ingestion throughput and reduce overhead.
+
+** Q103: What is refresh interval?
+The refresh interval controls when new documents become visible to searches.
+
+** Q104: Why is refresh interval important?
+Because it trades ingestion speed for search latency.
+
+** Q105: What is near real-time search?
+Elasticsearch search is near real-time, meaning documents become visible shortly after indexing.
+
+** Q106: What is document ingestion throughput?
+It is the volume of documents per unit time that Elasticsearch can ingest.
+
+** Q107: What is a Lucene index?
+Lucene is the search engine beneath Elasticsearch.
+
+** Q108: Why does Elasticsearch rely on Lucene?
+Because Lucene provides the underlying indexing, search, and scoring capabilities.
+
+** Q109: What is a query DSL?
+The query DSL is the Elasticsearch domain-specific language for writing queries.
+
+** Q110: What is a filter context?
+A filter context is used for exact matching and often caches results.
+
+** Q111: What is a query context?
+A query context computes relevance and scoring.
+
+** Q112: Why separate filter and query contexts?
+Because filters are efficient and often reusable, while queries compute relevance.
+
+** Q113: What is a script query?
+A script query runs a script to decide whether a document matches.
+
+** Q114: Why use scripts sparingly?
+They are slower and more complex than standard queries.
+
+** Q115: What is a function score query?
+A function score query modifies the relevance score using custom functions.
+
+** Q116: What is a geospatial query?
+A geospatial query filters or scores documents by geographic location.
+
+** Q117: What is a nested query?
+A nested query searches within nested objects.
+
+** Q118: Why is nested indexing useful?
+Because it supports document structures where arrays of objects are semantically grouped.
+
+** Q119: What is an index alias?
+An alias points to one or more indices, which helps with time-based index rollover and zero-downtime updates.
+
+** Q120: Why do aliases help in production?
+They let you redirect searches to new indices without changing queries.
+
+** Q121: What is a mapping conflict?
+A mapping conflict occurs when a field is mapped differently across indices or updates.
+
+** Q122: Why do mapping conflicts matter?
+They can break indexing or cause unexpected search behavior.
+
+** Q123: What is `text` vs `keyword` mapping?
+Text is meant for full-text search; keyword is for exact matching and sorting.
+
+** Q124: Why is analysis important for text search?
+Because tokens are normalized and lowercased so searches are more useful.
+
+** Q125: What is stemming?
+Stemming reduces words to their root form, such as "running" to "run".
+
+** Q126: What is tokenization?
+Tokenization splits text into searchable pieces or tokens.
+
+** Q127: What is a stop word?
+A stop word is a common word removed from indexing, such as "the" or "and".
+
+** Q128: Why is field data important?
+Field data is used for aggregations and sorting on certain field types.
+
+** Q129: What is a runtime field?
+A runtime field is computed at query time rather than stored in the index.
+
+** Q130: What is a scripted field?
+A scripted field is calculated using scripts during a query.
+
+** Q131: Why are scripts often expensive?
+Because they run at query time and can be computationally expensive.
+
+** Q132: What is a `_search` API?
+It queries documents from Elasticsearch.
+
+** Q133: What is a `_count` API?
+It counts matching documents.
+
+** Q134: What is a `_bulk` API?
+It allows high-throughput ingestion of many documents in one request.
+
+** Q135: What is a `_cat` API?
+It provides compact human-readable cluster, node, and index information.
+
+** Q136: Why do operators use `_cat` often?
+Because it is convenient for quick cluster diagnostics.
+
+** Q137: What is Elasticsearch monitoring?
+Monitoring tracks cluster health, shard utilization, memory, and indexing throughput.
+
+** Q138: What is a cluster state?
+A cluster state contains topology and metadata about nodes, indices, and shards.
+
+** Q139: What is a node role?
+Node role may be master, data, ingest, coordinating-only, or combinations.
+
+** Q140: Why separate node roles?
+To improve scalability and isolate workloads.
+
+** Q141: What is ingest pipeline?
+An ingest pipeline transforms documents before they reach an index.
+
+** Q142: What is Logstash filter chain?
+A Logstash pipeline can have multiple filters such as grok, mutate, geoip, and date.
+
+** Q143: Why add filters before Elasticsearch?
+Because it normalizes, enriches, and structures the data before indexing.
+
+** Q144: What is a pipeline bug?
+It can misparse or corrupt field values, leading to poor indexing and search results.
+
+** Q145: What is a no-index pattern?
+It means some data is intentionally not stored in Elasticsearch because it is irrelevant or too noisy.
+
+** Q146: Why use drop filters?
+To discard irrelevant or duplicate events before they reach Elasticsearch.
+
+** Q147: What is a log transform?
+A transformation reorganizes or enriches raw logs into structured fields.
+
+** Q148: What is telemetry?
+Telemetry is the collection of operational data like logs, events, metrics, and traces.
+
+** Q149: What is log correlation?
+It links related log events across services or components for troubleshooting.
+
+** Q150: What is a trace ID in logs?
+A trace ID allows associating log events with a specific request or transaction.
+
+** Q151: Why are trace IDs important?
+They aid debugging distributed systems and correlate logs across services.
+
+** Q152: What is a multi-line log?
+A multi-line log is a single event spread across several lines.
+
+** Q153: Why parse multi-line logs carefully?
+Because they may otherwise be indexed as multiple unrelated events.
+
+** Q154: What is a JSON log?
+A JSON log is structured and easy to parse and query.
+
+** Q155: Why prefer JSON logs?
+They are easier to index and query than plain text logs.
+
+** Q156: What is a logstash `json` codec?
+It parses JSON payloads directly into structured key-value fields.
+
+** Q157: What is a `csv` input?
+It reads comma-separated values, often used for structured exports.
+
+** Q158: What is a `jdbc` input?
+A `jdbc` input reads database rows into Logstash and Elasticsearch.
+
+** Q159: What is a `beats` input?
+A Beats input collects events from Beats agents such as Filebeat, Metricbeat, and Heartbeat.
+
+** Q160: What is a pipeline error?
+It may be due to bad field names, parse failures, or syntax issues in Logstash config.
+
+** Q161: What is Logstash output to Elasticsearch cluster?
+It sends processed documents to one or more Elasticsearch endpoints.
+
+** Q162: Why consider data shaping before indexing?
+Because fields and mappings are crucial for search quality and aggregation accuracy.
+
+** Q163: What is a `drop_if` filter?
+It drops data matching a condition, often used for noisy or sensitive logs.
+
+** Q164: What is a `mutate` filter in Logstash?
+It changes fields such as adding, renaming, or converting values.
+
+** Q165: What is an event timestamp?
+The time associated with the event, often derived from the log or the ingestion time.
+
+** Q166: Why is timestamp parsing essential?
+Because time-based queries and dashboards depend on a valid event time.
+
+** Q167: What is a date filter in Logstash?
+It parses dates into Elasticsearch-compatible timestamp values.
+
+** Q168: What is a field extraction pipeline?
+It turns raw text into structured fields such as service, host, severity, and message.
+
+** Q169: What is a data sink?
+It is the destination of processed data, often Elasticsearch.
+
+** Q170: What is a filter chain bug?
+It happens when one filter transforms fields in a way that breaks later processing.
+
+** Q171: What is event enrichment?
+It adds metadata such as environment, hostname, or region to logs.
+
+** Q172: Why enrich logs?
+Because it makes them more context-rich and easier to operationalize.
+
+** Q173: What is a log signature?
+A log signature is a pattern or fingerprint that identifies a recurring event pattern.
+
+** Q174: What is log correlation across hosts?
+It connects events from multiple systems related to the same transaction or incident.
+
+** Q175: What is an ELK dashboard alert?
+A dashboard alert identifies anomalies or threshold breaches in cluster data.
+
+** Q176: What is a threshold rule?
+A threshold rule triggers an alert when a metric or log count exceeds a value.
+
+** Q177: What is a log TTL?
+TTL (time-to-live) defines how long a document should stay before expiration.
+
+** Q178: Why use TTL or retention?
+To manage storage cost and lifecycle of the logs.
+
+** Q179: What is data archival?
+Archival stores old logs in cheaper storage for later or compliance-driven access.
+
+** Q180: Why do large enterprises implement hot/warm/cold cycles?
+Because search speed, cost, and retention needs differ across data age and access frequency.
+
+* Advanced / Expert
+
+** Q181: What is Elasticsearch cluster sizing?
+Sizing is the process of choosing hardware and shard counts based on expected data volume and query load.
+
+** Q182: What is a shard count trade-off?
+More shards improve parallelism but increase overhead and management cost.
+
+** Q183: Why is shard balancing important for performance?
+Because uneven distribution can create hot spots and slow queries.
+
+** Q184: What is a heap size tuning issue?
+Elasticsearch heap size must be tuned carefully; too high or too low can hurt performance.
+
+** Q185: Why is JVM tuning important for Elasticsearch?
+Elasticsearch runs on the JVM and is sensitive to heap, GC, and memory pressure.
+
+** Q186: What is the index refresh interval trade-off?
+A short refresh interval makes search more real-time but increases indexing overhead.
+
+** Q187: What is ingestion backpressure?
+Backpressure occurs when the pipeline cannot keep up with event rates.
+
+** Q188: How do operators handle backpressure?
+By buffering, scaling out, rate limiting, or rebalancing data pipelines.
+
+** Q189: What is data durability in Elasticsearch?
+Durability means data is stored safely and can survive node or shard failures.
+
+** Q190: Why are replicas important to durability?
+They protect against node failure and can help cluster recovery.
+
+** Q191: What is the role of Elasticsearch rebalancing?
+It moves shards across nodes to keep the cluster balanced and healthy.
+
+** Q192: What is query performance tuning?
+It involves good mappings, efficient filters, reduced field data, and proper index design.
+
+** Q193: What is search latency?
+It is the time taken to complete a search query.
+
+** Q194: Why do aggregations matter for operational platforms?
+They help answer business and operational questions like “which service failed the most?” or “what is the p99 latency?”
+
+** Q195: What is `p95`, `p99`, and percentiles in Elasticsearch?
+They describe the latency thresholds for the slowest 5% or 1% of requests.
+
+** Q196: Why are percentiles useful?
+Because average latency can hide spikes and bad tail behavior.
+
+** Q197: What is a hot shard?
+A hot shard is a shard receiving disproportionate traffic or load.
+
+** Q198: What is a cluster hotspot?
+A hotspot is a node or shard receiving much more traffic than its peers.
+
+** Q199: What are common operational concerns in ELK?
+- cluster health
+- shard allocation
+- index lifecycle
+- disk pressure
+- mapping drift
+- ingest backlog
+- query performance
+
+** Q200: What is the main lesson of ELK?
+ELK is not just log storage; it is an operational analytics platform that turns raw event streams into searchable, filterable, and visualizable evidence of system health, behavior, and errors.
+
+-----
+
+#+INCLUDE: "../footer.org"

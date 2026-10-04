@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kubernetes Volumes</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+</head>
+<body>
+<div id="content" class="content">
+<header>
+<h1 class="title">Kubernetes Volumes</h1>
+</header><div class="site-header">
+  <div class="site-title"><a href="/">Borislav Dostumski</a></div>
+  <nav class="site-nav">
+    <a href="/index.html">Index</a>
+    <a href="/certificates.html">Certificates</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/about.html">Bio</a>
+  </nav>
+</div>
+<div id="outline-container-orgb9c7a25" class="outline-2">
+<h2 id="orgb9c7a25">Kubernetes Volumes</h2>
+<div class="outline-text-2" id="text-orgb9c7a25">
+<hr>
+</div>
+</div>
+<div id="outline-container-orgda007bf" class="outline-2">
+<h2 id="orgda007bf">Beginner</h2>
+<div class="outline-text-2" id="text-orgda007bf">
+</div>
+<div id="outline-container-org6865bc5" class="outline-3">
+<h3 id="org6865bc5">Q1: What is a Kubernetes volume?</h3>
+<div class="outline-text-3" id="text-org6865bc5">
+<p>
+A Kubernetes volume is a storage object mounted into a Pod so containers can use persistent or temporary storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org0df3576" class="outline-3">
+<h3 id="org0df3576">Q2: Why do Pods need volumes?</h3>
+<div class="outline-text-3" id="text-org0df3576">
+<p>
+Pods often need storage for configuration, state, logs, caches, or database data.
+</p>
+</div>
+</div>
+<div id="outline-container-org1323ed5" class="outline-3">
+<h3 id="org1323ed5">Q3: What is a container filesystem?</h3>
+<div class="outline-text-3" id="text-org1323ed5">
+<p>
+A container filesystem is the read/write root filesystem used by a container process.
+</p>
+</div>
+</div>
+<div id="outline-container-orga303219" class="outline-3">
+<h3 id="orga303219">Q4: Why is container filesystem not sufficient for persistent state?</h3>
+<div class="outline-text-3" id="text-orga303219">
+<p>
+Because container filesystems are generally ephemeral and tied to the container lifecycle.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd518ada" class="outline-3">
+<h3 id="orgd518ada">Q5: What is an emptyDir volume?</h3>
+<div class="outline-text-3" id="text-orgd518ada">
+<p>
+An emptyDir volume is created when a pod starts and exists as long as the pod remains alive.
+</p>
+</div>
+</div>
+<div id="outline-container-org23f64fa" class="outline-3">
+<h3 id="org23f64fa">Q6: Why use emptyDir?</h3>
+<div class="outline-text-3" id="text-org23f64fa">
+<p>
+It is useful for temporary or shared data between containers in the same pod.
+</p>
+</div>
+</div>
+<div id="outline-container-org57b78e5" class="outline-3">
+<h3 id="org57b78e5">Q7: What is a hostPath volume?</h3>
+<div class="outline-text-3" id="text-org57b78e5">
+<p>
+A hostPath volume mounts a path from the worker node filesystem into the pod.
+</p>
+</div>
+</div>
+<div id="outline-container-orge42ebbb" class="outline-3">
+<h3 id="orge42ebbb">Q8: Why is hostPath risky?</h3>
+<div class="outline-text-3" id="text-orge42ebbb">
+<p>
+Because it exposes node filesystem content to the pod and can create security or portability problems.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbfcb3f3" class="outline-3">
+<h3 id="orgbfcb3f3">Q9: What is a ConfigMap volume?</h3>
+<div class="outline-text-3" id="text-orgbfcb3f3">
+<p>
+A ConfigMap volume mounts configuration data from a Kubernetes ConfigMap into files in the pod.
+</p>
+</div>
+</div>
+<div id="outline-container-org11bd58e" class="outline-3">
+<h3 id="org11bd58e">Q10: What is a Secret volume?</h3>
+<div class="outline-text-3" id="text-org11bd58e">
+<p>
+A Secret volume mounts sensitive data from a Kubernetes Secret into files in the pod.
+</p>
+</div>
+</div>
+<div id="outline-container-orga3d3914" class="outline-3">
+<h3 id="orga3d3914">Q11: What is a projected volume?</h3>
+<div class="outline-text-3" id="text-orga3d3914">
+<p>
+A projected volume combines multiple config or secret sources into a single mounted directory.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e63c1f" class="outline-3">
+<h3 id="org1e63c1f">Q12: Why use projected volumes?</h3>
+<div class="outline-text-3" id="text-org1e63c1f">
+<p>
+To mount several sources into one path without more complicated container setup.
+</p>
+</div>
+</div>
+<div id="outline-container-org14f44ca" class="outline-3">
+<h3 id="org14f44ca">Q13: What is a PersistentVolume?</h3>
+<div class="outline-text-3" id="text-org14f44ca">
+<p>
+A PersistentVolume (PV) is cluster-scoped storage that can be bound to a pod via a claim.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcb8d9b8" class="outline-3">
+<h3 id="orgcb8d9b8">Q14: What is a PersistentVolumeClaim?</h3>
+<div class="outline-text-3" id="text-orgcb8d9b8">
+<p>
+A PersistentVolumeClaim (PVC) is a request for storage made by a pod or workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org75c6845" class="outline-3">
+<h3 id="org75c6845">Q15: What is the relation between PVC and PV?</h3>
+<div class="outline-text-3" id="text-org75c6845">
+<p>
+A PVC binds to a compatible PV, which then provides storage to the pod.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbd5c1be" class="outline-3">
+<h3 id="orgbd5c1be">Q16: Why do PVCs matter?</h3>
+<div class="outline-text-3" id="text-orgbd5c1be">
+<p>
+They abstract the storage backend and make application requests declarative.
+</p>
+</div>
+</div>
+<div id="outline-container-orgad291f6" class="outline-3">
+<h3 id="orgad291f6">Q17: What is a volume mount?</h3>
+<div class="outline-text-3" id="text-orgad291f6">
+<p>
+A volume mount attaches a volume to a specific path inside a container.
+</p>
+</div>
+</div>
+<div id="outline-container-org12d162d" class="outline-3">
+<h3 id="org12d162d">Q18: What is `mountPath`?</h3>
+<div class="outline-text-3" id="text-org12d162d">
+<p>
+`mountPath` is the mount point inside the container filesystem.
+</p>
+</div>
+</div>
+<div id="outline-container-org6b8f31c" class="outline-3">
+<h3 id="org6b8f31c">Q19: What is a volume name?</h3>
+<div class="outline-text-3" id="text-org6b8f31c">
+<p>
+A volume name is the logical name used inside the pod spec for a mounted volume.
+</p>
+</div>
+</div>
+<div id="outline-container-org6f62265" class="outline-3">
+<h3 id="org6f62265">Q20: Why are volume names important?</h3>
+<div class="outline-text-3" id="text-org6f62265">
+<p>
+Because they connect the volume definition in pod spec to the mount configuration inside the container.
+</p>
+</div>
+</div>
+<div id="outline-container-org45e4862" class="outline-3">
+<h3 id="org45e4862">Q21: What is a StatefulSet?</h3>
+<div class="outline-text-3" id="text-org45e4862">
+<p>
+A StatefulSet is a workload for stateful applications and often uses persistent volume claims per pod.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdf7796d" class="outline-3">
+<h3 id="orgdf7796d">Q22: Why are StatefulSets tied to volumes?</h3>
+<div class="outline-text-3" id="text-orgdf7796d">
+<p>
+Because stateful apps often need resilient and stable storage that survives pod restarts.
+</p>
+</div>
+</div>
+<div id="outline-container-org674ff45" class="outline-3">
+<h3 id="org674ff45">Q23: What is a volumeClaimTemplate?</h3>
+<div class="outline-text-3" id="text-org674ff45">
+<p>
+A volumeClaimTemplate is used by a StatefulSet to dynamically create PVCs for each pod.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c2f85d" class="outline-3">
+<h3 id="org2c2f85d">Q24: Why is storage important for databases?</h3>
+<div class="outline-text-3" id="text-org2c2f85d">
+<p>
+Databases usually require durable storage for their data and metadata.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd886dad" class="outline-3">
+<h3 id="orgd886dad">Q25: What is a storage class?</h3>
+<div class="outline-text-3" id="text-orgd886dad">
+<p>
+A StorageClass defines the storage provisioner and rules for dynamic creation of PVs.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf47d45e" class="outline-3">
+<h3 id="orgf47d45e">Q26: Why use a StorageClass?</h3>
+<div class="outline-text-3" id="text-orgf47d45e">
+<p>
+It allows Kubernetes to dynamically provision storage without manual PV creation.
+</p>
+</div>
+</div>
+<div id="outline-container-orge61cec3" class="outline-3">
+<h3 id="orge61cec3">Q27: What is dynamic provisioning?</h3>
+<div class="outline-text-3" id="text-orge61cec3">
+<p>
+Dynamic provisioning creates a PV automatically when a PVC is created.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdce2bd7" class="outline-3">
+<h3 id="orgdce2bd7">Q28: What is static provisioning?</h3>
+<div class="outline-text-3" id="text-orgdce2bd7">
+<p>
+Static provisioning means a cluster admin manually creates a PV before the workload requests it.
+</p>
+</div>
+</div>
+<div id="outline-container-org914bc68" class="outline-3">
+<h3 id="org914bc68">Q29: What is a provisioner?</h3>
+<div class="outline-text-3" id="text-org914bc68">
+<p>
+A provisioner is the controller or plugin that creates the underlying storage resource.
+</p>
+</div>
+</div>
+<div id="outline-container-orgee1ab0c" class="outline-3">
+<h3 id="orgee1ab0c">Q30: What is CSI?</h3>
+<div class="outline-text-3" id="text-orgee1ab0c">
+<p>
+CSI (Container Storage Interface) is the standard interface used by Kubernetes storage plugins.
+</p>
+</div>
+</div>
+<div id="outline-container-orge7a6240" class="outline-3">
+<h3 id="orge7a6240">Q31: Why is CSI important?</h3>
+<div class="outline-text-3" id="text-orge7a6240">
+<p>
+It standardizes how storage systems integrate with Kubernetes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf22811b" class="outline-3">
+<h3 id="orgf22811b">Q32: What is a local volume?</h3>
+<div class="outline-text-3" id="text-orgf22811b">
+<p>
+A local volume is backed by storage local to a specific node.
+</p>
+</div>
+</div>
+<div id="outline-container-org4407107" class="outline-3">
+<h3 id="org4407107">Q33: Why are local volumes sometimes used?</h3>
+<div class="outline-text-3" id="text-org4407107">
+<p>
+Because they can provide low-latency storage for high-performance workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org8797efb" class="outline-3">
+<h3 id="org8797efb">Q34: What is a network-attached storage volume?</h3>
+<div class="outline-text-3" id="text-org8797efb">
+<p>
+A network-attached volume is backed by storage reached over the network, often via NFS or block storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org147cf26" class="outline-3">
+<h3 id="org147cf26">Q35: What is cloud block storage?</h3>
+<div class="outline-text-3" id="text-org147cf26">
+<p>
+Cloud block storage is storage provided by cloud providers as portable block devices.
+</p>
+</div>
+</div>
+<div id="outline-container-orgca0c682" class="outline-3">
+<h3 id="orgca0c682">Q36: Why do cloud infrastructures use block storage?</h3>
+<div class="outline-text-3" id="text-orgca0c682">
+<p>
+Because many workloads, especially databases, need block semantics and high performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org30a142b" class="outline-3">
+<h3 id="org30a142b">Q37: What is ReadWriteOnce?</h3>
+<div class="outline-text-3" id="text-org30a142b">
+<p>
+ReadWriteOnce means a volume can be mounted read-write by a single node at a time.
+</p>
+</div>
+</div>
+<div id="outline-container-org5f777cb" class="outline-3">
+<h3 id="org5f777cb">Q38: What is ReadOnlyMany?</h3>
+<div class="outline-text-3" id="text-org5f777cb">
+<p>
+ReadOnlyMany means many nodes can mount the same volume read-only.
+</p>
+</div>
+</div>
+<div id="outline-container-org37cd59c" class="outline-3">
+<h3 id="org37cd59c">Q39: What is ReadWriteMany?</h3>
+<div class="outline-text-3" id="text-org37cd59c">
+<p>
+ReadWriteMany means many nodes can mount the same volume with read-write access.
+</p>
+</div>
+</div>
+<div id="outline-container-org4ba2303" class="outline-3">
+<h3 id="org4ba2303">Q40: Why do access modes matter?</h3>
+<div class="outline-text-3" id="text-org4ba2303">
+<p>
+They define how many nodes can access a storage volume and in what mode.
+</p>
+</div>
+</div>
+<div id="outline-container-org17d08fe" class="outline-3">
+<h3 id="org17d08fe">Q41: What is a PVC size?</h3>
+<div class="outline-text-3" id="text-org17d08fe">
+<p>
+PVC size specifies the requested storage size, such as 10Gi.
+</p>
+</div>
+</div>
+<div id="outline-container-orge190bef" class="outline-3">
+<h3 id="orge190bef">Q42: What is a PV size?</h3>
+<div class="outline-text-3" id="text-orge190bef">
+<p>
+The PV size is the actual capacity of the underlying storage resource.
+</p>
+</div>
+</div>
+<div id="outline-container-orge5cb58b" class="outline-3">
+<h3 id="orge5cb58b">Q43: Why is capacity important?</h3>
+<div class="outline-text-3" id="text-orge5cb58b">
+<p>
+Because workloads need enough space for data, logs, and future growth.
+</p>
+</div>
+</div>
+<div id="outline-container-org6e5e9db" class="outline-3">
+<h3 id="org6e5e9db">Q44: What is volume expansion?</h3>
+<div class="outline-text-3" id="text-org6e5e9db">
+<p>
+Volume expansion increases a PV or PVC size after the fact.
+</p>
+</div>
+</div>
+<div id="outline-container-org2749545" class="outline-3">
+<h3 id="org2749545">Q45: Why do operators care about expansion?</h3>
+<div class="outline-text-3" id="text-org2749545">
+<p>
+Because workloads often grow over time and need additional storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org70897ff" class="outline-3">
+<h3 id="org70897ff">Q46: What is backup and restore of Kubernetes volumes?</h3>
+<div class="outline-text-3" id="text-org70897ff">
+<p>
+It means making copies of the data on a volume and restoring it to another storage object.
+</p>
+</div>
+</div>
+<div id="outline-container-org4dba4bf" class="outline-3">
+<h3 id="org4dba4bf">Q47: What is a snapshot?</h3>
+<div class="outline-text-3" id="text-org4dba4bf">
+<p>
+A snapshot is a point-in-time copy of a volume.
+</p>
+</div>
+</div>
+<div id="outline-container-org452a01d" class="outline-3">
+<h3 id="org452a01d">Q48: Why are snapshots useful?</h3>
+<div class="outline-text-3" id="text-org452a01d">
+<p>
+They allow backups, cloning, and recovery of volume contents.
+</p>
+</div>
+</div>
+<div id="outline-container-org0608396" class="outline-3">
+<h3 id="org0608396">Q49: What is a clone?</h3>
+<div class="outline-text-3" id="text-org0608396">
+<p>
+A clone is a new volume created from an existing snapshot or data set.
+</p>
+</div>
+</div>
+<div id="outline-container-org0a67f4c" class="outline-3">
+<h3 id="org0a67f4c">Q50: What is a volume mount path?</h3>
+<div class="outline-text-3" id="text-org0a67f4c">
+<p>
+It is the directory inside a container where the volume is attached.
+</p>
+</div>
+</div>
+<div id="outline-container-org25a2ca0" class="outline-3">
+<h3 id="org25a2ca0">Q51: Why is `subPath` used?</h3>
+<div class="outline-text-3" id="text-org25a2ca0">
+<p>
+A `subPath` mount attaches only a specific subdirectory or file from a volume.
+</p>
+</div>
+</div>
+<div id="outline-container-orge38c42e" class="outline-3">
+<h3 id="orge38c42e">Q52: Why use `subPath` carefully?</h3>
+<div class="outline-text-3" id="text-orge38c42e">
+<p>
+Because it can be confusing and may not behave as expected if the underlying directory structure changes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc388de5" class="outline-3">
+<h3 id="orgc388de5">Q53: What is a volume lifecycle?</h3>
+<div class="outline-text-3" id="text-orgc388de5">
+<p>
+It includes creation, attachment, use, release, and cleanup.
+</p>
+</div>
+</div>
+<div id="outline-container-org2325253" class="outline-3">
+<h3 id="org2325253">Q54: Why is lifecycle management important?</h3>
+<div class="outline-text-3" id="text-org2325253">
+<p>
+Because volumes can persist beyond the lifetime of individual pods and need careful governance.
+</p>
+</div>
+</div>
+<div id="outline-container-org8b706ab" class="outline-3">
+<h3 id="org8b706ab">Q55: What is a volume reclaim policy?</h3>
+<div class="outline-text-3" id="text-org8b706ab">
+<p>
+A reclaim policy describes what happens when a PV is released: retain, delete, or recycle.
+</p>
+</div>
+</div>
+<div id="outline-container-org4080bcd" class="outline-3">
+<h3 id="org4080bcd">Q56: What is Retain?</h3>
+<div class="outline-text-3" id="text-org4080bcd">
+<p>
+Retain preserves the underlying storage after the PV is released.
+</p>
+</div>
+</div>
+<div id="outline-container-org2c0200b" class="outline-3">
+<h3 id="org2c0200b">Q57: What is Delete?</h3>
+<div class="outline-text-3" id="text-org2c0200b">
+<p>
+Delete deletes the backing storage resource when the PV is released.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc29b5bf" class="outline-3">
+<h3 id="orgc29b5bf">Q58: What is Recycle?</h3>
+<div class="outline-text-3" id="text-orgc29b5bf">
+<p>
+Recycle is an older behavior that makes the volume reusable, though it is less common in modern Kubernetes.
+</p>
+</div>
+</div>
+<div id="outline-container-org4801e56" class="outline-3">
+<h3 id="org4801e56">Q59: What is a PVC pending state?</h3>
+<div class="outline-text-3" id="text-org4801e56">
+<p>
+A PVC remains pending until a compatible PV is bound or a provisioner creates one.
+</p>
+</div>
+</div>
+<div id="outline-container-org2dde3d0" class="outline-3">
+<h3 id="org2dde3d0">Q60: Why would a PVC be pending?</h3>
+<div class="outline-text-3" id="text-org2dde3d0">
+<p>
+Possible reasons include unavailable storage classes, no matching volume, or provisioning delays.
+</p>
+</div>
+</div>
+<div id="outline-container-org287fa55" class="outline-3">
+<h3 id="org287fa55">Q61: What is `volumeMode`?</h3>
+<div class="outline-text-3" id="text-org287fa55">
+<p>
+`volumeMode` is either Filesystem or Block and defines how the storage is exposed.
+</p>
+</div>
+</div>
+<div id="outline-container-org145d6b4" class="outline-3">
+<h3 id="org145d6b4">Q62: What is filesystem volume mode?</h3>
+<div class="outline-text-3" id="text-org145d6b4">
+<p>
+It exposes the storage as a filesystem mount point.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc70d51" class="outline-3">
+<h3 id="orgbc70d51">Q63: What is block volume mode?</h3>
+<div class="outline-text-3" id="text-orgbc70d51">
+<p>
+It exposes the storage as a raw block device.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc7ac582" class="outline-3">
+<h3 id="orgc7ac582">Q64: Why is block mode relevant?</h3>
+<div class="outline-text-3" id="text-orgc7ac582">
+<p>
+Some database and storage systems require block access.
+</p>
+</div>
+</div>
+<div id="outline-container-org758586c" class="outline-3">
+<h3 id="org758586c">Q65: What is a pod with multiple volumes?</h3>
+<div class="outline-text-3" id="text-org758586c">
+<p>
+A pod can mount several volumes at once, such as config, secret, and persistent data.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf41450e" class="outline-3">
+<h3 id="orgf41450e">Q66: Why mount multiple volumes?</h3>
+<div class="outline-text-3" id="text-orgf41450e">
+<p>
+Because different application parts may need different kinds of data.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c75488" class="outline-3">
+<h3 id="org1c75488">Q67: What is an application state volume?</h3>
+<div class="outline-text-3" id="text-org1c75488">
+<p>
+A volume that stores long-lived state such as database files or user uploads.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeca1c84" class="outline-3">
+<h3 id="orgeca1c84">Q68: What is a cache volume?</h3>
+<div class="outline-text-3" id="text-orgeca1c84">
+<p>
+A cache volume stores temporary or reusable data to improve performance.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e7eabc" class="outline-3">
+<h3 id="org1e7eabc">Q69: What is a temp volume?</h3>
+<div class="outline-text-3" id="text-org1e7eabc">
+<p>
+A temp volume is often used for scratch or transient operations.
+</p>
+</div>
+</div>
+<div id="outline-container-org73ae2df" class="outline-3">
+<h3 id="org73ae2df">Q70: What is the purpose of volumes for log storage?</h3>
+<div class="outline-text-3" id="text-org73ae2df">
+<p>
+To keep logs accessible even after pod replacement or restart.
+</p>
+</div>
+</div>
+<div id="outline-container-orge419b65" class="outline-3">
+<h3 id="orge419b65">Q71: Why are logs in volumes helpful?</h3>
+<div class="outline-text-3" id="text-orge419b65">
+<p>
+They support debugging, monitoring, and retention decisions.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e66ed9" class="outline-3">
+<h3 id="org0e66ed9">Q72: What is a stateful workload?</h3>
+<div class="outline-text-3" id="text-org0e66ed9">
+<p>
+A stateful workload depends on persistent storage and usually stable identity.
+</p>
+</div>
+</div>
+<div id="outline-container-org32316a3" class="outline-3">
+<h3 id="org32316a3">Q73: What is a stateless workload?</h3>
+<div class="outline-text-3" id="text-org32316a3">
+<p>
+A stateless workload does not rely on persistent local state.
+</p>
+</div>
+</div>
+<div id="outline-container-org685cf61" class="outline-3">
+<h3 id="org685cf61">Q74: Why are stateful app volumes important for reliability?</h3>
+<div class="outline-text-3" id="text-org685cf61">
+<p>
+Because without persistent storage, data can be lost when the pod moves or restarts.
+</p>
+</div>
+</div>
+<div id="outline-container-org255e34a" class="outline-3">
+<h3 id="org255e34a">Q75: What is an `emptyDir` lifecycle tied to the pod?</h3>
+<div class="outline-text-3" id="text-org255e34a">
+<p>
+An `emptyDir` is created when a pod starts and removed when the pod is deleted.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf909343" class="outline-3">
+<h3 id="orgf909343">Q76: What is a `hostPath` lifecycle tied to the node?</h3>
+<div class="outline-text-3" id="text-orgf909343">
+<p>
+A `hostPath` points to a path on the worker host and is not automatically portable.
+</p>
+</div>
+</div>
+<div id="outline-container-org7540cbe" class="outline-3">
+<h3 id="org7540cbe">Q77: What is a volume for application secrets?</h3>
+<div class="outline-text-3" id="text-org7540cbe">
+<p>
+Used to inject TLS certs, API keys, or other sensitive files into the pod at runtime.
+</p>
+</div>
+</div>
+<div id="outline-container-org7863f35" class="outline-3">
+<h3 id="org7863f35">Q78: What happens if a pod is rescheduled?</h3>
+<div class="outline-text-3" id="text-org7863f35">
+<p>
+With persistent volumes, the new pod can reattach the same storage if the backend supports it.
+</p>
+</div>
+</div>
+<div id="outline-container-org8c5460d" class="outline-3">
+<h3 id="org8c5460d">Q79: Why does rescheduling matter?</h3>
+<div class="outline-text-3" id="text-org8c5460d">
+<p>
+Because pods may move between nodes in a cluster for maintenance or load balancing.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a38c83" class="outline-3">
+<h3 id="org6a38c83">Q80: What is a disk failure?</h3>
+<div class="outline-text-3" id="text-org6a38c83">
+<p>
+A disk failure can make storage unavailable and may affect the whole workload.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfda899f" class="outline-3">
+<h3 id="orgfda899f">Q81: Why use replicated storage?</h3>
+<div class="outline-text-3" id="text-orgfda899f">
+<p>
+Replicated storage reduces the chance of data loss during node or disk failure.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8596dd" class="outline-3">
+<h3 id="orgc8596dd">Q82: What is a volume read/write speed?</h3>
+<div class="outline-text-3" id="text-orgc8596dd">
+<p>
+It measures how quickly the storage can read and write data.
+</p>
+</div>
+</div>
+<div id="outline-container-org64c46a4" class="outline-3">
+<h3 id="org64c46a4">Q83: Why is storage performance important?</h3>
+<div class="outline-text-3" id="text-org64c46a4">
+<p>
+Slow storage can increase latency and reduce application throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-org9daec26" class="outline-3">
+<h3 id="org9daec26">Q84: What is IOPS?</h3>
+<div class="outline-text-3" id="text-org9daec26">
+<p>
+IOPS is input/output operations per second, a common performance metric for storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org93ca9b2" class="outline-3">
+<h3 id="org93ca9b2">Q85: What is throughput?</h3>
+<div class="outline-text-3" id="text-org93ca9b2">
+<p>
+Throughput measures how much data can move per second.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc671577" class="outline-3">
+<h3 id="orgc671577">Q86: Why do databases care about volume performance?</h3>
+<div class="outline-text-3" id="text-orgc671577">
+<p>
+They often do many random I/O operations and need predictable latency.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcdb2023" class="outline-3">
+<h3 id="orgcdb2023">Q87: What is PVC binding?</h3>
+<div class="outline-text-3" id="text-orgcdb2023">
+<p>
+PVC binding is the process of associating a claim with a specific PV.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeafbdf2" class="outline-3">
+<h3 id="orgeafbdf2">Q88: What is a volume binding mode?</h3>
+<div class="outline-text-3" id="text-orgeafbdf2">
+<p>
+A volume binding mode determines when a PVC binds to a volume, such as immediate or wait for first consumer.
+</p>
+</div>
+</div>
+<div id="outline-container-org34f6673" class="outline-3">
+<h3 id="org34f6673">Q89: What is `WaitForFirstConsumer`?</h3>
+<div class="outline-text-3" id="text-org34f6673">
+<p>
+It delays volume binding until the pod is scheduled to a suitable node.
+</p>
+</div>
+</div>
+<div id="outline-container-org1a70793" class="outline-3">
+<h3 id="org1a70793">Q90: Why is topology-aware binding useful?</h3>
+<div class="outline-text-3" id="text-org1a70793">
+<p>
+It reduces cross-node or cross-zone storage inefficiency and improves locality.
+</p>
+</div>
+</div>
+<div id="outline-container-orgac168e3" class="outline-3">
+<h3 id="orgac168e3">Q91: What is a `StorageClass` parameter?</h3>
+<div class="outline-text-3" id="text-orgac168e3">
+<p>
+A StorageClass parameter customizes how the provisioner behaves.
+</p>
+</div>
+</div>
+<div id="outline-container-org1647611" class="outline-3">
+<h3 id="org1647611">Q92: What is a custom storage class?</h3>
+<div class="outline-text-3" id="text-org1647611">
+<p>
+A custom storage class defines a specific backend or storage profile.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8faa87" class="outline-3">
+<h3 id="orgc8faa87">Q93: Why create separate storage classes?</h3>
+<div class="outline-text-3" id="text-orgc8faa87">
+<p>
+For different classes of workloads, such as fast SSD storage and slower cheap storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org5b43a3d" class="outline-3">
+<h3 id="org5b43a3d">Q94: What are examples of storage backends?</h3>
+<div class="outline-text-3" id="text-org5b43a3d">
+<p>
+NFS, Ceph, OpenEBS, EBS, Azure Disk, GCP PD, or SAN-based storage.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc12c8f9" class="outline-3">
+<h3 id="orgc12c8f9">Q95: Why is storage backend choice important?</h3>
+<div class="outline-text-3" id="text-orgc12c8f9">
+<p>
+It affects performance, durability, cost, and operational complexity.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc47ce31" class="outline-3">
+<h3 id="orgc47ce31">Q96: What is an external storage controller?</h3>
+<div class="outline-text-3" id="text-orgc47ce31">
+<p>
+It manages the storage system behind Kubernetes.
+</p>
+</div>
+</div>
+<div id="outline-container-org82aa058" class="outline-3">
+<h3 id="org82aa058">Q97: What is a CSI driver?</h3>
+<div class="outline-text-3" id="text-org82aa058">
+<p>
+A CSI driver implements the storage operations that Kubernetes uses.
+</p>
+</div>
+</div>
+<div id="outline-container-orge44f2ec" class="outline-3">
+<h3 id="orge44f2ec">Q98: What is a storage driver plugin?</h3>
+<div class="outline-text-3" id="text-orge44f2ec">
+<p>
+It is the implementation of volume operations for a specific backend.
+</p>
+</div>
+</div>
+<div id="outline-container-org10466eb" class="outline-3">
+<h3 id="org10466eb">Q99: What is a data volume or app volume?</h3>
+<div class="outline-text-3" id="text-org10466eb">
+<p>
+It is a volume used to store the main application state.
+</p>
+</div>
+</div>
+<div id="outline-container-org69cb2ec" class="outline-3">
+<h3 id="org69cb2ec">Q100: What is a Kubernetes Volume object vs a PVC?</h3>
+<div class="outline-text-3" id="text-org69cb2ec">
+<p>
+A Volume is a pod-level mount definition; a PVC is the declarative request to bind to a persistent backend.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd70a32b" class="outline-2">
+<h2 id="orgd70a32b">Intermediate</h2>
+<div class="outline-text-2" id="text-orgd70a32b">
+</div>
+<div id="outline-container-org19445e1" class="outline-3">
+<h3 id="org19445e1">Q101: What is an `emptyDir` for shared cache?</h3>
+<div class="outline-text-3" id="text-org19445e1">
+<p>
+It is often used for data shared between containers in the same pod.
+</p>
+</div>
+</div>
+<div id="outline-container-org75492b7" class="outline-3">
+<h3 id="org75492b7">Q102: What is a sidecar container and shared volume?</h3>
+<div class="outline-text-3" id="text-org75492b7">
+<p>
+A sidecar may read or write a shared volume for logs, temporary files, or configuration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf735b56" class="outline-3">
+<h3 id="orgf735b56">Q103: What is a pod-level shared filesystem?</h3>
+<div class="outline-text-3" id="text-orgf735b56">
+<p>
+A pod-level shared filesystem can be created with `emptyDir` or other shared mounts.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ef69a3" class="outline-3">
+<h3 id="org2ef69a3">Q104: What is a volume mount in a Deployment?</h3>
+<div class="outline-text-3" id="text-org2ef69a3">
+<p>
+A deployment’s pod template can include volume definitions and mounts.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcf38b11" class="outline-3">
+<h3 id="orgcf38b11">Q105: Why is a ConfigMap volume read-only?</h3>
+<div class="outline-text-3" id="text-orgcf38b11">
+<p>
+It is usually mounted read-only to prevent accidental modification of config.
+</p>
+</div>
+</div>
+<div id="outline-container-org3d5bf93" class="outline-3">
+<h3 id="org3d5bf93">Q106: Why are secret volumes often read-only?</h3>
+<div class="outline-text-3" id="text-org3d5bf93">
+<p>
+Because they contain sensitive values and should not be modified by the application.
+</p>
+</div>
+</div>
+<div id="outline-container-org09b0d00" class="outline-3">
+<h3 id="org09b0d00">Q107: What is a `secret` source in a pod?</h3>
+<div class="outline-text-3" id="text-org09b0d00">
+<p>
+A `secret` volume source references a Kubernetes Secret object.
+</p>
+</div>
+</div>
+<div id="outline-container-org65c1800" class="outline-3">
+<h3 id="org65c1800">Q108: Why are secrets mounted as files?</h3>
+<div class="outline-text-3" id="text-org65c1800">
+<p>
+Because some software expects them as files rather than environment variables.
+</p>
+</div>
+</div>
+<div id="outline-container-org2717b8b" class="outline-3">
+<h3 id="org2717b8b">Q109: What is a `configMap` source in a pod?</h3>
+<div class="outline-text-3" id="text-org2717b8b">
+<p>
+It references a ConfigMap and exposes it as files or keys.
+</p>
+</div>
+</div>
+<div id="outline-container-org50757fc" class="outline-3">
+<h3 id="org50757fc">Q110: What is a projection volume?</h3>
+<div class="outline-text-3" id="text-org50757fc">
+<p>
+It can combine multiple config or secret sources into a single mounted directory.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0b0101" class="outline-3">
+<h3 id="orgf0b0101">Q111: What is a `subPath` mount for a single file?</h3>
+<div class="outline-text-3" id="text-orgf0b0101">
+<p>
+It allows only one file from a volume to be mounted into a container.
+</p>
+</div>
+</div>
+<div id="outline-container-org22506e7" class="outline-3">
+<h3 id="org22506e7">Q112: Why is file permission control important on mounted volumes?</h3>
+<div class="outline-text-3" id="text-org22506e7">
+<p>
+Because the app must read and write with the correct user and group.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb30cb49" class="outline-3">
+<h3 id="orgb30cb49">Q113: What is ownership mismatch on mounted volume?</h3>
+<div class="outline-text-3" id="text-orgb30cb49">
+<p>
+It happens when the volume files are owned by a different UID/GID than the container runtime user.
+</p>
+</div>
+</div>
+<div id="outline-container-org8edc997" class="outline-3">
+<h3 id="org8edc997">Q114: Why does volume ownership matter?</h3>
+<div class="outline-text-3" id="text-org8edc997">
+<p>
+It affects read/write access and application startup behavior.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfdb689d" class="outline-3">
+<h3 id="orgfdb689d">Q115: What is a storage mount permission issue?</h3>
+<div class="outline-text-3" id="text-orgfdb689d">
+<p>
+It occurs when the mounted path does not have the necessary permissions for the application.
+</p>
+</div>
+</div>
+<div id="outline-container-orga6e77d2" class="outline-3">
+<h3 id="orga6e77d2">Q116: Why do database services often require `fsGroup`?</h3>
+<div class="outline-text-3" id="text-orga6e77d2">
+<p>
+`fsGroup` can enable group ownership on mounted volumes so the app can write to them.
+</p>
+</div>
+</div>
+<div id="outline-container-orga2eaeee" class="outline-3">
+<h3 id="orga2eaeee">Q117: What is `fsGroup`?</h3>
+<div class="outline-text-3" id="text-orga2eaeee">
+<p>
+It is a pod security feature that sets a supplemental group for mounted volumes.
+</p>
+</div>
+</div>
+<div id="outline-container-org5470d0e" class="outline-3">
+<h3 id="org5470d0e">Q118: Why use `fsGroup` for volumes?</h3>
+<div class="outline-text-3" id="text-org5470d0e">
+<p>
+To ensure the application user can read or write the volume data.
+</p>
+</div>
+</div>
+<div id="outline-container-org08ab3d9" class="outline-3">
+<h3 id="org08ab3d9">Q119: What is a volume snapshot in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org08ab3d9">
+<p>
+A snapshot is a point-in-time storage image created from a persistent volume.
+</p>
+</div>
+</div>
+<div id="outline-container-org06051d0" class="outline-3">
+<h3 id="org06051d0">Q120: Why are snapshots used for backup?</h3>
+<div class="outline-text-3" id="text-org06051d0">
+<p>
+They allow quick recovery of a point-in-time state.
+</p>
+</div>
+</div>
+<div id="outline-container-org957bca4" class="outline-3">
+<h3 id="org957bca4">Q121: What is a volume backup plan?</h3>
+<div class="outline-text-3" id="text-org957bca4">
+<p>
+It includes snapshotting, retention, verification, and restore testing.
+</p>
+</div>
+</div>
+<div id="outline-container-orga910d84" class="outline-3">
+<h3 id="orga910d84">Q122: What is a PVC restore process?</h3>
+<div class="outline-text-3" id="text-orga910d84">
+<p>
+It recreates a volume or claim and copies the backup or snapshot back into it.
+</p>
+</div>
+</div>
+<div id="outline-container-org1c2d77d" class="outline-3">
+<h3 id="org1c2d77d">Q123: What is a storage policy?</h3>
+<div class="outline-text-3" id="text-org1c2d77d">
+<p>
+It defines the way storage is provisioned, retained, and recovered.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdd09f81" class="outline-3">
+<h3 id="orgdd09f81">Q124: What is a persistent data plan?</h3>
+<div class="outline-text-3" id="text-orgdd09f81">
+<p>
+It is the strategy for ensuring important data outlives ephemeral pods and nodes.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf3ef5dd" class="outline-3">
+<h3 id="orgf3ef5dd">Q125: What is the effect of deleting a pod on a PVC?</h3>
+<div class="outline-text-3" id="text-orgf3ef5dd">
+<p>
+The pod can be deleted without necessarily deleting the PVC or the data behind it.
+</p>
+</div>
+</div>
+<div id="outline-container-org067e2e2" class="outline-3">
+<h3 id="org067e2e2">Q126: Why is this important for workloads?</h3>
+<div class="outline-text-3" id="text-org067e2e2">
+<p>
+It allows pods to be recreated and reattached to the same persistent data.
+</p>
+</div>
+</div>
+<div id="outline-container-orgeb4bac6" class="outline-3">
+<h3 id="orgeb4bac6">Q127: What is a pod restart vs PVC deletion?</h3>
+<div class="outline-text-3" id="text-orgeb4bac6">
+<p>
+A pod restart keeps the storage. PVC deletion may release or delete the data depending on reclaim policy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdb9e591" class="outline-3">
+<h3 id="orgdb9e591">Q128: Why is reclaim policy important?</h3>
+<div class="outline-text-3" id="text-orgdb9e591">
+<p>
+Because it determines whether underlying storage remains for future use or is deleted.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd237b9e" class="outline-3">
+<h3 id="orgd237b9e">Q129: What is a `Retain` reclaim policy?</h3>
+<div class="outline-text-3" id="text-orgd237b9e">
+<p>
+It keeps the data and backing volume around after the claim is released.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf49ceba" class="outline-3">
+<h3 id="orgf49ceba">Q130: What is a `Delete` reclaim policy?</h3>
+<div class="outline-text-3" id="text-orgf49ceba">
+<p>
+It deletes the underlying storage resource when the PVC is deleted.
+</p>
+</div>
+</div>
+<div id="outline-container-org67e1d06" class="outline-3">
+<h3 id="org67e1d06">Q131: Why do high-value volumes often use Retain?</h3>
+<div class="outline-text-3" id="text-org67e1d06">
+<p>
+Because it reduces risk of accidental data destruction during cleanup.
+</p>
+</div>
+</div>
+<div id="outline-container-org30743e7" class="outline-3">
+<h3 id="org30743e7">Q132: What is a stale volume?</h3>
+<div class="outline-text-3" id="text-org30743e7">
+<p>
+A stale volume is one no longer actively used but still present and maybe still storing data.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3fee8c" class="outline-3">
+<h3 id="orgd3fee8c">Q133: Why prune stale volumes?</h3>
+<div class="outline-text-3" id="text-orgd3fee8c">
+<p>
+Because they consume resources and can create confusion or security issues.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc8c1315" class="outline-3">
+<h3 id="orgc8c1315">Q134: What is a storage leak?</h3>
+<div class="outline-text-3" id="text-orgc8c1315">
+<p>
+It occurs when volumes accumulate because they are not cleaned up or not reclaimed properly.
+</p>
+</div>
+</div>
+<div id="outline-container-org5e66094" class="outline-3">
+<h3 id="org5e66094">Q135: Why is object storage not the same as Kubernetes volumes?</h3>
+<div class="outline-text-3" id="text-org5e66094">
+<p>
+Object stores have different semantics and are often used for different data patterns, not the same as pod-attached block filesystems.
+</p>
+</div>
+</div>
+<div id="outline-container-org75e8bc7" class="outline-3">
+<h3 id="org75e8bc7">Q136: What is a `filesystem` volume mode?</h3>
+<div class="outline-text-3" id="text-org75e8bc7">
+<p>
+It presents storage as a mounted directory with a standard filesystem.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb2ab721" class="outline-3">
+<h3 id="orgb2ab721">Q137: What is a `block` volume mode?</h3>
+<div class="outline-text-3" id="text-orgb2ab721">
+<p>
+It presents storage as a raw device that is treated as a block.
+</p>
+</div>
+</div>
+<div id="outline-container-org7d242f5" class="outline-3">
+<h3 id="org7d242f5">Q138: Why use block mode for databases?</h3>
+<div class="outline-text-3" id="text-org7d242f5">
+<p>
+Because some database backends prefer raw block devices or direct block semantics.
+</p>
+</div>
+</div>
+<div id="outline-container-org5c9edcf" class="outline-3">
+<h3 id="org5c9edcf">Q139: What is a high-IOPS workload?</h3>
+<div class="outline-text-3" id="text-org5c9edcf">
+<p>
+Workloads such as databases or search indexes that need frequent random I/O.
+</p>
+</div>
+</div>
+<div id="outline-container-orgae95990" class="outline-3">
+<h3 id="orgae95990">Q140: Why use SSD-backed volumes for databases?</h3>
+<div class="outline-text-3" id="text-orgae95990">
+<p>
+Because they deliver lower latency and higher throughput.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ddcc04" class="outline-3">
+<h3 id="org1ddcc04">Q141: What is a local SSD volume?</h3>
+<div class="outline-text-3" id="text-org1ddcc04">
+<p>
+A local SSD or NVMe device is directly attached to a node and may have lower latency.
+</p>
+</div>
+</div>
+<div id="outline-container-org302dbc7" class="outline-3">
+<h3 id="org302dbc7">Q142: Why do local volumes need extra planning?</h3>
+<div class="outline-text-3" id="text-org302dbc7">
+<p>
+Because failures or node maintenance can affect data availability.
+</p>
+</div>
+</div>
+<div id="outline-container-org43e20b1" class="outline-3">
+<h3 id="org43e20b1">Q143: What is multi-zone storage?</h3>
+<div class="outline-text-3" id="text-org43e20b1">
+<p>
+Storage that spans or replicates across zones for resilience.
+</p>
+</div>
+</div>
+<div id="outline-container-org6659546" class="outline-3">
+<h3 id="org6659546">Q144: Why do multi-zone volumes reduce risk?</h3>
+<div class="outline-text-3" id="text-org6659546">
+<p>
+Because a zone failure does not necessarily lose the data.
+</p>
+</div>
+</div>
+<div id="outline-container-orga6aecac" class="outline-3">
+<h3 id="orga6aecac">Q145: What is a topology constraint for volume placement?</h3>
+<div class="outline-text-3" id="text-orga6aecac">
+<p>
+It restricts where the pod and storage can be scheduled so they remain compatible.
+</p>
+</div>
+</div>
+<div id="outline-container-org32c95ef" class="outline-3">
+<h3 id="org32c95ef">Q146: Why is storage topology important in cloud clusters?</h3>
+<div class="outline-text-3" id="text-org32c95ef">
+<p>
+Because cloud volumes are often tied to a region or zone.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdcaeaa3" class="outline-3">
+<h3 id="orgdcaeaa3">Q147: What is `WaitForFirstConsumer` binding mode?</h3>
+<div class="outline-text-3" id="text-orgdcaeaa3">
+<p>
+It delays binding until a pod is scheduled to a node, which helps choose the right storage topology.
+</p>
+</div>
+</div>
+<div id="outline-container-org1bd4837" class="outline-3">
+<h3 id="org1bd4837">Q148: What is a node affinity constraint with volumes?</h3>
+<div class="outline-text-3" id="text-org1bd4837">
+<p>
+It ensures the pod is placed on a specific node or zone capable of accessing the volume.
+</p>
+</div>
+</div>
+<div id="outline-container-org42470af" class="outline-3">
+<h3 id="org42470af">Q149: Why is volume placement critical for stateful workloads?</h3>
+<div class="outline-text-3" id="text-org42470af">
+<p>
+Because they need storage close to the node running the workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org3a9fcc2" class="outline-3">
+<h3 id="org3a9fcc2">Q150: What is a distributed stateful application?</h3>
+<div class="outline-text-3" id="text-org3a9fcc2">
+<p>
+An application where state is replicated or sharded across multiple pods, often requiring complex storage design.
+</p>
+</div>
+</div>
+<div id="outline-container-org8c5690e" class="outline-3">
+<h3 id="org8c5690e">Q151: What is a replicated database pattern?</h3>
+<div class="outline-text-3" id="text-org8c5690e">
+<p>
+It uses multiple pods or nodes with consistent storage or replication strategy.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc3f26b2" class="outline-3">
+<h3 id="orgc3f26b2">Q152: Why is duplicated storage data important?</h3>
+<div class="outline-text-3" id="text-orgc3f26b2">
+<p>
+It protects against node or disk loss and increases resilience.
+</p>
+</div>
+</div>
+<div id="outline-container-org87fd559" class="outline-3">
+<h3 id="org87fd559">Q153: What are examples of stateful workloads in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org87fd559">
+<p>
+Databases, message queues, caches, search engines, and content management data stores.
+</p>
+</div>
+</div>
+<div id="outline-container-org7570835" class="outline-3">
+<h3 id="org7570835">Q154: Why do stateful workloads often use StatefulSets with PVCs?</h3>
+<div class="outline-text-3" id="text-org7570835">
+<p>
+Because they need stable identity and persistent data.
+</p>
+</div>
+</div>
+<div id="outline-container-org23c5fb9" class="outline-3">
+<h3 id="org23c5fb9">Q155: What is a PVC per pod pattern?</h3>
+<div class="outline-text-3" id="text-org23c5fb9">
+<p>
+It means each StatefulSet pod gets its own volume or claim.
+</p>
+</div>
+</div>
+<div id="outline-container-org8d8981c" class="outline-3">
+<h3 id="org8d8981c">Q156: Why do stateful sets use `volumeClaimTemplates`?</h3>
+<div class="outline-text-3" id="text-org8d8981c">
+<p>
+To automatically create a PVC per pod and maintain stable volume identity.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e859f5" class="outline-3">
+<h3 id="org2e859f5">Q157: Why is storage planning a key part of cluster design?</h3>
+<div class="outline-text-3" id="text-org2e859f5">
+<p>
+Because data retention and recovery depend on storage strategy and quorum.
+</p>
+</div>
+</div>
+<div id="outline-container-org733ed45" class="outline-3">
+<h3 id="org733ed45">Q158: What is backup verification?</h3>
+<div class="outline-text-3" id="text-org733ed45">
+<p>
+It ensures the backup or snapshot is valid and restorable.
+</p>
+</div>
+</div>
+<div id="outline-container-org4a36460" class="outline-3">
+<h3 id="org4a36460">Q159: What is a restore test?</h3>
+<div class="outline-text-3" id="text-org4a36460">
+<p>
+A restore test verifies a backup can successfully recover an application or dataset.
+</p>
+</div>
+</div>
+<div id="outline-container-org369a3b7" class="outline-3">
+<h3 id="org369a3b7">Q160: Why is restore testing critical?</h3>
+<div class="outline-text-3" id="text-org369a3b7">
+<p>
+Because untested backups do not provide real protection.
+</p>
+</div>
+</div>
+<div id="outline-container-org82d0bce" class="outline-3">
+<h3 id="org82d0bce">Q161: What is a storage failure model?</h3>
+<div class="outline-text-3" id="text-org82d0bce">
+<p>
+It describes how the system behaves when disks, nodes, or storage controllers fail.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaa37005" class="outline-3">
+<h3 id="orgaa37005">Q162: Why is storage failure modeling important?</h3>
+<div class="outline-text-3" id="text-orgaa37005">
+<p>
+Because stateful workloads need resilient storage planning.
+</p>
+</div>
+</div>
+<div id="outline-container-orgca3ca6f" class="outline-3">
+<h3 id="orgca3ca6f">Q163: Why do volumes affect dependency chains?</h3>
+<div class="outline-text-3" id="text-orgca3ca6f">
+<p>
+Because app services often depend on a volume and may fail if the volume is missing or inaccessible.
+</p>
+</div>
+</div>
+<div id="outline-container-org956d28a" class="outline-3">
+<h3 id="org956d28a">Q164: What is a volume mount issue in a pod spec?</h3>
+<div class="outline-text-3" id="text-org956d28a">
+<p>
+It can appear as errors like "No such file or directory" or "permission denied".
+</p>
+</div>
+</div>
+<div id="outline-container-org7c192f9" class="outline-3">
+<h3 id="org7c192f9">Q165: Why do volume issues often appear as application startup failures?</h3>
+<div class="outline-text-3" id="text-org7c192f9">
+<p>
+Because the app cannot access data at the expected path.
+</p>
+</div>
+</div>
+<div id="outline-container-org38d879a" class="outline-3">
+<h3 id="org38d879a">Q166: Why is Kubernetes volume design important for ops?</h3>
+<div class="outline-text-3" id="text-org38d879a">
+<p>
+Because storage issues are often among the hardest to debug and the costliest to fix.
+</p>
+</div>
+</div>
+<div id="outline-container-org946607a" class="outline-3">
+<h3 id="org946607a">Q167: What is a read-only volume?</h3>
+<div class="outline-text-3" id="text-org946607a">
+<p>
+A read-only volume is mounted without write access.
+</p>
+</div>
+</div>
+<div id="outline-container-org66648fd" class="outline-3">
+<h3 id="org66648fd">Q168: Why limit writes for config and certificates?</h3>
+<div class="outline-text-3" id="text-org66648fd">
+<p>
+Because those data sources should not be modified at runtime by the application.
+</p>
+</div>
+</div>
+<div id="outline-container-org4bbbd15" class="outline-3">
+<h3 id="org4bbbd15">Q169: What is a mount for generated files?</h3>
+<div class="outline-text-3" id="text-org4bbbd15">
+<p>
+It allows an app to write dynamic files but to a persistent location.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc642662" class="outline-3">
+<h3 id="orgc642662">Q170: Why can mounted config and secret volumes be used independently?</h3>
+<div class="outline-text-3" id="text-orgc642662">
+<p>
+Because they isolate config from persistent application state.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3f67f5" class="outline-3">
+<h3 id="orgd3f67f5">Q171: What is ephemeral vs persistent in volume design?</h3>
+<div class="outline-text-3" id="text-orgd3f67f5">
+<p>
+Ephemeral volumes are local to pod lifetime; persistent volumes survive beyond the pod.
+</p>
+</div>
+</div>
+<div id="outline-container-org182d606" class="outline-3">
+<h3 id="org182d606">Q172: Why is stateful storage often decoupled from app code?</h3>
+<div class="outline-text-3" id="text-org182d606">
+<p>
+Because storage should be managed as infrastructure rather than embedded in the image.
+</p>
+</div>
+</div>
+<div id="outline-container-org1bf1b08" class="outline-3">
+<h3 id="org1bf1b08">Q173: What is the role of storage in reliability engineering?</h3>
+<div class="outline-text-3" id="text-org1bf1b08">
+<p>
+It helps ensure data survives failures and can be recovered and restored.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcd374ce" class="outline-3">
+<h3 id="orgcd374ce">Q174: What is restoring a stateful app from volume backup?</h3>
+<div class="outline-text-3" id="text-orgcd374ce">
+<p>
+It recreates the app and reattaches the volume to resume with prior content.
+</p>
+</div>
+</div>
+<div id="outline-container-org9809b44" class="outline-3">
+<h3 id="org9809b44">Q175: What is a volume lifecycle policy?</h3>
+<div class="outline-text-3" id="text-org9809b44">
+<p>
+It defines retention, backup, and cleanup decisions for storage.
+</p>
+</div>
+</div>
+<div id="outline-container-org499847f" class="outline-3">
+<h3 id="org499847f">Q176: Why is capacity planning related to volumes?</h3>
+<div class="outline-text-3" id="text-org499847f">
+<p>
+Because storage must match workload needs and future growth.
+</p>
+</div>
+</div>
+<div id="outline-container-org6c7464e" class="outline-3">
+<h3 id="org6c7464e">Q177: What is a persistent storage audit?</h3>
+<div class="outline-text-3" id="text-org6c7464e">
+<p>
+It checks whether volumes are still needed, correctly provisioned, backed up, and secure.
+</p>
+</div>
+</div>
+<div id="outline-container-org39c5629" class="outline-3">
+<h3 id="org39c5629">Q178: Why do teams need storage ownership policies?</h3>
+<div class="outline-text-3" id="text-org39c5629">
+<p>
+Because different teams may use different storage classes or workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org0716c83" class="outline-3">
+<h3 id="org0716c83">Q179: What is a `StorageClass` default behavior?</h3>
+<div class="outline-text-3" id="text-org0716c83">
+<p>
+It may automatically provision volumes when a PVC omits a class.
+</p>
+</div>
+</div>
+<div id="outline-container-org0e1c13e" class="outline-3">
+<h3 id="org0e1c13e">Q180: What is the key concept behind Kubernetes volumes?</h3>
+<div class="outline-text-3" id="text-org0e1c13e">
+<p>
+Persistent storage in Kubernetes is abstracted from the application via PVCs and volumes, allowing workloads to read and write data safely across pod lifecycles.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf54b29d" class="outline-2">
+<h2 id="orgf54b29d">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-orgf54b29d">
+</div>
+<div id="outline-container-org42f21c4" class="outline-3">
+<h3 id="org42f21c4">Q181: What is CSI snapshotting?</h3>
+<div class="outline-text-3" id="text-org42f21c4">
+<p>
+It is the CSI standard way to create volume snapshots for backup and restore.
+</p>
+</div>
+</div>
+<div id="outline-container-org5d7f5bc" class="outline-3">
+<h3 id="org5d7f5bc">Q182: Why is snapshot support important?</h3>
+<div class="outline-text-3" id="text-org5d7f5bc">
+<p>
+Because it provides reliable restore capabilities for stateful workloads.
+</p>
+</div>
+</div>
+<div id="outline-container-org27137c3" class="outline-3">
+<h3 id="org27137c3">Q183: What is a volume clone from snapshot?</h3>
+<div class="outline-text-3" id="text-org27137c3">
+<p>
+It creates a new volume from the snapshot’s contents.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf11ab82" class="outline-3">
+<h3 id="orgf11ab82">Q184: Why are snapshots often used in disaster recovery?</h3>
+<div class="outline-text-3" id="text-orgf11ab82">
+<p>
+Because they are simple, fast copies of data at a point in time.
+</p>
+</div>
+</div>
+<div id="outline-container-org288c42c" class="outline-3">
+<h3 id="org288c42c">Q185: What is storage encryption at rest?</h3>
+<div class="outline-text-3" id="text-org288c42c">
+<p>
+It encrypts data stored on the backing disk to protect it from unauthorized access.
+</p>
+</div>
+</div>
+<div id="outline-container-org2011eff" class="outline-3">
+<h3 id="org2011eff">Q186: Why is encryption important for volumes?</h3>
+<div class="outline-text-3" id="text-org2011eff">
+<p>
+Because volumes often hold sensitive data such as databases, credentials, or user content.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf65b453" class="outline-3">
+<h3 id="orgf65b453">Q187: What is KMS integration for storage?</h3>
+<div class="outline-text-3" id="text-orgf65b453">
+<p>
+It uses external key management to manage encryption keys for storage.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdf4d7b4" class="outline-3">
+<h3 id="orgdf4d7b4">Q188: What is a storage security boundary?</h3>
+<div class="outline-text-3" id="text-orgdf4d7b4">
+<p>
+It is the trust and isolation boundary around the volume and its access paths.
+</p>
+</div>
+</div>
+<div id="outline-container-org383eff8" class="outline-3">
+<h3 id="org383eff8">Q189: Why does pod security matter for volumes?</h3>
+<div class="outline-text-3" id="text-org383eff8">
+<p>
+Because the container user must be allowed to read and write the data appropriately.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd2a24a1" class="outline-3">
+<h3 id="orgd2a24a1">Q190: What is a data exfiltration risk with volumes?</h3>
+<div class="outline-text-3" id="text-orgd2a24a1">
+<p>
+If volume access is too broad, an attacker may copy data from a compromised workload.
+</p>
+</div>
+</div>
+<div id="outline-container-org5b2830f" class="outline-3">
+<h3 id="org5b2830f">Q191: Why limit PVC access?</h3>
+<div class="outline-text-3" id="text-org5b2830f">
+<p>
+Because broad volume access increases the blast radius of a compromise.
+</p>
+</div>
+</div>
+<div id="outline-container-orgff0b4ed" class="outline-3">
+<h3 id="orgff0b4ed">Q192: What is block storage data consistency?</h3>
+<div class="outline-text-3" id="text-orgff0b4ed">
+<p>
+It means the data is written in a deterministic, recoverable way and can be restored safely.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf4c9f38" class="outline-3">
+<h3 id="orgf4c9f38">Q193: Why are file system semantics important?</h3>
+<div class="outline-text-3" id="text-orgf4c9f38">
+<p>
+Because many apps rely on directories, permissions, and file locking.
+</p>
+</div>
+</div>
+<div id="outline-container-org09445c2" class="outline-3">
+<h3 id="org09445c2">Q194: What is storage latency?</h3>
+<div class="outline-text-3" id="text-org09445c2">
+<p>
+Latency is the delay in getting data from the storage system.
+</p>
+</div>
+</div>
+<div id="outline-container-org6357e44" class="outline-3">
+<h3 id="org6357e44">Q195: Why is latency so important for DBs?</h3>
+<div class="outline-text-3" id="text-org6357e44">
+<p>
+Because databases are highly sensitive to latency and jitter.
+</p>
+</div>
+</div>
+<div id="outline-container-orga0b946f" class="outline-3">
+<h3 id="orga0b946f">Q196: What is a storage performance bottleneck?</h3>
+<div class="outline-text-3" id="text-orga0b946f">
+<p>
+It is when the storage system cannot keep up with the workload’s I/O demand.
+</p>
+</div>
+</div>
+<div id="outline-container-org5aa6d3e" class="outline-3">
+<h3 id="org5aa6d3e">Q197: What is storage throttling?</h3>
+<div class="outline-text-3" id="text-org5aa6d3e">
+<p>
+It is a limit or slowdown imposed by the backend or OS when throughput or IOPS exceeds the allowed amount.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce3610a" class="outline-3">
+<h3 id="orgce3610a">Q198: Why is storage performance tuning important for stateful workloads?</h3>
+<div class="outline-text-3" id="text-orgce3610a">
+<p>
+Because poor performance can cause slow reads, timeouts, and application degradation.
+</p>
+</div>
+</div>
+<div id="outline-container-org6f738fe" class="outline-3">
+<h3 id="org6f738fe">Q199: What is the relationship between volumes and resilience?</h3>
+<div class="outline-text-3" id="text-org6f738fe">
+<p>
+Volumes are the persistence mechanism that enables stateful workloads to survive restarts, node churn, and some failures.
+</p>
+</div>
+</div>
+<div id="outline-container-orgebc2180" class="outline-3">
+<h3 id="orgebc2180">Q200: What is the main lesson of Kubernetes volumes?</h3>
+<div class="outline-text-3" id="text-orgebc2180">
+<p>
+Kubernetes volumes are the bridge between ephemeral containers and durable workload state; they let workloads persist data, share configuration, and maintain available state across pod lifecycle events.
+</p>
+
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

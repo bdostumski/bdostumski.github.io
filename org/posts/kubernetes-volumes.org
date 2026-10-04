@@ -1,0 +1,621 @@
+#+TITLE: Kubernetes Volumes
+#+DATE: 2026-10-20
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Kubernetes Volumes
+
+-----
+
+* Beginner
+
+** Q1: What is a Kubernetes volume?
+A Kubernetes volume is a storage object mounted into a Pod so containers can use persistent or temporary storage.
+
+** Q2: Why do Pods need volumes?
+Pods often need storage for configuration, state, logs, caches, or database data.
+
+** Q3: What is a container filesystem?
+A container filesystem is the read/write root filesystem used by a container process.
+
+** Q4: Why is container filesystem not sufficient for persistent state?
+Because container filesystems are generally ephemeral and tied to the container lifecycle.
+
+** Q5: What is an emptyDir volume?
+An emptyDir volume is created when a pod starts and exists as long as the pod remains alive.
+
+** Q6: Why use emptyDir?
+It is useful for temporary or shared data between containers in the same pod.
+
+** Q7: What is a hostPath volume?
+A hostPath volume mounts a path from the worker node filesystem into the pod.
+
+** Q8: Why is hostPath risky?
+Because it exposes node filesystem content to the pod and can create security or portability problems.
+
+** Q9: What is a ConfigMap volume?
+A ConfigMap volume mounts configuration data from a Kubernetes ConfigMap into files in the pod.
+
+** Q10: What is a Secret volume?
+A Secret volume mounts sensitive data from a Kubernetes Secret into files in the pod.
+
+** Q11: What is a projected volume?
+A projected volume combines multiple config or secret sources into a single mounted directory.
+
+** Q12: Why use projected volumes?
+To mount several sources into one path without more complicated container setup.
+
+** Q13: What is a PersistentVolume?
+A PersistentVolume (PV) is cluster-scoped storage that can be bound to a pod via a claim.
+
+** Q14: What is a PersistentVolumeClaim?
+A PersistentVolumeClaim (PVC) is a request for storage made by a pod or workload.
+
+** Q15: What is the relation between PVC and PV?
+A PVC binds to a compatible PV, which then provides storage to the pod.
+
+** Q16: Why do PVCs matter?
+They abstract the storage backend and make application requests declarative.
+
+** Q17: What is a volume mount?
+A volume mount attaches a volume to a specific path inside a container.
+
+** Q18: What is `mountPath`?
+`mountPath` is the mount point inside the container filesystem.
+
+** Q19: What is a volume name?
+A volume name is the logical name used inside the pod spec for a mounted volume.
+
+** Q20: Why are volume names important?
+Because they connect the volume definition in pod spec to the mount configuration inside the container.
+
+** Q21: What is a StatefulSet?
+A StatefulSet is a workload for stateful applications and often uses persistent volume claims per pod.
+
+** Q22: Why are StatefulSets tied to volumes?
+Because stateful apps often need resilient and stable storage that survives pod restarts.
+
+** Q23: What is a volumeClaimTemplate?
+A volumeClaimTemplate is used by a StatefulSet to dynamically create PVCs for each pod.
+
+** Q24: Why is storage important for databases?
+Databases usually require durable storage for their data and metadata.
+
+** Q25: What is a storage class?
+A StorageClass defines the storage provisioner and rules for dynamic creation of PVs.
+
+** Q26: Why use a StorageClass?
+It allows Kubernetes to dynamically provision storage without manual PV creation.
+
+** Q27: What is dynamic provisioning?
+Dynamic provisioning creates a PV automatically when a PVC is created.
+
+** Q28: What is static provisioning?
+Static provisioning means a cluster admin manually creates a PV before the workload requests it.
+
+** Q29: What is a provisioner?
+A provisioner is the controller or plugin that creates the underlying storage resource.
+
+** Q30: What is CSI?
+CSI (Container Storage Interface) is the standard interface used by Kubernetes storage plugins.
+
+** Q31: Why is CSI important?
+It standardizes how storage systems integrate with Kubernetes.
+
+** Q32: What is a local volume?
+A local volume is backed by storage local to a specific node.
+
+** Q33: Why are local volumes sometimes used?
+Because they can provide low-latency storage for high-performance workloads.
+
+** Q34: What is a network-attached storage volume?
+A network-attached volume is backed by storage reached over the network, often via NFS or block storage.
+
+** Q35: What is cloud block storage?
+Cloud block storage is storage provided by cloud providers as portable block devices.
+
+** Q36: Why do cloud infrastructures use block storage?
+Because many workloads, especially databases, need block semantics and high performance.
+
+** Q37: What is ReadWriteOnce?
+ReadWriteOnce means a volume can be mounted read-write by a single node at a time.
+
+** Q38: What is ReadOnlyMany?
+ReadOnlyMany means many nodes can mount the same volume read-only.
+
+** Q39: What is ReadWriteMany?
+ReadWriteMany means many nodes can mount the same volume with read-write access.
+
+** Q40: Why do access modes matter?
+They define how many nodes can access a storage volume and in what mode.
+
+** Q41: What is a PVC size?
+PVC size specifies the requested storage size, such as 10Gi.
+
+** Q42: What is a PV size?
+The PV size is the actual capacity of the underlying storage resource.
+
+** Q43: Why is capacity important?
+Because workloads need enough space for data, logs, and future growth.
+
+** Q44: What is volume expansion?
+Volume expansion increases a PV or PVC size after the fact.
+
+** Q45: Why do operators care about expansion?
+Because workloads often grow over time and need additional storage.
+
+** Q46: What is backup and restore of Kubernetes volumes?
+It means making copies of the data on a volume and restoring it to another storage object.
+
+** Q47: What is a snapshot?
+A snapshot is a point-in-time copy of a volume.
+
+** Q48: Why are snapshots useful?
+They allow backups, cloning, and recovery of volume contents.
+
+** Q49: What is a clone?
+A clone is a new volume created from an existing snapshot or data set.
+
+** Q50: What is a volume mount path?
+It is the directory inside a container where the volume is attached.
+
+** Q51: Why is `subPath` used?
+A `subPath` mount attaches only a specific subdirectory or file from a volume.
+
+** Q52: Why use `subPath` carefully?
+Because it can be confusing and may not behave as expected if the underlying directory structure changes.
+
+** Q53: What is a volume lifecycle?
+It includes creation, attachment, use, release, and cleanup.
+
+** Q54: Why is lifecycle management important?
+Because volumes can persist beyond the lifetime of individual pods and need careful governance.
+
+** Q55: What is a volume reclaim policy?
+A reclaim policy describes what happens when a PV is released: retain, delete, or recycle.
+
+** Q56: What is Retain?
+Retain preserves the underlying storage after the PV is released.
+
+** Q57: What is Delete?
+Delete deletes the backing storage resource when the PV is released.
+
+** Q58: What is Recycle?
+Recycle is an older behavior that makes the volume reusable, though it is less common in modern Kubernetes.
+
+** Q59: What is a PVC pending state?
+A PVC remains pending until a compatible PV is bound or a provisioner creates one.
+
+** Q60: Why would a PVC be pending?
+Possible reasons include unavailable storage classes, no matching volume, or provisioning delays.
+
+** Q61: What is `volumeMode`?
+`volumeMode` is either Filesystem or Block and defines how the storage is exposed.
+
+** Q62: What is filesystem volume mode?
+It exposes the storage as a filesystem mount point.
+
+** Q63: What is block volume mode?
+It exposes the storage as a raw block device.
+
+** Q64: Why is block mode relevant?
+Some database and storage systems require block access.
+
+** Q65: What is a pod with multiple volumes?
+A pod can mount several volumes at once, such as config, secret, and persistent data.
+
+** Q66: Why mount multiple volumes?
+Because different application parts may need different kinds of data.
+
+** Q67: What is an application state volume?
+A volume that stores long-lived state such as database files or user uploads.
+
+** Q68: What is a cache volume?
+A cache volume stores temporary or reusable data to improve performance.
+
+** Q69: What is a temp volume?
+A temp volume is often used for scratch or transient operations.
+
+** Q70: What is the purpose of volumes for log storage?
+To keep logs accessible even after pod replacement or restart.
+
+** Q71: Why are logs in volumes helpful?
+They support debugging, monitoring, and retention decisions.
+
+** Q72: What is a stateful workload?
+A stateful workload depends on persistent storage and usually stable identity.
+
+** Q73: What is a stateless workload?
+A stateless workload does not rely on persistent local state.
+
+** Q74: Why are stateful app volumes important for reliability?
+Because without persistent storage, data can be lost when the pod moves or restarts.
+
+** Q75: What is an `emptyDir` lifecycle tied to the pod?
+An `emptyDir` is created when a pod starts and removed when the pod is deleted.
+
+** Q76: What is a `hostPath` lifecycle tied to the node?
+A `hostPath` points to a path on the worker host and is not automatically portable.
+
+** Q77: What is a volume for application secrets?
+Used to inject TLS certs, API keys, or other sensitive files into the pod at runtime.
+
+** Q78: What happens if a pod is rescheduled?
+With persistent volumes, the new pod can reattach the same storage if the backend supports it.
+
+** Q79: Why does rescheduling matter?
+Because pods may move between nodes in a cluster for maintenance or load balancing.
+
+** Q80: What is a disk failure?
+A disk failure can make storage unavailable and may affect the whole workload.
+
+** Q81: Why use replicated storage?
+Replicated storage reduces the chance of data loss during node or disk failure.
+
+** Q82: What is a volume read/write speed?
+It measures how quickly the storage can read and write data.
+
+** Q83: Why is storage performance important?
+Slow storage can increase latency and reduce application throughput.
+
+** Q84: What is IOPS?
+IOPS is input/output operations per second, a common performance metric for storage.
+
+** Q85: What is throughput?
+Throughput measures how much data can move per second.
+
+** Q86: Why do databases care about volume performance?
+They often do many random I/O operations and need predictable latency.
+
+** Q87: What is PVC binding?
+PVC binding is the process of associating a claim with a specific PV.
+
+** Q88: What is a volume binding mode?
+A volume binding mode determines when a PVC binds to a volume, such as immediate or wait for first consumer.
+
+** Q89: What is `WaitForFirstConsumer`?
+It delays volume binding until the pod is scheduled to a suitable node.
+
+** Q90: Why is topology-aware binding useful?
+It reduces cross-node or cross-zone storage inefficiency and improves locality.
+
+** Q91: What is a `StorageClass` parameter?
+A StorageClass parameter customizes how the provisioner behaves.
+
+** Q92: What is a custom storage class?
+A custom storage class defines a specific backend or storage profile.
+
+** Q93: Why create separate storage classes?
+For different classes of workloads, such as fast SSD storage and slower cheap storage.
+
+** Q94: What are examples of storage backends?
+NFS, Ceph, OpenEBS, EBS, Azure Disk, GCP PD, or SAN-based storage.
+
+** Q95: Why is storage backend choice important?
+It affects performance, durability, cost, and operational complexity.
+
+** Q96: What is an external storage controller?
+It manages the storage system behind Kubernetes.
+
+** Q97: What is a CSI driver?
+A CSI driver implements the storage operations that Kubernetes uses.
+
+** Q98: What is a storage driver plugin?
+It is the implementation of volume operations for a specific backend.
+
+** Q99: What is a data volume or app volume?
+It is a volume used to store the main application state.
+
+** Q100: What is a Kubernetes Volume object vs a PVC?
+A Volume is a pod-level mount definition; a PVC is the declarative request to bind to a persistent backend.
+
+* Intermediate
+
+** Q101: What is an `emptyDir` for shared cache?
+It is often used for data shared between containers in the same pod.
+
+** Q102: What is a sidecar container and shared volume?
+A sidecar may read or write a shared volume for logs, temporary files, or configuration.
+
+** Q103: What is a pod-level shared filesystem?
+A pod-level shared filesystem can be created with `emptyDir` or other shared mounts.
+
+** Q104: What is a volume mount in a Deployment?
+A deployment’s pod template can include volume definitions and mounts.
+
+** Q105: Why is a ConfigMap volume read-only?
+It is usually mounted read-only to prevent accidental modification of config.
+
+** Q106: Why are secret volumes often read-only?
+Because they contain sensitive values and should not be modified by the application.
+
+** Q107: What is a `secret` source in a pod?
+A `secret` volume source references a Kubernetes Secret object.
+
+** Q108: Why are secrets mounted as files?
+Because some software expects them as files rather than environment variables.
+
+** Q109: What is a `configMap` source in a pod?
+It references a ConfigMap and exposes it as files or keys.
+
+** Q110: What is a projection volume?
+It can combine multiple config or secret sources into a single mounted directory.
+
+** Q111: What is a `subPath` mount for a single file?
+It allows only one file from a volume to be mounted into a container.
+
+** Q112: Why is file permission control important on mounted volumes?
+Because the app must read and write with the correct user and group.
+
+** Q113: What is ownership mismatch on mounted volume?
+It happens when the volume files are owned by a different UID/GID than the container runtime user.
+
+** Q114: Why does volume ownership matter?
+It affects read/write access and application startup behavior.
+
+** Q115: What is a storage mount permission issue?
+It occurs when the mounted path does not have the necessary permissions for the application.
+
+** Q116: Why do database services often require `fsGroup`?
+`fsGroup` can enable group ownership on mounted volumes so the app can write to them.
+
+** Q117: What is `fsGroup`?
+It is a pod security feature that sets a supplemental group for mounted volumes.
+
+** Q118: Why use `fsGroup` for volumes?
+To ensure the application user can read or write the volume data.
+
+** Q119: What is a volume snapshot in Kubernetes?
+A snapshot is a point-in-time storage image created from a persistent volume.
+
+** Q120: Why are snapshots used for backup?
+They allow quick recovery of a point-in-time state.
+
+** Q121: What is a volume backup plan?
+It includes snapshotting, retention, verification, and restore testing.
+
+** Q122: What is a PVC restore process?
+It recreates a volume or claim and copies the backup or snapshot back into it.
+
+** Q123: What is a storage policy?
+It defines the way storage is provisioned, retained, and recovered.
+
+** Q124: What is a persistent data plan?
+It is the strategy for ensuring important data outlives ephemeral pods and nodes.
+
+** Q125: What is the effect of deleting a pod on a PVC?
+The pod can be deleted without necessarily deleting the PVC or the data behind it.
+
+** Q126: Why is this important for workloads?
+It allows pods to be recreated and reattached to the same persistent data.
+
+** Q127: What is a pod restart vs PVC deletion?
+A pod restart keeps the storage. PVC deletion may release or delete the data depending on reclaim policy.
+
+** Q128: Why is reclaim policy important?
+Because it determines whether underlying storage remains for future use or is deleted.
+
+** Q129: What is a `Retain` reclaim policy?
+It keeps the data and backing volume around after the claim is released.
+
+** Q130: What is a `Delete` reclaim policy?
+It deletes the underlying storage resource when the PVC is deleted.
+
+** Q131: Why do high-value volumes often use Retain?
+Because it reduces risk of accidental data destruction during cleanup.
+
+** Q132: What is a stale volume?
+A stale volume is one no longer actively used but still present and maybe still storing data.
+
+** Q133: Why prune stale volumes?
+Because they consume resources and can create confusion or security issues.
+
+** Q134: What is a storage leak?
+It occurs when volumes accumulate because they are not cleaned up or not reclaimed properly.
+
+** Q135: Why is object storage not the same as Kubernetes volumes?
+Object stores have different semantics and are often used for different data patterns, not the same as pod-attached block filesystems.
+
+** Q136: What is a `filesystem` volume mode?
+It presents storage as a mounted directory with a standard filesystem.
+
+** Q137: What is a `block` volume mode?
+It presents storage as a raw device that is treated as a block.
+
+** Q138: Why use block mode for databases?
+Because some database backends prefer raw block devices or direct block semantics.
+
+** Q139: What is a high-IOPS workload?
+Workloads such as databases or search indexes that need frequent random I/O.
+
+** Q140: Why use SSD-backed volumes for databases?
+Because they deliver lower latency and higher throughput.
+
+** Q141: What is a local SSD volume?
+A local SSD or NVMe device is directly attached to a node and may have lower latency.
+
+** Q142: Why do local volumes need extra planning?
+Because failures or node maintenance can affect data availability.
+
+** Q143: What is multi-zone storage?
+Storage that spans or replicates across zones for resilience.
+
+** Q144: Why do multi-zone volumes reduce risk?
+Because a zone failure does not necessarily lose the data.
+
+** Q145: What is a topology constraint for volume placement?
+It restricts where the pod and storage can be scheduled so they remain compatible.
+
+** Q146: Why is storage topology important in cloud clusters?
+Because cloud volumes are often tied to a region or zone.
+
+** Q147: What is `WaitForFirstConsumer` binding mode?
+It delays binding until a pod is scheduled to a node, which helps choose the right storage topology.
+
+** Q148: What is a node affinity constraint with volumes?
+It ensures the pod is placed on a specific node or zone capable of accessing the volume.
+
+** Q149: Why is volume placement critical for stateful workloads?
+Because they need storage close to the node running the workload.
+
+** Q150: What is a distributed stateful application?
+An application where state is replicated or sharded across multiple pods, often requiring complex storage design.
+
+** Q151: What is a replicated database pattern?
+It uses multiple pods or nodes with consistent storage or replication strategy.
+
+** Q152: Why is duplicated storage data important?
+It protects against node or disk loss and increases resilience.
+
+** Q153: What are examples of stateful workloads in Kubernetes?
+Databases, message queues, caches, search engines, and content management data stores.
+
+** Q154: Why do stateful workloads often use StatefulSets with PVCs?
+Because they need stable identity and persistent data.
+
+** Q155: What is a PVC per pod pattern?
+It means each StatefulSet pod gets its own volume or claim.
+
+** Q156: Why do stateful sets use `volumeClaimTemplates`?
+To automatically create a PVC per pod and maintain stable volume identity.
+
+** Q157: Why is storage planning a key part of cluster design?
+Because data retention and recovery depend on storage strategy and quorum.
+
+** Q158: What is backup verification?
+It ensures the backup or snapshot is valid and restorable.
+
+** Q159: What is a restore test?
+A restore test verifies a backup can successfully recover an application or dataset.
+
+** Q160: Why is restore testing critical?
+Because untested backups do not provide real protection.
+
+** Q161: What is a storage failure model?
+It describes how the system behaves when disks, nodes, or storage controllers fail.
+
+** Q162: Why is storage failure modeling important?
+Because stateful workloads need resilient storage planning.
+
+** Q163: Why do volumes affect dependency chains?
+Because app services often depend on a volume and may fail if the volume is missing or inaccessible.
+
+** Q164: What is a volume mount issue in a pod spec?
+It can appear as errors like "No such file or directory" or "permission denied".
+
+** Q165: Why do volume issues often appear as application startup failures?
+Because the app cannot access data at the expected path.
+
+** Q166: Why is Kubernetes volume design important for ops?
+Because storage issues are often among the hardest to debug and the costliest to fix.
+
+** Q167: What is a read-only volume?
+A read-only volume is mounted without write access.
+
+** Q168: Why limit writes for config and certificates?
+Because those data sources should not be modified at runtime by the application.
+
+** Q169: What is a mount for generated files?
+It allows an app to write dynamic files but to a persistent location.
+
+** Q170: Why can mounted config and secret volumes be used independently?
+Because they isolate config from persistent application state.
+
+** Q171: What is ephemeral vs persistent in volume design?
+Ephemeral volumes are local to pod lifetime; persistent volumes survive beyond the pod.
+
+** Q172: Why is stateful storage often decoupled from app code?
+Because storage should be managed as infrastructure rather than embedded in the image.
+
+** Q173: What is the role of storage in reliability engineering?
+It helps ensure data survives failures and can be recovered and restored.
+
+** Q174: What is restoring a stateful app from volume backup?
+It recreates the app and reattaches the volume to resume with prior content.
+
+** Q175: What is a volume lifecycle policy?
+It defines retention, backup, and cleanup decisions for storage.
+
+** Q176: Why is capacity planning related to volumes?
+Because storage must match workload needs and future growth.
+
+** Q177: What is a persistent storage audit?
+It checks whether volumes are still needed, correctly provisioned, backed up, and secure.
+
+** Q178: Why do teams need storage ownership policies?
+Because different teams may use different storage classes or workloads.
+
+** Q179: What is a `StorageClass` default behavior?
+It may automatically provision volumes when a PVC omits a class.
+
+** Q180: What is the key concept behind Kubernetes volumes?
+Persistent storage in Kubernetes is abstracted from the application via PVCs and volumes, allowing workloads to read and write data safely across pod lifecycles.
+
+* Advanced / Expert
+
+** Q181: What is CSI snapshotting?
+It is the CSI standard way to create volume snapshots for backup and restore.
+
+** Q182: Why is snapshot support important?
+Because it provides reliable restore capabilities for stateful workloads.
+
+** Q183: What is a volume clone from snapshot?
+It creates a new volume from the snapshot’s contents.
+
+** Q184: Why are snapshots often used in disaster recovery?
+Because they are simple, fast copies of data at a point in time.
+
+** Q185: What is storage encryption at rest?
+It encrypts data stored on the backing disk to protect it from unauthorized access.
+
+** Q186: Why is encryption important for volumes?
+Because volumes often hold sensitive data such as databases, credentials, or user content.
+
+** Q187: What is KMS integration for storage?
+It uses external key management to manage encryption keys for storage.
+
+** Q188: What is a storage security boundary?
+It is the trust and isolation boundary around the volume and its access paths.
+
+** Q189: Why does pod security matter for volumes?
+Because the container user must be allowed to read and write the data appropriately.
+
+** Q190: What is a data exfiltration risk with volumes?
+If volume access is too broad, an attacker may copy data from a compromised workload.
+
+** Q191: Why limit PVC access?
+Because broad volume access increases the blast radius of a compromise.
+
+** Q192: What is block storage data consistency?
+It means the data is written in a deterministic, recoverable way and can be restored safely.
+
+** Q193: Why are file system semantics important?
+Because many apps rely on directories, permissions, and file locking.
+
+** Q194: What is storage latency?
+Latency is the delay in getting data from the storage system.
+
+** Q195: Why is latency so important for DBs?
+Because databases are highly sensitive to latency and jitter.
+
+** Q196: What is a storage performance bottleneck?
+It is when the storage system cannot keep up with the workload’s I/O demand.
+
+** Q197: What is storage throttling?
+It is a limit or slowdown imposed by the backend or OS when throughput or IOPS exceeds the allowed amount.
+
+** Q198: Why is storage performance tuning important for stateful workloads?
+Because poor performance can cause slow reads, timeouts, and application degradation.
+
+** Q199: What is the relationship between volumes and resilience?
+Volumes are the persistence mechanism that enables stateful workloads to survive restarts, node churn, and some failures.
+
+** Q200: What is the main lesson of Kubernetes volumes?
+Kubernetes volumes are the bridge between ephemeral containers and durable workload state; they let workloads persist data, share configuration, and maintain available state across pod lifecycle events.
+
+-----
+
+#+INCLUDE: "../footer.org"
