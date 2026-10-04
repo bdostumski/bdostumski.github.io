@@ -22,1505 +22,1505 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org0989cdc" class="outline-2">
-<h2 id="org0989cdc">Docker Multi-Stage Builds</h2>
-<div class="outline-text-2" id="text-org0989cdc">
+<div id="outline-container-orgae12da7" class="outline-2">
+<h2 id="orgae12da7">Docker Multi-Stage Builds</h2>
+<div class="outline-text-2" id="text-orgae12da7">
 <hr>
 </div>
 </div>
-<div id="outline-container-org28c81cd" class="outline-2">
-<h2 id="org28c81cd">Beginner</h2>
-<div class="outline-text-2" id="text-org28c81cd">
+<div id="outline-container-org9a6d23b" class="outline-2">
+<h2 id="org9a6d23b">Beginner</h2>
+<div class="outline-text-2" id="text-org9a6d23b">
 </div>
-<div id="outline-container-org20c0a60" class="outline-3">
-<h3 id="org20c0a60">Q1: What is a Docker multi-stage build?</h3>
-<div class="outline-text-3" id="text-org20c0a60">
+<div id="outline-container-org22ce033" class="outline-3">
+<h3 id="org22ce033">Q1: What is a Docker multi-stage build?</h3>
+<div class="outline-text-3" id="text-org22ce033">
 <p>
 A Docker multi-stage build uses multiple <code>FROM</code> instructions in a single Dockerfile to build artifacts in one stage and copy only the needed result into a smaller final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org9eefbf0" class="outline-3">
-<h3 id="org9eefbf0">Q2: Why do we need multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org9eefbf0">
+<div id="outline-container-orgaac94e4" class="outline-3">
+<h3 id="orgaac94e4">Q2: Why do we need multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgaac94e4">
 <p>
 They reduce image size, improve security, and keep build tooling out of the final runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-org3ab50c1" class="outline-3">
-<h3 id="org3ab50c1">Q3: What is a Dockerfile?</h3>
-<div class="outline-text-3" id="text-org3ab50c1">
+<div id="outline-container-org0344873" class="outline-3">
+<h3 id="org0344873">Q3: What is a Dockerfile?</h3>
+<div class="outline-text-3" id="text-org0344873">
 <p>
 A Dockerfile is a text file that defines how an image is built.
 </p>
 </div>
 </div>
-<div id="outline-container-orga413e1d" class="outline-3">
-<h3 id="orga413e1d">Q4: What is a build stage?</h3>
-<div class="outline-text-3" id="text-orga413e1d">
+<div id="outline-container-org5ad8a63" class="outline-3">
+<h3 id="org5ad8a63">Q4: What is a build stage?</h3>
+<div class="outline-text-3" id="text-org5ad8a63">
 <p>
 A build stage is a section of the Dockerfile starting with a <code>FROM</code> instruction.
 </p>
 </div>
 </div>
-<div id="outline-container-org876fbd6" class="outline-3">
-<h3 id="org876fbd6">Q5: What is a final stage?</h3>
-<div class="outline-text-3" id="text-org876fbd6">
+<div id="outline-container-orgc671f91" class="outline-3">
+<h3 id="orgc671f91">Q5: What is a final stage?</h3>
+<div class="outline-text-3" id="text-orgc671f91">
 <p>
 The final stage is the last stage in the Dockerfile and is the image that gets produced as the final artifact.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e46626" class="outline-3">
-<h3 id="org6e46626">Q6: What is the purpose of a build stage?</h3>
-<div class="outline-text-3" id="text-org6e46626">
+<div id="outline-container-orgbda2513" class="outline-3">
+<h3 id="orgbda2513">Q6: What is the purpose of a build stage?</h3>
+<div class="outline-text-3" id="text-orgbda2513">
 <p>
 A build stage can compile code, install dependencies, or generate artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org4dd59f2" class="outline-3">
-<h3 id="org4dd59f2">Q7: What is a runtime image?</h3>
-<div class="outline-text-3" id="text-org4dd59f2">
+<div id="outline-container-orgf0d43b8" class="outline-3">
+<h3 id="orgf0d43b8">Q7: What is a runtime image?</h3>
+<div class="outline-text-3" id="text-orgf0d43b8">
 <p>
 A runtime image is the final image used to run the application in production or development.
 </p>
 </div>
 </div>
-<div id="outline-container-org98a5a7c" class="outline-3">
-<h3 id="org98a5a7c">Q8: What is the main benefit of multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org98a5a7c">
+<div id="outline-container-org2796906" class="outline-3">
+<h3 id="org2796906">Q8: What is the main benefit of multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org2796906">
 <p>
 They allow builders and compilers to remain in earlier stages while the final image stays lean.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe782f6" class="outline-3">
-<h3 id="orgbe782f6">Q9: What does <code>COPY --from=...</code> do?</h3>
-<div class="outline-text-3" id="text-orgbe782f6">
+<div id="outline-container-orga05d689" class="outline-3">
+<h3 id="orga05d689">Q9: What does <code>COPY --from=...</code> do?</h3>
+<div class="outline-text-3" id="text-orga05d689">
 <p>
 It copies files from one stage into another stage in a multi-stage Dockerfile.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e6481b" class="outline-3">
-<h3 id="org5e6481b">Q10: What is image layering?</h3>
-<div class="outline-text-3" id="text-org5e6481b">
+<div id="outline-container-orge00426c" class="outline-3">
+<h3 id="orge00426c">Q10: What is image layering?</h3>
+<div class="outline-text-3" id="text-orge00426c">
 <p>
 Image layering is how Docker composes read-only filesystem layers to build an image.
 </p>
 </div>
 </div>
-<div id="outline-container-org18f46fe" class="outline-3">
-<h3 id="org18f46fe">Q11: Why is the final image usually smaller with multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org18f46fe">
+<div id="outline-container-orga08f8a5" class="outline-3">
+<h3 id="orga08f8a5">Q11: Why is the final image usually smaller with multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orga08f8a5">
 <p>
 Because only necessary files are copied from the build stage into the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdb75327" class="outline-3">
-<h3 id="orgdb75327">Q12: What is a build dependency?</h3>
-<div class="outline-text-3" id="text-orgdb75327">
+<div id="outline-container-orgec0478b" class="outline-3">
+<h3 id="orgec0478b">Q12: What is a build dependency?</h3>
+<div class="outline-text-3" id="text-orgec0478b">
 <p>
 A build dependency is a tool or package required only while compiling or packaging the application.
 </p>
 </div>
 </div>
-<div id="outline-container-org9077cc1" class="outline-3">
-<h3 id="org9077cc1">Q13: What is a runtime dependency?</h3>
-<div class="outline-text-3" id="text-org9077cc1">
+<div id="outline-container-org81dc94f" class="outline-3">
+<h3 id="org81dc94f">Q13: What is a runtime dependency?</h3>
+<div class="outline-text-3" id="text-org81dc94f">
 <p>
 A runtime dependency is a library or package needed when the application actually runs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb1df401" class="outline-3">
-<h3 id="orgb1df401">Q14: What is a compiled artifact?</h3>
-<div class="outline-text-3" id="text-orgb1df401">
+<div id="outline-container-org48c8771" class="outline-3">
+<h3 id="org48c8771">Q14: What is a compiled artifact?</h3>
+<div class="outline-text-3" id="text-org48c8771">
 <p>
 A compiled artifact is the output of the build step, such as a binary, JAR, WAR, or static files.
 </p>
 </div>
 </div>
-<div id="outline-container-orga43c356" class="outline-3">
-<h3 id="orga43c356">Q15: Why do compiled artifacts matter?</h3>
-<div class="outline-text-3" id="text-orga43c356">
+<div id="outline-container-org6ba2c35" class="outline-3">
+<h3 id="org6ba2c35">Q15: Why do compiled artifacts matter?</h3>
+<div class="outline-text-3" id="text-org6ba2c35">
 <p>
 They are usually the only things needed in the final runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-org08ae1f6" class="outline-3">
-<h3 id="org08ae1f6">Q16: What is a builder image?</h3>
-<div class="outline-text-3" id="text-org08ae1f6">
+<div id="outline-container-org5ca275c" class="outline-3">
+<h3 id="org5ca275c">Q16: What is a builder image?</h3>
+<div class="outline-text-3" id="text-org5ca275c">
 <p>
 A builder image contains the toolchain required to compile the project.
 </p>
 </div>
 </div>
-<div id="outline-container-org8f0b735" class="outline-3">
-<h3 id="org8f0b735">Q17: What is a distroless image?</h3>
-<div class="outline-text-3" id="text-org8f0b735">
+<div id="outline-container-org3737b1d" class="outline-3">
+<h3 id="org3737b1d">Q17: What is a distroless image?</h3>
+<div class="outline-text-3" id="text-org3737b1d">
 <p>
 A distroless image contains only the runtime dependencies and not a package manager or shell.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4857cb" class="outline-3">
-<h3 id="orgd4857cb">Q18: Why do developers like distroless images?</h3>
-<div class="outline-text-3" id="text-orgd4857cb">
+<div id="outline-container-org4de57d7" class="outline-3">
+<h3 id="org4de57d7">Q18: Why do developers like distroless images?</h3>
+<div class="outline-text-3" id="text-org4de57d7">
 <p>
 They reduce attack surface and image size.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd0e86ef" class="outline-3">
-<h3 id="orgd0e86ef">Q19: What is a base image?</h3>
-<div class="outline-text-3" id="text-orgd0e86ef">
+<div id="outline-container-org921f3d2" class="outline-3">
+<h3 id="org921f3d2">Q19: What is a base image?</h3>
+<div class="outline-text-3" id="text-org921f3d2">
 <p>
 A base image is the starting point for a Docker image build.
 </p>
 </div>
 </div>
-<div id="outline-container-orga9c76b7" class="outline-3">
-<h3 id="orga9c76b7">Q20: What is a final image after multi-stage build?</h3>
-<div class="outline-text-3" id="text-orga9c76b7">
+<div id="outline-container-org30b63fa" class="outline-3">
+<h3 id="org30b63fa">Q20: What is a final image after multi-stage build?</h3>
+<div class="outline-text-3" id="text-org30b63fa">
 <p>
 It is the image produced by the last stage and served to runtime workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f73d49" class="outline-3">
-<h3 id="org3f73d49">Q21: Why remove build tools from runtime images?</h3>
-<div class="outline-text-3" id="text-org3f73d49">
+<div id="outline-container-orgdd0f0a4" class="outline-3">
+<h3 id="orgdd0f0a4">Q21: Why remove build tools from runtime images?</h3>
+<div class="outline-text-3" id="text-orgdd0f0a4">
 <p>
 To reduce attack surface and avoid unnecessary package installation.
 </p>
 </div>
 </div>
-<div id="outline-container-org2cb5ead" class="outline-3">
-<h3 id="org2cb5ead">Q22: What is the typical pattern in a multi-stage Dockerfile?</h3>
-<div class="outline-text-3" id="text-org2cb5ead">
+<div id="outline-container-org813bb19" class="outline-3">
+<h3 id="org813bb19">Q22: What is the typical pattern in a multi-stage Dockerfile?</h3>
+<div class="outline-text-3" id="text-org813bb19">
 <p>
 Build in one stage, then copy results into a smaller runtime stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b5b36e" class="outline-3">
-<h3 id="org9b5b36e">Q23: What is a common cross-compilation scenario?</h3>
-<div class="outline-text-3" id="text-org9b5b36e">
+<div id="outline-container-org888ad52" class="outline-3">
+<h3 id="org888ad52">Q23: What is a common cross-compilation scenario?</h3>
+<div class="outline-text-3" id="text-org888ad52">
 <p>
 Using a build image with the full toolchain to compile for a target environment and then shipping a minimal runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc01fb85" class="outline-3">
-<h3 id="orgc01fb85">Q24: What is a Docker stage name?</h3>
-<div class="outline-text-3" id="text-orgc01fb85">
+<div id="outline-container-org1a9026e" class="outline-3">
+<h3 id="org1a9026e">Q24: What is a Docker stage name?</h3>
+<div class="outline-text-3" id="text-org1a9026e">
 <p>
 A Docker stage can be assigned a name using <code>AS stage_name</code> to make copying easier.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d5f063" class="outline-3">
-<h3 id="org0d5f063">Q25: What is the role of <code>AS</code> in Dockerfile?</h3>
-<div class="outline-text-3" id="text-org0d5f063">
+<div id="outline-container-orgbe7a964" class="outline-3">
+<h3 id="orgbe7a964">Q25: What is the role of <code>AS</code> in Dockerfile?</h3>
+<div class="outline-text-3" id="text-orgbe7a964">
 <p>
 <code>AS</code> assigns a name to a stage so it can be referenced later with <code>COPY --from=stage_name</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org795a667" class="outline-3">
-<h3 id="org795a667">Q26: What is a stage dependency?</h3>
-<div class="outline-text-3" id="text-org795a667">
+<div id="outline-container-org56666dc" class="outline-3">
+<h3 id="org56666dc">Q26: What is a stage dependency?</h3>
+<div class="outline-text-3" id="text-org56666dc">
 <p>
 A stage dependency is when one stage depends on artifacts produced by another stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org052ba27" class="outline-3">
-<h3 id="org052ba27">Q27: What is a compile-only dependency?</h3>
-<div class="outline-text-3" id="text-org052ba27">
+<div id="outline-container-org8e0bbe5" class="outline-3">
+<h3 id="org8e0bbe5">Q27: What is a compile-only dependency?</h3>
+<div class="outline-text-3" id="text-org8e0bbe5">
 <p>
 A dependency required for compilation but not needed at runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-orge32fc74" class="outline-3">
-<h3 id="orge32fc74">Q28: What is a package manager in build stages?</h3>
-<div class="outline-text-3" id="text-orge32fc74">
+<div id="outline-container-orgd3d7c79" class="outline-3">
+<h3 id="orgd3d7c79">Q28: What is a package manager in build stages?</h3>
+<div class="outline-text-3" id="text-orgd3d7c79">
 <p>
 A package manager such as apt, apk, yum, npm, or Maven is often used during compilation.
 </p>
 </div>
 </div>
-<div id="outline-container-org70d2634" class="outline-3">
-<h3 id="org70d2634">Q29: What is a package manager in runtime stage?</h3>
-<div class="outline-text-3" id="text-org70d2634">
+<div id="outline-container-orgcaadf36" class="outline-3">
+<h3 id="orgcaadf36">Q29: What is a package manager in runtime stage?</h3>
+<div class="outline-text-3" id="text-orgcaadf36">
 <p>
 Sometimes runtime stage is minimal and may not include package managers at all.
 </p>
 </div>
 </div>
-<div id="outline-container-org4f02700" class="outline-3">
-<h3 id="org4f02700">Q30: Why not include build tools in final image?</h3>
-<div class="outline-text-3" id="text-org4f02700">
+<div id="outline-container-org136ba0a" class="outline-3">
+<h3 id="org136ba0a">Q30: Why not include build tools in final image?</h3>
+<div class="outline-text-3" id="text-org136ba0a">
 <p>
 Because they increase image size and can expose vulnerabilities.
 </p>
 </div>
 </div>
-<div id="outline-container-org56388be" class="outline-3">
-<h3 id="org56388be">Q31: What is a minimal runtime image?</h3>
-<div class="outline-text-3" id="text-org56388be">
+<div id="outline-container-orgdc516bf" class="outline-3">
+<h3 id="orgdc516bf">Q31: What is a minimal runtime image?</h3>
+<div class="outline-text-3" id="text-orgdc516bf">
 <p>
 A minimal runtime image includes only what the app needs to run.
 </p>
 </div>
 </div>
-<div id="outline-container-org181a1a8" class="outline-3">
-<h3 id="org181a1a8">Q32: What is a JAR-based Java project multi-stage build?</h3>
-<div class="outline-text-3" id="text-org181a1a8">
+<div id="outline-container-org169610f" class="outline-3">
+<h3 id="org169610f">Q32: What is a JAR-based Java project multi-stage build?</h3>
+<div class="outline-text-3" id="text-org169610f">
 <p>
 It often uses a JDK builder stage and a slim JRE final stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org381c7bc" class="outline-3">
-<h3 id="org381c7bc">Q33: What is a Go multi-stage build?</h3>
-<div class="outline-text-3" id="text-org381c7bc">
+<div id="outline-container-org302c0ec" class="outline-3">
+<h3 id="org302c0ec">Q33: What is a Go multi-stage build?</h3>
+<div class="outline-text-3" id="text-org302c0ec">
 <p>
 It often compiles Go code in a Go builder stage and ships a minimal final binary image.
 </p>
 </div>
 </div>
-<div id="outline-container-org7d856bc" class="outline-3">
-<h3 id="org7d856bc">Q34: What is a Node.js multi-stage build?</h3>
-<div class="outline-text-3" id="text-org7d856bc">
+<div id="outline-container-org00cf7fd" class="outline-3">
+<h3 id="org00cf7fd">Q34: What is a Node.js multi-stage build?</h3>
+<div class="outline-text-3" id="text-org00cf7fd">
 <p>
 It often compiles or installs dependencies in a node builder stage and ships a minimal runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d0e870" class="outline-3">
-<h3 id="org0d0e870">Q35: What is a static web app multi-stage build?</h3>
-<div class="outline-text-3" id="text-org0d0e870">
+<div id="outline-container-org401428d" class="outline-3">
+<h3 id="org401428d">Q35: What is a static web app multi-stage build?</h3>
+<div class="outline-text-3" id="text-org401428d">
 <p>
 It often uses a Node or Nginx builder stage to generate static assets and then copies them into a smaller runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc79b1e4" class="outline-3">
-<h3 id="orgc79b1e4">Q36: What is an application artifact path?</h3>
-<div class="outline-text-3" id="text-orgc79b1e4">
+<div id="outline-container-orgaaf3803" class="outline-3">
+<h3 id="orgaaf3803">Q36: What is an application artifact path?</h3>
+<div class="outline-text-3" id="text-orgaaf3803">
 <p>
 An artifact path is the directory inside the build stage where compiled or packaged outputs are stored.
 </p>
 </div>
 </div>
-<div id="outline-container-org3a41f85" class="outline-3">
-<h3 id="org3a41f85">Q37: What is a Docker build context?</h3>
-<div class="outline-text-3" id="text-org3a41f85">
+<div id="outline-container-orgdf0caf0" class="outline-3">
+<h3 id="orgdf0caf0">Q37: What is a Docker build context?</h3>
+<div class="outline-text-3" id="text-orgdf0caf0">
 <p>
 The build context is the filesystem sent to the Docker daemon to build the image.
 </p>
 </div>
 </div>
-<div id="outline-container-org98d0a30" class="outline-3">
-<h3 id="org98d0a30">Q38: What is the role of <code>COPY</code> in multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org98d0a30">
+<div id="outline-container-orgdf6224f" class="outline-3">
+<h3 id="orgdf6224f">Q38: What is the role of <code>COPY</code> in multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgdf6224f">
 <p>
 <code>COPY</code> moves files between the build context and stages and between stages themselves.
 </p>
 </div>
 </div>
-<div id="outline-container-org1341722" class="outline-3">
-<h3 id="org1341722">Q39: What is a final stage based on a slim base?</h3>
-<div class="outline-text-3" id="text-org1341722">
+<div id="outline-container-orgdf799fd" class="outline-3">
+<h3 id="orgdf799fd">Q39: What is a final stage based on a slim base?</h3>
+<div class="outline-text-3" id="text-orgdf799fd">
 <p>
 A final stage often uses a slim OS like alpine, debian-slim, or distroless.
 </p>
 </div>
 </div>
-<div id="outline-container-org43fd51a" class="outline-3">
-<h3 id="org43fd51a">Q40: What is a security hardening step?</h3>
-<div class="outline-text-3" id="text-org43fd51a">
+<div id="outline-container-orgce445bd" class="outline-3">
+<h3 id="orgce445bd">Q40: What is a security hardening step?</h3>
+<div class="outline-text-3" id="text-orgce445bd">
 <p>
 It reduces attack surface by removing shells, package managers, and unnecessary libraries from the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b4831d" class="outline-3">
-<h3 id="org6b4831d">Q41: What is a shell-less image?</h3>
-<div class="outline-text-3" id="text-org6b4831d">
+<div id="outline-container-orgb48a4fe" class="outline-3">
+<h3 id="orgb48a4fe">Q41: What is a shell-less image?</h3>
+<div class="outline-text-3" id="text-orgb48a4fe">
 <p>
 A shell-less image contains no shell binary, making debugging harder but reducing attack surface.
 </p>
 </div>
 </div>
-<div id="outline-container-org2db51c5" class="outline-3">
-<h3 id="org2db51c5">Q42: Why remove shell from a final image?</h3>
-<div class="outline-text-3" id="text-org2db51c5">
+<div id="outline-container-orgfe3f08e" class="outline-3">
+<h3 id="orgfe3f08e">Q42: Why remove shell from a final image?</h3>
+<div class="outline-text-3" id="text-orgfe3f08e">
 <p>
 The shell is not needed in many production images and can be exploited if present.
 </p>
 </div>
 </div>
-<div id="outline-container-org453d78d" class="outline-3">
-<h3 id="org453d78d">Q43: What is the difference between build and runtime stage?</h3>
-<div class="outline-text-3" id="text-org453d78d">
+<div id="outline-container-org82bdbbb" class="outline-3">
+<h3 id="org82bdbbb">Q43: What is the difference between build and runtime stage?</h3>
+<div class="outline-text-3" id="text-org82bdbbb">
 <p>
 The build stage creates output, while the runtime stage executes and serves the application.
 </p>
 </div>
 </div>
-<div id="outline-container-org9057423" class="outline-3">
-<h3 id="org9057423">Q44: What are common build tools that stay in build stage?</h3>
-<div class="outline-text-3" id="text-org9057423">
+<div id="outline-container-org1ad017b" class="outline-3">
+<h3 id="org1ad017b">Q44: What are common build tools that stay in build stage?</h3>
+<div class="outline-text-3" id="text-org1ad017b">
 <p>
 Examples include Maven, Gradle, npm, gcc, make, and other compilers.
 </p>
 </div>
 </div>
-<div id="outline-container-org8de0df5" class="outline-3">
-<h3 id="org8de0df5">Q45: What is a final binary image?</h3>
-<div class="outline-text-3" id="text-org8de0df5">
+<div id="outline-container-orgca97514" class="outline-3">
+<h3 id="orgca97514">Q45: What is a final binary image?</h3>
+<div class="outline-text-3" id="text-orgca97514">
 <p>
 A final binary image contains only the compiled binary and minimal runtime dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org4aa7151" class="outline-3">
-<h3 id="org4aa7151">Q46: What is an entrypoint in Docker?</h3>
-<div class="outline-text-3" id="text-org4aa7151">
+<div id="outline-container-org547a374" class="outline-3">
+<h3 id="org547a374">Q46: What is an entrypoint in Docker?</h3>
+<div class="outline-text-3" id="text-org547a374">
 <p>
 An entrypoint defines the command executed when the container starts.
 </p>
 </div>
 </div>
-<div id="outline-container-org06f2ed6" class="outline-3">
-<h3 id="org06f2ed6">Q47: What is CMD?</h3>
-<div class="outline-text-3" id="text-org06f2ed6">
+<div id="outline-container-org16e4c49" class="outline-3">
+<h3 id="org16e4c49">Q47: What is CMD?</h3>
+<div class="outline-text-3" id="text-org16e4c49">
 <p>
 CMD defines default arguments to the entrypoint or the main command when the container starts.
 </p>
 </div>
 </div>
-<div id="outline-container-org9189fd6" class="outline-3">
-<h3 id="org9189fd6">Q48: Why does entrypoint matter in multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org9189fd6">
+<div id="outline-container-org79e1b26" class="outline-3">
+<h3 id="org79e1b26">Q48: Why does entrypoint matter in multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org79e1b26">
 <p>
 Because the final image might need a runtime command that uses the copied artifact.
 </p>
 </div>
 </div>
-<div id="outline-container-org050c1cb" class="outline-3">
-<h3 id="org050c1cb">Q49: What is a minimal runtime base for Go?</h3>
-<div class="outline-text-3" id="text-org050c1cb">
+<div id="outline-container-orgec5b58c" class="outline-3">
+<h3 id="orgec5b58c">Q49: What is a minimal runtime base for Go?</h3>
+<div class="outline-text-3" id="text-orgec5b58c">
 <p>
 A Go final stage may use a scratch image or a tiny alpine image with the compiled binary.
 </p>
 </div>
 </div>
-<div id="outline-container-orge28364e" class="outline-3">
-<h3 id="orge28364e">Q50: Why is scratch used?</h3>
-<div class="outline-text-3" id="text-orge28364e">
+<div id="outline-container-org2978543" class="outline-3">
+<h3 id="org2978543">Q50: Why is scratch used?</h3>
+<div class="outline-text-3" id="text-org2978543">
 <p>
 <code>scratch</code> is an empty base image, often producing the smallest possible final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org134515f" class="outline-3">
-<h3 id="org134515f">Q51: What is the limitation of scratch?</h3>
-<div class="outline-text-3" id="text-org134515f">
+<div id="outline-container-org2b05743" class="outline-3">
+<h3 id="org2b05743">Q51: What is the limitation of scratch?</h3>
+<div class="outline-text-3" id="text-org2b05743">
 <p>
 It lacks common system libraries and tools, so the binary must be statically linked or contain everything it needs.
 </p>
 </div>
 </div>
-<div id="outline-container-org75d7d63" class="outline-3">
-<h3 id="org75d7d63">Q52: Why not always use scratch?</h3>
-<div class="outline-text-3" id="text-org75d7d63">
+<div id="outline-container-org3324063" class="outline-3">
+<h3 id="org3324063">Q52: Why not always use scratch?</h3>
+<div class="outline-text-3" id="text-org3324063">
 <p>
 Because you may need glibc or other libraries at runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc900d03" class="outline-3">
-<h3 id="orgc900d03">Q53: What is a statically compiled binary?</h3>
-<div class="outline-text-3" id="text-orgc900d03">
+<div id="outline-container-orga924224" class="outline-3">
+<h3 id="orga924224">Q53: What is a statically compiled binary?</h3>
+<div class="outline-text-3" id="text-orga924224">
 <p>
 A statically compiled binary contains all required libraries at compile time.
 </p>
 </div>
 </div>
-<div id="outline-container-org7932ae6" class="outline-3">
-<h3 id="org7932ae6">Q54: What is a dynamically linked binary?</h3>
-<div class="outline-text-3" id="text-org7932ae6">
+<div id="outline-container-org51f4fd3" class="outline-3">
+<h3 id="org51f4fd3">Q54: What is a dynamically linked binary?</h3>
+<div class="outline-text-3" id="text-org51f4fd3">
 <p>
 A dynamically linked binary expects shared libraries at runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-org4514306" class="outline-3">
-<h3 id="org4514306">Q55: Why is dynamic linking a concern?</h3>
-<div class="outline-text-3" id="text-org4514306">
+<div id="outline-container-orgd5f0b04" class="outline-3">
+<h3 id="orgd5f0b04">Q55: Why is dynamic linking a concern?</h3>
+<div class="outline-text-3" id="text-orgd5f0b04">
 <p>
 The runtime image must include necessary shared libraries, increasing image size and compatibility issues.
 </p>
 </div>
 </div>
-<div id="outline-container-org1fb7d2a" class="outline-3">
-<h3 id="org1fb7d2a">Q56: What is a compiler toolchain?</h3>
-<div class="outline-text-3" id="text-org1fb7d2a">
+<div id="outline-container-orgd646c63" class="outline-3">
+<h3 id="orgd646c63">Q56: What is a compiler toolchain?</h3>
+<div class="outline-text-3" id="text-orgd646c63">
 <p>
 A compiler toolchain includes compilers, linkers, standard libraries, and build utilities.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c9d6ba" class="outline-3">
-<h3 id="org6c9d6ba">Q57: What is a packaging step?</h3>
-<div class="outline-text-3" id="text-org6c9d6ba">
+<div id="outline-container-org9d03c42" class="outline-3">
+<h3 id="org9d03c42">Q57: What is a packaging step?</h3>
+<div class="outline-text-3" id="text-org9d03c42">
 <p>
 A packaging step creates an artifact like a tarball, JAR, or executable from the build.
 </p>
 </div>
 </div>
-<div id="outline-container-org16cc50c" class="outline-3">
-<h3 id="org16cc50c">Q58: What is a dependency installation step?</h3>
-<div class="outline-text-3" id="text-org16cc50c">
+<div id="outline-container-orgec65afe" class="outline-3">
+<h3 id="orgec65afe">Q58: What is a dependency installation step?</h3>
+<div class="outline-text-3" id="text-orgec65afe">
 <p>
 It installs runtime or build dependencies needed during the build.
 </p>
 </div>
 </div>
-<div id="outline-container-org01621cd" class="outline-3">
-<h3 id="org01621cd">Q59: What is artifact copying?</h3>
-<div class="outline-text-3" id="text-org01621cd">
+<div id="outline-container-org4cef101" class="outline-3">
+<h3 id="org4cef101">Q59: What is artifact copying?</h3>
+<div class="outline-text-3" id="text-org4cef101">
 <p>
 Artifact copying moves the built output from build stage to runtime stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org837acdd" class="outline-3">
-<h3 id="org837acdd">Q60: What is typical caching in Docker builds?</h3>
-<div class="outline-text-3" id="text-org837acdd">
+<div id="outline-container-orge2892c2" class="outline-3">
+<h3 id="orge2892c2">Q60: What is typical caching in Docker builds?</h3>
+<div class="outline-text-3" id="text-orge2892c2">
 <p>
 Docker reuses layers when unchanged, making multi-stage builds faster and more efficient.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgda85621" class="outline-2">
-<h2 id="orgda85621">Intermediate</h2>
-<div class="outline-text-2" id="text-orgda85621">
+<div id="outline-container-org21cb210" class="outline-2">
+<h2 id="org21cb210">Intermediate</h2>
+<div class="outline-text-2" id="text-org21cb210">
 </div>
-<div id="outline-container-org5cfa17b" class="outline-3">
-<h3 id="org5cfa17b">Q61: What is a Docker cache layer?</h3>
-<div class="outline-text-3" id="text-org5cfa17b">
+<div id="outline-container-orgb5b7b68" class="outline-3">
+<h3 id="orgb5b7b68">Q61: What is a Docker cache layer?</h3>
+<div class="outline-text-3" id="text-orgb5b7b68">
 <p>
 A cache layer is a Docker image layer reused when the same steps are repeated without changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org1e2dd94" class="outline-3">
-<h3 id="org1e2dd94">Q62: How do multi-stage builds help caching?</h3>
-<div class="outline-text-3" id="text-org1e2dd94">
+<div id="outline-container-orgc8bbebf" class="outline-3">
+<h3 id="orgc8bbebf">Q62: How do multi-stage builds help caching?</h3>
+<div class="outline-text-3" id="text-orgc8bbebf">
 <p>
 Each stage can be cached independently, and the final image may re-use earlier build steps.
 </p>
 </div>
 </div>
-<div id="outline-container-org346ab36" class="outline-3">
-<h3 id="org346ab36">Q63: What is the order of operations in Dockerfile?</h3>
-<div class="outline-text-3" id="text-org346ab36">
+<div id="outline-container-orgd18bebb" class="outline-3">
+<h3 id="orgd18bebb">Q63: What is the order of operations in Dockerfile?</h3>
+<div class="outline-text-3" id="text-orgd18bebb">
 <p>
 Docker executes instructions in order, building cacheable layers sequentially.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc96f808" class="outline-3">
-<h3 id="orgc96f808">Q64: Why is build ordering important?</h3>
-<div class="outline-text-3" id="text-orgc96f808">
+<div id="outline-container-org00d20e2" class="outline-3">
+<h3 id="org00d20e2">Q64: Why is build ordering important?</h3>
+<div class="outline-text-3" id="text-org00d20e2">
 <p>
 Because changing an early instruction invalidates later cached layers, which affects build performance.
 </p>
 </div>
 </div>
-<div id="outline-container-org017df32" class="outline-3">
-<h3 id="org017df32">Q65: What is a common multi-stage pattern for Node.js?</h3>
-<div class="outline-text-3" id="text-org017df32">
+<div id="outline-container-orga149720" class="outline-3">
+<h3 id="orga149720">Q65: What is a common multi-stage pattern for Node.js?</h3>
+<div class="outline-text-3" id="text-orga149720">
 <p>
 Install dependencies in a build stage, compile assets if needed, then copy produced files to a runtime stage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf857d17" class="outline-3">
-<h3 id="orgf857d17">Q66: What is a common multi-stage pattern for Java?</h3>
-<div class="outline-text-3" id="text-orgf857d17">
+<div id="outline-container-org2824bf0" class="outline-3">
+<h3 id="org2824bf0">Q66: What is a common multi-stage pattern for Java?</h3>
+<div class="outline-text-3" id="text-org2824bf0">
 <p>
 Use a JDK image to compile and package, then copy the JAR to a JRE-based final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org63f750f" class="outline-3">
-<h3 id="org63f750f">Q67: What is a common multi-stage pattern for Go?</h3>
-<div class="outline-text-3" id="text-org63f750f">
+<div id="outline-container-org85cc458" class="outline-3">
+<h3 id="org85cc458">Q67: What is a common multi-stage pattern for Go?</h3>
+<div class="outline-text-3" id="text-org85cc458">
 <p>
 Use a Go builder image, copy the source code, build the binary, copy the binary into a minimal final image.
 </p>
 </div>
 </div>
-<div id="outline-container-orge019080" class="outline-3">
-<h3 id="orge019080">Q68: What is a common multi-stage pattern for Python?</h3>
-<div class="outline-text-3" id="text-orge019080">
+<div id="outline-container-org1e9f5ac" class="outline-3">
+<h3 id="org1e9f5ac">Q68: What is a common multi-stage pattern for Python?</h3>
+<div class="outline-text-3" id="text-org1e9f5ac">
 <p>
 Install dependencies in a build stage, maybe compile a wheel, then copy the installed app into a slim Python runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-org051503c" class="outline-3">
-<h3 id="org051503c">Q69: What is a builder image name example?</h3>
-<div class="outline-text-3" id="text-org051503c">
+<div id="outline-container-org0467c66" class="outline-3">
+<h3 id="org0467c66">Q69: What is a builder image name example?</h3>
+<div class="outline-text-3" id="text-org0467c66">
 <p>
 Example:
 <code>FROM maven:3.9-eclipse-temurin-17 AS build</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org926f5db" class="outline-3">
-<h3 id="org926f5db">Q70: What is a runtime image example?</h3>
-<div class="outline-text-3" id="text-org926f5db">
+<div id="outline-container-org9dd19c3" class="outline-3">
+<h3 id="org9dd19c3">Q70: What is a runtime image example?</h3>
+<div class="outline-text-3" id="text-org9dd19c3">
 <p>
 Example:
 <code>FROM eclipse-temurin:17-jre-jammy</code>
 </p>
 </div>
 </div>
-<div id="outline-container-orgcce8d93" class="outline-3">
-<h3 id="orgcce8d93">Q71: What is a copy from stage example?</h3>
-<div class="outline-text-3" id="text-orgcce8d93">
+<div id="outline-container-org01d803b" class="outline-3">
+<h3 id="org01d803b">Q71: What is a copy from stage example?</h3>
+<div class="outline-text-3" id="text-org01d803b">
 <p>
 Example:
 <code>COPY --from=build /workspace/app.jar /app/app.jar</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org3830fa4" class="outline-3">
-<h3 id="org3830fa4">Q72: Why does build context matter in multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org3830fa4">
+<div id="outline-container-org5326b1e" class="outline-3">
+<h3 id="org5326b1e">Q72: Why does build context matter in multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org5326b1e">
 <p>
 It affects what files are available to the build and what gets sent to the daemon.
 </p>
 </div>
 </div>
-<div id="outline-container-org9416ef7" class="outline-3">
-<h3 id="org9416ef7">Q73: What is .dockerignore?</h3>
-<div class="outline-text-3" id="text-org9416ef7">
+<div id="outline-container-org295b993" class="outline-3">
+<h3 id="org295b993">Q73: What is .dockerignore?</h3>
+<div class="outline-text-3" id="text-org295b993">
 <p>
 <code>.dockerignore</code> excludes files from the build context, reducing build time and accidentally including secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org1094ff8" class="outline-3">
-<h3 id="org1094ff8">Q74: Why is .dockerignore important in multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org1094ff8">
+<div id="outline-container-orgffff5b9" class="outline-3">
+<h3 id="orgffff5b9">Q74: Why is .dockerignore important in multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgffff5b9">
 <p>
 Because it reduces data sent to Docker and can prevent sensitive files, build artifacts, or caches from being copied.
 </p>
 </div>
 </div>
-<div id="outline-container-org858c6bc" class="outline-3">
-<h3 id="org858c6bc">Q75: What is a build artifact path example?</h3>
-<div class="outline-text-3" id="text-org858c6bc">
+<div id="outline-container-orga3acc05" class="outline-3">
+<h3 id="orga3acc05">Q75: What is a build artifact path example?</h3>
+<div class="outline-text-3" id="text-orga3acc05">
 <p>
 Example:
 <code>/workspace/target/app.jar</code>
 </p>
 </div>
 </div>
-<div id="outline-container-orgb7a1d7c" class="outline-3">
-<h3 id="orgb7a1d7c">Q76: How do you copy multiple artifacts?</h3>
-<div class="outline-text-3" id="text-orgb7a1d7c">
+<div id="outline-container-org1860a68" class="outline-3">
+<h3 id="org1860a68">Q76: How do you copy multiple artifacts?</h3>
+<div class="outline-text-3" id="text-org1860a68">
 <p>
 Use multiple <code>COPY --from=...</code> lines or copy a directory containing multiple outputs.
 </p>
 </div>
 </div>
-<div id="outline-container-org477f574" class="outline-3">
-<h3 id="org477f574">Q77: Why use a named stage?</h3>
-<div class="outline-text-3" id="text-org477f574">
+<div id="outline-container-org1e29b39" class="outline-3">
+<h3 id="org1e29b39">Q77: Why use a named stage?</h3>
+<div class="outline-text-3" id="text-org1e29b39">
 <p>
 Named stages improve readability and make stage references explicit.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfec059f" class="outline-3">
-<h3 id="orgfec059f">Q78: What is a build-only dependency?</h3>
-<div class="outline-text-3" id="text-orgfec059f">
+<div id="outline-container-org8a60ff1" class="outline-3">
+<h3 id="org8a60ff1">Q78: What is a build-only dependency?</h3>
+<div class="outline-text-3" id="text-org8a60ff1">
 <p>
 A dependency required only for the compilation step.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaf97c7b" class="outline-3">
-<h3 id="orgaf97c7b">Q79: What is a runtime-only dependency?</h3>
-<div class="outline-text-3" id="text-orgaf97c7b">
+<div id="outline-container-orgd547f82" class="outline-3">
+<h3 id="orgd547f82">Q79: What is a runtime-only dependency?</h3>
+<div class="outline-text-3" id="text-orgd547f82">
 <p>
 A dependency required only when the app executes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba7d504" class="outline-3">
-<h3 id="orgba7d504">Q80: What is image optimization?</h3>
-<div class="outline-text-3" id="text-orgba7d504">
+<div id="outline-container-orgfa3a5cf" class="outline-3">
+<h3 id="orgfa3a5cf">Q80: What is image optimization?</h3>
+<div class="outline-text-3" id="text-orgfa3a5cf">
 <p>
 Image optimization includes reducing layer count, removing unnecessary files, and minimizing runtime dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ccefd7" class="outline-3">
-<h3 id="org7ccefd7">Q81: What is a layer count reduction strategy?</h3>
-<div class="outline-text-3" id="text-org7ccefd7">
+<div id="outline-container-orge208296" class="outline-3">
+<h3 id="orge208296">Q81: What is a layer count reduction strategy?</h3>
+<div class="outline-text-3" id="text-orge208296">
 <p>
 Combine related commands into fewer Dockerfile instructions to reduce layer count.
 </p>
 </div>
 </div>
-<div id="outline-container-org8972514" class="outline-3">
-<h3 id="org8972514">Q82: What is the role of <code>RUN apt-get clean</code>?</h3>
-<div class="outline-text-3" id="text-org8972514">
+<div id="outline-container-orge5b36a2" class="outline-3">
+<h3 id="orge5b36a2">Q82: What is the role of <code>RUN apt-get clean</code>?</h3>
+<div class="outline-text-3" id="text-orge5b36a2">
 <p>
 It removes package manager caches to reduce final image size.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f81228" class="outline-3">
-<h3 id="org3f81228">Q83: What is a package manager cache cleanup?</h3>
-<div class="outline-text-3" id="text-org3f81228">
+<div id="outline-container-org00f338b" class="outline-3">
+<h3 id="org00f338b">Q83: What is a package manager cache cleanup?</h3>
+<div class="outline-text-3" id="text-org00f338b">
 <p>
 It removes temporary package download caches after installation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb52470" class="outline-3">
-<h3 id="orgbb52470">Q84: Why is package manager cache cleanup important?</h3>
-<div class="outline-text-3" id="text-orgbb52470">
+<div id="outline-container-orgffe7998" class="outline-3">
+<h3 id="orgffe7998">Q84: Why is package manager cache cleanup important?</h3>
+<div class="outline-text-3" id="text-orgffe7998">
 <p>
 It reduces image size and leaves less noise in the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org842c713" class="outline-3">
-<h3 id="org842c713">Q85: What is the role of <code>rm -rf /var/lib/apt/lists/*</code>?</h3>
-<div class="outline-text-3" id="text-org842c713">
+<div id="outline-container-orged7803c" class="outline-3">
+<h3 id="orged7803c">Q85: What is the role of <code>rm -rf /var/lib/apt/lists/*</code>?</h3>
+<div class="outline-text-3" id="text-orged7803c">
 <p>
 It removes downloaded package metadata to shrink the image.
 </p>
 </div>
 </div>
-<div id="outline-container-org03dff8d" class="outline-3">
-<h3 id="org03dff8d">Q86: What is a runtime-only library?</h3>
-<div class="outline-text-3" id="text-org03dff8d">
+<div id="outline-container-orgd99c1bf" class="outline-3">
+<h3 id="orgd99c1bf">Q86: What is a runtime-only library?</h3>
+<div class="outline-text-3" id="text-orgd99c1bf">
 <p>
 A library required by the final app at execution time but not during compilation.
 </p>
 </div>
 </div>
-<div id="outline-container-org59133e8" class="outline-3">
-<h3 id="org59133e8">Q87: What is a build-time tool chain?</h3>
-<div class="outline-text-3" id="text-org59133e8">
+<div id="outline-container-orga08fd61" class="outline-3">
+<h3 id="orga08fd61">Q87: What is a build-time tool chain?</h3>
+<div class="outline-text-3" id="text-orga08fd61">
 <p>
 The set of tools needed only to compile or package an app.
 </p>
 </div>
 </div>
-<div id="outline-container-org65b1fe0" class="outline-3">
-<h3 id="org65b1fe0">Q88: What is a clean build stage?</h3>
-<div class="outline-text-3" id="text-org65b1fe0">
+<div id="outline-container-orgd7aba24" class="outline-3">
+<h3 id="orgd7aba24">Q88: What is a clean build stage?</h3>
+<div class="outline-text-3" id="text-orgd7aba24">
 <p>
 A clean build stage is a stage that does not carry package manager caches or previous build artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org319aaaf" class="outline-3">
-<h3 id="org319aaaf">Q89: What is file ownership in runtime image?</h3>
-<div class="outline-text-3" id="text-org319aaaf">
+<div id="outline-container-org6666af9" class="outline-3">
+<h3 id="org6666af9">Q89: What is file ownership in runtime image?</h3>
+<div class="outline-text-3" id="text-org6666af9">
 <p>
 The final image should have correct file permissions for the runtime user.
 </p>
 </div>
 </div>
-<div id="outline-container-org3262904" class="outline-3">
-<h3 id="org3262904">Q90: What is the runtime user in Docker?</h3>
-<div class="outline-text-3" id="text-org3262904">
+<div id="outline-container-orgf4ad504" class="outline-3">
+<h3 id="orgf4ad504">Q90: What is the runtime user in Docker?</h3>
+<div class="outline-text-3" id="text-orgf4ad504">
 <p>
 A non-root runtime user improves the security posture of the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ed1504" class="outline-3">
-<h3 id="org7ed1504">Q91: What is application user configuration?</h3>
-<div class="outline-text-3" id="text-org7ed1504">
+<div id="outline-container-org7c10360" class="outline-3">
+<h3 id="org7c10360">Q91: What is application user configuration?</h3>
+<div class="outline-text-3" id="text-org7c10360">
 <p>
 It includes creating a runtime user and setting ownership of application files.
 </p>
 </div>
 </div>
-<div id="outline-container-orge624446" class="outline-3">
-<h3 id="orge624446">Q92: Why use a non-root user?</h3>
-<div class="outline-text-3" id="text-orge624446">
+<div id="outline-container-org74a3968" class="outline-3">
+<h3 id="org74a3968">Q92: Why use a non-root user?</h3>
+<div class="outline-text-3" id="text-org74a3968">
 <p>
 It reduces the impact of attacker code execution within the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org81d55e9" class="outline-3">
-<h3 id="org81d55e9">Q93: What is the difference between base image user and app user?</h3>
-<div class="outline-text-3" id="text-org81d55e9">
+<div id="outline-container-org0c87e46" class="outline-3">
+<h3 id="org0c87e46">Q93: What is the difference between base image user and app user?</h3>
+<div class="outline-text-3" id="text-org0c87e46">
 <p>
 Some base images run as root by default; better practice is to create a dedicated user for the app.
 </p>
 </div>
 </div>
-<div id="outline-container-org8432658" class="outline-3">
-<h3 id="org8432658">Q94: Why do multi-stage builds help with security?</h3>
-<div class="outline-text-3" id="text-org8432658">
+<div id="outline-container-org91e5739" class="outline-3">
+<h3 id="org91e5739">Q94: Why do multi-stage builds help with security?</h3>
+<div class="outline-text-3" id="text-org91e5739">
 <p>
 Because they remove build dependencies and tools from the final image, which reduces the attack surface.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeec8aea" class="outline-3">
-<h3 id="orgeec8aea">Q95: What is a production image?</h3>
-<div class="outline-text-3" id="text-orgeec8aea">
+<div id="outline-container-org27b5a69" class="outline-3">
+<h3 id="org27b5a69">Q95: What is a production image?</h3>
+<div class="outline-text-3" id="text-org27b5a69">
 <p>
 A production image is the final runtime image used in deployment.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdb76f35" class="outline-3">
-<h3 id="orgdb76f35">Q96: What is a development image?</h3>
-<div class="outline-text-3" id="text-orgdb76f35">
+<div id="outline-container-org31cc7d8" class="outline-3">
+<h3 id="org31cc7d8">Q96: What is a development image?</h3>
+<div class="outline-text-3" id="text-org31cc7d8">
 <p>
 A development image may include more tools and debug utilities than a production image.
 </p>
 </div>
 </div>
-<div id="outline-container-orge9ead7d" class="outline-3">
-<h3 id="orge9ead7d">Q97: Why not use the same image for dev and prod?</h3>
-<div class="outline-text-3" id="text-orge9ead7d">
+<div id="outline-container-org17ab084" class="outline-3">
+<h3 id="org17ab084">Q97: Why not use the same image for dev and prod?</h3>
+<div class="outline-text-3" id="text-org17ab084">
 <p>
 Development images may need compilers, editors, and debugging tools while production images should be minimal.
 </p>
 </div>
 </div>
-<div id="outline-container-org775f514" class="outline-3">
-<h3 id="org775f514">Q98: What is a builder pattern for static sites?</h3>
-<div class="outline-text-3" id="text-org775f514">
+<div id="outline-container-org65a9d04" class="outline-3">
+<h3 id="org65a9d04">Q98: What is a builder pattern for static sites?</h3>
+<div class="outline-text-3" id="text-org65a9d04">
 <p>
 Compile site assets in one stage, then serve those static files from a minimal Nginx or static web server image.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d2e0cc" class="outline-3">
-<h3 id="org3d2e0cc">Q99: What is a builder pattern for a Java backend?</h3>
-<div class="outline-text-3" id="text-org3d2e0cc">
+<div id="outline-container-orgb704451" class="outline-3">
+<h3 id="orgb704451">Q99: What is a builder pattern for a Java backend?</h3>
+<div class="outline-text-3" id="text-orgb704451">
 <p>
 Compile the Java app in a JDK stage, then run the JAR in a JRE-based image.
 </p>
 </div>
 </div>
-<div id="outline-container-org147b9e3" class="outline-3">
-<h3 id="org147b9e3">Q100: What is a builder pattern for a .NET app?</h3>
-<div class="outline-text-3" id="text-org147b9e3">
+<div id="outline-container-org092a1fb" class="outline-3">
+<h3 id="org092a1fb">Q100: What is a builder pattern for a .NET app?</h3>
+<div class="outline-text-3" id="text-org092a1fb">
 <p>
 Restore and build in a .NET SDK image, then copy the compiled app into an ASP.NET or runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-org954ae2c" class="outline-3">
-<h3 id="org954ae2c">Q101: What is a common pattern with Maven?</h3>
-<div class="outline-text-3" id="text-org954ae2c">
+<div id="outline-container-org13a0bf1" class="outline-3">
+<h3 id="org13a0bf1">Q101: What is a common pattern with Maven?</h3>
+<div class="outline-text-3" id="text-org13a0bf1">
 <p>
 <code>mvn dependency:go-offline</code> and compile in the builder stage, then copy the packaged JAR to the runtime stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org667e3d5" class="outline-3">
-<h3 id="org667e3d5">Q102: What is a common pattern with Gradle?</h3>
-<div class="outline-text-3" id="text-org667e3d5">
+<div id="outline-container-org6dc4c15" class="outline-3">
+<h3 id="org6dc4c15">Q102: What is a common pattern with Gradle?</h3>
+<div class="outline-text-3" id="text-org6dc4c15">
 <p>
 Use a Gradle builder stage to build the application, then copy the JAR or WAR to the final stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org1a731fd" class="outline-3">
-<h3 id="org1a731fd">Q103: What is a common pattern with npm?</h3>
-<div class="outline-text-3" id="text-org1a731fd">
+<div id="outline-container-org574c359" class="outline-3">
+<h3 id="org574c359">Q103: What is a common pattern with npm?</h3>
+<div class="outline-text-3" id="text-org574c359">
 <p>
 Use a Node builder stage to install dependencies and build the frontend, then copy built static assets to a smaller runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-org9752758" class="outline-3">
-<h3 id="org9752758">Q104: What is a common pattern with Python?</h3>
-<div class="outline-text-3" id="text-org9752758">
+<div id="outline-container-org4be7daf" class="outline-3">
+<h3 id="org4be7daf">Q104: What is a common pattern with Python?</h3>
+<div class="outline-text-3" id="text-org4be7daf">
 <p>
 Use a Python builder stage for pip install and compile assets, then copy the app into a runtime image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdac844f" class="outline-3">
-<h3 id="orgdac844f">Q105: Why is the final runtime image often “smaller but not necessarily simpler”?</h3>
-<div class="outline-text-3" id="text-orgdac844f">
+<div id="outline-container-orgbedf6b4" class="outline-3">
+<h3 id="orgbedf6b4">Q105: Why is the final runtime image often “smaller but not necessarily simpler”?</h3>
+<div class="outline-text-3" id="text-orgbedf6b4">
 <p>
 Because it contains only what is needed to run, but may still require OS binaries and libraries.
 </p>
 </div>
 </div>
-<div id="outline-container-org49ab984" class="outline-3">
-<h3 id="org49ab984">Q106: What is the build cache in Docker?</h3>
-<div class="outline-text-3" id="text-org49ab984">
+<div id="outline-container-org336b665" class="outline-3">
+<h3 id="org336b665">Q106: What is the build cache in Docker?</h3>
+<div class="outline-text-3" id="text-org336b665">
 <p>
 It is reuse of previous build instruction outputs to avoid redoing expensive work.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf61b4e7" class="outline-3">
-<h3 id="orgf61b4e7">Q107: Why is <code>COPY package*.json</code> before app source useful?</h3>
-<div class="outline-text-3" id="text-orgf61b4e7">
+<div id="outline-container-orgbfdde92" class="outline-3">
+<h3 id="orgbfdde92">Q107: Why is <code>COPY package*.json</code> before app source useful?</h3>
+<div class="outline-text-3" id="text-orgbfdde92">
 <p>
 Because it allows dependencies to be cached separately from source changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org360914d" class="outline-3">
-<h3 id="org360914d">Q108: What is a lockfile?</h3>
-<div class="outline-text-3" id="text-org360914d">
+<div id="outline-container-org10d3884" class="outline-3">
+<h3 id="org10d3884">Q108: What is a lockfile?</h3>
+<div class="outline-text-3" id="text-org10d3884">
 <p>
 A lockfile pins dependency versions and improves reproducibility during builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org081f48d" class="outline-3">
-<h3 id="org081f48d">Q109: Why is dependency caching important?</h3>
-<div class="outline-text-3" id="text-org081f48d">
+<div id="outline-container-orga1c6244" class="outline-3">
+<h3 id="orga1c6244">Q109: Why is dependency caching important?</h3>
+<div class="outline-text-3" id="text-orga1c6244">
 <p>
 It speeds up builds and reduces time spent reinstalling dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org50e09be" class="outline-3">
-<h3 id="org50e09be">Q110: How do multi-stage builds help build reproducibility?</h3>
-<div class="outline-text-3" id="text-org50e09be">
+<div id="outline-container-org6c25eae" class="outline-3">
+<h3 id="org6c25eae">Q110: How do multi-stage builds help build reproducibility?</h3>
+<div class="outline-text-3" id="text-org6c25eae">
 <p>
 They separate dependency installation and compile steps from the final runtime shipping image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd80e841" class="outline-3">
-<h3 id="orgd80e841">Q111: What is the challenge with multi-stage builds in monorepos?</h3>
-<div class="outline-text-3" id="text-orgd80e841">
+<div id="outline-container-orgeb224f7" class="outline-3">
+<h3 id="orgeb224f7">Q111: What is the challenge with multi-stage builds in monorepos?</h3>
+<div class="outline-text-3" id="text-orgeb224f7">
 <p>
 They may need multiple build steps or copying from subdirectories into the runtime stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org575fa8c" class="outline-3">
-<h3 id="org575fa8c">Q112: Why should build artifacts be copied explicitly?</h3>
-<div class="outline-text-3" id="text-org575fa8c">
+<div id="outline-container-org8b28d34" class="outline-3">
+<h3 id="org8b28d34">Q112: Why should build artifacts be copied explicitly?</h3>
+<div class="outline-text-3" id="text-org8b28d34">
 <p>
 To avoid pulling too much of the source tree into the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d5f53b" class="outline-3">
-<h3 id="org6d5f53b">Q113: What is a namespace in Docker build?</h3>
-<div class="outline-text-3" id="text-org6d5f53b">
+<div id="outline-container-orgef09573" class="outline-3">
+<h3 id="orgef09573">Q113: What is a namespace in Docker build?</h3>
+<div class="outline-text-3" id="text-orgef09573">
 <p>
 A build stage can be named and referred to later, like a namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-orge438570" class="outline-3">
-<h3 id="orge438570">Q114: What is the use of <code>--target</code> in docker build?</h3>
-<div class="outline-text-3" id="text-orge438570">
+<div id="outline-container-org1041673" class="outline-3">
+<h3 id="org1041673">Q114: What is the use of <code>--target</code> in docker build?</h3>
+<div class="outline-text-3" id="text-org1041673">
 <p>
 It allows building a specific stage in a multi-stage Dockerfile instead of the final stage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgee83967" class="outline-3">
-<h3 id="orgee83967">Q115: What is the benefit of building a target stage?</h3>
-<div class="outline-text-3" id="text-orgee83967">
+<div id="outline-container-org1969d8f" class="outline-3">
+<h3 id="org1969d8f">Q115: What is the benefit of building a target stage?</h3>
+<div class="outline-text-3" id="text-org1969d8f">
 <p>
 It enables building intermediate stages for testing or specialized outputs.
 </p>
 </div>
 </div>
-<div id="outline-container-org150b2f7" class="outline-3">
-<h3 id="org150b2f7">Q116: What is a builder stage used for debugging?</h3>
-<div class="outline-text-3" id="text-org150b2f7">
+<div id="outline-container-org7058d10" class="outline-3">
+<h3 id="org7058d10">Q116: What is a builder stage used for debugging?</h3>
+<div class="outline-text-3" id="text-org7058d10">
 <p>
 You may build a debug stage with compilers and shells, even if final image is minimal.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd69a676" class="outline-3">
-<h3 id="orgd69a676">Q117: What is a test stage?</h3>
-<div class="outline-text-3" id="text-orgd69a676">
+<div id="outline-container-orgdab3eba" class="outline-3">
+<h3 id="orgdab3eba">Q117: What is a test stage?</h3>
+<div class="outline-text-3" id="text-orgdab3eba">
 <p>
 A test stage may install test tools and run tests before copying artifacts to the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org170e5f4" class="outline-3">
-<h3 id="org170e5f4">Q118: Why is test stage useful?</h3>
-<div class="outline-text-3" id="text-org170e5f4">
+<div id="outline-container-orgf92ec4a" class="outline-3">
+<h3 id="orgf92ec4a">Q118: Why is test stage useful?</h3>
+<div class="outline-text-3" id="text-orgf92ec4a">
 <p>
 It validates the app before shipping the production image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff86564" class="outline-3">
-<h3 id="orgff86564">Q119: What is a scanner stage?</h3>
-<div class="outline-text-3" id="text-orgff86564">
+<div id="outline-container-org136750a" class="outline-3">
+<h3 id="org136750a">Q119: What is a scanner stage?</h3>
+<div class="outline-text-3" id="text-org136750a">
 <p>
 A scanning stage may run SAST or dependency scanning tools before final shipping.
 </p>
 </div>
 </div>
-<div id="outline-container-org164b782" class="outline-3">
-<h3 id="org164b782">Q120: What is a packaging stage?</h3>
-<div class="outline-text-3" id="text-org164b782">
+<div id="outline-container-orgc31b561" class="outline-3">
+<h3 id="orgc31b561">Q120: What is a packaging stage?</h3>
+<div class="outline-text-3" id="text-orgc31b561">
 <p>
 A packaging stage may compress or produce release artifacts for distribution.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgf865875" class="outline-2">
-<h2 id="orgf865875">Advanced / Expert</h2>
-<div class="outline-text-2" id="text-orgf865875">
+<div id="outline-container-org9f74014" class="outline-2">
+<h2 id="org9f74014">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-org9f74014">
 </div>
-<div id="outline-container-org27438b4" class="outline-3">
-<h3 id="org27438b4">Q121: What is a minimal runtime base?</h3>
-<div class="outline-text-3" id="text-org27438b4">
+<div id="outline-container-org6608f07" class="outline-3">
+<h3 id="org6608f07">Q121: What is a minimal runtime base?</h3>
+<div class="outline-text-3" id="text-org6608f07">
 <p>
 A minimal runtime base may be distroless or a tiny alpine image depending on the application requirements.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2cedcc" class="outline-3">
-<h3 id="orgc2cedcc">Q122: What is image squashing?</h3>
-<div class="outline-text-3" id="text-orgc2cedcc">
+<div id="outline-container-orgd8d4940" class="outline-3">
+<h3 id="orgd8d4940">Q122: What is image squashing?</h3>
+<div class="outline-text-3" id="text-orgd8d4940">
 <p>
 Image squashing reduces image layers and compresses filesystem content, but it is often not used in normal Docker builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org0706d83" class="outline-3">
-<h3 id="org0706d83">Q123: What is Docker buildkit?</h3>
-<div class="outline-text-3" id="text-org0706d83">
+<div id="outline-container-orga070f09" class="outline-3">
+<h3 id="orga070f09">Q123: What is Docker buildkit?</h3>
+<div class="outline-text-3" id="text-orga070f09">
 <p>
 BuildKit is the modern Docker builder backend with better caching, concurrent builds, and advanced features.
 </p>
 </div>
 </div>
-<div id="outline-container-org09a3fae" class="outline-3">
-<h3 id="org09a3fae">Q124: Why is BuildKit important for multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org09a3fae">
+<div id="outline-container-orgf93aff6" class="outline-3">
+<h3 id="orgf93aff6">Q124: Why is BuildKit important for multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgf93aff6">
 <p>
 It improves build efficiency and supports advanced caching semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-org6dd8478" class="outline-3">
-<h3 id="org6dd8478">Q125: What is a build cache mount?</h3>
-<div class="outline-text-3" id="text-org6dd8478">
+<div id="outline-container-org7fdeba7" class="outline-3">
+<h3 id="org7fdeba7">Q125: What is a build cache mount?</h3>
+<div class="outline-text-3" id="text-org7fdeba7">
 <p>
 A build cache mount allows persistent caching of dependency directories across builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org78b1eb2" class="outline-3">
-<h3 id="org78b1eb2">Q126: What is <code>--mount=type=cache</code> in Docker BuildKit?</h3>
-<div class="outline-text-3" id="text-org78b1eb2">
+<div id="outline-container-org493446a" class="outline-3">
+<h3 id="org493446a">Q126: What is <code>--mount=type=cache</code> in Docker BuildKit?</h3>
+<div class="outline-text-3" id="text-org493446a">
 <p>
 It enables persistent caching for build dependencies like npm or Maven caches.
 </p>
 </div>
 </div>
-<div id="outline-container-org636415e" class="outline-3">
-<h3 id="org636415e">Q127: What is a multi-arch build?</h3>
-<div class="outline-text-3" id="text-org636415e">
+<div id="outline-container-org8a554f4" class="outline-3">
+<h3 id="org8a554f4">Q127: What is a multi-arch build?</h3>
+<div class="outline-text-3" id="text-org8a554f4">
 <p>
 A multi-arch build produces images for multiple CPU architectures, such as amd64 and arm64.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb3b4c34" class="outline-3">
-<h3 id="orgb3b4c34">Q128: Why are multi-stage builds useful for multi-arch builds?</h3>
-<div class="outline-text-3" id="text-orgb3b4c34">
+<div id="outline-container-org1f9849a" class="outline-3">
+<h3 id="org1f9849a">Q128: Why are multi-stage builds useful for multi-arch builds?</h3>
+<div class="outline-text-3" id="text-org1f9849a">
 <p>
 Because the builder stage can compile for one architecture and the final stage can package the output for the target arch.
 </p>
 </div>
 </div>
-<div id="outline-container-org9fdeb01" class="outline-3">
-<h3 id="org9fdeb01">Q129: What is cross-compilation?</h3>
-<div class="outline-text-3" id="text-org9fdeb01">
+<div id="outline-container-orgacef2de" class="outline-3">
+<h3 id="orgacef2de">Q129: What is cross-compilation?</h3>
+<div class="outline-text-3" id="text-orgacef2de">
 <p>
 Cross-compilation builds artifacts for a different architecture than the host machine.
 </p>
 </div>
 </div>
-<div id="outline-container-org6f823b2" class="outline-3">
-<h3 id="org6f823b2">Q130: What is a target architecture mismatch?</h3>
-<div class="outline-text-3" id="text-org6f823b2">
+<div id="outline-container-org90989e1" class="outline-3">
+<h3 id="org90989e1">Q130: What is a target architecture mismatch?</h3>
+<div class="outline-text-3" id="text-org90989e1">
 <p>
 It happens when the final image is built for the wrong architecture or the binary is incompatible with the runtime environment.
 </p>
 </div>
 </div>
-<div id="outline-container-org9139f2a" class="outline-3">
-<h3 id="org9139f2a">Q131: How do multi-stage builds help with architecture mismatch?</h3>
-<div class="outline-text-3" id="text-org9139f2a">
+<div id="outline-container-orgc6fdd21" class="outline-3">
+<h3 id="orgc6fdd21">Q131: How do multi-stage builds help with architecture mismatch?</h3>
+<div class="outline-text-3" id="text-orgc6fdd21">
 <p>
 They can segregate the build environment from the final runtime image to keep the output specific and portable.
 </p>
 </div>
 </div>
-<div id="outline-container-org72499e1" class="outline-3">
-<h3 id="org72499e1">Q132: Why is static linking beneficial in minimal images?</h3>
-<div class="outline-text-3" id="text-org72499e1">
+<div id="outline-container-orgbb8d8bf" class="outline-3">
+<h3 id="orgbb8d8bf">Q132: Why is static linking beneficial in minimal images?</h3>
+<div class="outline-text-3" id="text-orgbb8d8bf">
 <p>
 It reduces the need for runtime libraries and keeps the final image leaner.
 </p>
 </div>
 </div>
-<div id="outline-container-org64b8f41" class="outline-3">
-<h3 id="org64b8f41">Q133: What is glibc?</h3>
-<div class="outline-text-3" id="text-org64b8f41">
+<div id="outline-container-org5682acb" class="outline-3">
+<h3 id="org5682acb">Q133: What is glibc?</h3>
+<div class="outline-text-3" id="text-org5682acb">
 <p>
 glibc is the GNU C runtime library often needed by dynamically linked binaries.
 </p>
 </div>
 </div>
-<div id="outline-container-org763cb1a" class="outline-3">
-<h3 id="org763cb1a">Q134: Why is glibc size relevant?</h3>
-<div class="outline-text-3" id="text-org763cb1a">
+<div id="outline-container-org5294b70" class="outline-3">
+<h3 id="org5294b70">Q134: Why is glibc size relevant?</h3>
+<div class="outline-text-3" id="text-org5294b70">
 <p>
 Because it adds to the image size and complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org5806136" class="outline-3">
-<h3 id="org5806136">Q135: What is musl?</h3>
-<div class="outline-text-3" id="text-org5806136">
+<div id="outline-container-org239f51b" class="outline-3">
+<h3 id="org239f51b">Q135: What is musl?</h3>
+<div class="outline-text-3" id="text-org239f51b">
 <p>
 musl is a lightweight C library used in Alpine and some minimal runtime environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc1d7ec1" class="outline-3">
-<h3 id="orgc1d7ec1">Q136: What is the risk of mismatched libc?</h3>
-<div class="outline-text-3" id="text-orgc1d7ec1">
+<div id="outline-container-org43df668" class="outline-3">
+<h3 id="org43df668">Q136: What is the risk of mismatched libc?</h3>
+<div class="outline-text-3" id="text-org43df668">
 <p>
 A binary compiled against glibc may not run in musl-based image or vice versa.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb9409e6" class="outline-3">
-<h3 id="orgb9409e6">Q137: What is binary compatibility?</h3>
-<div class="outline-text-3" id="text-orgb9409e6">
+<div id="outline-container-orgd6b25c3" class="outline-3">
+<h3 id="orgd6b25c3">Q137: What is binary compatibility?</h3>
+<div class="outline-text-3" id="text-orgd6b25c3">
 <p>
 Binary compatibility means the generated artifact runs on the target environment without requiring different libraries or ABI changes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgedbc15b" class="outline-3">
-<h3 id="orgedbc15b">Q138: What is a runtime library path issue?</h3>
-<div class="outline-text-3" id="text-orgedbc15b">
+<div id="outline-container-org8acd6ac" class="outline-3">
+<h3 id="org8acd6ac">Q138: What is a runtime library path issue?</h3>
+<div class="outline-text-3" id="text-org8acd6ac">
 <p>
 It happens when the binary expects a library that is not present in the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f646b5" class="outline-3">
-<h3 id="org5f646b5">Q139: What is an entrypoint script?</h3>
-<div class="outline-text-3" id="text-org5f646b5">
+<div id="outline-container-orgd09822c" class="outline-3">
+<h3 id="orgd09822c">Q139: What is an entrypoint script?</h3>
+<div class="outline-text-3" id="text-orgd09822c">
 <p>
 An entrypoint script can prepare runtime environment variables, checks, or symlinks before launching the app.
 </p>
 </div>
 </div>
-<div id="outline-container-org8dba492" class="outline-3">
-<h3 id="org8dba492">Q140: Why use an entrypoint script in runtime stage?</h3>
-<div class="outline-text-3" id="text-org8dba492">
+<div id="outline-container-orgd2d3a7f" class="outline-3">
+<h3 id="orgd2d3a7f">Q140: Why use an entrypoint script in runtime stage?</h3>
+<div class="outline-text-3" id="text-orgd2d3a7f">
 <p>
 To handle environment initialization, migrations, or dynamic configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org40e8052" class="outline-3">
-<h3 id="org40e8052">Q141: What is a build artifact verification step?</h3>
-<div class="outline-text-3" id="text-org40e8052">
+<div id="outline-container-org3357367" class="outline-3">
+<h3 id="org3357367">Q141: What is a build artifact verification step?</h3>
+<div class="outline-text-3" id="text-org3357367">
 <p>
 It validates that the compiled output works or runs correctly before packaging.
 </p>
 </div>
 </div>
-<div id="outline-container-orge22a0e1" class="outline-3">
-<h3 id="orge22a0e1">Q142: What is Docker image signing?</h3>
-<div class="outline-text-3" id="text-orge22a0e1">
+<div id="outline-container-org093c224" class="outline-3">
+<h3 id="org093c224">Q142: What is Docker image signing?</h3>
+<div class="outline-text-3" id="text-org093c224">
 <p>
 Image signing ensures the image has not been tampered with between build and deployment.
 </p>
 </div>
 </div>
-<div id="outline-container-orge1f259c" class="outline-3">
-<h3 id="orge1f259c">Q143: How do multi-stage builds interact with image signing?</h3>
-<div class="outline-text-3" id="text-orge1f259c">
+<div id="outline-container-orgd5652d1" class="outline-3">
+<h3 id="orgd5652d1">Q143: How do multi-stage builds interact with image signing?</h3>
+<div class="outline-text-3" id="text-orgd5652d1">
 <p>
 The final image is the signed artifact; the build stage is not usually what is distributed.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ba9d7f" class="outline-3">
-<h3 id="org2ba9d7f">Q144: What is artifact provenance?</h3>
-<div class="outline-text-3" id="text-org2ba9d7f">
+<div id="outline-container-org36ef51c" class="outline-3">
+<h3 id="org36ef51c">Q144: What is artifact provenance?</h3>
+<div class="outline-text-3" id="text-org36ef51c">
 <p>
 Provenance tracks the source, build steps, and environment used to produce the final artifact.
 </p>
 </div>
 </div>
-<div id="outline-container-org9d14125" class="outline-3">
-<h3 id="org9d14125">Q145: Why is provenance important?</h3>
-<div class="outline-text-3" id="text-org9d14125">
+<div id="outline-container-orgf51509e" class="outline-3">
+<h3 id="orgf51509e">Q145: Why is provenance important?</h3>
+<div class="outline-text-3" id="text-orgf51509e">
 <p>
 It helps audit and trace how an image was built and what inputs were included.
 </p>
 </div>
 </div>
-<div id="outline-container-org628a535" class="outline-3">
-<h3 id="org628a535">Q146: What is a security scan in Docker builds?</h3>
-<div class="outline-text-3" id="text-org628a535">
+<div id="outline-container-orgbd03b2d" class="outline-3">
+<h3 id="orgbd03b2d">Q146: What is a security scan in Docker builds?</h3>
+<div class="outline-text-3" id="text-orgbd03b2d">
 <p>
 A security scan checks the final image for known vulnerabilities in packages and libraries.
 </p>
 </div>
 </div>
-<div id="outline-container-org191626d" class="outline-3">
-<h3 id="org191626d">Q147: Why run scans after multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org191626d">
+<div id="outline-container-org199d1a6" class="outline-3">
+<h3 id="org199d1a6">Q147: Why run scans after multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org199d1a6">
 <p>
 Because the final image has fewer dependencies and fewer vulnerabilities than the build image.
 </p>
 </div>
 </div>
-<div id="outline-container-orge821764" class="outline-3">
-<h3 id="orge821764">Q148: What is Docker SBOM?</h3>
-<div class="outline-text-3" id="text-orge821764">
+<div id="outline-container-org7160601" class="outline-3">
+<h3 id="org7160601">Q148: What is Docker SBOM?</h3>
+<div class="outline-text-3" id="text-org7160601">
 <p>
 An SBOM (Software Bill of Materials) documents the components and dependencies in an image.
 </p>
 </div>
 </div>
-<div id="outline-container-org778f273" class="outline-3">
-<h3 id="org778f273">Q149: Why are SBOMs valuable?</h3>
-<div class="outline-text-3" id="text-org778f273">
+<div id="outline-container-org2fbeb5a" class="outline-3">
+<h3 id="org2fbeb5a">Q149: Why are SBOMs valuable?</h3>
+<div class="outline-text-3" id="text-org2fbeb5a">
 <p>
 They improve security visibility and compliance tracking for released images.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd283d3c" class="outline-3">
-<h3 id="orgd283d3c">Q150: What is a release stage?</h3>
-<div class="outline-text-3" id="text-orgd283d3c">
+<div id="outline-container-orgbee2dd5" class="outline-3">
+<h3 id="orgbee2dd5">Q150: What is a release stage?</h3>
+<div class="outline-text-3" id="text-orgbee2dd5">
 <p>
 A release stage packages and signs the final image for deployment to registries or production systems.
 </p>
 </div>
 </div>
-<div id="outline-container-org3eb497b" class="outline-3">
-<h3 id="org3eb497b">Q151: What is a debug stage?</h3>
-<div class="outline-text-3" id="text-org3eb497b">
+<div id="outline-container-orgad14251" class="outline-3">
+<h3 id="orgad14251">Q151: What is a debug stage?</h3>
+<div class="outline-text-3" id="text-orgad14251">
 <p>
 A debug stage includes shells, editors, and debugging tools for troubleshooting.
 </p>
 </div>
 </div>
-<div id="outline-container-org6653935" class="outline-3">
-<h3 id="org6653935">Q152: Why not ship debug stages to production?</h3>
-<div class="outline-text-3" id="text-org6653935">
+<div id="outline-container-org4e88cba" class="outline-3">
+<h3 id="org4e88cba">Q152: Why not ship debug stages to production?</h3>
+<div class="outline-text-3" id="text-org4e88cba">
 <p>
 They increase size and attack surface and are not needed by the runtime app.
 </p>
 </div>
 </div>
-<div id="outline-container-org73555d9" class="outline-3">
-<h3 id="org73555d9">Q153: What is a builder-only artifact copy step?</h3>
-<div class="outline-text-3" id="text-org73555d9">
+<div id="outline-container-org6c58825" class="outline-3">
+<h3 id="org6c58825">Q153: What is a builder-only artifact copy step?</h3>
+<div class="outline-text-3" id="text-org6c58825">
 <p>
 It selectively copies the final binary or package from the builder to the runtime stage.
 </p>
 </div>
 </div>
-<div id="outline-container-org9569727" class="outline-3">
-<h3 id="org9569727">Q154: Why is explicit copying safer than copying full directories?</h3>
-<div class="outline-text-3" id="text-org9569727">
+<div id="outline-container-org30a06d9" class="outline-3">
+<h3 id="org30a06d9">Q154: Why is explicit copying safer than copying full directories?</h3>
+<div class="outline-text-3" id="text-org30a06d9">
 <p>
 It reduces the risk of including build scripts, source code, secrets, or transient files in the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org184ace1" class="outline-3">
-<h3 id="org184ace1">Q155: What is the problem of copying the entire workspace?</h3>
-<div class="outline-text-3" id="text-org184ace1">
+<div id="outline-container-org0d18dde" class="outline-3">
+<h3 id="org0d18dde">Q155: What is the problem of copying the entire workspace?</h3>
+<div class="outline-text-3" id="text-org0d18dde">
 <p>
 It may include source code, dependencies, build caches, and credentials, which is often undesirable.
 </p>
 </div>
 </div>
-<div id="outline-container-org449ccf9" class="outline-3">
-<h3 id="org449ccf9">Q156: What is an artifact whitelist?</h3>
-<div class="outline-text-3" id="text-org449ccf9">
+<div id="outline-container-orgaa4add9" class="outline-3">
+<h3 id="orgaa4add9">Q156: What is an artifact whitelist?</h3>
+<div class="outline-text-3" id="text-orgaa4add9">
 <p>
 A whitelist is a rule that copies only known required outputs into the final stage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca3d4b0" class="outline-3">
-<h3 id="orgca3d4b0">Q157: Why is it good practice to copy only the artifact?</h3>
-<div class="outline-text-3" id="text-orgca3d4b0">
+<div id="outline-container-org1fead64" class="outline-3">
+<h3 id="org1fead64">Q157: Why is it good practice to copy only the artifact?</h3>
+<div class="outline-text-3" id="text-org1fead64">
 <p>
 It minimizes image size and reduces the chance of leaking internal build data.
 </p>
 </div>
 </div>
-<div id="outline-container-org9836b1d" class="outline-3">
-<h3 id="org9836b1d">Q158: What is Docker layer hygiene?</h3>
-<div class="outline-text-3" id="text-org9836b1d">
+<div id="outline-container-org95e6e5b" class="outline-3">
+<h3 id="org95e6e5b">Q158: What is Docker layer hygiene?</h3>
+<div class="outline-text-3" id="text-org95e6e5b">
 <p>
 Maintaining clean layers and removing temporary artifacts is part of robust Docker image design.
 </p>
 </div>
 </div>
-<div id="outline-container-org32cc1ae" class="outline-3">
-<h3 id="org32cc1ae">Q159: Why is docker build context size important?</h3>
-<div class="outline-text-3" id="text-org32cc1ae">
+<div id="outline-container-org879a40b" class="outline-3">
+<h3 id="org879a40b">Q159: Why is docker build context size important?</h3>
+<div class="outline-text-3" id="text-org879a40b">
 <p>
 Large contexts slow builds and may include unnecessary files.
 </p>
 </div>
 </div>
-<div id="outline-container-org0e56298" class="outline-3">
-<h3 id="org0e56298">Q160: How does .dockerignore help with multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org0e56298">
+<div id="outline-container-org25f8400" class="outline-3">
+<h3 id="org25f8400">Q160: How does .dockerignore help with multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org25f8400">
 <p>
 It can exclude node<sub>modules</sub>, build directories, local secrets, and large generated files.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf1a7253" class="outline-3">
-<h3 id="orgf1a7253">Q161: What is a monorepo multi-stage build challenge?</h3>
-<div class="outline-text-3" id="text-orgf1a7253">
+<div id="outline-container-orgc72f143" class="outline-3">
+<h3 id="orgc72f143">Q161: What is a monorepo multi-stage build challenge?</h3>
+<div class="outline-text-3" id="text-orgc72f143">
 <p>
 Multiple services or modules may require separate builder stages or multiple output copies.
 </p>
 </div>
 </div>
-<div id="outline-container-org6eed9d7" class="outline-3">
-<h3 id="org6eed9d7">Q162: Why is a single Dockerfile sometimes insufficient for complex projects?</h3>
-<div class="outline-text-3" id="text-org6eed9d7">
+<div id="outline-container-org2242a33" class="outline-3">
+<h3 id="org2242a33">Q162: Why is a single Dockerfile sometimes insufficient for complex projects?</h3>
+<div class="outline-text-3" id="text-org2242a33">
 <p>
 Because different components may require different build tools, artifact locations, or runtime packaging.
 </p>
 </div>
 </div>
-<div id="outline-container-org390b0f3" class="outline-3">
-<h3 id="org390b0f3">Q163: What is an image release pipeline?</h3>
-<div class="outline-text-3" id="text-org390b0f3">
+<div id="outline-container-orgfc59a78" class="outline-3">
+<h3 id="orgfc59a78">Q163: What is an image release pipeline?</h3>
+<div class="outline-text-3" id="text-orgfc59a78">
 <p>
 It builds and tests the app, scans the image, and pushes the final runtime image to a registry.
 </p>
 </div>
 </div>
-<div id="outline-container-orga51956e" class="outline-3">
-<h3 id="orga51956e">Q164: Why is multi-stage build central to image pipelines?</h3>
-<div class="outline-text-3" id="text-orga51956e">
+<div id="outline-container-org4a97fcd" class="outline-3">
+<h3 id="org4a97fcd">Q164: Why is multi-stage build central to image pipelines?</h3>
+<div class="outline-text-3" id="text-org4a97fcd">
 <p>
 Because it aligns build-time dependencies with final runtime requirements and improves operational quality.
 </p>
 </div>
 </div>
-<div id="outline-container-org243e68d" class="outline-3">
-<h3 id="org243e68d">Q165: What is a final stage with a rootless user?</h3>
-<div class="outline-text-3" id="text-org243e68d">
+<div id="outline-container-org3397527" class="outline-3">
+<h3 id="org3397527">Q165: What is a final stage with a rootless user?</h3>
+<div class="outline-text-3" id="text-org3397527">
 <p>
 A rootless final image runs the app as a non-root user to reduce privilege risk.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf629c23" class="outline-3">
-<h3 id="orgf629c23">Q166: What is a read-only root filesystem?</h3>
-<div class="outline-text-3" id="text-orgf629c23">
+<div id="outline-container-orgbcff3e0" class="outline-3">
+<h3 id="orgbcff3e0">Q166: What is a read-only root filesystem?</h3>
+<div class="outline-text-3" id="text-orgbcff3e0">
 <p>
 A read-only root filesystem prevents writes to the image filesystem and can be combined with mounted volumes for state.
 </p>
 </div>
 </div>
-<div id="outline-container-org88dcca6" class="outline-3">
-<h3 id="org88dcca6">Q167: What is volume vs image durability?</h3>
-<div class="outline-text-3" id="text-org88dcca6">
+<div id="outline-container-org608e995" class="outline-3">
+<h3 id="org608e995">Q167: What is volume vs image durability?</h3>
+<div class="outline-text-3" id="text-org608e995">
 <p>
 The image layer is immutable; volumes provide persistence for runtime state.
 </p>
 </div>
 </div>
-<div id="outline-container-org59bdfe9" class="outline-3">
-<h3 id="org59bdfe9">Q168: Why do multi-stage builds interoperate with volumes?</h3>
-<div class="outline-text-3" id="text-org59bdfe9">
+<div id="outline-container-orga86d3c5" class="outline-3">
+<h3 id="orga86d3c5">Q168: Why do multi-stage builds interoperate with volumes?</h3>
+<div class="outline-text-3" id="text-orga86d3c5">
 <p>
 Because the final image is minimal and state belongs in managed volumes or external storage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgebc07c0" class="outline-3">
-<h3 id="orgebc07c0">Q169: What is a security best practice in multi-stage builds?</h3>
-<div class="outline-text-3" id="text-orgebc07c0">
+<div id="outline-container-orgab183a2" class="outline-3">
+<h3 id="orgab183a2">Q169: What is a security best practice in multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgab183a2">
 <p>
 Ship only the artifact and runtime runtime dependencies, with no compilers or package managers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc935df" class="outline-3">
-<h3 id="orgbc935df">Q170: What is the final engineering principle behind multi-stage builds?</h3>
-<div class="outline-text-3" id="text-orgbc935df">
+<div id="outline-container-org888c855" class="outline-3">
+<h3 id="org888c855">Q170: What is the final engineering principle behind multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org888c855">
 <p>
 Build in a rich environment, ship a small and secure environment. That is the heart of Docker multi-stage build design.
 </p>
 </div>
 </div>
-<div id="outline-container-org56daa3e" class="outline-3">
-<h3 id="org56daa3e">Q171: Why is minimal runtime image desirable in production?</h3>
-<div class="outline-text-3" id="text-org56daa3e">
+<div id="outline-container-orgdda8266" class="outline-3">
+<h3 id="orgdda8266">Q171: Why is minimal runtime image desirable in production?</h3>
+<div class="outline-text-3" id="text-orgdda8266">
 <p>
 It reduces security exposure, deployment time, and operational complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a6d570" class="outline-3">
-<h3 id="org9a6d570">Q172: What is the consequence of carrying build artifacts into runtime?</h3>
-<div class="outline-text-3" id="text-org9a6d570">
+<div id="outline-container-orgb46abb4" class="outline-3">
+<h3 id="orgb46abb4">Q172: What is the consequence of carrying build artifacts into runtime?</h3>
+<div class="outline-text-3" id="text-orgb46abb4">
 <p>
 It may leak source code, build logic, and internal structure while increasing attack surface.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b8cab5" class="outline-3">
-<h3 id="org6b8cab5">Q173: What is a common operational mistake with multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org6b8cab5">
+<div id="outline-container-org651c705" class="outline-3">
+<h3 id="org651c705">Q173: What is a common operational mistake with multi-stage builds?</h3>
+<div class="outline-text-3" id="text-org651c705">
 <p>
 Copying the entire source tree or build directory instead of just the required artifact.
 </p>
 </div>
 </div>
-<div id="outline-container-orge05d15b" class="outline-3">
-<h3 id="orge05d15b">Q174: What is a common security mistake?</h3>
-<div class="outline-text-3" id="text-orge05d15b">
+<div id="outline-container-org6733d99" class="outline-3">
+<h3 id="org6733d99">Q174: What is a common security mistake?</h3>
+<div class="outline-text-3" id="text-org6733d99">
 <p>
 Leaving package managers or shell utilities in the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0d2dc0" class="outline-3">
-<h3 id="orge0d2dc0">Q175: What is a common performance mistake?</h3>
-<div class="outline-text-3" id="text-orge0d2dc0">
+<div id="outline-container-orgc7b41ef" class="outline-3">
+<h3 id="orgc7b41ef">Q175: What is a common performance mistake?</h3>
+<div class="outline-text-3" id="text-orgc7b41ef">
 <p>
 Not optimizing dependency installation ordering and build cache usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org7633a4c" class="outline-3">
-<h3 id="org7633a4c">Q176: What is a common compatibility mistake?</h3>
-<div class="outline-text-3" id="text-org7633a4c">
+<div id="outline-container-org9f578be" class="outline-3">
+<h3 id="org9f578be">Q176: What is a common compatibility mistake?</h3>
+<div class="outline-text-3" id="text-org9f578be">
 <p>
 Compiling against one system library and running against another in the final image.
 </p>
 </div>
 </div>
-<div id="outline-container-org0679927" class="outline-3">
-<h3 id="org0679927">Q177: How do you diagnose a root cause with multi-stage builds?</h3>
-<div class="outline-text-3" id="text-org0679927">
+<div id="outline-container-orgadc4ab5" class="outline-3">
+<h3 id="orgadc4ab5">Q177: How do you diagnose a root cause with multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgadc4ab5">
 <p>
 Check the runtime base image, binary linkage, copied artifact paths, and runtime dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb9b2e00" class="outline-3">
-<h3 id="orgb9b2e00">Q178: Why does multi-stage builds matter in CI/CD?</h3>
-<div class="outline-text-3" id="text-orgb9b2e00">
+<div id="outline-container-orgeec927e" class="outline-3">
+<h3 id="orgeec927e">Q178: Why does multi-stage builds matter in CI/CD?</h3>
+<div class="outline-text-3" id="text-orgeec927e">
 <p>
 It makes the build pipeline smaller, faster, and more secure while producing deployable artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org724ce81" class="outline-3">
-<h3 id="org724ce81">Q179: What is artifact promotion?</h3>
-<div class="outline-text-3" id="text-org724ce81">
+<div id="outline-container-org1f717b1" class="outline-3">
+<h3 id="org1f717b1">Q179: What is artifact promotion?</h3>
+<div class="outline-text-3" id="text-org1f717b1">
 <p>
 Artifact promotion moves a validated build artifact through the pipeline to higher environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orge16fa64" class="outline-3">
-<h3 id="orge16fa64">Q180: What is the major benefit of multi-stage build for release engineering?</h3>
-<div class="outline-text-3" id="text-orge16fa64">
+<div id="outline-container-org86c6a4b" class="outline-3">
+<h3 id="org86c6a4b">Q180: What is the major benefit of multi-stage build for release engineering?</h3>
+<div class="outline-text-3" id="text-org86c6a4b">
 <p>
 It cleanly separates the build environment from the runtime environment, helping security, portability, and operational quality.
 </p>
 </div>
 </div>
-<div id="outline-container-org102e4f1" class="outline-3">
-<h3 id="org102e4f1">Q181: What is runtime minimalism?</h3>
-<div class="outline-text-3" id="text-org102e4f1">
+<div id="outline-container-orgdc8b050" class="outline-3">
+<h3 id="orgdc8b050">Q181: What is runtime minimalism?</h3>
+<div class="outline-text-3" id="text-orgdc8b050">
 <p>
 Runtime minimalism means the final image contains as little as possible while still running the app correctly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc3b7a1" class="outline-3">
-<h3 id="orgcc3b7a1">Q182: What is build-time richness?</h3>
-<div class="outline-text-3" id="text-orgcc3b7a1">
+<div id="outline-container-org9b01505" class="outline-3">
+<h3 id="org9b01505">Q182: What is build-time richness?</h3>
+<div class="outline-text-3" id="text-org9b01505">
 <p>
 Build-time richness means the builder stage contains the necessary toolchain and dependencies for compilation.
 </p>
 </div>
 </div>
-<div id="outline-container-orga76fb7d" class="outline-3">
-<h3 id="orga76fb7d">Q183: What is the relationship between multi-stage builds and declarative infrastructure?</h3>
-<div class="outline-text-3" id="text-orga76fb7d">
+<div id="outline-container-org982416e" class="outline-3">
+<h3 id="org982416e">Q183: What is the relationship between multi-stage builds and declarative infrastructure?</h3>
+<div class="outline-text-3" id="text-org982416e">
 <p>
 They reflect the same principle: build once, then ship a focused runtime artifact.
 </p>
 </div>
 </div>
-<div id="outline-container-org729e17c" class="outline-3">
-<h3 id="org729e17c">Q184: What is the key difference between a build phase and a runtime phase?</h3>
-<div class="outline-text-3" id="text-org729e17c">
+<div id="outline-container-org3fe6b39" class="outline-3">
+<h3 id="org3fe6b39">Q184: What is the key difference between a build phase and a runtime phase?</h3>
+<div class="outline-text-3" id="text-org3fe6b39">
 <p>
 Build phase creates and assembles artifacts; runtime phase executes and serves them.
 </p>
 </div>
 </div>
-<div id="outline-container-orga48cf5e" class="outline-3">
-<h3 id="orga48cf5e">Q185: What is the final lesson of Docker multi-stage builds?</h3>
-<div class="outline-text-3" id="text-orga48cf5e">
+<div id="outline-container-orgefdb255" class="outline-3">
+<h3 id="orgefdb255">Q185: What is the final lesson of Docker multi-stage builds?</h3>
+<div class="outline-text-3" id="text-orgefdb255">
 <p>
 A good multi-stage Dockerfile is a sign of disciplined engineering: keep the build environment rich, keep the runtime image minimal, and keep the artifact boundaries explicit.
 </p>
