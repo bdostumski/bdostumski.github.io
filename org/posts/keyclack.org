@@ -1,0 +1,622 @@
+#+TITLE: Keycloak
+#+DATE: 2026-09-08
+#+TAGS: DevOps
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Keycloak
+
+-----
+
+* Beginner
+
+** Q1: What is Keycloak?
+Keycloak is an open-source identity and access management solution for modern applications and services.
+
+** Q2: Why use Keycloak?
+It centralizes authentication, authorization, user management, and federation for applications.
+
+** Q3: What is identity management?
+Identity management is the process of managing users, credentials, identity attributes, roles, and access.
+
+** Q4: What is authentication?
+Authentication is the process of verifying who a user is.
+
+** Q5: What is authorization?
+Authorization decides what an authenticated user is allowed to do.
+
+** Q6: What is OAuth 2.0?
+OAuth 2.0 is a delegated authorization framework that allows an app to access a resource on behalf of a user.
+
+** Q7: What is OpenID Connect (OIDC)?
+OIDC is an identity layer built on top of OAuth 2.0. It adds authentication and user identity information.
+
+** Q8: What is a realm in Keycloak?
+A realm is a logical space where users, clients, roles, and groups are managed.
+
+** Q9: Why are realms useful?
+They allow separation between environments, tenants, or application domains.
+
+** Q10: What is a user in Keycloak?
+A user is an identity that can log in and receive tokens or access resources.
+
+** Q11: What is a client in Keycloak?
+A client is an application or service that delegates authentication or authorization to Keycloak.
+
+** Q12: What is a client ID?
+A client ID identifies the client application in Keycloak.
+
+** Q13: What is a client secret?
+A client secret is a credential used by confidential clients to authenticate to Keycloak.
+
+** Q14: What is a public client?
+A public client runs on the frontend and does not have a secret, such as a SPA.
+
+** Q15: What is a confidential client?
+A confidential client can securely hold credentials such as a client secret, such as a backend server.
+
+** Q16: What is a role?
+A role defines permissions or groups of permissions that can be assigned to users or clients.
+
+** Q17: What is a realm role?
+A realm role applies within a realm.
+
+** Q18: What is a client role?
+A client role applies to a specific client application.
+
+** Q19: What is a user role?
+A user role is a role assigned to a particular user.
+
+** Q20: What is a group in Keycloak?
+A group is a collection of users that can share common roles and attributes.
+
+** Q21: Why are groups useful?
+They simplify permission assignment across many users.
+
+** Q22: What is a federated identity?
+A federated identity refers to users or identities coming from an external identity provider or directory.
+
+** Q23: What is identity brokering?
+Identity brokering lets Keycloak delegate authentication to external providers like Google, GitHub, or LDAP.
+
+** Q24: What is SSO?
+SSO (Single Sign-On) allows the same login to work across multiple applications.
+
+** Q25: Why use SSO?
+It reduces repeated logins and centralizes identity management.
+
+** Q26: What is an access token?
+An access token is a token presented to a resource server to authorize a request.
+
+** Q27: What is an ID token?
+An ID token contains user identity claims as part of OIDC.
+
+** Q28: What is a refresh token?
+A refresh token allows a client to get a new access token without re-authenticating the user.
+
+** Q29: What is a token claim?
+A token claim is a piece of data embedded in the token, such as sub, email, or role.
+
+** Q30: What is JWT?
+JWT (JSON Web Token) is a compact, self-contained token format used by OAuth/OIDC.
+
+** Q31: What is a signing key?
+A signing key is used to sign tokens produced by Keycloak.
+
+** Q32: What is token validation?
+Token validation checks whether a token is valid, signed correctly, and still active.
+
+** Q33: What is a user session?
+A user session represents an authenticated user session in Keycloak.
+
+** Q34: What is a logout flow?
+Logout invalidates a user session and tokens, ending the authentication context.
+
+** Q35: What is the Keycloak admin console?
+The Keycloak admin console provides a UI for managing realms, users, roles, clients, and policies.
+
+** Q36: What is Keycloak theme?
+A Keycloak theme customizes the look and feel of login pages and admin pages.
+
+** Q37: Why use Keycloak themes?
+To match the brand and user experience of your application.
+
+** Q38: What is an authentication flow?
+An authentication flow is a sequence of steps that a user must complete to log in.
+
+** Q39: What is a browser flow?
+A browser flow is the sequence used for login in a browser-based app.
+
+** Q40: What is a direct grant flow?
+A direct grant flow is used for username/password authentication to obtain tokens directly.
+
+** Q41: Why avoid direct grant in production for browser apps?
+Because it is less appropriate for browser apps and often better replaced by OIDC flows like Authorization Code + PKCE.
+
+** Q42: What is Authorization Code Flow?
+Authorization Code Flow is a browser-based OIDC flow where the client receives an auth code and exchanges it for tokens.
+
+** Q43: What is PKCE?
+PKCE (Proof Key for Code Exchange) prevents authorization code interception and is recommended for public clients.
+
+** Q44: What is implicit flow?
+Implicit flow was an older OAuth flow for browser apps, but it is discouraged in modern security design.
+
+** Q45: What is client credentials flow?
+Client Credentials Flow is used for machine-to-machine authentication where no user context is involved.
+
+** Q46: What is password grant?
+Password grant is an older OAuth flow for obtaining tokens using user credentials directly from the client.
+
+** Q47: Why is password grant often discouraged?
+It requires the client to handle user credentials and is less secure than more modern flows.
+
+** Q48: What is a resource server?
+A resource server protects APIs and validates access tokens.
+
+** Q49: What is a protected API?
+A protected API requires valid access tokens before serving requests.
+
+** Q50: What is a scope?
+A scope is a permission or claim group that a client may request from the user.
+
+** Q51: What is a permission?
+Permission is a granted right to access a resource or action.
+
+** Q52: What is a policy in Keycloak?
+A policy defines conditions under which a permission is granted.
+
+** Q53: What is authorization in Keycloak?
+Keycloak can enforce fine-grained permissions on resources and actions via UMA or policies.
+
+** Q54: What is UMA?
+UMA (User-Managed Access) allows users to manage access to resources and permissions.
+
+** Q55: What is a resource in Keycloak?
+A resource is something protected by authorization policies, like an API or feature.
+
+** Q56: What is an audience?
+An audience identifies the intended recipient of a token, usually the API or resource server.
+
+** Q57: What is a JWT claim `aud`?
+`aud` tells the recipient which resource the token is for.
+
+** Q58: What is a JWT claim `iss`?
+`iss` is the issuer of the token.
+
+** Q59: What is a JWT claim `sub`?
+`sub` is the subject, usually the user identifier.
+
+** Q60: What is a JWT claim `exp`?
+`exp` is the expiration time of the token.
+
+** Q61: Why does Keycloak use signed tokens?
+To ensure authenticity and integrity of token data.
+
+** Q62: What is a public key?
+A public key is used by clients and resource servers to validate token signatures.
+
+** Q63: What is a private key?
+A private key is used by the identity provider to sign tokens.
+
+** Q64: What is Keycloak adapter?
+A Keycloak adapter is a library that makes integrating applications with Keycloak easier.
+
+** Q65: What is the Keycloak JavaScript adapter?
+It helps browser SPAs or frontend apps integrate with Keycloak using OIDC.
+
+** Q66: What is a frontend app login flow?
+Usually an OIDC Authorization Code flow with PKCE for browser applications.
+
+** Q67: What is a backend app login flow?
+Usually a confidential client using client credentials or authorization code flow with a server-side session.
+
+** Q68: What is a custom identity provider?
+A custom identity provider is a custom external auth system integrated into Keycloak.
+
+** Q69: What is Keycloak federation?
+Federation allows Keycloak to connect to LDAP, Active Directory, or other identity stores.
+
+** Q70: What is a social login?
+A social login uses a third-party identity provider such as GitHub, Google, or Facebook.
+
+** Q71: What is a login page?
+A login page is the UI where users authenticate to Keycloak.
+
+** Q72: What is a registration page?
+A registration page allows new users to create accounts.
+
+** Q73: What is password policy?
+A password policy defines minimum password length, complexity, or expiration requirements.
+
+** Q74: Why use password policies?
+To reduce the risk of weak or reused credentials.
+
+** Q75: What is account console?
+Account console is the user-facing UI where a user can manage their profile, sessions, and credentials.
+
+** Q76: What is a user attribute?
+A user attribute stores profile data like email, phone, or custom fields.
+
+** Q77: What is a mapper?
+A mapper translates identity data from the external provider or source into Keycloak user attributes or token claims.
+
+** Q78: Why are mappers important?
+Because they map identity information from external sources into claims used by applications.
+
+** Q79: What is a consent screen?
+A consent screen asks the user to approve the application’s access to their identity and profile information.
+
+** Q80: What is user consent?
+User consent is the permission granted by the user to share identity data with a client application.
+
+** Q81: What is a resource ownership model?
+It defines who owns or manages access to a particular resource.
+
+** Q82: What is a session timeout?
+A session timeout is the period after which an inactive user session expires.
+
+** Q83: Why are session timeouts useful?
+They reduce the risk of stale or forgotten sessions.
+
+** Q84: What is a brute-force detection?
+Brute-force detection detects repeated failed login attempts and may temporarily block access.
+
+** Q85: Why use brute-force protection?
+To reduce password guessing and unauthorized access attempts.
+
+** Q86: What is a login theme?
+A login theme customizes the UI used for authentication screens.
+
+** Q87: Why might a team customize the Keycloak UI?
+To align with corporate branding or a product-specific experience.
+
+** Q88: What is Keycloak `docker-compose`?
+It is a common way to run Keycloak in development or small deployments with Docker Compose.
+
+** Q89: What is Keycloak `realm-export`?
+It exports realm configuration to a JSON file for backup or migration.
+
+** Q90: What is a Keycloak import?
+Importing a realm restores the configuration into a new Keycloak instance.
+
+** Q91: What is admin REST API?
+The admin REST API lets automation manage realms, users, clients, and flows.
+
+** Q92: Why use the admin API?
+Because it enables automation and infrastructure-as-code for identity configuration.
+
+** Q93: What is a realm JSON file?
+A realm JSON file contains the realm definition and configuration.
+
+** Q94: Why use infrastructure as code for Keycloak?
+Because it makes identity configuration reproducible and version-controlled.
+
+** Q95: What is a Keycloak realm role assignment?
+It assigns a role to a user or group within a realm.
+
+** Q96: What is a client role mapping?
+It assigns a role to a user or group within a specific client.
+
+** Q97: What is a user claim?
+A claim is data inside a token that identifies or describes a user, such as email or groups.
+
+** Q98: What is a group claim?
+A group claim includes group membership information in tokens.
+
+** Q99: Why use group claims?
+Because applications can enforce authorization based on group membership.
+
+** Q100: What is a user profile?
+A user profile is the set of attributes and metadata associated with a user.
+
+* Intermediate
+
+** Q101: What is OIDC Discovery document?
+The discovery document provides metadata about the OIDC provider, including issuer and token endpoints.
+
+** Q102: What is well-known configuration?
+It is the standard `/.well-known/openid-configuration` endpoint.
+
+** Q103: What is OAuth 2.0 Authorization Code Flow with PKCE?
+It is the recommended flow for browser apps and public clients.
+
+** Q104: Why is PKCE recommended for SPAs?
+Because SPAs cannot securely keep a client secret and are exposed in the browser.
+
+** Q105: What is token exchange?
+Token exchange is the process of exchanging one token for another token with different claims or audience.
+
+** Q106: What is an identity token vs access token?
+ID token describes user identity.
+Access token authorizes access to APIs.
+
+** Q107: What is refresh token rotation?
+Refresh rotation ensures a token cannot be reused indefinitely and improves security.
+
+** Q108: What is token revocation?
+Token revocation invalidates a token before its expiration time.
+
+** Q109: Why use revocation?
+To quickly shut down a token if it is suspected to be compromised.
+
+** Q110: What is logout and token invalidation?
+Logout ends the user session and often invalidates access and refresh tokens.
+
+** Q111: What is session management?
+It manages the active user sessions, their validity, and timeouts.
+
+** Q112: What is an identity provider alias?
+It is the name Keycloak uses to reference an external provider.
+
+** Q113: What is social login integration?
+It connects Keycloak to external identity providers such as Google or GitHub.
+
+** Q114: What is LDAP integration?
+LDAP integration allows Keycloak to authenticate users against an enterprise directory.
+
+** Q115: What is Active Directory integration?
+Keycloak can integrate with Microsoft Active Directory or AD FS for enterprise identity.
+
+** Q116: What is an identity broker?
+An identity broker routes authentication requests to configured external identity providers.
+
+** Q117: What is a custom login flow?
+It is a custom sequence of authentication actions for a realm or client.
+
+** Q118: What is a first broker login flow?
+It is the login flow used when a user logs in with an external identity provider for the first time.
+
+** Q119: What is a required action?
+A required action is an additional step a user must complete after login, such as password update or profile verification.
+
+** Q120: What is a password update action?
+It prompts the user to change or confirm a password.
+
+** Q121: What is a user profile provider?
+It defines the attributes and validation rules for user profiles.
+
+** Q122: What is user federation?
+User federation connects Keycloak to an external user store.
+
+** Q123: Why use federation?
+To avoid duplicating user identities in multiple systems.
+
+** Q124: What is a realm role mapping?
+It assigns a realm role to a user or group.
+
+** Q125: What is a client scope?
+A client scope allows a client to request a set of claims or roles in an access token.
+
+** Q126: Why use client scopes?
+Because applications often need specific token claims or roles without polluting all tokens.
+
+** Q127: What is a protocol mapper?
+A protocol mapper transforms user data into a JWT claim or OIDC claim.
+
+** Q128: What is a built-in protocol mapper?
+A built-in mapper, like `group-membership` or `email`, automatically adds common claims.
+
+** Q129: What is a custom protocol mapper?
+A custom mapper adds app-specific claims to tokens.
+
+** Q130: What is a user info endpoint?
+The user info endpoint returns user identity information to authorized clients.
+
+** Q131: What is a token introspection endpoint?
+It lets resource servers validate token validity and metadata.
+
+** Q132: What is a revocation endpoint?
+It allows clients or systems to revoke tokens.
+
+** Q133: What is a JWK set?
+A JWK set contains public keys used to validate JWT signatures.
+
+** Q134: Why do resource servers fetch JWKs?
+Because they need the public keys to verify JWT signatures.
+
+** Q135: What is TLS?
+TLS secures traffic between clients, Keycloak, and APIs.
+
+** Q136: Why is TLS important for Keycloak?
+Because identity data, tokens, and secrets must be protected in transit.
+
+** Q137: What is a secure cookie?
+A secure cookie is used to store session-related info and should only be transmitted over HTTPS.
+
+** Q138: What is a SameSite cookie?
+A SameSite cookie restricts when a browser sends cookies to third-party sites.
+
+** Q139: Why is cookie security important?
+Because session hijacking or CSRF attacks may use cookies if not protected properly.
+
+** Q140: What is CSRF?
+CSRF (Cross-Site Request Forgery) is a web attack where a malicious site tricks a browser into making authenticated requests.
+
+** Q141: What is a logout redirect URI?
+It is the URL the user is redirected to after logout.
+
+** Q142: What is a redirect URI?
+It is the callback URI used by OAuth/OIDC after login.
+
+** Q143: Why is redirect URI validation important?
+Because redirect URIs are a common OAuth security check and must match exactly or appropriately.
+
+** Q144: What is a trusted client?
+A trusted client is expected to handle security and identity correctly.
+
+** Q145: What is a public client redirect issue?
+A public client cannot safely keep a secret and must use flows like PKCE.
+
+** Q146: What is a confidential client redirect issue?
+Confidential clients can use server-side secure credential storage.
+
+** Q147: What is an authorization server?
+An authorization server issues tokens and manages identity and authorization decisions.
+
+** Q148: What is a resource owner?
+A resource owner is the person or system that owns the protected resource.
+
+** Q149: What is delegated authorization?
+Delegated authorization means an app acts on behalf of a user with their consent.
+
+** Q150: What is client configuration?
+Client configuration includes redirect URIs, grant types, scopes, and credentials.
+
+** Q151: What is an audience claim in API tokens?
+It tells the API which client or resource should accept the token.
+
+** Q152: What is an access token audience mismatch?
+It happens when the API expects a different audience than the token provides.
+
+** Q153: Why is audience validation important?
+Because otherwise an API might accept a token meant for another service.
+
+** Q154: What is Keycloak multi-tenancy?
+It is the support for multiple isolated realms or clients in the same deployment.
+
+** Q155: What is realm isolation?
+Realm isolation keeps users, roles, and clients separate between realms.
+
+** Q156: Why is realm isolation useful?
+It supports separate domains, tenants, or business units.
+
+** Q157: What is a user federation mapper?
+It maps external user attributes or groups into Keycloak identity information.
+
+** Q158: What is an event listener?
+An event listener can react to login, logout, or registration events.
+
+** Q159: Why use event listeners?
+To trigger audits, metrics, or external notifications.
+
+** Q160: What is a theme provider?
+A theme provider allows custom pages or styling for authentication flows.
+
+** Q161: What is a realm export or import strategy?
+It is how a realm configuration is moved between environments or instances.
+
+** Q162: Why is version control important for Keycloak config?
+Because identity configs can drift over time without proper governance.
+
+** Q163: What is a default role?
+A default role is assigned to every user or group automatically.
+
+** Q164: Why use default roles?
+To avoid repetitive role mapping for common access.
+
+** Q165: What is a composite role?
+A composite role contains other roles and can simplify permissions.
+
+** Q166: Why use composite roles?
+They make role management easier and more scalable.
+
+** Q167: What is feature flag or preview feature?
+Keycloak includes some experimental features behind configuration flags.
+
+** Q168: What is a `client-scopes` configuration?
+It defines which claims and roles are included by default in tokens for clients.
+
+** Q169: What is fine-grained authorization?
+It allows detailed permissions per resource, action, and user or policy.
+
+** Q170: What is an authorization policy?
+It combines conditions and permissions to decide who can access a resource.
+
+** Q171: What is a permission ticket?
+A permission ticket is part of UMA flows and represents a request for access to a resource.
+
+** Q172: What is an UMA flow?
+It allows resource owners to manage and grant access to resources.
+
+** Q173: What is realm-level security?
+It ensures security controls and login settings are applied consistently within a realm.
+
+** Q174: Why is Keycloak valuable for enterprise identity?
+Because it supports federation, roles, SSO, MFA, and policy enforcement across many apps.
+
+** Q175: What is a group membership claim?
+It contains the user’s group memberships in a token.
+
+** Q176: Why does authorization often rely on claims?
+Because resource servers can make decisions based on roles, scopes, or group claims.
+
+** Q177: What is a token audience mismatch error?
+It means the API is rejecting a token because it is not meant for that service.
+
+** Q178: Why handle tokens carefully in APIs?
+Because they are security-sensitive and often grant access to protected actions.
+
+** Q179: What is a login redirect with `code`?
+The browser receives an authorization code and exchanges it for tokens in the backend.
+
+** Q180: What is the relationship between Keycloak and OAuth/OIDC?
+Keycloak implements both OAuth 2.0 and OIDC and acts as an identity provider and authorization server.
+
+* Advanced / Expert
+
+** Q181: What is multi-factor authentication (MFA)?
+MFA requires more than one factor, such as password and TOTP, to authenticate.
+
+** Q182: Why is MFA important?
+It reduces the chance of account compromise even if a password is stolen.
+
+** Q183: What is OTP?
+OTP (One-Time Password) is a transient code often generated via TOTP or HOTP.
+
+** Q184: What is TOTP?
+TOTP (Time-based One-Time Password) is a common MFA method.
+
+** Q185: What is WebAuthn?
+WebAuthn is a passkey or FIDO-based authentication mechanism that avoids static secrets.
+
+** Q186: Why is WebAuthn important?
+It provides stronger user authentication and better phishing resistance.
+
+** Q187: What is passkey?
+A passkey is a passwordless or FIDO-based credential stored on a device.
+
+** Q188: What is a custom authenticator?
+A custom authenticator can implement special authentication logic or enforce custom user checks.
+
+** Q189: What is a required action provider?
+It enforces an action after login, such as password update, email verification, or profile completion.
+
+** Q190: What is a custom identity provider SPI?
+SPI (Service Provider Interface) allows custom logic for identity or protocol features.
+
+** Q191: What is an event listener SPI?
+It enables integration with external systems when significant authentication or account events occur.
+
+** Q192: What is a custom theme provider?
+It allows custom UI and behavior at the Keycloak authentication boundary.
+
+** Q193: What is a User Storage SPI?
+It enables custom user storage integration, including databases or external directories.
+
+** Q194: Why use custom user storage?
+For integrating with legacy or non-standard identity systems.
+
+** Q195: What is policy enforcement in Keycloak?
+It decides whether a request to a resource is allowed based on the user, resource, and rules.
+
+** Q196: What is an UMA resource permission ticket?
+It is the request object that a client creates when asking for a permission.
+
+** Q197: What is a Keycloak admin event?
+It is an event tracking administrative actions like user creation or client configuration changes.
+
+** Q198: What is an account event?
+It is a user-related event such as login, logout, or failed authentication.
+
+** Q199: What is the core security principle behind Keycloak?
+Keycloak centralizes identity, strongly enforces protocols like OAuth/OIDC, and reduces per-application security complexity.
+
+** Q200: What is the single most important lesson about Keycloak?
+The real value of Keycloak is not just login pages; it is centralized identity, strong token handling, policy enforcement, and scalable user management across many applications.
+
+-----
+
+#+INCLUDE: "../footer.org"
