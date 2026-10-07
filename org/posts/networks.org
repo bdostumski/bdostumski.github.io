@@ -296,6 +296,11 @@ SSL (Secure Sockets Layer) is the older predecessor to TLS.
 ** Q90: What is a TCP handshake?
 The TCP handshake is the sequence of SYN, SYN-ACK, and ACK used to establish a connection.
 
+| Packet  | Label               | Connection       | Description                                                       |
+| SYN     | Can we connect?     | Client -> Server    | I want to start a TCP connection.                                 |
+| SYN-ACK | Yes, I'm ready.     | Server -> Client | Yes, I received your request, and I'm ready to connect too.  |
+| ACK     | Great, let's start. | Client -> Server | I received your response                                          |
+
 ** Q91: What is a three-way handshake?
 A three-way handshake is the standard process used by TCP to connect two endpoints.
 
@@ -325,6 +330,27 @@ A FIN packet indicates the sender has no more data to send.
 
 ** Q100: What is a SYN flood?
 A SYN flood is a denial-of-service attack that overwhelms a server with half-open TCP connections.
+Attacker sends a large number of SYN requests but does not complete the handshake.
+
+#+BEGIN_SRC text
+Attacker -> Server : SYN
+Attacker -> Server : SYN
+Attacker -> Server : SYN
+...
+#+END_SRC
+
+For each SYN, the server sends a SYN-ACK and temporarily keeps information about the connection waiting for the final ACK. 
+What happens? The server has a limited amount of memory/resources for these half-open connection.
+So the goal is to exhaust the server's TCP connection resources, making the server slow or unavailable to legitimate users. 
+
+Example:
+- Someone calls in a restaurant: "I'd like a table." -> SYN
+- Restaurant: "Sure, we're reserving one for you." -> SYN-ACK
+- Customer: "I'm coming." -> ACK
+
+Now imagine someone makes thousands of reservations but never shows up.
+The restaurant keeps holding tables for them, and eventually real customers can't get a table.
+That's essentially the idea behind a SYN flood.
 
 ** Q101: What is a port scan?
 A port scan probes multiple ports to discover which services are exposed.
@@ -729,11 +755,27 @@ HTTP/3 runs over QUIC, which integrates encryption at the transport layer.
 ** Q232: What is a SYN cookie?
 A SYN cookie is a technique used to protect servers from SYN flood attacks without storing many half-open connections.
 
+- SYN flood - attackers send lots of SYN's to consume server resources
+- SYN cookies - server avoids allocating significant connection until the client proves it can complete the handshake.
+  Defense mechanism against SYN flood style resource exhaustion.
+
 ** Q233: What is a DDoS attack?
 A DDoS attack overwhelms a target with a flood of traffic from many sources, often distributed across botnets.
 
+- DoS - an attack intended to make a service unavailable
+- DDoS - the same general goal, but the attack comes from many sources
+- SYN flood - a technique that abuses the TCP handshake. SYN flood can be DoS or DDoS attack, depending on whether the trafic comes from one source or many sources.
+
 ** Q234: How do networks mitigate DDoS?
 By rate limiting, filtering, CDN use, scrubbing centers, and distributed defense systems.
+
+- Rate limit - Limits how many requests a client can make in a given period. Helps prevent one source from consuming all resources.
+- Firewall and traffic filtering - Block traffic that matches suspicious patterns. For example, unwanted ports, protocols, IP addresses, or malformed packets.
+- DDoS protection service - Service such as cloud-based DDoS protection can sit between users and the server. They filter attack traffic before reaches the server.
+- Load balancing - Distributes traffic across multiple servers. This prevents one server to become a single point of failure.
+- CDNs (Content Delivery Network) - Distributes content across many geographically distributed servers. They can absorb large amounts of traffic and keep the origin server protected.
+- Anycast networking - The same IP address is announced from multiple locations. Incoming traffic is distributed among those locations rather than hitting one machine.
+- SYN cookie - Specifically help defend against SYN-flood attacks by reducing the amount of connection state the server needs to maintain for incomplete TCP handshakes.
 
 ** Q235: What is a CDN?
 A CDN (Content Delivery Network) caches content near users to improve performance and reduce origin load.
