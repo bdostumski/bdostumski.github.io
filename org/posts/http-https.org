@@ -21,6 +21,10 @@ HTTPS is HTTP over TLS/SSL, meaning the HTTP traffic is encrypted and authentica
 ** Q3: Why is HTTPS important?
 HTTPS protects data in transit from eavesdropping, tampering, and impersonation.
 
+- Eavesdropping - Someone is listening (An attacker secretly observes the data traveling between you and a website)
+- Tampering - Someone changes the data (An attacker intercepts the communication and modifies it)
+- Impersonation - Someone pretends to be the website (TLS certificate help your browser to verify that it is communicating with the server associated with the requested domain)
+
 ** Q4: What is a URL?
 A URL (Uniform Resource Locator) is the address used to identify a web resource, such as https://example.com/page.
 
@@ -221,6 +225,15 @@ A bearer token is a token that grants access to whoever possesses it, so it must
 
 ** Q70: What is Basic Auth?
 Basic Auth sends a username and password encoded as base64 inside the Authorization header.
+
+- username:password
+- encoded with base64
+- then sent like: Authorization: Basic <base64(username:password)> 
+
+Important notes:
+- It is not encrypted by itself. Base64 is just encoding, not security.
+- It should only be used over HTTPS, otherwise credentials can be intercepted.
+- It is widely considered outdated compared to token-based auth or OAuth for modern apps. 
 
 ** Q71: Why is Basic Auth not ideal?
 It is not very secure unless used over HTTPS and is weaker than modern token-based auth.
@@ -691,8 +704,37 @@ It includes HTTPS only, HSTS, secure cookies, strong TLS, headers like Content-S
 ** Q225: What is CSP?
 CSP (Content Security Policy) restricts script execution and resource loading to reduce XSS risk.
 
+#+BEGIN_SRC http
+
+// A website might send this HTTP header
+Content-Security-Policy: frame-ancestors 'self';
+
+// Only allow JavaScript (script) to come from the website's own origin ('self').
+
+#+END_SRC
+
+- script-src  - JavaScript
+- style-src   - CSS
+- img-src     - Images
+- font-src    - Fonts
+- connect-src - API/network connections
+- frame-src   - Embeded frames
+
+CSP controls what the browser is allowed to load or execute on a webpage.
+
 ** Q226: What is X-Frame-Options?
 X-Frame-Options prevents clickjacking by denying or restricting framing of a page.
+
+#+BEGIN_SRC http
+
+HTTP/1.1 200 OK
+Content-Security-Policy: frame-ancestors 'none';
+
+#+END_SRC
+
+- NONE - Nobody can put your page inside an iframe, including your own site.
+- SELF - Your page can only be framed by pages from the same origin.
+- SELF - You may encounter: Content-Security-Policy: frame-ancestors 'self' https://trusted.example.com;
 
 ** Q227: What is Referrer-Policy?
 Referrer-Policy controls how much referrer information is sent across origins.
