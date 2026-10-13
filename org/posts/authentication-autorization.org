@@ -1,0 +1,623 @@
+#+TITLE: Authentication & Authorization
+#+DATE: 2025-02-07
+#+TAGS: Network
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Authentication & Authorization
+
+-----
+
+* Beginner
+
+** Q1: What is authentication?
+Authentication is the process of verifying who a user or system is.
+
+** Q2: What is authorization?
+Authorization is the process of deciding what an authenticated user or system is allowed to do.
+
+** Q3: Why are authentication and authorization different?
+Authentication answers “Who are you?”
+Authorization answers “What are you allowed to do?”
+
+** Q4: What is identity?
+Identity is the set of attributes or claims that represent a person or system.
+
+** Q5: What is a principal?
+A principal is an entity, such as a user or service, that can be authenticated.
+
+** Q6: What is a subject?
+A subject is an authenticated identity or principal in security systems.
+
+** Q7: What is a credential?
+A credential is the secret or evidence used to prove identity, such as a password or certificate.
+
+** Q8: What is a secret?
+A secret is a value known only to the user or trusted system, such as a password or token.
+
+** Q9: What is a password?
+A password is a secret string used for authentication.
+
+** Q10: What is a user account?
+A user account is a digital record representing a user in a system.
+
+** Q11: What is a login?
+A login is the process of authenticating a user to a system.
+
+** Q12: What is a logout?
+A logout ends the authenticated session and revokes access for that session.
+
+** Q13: What is session management?
+Session management tracks authenticated sessions and their lifetime.
+
+** Q14: What is an authentication factor?
+A factor is a category of evidence used to verify identity, such as knowledge, possession, or inherence.
+
+** Q15: What is knowledge factor?
+A knowledge factor is something the user knows, like a password or PIN.
+
+** Q16: What is possession factor?
+A possession factor is something the user has, such as a hardware token or phone.
+
+** Q17: What is inherence factor?
+An inherence factor is something the user is or does, such as a fingerprint or face.
+
+** Q18: What is MFA?
+MFA (Multi-Factor Authentication) requires two or more authentication factors.
+
+** Q19: Why is MFA important?
+It reduces risk if one factor is compromised.
+
+** Q20: What is SSO?
+SSO (Single Sign-On) allows one login to provide access to multiple applications.
+
+** Q21: What is a realm?
+A realm is a logical security domain or tenant for users, credentials, and policies.
+
+** Q22: What is a role?
+A role is a logical grouping of permissions granted to a user or service.
+
+** Q23: What is a permission?
+A permission is the right to perform a specific action or access a resource.
+
+** Q24: What is ACL?
+ACL (Access Control List) is a list of subjects and allowed operations on a resource.
+
+** Q25: What is RBAC?
+RBAC (Role-Based Access Control) grants permissions through roles instead of directly assigning them to users.
+
+** Q26: What is ABAC?
+ABAC (Attribute-Based Access Control) grants permissions based on attributes like user role, department, or device type.
+
+** Q27: What is PBAC?
+Policy-Based Access Control uses security policies to authorize actions based on conditions.
+
+** Q28: What is policy evaluation?
+Policy evaluation analyzes conditions and decides whether access is allowed.
+
+** Q29: What is an access control matrix?
+An access control matrix maps subjects to resources and allowed actions.
+
+** Q30: What is least privilege?
+Least privilege means granting the minimum permissions needed to do a task.
+
+** Q31: Why is least privilege important?
+It reduces the blast radius of a compromise.
+
+** Q32: What is separation of duties?
+Separation of duties splits critical tasks across multiple users or roles.
+
+** Q33: What is a user store?
+A user store is a repository of identities, such as a database, LDAP directory, or external identity provider.
+
+** Q34: What is an identity provider?
+An identity provider authenticates users and provides identity information to other systems.
+
+** Q35: What is OAuth 2.0?
+OAuth 2.0 is an authorization framework for delegated access.
+
+** Q36: What is OpenID Connect?
+OIDC is an identity layer on top of OAuth 2.0 used for authentication.
+
+** Q37: What is SAML?
+SAML is an XML-based standard for exchanging authentication and authorization data between parties.
+
+** Q38: What is a token?
+A token is a digitally signed or generated artifact used to represent identity or permissions.
+
+** Q39: What is an access token?
+An access token is used to access protected resources.
+
+** Q40: What is an ID token?
+An ID token contains identity claims for the authenticated user.
+
+** Q41: What is a refresh token?
+A refresh token allows a client to obtain new tokens without user re-login.
+
+** Q42: What is a bearer token?
+A bearer token grants access to anyone who possesses it, so it must be protected.
+
+** Q43: What is a JWT?
+JWT (JSON Web Token) is a compact token format containing signed claims.
+
+** Q44: What is a claim?
+A claim is a statement about a subject, such as name, email, or role.
+
+** Q45: What is a scope?
+A scope is a requested permission or claim group in OAuth/OIDC.
+
+** Q46: What is a resource server?
+A resource server protects APIs and validates access tokens.
+
+** Q47: What is a client application?
+A client application requests tokens and accesses protected resources.
+
+** Q48: What is a confidential client?
+A confidential client can store credentials securely, such as a backend service.
+
+** Q49: What is a public client?
+A public client runs in a browser or mobile app and cannot safely store secrets.
+
+** Q50: What is a redirect URI?
+A redirect URI is a callback URL used after login or consent.
+
+** Q51: Why is redirect URI validation important?
+It prevents tokens from being sent to the wrong application.
+
+** Q52: What is consent?
+Consent is user approval to share information or permissions with an application.
+
+** Q53: Why does consent matter?
+It gives users control over which data is shared.
+
+** Q54: What is a session cookie?
+A session cookie stores session state in the browser.
+
+** Q55: Why use cookies in authentication?
+Cookies let web applications maintain session state without repeatedly asking the user to log in.
+
+** Q56: What is a secure cookie?
+A secure cookie is only sent over HTTPS.
+
+** Q57: What is a SameSite cookie?
+A SameSite cookie controls whether the browser sends the cookie in cross-site requests.
+
+** Q58: What is CSRF?
+CSRF (Cross-Site Request Forgery) is an attack that tricks a browser into making authenticated requests.
+
+** Q59: Why is CSRF protection important?
+Because session cookies can be abused if not protected.
+
+** Q60: What is OAuth 2.0 authorization code flow?
+A browser app redirects the user to the authorization server, receives an authorization code, and exchanges it for tokens.
+
+** Q61: What is PKCE?
+PKCE (Proof Key for Code Exchange) is used to protect authorization code flow for public clients.
+
+** Q62: What is client credentials flow?
+Client credentials flow allows a confidential client to authenticate as itself without a user.
+
+** Q63: What is device authorization flow?
+It is used for devices without browsers, such as TVs or IoT devices.
+
+** Q64: What is password grant?
+Password grant allows a client to exchange a username and password for tokens.
+
+** Q65: Why is password grant discouraged?
+Because it requires the client to handle user credentials directly.
+
+** Q66: What is authorization server?
+An authorization server authenticates users, issues tokens, and enforces access control.
+
+** Q67: What is an identity token vs access token?
+An ID token represents identity claims.
+An access token allows access to resources.
+
+** Q68: What is token introspection?
+Token introspection validates an opaque or JWT token and returns metadata about it.
+
+** Q69: What is token validation?
+Token validation checks issuer, audience, signature, expiration, and claims.
+
+** Q70: What is audience?
+Audience indicates the intended recipient of a token.
+
+** Q71: What is issuer?
+Issuer identifies the trusted identity provider that issued the token.
+
+** Q72: What is scope-based authorization?
+It authorizes actions based on requested scopes.
+
+** Q73: What is claim-based authorization?
+It authorizes based on claims in the token.
+
+** Q74: What is role-based authorization?
+It authorizes based on assigned roles.
+
+** Q75: What is policy-based authorization?
+It authorizes based on conditions and policy logic.
+
+** Q76: What is federated authentication?
+Federated authentication allows trust to be delegated to another identity provider.
+
+** Q77: What is social login?
+Social login uses third-party accounts like Google or GitHub to sign in.
+
+** Q78: Why use social login?
+It reduces registration friction and centralizes identity.
+
+** Q79: What is user provisioning?
+User provisioning creates and manages user accounts in target systems.
+
+** Q80: What is deprovisioning?
+Deprovisioning removes access or accounts when a user is no longer authorized.
+
+** Q81: What is account lockout?
+Account lockout temporarily disables access after repeated failed login attempts.
+
+** Q82: What is password hashing?
+Password hashing protects stored secrets by transforming them into non-reversible values.
+
+** Q83: Why hash passwords?
+Because storing plaintext passwords is insecure.
+
+** Q84: What is salting?
+Salting adds random data to passwords before hashing to prevent rainbow table attacks.
+
+** Q85: What is a certificate authority?
+A certificate authority signs certificates and validates identities.
+
+** Q86: What is TLS?
+TLS secures network communication and protects secrets in transit.
+
+** Q87: What is mTLS?
+Mutual TLS requires both sides to present client and server certificates.
+
+** Q88: Why is TLS important?
+Because tokens, passwords, and session values must be protected during transport.
+
+** Q89: What is a bad password policy?
+A weak or nonexistent password policy increases credential theft risk.
+
+** Q90: What is a password reset flow?
+It allows users to reset forgotten passwords securely.
+
+** Q91: What is an authorization code challenge?
+A PKCE challenge and verifier pair prevents interception of authorization codes.
+
+** Q92: What is a verifier?
+A verifier is a secret used with PKCE to prove possession of the initial challenge.
+
+** Q93: What is token expiry?
+Token expiry is the time after which a token is no longer valid.
+
+** Q94: Why use short-lived tokens?
+To reduce the impact of stolen or leaked tokens.
+
+** Q95: What is a session timeout?
+A session timeout ends an inactive or long-lived login session.
+
+** Q96: What is a file-based auth?
+It is authentication using local files or properties, often in simple systems.
+
+** Q97: What is LDAP?
+LDAP is a directory protocol often used for enterprise identity and group management.
+
+** Q98: What is Active Directory?
+Microsoft Active Directory is a directory service used for enterprise identity.
+
+** Q99: Why integrate with LDAP or AD?
+To reuse existing enterprise identities and groups.
+
+** Q100: What is user impersonation?
+Impersonation allows an admin to act as another user for debugging or support.
+
+* Intermediate
+
+** Q101: What is identity federation?
+Identity federation connects multiple identity domains via trust agreements or standards.
+
+** Q102: What is an external identity provider?
+An external IdP authenticates users and provides claims to the relying system.
+
+** Q103: What is a service provider?
+A service provider relies on an identity provider for authentication and identity claims.
+
+** Q104: What is OAuth 2.0 vs OIDC?
+OAuth 2.0 is for authorization; OIDC adds authentication and user identity.
+
+** Q105: What is SAML vs OIDC?
+SAML is XML-based and common in enterprise SSO; OIDC is JSON-based and common in modern web apps.
+
+** Q106: What is IdP-initiated login?
+A user starts from the identity provider and is redirected into the application.
+
+** Q107: What is SP-initiated login?
+A user starts at the application and is redirected to the identity provider.
+
+** Q108: What is a trust relationship?
+A trust relationship allows one system to trust another identity provider or domain.
+
+** Q109: What is claim mapping?
+Claim mapping transforms attributes from one system into claims expected by another.
+
+** Q110: What is a protocol mapper?
+A protocol mapper transforms internal identity information into token claims.
+
+** Q111: What is consent management?
+Consent management handles when and how users allow applications to access personal data.
+
+** Q112: What is OAuth scope consent?
+The user consents to granting specific scopes to an application.
+
+** Q113: What is a token audience mismatch?
+It occurs when a token is intended for one API but presented to another.
+
+** Q114: Why is audience validation required?
+Because an API must ensure the token is meant for it.
+
+** Q115: What is issuer validation?
+The API verifies the token was issued by a trusted identity provider.
+
+** Q116: What is token signing?
+Token signing creates a verifiable signature and ensures token integrity.
+
+** Q117: What is a JWK?
+A JWK is a JSON representation of a cryptographic key used to verify JWT signatures.
+
+** Q118: What is a JWK set endpoint?
+It exposes public keys that clients and APIs can use to validate tokens.
+
+** Q119: What is a token payload?
+The payload is the part of the JWT that contains claims.
+
+** Q120: Why is JWT header important?
+It contains metadata such as algorithm and token type.
+
+** Q121: What is a symmetric signing key?
+A symmetric key is shared between parties and used for HMAC-based signing.
+
+** Q122: What is an asymmetric signing key?
+An asymmetric key pair uses a private key to sign and a public key to verify.
+
+** Q123: Why prefer asymmetric keys for OAuth/OIDC?
+They allow verification without sharing private keys and are common for distributed systems.
+
+** Q124: What is a user-management system?
+It handles user creation, deactivation, password reset, roles, and profile updates.
+
+** Q125: What is account recovery?
+Account recovery is the process of regaining access after forgetting credentials or losing devices.
+
+** Q126: Why are recovery flows sensitive?
+They often verify identity and can become attack paths if not designed well.
+
+** Q127: What is passwordless authentication?
+Passwordless authentication uses factors such as magic links, OTPs, or passkeys instead of passwords.
+
+** Q128: What is magic link auth?
+A magic link sends a one-time login link to the user’s email or phone.
+
+** Q129: What is a one-time passcode?
+A one-time passcode is a temporary code used as a possession factor.
+
+** Q130: What is TOTP?
+TOTP is a time-based one-time password used in MFA systems.
+
+** Q131: What is HOTP?
+HOTP is a counter-based one-time password algorithm.
+
+** Q132: What is WebAuthn?
+WebAuthn is a strong authentication standard using public-key cryptography and devices such as security keys.
+
+** Q133: What is passkey?
+A passkey is a WebAuthn-based credential stored on a device.
+
+** Q134: What is OAuth token revocation?
+Token revocation invalidates tokens before their expiry to terminate authorization quickly.
+
+** Q135: What is token exchange?
+Token exchange converts one token into another, often for different audiences or scopes.
+
+** Q136: What is delegated access?
+Delegated access means a user authorizes an app to act on their behalf.
+
+** Q137: What is a resource owner password flow?
+It is a flow where the resource owner directly provides credentials to the client.
+
+** Q138: Why is resource owner password flow discouraged?
+Because it increases exposure to credential handling by clients.
+
+** Q139: What is a security context?
+A security context holds the authenticated user identity and associated claims.
+
+** Q140: What is a principal transformer?
+It converts raw identity data into a principal object used by the application.
+
+** Q141: What is a permission check?
+It verifies whether a subject is allowed to perform a certain action.
+
+** Q142: What is a policy engine?
+A policy engine evaluates conditions and decides whether to allow access.
+
+** Q143: What is a role hierarchy?
+A role hierarchy allows higher-level roles to include lower-level permissions.
+
+** Q144: Why use role hierarchy?
+It simplifies role management in complex systems.
+
+** Q145: What is explicit deny?
+Explicit deny is a rule that always rejects an action, even if other rules might allow it.
+
+** Q146: Why is explicit deny useful?
+It adds a strong safety control in access management.
+
+** Q147: What is an attribute-based policy?
+It uses attributes like user department, IP range, or device health to determine access.
+
+** Q148: What is a conditional policy?
+A conditional policy grants access only when certain conditions are met.
+
+** Q149: What is authorization context?
+Authorization context includes user identity, request context, and resource metadata.
+
+** Q150: What is request context?
+Request context includes the resource, method, endpoint, time, and environment.
+
+** Q151: What is context-aware authorization?
+Context-aware authorization uses runtime environment or request attributes in decisions.
+
+** Q152: What is user session hijacking?
+It is the theft or takeover of an active user session.
+
+** Q153: Why is session fixation a risk?
+Session fixation occurs when an attacker forces a user to use a known session identifier.
+
+** Q154: How do auth systems prevent session fixation?
+By rotating session IDs after login.
+
+** Q155: What is secure token storage?
+Secure token storage keeps tokens in a safe place and avoids exposing them in logs or plaintext.
+
+** Q156: What is a refresh token leak?
+It is when a leaked refresh token allows long-lived access if not protected.
+
+** Q157: Why should refresh tokens be rotated?
+Rotation reduces the value of a stolen token and improves security.
+
+** Q158: What is token replay?
+Replay means presenting an already used token again to gain access.
+
+** Q159: Why is token replay protection important?
+Because tokens can be captured by attackers if not protected.
+
+** Q160: What is token caching?
+Token caching stores tokens to reduce repeated identity provider calls.
+
+** Q161: Why cache tokens carefully?
+Because stale or invalid tokens can cause security or correctness issues.
+
+** Q162: What is a backchannel logout?
+A backchannel logout invalidates sessions server-to-server without requiring browser interaction.
+
+** Q163: What is front-channel logout?
+Front-channel logout uses redirect-based browser flows for session invalidation.
+
+** Q164: Why are logout flows important?
+Because explicit logout and session invalidation reduce risk of stale sessions.
+
+** Q165: What is API gateway auth?
+It is auth enforced at the gateway before requests reach backend services.
+
+** Q166: Why add auth at the gateway?
+Because it centralizes access control and reduces duplication.
+
+** Q167: What is a trust boundary?
+A trust boundary is a place where trust changes, such as between public internet and internal systems.
+
+** Q168: Why is trust boundary important in auth?
+Because each boundary may require different validation and policy enforcement.
+
+** Q169: What is user attribute mapping?
+It maps identity provider attributes into the application’s expected user properties.
+
+** Q170: Why do apps need mapped identity claims?
+Because each system may expect different user data formats or fields.
+
+** Q171: What is a delegated permission model?
+A user delegates specific permissions or scopes to an application.
+
+** Q172: What is a policy repository?
+A policy repository stores the rules used to evaluate access decisions.
+
+** Q173: Why is policy governance important?
+Because policy drift or inconsistent rules can create security gaps.
+
+** Q174: What is a security review of auth rules?
+It checks whether permissions match the business needs and least privilege requirements.
+
+** Q175: What is an audit trail?
+An audit trail records who accessed what and when.
+
+** Q176: Why do auth systems need audit logs?
+Because security investigations and compliance often depend on them.
+
+** Q177: What is an auth failure event?
+An event such as password failure, lockout, or blocked access attempt.
+
+** Q178: Why monitor auth failures?
+Because repeated failures may indicate attacks or misconfiguration.
+
+** Q179: What is an anomaly in access patterns?
+An anomaly may be unusual user behavior, impossible geolocation, or suspicious token usage.
+
+** Q180: Why do identity providers watch anomalies?
+Because compromised accounts often show unusual access patterns.
+
+* Advanced / Expert
+
+** Q181: What is OAuth 2.0 token theft?
+Token theft is when an attacker obtains and uses a bearer token to access protected APIs.
+
+** Q182: Why is bearer token theft dangerous?
+Because the holder of the token can often access protected resources as that user.
+
+** Q183: What is API gateway authentication versus app-level auth?
+Gateway auth controls edge access; app-level auth enforces business-level authorization.
+
+** Q184: Why combine both?
+Because edge checks protect the system while app logic ensures policy correctness.
+
+** Q185: What is fine-grained authorization?
+It allows decision-making based on user attributes, resource, action, and environment.
+
+** Q186: What is a policy engine with multiple rules?
+It may evaluate conditions like user role, region, request type, and device status.
+
+** Q187: What is XACML?
+XACML (eXtensible Access Control Markup Language) is an XML-based policy language for access control.
+
+** Q188: Why use XACML or policy engines?
+Because they support complex rule evaluation and externalized policy logic.
+
+** Q189: What is resource ownership auth?
+It authorizes based on who owns the data or resource.
+
+** Q190: What is attribute-based access with context?
+Context may include time, IP address, environment, device posture, or user trust level.
+
+** Q191: What is a security token service?
+A security token service issues security tokens for authentication or authorization.
+
+** Q192: What is a trust broker?
+A trust broker mediates trust among multiple identity systems or domains.
+
+** Q193: What is claim-based federation?
+It exchanges user claims between identity providers and relying parties.
+
+** Q194: What is an OR logic in policy?
+It allows access when any one of multiple conditions is true.
+
+** Q195: What is an AND logic in policy?
+It requires all conditions to be satisfied before access is granted.
+
+** Q196: What is a deny override?
+A deny override ensures that an explicit deny rule wins over allow rules.
+
+** Q197: What is a PDP?
+PDP (Policy Decision Point) decides whether a request is allowed.
+
+** Q198: What is a PEP?
+PEP (Policy Enforcement Point) intercepts the request and enforces the PDP’s decision.
+
+** Q199: Why are PDP/PEP important in enterprise auth?
+They separate policy evaluation from actual request enforcement, which improves governance and extensibility.
+
+** Q200: What is the central lesson of authentication and authorization?
+Authentication proves identity, authorization decides access, and both must be designed with strong protocol choices, least privilege, and secure token handling to protect systems from abuse.
+
+-----
+
+#+INCLUDE: "../footer.org"
