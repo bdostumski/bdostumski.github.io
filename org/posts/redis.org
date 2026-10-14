@@ -1,0 +1,621 @@
+#+TITLE: Redis
+#+DATE: 2026-06-03
+#+TAGS: Database
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+#+HTML_HEAD: <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+
+#+INCLUDE: "../header.org"
+
+* Redis
+
+-----
+
+* Beginner
+
+** Q1: What is Redis?
+Redis is an in-memory data store designed for high performance, caching, messaging, and fast data access.
+
+** Q2: Why is Redis fast?
+Because it stores data primarily in memory instead of on disk, reducing latency.
+
+** Q3: What is an in-memory database?
+An in-memory database keeps the working dataset in RAM for fast reads and writes.
+
+** Q4: What is persistence in Redis?
+Persistence refers to storing data on disk so it can survive restarts or crashes.
+
+** Q5: What is Redis persistence?
+Redis supports persistence modes such as RDB snapshots and AOF append-only logs.
+
+** Q6: What is RDB?
+RDB creates periodic snapshots of the Redis dataset.
+
+** Q7: What is AOF?
+AOF (Append Only File) logs write operations so data can be reconstructed.
+
+** Q8: Why use Redis instead of a traditional database?
+Because it is optimized for latency-sensitive workloads and key-value operations.
+
+** Q9: What is a key-value store?
+A key-value store stores values associated with unique keys.
+
+** Q10: What is a Redis key?
+A Redis key is the unique identifier used to access stored data.
+
+** Q11: What is a Redis value?
+The value is the data stored under a key, which can be a string, list, hash, set, and more.
+
+** Q12: What are Redis data types?
+Redis supports strings, hashes, lists, sets, sorted sets, bitmaps, streams, geospatial indexes, and more.
+
+** Q13: What is a string in Redis?
+A string can store text, numbers, or binary data.
+
+** Q14: What is a hash in Redis?
+A hash stores field-value pairs, similar to a JavaScript object or dictionary.
+
+** Q15: What is a list in Redis?
+A list is an ordered collection of values, like a queue or stack.
+
+** Q16: What is a set in Redis?
+A set is an unordered collection of unique values.
+
+** Q17: What is a sorted set?
+A sorted set is a set with a score that allows ordering and range queries.
+
+** Q18: Why are sorted sets useful?
+They are commonly used for leaderboards, ranking, and time-based ordering.
+
+** Q19: What is a Redis transaction?
+A Redis transaction groups multiple operations so they execute as a unit.
+
+** Q20: What is `MULTI` in Redis?
+`MULTI` starts a transaction in Redis.
+
+** Q21: What is `EXEC` in Redis?
+`EXEC` runs all queued operations in a transaction.
+
+** Q22: What is `WATCH` in Redis?
+`WATCH` monitors keys for changes before a transaction runs.
+
+** Q23: What is optimistic locking?
+Optimistic locking is a concurrency strategy where writes proceed unless a watched key changes.
+
+** Q24: Why use transactions?
+To ensure a group of operations is applied atomically.
+
+** Q25: What is atomicity?
+Atomicity means all parts of an operation succeed together or none do.
+
+** Q26: What is a Redis pipeline?
+A pipeline lets a client send many commands at once to reduce round trips.
+
+** Q27: Why use pipelining?
+Because it improves throughput and reduces network overhead.
+
+** Q28: What is Redis latency?
+Latency is the time required to serve a Redis command.
+
+** Q29: Why is low latency important?
+Because Redis is often used for request-heavy or real-time systems.
+
+** Q30: What is Redis pub/sub?
+Pub/Sub allows publishers to send messages to channels and subscribers to receive them.
+
+** Q31: What is a Redis pub/sub channel?
+A channel is a named communication stream for messages.
+
+** Q32: Why use pub/sub?
+For event notifications, messaging, and real-time updates.
+
+** Q33: What is a Redis stream?
+A stream is a log-like data structure for event history and consumption.
+
+** Q34: Why use streams?
+For event sourcing, logs, and consumer groups.
+
+** Q35: What is a Redis consumer group?
+A consumer group allows multiple consumers to process messages from the same stream efficiently.
+
+** Q36: What is a Redis queue?
+A Redis list or stream can act as a queue for tasks or messages.
+
+** Q37: What is Redis caching?
+Redis caching stores frequently accessed data in memory to reduce expensive reads.
+
+** Q38: Why cache with Redis?
+To reduce database or API load and improve response times.
+
+** Q39: What is session storage in Redis?
+Sessions can be stored in Redis to support fast user authentication and tracking.
+
+** Q40: What is token storage in Redis?
+Redis can store tokens, refresh states, or rate-limiting data.
+
+** Q41: What is Redis rate limiting?
+Redis can count requests over time to enforce rate limits.
+
+** Q42: Why use Redis for rate limiting?
+Because Redis operations are fast and easy to implement with counters and TTLs.
+
+** Q43: What is TTL in Redis?
+TTL (Time To Live) is how long a key remains in Redis before expiration.
+
+** Q44: Why use TTL?
+To automatically expire cached data or temporary values.
+
+** Q45: What is `SET` in Redis?
+`SET` stores a string value for a given key.
+
+** Q46: What is `GET` in Redis?
+`GET` retrieves the value associated with a key.
+
+** Q47: What is `DEL` in Redis?
+`DEL` deletes a key and its value.
+
+** Q48: What is `EXPIRE` in Redis?
+`EXPIRE` sets a TTL on a key.
+
+** Q49: What is `INCR`?
+`INCR` increments a numeric value stored in a key.
+
+** Q50: What is `DECR`?
+`DECR` decrements a numeric value stored in a key.
+
+** Q51: What is `HSET`?
+`HSET` sets a field in a hash.
+
+** Q52: What is `HGET`?
+`HGET` retrieves a field value from a hash.
+
+** Q53: What is `LPUSH`?
+`LPUSH` adds an element to the left side of a list.
+
+** Q54: What is `RPUSH`?
+`RPUSH` adds an element to the right side of a list.
+
+** Q55: What is `LPOP`?
+`LPOP` pops an element from the left of a list.
+
+** Q56: What is `RPOP`?
+`RPOP` pops an element from the right of a list.
+
+** Q57: What is `SADD`?
+`SADD` adds members to a set.
+
+** Q58: What is `SINTER`?
+`SINTER` returns the intersection of multiple sets.
+
+** Q59: What is `ZADD`?
+`ZADD` adds a member with a score to a sorted set.
+
+** Q60: What is `ZRANGE`?
+`ZRANGE` returns members from a sorted set by score or index.
+
+** Q61: Why is Redis called a data structure server?
+Because it supports rich data structures beyond simple strings.
+
+** Q62: What is a Redis cluster?
+A Redis cluster is a distributed deployment that shards data across multiple nodes.
+
+** Q63: Why use Redis cluster?
+To scale horizontally and distribute memory across nodes.
+
+** Q64: What is sharding in Redis?
+Sharding partitions the dataset across nodes based on key hash ranges.
+
+** Q65: What is a master node in Redis?
+A master node handles writes and replication for a dataset.
+
+** Q66: What is a replica in Redis?
+A replica is a copy of data used for failover or read scaling.
+
+** Q67: Why use replicas?
+For high availability and maybe read-scaling.
+
+** Q68: What is replication in Redis?
+Replication copies data from a primary node to one or more replicas.
+
+** Q69: What is failover?
+Failover means promoting a replica to become the new primary when the original fails.
+
+** Q70: Why is Redis often paired with an application cache?
+Because caching is a common use case for hot or frequently accessed data.
+
+** Q71: What is data serialization?
+Serialization converts objects into a format supported by Redis, often JSON or binary.
+
+** Q72: Why does serialization matter?
+Because application objects must be converted to bytes or strings before storage.
+
+** Q73: What is a Redis client?
+A Redis client is a library or program used to interact with Redis.
+
+** Q74: What is a Redis connection pool?
+A connection pool reuses Redis connections to reduce overhead.
+
+** Q75: What is Redis memory usage?
+It is the amount of memory the Redis dataset consumes.
+
+** Q76: Why monitor Redis memory?
+Because memory pressure can trigger eviction or out-of-memory behavior.
+
+** Q77: What is eviction in Redis?
+Eviction removes keys when memory limits are exceeded.
+
+** Q78: What is Redis maxmemory?
+`maxmemory` is the maximum amount of memory Redis may use.
+
+** Q79: What is an eviction policy?
+An eviction policy decides which keys to remove when the memory limit is reached.
+
+** Q80: What is `allkeys-lru`?
+It evicts the least recently used keys across all keys in the database.
+
+** Q81: What is `volatile-lru`?
+It evicts least recently used keys only among keys with an expiration set.
+
+** Q82: Why is eviction policy important?
+Because it affects which data stays in memory under pressure.
+
+** Q83: What is a Redis keyspace?
+A Redis keyspace is the collection of all keys in a database.
+
+** Q84: Why does Redis use a single-threaded execution model?
+To keep commands simple, predictable, and efficient for high-throughput workloads.
+
+** Q85: What is I/O multiplexing?
+It allows Redis to handle many clients efficiently in a single event loop.
+
+** Q86: Why is Redis single-threaded for commands?
+Because many Redis workloads are CPU-light and network-heavy, and this model reduces locking complexity.
+
+** Q87: What is Redis networking?
+Redis uses a simple protocol and clients communicate over TCP.
+
+** Q88: What is RESP?
+RESP (REdis Serialization Protocol) is Redis’s wire protocol.
+
+** Q89: Why is RESP important?
+It defines how clients and Redis communicate.
+
+** Q90: What is Redis command latency?
+It is the time taken for Redis to process a given command.
+
+** Q91: What is Redis `PING`?
+`PING` checks whether Redis is alive and responding.
+
+** Q92: What is Redis `INFO`?
+`INFO` shows operational details about Redis such as memory, persistence, and clients.
+
+** Q93: What is a Redis database number?
+Redis supports multiple logical databases indexed by number.
+
+** Q94: Why is database number not always ideal?
+It can be confusing in multi-tenant or shared environments, so many users prefer separate Redis instances.
+
+** Q95: What is Redis sandboxing?
+It is the practice of isolating Redis instances to control resource use and risk.
+
+** Q96: Why secure Redis?
+Because Redis can expose sensitive data if publicly reachable without authentication and firewalling.
+
+** Q97: What is Redis ACL?
+Redis ACLs control which users and commands can access the Redis instance.
+
+** Q98: What is `requirepass`?
+`requirepass` sets a password for Redis authentication.
+
+** Q99: Why require authentication?
+To prevent unauthorized access to the data store.
+
+** Q100: What is a Redis `AUTH` command?
+It authenticates a client to the Redis server.
+
+* Intermediate
+
+** Q101: What is Redis modules?
+Redis modules extend Redis with new data types and features.
+
+** Q102: Why use Redis modules?
+For search, JSON, time series, and other advanced workloads.
+
+** Q103: What is RedisJSON?
+RedisJSON adds JSON data type support to Redis.
+
+** Q104: What is RediSearch?
+RediSearch adds full-text and secondary indexing capabilities.
+
+** Q105: What is RedisTimeSeries?
+RedisTimeSeries stores and queries time-series data efficiently.
+
+** Q106: What is RedisBloom?
+RedisBloom adds probabilistic data structures such as bloom filters.
+
+** Q107: Why use probabilistic structures?
+To support membership checks and approximate counting with low memory use.
+
+** Q108: What is a bloom filter?
+A bloom filter tests whether an element is likely in a set without storing all values.
+
+** Q109: Why use a bloom filter with Redis?
+To filter out expensive or impossible lookups.
+
+** Q110: What is Redis caching for object graphs?
+Redis can cache serialized objects or nested structures for fast application access.
+
+** Q111: Why is serialization format important for caches?
+Because JSON is human-readable but may be bigger than binary formats.
+
+** Q112: What is Redis data structure selection?
+It means choosing the right Redis type for the problem, such as strings for simple values or sorted sets for ranking.
+
+** Q113: Why does data structure choice matter?
+Because different structures support different operations and memory profiles.
+
+** Q114: What is Redis bitmap?
+A bitmap is a compact representation of bits and can be used for flags or membership.
+
+** Q115: Why use bitmaps?
+For compact boolean or presence tracking.
+
+** Q116: What is Redis geospatial support?
+It provides commands for storing and querying locations by latitude and longitude.
+
+** Q117: Why use geospatial indexes?
+For nearby places, maps, or location-aware features.
+
+** Q118: What is Redis stream consumer group?
+A consumer group allows multiple readers to coordinate consumption from a stream.
+
+** Q119: Why use stream consumer groups?
+For reliable event processing and distributing work among workers.
+
+** Q120: What is Redis message queue pattern?
+Lists or streams are often used as queues.
+
+** Q121: Why use Redis for queues?
+Because it is lightweight, fast, and simple to integrate.
+
+** Q122: What is a blocking pop?
+`BLPOP` or `BRPOP` waits for data to be available in a list before returning.
+
+** Q123: Why use blocking operations?
+To implement efficient worker queues with minimal polling.
+
+** Q124: What is a Redis lock?
+A Redis lock is a pattern using a key with expiration to coordinate distributed mutexes.
+
+** Q125: Why use Redis locks?
+To coordinate access to shared resources across processes or nodes.
+
+** Q126: Why is lock expiration important?
+Because processes may fail while holding the lock, so the lock should time out.
+
+** Q127: What is a distributed lock?
+A distributed lock coordinates multiple services across machines.
+
+** Q128: Why are distributed locks risky?
+Because lock management across processes is complex and can lead to race conditions.
+
+** Q129: What is Redlock?
+Redlock is a distributed locking algorithm using multiple Redis nodes.
+
+** Q130: Why is Redlock controversial?
+Because it depends on assumptions about clock drift and failure detection that are not always perfect.
+
+** Q131: What is a Redis semaphore?
+A semaphore can be modeled with counters or keys to limit concurrent access to a resource.
+
+** Q132: What is a cache-aside use case in Redis?
+Application code checks Redis first, then fetches from DB on miss.
+
+** Q133: What is a write-through cache?
+Data is written to Redis and the primary store at the same time.
+
+** Q134: What is a write-behind cache?
+Data is written to the cache first and later asynchronously to the database.
+
+** Q135: Why use write-through vs write-behind?
+Because trade-offs differ between consistency, complexity, and performance.
+
+** Q136: What is Redis for session caching?
+Redis stores session state with short TTLs and fast access.
+
+** Q137: What is a Redis-backed leaderboard?
+A sorted set stores user scores and supports ranking queries.
+
+** Q138: What is a leaderboard query in Redis?
+`ZRANGE` or `ZREVRANGE` with scores allows ordering by rank.
+
+** Q139: Why use sorted sets for ranking?
+Because they are optimized for score-based ordering.
+
+** Q140: What is a transient cache?
+A transient cache is short-lived and often used for temporary values.
+
+** Q141: Why cache user preferences in Redis?
+Because they are often read frequently and small in size.
+
+** Q142: What is a Redis cache invalidation strategy?
+It defines how keys are removed or expired when the source-of-truth changes.
+
+** Q143: What is key versioning?
+Using names with version prefixes helps refresh caches after changes.
+
+** Q144: Why use key versioning?
+Because it allows clean cache invalidation without touching all old keys.
+
+** Q145: What is a Redis memory fragmentation?
+Memory fragmentation occurs when memory is split into small blocks due to allocations and frees.
+
+** Q146: Why is fragmentation important?
+It affects the efficiency of Redis memory usage and may reduce the effective capacity.
+
+** Q147: What is Redis OOM?
+OOM (Out of Memory) occurs when Redis exceeds its configured memory limit.
+
+** Q148: Why is OOM a risk?
+Because Redis may start evicting keys or stop accepting writes depending on configuration.
+
+** Q149: What is memory profiling in Redis?
+It helps understand which keys use the most memory.
+
+** Q150: What is `MEMORY USAGE` in Redis?
+It shows how much memory a key consumes.
+
+** Q151: Why is `TTL` important in rate limiting?
+Because counters should eventually expire to reflect recent usage.
+
+** Q152: What is a sliding window rate limit?
+It tracks requests over a recent time period and moves the window with each request.
+
+** Q153: What is a fixed window rate limit?
+It resets counters at fixed intervals, such as per minute.
+
+** Q154: Why use Redis for counters?
+Because counters are simple, fast, and efficient in Redis.
+
+** Q155: What is a Redis search index?
+A search index allows full-text search, filtering, and ranking across keys.
+
+** Q156: Why use Redis for search in some cases?
+Because it can serve low-latency search within certain data constraints.
+
+** Q157: What is Redis `SCAN`?
+`SCAN` iterates over keys without blocking the server as much as `KEYS`.
+
+** Q158: Why prefer `SCAN` to `KEYS`?
+Because `KEYS` can block a Redis instance under heavy load.
+
+** Q159: What is `HSCAN`?
+`HSCAN` iterates over hash fields incrementally.
+
+** Q160: What is `SSCAN`?
+`SSCAN` iterates over set members incrementally.
+
+** Q161: What is `ZSCAN`?
+`ZSCAN` iterates over sorted set members and scores incrementally.
+
+** Q162: Why is incremental iteration important?
+Because it avoids large blocking operations on big datasets.
+
+** Q163: What is Redis `PUBLISH`?
+`PUBLISH` sends a message to a channel.
+
+** Q164: What is `SUBSCRIBE`?
+`SUBSCRIBE` listens for messages on one or more channels.
+
+** Q165: Why use Redis for event fan-out?
+Because pub/sub enables real-time broadcasting to many subscribers.
+
+** Q166: What is a Redis `XADD`?
+`XADD` appends to a stream.
+
+** Q167: What is `XREAD`?
+`XREAD` reads messages from a stream, including from consumer groups.
+
+** Q168: What is `XGROUP CREATE`?
+It creates a consumer group for a Redis stream.
+
+** Q169: Why are streams useful in event-driven apps?
+Because they provide durable, append-only event logs with consumer coordination.
+
+** Q170: What is a Redis event-sourcing pattern?
+It stores state changes as events in a stream and reconstructs state from them.
+
+** Q171: Why do event-driven systems often prefer Redis streams?
+Because they combine event logging with low-latency processing.
+
+** Q172: What is a Redis cache stampede?
+It happens when many requests miss a cache simultaneously and all hit the backend.
+
+** Q173: Why use single-flight with Redis cache?
+To avoid repeated expensive reloads when a key expires.
+
+** Q174: What is a Redis LRU eviction issue?
+It may evict the wrong keys if memory is set too low or workload patterns are not understood.
+
+** Q175: What is a Redis defragmentation?
+It reclaims memory fragmentation to improve efficiency.
+
+** Q176: Why use Redis persistence in production?
+Because data durability matters, even if Redis is primarily in-memory.
+
+** Q177: What is an AOF rewrite?
+It compacts the AOF file to reduce size and improve performance.
+
+** Q178: Why is Redis persistence tuning important?
+Because the right trade-off is between durability, performance, and recovery time.
+
+** Q179: What is Redis backup strategy?
+It is the plan for saving data snapshots or logs to external storage.
+
+** Q180: Why are backups important?
+Because a node crash or corruption can otherwise lead to data loss.
+
+* Advanced / Expert
+
+** Q181: What is a Redis cluster hash slot?
+A hash slot is a partition identifier used to assign keys across cluster nodes.
+
+** Q182: Why are hash slots important?
+Because they enable sharding without a central coordinator for routing.
+
+** Q183: What is a cluster resharding?
+It redistributes hash slots when capacity changes.
+
+** Q184: What is a failover in Redis cluster?
+It promotes a replica to primary when the current master is unavailable.
+
+** Q185: Why is cluster topology important?
+Because cluster design determines failure domains, scaling, and data distribution.
+
+** Q186: What is a primary key conflict in cluster?
+It happens when multiple partitions or nodes hold overlapping keys due to misconfiguration or migration issues.
+
+** Q187: What is `redis-cli`?
+It is the command-line interface for interacting with Redis.
+
+** Q188: Why is `redis-cli` useful?
+It helps diagnose, query, and manage a Redis instance directly.
+
+** Q189: What is Redis `MONITOR`?
+`MONITOR` streams commands being processed in real time.
+
+** Q190: Why use `MONITOR`?
+For analysis and debugging of client traffic and performance issues.
+
+** Q191: What is Redis latency monitoring?
+It tracks timing for commands to identify bottlenecks and slow operations.
+
+** Q192: Why does Redis tuning matter?
+Because efficient command design and memory configuration strongly influence performance.
+
+** Q193: What is CPU-bound Redis use?
+It occurs when operations like serialization, high-key cardinality, or scripting cost too much CPU.
+
+** Q194: Why is Redis scripting sometimes risky?
+Because Lua scripts can block the server and be harder to reason about.
+
+** Q195: What is Lua scripting in Redis?
+It executes scripts in Redis for atomic operations and custom logic.
+
+** Q196: Why are scripts atomic?
+Because they run as a single command inside Redis.
+
+** Q197: What is a Redis `EVALSHA`?
+It runs a previously loaded Lua script by hash.
+
+** Q198: Why use `EVALSHA`?
+To reduce script transfer cost and reuse logic efficiently.
+
+** Q199: What is the difference between Redis as cache and as primary datastore?
+As a cache, it is often ephemeral and optimized for fast retrieval; as a primary datastore, it requires more careful persistence, durability, and data modeling.
+
+** Q200: What is the main lesson of Redis?
+Redis is a high-performance in-memory data store whose value comes from speed, rich data structures, and flexible use cases—from simple caching to queues, streams, session management, rate limiting, and real-time data processing.
+
+-----
+
+#+INCLUDE: "../footer.org"
