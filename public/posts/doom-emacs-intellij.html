@@ -23,9 +23,9 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-orgc68cb36" class="outline-2">
-<h2 id="orgc68cb36">Doom Emacs for IntelliJ</h2>
-<div class="outline-text-2" id="text-orgc68cb36">
+<div id="outline-container-orga988889" class="outline-2">
+<h2 id="orga988889">Doom Emacs for IntelliJ</h2>
+<div class="outline-text-2" id="text-orga988889">
 <hr>
 
 <p>
@@ -33,13 +33,13 @@
 </p>
 
 
-<figure id="org2b68dbe">
+<figure id="org8c1aee5">
 <img src="../../static/resources/intellij-layout-config.png" alt="intellij-layout-config.png">
 
 </figure>
 
 
-<figure id="org2eec458">
+<figure id="orged3cba8">
 <img src="../../static/resources/intellij-layout-config-1.png" alt="intellij-layout-config-1.png">
 
 </figure>
@@ -51,14 +51,15 @@
 " ============================================================
 "
 " REQUIRED IDE PLUGINS (Settings &gt; Plugins &gt; Marketplace):
-"   * IdeaVIM               &lt;- Vim emulation/keybindings
-"   * EasyMotion            &lt;- EasyMotion layer for IdeaVim (uses AceJump)
-"   * AceJump               &lt;- Fast jump motions
-"   * Whichkey              &lt;- Which-Key popup for key hints
-"   * Multicursor           &lt;- Multiple cursors editing
-"   * SonarQube             &lt;- SonarLint static analysis
-"   * QuickScope            &lt;- Quickscope-style target highlighting
-"   * .gitignore            &lt;- .gitignore/.ignore support
+"   * IdeaVIM               &lt;- Vim emulation and keyboard shortcuts in JetBrains IDEs
+"   * EasyMotion            &lt;- Quick navigation using keyboard-triggered targets
+"   * AceJump               &lt;- Jump directly to visible characters or locations
+"   * Whichkey              &lt;- Displays available keybindings and shortcuts
+"   * Multicursor           &lt;- Edit multiple locations simultaneously
+"   * AnyObject             &lt;- Edit code the way you think it
+"   * SonarQube             &lt;- Static code analysis and real-time code quality feedback
+"   * QuickScope            &lt;- Highlights characters that can be used as Vim motion targets
+"   * .gitignore            &lt;- Support for .gitignore, .ignore, and related ignore files
 "
 " If a plugin is missing, IdeaVim logs "unknown option" on startup.
 "
@@ -71,7 +72,7 @@ let maplocalleader=","
 
 
 " ------------------------------------------------------------
-" Plugins
+" PLUGINS
 " ------------------------------------------------------------
 
 set surround                " ys / cs / ds
@@ -114,6 +115,7 @@ set showmode
 set showcmd
 
 " which-key needs a long/absent timeout or the popup races you
+set timeout
 set notimeout
 set timeoutlen=1000
 
@@ -161,18 +163,73 @@ sethandler &lt;C-V&gt; a:ide
 sethandler &lt;C-C&gt; a:ide
 sethandler &lt;C-S&gt; a:ide
 sethandler &lt;C-F&gt; a:ide
+sethandler &lt;C-v&gt; a:vim
 
-" multiple-cursors owns these
-sethandler &lt;C-N&gt; a:vim
-sethandler &lt;C-P&gt; a:vim
-sethandler &lt;C-X&gt; a:vim
+" AnyObject
+" Usage:
+" v + [i/a] + text object -&gt; visual select
+" d + [i/a] + text object -&gt; delete
+" c + [i/a] + text object -&gt; change
+" y + [i/a] + text object -&gt; yank
+" &gt; + [i/a] + text object -&gt; indent
+" = + [i/a] + text object -&gt; auto-indent
 
+" [i/a]
+" i -&gt; inside
+" a -&gt; around
+
+" text object
+" a -&gt; argument
+" f -&gt; function
+" m -&gt; lambda or function
+" c -&gt; class
+" v -&gt; variable
+" l -&gt; loop
+" y -&gt; conditional
+" i -&gt; item
+" x -&gt; arg or item
+" q -&gt; quote
+" g -&gt; string
+" o -&gt; bracket
+" u -&gt; subword
+" d -&gt; entire document content
+" k -&gt; comment
+" n -&gt; indent block
+
+" Enable AnyObject
+set anyobject
+set argtextobj
+set functiontextobj
+set indentobject
+set textobj-entire
+set textobj-line
+set textobj-uri
+
+" Enable IdeaVim multicursor extension
+" Usage:
+" Put cursor on a word
+" Press &lt;C-n&gt; a few times to add matches
+" If one is wrong: press &lt;C-x&gt; to skip it (or &lt;C-p&gt; to remove it)
+" Type once to edit all selected cursors simultaneously.
+set multiple-cursors
+
+nmap &lt;C-n&gt; &lt;Plug&gt;NextWholeOccurrence
+xmap &lt;C-n&gt; &lt;Plug&gt;NextWholeOccurrence
+
+nmap g&lt;C-n&gt; &lt;Plug&gt;NextOccurrence
+xmap g&lt;C-n&gt; &lt;Plug&gt;NextOccurrence
+
+xmap &lt;C-x&gt; &lt;Plug&gt;SkipOccurrence
+xmap &lt;C-p&gt; &lt;Plug&gt;RemoveOccurrence
+
+" Select all matches
+nmap &lt;A-n&gt; &lt;Plug&gt;AllWholeOccurrences
+xmap &lt;A-n&gt; &lt;Plug&gt;AllWholeOccurrences
 
 " ============================================================
 " EDITING QUALITY OF LIFE
 " ============================================================
 
-inoremap jk &lt;Esc&gt;
 inoremap jj &lt;Esc&gt;
 
 " Q was mapped to gq, which IdeaVim does not implement. Replay @q instead.
@@ -330,7 +387,7 @@ let g:WhichKeyDesc_project_R  = "&lt;leader&gt;pR rebuild project"
 
 nnoremap &lt;leader&gt;pp :action ManageRecentProjects&lt;CR&gt;
 nnoremap &lt;leader&gt;pf :action GotoFile&lt;CR&gt;
-nnorEmap &lt;leader&gt;pt :action ActivateProjectToolWindow&lt;CR&gt;
+nnoremap &lt;leader&gt;pt :action ActivateProjectToolWindow&lt;CR&gt;
 nnoremap &lt;leader&gt;ps :action FindInPath&lt;CR&gt;
 nnoremap &lt;leader&gt;pr :action ReplaceInPath&lt;CR&gt;
 nnoremap &lt;leader&gt;pS :action ShowProjectStructureSettings&lt;CR&gt;

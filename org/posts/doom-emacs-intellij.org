@@ -24,14 +24,15 @@
 " ============================================================
 "
 " REQUIRED IDE PLUGINS (Settings > Plugins > Marketplace):
-"   * IdeaVIM               <- Vim emulation/keybindings
-"   * EasyMotion            <- EasyMotion layer for IdeaVim (uses AceJump)
-"   * AceJump               <- Fast jump motions
-"   * Whichkey              <- Which-Key popup for key hints
-"   * Multicursor           <- Multiple cursors editing
-"   * SonarQube             <- SonarLint static analysis
-"   * QuickScope            <- Quickscope-style target highlighting
-"   * .gitignore            <- .gitignore/.ignore support
+"   * IdeaVIM               <- Vim emulation and keyboard shortcuts in JetBrains IDEs
+"   * EasyMotion            <- Quick navigation using keyboard-triggered targets
+"   * AceJump               <- Jump directly to visible characters or locations
+"   * Whichkey              <- Displays available keybindings and shortcuts
+"   * Multicursor           <- Edit multiple locations simultaneously
+"   * AnyObject             <- Edit code the way you think it
+"   * SonarQube             <- Static code analysis and real-time code quality feedback
+"   * QuickScope            <- Highlights characters that can be used as Vim motion targets
+"   * .gitignore            <- Support for .gitignore, .ignore, and related ignore files
 "
 " If a plugin is missing, IdeaVim logs "unknown option" on startup.
 "
@@ -44,7 +45,7 @@ let maplocalleader=","
 
 
 " ------------------------------------------------------------
-" Plugins
+" PLUGINS
 " ------------------------------------------------------------
 
 set surround                " ys / cs / ds
@@ -87,6 +88,7 @@ set showmode
 set showcmd
 
 " which-key needs a long/absent timeout or the popup races you
+set timeout
 set notimeout
 set timeoutlen=1000
 
@@ -134,18 +136,73 @@ sethandler <C-V> a:ide
 sethandler <C-C> a:ide
 sethandler <C-S> a:ide
 sethandler <C-F> a:ide
+sethandler <C-v> a:vim
 
-" multiple-cursors owns these
-sethandler <C-N> a:vim
-sethandler <C-P> a:vim
-sethandler <C-X> a:vim
+" AnyObject
+" Usage:
+" v + [i/a] + text object -> visual select
+" d + [i/a] + text object -> delete
+" c + [i/a] + text object -> change
+" y + [i/a] + text object -> yank
+" > + [i/a] + text object -> indent
+" = + [i/a] + text object -> auto-indent
 
+" [i/a]
+" i -> inside
+" a -> around
+
+" text object
+" a -> argument
+" f -> function
+" m -> lambda or function
+" c -> class
+" v -> variable
+" l -> loop
+" y -> conditional
+" i -> item
+" x -> arg or item
+" q -> quote
+" g -> string
+" o -> bracket
+" u -> subword
+" d -> entire document content
+" k -> comment
+" n -> indent block
+
+" Enable AnyObject
+set anyobject
+set argtextobj
+set functiontextobj
+set indentobject
+set textobj-entire
+set textobj-line
+set textobj-uri
+
+" Enable IdeaVim multicursor extension
+" Usage:
+" Put cursor on a word
+" Press <C-n> a few times to add matches
+" If one is wrong: press <C-x> to skip it (or <C-p> to remove it)
+" Type once to edit all selected cursors simultaneously.
+set multiple-cursors
+
+nmap <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+
+nmap g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+
+xmap <C-x> <Plug>SkipOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+
+" Select all matches
+nmap <A-n> <Plug>AllWholeOccurrences
+xmap <A-n> <Plug>AllWholeOccurrences
 
 " ============================================================
 " EDITING QUALITY OF LIFE
 " ============================================================
 
-inoremap jk <Esc>
 inoremap jj <Esc>
 
 " Q was mapped to gq, which IdeaVim does not implement. Replay @q instead.
@@ -303,7 +360,7 @@ let g:WhichKeyDesc_project_R  = "<leader>pR rebuild project"
 
 nnoremap <leader>pp :action ManageRecentProjects<CR>
 nnoremap <leader>pf :action GotoFile<CR>
-nnorEmap <leader>pt :action ActivateProjectToolWindow<CR>
+nnoremap <leader>pt :action ActivateProjectToolWindow<CR>
 nnoremap <leader>ps :action FindInPath<CR>
 nnoremap <leader>pr :action ReplaceInPath<CR>
 nnoremap <leader>pS :action ShowProjectStructureSettings<CR>
