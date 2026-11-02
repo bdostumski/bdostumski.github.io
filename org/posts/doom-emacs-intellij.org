@@ -11,6 +11,10 @@
 
 -----
 
+[[File:../../resources/custom-intellij-layout-config.zip][Download Doom Emacs-inspired IntelliJ IDEA layout]]
+
+[[file:../../resources/intellij-layout-config.png]]
+
 #+BEGIN_SRC vim
 
 " ============================================================
@@ -29,7 +33,6 @@
 " LEADER
 " ------------------------------------------------------------
 " NOTE: localleader is "," (was SPC — identical leaders make every <localleader> map dead weight).
-
 let mapleader=" "
 let maplocalleader=","
 
@@ -57,7 +60,7 @@ set easymotion
 let g:argtextobj_pairs="[:],(:),<:>"
 let g:highlightedyank_highlight_duration = "200"
 
- 
+
 " ------------------------------------------------------------
 " GENERAL OPTIONS
 " ------------------------------------------------------------
@@ -79,15 +82,15 @@ set showcmd
 
 " which-key needs a long/absent timeout or the popup races you
 set notimeout
-set timeoutlen=5000
+set timeoutlen=1000
 
 set clipboard=unnamedplus,unnamed,ideaput
 
- 
+
 " ------------------------------------------------------------
 " IDEAVIM-SPECIFIC OPTIONS
 " ------------------------------------------------------------
- 
+
 set ideajoin                " J uses IntelliJ's smart join
 set ideamarks               " vim marks <-> IDE bookmarks
 set idearefactormode=keep   " stay in normal mode during refactors
@@ -102,7 +105,7 @@ let g:WhichKey_SortOrder = "by_key_prefix_first"
 let g:WhichKey_ShowVimActions = "true"
 let g:WhichKey_ShowTypedSequence = "true"
 
- 
+
 " ------------------------------------------------------------
 " KEY OWNERSHIP (sethandler) — who gets the keystroke, vim or IDE
 " ------------------------------------------------------------
@@ -131,14 +134,14 @@ sethandler <C-N> a:vim
 sethandler <C-P> a:vim
 sethandler <C-X> a:vim
 
- 
+
 " ============================================================
 " EDITING QUALITY OF LIFE
 " ============================================================
 
 inoremap jk <Esc>
 inoremap jj <Esc>
- 
+
 " Q was mapped to gq, which IdeaVim does not implement. Replay @q instead.
 nnoremap Q @q
 
@@ -166,7 +169,7 @@ vnoremap K :m '<-2<CR>gv=gv
 nnoremap [<Space> O<Esc>j
 nnoremap ]<Space> o<Esc>k
 
- 
+
 " ============================================================
 " DOOM-STYLE LEADER MAP
 "
@@ -185,7 +188,7 @@ nnoremap ]<Space> o<Esc>k
 "                                       SPC w   window
 " ============================================================
 
- 
+
 " ------------------------------------------------------------
 " TOP LEVEL
 " ------------------------------------------------------------
@@ -206,7 +209,7 @@ nnoremap <leader>/ :action FindInPath<CR>
 nnoremap <leader>: :action GotoAction<CR>
 nnoremap <leader>' :action ActivateFindToolWindow<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC b  BUFFERS  (IntelliJ editor tabs)
 " ------------------------------------------------------------
@@ -240,7 +243,7 @@ nnoremap <leader>bS :action SaveAll<CR>
 nnoremap <leader>br :action Synchronize<CR>
 nnoremap <leader>bz :action PinActiveTabToggle<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC f  FILES
 " ------------------------------------------------------------
@@ -276,7 +279,7 @@ nnoremap <leader>ft :action SelectInProjectView<CR>
 nnoremap <leader>fe :action RevealIn<CR>
 nnoremap <leader>fc :action CloseContent<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC p  PROJECT
 " ------------------------------------------------------------
@@ -294,7 +297,7 @@ let g:WhichKeyDesc_project_R  = "<leader>pR rebuild project"
 
 nnoremap <leader>pp :action ManageRecentProjects<CR>
 nnoremap <leader>pf :action GotoFile<CR>
-nnoremap <leader>pt :action ActivateProjectToolWindow<CR>
+nnorEmap <leader>pt :action ActivateProjectToolWindow<CR>
 nnoremap <leader>ps :action FindInPath<CR>
 nnoremap <leader>pr :action ReplaceInPath<CR>
 nnoremap <leader>pS :action ShowProjectStructureSettings<CR>
@@ -302,7 +305,7 @@ nnoremap <leader>pi :action InspectCode<CR>
 nnoremap <leader>pb :action CompileDirty<CR>
 nnoremap <leader>pR :action CompileProject<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC s  SEARCH
 " ------------------------------------------------------------
@@ -336,7 +339,7 @@ nnoremap <leader>sU :action ShowUsages<CR>
 nnoremap <leader>sh :action HighlightUsagesInFile<CR>
 nnoremap <leader>sl :action RecentLocations<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC c  CODE + REFACTOR
 " ------------------------------------------------------------
@@ -358,6 +361,7 @@ let g:WhichKeyDesc_code_D    = "<leader>cD external documentation"
 let g:WhichKeyDesc_code_t    = "<leader>ct expression type"
 let g:WhichKeyDesc_code_p    = "<leader>cp parameter info"
 let g:WhichKeyDesc_code_x    = "<leader>cx show error description"
+let g:WhichKeyDesc_code_q    = "<leader>cq sonarqube analyze"
 
 nnoremap <leader>ca :action ShowIntentionActions<CR>
 nnoremap <leader>cf :action ReformatCode<CR>
@@ -379,6 +383,7 @@ nnoremap <leader>cD :action ExternalJavaDoc<CR>
 nnoremap <leader>ct :action ExpressionTypeInfo<CR>
 nnoremap <leader>cp :action ParameterInfo<CR>
 nnoremap <leader>cx :action ShowErrorDescription<CR>
+nnoremap <leader>cq :action SonarLint.AnalyzeFiles<CR>
 
 " -- SPC c r : refactor sub-menu --
 let g:WhichKeyDesc_code_refactor    = "<leader>cr +refactor"
@@ -425,7 +430,7 @@ nnoremap <leader>cht :action TypeHierarchy<CR>
 nnoremap <leader>chm :action MethodHierarchy<CR>
 nnoremap <leader>chc :action CallHierarchy<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC g  GIT
 " ------------------------------------------------------------
@@ -465,7 +470,7 @@ nnoremap <leader>gZ :action Git.Unstash<CR>
 nnoremap <leader>gx :action Git.ResolveConflicts<CR>
 nnoremap <leader>g<Space> :action Vcs.QuickListPopupAction<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC r  RUN
 " ------------------------------------------------------------
@@ -479,7 +484,7 @@ let g:WhichKeyDesc_run_S  = "<leader>rS stop background process"
 let g:WhichKeyDesc_run_l  = "<leader>rl choose configuration"
 let g:WhichKeyDesc_run_E  = "<leader>rE edit configurations"
 let g:WhichKeyDesc_run_w  = "<leader>rw run tool window"
- 
+
 nnoremap <leader>rr :action Run<CR>
 nnoremap <leader>rc :action RunClass<CR>
 nnoremap <leader>re :action Rerun<CR>
@@ -533,7 +538,7 @@ nnoremap <leader>de :action EvaluateExpression<CR>
 vnoremap <leader>de :action EvaluateExpression<CR>
 nnoremap <leader>dw :action Debugger.AddToWatch<CR>
 nnoremap <leader>dW :action ActivateDebugToolWindow<CR>
- 
+
 " ------------------------------------------------------------
 " SPC t  TEST
 " ------------------------------------------------------------
@@ -547,7 +552,7 @@ let g:WhichKeyDesc_test_g  = "<leader>tg goto test / subject"
 let g:WhichKeyDesc_test_n  = "<leader>tn create new test"
 let g:WhichKeyDesc_test_c  = "<leader>tc run with coverage"
 let g:WhichKeyDesc_test_w  = "<leader>tw test tool window"
- 
+
 nnoremap <leader>tt :action RunClass<CR>
 nnoremap <leader>tr :action Rerun<CR>
 nnoremap <leader>td :action DebugClass<CR>
@@ -557,7 +562,7 @@ nnoremap <leader>tn :action CreateTestAction<CR>
 nnoremap <leader>tc :action RunCoverage<CR>
 nnoremap <leader>tw :action ActivateRunToolWindow<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC T  TOGGLES
 " ------------------------------------------------------------
@@ -587,7 +592,7 @@ nnoremap <leader>Tb :action XDebugger.MuteBreakpoints<CR>
 nnoremap <leader>Ts :action TogglePowerSave<CR>
 nnoremap <leader>Tv :action VimPluginToggle<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC w  WINDOWS
 " ------------------------------------------------------------
@@ -606,6 +611,7 @@ let g:WhichKeyDesc_window_o  = "<leader>wo close other splits"
 let g:WhichKeyDesc_window_x  = "<leader>wx move to opposite group"
 let g:WhichKeyDesc_window_m  = "<leader>wm maximize editor"
 let g:WhichKeyDesc_window_u  = "<leader>wu hide all tool windows"
+let g:WhichKeyDesc_window_q  = "<leader>wq hide last active window"
 let g:WhichKeyDesc_window_d  = "<leader>wd close buffer"
 
 nnoremap <leader>wh <C-w>h
@@ -621,6 +627,7 @@ nnoremap <leader>wo :action UnsplitAll<CR>
 nnoremap <leader>wx :action MoveEditorToOppositeTabGroup<CR>
 nnoremap <leader>wm :action MaximizeEditorInSplit<CR>
 nnoremap <leader>wu :action HideAllWindows<CR>
+nnoremap <leader>wq :action HideActiveWindow<CR>
 nnoremap <leader>wd :action CloseContent<CR>
 
 " Raw Ctrl-hjkl window motion (sethandler above keeps these from the IDE)
@@ -629,7 +636,6 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
- 
 " ------------------------------------------------------------
 " SPC o  OPEN (tool windows)
 " ------------------------------------------------------------
@@ -665,7 +671,7 @@ nnoremap <leader>ob :action ActivateDatabaseToolWindow<CR>
 nnoremap <leader>on :action ActivateNotificationsToolWindow<CR>
 nnoremap <leader>oB :action ActivateBookmarksToolWindow<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC e  ERRORS
 " ------------------------------------------------------------
@@ -685,7 +691,7 @@ nnoremap <leader>ea :action ShowIntentionActions<CR>
 nnoremap <leader>ed :action ShowErrorDescription<CR>
 nnoremap <leader>ei :action InspectCode<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC j  JUMP
 " ------------------------------------------------------------
@@ -713,7 +719,7 @@ nnoremap <leader>jf :action Forward<CR>
 nnoremap <leader>je :action JumpToLastChange<CR>
 nnoremap <leader>jr :action RecentLocations<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC n  BOOKMARKS / NOTES
 " ------------------------------------------------------------
@@ -735,7 +741,7 @@ nnoremap <leader>nj :action GotoNextBookmark<CR>
 nnoremap <leader>nk :action GotoPreviousBookmark<CR>
 nnoremap <leader>nt :action ActivateTODOToolWindow<CR>
 
- 
+
 " ------------------------------------------------------------
 " SPC i  INSERT
 " ------------------------------------------------------------
@@ -752,7 +758,7 @@ nnoremap <leader>ig :action Generate<CR>
 nnoremap <leader>iy :action PasteMultiple<CR>
 nnoremap <leader>ii :action ImplementMethods<CR>
 nnoremap <leader>io :action OverrideMethods<CR>
- 
+
 
 " ------------------------------------------------------------
 " SPC m  MAJOR MODE — Java / Maven / Spring
@@ -780,12 +786,12 @@ nnoremap <leader>mt :action GotoTest<CR>
 nnoremap <leader>ms :action GotoSuperMethod<CR>
 nnoremap <leader>mi :action GotoImplementation<CR>
 nnoremap <leader>md :action ShowPackageDeps<CR>
- 
+
 
 " ------------------------------------------------------------
 " SPC h  HELP
 " ------------------------------------------------------------
- 
+
 let g:WhichKeyDesc_help    = "<leader>h +help"
 let g:WhichKeyDesc_help_a  = "<leader>ha find action"
 let g:WhichKeyDesc_help_k  = "<leader>hk find IDE action id (for .ideavimrc)"
@@ -823,7 +829,7 @@ nnoremap <leader>qp :action CloseProject<CR>
 nnoremap <leader>qs :action SaveAll<CR>
 nnoremap <leader>qr :action IdeaVim.ReloadVimRc.reload<CR>
 nnoremap <leader>qR :action RestartIde<CR>
- 
+
 
 " ============================================================
 " GOTO — plain `g` prefix (no leader, Doom/LSP style)
@@ -846,11 +852,11 @@ nnoremap gh :action QuickJavaDoc<CR>
 
 " gs super method
 nnoremap gs :action GotoSuperMethod<CR>
- 
+
 " gt/gT stay as vim tab motion
 nnoremap gI :action QuickImplementations<CR>
 
- 
+
 " ============================================================
 " UNIMPAIRED-STYLE PAIRS
 " ============================================================
@@ -880,7 +886,7 @@ nnoremap [u :action GotoPrevElementUnderCaretUsage<CR>
 " bookmarks
 nnoremap ]n :action GotoNextBookmark<CR>
 nnoremap [n :action GotoPreviousBookmark<CR>
- 
+
 
 " ============================================================
 " FOLDING
