@@ -571,26 +571,483 @@ Align branching/release model with product delivery cadence.
 ** Q185: Final maturity principle?
 Git excellence is trustworthy history, fast collaboration, and resilient recovery.
 
-* Bonus: Practical “Safe Daily Git Flow” Command Set
+* Example:
 
-#+BEGIN_SRC bash
-# update local main safely
-git switch main
-git pull --ff-only
+#+BEGIN_SRC text
+# Project structure
+.
+├─ .github/
+│  ├─ workflows/
+│  │  ├─ example-java-ci-cd.yml
+│  │  └─ example-k8s-helm-cd.yml
+│  └─ dependabot.yml
+├─ Dockerfile
+├─ pom.xml
+├─ src/main/java/com/example/App.java
+└─ chart/
+   ├─ Chart.yaml
+   ├─ values.yaml
+   └─ templates/
+      ├─ deployment.yaml
+      ├─ service.yaml
+      ├─ serviceaccount.yaml
+      ├─ networkpolicy.yaml
+      └─ _helpers.tpl
 
-# start feature branch
-git switch -c feat/user-import
+#+END_SRC
 
-# work, stage selectively, commit
-git add -p
-git commit -m "feat: add CSV parser for user import"
+#+BEGIN_SRC yaml
 
-# rebase on latest main before push
-git fetch origin
-git rebase origin/main
+# ./.github/workflows/example-java-ci-cd.yml
 
-# push branch and open PR
-git push -u origin feat/user-import
+name: example-java-ci-cd
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  packages: write
+  id-token: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin
+      - uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3
+
+  build-test-sca:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Build + tests
+        run: mvn -B -ntp clean verify
+      - name: OWASP Dependency Check
+        run: mvn -B -ntp org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
+
+  build-scan-sign:
+    runs-on: ubuntu-latest
+    needs: [secret-scan, codeql, build-test-sca]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          format: sarif
+          output: trivy-image.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-image.sarif
+
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign image (keyless)
+        run: cosign sign --yes ${{ fromJSON(steps.meta.outputs.json).tags[0] }}@${{ steps.build.outputs.digest }}
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# ./.github/workflows/example-k8s-helm-cd.yml
+
+name: example-k8s-helm-cd
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
+jobs:
+  helm-manifest-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: Helm lint
+        run: helm lint ./chart
+
+      - name: Render manifests
+        run: helm template myapp ./chart --namespace production > rendered.yaml
+
+      - name: Trivy config scan (IaC misconfig)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: config
+          scan-ref: rendered.yaml
+          format: sarif
+          output: trivy-config.sarif
+          severity: HIGH,CRITICAL
+          exit-code: 1
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-config.sarif
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: helm-manifest-security
+    environment:
+      name: production
+      url: https://your-app.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      # Example: AWS EKS with OIDC auth
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::123456789012:role/github-actions-eks-deploy
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name my-eks-cluster --region us-east-1
+
+      - name: Deploy with Helm (atomic + wait)
+        run: |
+          helm upgrade --install myapp ./chart \
+            --namespace production \
+            --create-namespace \
+            --atomic \
+            --wait \
+            --timeout 10m
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# ./.github/dependabot.yml
+
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "security"
+
+#+END_SRC
+
+#+BEGIN_SRC  dockerfile
+
+# ././Dockerfile
+
+# build stage
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn -B -ntp clean package -DskipTests
+
+# runtime stage
+FROM eclipse-temurin:21-jre-alpine
+RUN addgroup -S app && adduser -S app -G app
+WORKDIR /app
+COPY --from=build /app/target/app.jar /app/app.jar
+USER app
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]
+
+#+END_SRC
+
+#+BEGIN_SRC xml
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>app</artifactId>
+  <version>1.0.0</version>
+  <name>example-java-app</name>
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>3.3.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.example.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
+#+END_SRC
+
+#+BEGIN_SRC java
+
+// ./src/main/java/com/example/App.java
+
+package com.example;
+
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+
+public class App {
+  public static void main(String[] args) throws IOException {
+    HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+    server.createContext("/healthz", exchange -> {
+      byte[] body = "ok".getBytes();
+      exchange.sendResponseHeaders(200, body.length);
+      try (OutputStream os = exchange.getResponseBody()) { os.write(body); }
+    });
+    server.start();
+    System.out.println("Server started on :8080");
+  }
+}
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# ./chart/Chart.yaml
+
+apiVersion: v2
+name: myapp
+description: Example Java app chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+#+END_SRC
+
+
+#+BEGIN_SRC yaml
+
+# ./chart/values.yaml
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/OWNER/REPO
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+#+END_SRC
+
+#+BEGIN_SRC tpl
+
+# ./chart/templates/_helpers.tpl
+
+{{- define "myapp.name" -}}myapp{{- end -}}
+{{- define "myapp.fullname" -}}{{ include "myapp.name" . }}{{- end -}}
+
+#+END_SRC
+
+
+#+BEGIN_SRC yaml
+
+# ./chart/templates/serviceaccount.yaml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "myapp.fullname" . }}
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# ./chart/templates/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myapp.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: { app: {{ include "myapp.name" . }} }
+  template:
+    metadata:
+      labels: { app: {{ include "myapp.name" . }} }
+    spec:
+      serviceAccountName: {{ include "myapp.fullname" . }}
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          securityContext:
+            runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+            capabilities:
+              drop: {{ toJson .Values.securityContext.capabilities.drop }}
+          readinessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.service.targetPort }} }
+          livenessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.service.targetPort }} }
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# ./chart/templates/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "myapp.fullname" . }}
+spec:
+  type: {{ .Values.service.type }}
+  selector: { app: {{ include "myapp.name" . }} }
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# ./chart/templates/networkpolicy.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "myapp.fullname" . }}
+spec:
+  podSelector:
+    matchLabels: { app: {{ include "myapp.name" . }} }
+  policyTypes: ["Ingress","Egress"]
+  ingress:
+    - from: []   # restrict by default; customize for ingress controller/ns
+      ports:
+        - protocol: TCP
+          port: {{ .Values.service.targetPort }}
+  egress:
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+
 #+END_SRC
 
 -----
