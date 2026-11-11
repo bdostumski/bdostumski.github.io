@@ -571,6 +571,133 @@ Align branching/release model with product delivery cadence.
 ** Q185: Final maturity principle?
 Git excellence is trustworthy history, fast collaboration, and resilient recovery.
 
+* Commands:
+
+#+BEGIN_SRC bash
+
+# 1) Sync main
+git checkout main
+git pull origin main
+
+# 2) Create feature branch
+git checkout -b feature/my-change
+
+# 3) Work + inspect
+git status
+git diff
+git add .
+git commit -m "feat: add my change"
+
+# 4) Keep branch updated
+git fetch origin
+git rebase origin/main      # or: git merge origin/main
+
+# 5) Push branch
+git push -u origin feature/my-change
+
+# 6) After PR review changes
+git add .
+git commit -m "fix: address PR feedback"
+git push
+
+# Compact history
+git log --oneline --graph --decorate -30
+
+# Full commit details
+git log -p -20
+
+# One specific commit
+git show <commit_sha>
+
+# Files changed in a commit
+git show --name-only --oneline <commit_sha>
+
+# Stats (added/removed lines) per commit
+git log --stat -20
+
+# Commits for one file
+git log -- <path/to/file>
+
+# Diff of one file in one commit
+git show <commit_sha> -- <path/to/file>
+
+# Search commit messages
+git log --oneline --grep "fix"
+
+# Search commits by author
+git log --author="Your Name" --oneline
+
+# Who changed each line in a file
+git blame <file>
+
+# Show commits not yet in main (great for PR review locally)
+git log --oneline main..HEAD
+
+# Show only merge commits
+git log --merges --oneline
+
+# Show commits between tags/releases
+git log --oneline v1.2.0..v1.3.0
+
+# Find which commit introduced/removed a string
+git log -S "someFunctionName" --oneline -p
+
+# Find commits matching regex in diff
+git log -G "try\\s*\\{" -p
+
+# Show refs (branches/tags) containing a commit
+git branch --contains <sha>
+git tag --contains <sha>
+
+# Beautiful custom history view
+git log --pretty=format:"%h %ad %an %s" --date=short -30
+
+# Unstage file
+git restore --staged <file>
+
+# Discard local file changes
+git restore <file>
+
+# Stash temp work
+git stash
+git stash pop
+
+# Rename branch
+git branch -m new-branch-name
+
+# Delete merged local branch
+git branch -d feature/my-change
+
+# Example
+git checkout main
+git pull origin main
+git checkout -b hotfix/fix-prod
+# edit...
+git add .
+git commit -m "fix: production issue"
+git push -u origin hotfix/fix-prod
+
+# See existing worktrees
+git worktree list
+
+# Create new worktree with new branch
+git worktree add ../repo-feature -b feature/my-change main
+
+# Create worktree for existing branch
+git worktree add ../repo-hotfix hotfix/urgent-fix
+
+# Enter and work normally
+cd ../repo-feature
+git status
+
+# Remove a worktree (from main repo folder)
+git worktree remove ../repo-feature
+
+# Prune stale metadata
+git worktree prune
+
+#+END_SRC
+
 * Example:
 
 #+BEGIN_SRC text

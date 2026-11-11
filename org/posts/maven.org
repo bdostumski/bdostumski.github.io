@@ -556,44 +556,118 @@ Align module boundaries with domain boundaries to reduce build coupling.
 ** Q180: Final maturity principle?
 Maven excellence is disciplined dependency governance plus fast, reproducible delivery.
 
-* Bonus: Minimal Maven POM Template (Spring Boot style)
+* Commands:
 
-#+BEGIN_SRC xml
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+#+BEGIN_SRC bash
 
-  <groupId>com.example</groupId>
-  <artifactId>demo</artifactId>
-  <version>1.0.0</version>
-  <packaging>jar</packaging>
+# 1) Check toolchain
+mvn -v
 
-  <properties>
-    <java.version>21</java.version>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
-  </properties>
+# 2) Clean + compile
+mvn clean compile
 
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <version>3.3.2</version>
-    </dependency>
-  </dependencies>
+# 3) Run unit tests
+mvn test
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
-        <configuration>
-          <release>${maven.compiler.release}</release>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-</project>
+# 4) Build artifact (JAR/WAR)
+mvn clean package
+
+# 5) Full CI-style validation
+mvn clean verify
+
+# 6) Install locally (for other local projects/modules)
+mvn clean install
+
+# Skip running tests (but still compile test code)
+mvn clean package -DskipTests
+
+# Skip compiling and running tests entirely
+mvn clean package -Dmaven.test.skip=true
+
+# Use profile (e.g., prod settings in pom.xml)
+mvn clean verify -Pprod
+
+# Build specific module + required dependencies (multi-module repo)
+mvn -pl api-service -am clean install
+
+# Parallel build using available cores
+mvn -T 1C clean install
+
+# Force update SNAPSHOT/releases from remote repos
+mvn -U clean verify
+
+# Debug failed build
+mvn -X clean test
+
+# Quieter logs
+mvn -q clean package
+
+# Dependency troubleshooting
+mvn dependency:tree
+mvn dependency:analyze
+
+# Show final merged pom (very useful for debugging inheritance/profiles)
+mvn help:effective-pom
+
+# Check for newer dependencies/plugins
+mvn versions:display-dependency-updates versions:display-plugin-updates
+
+# Publish artifact to remote repo (Nexus/Artifactory/GitHub Packages)
+mvn clean deploy -Pprod
+
+mvn clean test
+mvn clean verify
+mvn clean deploy -Pprod
+
+# --- Surefire/Failsafe (tests) ---
+mvn surefire:test
+mvn -Dtest=UserServiceTest test
+mvn -Dtest=UserServiceTest#shouldCreateUser test
+mvn failsafe:integration-test failsafe:verify
+
+# --- Dependency plugin ---
+mvn dependency:tree
+mvn dependency:analyze
+mvn dependency:purge-local-repository
+mvn dependency:copy-dependencies -DoutputDirectory=target/deps
+
+# --- Versions plugin ---
+mvn versions:display-dependency-updates
+mvn versions:display-plugin-updates
+mvn versions:set -DnewVersion=1.2.0
+mvn versions:use-latest-releases
+
+# --- Help plugin ---
+mvn help:effective-pom
+mvn help:active-profiles
+mvn help:all-profiles
+mvn help:describe -Dplugin=compiler
+
+# --- Exec plugin ---
+mvn exec:java -Dexec.mainClass="com.example.App"
+mvn exec:exec -Dexec.executable="java" -Dexec.args="-version"
+
+# --- Compiler/JAR plugins ---
+mvn compiler:compile
+mvn compiler:testCompile
+mvn jar:jar
+
+# --- Spring Boot plugin (if Spring Boot app) ---
+mvn spring-boot:run
+mvn spring-boot:repackage
+mvn spring-boot:build-image
+
+# --- JaCoCo (coverage) ---
+mvn jacoco:prepare-agent test jacoco:report
+
+# --- OWASP Dependency Check (security) ---
+mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
+
+# --- Enforcer plugin (build policy) ---
+mvn enforcer:enforce
+
+# --- Site/Docs ---
+mvn site
+mvn site:stage
+
 #+END_SRC
