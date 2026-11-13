@@ -571,130 +571,797 @@ Align branching/release model with product delivery cadence.
 ** Q185: Final maturity principle?
 Git excellence is trustworthy history, fast collaboration, and resilient recovery.
 
-* Commands:
+* Example
+*1. Git Configuration & Initial Setup*
+
+Configure Git before starting development.
+
+   #+BEGIN_SRC bash
+
+# Check Git version
+git --version
+
+# Configure your identity
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Configure default branch
+git config --global init.defaultBranch main
+
+# Configure default editor
+git config --global core.editor "code --wait"
+
+# View configuration
+git config --list
+git config --global --list
+git config user.name
+git config user.email
+
+# Initialize a repository
+git init
+
+### Clone an existing repository
+git clone <repository_url>
+git clone <repository_url> <directory_name>
+git clone --depth 1 <repository_url>
+
+# Configure useful aliases
+git config --global alias.st status
+git config --global alias.co switch
+git config --global alias.br branch
+git config --global alias.lg "log --oneline --graph --decorate --all"
+
+   #+END_SRC
+
+*2. Daily Git Workflow – Developer Essentials*
+   
+Most frequently used commands.
+
+   #+BEGIN_SRC bash
+
+
+# Check working directory status
+git status
+git status -sb
+
+# Inspect changes
+git diff
+git diff --staged
+git diff --stat
+git diff --check
+
+# Stage files
+git add <file>
+git add <directory>
+git add .
+git add -A
+git add -p
+
+- `git add .` – Stage changes in the current directory.
+- `git add -A` – Stage all changes, including deletions.
+- `git add -p` – Interactively stage individual changes.
+
+# Commit changes
+git commit -m "feat: add user authentication"
+git commit -m "fix: resolve login issue"
+git commit
+
+# Commit staged changes and tracked modifications
+git commit -am "fix: update validation"
+
+Note: `-am` does not include new, untracked files.
+
+# Amend the latest commit
+git commit --amend
+git commit --amend -m "feat: improve authentication"
+
+Note: only amend commits that have not already been shared, unless your team explicitly agrees to rewriting history.
+
+# Inspect the latest commit
+git show
+git show --stat
+git show --name-only
+
+   #+END_SRC
+   
+
+*3. Branch Management & Feature Development*
+   
+Branches allow developers to work independently without affecting the main development line.
 
 #+BEGIN_SRC bash
 
-# 1) Sync main
-git checkout main
-git pull origin main
+# List branches
+git branch
+git branch -a
+git branch -r
 
-# 2) Create feature branch
-git checkout -b feature/my-change
+# Create a branch
+git branch feature/my-change
 
-# 3) Work + inspect
+# Create and switch to a branch
+git switch -c feature/my-change
+
+# Switch branches
+git switch main
+git switch develop
+
+# Rename a branch
+git branch -m new-branch-name
+
+# Delete a local branch
+git branch -d feature/my-change
+git branch -D feature/my-change
+
+Note: `-D` force-deletes a branch, even if it has unmerged work.
+
+# Delete a remote branch
+git push origin --delete feature/my-change
+
+# Show the current branch
+git branch --show-current
+
+# See which branches contain a commit
+git branch --contains <commit_sha>
+
+# Example: Standard feature development
+git switch main
+git pull --ff-only origin main
+
+git switch -c feature/user-authentication
+
+# Implement changes
+
 git status
 git diff
-git add .
-git commit -m "feat: add my change"
+git add -p
+git commit -m "feat: add user authentication"
 
-# 4) Keep branch updated
+git push -u origin feature/user-authentication
+
+#+END_SRC
+
+
+*4. Remote Repository Management*
+
+Manage connections to GitHub, GitLab, Bitbucket, and other Git servers.
+
+   #+BEGIN_SRC bash
+
+# Show remote repositories
+git remote
+git remote -v
+
+# Add a remote
+git remote add origin <repository_url>
+
+# Change remote URL
+git remote set-url origin <repository_url>
+
+# Rename a remote
+git remote rename origin upstream
+
+# Remove a remote
+git remote remove origin
+
+# Download remote updates without merging
+git fetch
 git fetch origin
-git rebase origin/main      # or: git merge origin/main
+git fetch --all
+git fetch --prune
 
-# 5) Push branch
-git push -u origin feature/my-change
+# Download and integrate remote changes
+git pull
+git pull origin main
+git pull --ff-only
+git pull --rebase
 
-# 6) After PR review changes
-git add .
-git commit -m "fix: address PR feedback"
+# Push changes
 git push
+git push origin main
+git push -u origin feature/my-change
+git push --force-with-lease
 
-# Compact history
+Note: prefer `--force-with-lease` over `--force` when rewriting a remote branch. Coordinate with teammates first.
+
+   #+END_SRC
+
+
+*5. Merge, Rebase & Conflict Resolution*
+
+Essential for keeping feature branches synchronized with the main development branch.
+
+#+BEGIN_SRC bash
+
+# Merge another branch into the current branch
+git merge feature/my-change
+
+# Merge without creating a merge commit when possible
+git merge --ff-only feature/my-change
+
+# Create an explicit merge commit
+git merge --no-ff feature/my-change
+
+# Rebase your feature branch onto main
+git fetch origin
+git rebase origin/main
+
+# Interactive rebase
+git rebase -i HEAD~5
+
+Useful for:
+- Squashing commits.
+- Reordering commits.
+- Renaming commit messages.
+- Removing unnecessary commits.
+
+# Continue after resolving conflicts
+git status
+# Resolve conflicts in files
+git add <resolved_file>
+git rebase --continue
+
+# Abort a rebase
+git rebase --abort
+
+# Abort a merge
+git merge --abort
+
+# Show conflicting files
+git diff --name-only --diff-filter=U
+
+# Compare branches
+git diff main..feature/my-change
+git diff main...feature/my-change
+git log main..feature/my-change --oneline
+
+Important:
+- `A..B` compares commit ranges.
+- `A...B` in `git diff` compares B against the merge base of A and B.
+
+#+END_SRC
+
+*6. Git History & Commit Investigation*
+   
+Important for code reviews, debugging, audits, and understanding how a project evolved.
+
+#+BEGIN_SRC bash
+
+# Compact commit history
+git log --oneline
+git log --oneline -30
 git log --oneline --graph --decorate -30
+git log --oneline --graph --decorate --all
 
 # Full commit details
+git log -p
 git log -p -20
 
-# One specific commit
+# Show one specific commit
 git show <commit_sha>
 
 # Files changed in a commit
 git show --name-only --oneline <commit_sha>
 
-# Stats (added/removed lines) per commit
+# Added and removed lines
 git log --stat -20
+git log --numstat -20
 
 # Commits for one file
 git log -- <path/to/file>
+
+# Show file history with patches
+git log -p -- <path/to/file>
 
 # Diff of one file in one commit
 git show <commit_sha> -- <path/to/file>
 
 # Search commit messages
-git log --oneline --grep "fix"
+git log --oneline --grep="fix"
+git log --oneline --grep="authentication"
 
 # Search commits by author
 git log --author="Your Name" --oneline
 
-# Who changed each line in a file
+# Find who changed each line
 git blame <file>
+git blame -L 10,50 <file>
 
-# Show commits not yet in main (great for PR review locally)
+# Show commits not yet in main
 git log --oneline main..HEAD
 
 # Show only merge commits
 git log --merges --oneline
 
-# Show commits between tags/releases
+# Show commits between releases
 git log --oneline v1.2.0..v1.3.0
 
-# Find which commit introduced/removed a string
+# Find which commit introduced or removed a string
 git log -S "someFunctionName" --oneline -p
 
-# Find commits matching regex in diff
-git log -G "try\\s*\\{" -p
+# Find commits matching a pattern in the diff
+git log -G 'try[[:space:]]*\{' -p
 
-# Show refs (branches/tags) containing a commit
-git branch --contains <sha>
-git tag --contains <sha>
-
-# Beautiful custom history view
+# Custom history format
 git log --pretty=format:"%h %ad %an %s" --date=short -30
 
-# Unstage file
+# Show contributors
+git shortlog -sn
+git shortlog -sne --all
+
+#+END_SRC
+
+
+*7. Undo Changes & Recover Work*
+
+One of the most important Git topics. Understand these commands before using destructive operations.
+
+#+BEGIN_SRC bash
+
+# Unstage a file
 git restore --staged <file>
 
-# Discard local file changes
+# Discard local changes in a file
 git restore <file>
 
-# Stash temp work
+# Restore a file from another commit
+git restore --source=<commit_sha> -- <file>
+
+# Undo the latest commit but keep changes staged
+git reset --soft HEAD~1
+
+# Undo the latest commit but keep changes unstaged
+git reset HEAD~1
+
+# Completely discard the latest commit and its local changes
+git reset --hard HEAD~1
+
+Warning: `--hard` discards tracked working-tree changes. Make sure you do not need them.
+
+# Safely undo a commit that has already been pushed
+git revert <commit_sha>
+git push
+
+# Revert a merge commit
+git revert -m 1 <merge_commit_sha>
+
+# Recover previous HEAD positions
+git reflog
+git reflog --all
+
+# Recover a deleted or lost commit
+git reflog
+git switch -c recovery-branch <commit_sha>
+
+# Remove untracked files (preview first)
+git clean -n
+
+# Remove untracked files
+git clean -f
+git clean -fd
+
+Warning: `git clean` permanently removes untracked files and directories. Use `-n` first.
+
+#+END_SRC
+
+*8. Stash – Temporarily Save Uncommitted Work*
+
+Useful when switching branches or handling urgent production fixes.
+
+#+BEGIN_SRC bash
+
+# Save current changes
 git stash
+git stash push -m "WIP: authentication changes"
+
+# Include untracked files
+git stash -u
+
+# List stashes
+git stash list
+
+# Inspect a stash
+git stash show
+git stash show -p stash@{0}
+
+# Apply latest stash
+git stash apply
+
+# Apply and remove latest stash
 git stash pop
 
-# Rename branch
-git branch -m new-branch-name
+# Apply a specific stash
+git stash apply stash@{1}
 
-# Delete merged local branch
-git branch -d feature/my-change
+# Delete a stash
+git stash drop stash@{0}
 
-# Example
-git checkout main
-git pull origin main
-git checkout -b hotfix/fix-prod
-# edit...
-git add .
-git commit -m "fix: production issue"
-git push -u origin hotfix/fix-prod
+# Delete all stashes
+git stash clear
 
-# See existing worktrees
+#+END_SRC
+
+*9. Cherry-Pick – Move Specific Commits Between Branches*
+
+Very useful for hotfixes and selectively moving changes between release branches.
+
+#+BEGIN_SRC bash
+
+# Apply one commit to the current branch
+git cherry-pick <commit_sha>
+
+# Apply multiple commits
+git cherry-pick <sha1> <sha2>
+
+# Apply a range of commits
+git cherry-pick <old_sha>..<new_sha>
+
+Note: This excludes the first commit in the range.
+
+# Apply without committing immediately
+git cherry-pick --no-commit <commit_sha>
+
+# Continue after conflict resolution
+git add <resolved_file>
+git cherry-pick --continue
+
+# Abort cherry-pick
+git cherry-pick --abort
+
+#+END_SRC
+
+*10. Debugging & Finding Bugs*
+
+Powerful commands for developers and technical leads investigating regressions.
+
+#+BEGIN_SRC bash
+
+# Find the commit that introduced a bug
+git bisect start
+git bisect bad
+git bisect good <known_good_commit>
+
+# Git checks out commits between good and bad revisions. Test each one and mark it:
+git bisect good
+git bisect bad
+
+# When finished:
+git bisect reset
+
+# Automate bisect with a test script
+git bisect start
+git bisect bad
+git bisect good <known_good_commit>
+git bisect run ./test.sh
+git bisect reset
+
+# Compare two commits
+git diff <commit1> <commit2>
+
+# Find deleted files
+git log --diff-filter=D --summary
+
+# Find commits that changed a specific file
+git log --follow --oneline -- <file>
+
+# Check repository integrity
+git fsck --full
+
+# Check differences in whitespace
+git diff --check
+
+#+END_SRC
+
+*11. Tags, Releases & Version Management*
+
+Especially important for technical leads and DevOps engineers.
+
+#+BEGIN_SRC bash
+
+# List tags
+git tag
+git tag -l
+
+# Create a lightweight tag
+git tag v1.0.0
+
+# Create an annotated release tag
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# Tag a specific commit
+git tag -a v1.0.0 <commit_sha> -m "Release version 1.0.0"
+
+# Inspect a tag
+git show v1.0.0
+
+# Push one tag
+git push origin v1.0.0
+
+# Push all tags
+git push origin --tags
+
+# Delete a local tag
+git tag -d v1.0.0
+
+# Delete a remote tag
+git push origin --delete v1.0.0
+
+# Compare releases
+git log --oneline v1.0.0..v1.1.0
+git diff v1.0.0 v1.1.0
+
+#+END_SRC
+
+*12. Git Worktrees – Work on Multiple Branches Simultaneously*
+
+Extremely useful for technical leads, developers, and production hotfixes.
+
+#+BEGIN_SRC bash
+
+# List existing worktrees
 git worktree list
 
-# Create new worktree with new branch
+# Create a new worktree with a new branch
 git worktree add ../repo-feature -b feature/my-change main
 
-# Create worktree for existing branch
+### Create a worktree for an existing branch
 git worktree add ../repo-hotfix hotfix/urgent-fix
 
 # Enter and work normally
 cd ../repo-feature
 git status
 
-# Remove a worktree (from main repo folder)
+# Remove a worktree
 git worktree remove ../repo-feature
 
-# Prune stale metadata
+# Prune stale worktree metadata
 git worktree prune
+
+Benefits:
+- Fix a production issue without interrupting feature development.
+- Review pull requests in a separate working directory.
+- Run different branches simultaneously.
+- Avoid repeatedly switching branches.
+
+#+END_SRC
+
+*13. Advanced Git Operations & Repository Maintenance*
+
+#+BEGIN_SRC bash
+
+# Show all references
+git show-ref
+
+# Show branches and tags containing a commit
+git branch --contains <sha>
+git tag --contains <sha>
+
+# Show remote tracking information
+git branch -vv
+
+# Set upstream branch
+git branch --set-upstream-to=origin/main main
+
+# Delete stale remote-tracking branches
+git fetch --prune
+
+# Create a patch
+git format-patch -1 <commit_sha>
+git format-patch main..HEAD
+
+# Apply a patch
+git apply <patch_file>
+
+# Apply a patch as a commit
+git am <patch_file>
+
+# Export a repository snapshot
+git archive --format=zip --output=release.zip HEAD
+
+# Check Git object storage
+git count-objects -vH
+
+# Run repository maintenance
+git gc
+git maintenance run
+
+# Inspect Git internals
+git cat-file -p <object_sha>
+git ls-tree HEAD
+git rev-parse HEAD
+
+#+END_SRC
+
+*14. Technical Lead – Team Collaboration & Code Review*
+
+Commands especially useful when reviewing pull requests, managing team branches, and coordinating development.
+
+#+BEGIN_SRC bash
+
+# Review all branches
+git branch -a
+git branch -vv
+
+# Review changes between main and a feature branch
+git diff main...feature/my-change
+
+# Review commits in a feature branch
+git log --oneline main..feature/my-change
+
+# Review files changed by a branch
+git diff --name-status main...feature/my-change
+
+# Review change statistics
+git diff --stat main...feature/my-change
+
+# Find contributors
+git shortlog -sne --all
+
+# Inspect ownership of a file
+git blame <file>
+
+# Find changes from a particular author
+git log --author="Developer Name" --oneline
+
+# Check whether branches have diverged
+git rev-list --left-right --count main...feature/my-change
+
+# Check the merge base
+git merge-base main feature/my-change
+
+# Check commits reachable from one branch but not another
+git log main..feature/my-change --oneline
+git log feature/my-change..main --oneline
+
+Useful team practices:
+- Use protected `main` and release branches.
+- Require pull-request reviews.
+- Require CI checks before merging.
+- Use consistent branch naming.
+- Use conventional commit messages.
+- Prefer small, focused commits.
+- Avoid force-pushing shared branches.
+- Prefer `git revert` for shared history corrections.
+- Keep feature branches regularly synchronized with main.
+
+#+END_SRC
+
+*15. DevOps – Deployment, Hotfixes & Production Workflows*
+
+#+BEGIN_SRC bash
+
+# Update main before starting work
+git switch main
+git fetch origin
+git pull --ff-only origin main
+
+# Create a production hotfix branch
+git switch main
+git switch -c hotfix/fix-production-error
+
+# Commit and push hotfix
+git add -p
+git commit -m "fix: resolve production error"
+git push -u origin hotfix/fix-production-error
+
+# Create a release branch
+git switch main
+git switch -c release/1.2.0
+
+# Prepare a release
+git status
+git log --oneline main..HEAD
+git diff main...HEAD
+
+# Tag a production release
+git tag -a v1.2.0 -m "Release version 1.2.0"
+git push origin v1.2.0
+
+# Synchronize a release branch with main
+git fetch origin
+git rebase origin/main
+
+# Roll back a production change
+git revert <commit_sha>
+git push origin main
+
+Follow your organization deployment and approval process before pushing a production rollback.
+
+# Inspect exactly what will be deployed
+git diff <current_release> <target_release>
+git log --oneline <current_release>..<target_release>
+
+# Check the deployed version
+git describe --tags --always
+git rev-parse HEAD
+
+# Generate release notes
+git log --pretty=format:"- %h %s" v1.1.0..v1.2.0
+
+Useful CI/CD integration practices:
+- Build from a known commit SHA.
+- Tag production releases.
+- Keep deployment artifacts traceable to Git commits.
+- Use immutable release identifiers.
+- Protect deployment branches.
+- Require automated tests and security checks.
+- Never commit secrets, tokens, or credentials.
+- Use rollback commits or known-good release artifacts.
+
+#+END_SRC
+
+*16. Complete Real-World Workflows*
+
+#+BEGIN_SRC bash
+
+## A. Standard Feature Development
+git switch main
+git pull --ff-only origin main
+git switch -c feature/my-change
+
+# Develop the feature
+git status
+git diff
+git add -p
+git commit -m "feat: add my change"
+git fetch origin
+git rebase origin/main
+git push -u origin feature/my-change
+# Open a pull request and request review
+
+## B. Address Pull Request Feedback
+git switch feature/my-change
+
+# Make requested changes
+git add -p
+git commit -m "fix: address PR feedback"
+git push
+
+## C. Fix a Production Issue While Developing Another Feature
+
+# Save unfinished work if necessary
+git stash -u
+
+# Start a separate production fix
+git switch main
+git pull --ff-only origin main
+git switch -c hotfix/fix-prod
+
+# Fix the issue
+git add -p
+git commit -m "fix: resolve production issue"
+git push -u origin hotfix/fix-prod
+
+# Return to feature development
+git switch feature/my-change
+git stash pop
+
+## D. Recover a Mistakenly Deleted Commit
+git reflog
+
+# Find the previous commit SHA
+git switch -c recovery-branch <commit_sha>
+
+## E. Find Which Commit Introduced a Regression
+git bisect start
+git bisect bad
+git bisect good <known_good_commit>
+
+# Test and mark commits
+git bisect good
+git bisect bad
+git bisect reset
+
+## F. Prepare a Release
+git switch main
+git pull --ff-only origin main
+git switch -c release/1.2.0
+
+# Validate release
+git status
+git log --oneline -20
+git tag -a v1.2.0 -m "Release version 1.2.0"
+git push origin v1.2.0
 
 #+END_SRC
 
