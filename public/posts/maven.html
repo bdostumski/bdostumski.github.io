@@ -7,6 +7,7 @@
 <meta name="generator" content="Org Mode" />
 <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
 <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+<link rel="stylesheet" href="/static/css/style.css" type="text/css" />
 </head>
 <body>
 <div id="content" class="content">
@@ -21,1583 +22,2751 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-orge4c69c9" class="outline-2">
-<h2 id="orge4c69c9">Maven</h2>
-<div class="outline-text-2" id="text-orge4c69c9">
+<div id="outline-container-org4740bb8" class="outline-2">
+<h2 id="org4740bb8">Maven</h2>
+<div class="outline-text-2" id="text-org4740bb8">
 <hr>
 </div>
 </div>
-<div id="outline-container-orgf45f496" class="outline-2">
-<h2 id="orgf45f496">Beginner</h2>
-<div class="outline-text-2" id="text-orgf45f496">
+<div id="outline-container-orgf14f6de" class="outline-2">
+<h2 id="orgf14f6de">Maven Command Handbook:</h2>
+<div class="outline-text-2" id="text-orgf14f6de">
+<p>
+<b>1. Maven Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Maven version
+</span>mvn -version
+mvn -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Java version
+</span>java -version
+javac -version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Maven installation path
+</span><span style="font-weight: bold;">which</span> mvn                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Linux / macOS
+</span>where mvn                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Windows
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Maven configuration
+</span>mvn help:effective-settings
+mvn help:system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a custom settings file
+</span>mvn -s settings.xml clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a custom local repository
+</span>mvn -Dmaven.repo.local=/path/to/repository clean install
+
+</pre>
 </div>
-<div id="outline-container-org10605d7" class="outline-3">
-<h3 id="org10605d7">Q1: What is Maven?</h3>
-<div class="outline-text-3" id="text-org10605d7">
+
+<p>
+<b>2. Maven Wrapper</b>
+</p>
+
+<p>
+Maven Wrapper ensures that developers and CI/CD pipelines use a consistent Maven version.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate Maven Wrapper
+</span>mvn wrapper:wrapper
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set Maven Wrapper version
+</span>mvn wrapper:wrapper -Dmaven=3.9.9
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run Maven using Wrapper
+</span>Linux / macOS:
+./mvnw clean install
+./mvnw test
+./mvnw package
+
+Windows:
+mvnw.cmd clean install
+mvnw.cmd test
+mvnw.cmd package
+
+Note: Use <span style="font-weight: bold;">`mvnw`</span> instead of relying on a globally installed Maven version.
+
+</pre>
+</div>
+
+<p>
+<b>3. Understand the Maven Project</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display project information
+</span>mvn help:effective-pom
+mvn help:effective-pom -Dverbose
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display active profiles
+</span>mvn help:active-profiles
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all available profiles
+</span>mvn help:all-profiles
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display project properties
+</span>mvn help:evaluate -Dexpression=project.version -q -DforceStdout
+mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout
+mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a plugin
+</span>mvn help:describe -Dplugin=compiler
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a specific plugin goal
+</span>mvn help:describe <span style="font-style: italic;">\</span>
+  -Dplugin=org.apache.maven.plugins:maven-surefire-plugin <span style="font-style: italic;">\</span>
+  -Dgoal=test
+
+</pre>
+</div>
+
+
+<p>
+<b>4. Maven Build Lifecycle</b>
+</p>
+
+<p>
+Maven has three main built-in lifecycles:
+</p>
+
+<ul class="org-ul">
+<li>`clean` – Removes generated build files.</li>
+<li>`default` – Compiles, tests, packages, installs, and deploys the application.</li>
+<li>`site` – Generates project documentation.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Common lifecycle phases
+</span>mvn validate
+mvn compile
+mvn test
+mvn package
+mvn verify
+mvn install
+mvn deploy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Typical build commands
+</span>mvn clean package
+mvn clean verify
+mvn clean install
+mvn clean deploy
+
+</pre>
+</div>
+
+<p>
+Lifecycle differences
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`validate`</td>
+<td class="org-left">Validate project configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`compile`</td>
+<td class="org-left">Compile application source code</td>
+</tr>
+
+<tr>
+<td class="org-left">`test`</td>
+<td class="org-left">Execute unit tests</td>
+</tr>
+
+<tr>
+<td class="org-left">`package`</td>
+<td class="org-left">Create JAR/WAR</td>
+</tr>
+
+<tr>
+<td class="org-left">`verify`</td>
+<td class="org-left">Run verification checks</td>
+</tr>
+
+<tr>
+<td class="org-left">`install`</td>
+<td class="org-left">Install artifact in local repository</td>
+</tr>
+
+<tr>
+<td class="org-left">`deploy`</td>
+<td class="org-left">Publish artifact to remote repository</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Maven executes preceding phases in the same lifecycle when a later phase is invoked. For example, `mvn package` also runs compilation and tests.
+</p>
+
+<p>
+<b>5. Profiles &amp; Environment Configuration</b>
+</p>
+
+<p>
+Profiles allow different configurations for development, testing, and production environments.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Activate a profile
+</span>mvn clean install -Pdev
+mvn clean install -Ptest
+mvn clean install -Pprod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Activate multiple profiles
+</span>mvn clean install -Pdev,local
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Deactivate a profile
+</span>mvn clean install -P<span style="font-style: italic;">'!prod'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Activate a profile using a property
+</span>mvn clean install -Denv=dev
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Activate Spring Boot profile
+</span>mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pass Spring Boot properties
+</span>mvn spring-boot:run <span style="font-style: italic;">\</span>
+  -Dspring-boot.run.arguments=<span style="font-style: italic;">"--server.port=8081 --spring.profiles.active=dev"</span>
+
+</pre>
+</div>
+
+<p>
+<b>6. Dependency Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display dependency tree
+</span>mvn dependency:tree
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display verbose dependency tree
+</span>mvn dependency:tree -Dverbose
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Search for a specific dependency
+</span>mvn dependency:tree -Dincludes=org.springframework
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Analyze dependencies
+</span>mvn dependency:analyze
+mvn dependency:analyze-verbose
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Download dependencies
+</span>mvn dependency:resolve
+mvn dependency:resolve-plugins
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy dependencies
+</span>mvn dependency:copy-dependencies
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy dependencies to a specific directory
+</span>mvn dependency:copy-dependencies <span style="font-style: italic;">\</span>
+  -DoutputDirectory=target/dependencies
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force dependency updates
+</span>mvn clean install -U
+
+</pre>
+</div>
+
+<p>
+<b>7. Multi-Module Projects</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build all modules
+</span>mvn clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build a specific module
+</span>mvn clean install -pl module-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build a module and its dependencies
+</span>mvn clean install -pl module-name -am
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build a module and its dependent modules
+</span>mvn clean install -pl module-name -amd
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build multiple modules
+</span>mvn clean install -pl module-a,module-b
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resume build from a failed module
+</span>mvn clean install -rf :module-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific module goal
+</span>mvn -pl module-name test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Parallel build
+</span>mvn clean install -T 4
+mvn clean install -T 1C
+
+</pre>
+</div>
+
+<p>
+Useful multi-module options
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Option</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`-pl`</td>
+<td class="org-left">Select projects/modules</td>
+</tr>
+
+<tr>
+<td class="org-left">`-am`</td>
+<td class="org-left">Also build required modules</td>
+</tr>
+
+<tr>
+<td class="org-left">`-amd`</td>
+<td class="org-left">Also build dependent modules</td>
+</tr>
+
+<tr>
+<td class="org-left">`-rf`</td>
+<td class="org-left">Resume from a module</td>
+</tr>
+
+<tr>
+<td class="org-left">`-N`</td>
+<td class="org-left">Do not recurse into submodules</td>
+</tr>
+
+<tr>
+<td class="org-left">`-T 4`</td>
+<td class="org-left">Use four build threads</td>
+</tr>
+
+<tr>
+<td class="org-left">`1C`</td>
+<td class="org-left">means one thread per CPU</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>8. Daily Development Commands</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Clean project
+</span>mvn clean
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Compile source code
+</span>mvn compile
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run unit tests
+</span>mvn test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package application
+</span>mvn package
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install artifact locally
+</span>mvn install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Complete development build
+</span>mvn clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fast build without executing tests
+</span>mvn clean install -DskipTests
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Skip test compilation and execution
+</span>mvn clean install -Dmaven.test.skip=true
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build without cleaning
+</span>mvn install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build offline
+</span>mvn -o clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force dependency updates
+</span>mvn -U clean install
+
+</pre>
+</div>
+
+<p>
+Useful command-line options
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Option</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`-DskipTests`</td>
+<td class="org-left">Compile tests but do not execute them</td>
+</tr>
+
+<tr>
+<td class="org-left">`-Dmaven.test.skip=true`</td>
+<td class="org-left">Skip test compilation and execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`-U`</td>
+<td class="org-left">Force checking for updated snapshots and missing releases</td>
+</tr>
+
+<tr>
+<td class="org-left">`-o`</td>
+<td class="org-left">Offline mode</td>
+</tr>
+
+<tr>
+<td class="org-left">`-B`</td>
+<td class="org-left">Batch mode</td>
+</tr>
+
+<tr>
+<td class="org-left">`-q`</td>
+<td class="org-left">Quiet output</td>
+</tr>
+
+<tr>
+<td class="org-left">`-X`</td>
+<td class="org-left">Debug output</td>
+</tr>
+
+<tr>
+<td class="org-left">`-e`</td>
+<td class="org-left">Detailed error output</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>9. Testing – Surefire &amp; Failsafe</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run unit tests
+</span>mvn test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific test class
+</span>mvn -Dtest=UserServiceTest test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run multiple test classes
+</span>mvn -Dtest=UserServiceTest,OrderServiceTest test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific test method
+</span>mvn -Dtest=UserServiceTest#shouldCreateUser test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Skip tests
+</span>mvn package -DskipTests
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Skip test compilation and execution
+</span>mvn package -Dmaven.test.skip=true
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run integration tests
+</span>mvn verify
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific integration test
+</span>mvn -Dit.test=UserIntegrationTest verify
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Useful test options
+</span>mvn test -DfailIfNoTests=false
+mvn test -Dsurefire.failIfNoSpecifiedTests=false
+
+- Surefire normally executes unit tests during the <span style="font-weight: bold;">`test`</span> phase.
+- Failsafe normally executes integration tests during <span style="font-weight: bold;">`integration-test`</span> and checks results during <span style="font-weight: bold;">`verify`</span>.
+
+</pre>
+</div>
+
+<p>
+<b>10. Debugging – Maven, Tests &amp; Spring Boot</b>
+</p>
+
+<p>
+There are three different debugging scenarios: Maven build debugging, test debugging, and Java application debugging.
+</p>
+
+<p>
+<b>10.1 Maven Build Debugging</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable detailed Maven debug logs
+</span>mvn -X clean install
+mvn -X test
+mvn -X package
+mvn -X spring-boot:run
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Detailed exception output
+</span>mvn -e clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Debug Maven itself
+</span>mvnDebug clean install
+
+</pre>
+</div>
+
+<p>
+Difference:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`mvn -X`</td>
+<td class="org-left">Detailed Maven build logs</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn -e`</td>
+<td class="org-left">Detailed exception stack traces</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvnDebug`</td>
+<td class="org-left">Start Maven with JVM debugging enabled</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: `mvn -X` debugs the Maven build process. It does not automatically enable breakpoints in application Java code.
+</p>
+
+<p>
+<b>10.2 Debug Unit &amp; Integration Tests</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Debug unit tests with Surefire
+</span>mvn -Dmaven.surefire.debug test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Debug integration tests with Failsafe
+</span>mvn -Dmaven.failsafe.debug verify
+
+The test JVM normally waits for a debugger connection on port <span style="font-weight: bold;">`5005`</span>.
+
+</pre>
+</div>
+
+
+<p>
+<b>10.3 Start Spring Boot in Debug Mode</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Option 1 &#8211; Start Spring Boot and wait for debugger
+</span>mvn spring-boot:run <span style="font-style: italic;">\</span>
+  -Dspring-boot.run.jvmArguments=<span style="font-style: italic;">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Option 2 &#8211; Start Spring Boot without waiting for debugger
+</span>mvn spring-boot:run <span style="font-style: italic;">\</span>
+  -Dspring-boot.run.jvmArguments=<span style="font-style: italic;">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Option 3 &#8211; Debug a packaged Spring Boot JAR
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">First build:
+</span>mvn clean package
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Then start:
+</span>java -agentlib:<span style="font-weight: bold; font-style: italic;">jdwp</span>=<span style="font-weight: bold; font-style: italic;">transport</span>=dt_socket,<span style="font-weight: bold; font-style: italic;">server</span>=y,<span style="font-weight: bold; font-style: italic;">suspend</span>=y,<span style="font-weight: bold; font-style: italic;">address</span>=*:5005 <span style="font-style: italic;">\</span>
+  -jar target/application.jar
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Replace `application.jar` with your actual JAR filename.
+</span>
+</pre>
+</div>
+
+<p>
+<b>10.4 Connect IntelliJ IDEA / Eclipse Debugger</b>
+</p>
+
+<p>
+Create a <b><b>Remote JVM Debug</b></b> configuration.
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Setting</th>
+<th scope="col" class="org-left">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Host</td>
+<td class="org-left">`localhost`</td>
+</tr>
+
+<tr>
+<td class="org-left">Port</td>
+<td class="org-left">`5005`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debugger mode</td>
+<td class="org-left">Attach to remote JVM</td>
+</tr>
+
+<tr>
+<td class="org-left">Transport</td>
+<td class="org-left">Socket</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Steps:
+</p>
+
+<ol class="org-ol">
+<li>Start Spring Boot using one of the debug commands above.</li>
+<li>Create or select the Remote JVM Debug configuration in your IDE.</li>
+<li>Connect to `localhost:5005`.</li>
+<li>Set breakpoints in your Java code.</li>
+<li>Send a request to your application.</li>
+<li>Execution stops at the breakpoints.</li>
+</ol>
+
+<p>
+<b>10.5 Understand JVM Debugging Parameters</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+-agentlib:<span style="font-weight: bold; font-style: italic;">jdwp</span>=<span style="font-weight: bold; font-style: italic;">transport</span>=dt_socket,<span style="font-weight: bold; font-style: italic;">server</span>=y,<span style="font-weight: bold; font-style: italic;">suspend</span>=y,<span style="font-weight: bold; font-style: italic;">address</span>=*:5005
+
+</pre>
+</div>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`transport=dt<sub>socket</sub>`</td>
+<td class="org-left">Use socket communication</td>
+</tr>
+
+<tr>
+<td class="org-left">`server=y`</td>
+<td class="org-left">JVM listens for debugger connections</td>
+</tr>
+
+<tr>
+<td class="org-left">`suspend=y`</td>
+<td class="org-left">Wait for debugger before starting</td>
+</tr>
+
+<tr>
+<td class="org-left">`suspend=n`</td>
+<td class="org-left">Start application immediately</td>
+</tr>
+
+<tr>
+<td class="org-left">`address=*:5005`</td>
+<td class="org-left">Listen on port 5005 on available interfaces</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Security: Debug ports allow powerful control over the JVM. Restrict them to localhost or a trusted network. Never expose port 5005 publicly.
+</p>
+
+<p>
+<b>10.6 Quick Debugging Cheat Sheet</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Goal</th>
+<th scope="col" class="org-left">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Debug Maven build</td>
+<td class="org-left">`mvn -X clean install`</td>
+</tr>
+
+<tr>
+<td class="org-left">Detailed errors</td>
+<td class="org-left">`mvn -e clean install`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug Maven itself</td>
+<td class="org-left">`mvnDebug clean install`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug unit tests</td>
+<td class="org-left">`mvn -Dmaven.surefire.debug test`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug integration tests</td>
+<td class="org-left">`mvn -Dmaven.failsafe.debug verify`</td>
+</tr>
+
+<tr>
+<td class="org-left">Start Spring Boot and wait</td>
+<td class="org-left">Spring Boot command with `suspend=y`</td>
+</tr>
+
+<tr>
+<td class="org-left">Start Spring Boot immediately</td>
+<td class="org-left">Spring Boot command with `suspend=n`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug packaged JAR</td>
+<td class="org-left">`java -agentlib:jdwp=&#x2026; -jar target/application.jar`</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. Spring Boot Development &amp; Execution</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start Spring Boot application
+</span>mvn spring-boot:run
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with a specific profile
+</span>mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start on a custom port
+</span>mvn spring-boot:run <span style="font-style: italic;">\</span>
+  -Dspring-boot.run.arguments=<span style="font-style: italic;">"--server.port=8081"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with multiple application arguments
+</span>mvn spring-boot:run <span style="font-style: italic;">\</span>
+  -Dspring-boot.run.arguments=<span style="font-style: italic;">"--server.port=8081 --spring.profiles.active=dev"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package Spring Boot application
+</span>mvn clean package
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run packaged application
+</span>java -jar target/application.jar
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run packaged application with profile
+</span>java -jar target/application.jar --spring.profiles.active=prod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build without executing tests
+</span>mvn clean package -DskipTests
+
+</pre>
+</div>
+
+<p>
+<b>12. Compiler, JAR &amp; WAR</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Compile project
+</span>mvn compile
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package application
+</span>mvn package
+
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-xml">
+-- Configure Java compiler version
+
+In `pom.xml`:
+&lt;<span style="font-weight: bold;">properties</span>&gt;
+    &lt;<span style="font-weight: bold;">maven.compiler.release</span>&gt;21&lt;/<span style="font-weight: bold;">maven.compiler.release</span>&gt;
+&lt;/<span style="font-weight: bold;">properties</span>&gt;
+
+--- Package as JAR or WAR
+
+Configure the packaging type in the POM:
+&lt;<span style="font-weight: bold;">packaging</span>&gt;jar&lt;/<span style="font-weight: bold;">packaging</span>&gt;
+Or:
+&lt;<span style="font-weight: bold;">packaging</span>&gt;war&lt;/<span style="font-weight: bold;">packaging</span>&gt;
+
+Note: Changing `-Dpackaging=war` on the command line does not normally change the project's packaging type. Configure it in `pom.xml`.
+
+</pre>
+</div>
+
+
+<p>
+<b>13. Code Coverage – JaCoCo</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run tests with coverage
+</span>mvn clean test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate coverage report
+</span>mvn jacoco:report
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run verification
+</span>mvn verify
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Coverage report location
+</span>target/site/jacoco/index.html
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">JaCoCo must be configured in the POM for automatic lifecycle integration and coverage verification.
+</span>
+</pre>
+</div>
+
+<p>
+<b>14. Security Scanning &amp; Build Quality</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">OWASP Dependency Check
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run vulnerability scan
+</span>mvn org.owasp:dependency-check-maven:check
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate aggregate report
+</span>mvn org.owasp:dependency-check-maven:aggregate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Maven Enforcer
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enforce Maven rules
+</span>mvn enforcer:enforce
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check dependency convergence
+</span>mvn enforcer:enforce <span style="font-style: italic;">\</span>
+  -Drules=dependencyConvergence
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">These goals require the relevant plugins and configuration in the POM. OWASP scans may require network access to vulnerability databases.
+</span>
+</pre>
+</div>
+
+
+<p>
+<b>15. Dependency &amp; Plugin Version Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check dependency updates
+</span>mvn versions:display-dependency-updates
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check plugin updates
+</span>mvn versions:display-plugin-updates
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check property updates
+</span>mvn versions:display-property-updates
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update dependency versions
+</span>mvn versions:use-latest-versions
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update release versions
+</span>mvn versions:use-latest-releases
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update parent version
+</span>mvn versions:update-parent
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set project version
+</span>mvn versions:set -DnewVersion=2.0.0
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Commit version changes
+</span>mvn versions:commit
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Revert version changes
+</span>mvn versions:revert
+
+</pre>
+</div>
+
+<p>
+<b>16. Run Java Applications with Exec Plugin</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a Java main class
+</span>mvn exec:java -Dexec.mainClass=<span style="font-style: italic;">"com.example.Main"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run with arguments
+</span>mvn exec:java <span style="font-style: italic;">\</span>
+  -Dexec.mainClass=<span style="font-style: italic;">"com.example.Main"</span> <span style="font-style: italic;">\</span>
+  -Dexec.args=<span style="font-style: italic;">"arg1 arg2"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run an external command
+</span>mvn exec:exec -Dexec.executable=java
+
+</pre>
+</div>
+
+
+<p>
+<b>17. Artifact Publishing – Nexus / Artifactory</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Deploy artifact
+</span>mvn clean deploy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Deploy with a profile
+</span>mvn clean deploy -Pproduction
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Deploy with custom settings
+</span>mvn clean deploy -s settings.xml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force dependency updates before deployment
+</span>mvn clean deploy -U
+
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-xml">
+--- Configure remote repository in pom.xml
+&lt;<span style="font-weight: bold;">distributionManagement</span>&gt;
+    &lt;<span style="font-weight: bold;">repository</span>&gt;
+        &lt;<span style="font-weight: bold;">id</span>&gt;company-releases&lt;/<span style="font-weight: bold;">id</span>&gt;
+        &lt;<span style="font-weight: bold;">url</span>&gt;https://nexus.example.com/repository/releases/&lt;/<span style="font-weight: bold;">url</span>&gt;
+    &lt;/<span style="font-weight: bold;">repository</span>&gt;
+    &lt;<span style="font-weight: bold;">snapshotRepository</span>&gt;
+        &lt;<span style="font-weight: bold;">id</span>&gt;company-snapshots&lt;/<span style="font-weight: bold;">id</span>&gt;
+        &lt;<span style="font-weight: bold;">url</span>&gt;https://nexus.example.com/repository/snapshots/&lt;/<span style="font-weight: bold;">url</span>&gt;
+    &lt;/<span style="font-weight: bold;">snapshotRepository</span>&gt;
+&lt;/<span style="font-weight: bold;">distributionManagement</span>&gt;
+
+--- Configure credentials in settings.xml
+&lt;<span style="font-weight: bold;">settings</span>&gt;
+    &lt;<span style="font-weight: bold;">servers</span>&gt;
+        &lt;<span style="font-weight: bold;">server</span>&gt;
+            &lt;<span style="font-weight: bold;">id</span>&gt;company-releases&lt;/<span style="font-weight: bold;">id</span>&gt;
+            &lt;<span style="font-weight: bold;">username</span>&gt;${env.NEXUS_USERNAME}&lt;/<span style="font-weight: bold;">username</span>&gt;
+            &lt;<span style="font-weight: bold;">password</span>&gt;${env.NEXUS_PASSWORD}&lt;/<span style="font-weight: bold;">password</span>&gt;
+        &lt;/<span style="font-weight: bold;">server</span>&gt;
+    &lt;/<span style="font-weight: bold;">servers</span>&gt;
+&lt;/<span style="font-weight: bold;">settings</span>&gt;
+
+--- Never commit credentials or passwords to source control. Use secure CI/CD variables or an approved secrets manager.
+
+</pre>
+</div>
+
+<p>
+<b>18. Logging, Troubleshooting &amp; Performance</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable Maven debug logs
+</span>mvn -X clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed exceptions
+</span>mvn -e clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run in batch mode
+</span>mvn -B clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run in quiet mode
+</span>mvn -q clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run parallel builds
+</span>mvn clean install -T 4
+mvn clean install -T 1C
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build offline
+</span>mvn -o clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force dependency updates
+</span>mvn -U clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Troubleshoot dependency conflicts
+</span>mvn dependency:tree -Dverbose
+mvn dependency:analyze
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Troubleshoot effective configuration
+</span>mvn help:effective-pom
+mvn help:effective-settings
+mvn help:active-profiles
+
+</pre>
+</div>
+
+
+<p>
+<b>19. Maven Site &amp; Documentation</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate project site
+</span>mvn site
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Deploy project site
+</span>mvn site-deploy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Documentation output
+</span>target/site/
+
+</pre>
+</div>
+
+<p>
+<b>20. Real-World Development &amp; DevOps Workflows</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A. Start developing a project
+</span>./mvnw clean install
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">B. Run a specific unit test
+</span>./mvnw -Dtest=UserServiceTest test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">C. Build quickly during development
+</span>./mvnw clean package -DskipTests
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">D. Troubleshoot dependency problems
+</span>./mvnw dependency:tree -Dverbose
+./mvnw help:effective-pom
+./mvnw clean install -U
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">E. Debug a Maven build
+</span>./mvnw -X clean install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">F. Debug Spring Boot in IntelliJ IDEA / Eclipse
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect the IDE debugger to `localhost:5005`.
+</span>./mvnw spring-boot:run <span style="font-style: italic;">\</span>
+  -Dspring-boot.run.jvmArguments=<span style="font-style: italic;">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">G. Build a production artifact
+</span>./mvnw clean verify -Pprod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">H. Run security and coverage checks
+</span>./mvnw clean verify
+./mvnw jacoco:report
+./mvnw org.owasp:dependency-check-maven:check
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">I. Build a multi-module project
+</span>./mvnw clean install -pl module-name -am
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">J. Deploy to Nexus / Artifactory
+</span>./mvnw clean deploy -Pprod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">K. Run the production JAR
+</span>java -jar target/application.jar <span style="font-style: italic;">\</span>
+  --spring.profiles.active=prod
+
+</pre>
+</div>
+
+
+<p>
+<b>21. Commands Every Developer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`mvn -version`</td>
+<td class="org-left">Check Maven version</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean install`</td>
+<td class="org-left">Standard build</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean package`</td>
+<td class="org-left">Create JAR/WAR</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean verify`</td>
+<td class="org-left">Run verification</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn test`</td>
+<td class="org-left">Run unit tests</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn -DskipTests package`</td>
+<td class="org-left">Package without executing tests</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn -U clean install`</td>
+<td class="org-left">Force dependency updates</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn dependency:tree`</td>
+<td class="org-left">Inspect dependencies</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn <a href="help:effective-pom">help:effective-pom</a>`</td>
+<td class="org-left">Inspect effective POM</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn <a href="help:active-profiles">help:active-profiles</a>`</td>
+<td class="org-left">Inspect active profiles</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean install -Pprod`</td>
+<td class="org-left">Build with production profile</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean install -pl module -am`</td>
+<td class="org-left">Build a module and dependencies</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean install -T 1C`</td>
+<td class="org-left">Parallel build</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn -X clean install`</td>
+<td class="org-left">Debug Maven build</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn spring-boot:run`</td>
+<td class="org-left">Start Spring Boot</td>
+</tr>
+
+<tr>
+<td class="org-left">Spring Boot with JDWP</td>
+<td class="org-left">Debug application using IDE</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn versions:display-dependency-updates`</td>
+<td class="org-left">Check dependency updates</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn jacoco:report`</td>
+<td class="org-left">Generate coverage report</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn clean deploy`</td>
+<td class="org-left">Publish artifact</td>
+</tr>
+
+<tr>
+<td class="org-left">`mvn site`</td>
+<td class="org-left">Generate documentation</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>22. Best Practices for Technical Leads &amp; DevOps</b>
+</p>
+
+<ol class="org-ol">
+<li>Use Maven Wrapper (`mvnw`) to standardize Maven versions.</li>
+<li>Define Java and Maven plugin versions in the project.</li>
+<li>Use dependency management to centralize dependency versions.</li>
+<li>Avoid dynamic dependency versions such as `LATEST` and `RELEASE`.</li>
+<li>Use `mvn verify` in CI pipelines to run verification checks.</li>
+<li>Avoid skipping tests in production release pipelines.</li>
+<li>Use Maven profiles for build-time environment configuration.</li>
+<li>Keep credentials in secure CI/CD variables or Maven settings files.</li>
+<li>Use OWASP Dependency Check for vulnerability scanning.</li>
+<li>Use Enforcer rules to maintain dependency and Java version consistency.</li>
+<li>Use JaCoCo to monitor test coverage.</li>
+<li>Use Nexus or Artifactory for centralized artifact management.</li>
+<li>Use `mvn -X` to troubleshoot build problems.</li>
+<li>Use remote JVM debugging for application-level debugging.</li>
+<li>Use parallel builds carefully, particularly with plugins that are not thread-safe.</li>
+<li>Prefer reproducible builds and pinned plugin versions.</li>
+<li>Keep release and snapshot repositories separate.</li>
+<li>Use `clean verify` as a reliable CI validation step before publishing artifacts.</li>
+</ol>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org5233855" class="outline-2">
+<h2 id="org5233855">Beginner</h2>
+<div class="outline-text-2" id="text-org5233855">
+</div>
+<div id="outline-container-orgcda227c" class="outline-3">
+<h3 id="orgcda227c">Q1: What is Maven?</h3>
+<div class="outline-text-3" id="text-orgcda227c">
 <p>
 Maven is a build automation and project management tool primarily for Java projects.
 </p>
 </div>
 </div>
-<div id="outline-container-org954b5b7" class="outline-3">
-<h3 id="org954b5b7">Q2: What problems does Maven solve?</h3>
-<div class="outline-text-3" id="text-org954b5b7">
+<div id="outline-container-org7da50c2" class="outline-3">
+<h3 id="org7da50c2">Q2: What problems does Maven solve?</h3>
+<div class="outline-text-3" id="text-org7da50c2">
 <p>
 Dependency management, standardized build lifecycle, and reproducible project structure.
 </p>
 </div>
 </div>
-<div id="outline-container-org5846bf2" class="outline-3">
-<h3 id="org5846bf2">Q3: What is POM?</h3>
-<div class="outline-text-3" id="text-org5846bf2">
+<div id="outline-container-org8c91820" class="outline-3">
+<h3 id="org8c91820">Q3: What is POM?</h3>
+<div class="outline-text-3" id="text-org8c91820">
 <p>
 Project Object Model file (<code>pom.xml</code>) describing project metadata and build configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org9fc49af" class="outline-3">
-<h3 id="org9fc49af">Q4: Why is pom.xml central in Maven?</h3>
-<div class="outline-text-3" id="text-org9fc49af">
+<div id="outline-container-org40c764a" class="outline-3">
+<h3 id="org40c764a">Q4: Why is pom.xml central in Maven?</h3>
+<div class="outline-text-3" id="text-org40c764a">
 <p>
 It defines coordinates, dependencies, plugins, profiles, and lifecycle behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc8350ec" class="outline-3">
-<h3 id="orgc8350ec">Q5: What are Maven coordinates?</h3>
-<div class="outline-text-3" id="text-orgc8350ec">
+<div id="outline-container-org4a7f9f9" class="outline-3">
+<h3 id="org4a7f9f9">Q5: What are Maven coordinates?</h3>
+<div class="outline-text-3" id="text-org4a7f9f9">
 <p>
 <code>groupId</code>, <code>artifactId</code>, <code>version</code> (GAV) uniquely identifying artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb31dac" class="outline-3">
-<h3 id="orgeb31dac">Q6: What is groupId?</h3>
-<div class="outline-text-3" id="text-orgeb31dac">
+<div id="outline-container-orgadeb197" class="outline-3">
+<h3 id="orgadeb197">Q6: What is groupId?</h3>
+<div class="outline-text-3" id="text-orgadeb197">
 <p>
 Organization or domain-based namespace for project artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org62328db" class="outline-3">
-<h3 id="org62328db">Q7: What is artifactId?</h3>
-<div class="outline-text-3" id="text-org62328db">
+<div id="outline-container-org7cdb14b" class="outline-3">
+<h3 id="org7cdb14b">Q7: What is artifactId?</h3>
+<div class="outline-text-3" id="text-org7cdb14b">
 <p>
 Module/library name within group.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d84e6d" class="outline-3">
-<h3 id="org3d84e6d">Q8: What is version?</h3>
-<div class="outline-text-3" id="text-org3d84e6d">
+<div id="outline-container-org84feebe" class="outline-3">
+<h3 id="org84feebe">Q8: What is version?</h3>
+<div class="outline-text-3" id="text-org84feebe">
 <p>
 Artifact release identifier (e.g., <code>1.0.0</code>).
 </p>
 </div>
 </div>
-<div id="outline-container-orgc050d62" class="outline-3">
-<h3 id="orgc050d62">Q9: What is packaging in Maven?</h3>
-<div class="outline-text-3" id="text-orgc050d62">
+<div id="outline-container-orgf6f9c84" class="outline-3">
+<h3 id="orgf6f9c84">Q9: What is packaging in Maven?</h3>
+<div class="outline-text-3" id="text-orgf6f9c84">
 <p>
 Artifact type produced by build (jar, war, pom, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org60f08ad" class="outline-3">
-<h3 id="org60f08ad">Q10: Default packaging type?</h3>
-<div class="outline-text-3" id="text-org60f08ad">
+<div id="outline-container-orgd838734" class="outline-3">
+<h3 id="orgd838734">Q10: Default packaging type?</h3>
+<div class="outline-text-3" id="text-orgd838734">
 <p>
 <code>jar</code> if unspecified.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c79119" class="outline-3">
-<h3 id="org3c79119">Q11: What is Maven lifecycle?</h3>
-<div class="outline-text-3" id="text-org3c79119">
+<div id="outline-container-org14918e0" class="outline-3">
+<h3 id="org14918e0">Q11: What is Maven lifecycle?</h3>
+<div class="outline-text-3" id="text-org14918e0">
 <p>
 Ordered sequence of build phases executed to build/test/package/deploy software.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc018a95" class="outline-3">
-<h3 id="orgc018a95">Q12: Three built-in lifecycles?</h3>
-<div class="outline-text-3" id="text-orgc018a95">
+<div id="outline-container-org0104fff" class="outline-3">
+<h3 id="org0104fff">Q12: Three built-in lifecycles?</h3>
+<div class="outline-text-3" id="text-org0104fff">
 <p>
 <code>clean</code>, <code>default</code> (build), <code>site</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org4de56bd" class="outline-3">
-<h3 id="org4de56bd">Q13: What is a phase?</h3>
-<div class="outline-text-3" id="text-org4de56bd">
+<div id="outline-container-orge744c0a" class="outline-3">
+<h3 id="orge744c0a">Q13: What is a phase?</h3>
+<div class="outline-text-3" id="text-orge744c0a">
 <p>
 Named step in lifecycle (compile, test, package, verify, install, deploy&#x2026;).
 </p>
 </div>
 </div>
-<div id="outline-container-org8dfb922" class="outline-3">
-<h3 id="org8dfb922">Q14: What is a goal?</h3>
-<div class="outline-text-3" id="text-org8dfb922">
+<div id="outline-container-orgdb4828b" class="outline-3">
+<h3 id="orgdb4828b">Q14: What is a goal?</h3>
+<div class="outline-text-3" id="text-orgdb4828b">
 <p>
 Specific task executed by a plugin (e.g., compiler:compile).
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf05d3f" class="outline-3">
-<h3 id="orgcf05d3f">Q15: Phase vs goal?</h3>
-<div class="outline-text-3" id="text-orgcf05d3f">
+<div id="outline-container-org1bd6960" class="outline-3">
+<h3 id="org1bd6960">Q15: Phase vs goal?</h3>
+<div class="outline-text-3" id="text-org1bd6960">
 <p>
 Phase is lifecycle step; goals are plugin tasks bound to phases.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b52eda" class="outline-3">
-<h3 id="org4b52eda">Q16: What does <code>mvn clean</code> do?</h3>
-<div class="outline-text-3" id="text-org4b52eda">
+<div id="outline-container-orgbc464ed" class="outline-3">
+<h3 id="orgbc464ed">Q16: What does <code>mvn clean</code> do?</h3>
+<div class="outline-text-3" id="text-orgbc464ed">
 <p>
 Runs clean lifecycle, removing previous build output (target directory).
 </p>
 </div>
 </div>
-<div id="outline-container-org11d89f5" class="outline-3">
-<h3 id="org11d89f5">Q17: What does <code>mvn compile</code> do?</h3>
-<div class="outline-text-3" id="text-org11d89f5">
+<div id="outline-container-org38c327f" class="outline-3">
+<h3 id="org38c327f">Q17: What does <code>mvn compile</code> do?</h3>
+<div class="outline-text-3" id="text-org38c327f">
 <p>
 Compiles main source code.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb323c2b" class="outline-3">
-<h3 id="orgb323c2b">Q18: What does <code>mvn test</code> do?</h3>
-<div class="outline-text-3" id="text-orgb323c2b">
+<div id="outline-container-org8925563" class="outline-3">
+<h3 id="org8925563">Q18: What does <code>mvn test</code> do?</h3>
+<div class="outline-text-3" id="text-org8925563">
 <p>
 Runs tests (usually unit tests) in test phase.
 </p>
 </div>
 </div>
-<div id="outline-container-org0ac9c05" class="outline-3">
-<h3 id="org0ac9c05">Q19: What does <code>mvn package</code> do?</h3>
-<div class="outline-text-3" id="text-org0ac9c05">
+<div id="outline-container-orga51a78d" class="outline-3">
+<h3 id="orga51a78d">Q19: What does <code>mvn package</code> do?</h3>
+<div class="outline-text-3" id="text-orga51a78d">
 <p>
 Packages compiled code into distributable artifact (jar/war).
 </p>
 </div>
 </div>
-<div id="outline-container-org52a1dd3" class="outline-3">
-<h3 id="org52a1dd3">Q20: What does <code>mvn verify</code> do?</h3>
-<div class="outline-text-3" id="text-org52a1dd3">
+<div id="outline-container-org52dbdd3" class="outline-3">
+<h3 id="org52dbdd3">Q20: What does <code>mvn verify</code> do?</h3>
+<div class="outline-text-3" id="text-org52dbdd3">
 <p>
 Runs checks/verification after packaging (integration with QA gates/plugins).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd07184a" class="outline-3">
-<h3 id="orgd07184a">Q21: What does <code>mvn install</code> do?</h3>
-<div class="outline-text-3" id="text-orgd07184a">
+<div id="outline-container-org54d9341" class="outline-3">
+<h3 id="org54d9341">Q21: What does <code>mvn install</code> do?</h3>
+<div class="outline-text-3" id="text-org54d9341">
 <p>
 Installs built artifact into local Maven repository.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeeba2eb" class="outline-3">
-<h3 id="orgeeba2eb">Q22: What does <code>mvn deploy</code> do?</h3>
-<div class="outline-text-3" id="text-orgeeba2eb">
+<div id="outline-container-orgb2440ca" class="outline-3">
+<h3 id="orgb2440ca">Q22: What does <code>mvn deploy</code> do?</h3>
+<div class="outline-text-3" id="text-orgb2440ca">
 <p>
 Publishes artifact to remote repository for team/shared usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org79131f3" class="outline-3">
-<h3 id="org79131f3">Q23: What is local repository?</h3>
-<div class="outline-text-3" id="text-org79131f3">
+<div id="outline-container-org307e7df" class="outline-3">
+<h3 id="org307e7df">Q23: What is local repository?</h3>
+<div class="outline-text-3" id="text-org307e7df">
 <p>
 Local cache/store of artifacts, usually under <code>~/.m2/repository</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf33ceb9" class="outline-3">
-<h3 id="orgf33ceb9">Q24: What is remote repository?</h3>
-<div class="outline-text-3" id="text-orgf33ceb9">
+<div id="outline-container-org7cbd7a9" class="outline-3">
+<h3 id="org7cbd7a9">Q24: What is remote repository?</h3>
+<div class="outline-text-3" id="text-org7cbd7a9">
 <p>
 Server-hosted artifact repository (Maven Central, Nexus, Artifactory, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org92a145b" class="outline-3">
-<h3 id="org92a145b">Q25: What is Maven Central?</h3>
-<div class="outline-text-3" id="text-org92a145b">
+<div id="outline-container-org147388c" class="outline-3">
+<h3 id="org147388c">Q25: What is Maven Central?</h3>
+<div class="outline-text-3" id="text-org147388c">
 <p>
 Default public repository hosting open-source Maven artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a342ec" class="outline-3">
-<h3 id="org2a342ec">Q26: What is dependency in Maven?</h3>
-<div class="outline-text-3" id="text-org2a342ec">
+<div id="outline-container-org3c99ae2" class="outline-3">
+<h3 id="org3c99ae2">Q26: What is dependency in Maven?</h3>
+<div class="outline-text-3" id="text-org3c99ae2">
 <p>
 External artifact required by project.
 </p>
 </div>
 </div>
-<div id="outline-container-org7146977" class="outline-3">
-<h3 id="org7146977">Q27: How declare dependency?</h3>
-<div class="outline-text-3" id="text-org7146977">
+<div id="outline-container-org0aca421" class="outline-3">
+<h3 id="org0aca421">Q27: How declare dependency?</h3>
+<div class="outline-text-3" id="text-org0aca421">
 <p>
 Inside <code>&lt;dependencies&gt;</code> section in pom.xml.
 </p>
 </div>
 </div>
-<div id="outline-container-orge3473b9" class="outline-3">
-<h3 id="orge3473b9">Q28: What is dependency scope?</h3>
-<div class="outline-text-3" id="text-orge3473b9">
+<div id="outline-container-orga29ebfb" class="outline-3">
+<h3 id="orga29ebfb">Q28: What is dependency scope?</h3>
+<div class="outline-text-3" id="text-orga29ebfb">
 <p>
 Defines classpath visibility and transitivity behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org13ef787" class="outline-3">
-<h3 id="org13ef787">Q29: Common scopes?</h3>
-<div class="outline-text-3" id="text-org13ef787">
+<div id="outline-container-org7301a09" class="outline-3">
+<h3 id="org7301a09">Q29: Common scopes?</h3>
+<div class="outline-text-3" id="text-org7301a09">
 <p>
 <code>compile</code>, <code>provided</code>, <code>runtime</code>, <code>test</code>, <code>system</code>, <code>import</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org8988dc3" class="outline-3">
-<h3 id="org8988dc3">Q30: compile scope meaning?</h3>
-<div class="outline-text-3" id="text-org8988dc3">
+<div id="outline-container-org1ea773a" class="outline-3">
+<h3 id="org1ea773a">Q30: compile scope meaning?</h3>
+<div class="outline-text-3" id="text-org1ea773a">
 <p>
 Available in all classpaths and transitive by default.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a76fa4" class="outline-3">
-<h3 id="org2a76fa4">Q31: provided scope meaning?</h3>
-<div class="outline-text-3" id="text-org2a76fa4">
+<div id="outline-container-org99c05b9" class="outline-3">
+<h3 id="org99c05b9">Q31: provided scope meaning?</h3>
+<div class="outline-text-3" id="text-org99c05b9">
 <p>
 Needed for compile/test but expected from runtime container (not packaged transitively as runtime).
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5426b0" class="outline-3">
-<h3 id="orgb5426b0">Q32: runtime scope meaning?</h3>
-<div class="outline-text-3" id="text-orgb5426b0">
+<div id="outline-container-orga705e77" class="outline-3">
+<h3 id="orga705e77">Q32: runtime scope meaning?</h3>
+<div class="outline-text-3" id="text-orga705e77">
 <p>
 Not needed at compile time, required at runtime/test runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-org88b7969" class="outline-3">
-<h3 id="org88b7969">Q33: test scope meaning?</h3>
-<div class="outline-text-3" id="text-org88b7969">
+<div id="outline-container-org968d9e2" class="outline-3">
+<h3 id="org968d9e2">Q33: test scope meaning?</h3>
+<div class="outline-text-3" id="text-org968d9e2">
 <p>
 Only available during test compilation/execution.
 </p>
 </div>
 </div>
-<div id="outline-container-org6046fac" class="outline-3">
-<h3 id="org6046fac">Q34: What is transitive dependency?</h3>
-<div class="outline-text-3" id="text-org6046fac">
+<div id="outline-container-orge4718f0" class="outline-3">
+<h3 id="orge4718f0">Q34: What is transitive dependency?</h3>
+<div class="outline-text-3" id="text-orge4718f0">
 <p>
 Dependency brought indirectly by another dependency.
 </p>
 </div>
 </div>
-<div id="outline-container-org49c2419" class="outline-3">
-<h3 id="org49c2419">Q35: Why transitive deps are useful?</h3>
-<div class="outline-text-3" id="text-org49c2419">
+<div id="outline-container-org3f07ae6" class="outline-3">
+<h3 id="org3f07ae6">Q35: Why transitive deps are useful?</h3>
+<div class="outline-text-3" id="text-org3f07ae6">
 <p>
 Reduce manual declaration burden.
 </p>
 </div>
 </div>
-<div id="outline-container-org240d3b8" class="outline-3">
-<h3 id="org240d3b8">Q36: Risk of transitive dependencies?</h3>
-<div class="outline-text-3" id="text-org240d3b8">
+<div id="outline-container-org0ec6a37" class="outline-3">
+<h3 id="org0ec6a37">Q36: Risk of transitive dependencies?</h3>
+<div class="outline-text-3" id="text-org0ec6a37">
 <p>
 Version conflicts and hidden classpath surprises.
 </p>
 </div>
 </div>
-<div id="outline-container-orge270c4e" class="outline-3">
-<h3 id="orge270c4e">Q37: What is dependency conflict in Maven?</h3>
-<div class="outline-text-3" id="text-orge270c4e">
+<div id="outline-container-orgfc82547" class="outline-3">
+<h3 id="orgfc82547">Q37: What is dependency conflict in Maven?</h3>
+<div class="outline-text-3" id="text-orgfc82547">
 <p>
 Multiple versions of same artifact appear in dependency graph.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e115e1" class="outline-3">
-<h3 id="org8e115e1">Q38: Maven conflict resolution default?</h3>
-<div class="outline-text-3" id="text-org8e115e1">
+<div id="outline-container-orgea46ce8" class="outline-3">
+<h3 id="orgea46ce8">Q38: Maven conflict resolution default?</h3>
+<div class="outline-text-3" id="text-orgea46ce8">
 <p>
 “Nearest definition” in dependency tree wins.
 </p>
 </div>
 </div>
-<div id="outline-container-org94ada8f" class="outline-3">
-<h3 id="org94ada8f">Q39: How inspect dependency tree?</h3>
-<div class="outline-text-3" id="text-org94ada8f">
+<div id="outline-container-org5260ff4" class="outline-3">
+<h3 id="org5260ff4">Q39: How inspect dependency tree?</h3>
+<div class="outline-text-3" id="text-org5260ff4">
 <p>
 Use <code>mvn dependency:tree</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd00623a" class="outline-3">
-<h3 id="orgd00623a">Q40: What is exclusion in dependency?</h3>
-<div class="outline-text-3" id="text-orgd00623a">
+<div id="outline-container-org6acd835" class="outline-3">
+<h3 id="org6acd835">Q40: What is exclusion in dependency?</h3>
+<div class="outline-text-3" id="text-org6acd835">
 <p>
 Prevent specific transitive artifact from being included.
 </p>
 </div>
 </div>
-<div id="outline-container-org07fbaf1" class="outline-3">
-<h3 id="org07fbaf1">Q41: What is dependencyManagement?</h3>
-<div class="outline-text-3" id="text-org07fbaf1">
+<div id="outline-container-org8b044de" class="outline-3">
+<h3 id="org8b044de">Q41: What is dependencyManagement?</h3>
+<div class="outline-text-3" id="text-org8b044de">
 <p>
 Central section controlling dependency versions without direct inclusion.
 </p>
 </div>
 </div>
-<div id="outline-container-org5fe333e" class="outline-3">
-<h3 id="org5fe333e">Q42: dependencyManagement vs dependencies?</h3>
-<div class="outline-text-3" id="text-org5fe333e">
+<div id="outline-container-org3e1055d" class="outline-3">
+<h3 id="org3e1055d">Q42: dependencyManagement vs dependencies?</h3>
+<div class="outline-text-3" id="text-org3e1055d">
 <p>
 Management defines versions/rules; dependencies actually include artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org444a226" class="outline-3">
-<h3 id="org444a226">Q43: What is parent POM?</h3>
-<div class="outline-text-3" id="text-org444a226">
+<div id="outline-container-org33c022d" class="outline-3">
+<h3 id="org33c022d">Q43: What is parent POM?</h3>
+<div class="outline-text-3" id="text-org33c022d">
 <p>
 POM inherited by child project for shared configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b48e9f" class="outline-3">
-<h3 id="org9b48e9f">Q44: Why use parent POM?</h3>
-<div class="outline-text-3" id="text-org9b48e9f">
+<div id="outline-container-orgebff12c" class="outline-3">
+<h3 id="orgebff12c">Q44: Why use parent POM?</h3>
+<div class="outline-text-3" id="text-orgebff12c">
 <p>
 Consistency and reduced duplication across modules/projects.
 </p>
 </div>
 </div>
-<div id="outline-container-org0a66d78" class="outline-3">
-<h3 id="org0a66d78">Q45: What is multi-module Maven project?</h3>
-<div class="outline-text-3" id="text-org0a66d78">
+<div id="outline-container-org9c354c9" class="outline-3">
+<h3 id="org9c354c9">Q45: What is multi-module Maven project?</h3>
+<div class="outline-text-3" id="text-org9c354c9">
 <p>
 Aggregator project building multiple modules together.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b1bcc9" class="outline-3">
-<h3 id="org6b1bcc9">Q46: What is aggregator POM packaging?</h3>
-<div class="outline-text-3" id="text-org6b1bcc9">
+<div id="outline-container-org9f14b5a" class="outline-3">
+<h3 id="org9f14b5a">Q46: What is aggregator POM packaging?</h3>
+<div class="outline-text-3" id="text-org9f14b5a">
 <p>
 Usually <code>pom</code> packaging.
 </p>
 </div>
 </div>
-<div id="outline-container-org6087bea" class="outline-3">
-<h3 id="org6087bea">Q47: Standard Maven directory layout?</h3>
-<div class="outline-text-3" id="text-org6087bea">
+<div id="outline-container-orge236fb6" class="outline-3">
+<h3 id="orge236fb6">Q47: Standard Maven directory layout?</h3>
+<div class="outline-text-3" id="text-orge236fb6">
 <p>
 <code>src/main/java</code>, <code>src/test/java</code>, <code>src/main/resources</code>, etc.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf007df" class="outline-3">
-<h3 id="orgcf007df">Q48: Why follow standard layout?</h3>
-<div class="outline-text-3" id="text-orgcf007df">
+<div id="outline-container-org54b7885" class="outline-3">
+<h3 id="org54b7885">Q48: Why follow standard layout?</h3>
+<div class="outline-text-3" id="text-org54b7885">
 <p>
 Convention over configuration; plugin defaults work seamlessly.
 </p>
 </div>
 </div>
-<div id="outline-container-orga4f0d16" class="outline-3">
-<h3 id="orga4f0d16">Q49: What is plugin in Maven?</h3>
-<div class="outline-text-3" id="text-orga4f0d16">
+<div id="outline-container-orgd238ae2" class="outline-3">
+<h3 id="orgd238ae2">Q49: What is plugin in Maven?</h3>
+<div class="outline-text-3" id="text-orgd238ae2">
 <p>
 Extension component adding build functionality.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b1d56e" class="outline-3">
-<h3 id="org3b1d56e">Q50: Common core plugins?</h3>
-<div class="outline-text-3" id="text-org3b1d56e">
+<div id="outline-container-org7a37be0" class="outline-3">
+<h3 id="org7a37be0">Q50: Common core plugins?</h3>
+<div class="outline-text-3" id="text-org7a37be0">
 <p>
 compiler, surefire, failsafe, jar, resources, clean, install, deploy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb2c558" class="outline-3">
-<h3 id="orgfb2c558">Q51: What is surefire plugin?</h3>
-<div class="outline-text-3" id="text-orgfb2c558">
+<div id="outline-container-orgfca02f1" class="outline-3">
+<h3 id="orgfca02f1">Q51: What is surefire plugin?</h3>
+<div class="outline-text-3" id="text-orgfca02f1">
 <p>
 Runs unit tests in test phase.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c23d33" class="outline-3">
-<h3 id="org8c23d33">Q52: What is failsafe plugin?</h3>
-<div class="outline-text-3" id="text-org8c23d33">
+<div id="outline-container-org0593e67" class="outline-3">
+<h3 id="org0593e67">Q52: What is failsafe plugin?</h3>
+<div class="outline-text-3" id="text-org0593e67">
 <p>
 Runs integration tests, typically in integration-test/verify phases.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b7da01" class="outline-3">
-<h3 id="org3b7da01">Q53: Why separate unit and integration tests?</h3>
-<div class="outline-text-3" id="text-org3b7da01">
+<div id="outline-container-org8f3428e" class="outline-3">
+<h3 id="org8f3428e">Q53: Why separate unit and integration tests?</h3>
+<div class="outline-text-3" id="text-org8f3428e">
 <p>
 Faster feedback and clearer pipeline stages.
 </p>
 </div>
 </div>
-<div id="outline-container-org5db2fcb" class="outline-3">
-<h3 id="org5db2fcb">Q54: What is settings.xml?</h3>
-<div class="outline-text-3" id="text-org5db2fcb">
+<div id="outline-container-orgac72fa7" class="outline-3">
+<h3 id="orgac72fa7">Q54: What is settings.xml?</h3>
+<div class="outline-text-3" id="text-orgac72fa7">
 <p>
 User/global Maven runtime configuration (repos, mirrors, credentials, profiles).
 </p>
 </div>
 </div>
-<div id="outline-container-org1d7bab6" class="outline-3">
-<h3 id="org1d7bab6">Q55: Should credentials be stored in pom.xml?</h3>
-<div class="outline-text-3" id="text-org1d7bab6">
+<div id="outline-container-orgada484f" class="outline-3">
+<h3 id="orgada484f">Q55: Should credentials be stored in pom.xml?</h3>
+<div class="outline-text-3" id="text-orgada484f">
 <p>
 No; use settings.xml/CI secret management.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4bb741" class="outline-3">
-<h3 id="orgd4bb741">Q56: Beginner Maven anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgd4bb741">
+<div id="outline-container-org5d250a1" class="outline-3">
+<h3 id="org5d250a1">Q56: Beginner Maven anti-pattern?</h3>
+<div class="outline-text-3" id="text-org5d250a1">
 <p>
 Copy-pasting huge plugin config without understanding lifecycle impact.
 </p>
 </div>
 </div>
-<div id="outline-container-org8326213" class="outline-3">
-<h3 id="org8326213">Q57: Another beginner anti-pattern?</h3>
-<div class="outline-text-3" id="text-org8326213">
+<div id="outline-container-org26a452d" class="outline-3">
+<h3 id="org26a452d">Q57: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-org26a452d">
 <p>
 Using dynamic/snapshot dependencies in production releases carelessly.
 </p>
 </div>
 </div>
-<div id="outline-container-org20c546a" class="outline-3">
-<h3 id="org20c546a">Q58: Beginner reproducibility baseline?</h3>
-<div class="outline-text-3" id="text-org20c546a">
+<div id="outline-container-orgf211b4e" class="outline-3">
+<h3 id="orgf211b4e">Q58: Beginner reproducibility baseline?</h3>
+<div class="outline-text-3" id="text-orgf211b4e">
 <p>
 Pin plugin/dependency versions explicitly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd9addfc" class="outline-3">
-<h3 id="orgd9addfc">Q59: Beginner CI baseline?</h3>
-<div class="outline-text-3" id="text-orgd9addfc">
+<div id="outline-container-org83b3361" class="outline-3">
+<h3 id="org83b3361">Q59: Beginner CI baseline?</h3>
+<div class="outline-text-3" id="text-org83b3361">
 <p>
 Run clean verify on every pull request.
 </p>
 </div>
 </div>
-<div id="outline-container-org0edbf59" class="outline-3">
-<h3 id="org0edbf59">Q60: Beginner best practice?</h3>
-<div class="outline-text-3" id="text-org0edbf59">
+<div id="outline-container-org3224f78" class="outline-3">
+<h3 id="org3224f78">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org3224f78">
 <p>
 Keep POM minimal, explicit, and convention-aligned.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org3c8dde9" class="outline-2">
-<h2 id="org3c8dde9">Intermediate</h2>
-<div class="outline-text-2" id="text-org3c8dde9">
+<div id="outline-container-org6c77331" class="outline-2">
+<h2 id="org6c77331">Intermediate</h2>
+<div class="outline-text-2" id="text-org6c77331">
 </div>
-<div id="outline-container-orgdbc4948" class="outline-3">
-<h3 id="orgdbc4948">Q61: What is BOM in Maven?</h3>
-<div class="outline-text-3" id="text-orgdbc4948">
+<div id="outline-container-org56e9918" class="outline-3">
+<h3 id="org56e9918">Q61: What is BOM in Maven?</h3>
+<div class="outline-text-3" id="text-org56e9918">
 <p>
 Bill of Materials POM centralizing compatible dependency versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c976ab" class="outline-3">
-<h3 id="org2c976ab">Q62: How import BOM?</h3>
-<div class="outline-text-3" id="text-org2c976ab">
+<div id="outline-container-orga15968a" class="outline-3">
+<h3 id="orga15968a">Q62: How import BOM?</h3>
+<div class="outline-text-3" id="text-orga15968a">
 <p>
 Use <code>dependencyManagement</code> with scope <code>import</code> and type <code>pom</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b888ad" class="outline-3">
-<h3 id="org6b888ad">Q63: Why use BOM?</h3>
-<div class="outline-text-3" id="text-org6b888ad">
+<div id="outline-container-org772050b" class="outline-3">
+<h3 id="org772050b">Q63: Why use BOM?</h3>
+<div class="outline-text-3" id="text-org772050b">
 <p>
 Version alignment and fewer dependency conflicts.
 </p>
 </div>
 </div>
-<div id="outline-container-org538219f" class="outline-3">
-<h3 id="org538219f">Q64: What is effective POM?</h3>
-<div class="outline-text-3" id="text-org538219f">
+<div id="outline-container-orgf5f7265" class="outline-3">
+<h3 id="orgf5f7265">Q64: What is effective POM?</h3>
+<div class="outline-text-3" id="text-orgf5f7265">
 <p>
 Fully resolved POM after inheritance, profiles, and defaults.
 </p>
 </div>
 </div>
-<div id="outline-container-org6cb4db1" class="outline-3">
-<h3 id="org6cb4db1">Q65: How view effective POM?</h3>
-<div class="outline-text-3" id="text-org6cb4db1">
+<div id="outline-container-org49bb364" class="outline-3">
+<h3 id="org49bb364">Q65: How view effective POM?</h3>
+<div class="outline-text-3" id="text-org49bb364">
 <p>
 <code>mvn help:effective-pom</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orga14c370" class="outline-3">
-<h3 id="orga14c370">Q66: What is effective settings?</h3>
-<div class="outline-text-3" id="text-orga14c370">
+<div id="outline-container-org7d89de9" class="outline-3">
+<h3 id="org7d89de9">Q66: What is effective settings?</h3>
+<div class="outline-text-3" id="text-org7d89de9">
 <p>
 Resolved settings after global/user/profile interpolation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgab1ae32" class="outline-3">
-<h3 id="orgab1ae32">Q67: How inspect effective settings?</h3>
-<div class="outline-text-3" id="text-orgab1ae32">
+<div id="outline-container-orgf1912df" class="outline-3">
+<h3 id="orgf1912df">Q67: How inspect effective settings?</h3>
+<div class="outline-text-3" id="text-orgf1912df">
 <p>
 <code>mvn help:effective-settings</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ba1ed3" class="outline-3">
-<h3 id="org7ba1ed3">Q68: What is Maven profile?</h3>
-<div class="outline-text-3" id="text-org7ba1ed3">
+<div id="outline-container-org2ddbd12" class="outline-3">
+<h3 id="org2ddbd12">Q68: What is Maven profile?</h3>
+<div class="outline-text-3" id="text-org2ddbd12">
 <p>
 Conditional configuration activated by property/JDK/OS/file/explicit flag.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc640cba" class="outline-3">
-<h3 id="orgc640cba">Q69: Why use profiles?</h3>
-<div class="outline-text-3" id="text-orgc640cba">
+<div id="outline-container-org89b26fe" class="outline-3">
+<h3 id="org89b26fe">Q69: Why use profiles?</h3>
+<div class="outline-text-3" id="text-org89b26fe">
 <p>
 Environment-specific behavior (dev/ci/release) without duplicating POMs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7f4b91" class="outline-3">
-<h3 id="orgc7f4b91">Q70: Profile activation methods?</h3>
-<div class="outline-text-3" id="text-orgc7f4b91">
+<div id="outline-container-org308f577" class="outline-3">
+<h3 id="org308f577">Q70: Profile activation methods?</h3>
+<div class="outline-text-3" id="text-org308f577">
 <p>
 <code>-P</code> flag, properties, OS, JDK version, file presence.
 </p>
 </div>
 </div>
-<div id="outline-container-org44051be" class="outline-3">
-<h3 id="org44051be">Q71: Profile anti-pattern?</h3>
-<div class="outline-text-3" id="text-org44051be">
+<div id="outline-container-org4760bd2" class="outline-3">
+<h3 id="org4760bd2">Q71: Profile anti-pattern?</h3>
+<div class="outline-text-3" id="text-org4760bd2">
 <p>
 Encoding business logic and excessive complexity in profiles.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c192f2" class="outline-3">
-<h3 id="org8c192f2">Q72: What is pluginManagement?</h3>
-<div class="outline-text-3" id="text-org8c192f2">
+<div id="outline-container-org4944822" class="outline-3">
+<h3 id="org4944822">Q72: What is pluginManagement?</h3>
+<div class="outline-text-3" id="text-org4944822">
 <p>
 Centralized plugin versions/config inherited by children.
 </p>
 </div>
 </div>
-<div id="outline-container-org048e8ff" class="outline-3">
-<h3 id="org048e8ff">Q73: pluginManagement vs plugins?</h3>
-<div class="outline-text-3" id="text-org048e8ff">
+<div id="outline-container-org4df1100" class="outline-3">
+<h3 id="org4df1100">Q73: pluginManagement vs plugins?</h3>
+<div class="outline-text-3" id="text-org4df1100">
 <p>
 Management defines defaults; plugins section binds executions.
 </p>
 </div>
 </div>
-<div id="outline-container-org9f447f5" class="outline-3">
-<h3 id="org9f447f5">Q74: Why pin plugin versions?</h3>
-<div class="outline-text-3" id="text-org9f447f5">
+<div id="outline-container-org15705db" class="outline-3">
+<h3 id="org15705db">Q74: Why pin plugin versions?</h3>
+<div class="outline-text-3" id="text-org15705db">
 <p>
 Avoid non-reproducible builds due to plugin version drift.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f0bc7e" class="outline-3">
-<h3 id="org3f0bc7e">Q75: What is Maven Wrapper?</h3>
-<div class="outline-text-3" id="text-org3f0bc7e">
+<div id="outline-container-org204a977" class="outline-3">
+<h3 id="org204a977">Q75: What is Maven Wrapper?</h3>
+<div class="outline-text-3" id="text-org204a977">
 <p>
 Project-local wrapper scripts ensuring consistent Maven version usage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc80aad7" class="outline-3">
-<h3 id="orgc80aad7">Q76: Why use Maven Wrapper in teams?</h3>
-<div class="outline-text-3" id="text-orgc80aad7">
+<div id="outline-container-orgb17c54a" class="outline-3">
+<h3 id="orgb17c54a">Q76: Why use Maven Wrapper in teams?</h3>
+<div class="outline-text-3" id="text-orgb17c54a">
 <p>
 Eliminates “works on my Maven version” problems.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfe7223d" class="outline-3">
-<h3 id="orgfe7223d">Q77: What is snapshot version?</h3>
-<div class="outline-text-3" id="text-orgfe7223d">
+<div id="outline-container-org0909ab0" class="outline-3">
+<h3 id="org0909ab0">Q77: What is snapshot version?</h3>
+<div class="outline-text-3" id="text-org0909ab0">
 <p>
 Mutable development version ending with <code>-SNAPSHOT</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org16918bd" class="outline-3">
-<h3 id="org16918bd">Q78: Snapshot vs release artifact?</h3>
-<div class="outline-text-3" id="text-org16918bd">
+<div id="outline-container-org10c5fce" class="outline-3">
+<h3 id="org10c5fce">Q78: Snapshot vs release artifact?</h3>
+<div class="outline-text-3" id="text-org10c5fce">
 <p>
 Snapshot can change; release should be immutable.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d87a20" class="outline-3">
-<h3 id="org1d87a20">Q79: What is updatePolicy for snapshots?</h3>
-<div class="outline-text-3" id="text-org1d87a20">
+<div id="outline-container-orgc5827ec" class="outline-3">
+<h3 id="orgc5827ec">Q79: What is updatePolicy for snapshots?</h3>
+<div class="outline-text-3" id="text-orgc5827ec">
 <p>
 Controls frequency of checking remote snapshot updates.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc120d6" class="outline-3">
-<h3 id="orgdc120d6">Q80: What is checksumPolicy?</h3>
-<div class="outline-text-3" id="text-orgdc120d6">
+<div id="outline-container-orgdf2b200" class="outline-3">
+<h3 id="orgdf2b200">Q80: What is checksumPolicy?</h3>
+<div class="outline-text-3" id="text-orgdf2b200">
 <p>
 Defines behavior on artifact checksum mismatch (warn/fail).
 </p>
 </div>
 </div>
-<div id="outline-container-org20d2a46" class="outline-3">
-<h3 id="org20d2a46">Q81: What is mirror in settings.xml?</h3>
-<div class="outline-text-3" id="text-org20d2a46">
+<div id="outline-container-orgf303bea" class="outline-3">
+<h3 id="orgf303bea">Q81: What is mirror in settings.xml?</h3>
+<div class="outline-text-3" id="text-orgf303bea">
 <p>
 Redirect repository requests through specified mirror (e.g., internal proxy).
 </p>
 </div>
 </div>
-<div id="outline-container-org60d9ef3" class="outline-3">
-<h3 id="org60d9ef3">Q82: Why use repository manager (Nexus/Artifactory)?</h3>
-<div class="outline-text-3" id="text-org60d9ef3">
+<div id="outline-container-org7d06154" class="outline-3">
+<h3 id="org7d06154">Q82: Why use repository manager (Nexus/Artifactory)?</h3>
+<div class="outline-text-3" id="text-org7d06154">
 <p>
 Caching, access control, proxying, and artifact governance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb041db4" class="outline-3">
-<h3 id="orgb041db4">Q83: What is dependency convergence?</h3>
-<div class="outline-text-3" id="text-orgb041db4">
+<div id="outline-container-orgeb44445" class="outline-3">
+<h3 id="orgeb44445">Q83: What is dependency convergence?</h3>
+<div class="outline-text-3" id="text-orgeb44445">
 <p>
 Ensuring consistent single versions across transitive graph.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd3b16ed" class="outline-3">
-<h3 id="orgd3b16ed">Q84: How enforce convergence?</h3>
-<div class="outline-text-3" id="text-orgd3b16ed">
+<div id="outline-container-org63f4685" class="outline-3">
+<h3 id="org63f4685">Q84: How enforce convergence?</h3>
+<div class="outline-text-3" id="text-org63f4685">
 <p>
 Maven Enforcer rules and BOM management.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd1a57e9" class="outline-3">
-<h3 id="orgd1a57e9">Q85: What is Maven Enforcer Plugin?</h3>
-<div class="outline-text-3" id="text-orgd1a57e9">
+<div id="outline-container-org187977e" class="outline-3">
+<h3 id="org187977e">Q85: What is Maven Enforcer Plugin?</h3>
+<div class="outline-text-3" id="text-org187977e">
 <p>
 Plugin enforcing project/build rules (Java version, banned deps, convergence, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org597b342" class="outline-3">
-<h3 id="org597b342">Q86: What is reproducible build in Maven context?</h3>
-<div class="outline-text-3" id="text-org597b342">
+<div id="outline-container-org229c2f1" class="outline-3">
+<h3 id="org229c2f1">Q86: What is reproducible build in Maven context?</h3>
+<div class="outline-text-3" id="text-org229c2f1">
 <p>
 Same source produces same artifact bytes/metadata (as much as possible).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd7f4853" class="outline-3">
-<h3 id="orgd7f4853">Q87: Common reproducibility issues?</h3>
-<div class="outline-text-3" id="text-orgd7f4853">
+<div id="outline-container-orgebce314" class="outline-3">
+<h3 id="orgebce314">Q87: Common reproducibility issues?</h3>
+<div class="outline-text-3" id="text-orgebce314">
 <p>
 Timestamps, plugin drift, generated file ordering, environment differences.
 </p>
 </div>
 </div>
-<div id="outline-container-org39a19fb" class="outline-3">
-<h3 id="org39a19fb">Q88: What is flatten-maven-plugin concept?</h3>
-<div class="outline-text-3" id="text-org39a19fb">
+<div id="outline-container-org358d3b1" class="outline-3">
+<h3 id="org358d3b1">Q88: What is flatten-maven-plugin concept?</h3>
+<div class="outline-text-3" id="text-org358d3b1">
 <p>
 Produces simplified consumer POM for publication/use cases.
 </p>
 </div>
 </div>
-<div id="outline-container-org98f661b" class="outline-3">
-<h3 id="org98f661b">Q89: What is versions-maven-plugin?</h3>
-<div class="outline-text-3" id="text-org98f661b">
+<div id="outline-container-org508eff5" class="outline-3">
+<h3 id="org508eff5">Q89: What is versions-maven-plugin?</h3>
+<div class="outline-text-3" id="text-org508eff5">
 <p>
 Helps inspect/update dependency/plugin versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org72b0bc2" class="outline-3">
-<h3 id="org72b0bc2">Q90: What is dependency mediation?</h3>
-<div class="outline-text-3" id="text-org72b0bc2">
+<div id="outline-container-org2190ecb" class="outline-3">
+<h3 id="org2190ecb">Q90: What is dependency mediation?</h3>
+<div class="outline-text-3" id="text-org2190ecb">
 <p>
 Maven selecting one artifact version among conflicts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcec62fc" class="outline-3">
-<h3 id="orgcec62fc">Q91: How force specific dependency version?</h3>
-<div class="outline-text-3" id="text-orgcec62fc">
+<div id="outline-container-org3414052" class="outline-3">
+<h3 id="org3414052">Q91: How force specific dependency version?</h3>
+<div class="outline-text-3" id="text-org3414052">
 <p>
 Declare direct dependency or manage version in dependencyManagement.
 </p>
 </div>
 </div>
-<div id="outline-container-org38264ed" class="outline-3">
-<h3 id="org38264ed">Q92: What is optional dependency?</h3>
-<div class="outline-text-3" id="text-org38264ed">
+<div id="outline-container-org6e419f0" class="outline-3">
+<h3 id="org6e419f0">Q92: What is optional dependency?</h3>
+<div class="outline-text-3" id="text-org6e419f0">
 <p>
 Dependency not transitively inherited by default consumers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgda3e7df" class="outline-3">
-<h3 id="orgda3e7df">Q93: What is classifier?</h3>
-<div class="outline-text-3" id="text-orgda3e7df">
+<div id="outline-container-org61b1f54" class="outline-3">
+<h3 id="org61b1f54">Q93: What is classifier?</h3>
+<div class="outline-text-3" id="text-org61b1f54">
 <p>
 Extra artifact variant label (sources, javadoc, tests, native variants).
 </p>
 </div>
 </div>
-<div id="outline-container-org5366e2a" class="outline-3">
-<h3 id="org5366e2a">Q94: What is attached artifact?</h3>
-<div class="outline-text-3" id="text-org5366e2a">
+<div id="outline-container-org4f5f09b" class="outline-3">
+<h3 id="org4f5f09b">Q94: What is attached artifact?</h3>
+<div class="outline-text-3" id="text-org4f5f09b">
 <p>
 Additional artifact produced in build besides main packaging.
 </p>
 </div>
 </div>
-<div id="outline-container-org1e4120a" class="outline-3">
-<h3 id="org1e4120a">Q95: What is shade plugin?</h3>
-<div class="outline-text-3" id="text-org1e4120a">
+<div id="outline-container-orgb014068" class="outline-3">
+<h3 id="orgb014068">Q95: What is shade plugin?</h3>
+<div class="outline-text-3" id="text-orgb014068">
 <p>
 Creates uber/fat jar and can relocate packages.
 </p>
 </div>
 </div>
-<div id="outline-container-orga5dae89" class="outline-3">
-<h3 id="orga5dae89">Q96: Shade vs assembly plugin?</h3>
-<div class="outline-text-3" id="text-orga5dae89">
+<div id="outline-container-org6c7b321" class="outline-3">
+<h3 id="org6c7b321">Q96: Shade vs assembly plugin?</h3>
+<div class="outline-text-3" id="text-org6c7b321">
 <p>
 Shade focuses class relocation/uber jars; assembly builds custom distributions.
 </p>
 </div>
 </div>
-<div id="outline-container-org0a0e3f2" class="outline-3">
-<h3 id="org0a0e3f2">Q97: What is resource filtering?</h3>
-<div class="outline-text-3" id="text-org0a0e3f2">
+<div id="outline-container-org700e830" class="outline-3">
+<h3 id="org700e830">Q97: What is resource filtering?</h3>
+<div class="outline-text-3" id="text-org700e830">
 <p>
 Replacing placeholders in resource files during build.
 </p>
 </div>
 </div>
-<div id="outline-container-org78390bf" class="outline-3">
-<h3 id="org78390bf">Q98: Resource filtering risk?</h3>
-<div class="outline-text-3" id="text-org78390bf">
+<div id="outline-container-orga3aaf5c" class="outline-3">
+<h3 id="orga3aaf5c">Q98: Resource filtering risk?</h3>
+<div class="outline-text-3" id="text-orga3aaf5c">
 <p>
 Accidental modification/leakage of binary/sensitive content.
 </p>
 </div>
 </div>
-<div id="outline-container-org18b895c" class="outline-3">
-<h3 id="org18b895c">Q99: What is toolchains plugin?</h3>
-<div class="outline-text-3" id="text-org18b895c">
+<div id="outline-container-org36534cb" class="outline-3">
+<h3 id="org36534cb">Q99: What is toolchains plugin?</h3>
+<div class="outline-text-3" id="text-org36534cb">
 <p>
 Selects configured JDK/toolchain independent from runtime JAVA<sub>HOME</sub>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeccc017" class="outline-3">
-<h3 id="orgeccc017">Q100: Why use toolchains?</h3>
-<div class="outline-text-3" id="text-orgeccc017">
+<div id="outline-container-org4305d27" class="outline-3">
+<h3 id="org4305d27">Q100: Why use toolchains?</h3>
+<div class="outline-text-3" id="text-org4305d27">
 <p>
 Consistent cross-JDK builds in CI/dev.
 </p>
 </div>
 </div>
-<div id="outline-container-orga7b2eab" class="outline-3">
-<h3 id="orga7b2eab">Q101: What is reactor build?</h3>
-<div class="outline-text-3" id="text-orga7b2eab">
+<div id="outline-container-orgae291f5" class="outline-3">
+<h3 id="orgae291f5">Q101: What is reactor build?</h3>
+<div class="outline-text-3" id="text-orgae291f5">
 <p>
 Maven building modules together in dependency-aware order.
 </p>
 </div>
 </div>
-<div id="outline-container-org9ed467f" class="outline-3">
-<h3 id="org9ed467f">Q102: How build specific module with dependencies?</h3>
-<div class="outline-text-3" id="text-org9ed467f">
+<div id="outline-container-org5fa7198" class="outline-3">
+<h3 id="org5fa7198">Q102: How build specific module with dependencies?</h3>
+<div class="outline-text-3" id="text-org5fa7198">
 <p>
 Use reactor flags like <code>-pl</code> and <code>-am</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff56969" class="outline-3">
-<h3 id="orgff56969">Q103: What is <code>-amd</code>?</h3>
-<div class="outline-text-3" id="text-orgff56969">
+<div id="outline-container-org4748f64" class="outline-3">
+<h3 id="org4748f64">Q103: What is <code>-amd</code>?</h3>
+<div class="outline-text-3" id="text-org4748f64">
 <p>
 Build selected module and dependents (affected downstream modules).
 </p>
 </div>
 </div>
-<div id="outline-container-org4c482ec" class="outline-3">
-<h3 id="org4c482ec">Q104: What is parallel build flag?</h3>
-<div class="outline-text-3" id="text-org4c482ec">
+<div id="outline-container-orge6443ca" class="outline-3">
+<h3 id="orge6443ca">Q104: What is parallel build flag?</h3>
+<div class="outline-text-3" id="text-orge6443ca">
 <p>
 <code>-T</code> for multithreaded module build.
 </p>
 </div>
 </div>
-<div id="outline-container-orged4f369" class="outline-3">
-<h3 id="orged4f369">Q105: Parallel build caveat?</h3>
-<div class="outline-text-3" id="text-orged4f369">
+<div id="outline-container-org5cb4870" class="outline-3">
+<h3 id="org5cb4870">Q105: Parallel build caveat?</h3>
+<div class="outline-text-3" id="text-org5cb4870">
 <p>
 Plugins/tests must be thread-safe; ordering assumptions may break.
 </p>
 </div>
 </div>
-<div id="outline-container-org798c0b4" class="outline-3">
-<h3 id="org798c0b4">Q106: What is incremental build challenge in Maven?</h3>
-<div class="outline-text-3" id="text-org798c0b4">
+<div id="outline-container-org00ee434" class="outline-3">
+<h3 id="org00ee434">Q106: What is incremental build challenge in Maven?</h3>
+<div class="outline-text-3" id="text-org00ee434">
 <p>
 Core Maven is not fully incremental like some newer build tools.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b53015" class="outline-3">
-<h3 id="org9b53015">Q107: Mitigation for slow builds?</h3>
-<div class="outline-text-3" id="text-org9b53015">
+<div id="outline-container-org1a41718" class="outline-3">
+<h3 id="org1a41718">Q107: Mitigation for slow builds?</h3>
+<div class="outline-text-3" id="text-org1a41718">
 <p>
 Module boundaries, test splitting, cache/proxy, parallelism, plugin tuning.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcda9f4f" class="outline-3">
-<h3 id="orgcda9f4f">Q108: What is surefire vs failsafe lifecycle binding?</h3>
-<div class="outline-text-3" id="text-orgcda9f4f">
+<div id="outline-container-orged563e6" class="outline-3">
+<h3 id="orged563e6">Q108: What is surefire vs failsafe lifecycle binding?</h3>
+<div class="outline-text-3" id="text-orged563e6">
 <p>
 Surefire in test phase; failsafe in integration-test + verify.
 </p>
 </div>
 </div>
-<div id="outline-container-orgadca25a" class="outline-3">
-<h3 id="orgadca25a">Q109: Why verify phase important with failsafe?</h3>
-<div class="outline-text-3" id="text-orgadca25a">
+<div id="outline-container-orgb6fc2d6" class="outline-3">
+<h3 id="orgb6fc2d6">Q109: Why verify phase important with failsafe?</h3>
+<div class="outline-text-3" id="text-orgb6fc2d6">
 <p>
 Ensures integration test failures fail build properly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf8f7086" class="outline-3">
-<h3 id="orgf8f7086">Q110: What is JaCoCo plugin use?</h3>
-<div class="outline-text-3" id="text-orgf8f7086">
+<div id="outline-container-orga926f15" class="outline-3">
+<h3 id="orga926f15">Q110: What is JaCoCo plugin use?</h3>
+<div class="outline-text-3" id="text-orga926f15">
 <p>
 Code coverage measurement/reporting.
 </p>
 </div>
 </div>
-<div id="outline-container-org5129e2c" class="outline-3">
-<h3 id="org5129e2c">Q111: Coverage anti-pattern?</h3>
-<div class="outline-text-3" id="text-org5129e2c">
+<div id="outline-container-org1069195" class="outline-3">
+<h3 id="org1069195">Q111: Coverage anti-pattern?</h3>
+<div class="outline-text-3" id="text-org1069195">
 <p>
 Chasing percentage metrics without meaningful assertions.
 </p>
 </div>
 </div>
-<div id="outline-container-org219a494" class="outline-3">
-<h3 id="org219a494">Q112: What is site lifecycle in Maven?</h3>
-<div class="outline-text-3" id="text-org219a494">
+<div id="outline-container-org0dd4c41" class="outline-3">
+<h3 id="org0dd4c41">Q112: What is site lifecycle in Maven?</h3>
+<div class="outline-text-3" id="text-org0dd4c41">
 <p>
 Generates project reports/documentation site.
 </p>
 </div>
 </div>
-<div id="outline-container-orgef93d59" class="outline-3">
-<h3 id="orgef93d59">Q113: Why site lifecycle less common now?</h3>
-<div class="outline-text-3" id="text-orgef93d59">
+<div id="outline-container-org0c36605" class="outline-3">
+<h3 id="org0c36605">Q113: Why site lifecycle less common now?</h3>
+<div class="outline-text-3" id="text-org0c36605">
 <p>
 Many teams use external docs/CI dashboards, but it remains useful.
 </p>
 </div>
 </div>
-<div id="outline-container-org7b27494" class="outline-3">
-<h3 id="org7b27494">Q114: What is GPG signing in Maven release?</h3>
-<div class="outline-text-3" id="text-org7b27494">
+<div id="outline-container-orgbb826ac" class="outline-3">
+<h3 id="orgbb826ac">Q114: What is GPG signing in Maven release?</h3>
+<div class="outline-text-3" id="text-orgbb826ac">
 <p>
 Cryptographically signing artifacts for integrity/trust.
 </p>
 </div>
 </div>
-<div id="outline-container-org0255dd7" class="outline-3">
-<h3 id="org0255dd7">Q115: What is release plugin concept?</h3>
-<div class="outline-text-3" id="text-org0255dd7">
+<div id="outline-container-orga17571c" class="outline-3">
+<h3 id="orga17571c">Q115: What is release plugin concept?</h3>
+<div class="outline-text-3" id="text-orga17571c">
 <p>
 Automates version bump/tag/release flow (opinions vary on usage).
 </p>
 </div>
 </div>
-<div id="outline-container-orge70b2aa" class="outline-3">
-<h3 id="orge70b2aa">Q116: Why some teams avoid release plugin?</h3>
-<div class="outline-text-3" id="text-orge70b2aa">
+<div id="outline-container-orgc1a58ca" class="outline-3">
+<h3 id="orgc1a58ca">Q116: Why some teams avoid release plugin?</h3>
+<div class="outline-text-3" id="text-orgc1a58ca">
 <p>
 Complexity and SCM workflow mismatch; prefer explicit CI release scripts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd2c7e6" class="outline-3">
-<h3 id="orgfd2c7e6">Q117: What is CI-friendly versioning?</h3>
-<div class="outline-text-3" id="text-orgfd2c7e6">
+<div id="outline-container-orge515e06" class="outline-3">
+<h3 id="orge515e06">Q117: What is CI-friendly versioning?</h3>
+<div class="outline-text-3" id="text-orge515e06">
 <p>
 Using properties (e.g., revision) to inject versions in pipelines.
 </p>
 </div>
 </div>
-<div id="outline-container-org95c3228" class="outline-3">
-<h3 id="org95c3228">Q118: What is build cache role with Maven?</h3>
-<div class="outline-text-3" id="text-org95c3228">
+<div id="outline-container-orgf3e76b3" class="outline-3">
+<h3 id="orgf3e76b3">Q118: What is build cache role with Maven?</h3>
+<div class="outline-text-3" id="text-orgf3e76b3">
 <p>
 Primarily repository cache/proxy; remote build cache support varies by tooling.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e42507" class="outline-3">
-<h3 id="org5e42507">Q119: What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-org5e42507">
+<div id="outline-container-org8b67c49" class="outline-3">
+<h3 id="org8b67c49">Q119: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-org8b67c49">
 <p>
 Huge parent POM mixing unrelated concerns for every module.
 </p>
 </div>
 </div>
-<div id="outline-container-org9ed7308" class="outline-3">
-<h3 id="org9ed7308">Q120: Better parent strategy?</h3>
-<div class="outline-text-3" id="text-org9ed7308">
+<div id="outline-container-org376ae8c" class="outline-3">
+<h3 id="org376ae8c">Q120: Better parent strategy?</h3>
+<div class="outline-text-3" id="text-org376ae8c">
 <p>
 Layered parents/BOMs with clear scope and ownership.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc54f0f6" class="outline-3">
-<h3 id="orgc54f0f6">Q121: What is security scanning in Maven pipelines?</h3>
-<div class="outline-text-3" id="text-orgc54f0f6">
+<div id="outline-container-orge55ffbd" class="outline-3">
+<h3 id="orge55ffbd">Q121: What is security scanning in Maven pipelines?</h3>
+<div class="outline-text-3" id="text-orge55ffbd">
 <p>
 Analyze dependencies/plugins for known vulnerabilities/licenses.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb31a387" class="outline-3">
-<h3 id="orgb31a387">Q122: Why scan plugins too?</h3>
-<div class="outline-text-3" id="text-orgb31a387">
+<div id="outline-container-org7edd49a" class="outline-3">
+<h3 id="org7edd49a">Q122: Why scan plugins too?</h3>
+<div class="outline-text-3" id="text-org7edd49a">
 <p>
 Build plugins execute code and can introduce supply-chain risk.
 </p>
 </div>
 </div>
-<div id="outline-container-org2db72bb" class="outline-3">
-<h3 id="org2db72bb">Q123: What is license compliance check?</h3>
-<div class="outline-text-3" id="text-org2db72bb">
+<div id="outline-container-org08da575" class="outline-3">
+<h3 id="org08da575">Q123: What is license compliance check?</h3>
+<div class="outline-text-3" id="text-org08da575">
 <p>
 Ensure dependency licenses meet organization policy.
 </p>
 </div>
 </div>
-<div id="outline-container-org01f57ff" class="outline-3">
-<h3 id="org01f57ff">Q124: Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-org01f57ff">
+<div id="outline-container-org285cea1" class="outline-3">
+<h3 id="org285cea1">Q124: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-org285cea1">
 <p>
 Team can explain classpath, lifecycle bindings, and dependency graph decisions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb46314" class="outline-3">
-<h3 id="orgcb46314">Q125: Intermediate troubleshooting flow?</h3>
-<div class="outline-text-3" id="text-orgcb46314">
+<div id="outline-container-orgf536236" class="outline-3">
+<h3 id="orgf536236">Q125: Intermediate troubleshooting flow?</h3>
+<div class="outline-text-3" id="text-orgf536236">
 <p>
 effective-pom -&gt; dependency tree -&gt; plugin execution debug -&gt; CI env parity.
 </p>
 </div>
 </div>
-<div id="outline-container-org4c62150" class="outline-3">
-<h3 id="org4c62150">Q126: What is <code>-X</code> in Maven?</h3>
-<div class="outline-text-3" id="text-org4c62150">
+<div id="outline-container-org75aaa68" class="outline-3">
+<h3 id="org75aaa68">Q126: What is <code>-X</code> in Maven?</h3>
+<div class="outline-text-3" id="text-org75aaa68">
 <p>
 Debug logging mode for detailed troubleshooting.
 </p>
 </div>
 </div>
-<div id="outline-container-org120afa0" class="outline-3">
-<h3 id="org120afa0">Q127: What is <code>-U</code> flag?</h3>
-<div class="outline-text-3" id="text-org120afa0">
+<div id="outline-container-org16123ad" class="outline-3">
+<h3 id="org16123ad">Q127: What is <code>-U</code> flag?</h3>
+<div class="outline-text-3" id="text-org16123ad">
 <p>
 Forces update checks for snapshots/releases metadata.
 </p>
 </div>
 </div>
-<div id="outline-container-org2d0a47f" class="outline-3">
-<h3 id="org2d0a47f">Q128: What is offline mode (-o)?</h3>
-<div class="outline-text-3" id="text-org2d0a47f">
+<div id="outline-container-org06d651b" class="outline-3">
+<h3 id="org06d651b">Q128: What is offline mode (-o)?</h3>
+<div class="outline-text-3" id="text-org06d651b">
 <p>
 Build using local repository only without remote access.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb7d663a" class="outline-3">
-<h3 id="orgb7d663a">Q129: Intermediate reliability principle?</h3>
-<div class="outline-text-3" id="text-orgb7d663a">
+<div id="outline-container-org4daa0de" class="outline-3">
+<h3 id="org4daa0de">Q129: Intermediate reliability principle?</h3>
+<div class="outline-text-3" id="text-org4daa0de">
 <p>
 Builds should be deterministic, policy-checked, and environment-consistent.
 </p>
 </div>
 </div>
-<div id="outline-container-org2365636" class="outline-3">
-<h3 id="org2365636">Q130: Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-org2365636">
+<div id="outline-container-org6c0116c" class="outline-3">
+<h3 id="org6c0116c">Q130: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org6c0116c">
 <p>
 Standardize parent/BOM/plugin governance and keep modules cohesive.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org41ec2eb" class="outline-2">
-<h2 id="org41ec2eb">Advanced</h2>
-<div class="outline-text-2" id="text-org41ec2eb">
+<div id="outline-container-org31818df" class="outline-2">
+<h2 id="org31818df">Advanced</h2>
+<div class="outline-text-2" id="text-org31818df">
 </div>
-<div id="outline-container-org13b275f" class="outline-3">
-<h3 id="org13b275f">Q131: What is enterprise Maven governance?</h3>
-<div class="outline-text-3" id="text-org13b275f">
+<div id="outline-container-orgab590d4" class="outline-3">
+<h3 id="orgab590d4">Q131: What is enterprise Maven governance?</h3>
+<div class="outline-text-3" id="text-orgab590d4">
 <p>
 Organization-wide control of dependencies, plugins, repos, and release policies.
 </p>
 </div>
 </div>
-<div id="outline-container-org730a710" class="outline-3">
-<h3 id="org730a710">Q132: What is golden parent POM?</h3>
-<div class="outline-text-3" id="text-org730a710">
+<div id="outline-container-orge1a3032" class="outline-3">
+<h3 id="orge1a3032">Q132: What is golden parent POM?</h3>
+<div class="outline-text-3" id="text-orge1a3032">
 <p>
 Curated parent enforcing approved plugin/dependency defaults and quality gates.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb47b315" class="outline-3">
-<h3 id="orgb47b315">Q133: What is platform BOM strategy?</h3>
-<div class="outline-text-3" id="text-orgb47b315">
+<div id="outline-container-orgedd5e82" class="outline-3">
+<h3 id="orgedd5e82">Q133: What is platform BOM strategy?</h3>
+<div class="outline-text-3" id="text-orgedd5e82">
 <p>
 Central BOMs per tech stack aligned with tested compatibility matrix.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3bc0b8" class="outline-3">
-<h3 id="orgc3bc0b8">Q134: What is dependency allowlist/denylist model?</h3>
-<div class="outline-text-3" id="text-orgc3bc0b8">
+<div id="outline-container-org2163ae0" class="outline-3">
+<h3 id="org2163ae0">Q134: What is dependency allowlist/denylist model?</h3>
+<div class="outline-text-3" id="text-org2163ae0">
 <p>
 Explicitly permit trusted artifacts and block risky/unapproved ones.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc428a9" class="outline-3">
-<h3 id="orgbc428a9">Q135: What is transitive risk management challenge?</h3>
-<div class="outline-text-3" id="text-orgbc428a9">
+<div id="outline-container-org4012050" class="outline-3">
+<h3 id="org4012050">Q135: What is transitive risk management challenge?</h3>
+<div class="outline-text-3" id="text-org4012050">
 <p>
 Indirect dependencies can introduce vulnerabilities unexpectedly.
 </p>
 </div>
 </div>
-<div id="outline-container-org76275af" class="outline-3">
-<h3 id="org76275af">Q136: Mitigation for transitive risk?</h3>
-<div class="outline-text-3" id="text-org76275af">
+<div id="outline-container-org1f61996" class="outline-3">
+<h3 id="org1f61996">Q136: Mitigation for transitive risk?</h3>
+<div class="outline-text-3" id="text-org1f61996">
 <p>
 SBOM generation, continuous scanning, and strict upgrade cadence.
 </p>
 </div>
 </div>
-<div id="outline-container-org733103a" class="outline-3">
-<h3 id="org733103a">Q137: What is SBOM in Maven ecosystem?</h3>
-<div class="outline-text-3" id="text-org733103a">
+<div id="outline-container-org901a10e" class="outline-3">
+<h3 id="org901a10e">Q137: What is SBOM in Maven ecosystem?</h3>
+<div class="outline-text-3" id="text-org901a10e">
 <p>
 Machine-readable dependency inventory produced during build/release.
 </p>
 </div>
 </div>
-<div id="outline-container-org8452eeb" class="outline-3">
-<h3 id="org8452eeb">Q138: Why SBOM matters?</h3>
-<div class="outline-text-3" id="text-org8452eeb">
+<div id="outline-container-orga9a27dd" class="outline-3">
+<h3 id="orga9a27dd">Q138: Why SBOM matters?</h3>
+<div class="outline-text-3" id="text-orga9a27dd">
 <p>
 Compliance, incident response, and supply-chain transparency.
 </p>
 </div>
 </div>
-<div id="outline-container-org8b71e8e" class="outline-3">
-<h3 id="org8b71e8e">Q139: What is artifact provenance?</h3>
-<div class="outline-text-3" id="text-org8b71e8e">
+<div id="outline-container-orgd36a29d" class="outline-3">
+<h3 id="orgd36a29d">Q139: What is artifact provenance?</h3>
+<div class="outline-text-3" id="text-orgd36a29d">
 <p>
 Traceability of who built artifact, from which source, with what tools.
 </p>
 </div>
 </div>
-<div id="outline-container-org2f55b3b" class="outline-3">
-<h3 id="org2f55b3b">Q140: How strengthen provenance in Maven pipelines?</h3>
-<div class="outline-text-3" id="text-org2f55b3b">
+<div id="outline-container-org59d6f70" class="outline-3">
+<h3 id="org59d6f70">Q140: How strengthen provenance in Maven pipelines?</h3>
+<div class="outline-text-3" id="text-org59d6f70">
 <p>
 Signed commits/tags, signed artifacts, immutable CI, attestations.
 </p>
 </div>
 </div>
-<div id="outline-container-org619a212" class="outline-3">
-<h3 id="org619a212">Q141: What is hermetic build principle?</h3>
-<div class="outline-text-3" id="text-org619a212">
+<div id="outline-container-org246f1e5" class="outline-3">
+<h3 id="org246f1e5">Q141: What is hermetic build principle?</h3>
+<div class="outline-text-3" id="text-org246f1e5">
 <p>
 Build isolated from undeclared external influences for reproducibility/security.
 </p>
 </div>
 </div>
-<div id="outline-container-org514cb90" class="outline-3">
-<h3 id="org514cb90">Q142: Maven hermeticity challenge?</h3>
-<div class="outline-text-3" id="text-org514cb90">
+<div id="outline-container-org88bf9e5" class="outline-3">
+<h3 id="org88bf9e5">Q142: Maven hermeticity challenge?</h3>
+<div class="outline-text-3" id="text-org88bf9e5">
 <p>
 Plugins/dependencies often fetched from remote repos unless mirrored/pinned.
 </p>
 </div>
 </div>
-<div id="outline-container-org9adb185" class="outline-3">
-<h3 id="org9adb185">Q143: How approximate hermetic Maven builds?</h3>
-<div class="outline-text-3" id="text-org9adb185">
+<div id="outline-container-orgc7889ba" class="outline-3">
+<h3 id="orgc7889ba">Q143: How approximate hermetic Maven builds?</h3>
+<div class="outline-text-3" id="text-orgc7889ba">
 <p>
 Internal mirrored repos, locked versions, controlled toolchains, offline-capable CI steps.
 </p>
 </div>
 </div>
-<div id="outline-container-org0779b01" class="outline-3">
-<h3 id="org0779b01">Q144: What is build promotion model?</h3>
-<div class="outline-text-3" id="text-org0779b01">
+<div id="outline-container-orgb7c90ff" class="outline-3">
+<h3 id="orgb7c90ff">Q144: What is build promotion model?</h3>
+<div class="outline-text-3" id="text-orgb7c90ff">
 <p>
 Promote same artifact binary across environments instead of rebuilding.
 </p>
 </div>
 </div>
-<div id="outline-container-orge89b9fb" class="outline-3">
-<h3 id="orge89b9fb">Q145: Why avoid rebuilding per environment?</h3>
-<div class="outline-text-3" id="text-orge89b9fb">
+<div id="outline-container-org907593d" class="outline-3">
+<h3 id="org907593d">Q145: Why avoid rebuilding per environment?</h3>
+<div class="outline-text-3" id="text-org907593d">
 <p>
 Rebuilds can produce drift and invalidate prior test assurances.
 </p>
 </div>
 </div>
-<div id="outline-container-org3a05ff9" class="outline-3">
-<h3 id="org3a05ff9">Q146: What is monorepo Maven scaling challenge?</h3>
-<div class="outline-text-3" id="text-org3a05ff9">
+<div id="outline-container-orgd93ee0f" class="outline-3">
+<h3 id="orgd93ee0f">Q146: What is monorepo Maven scaling challenge?</h3>
+<div class="outline-text-3" id="text-orgd93ee0f">
 <p>
 Large reactor size and cross-module coupling slow feedback.
 </p>
 </div>
 </div>
-<div id="outline-container-org2da4f1f" class="outline-3">
-<h3 id="org2da4f1f">Q147: Mitigation for monorepo scale?</h3>
-<div class="outline-text-3" id="text-org2da4f1f">
+<div id="outline-container-orgb92986c" class="outline-3">
+<h3 id="orgb92986c">Q147: Mitigation for monorepo scale?</h3>
+<div class="outline-text-3" id="text-orgb92986c">
 <p>
 Clear module boundaries, selective builds, parallel CI partitioning.
 </p>
 </div>
 </div>
-<div id="outline-container-orgda56008" class="outline-3">
-<h3 id="orgda56008">Q148: What is graph-aware CI optimization?</h3>
-<div class="outline-text-3" id="text-orgda56008">
+<div id="outline-container-orgf4c0b20" class="outline-3">
+<h3 id="orgf4c0b20">Q148: What is graph-aware CI optimization?</h3>
+<div class="outline-text-3" id="text-orgf4c0b20">
 <p>
 Run only impacted module tests/builds based on dependency graph changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org3afc0ba" class="outline-3">
-<h3 id="org3afc0ba">Q149: What is flaky test impact on Maven pipelines?</h3>
-<div class="outline-text-3" id="text-org3afc0ba">
+<div id="outline-container-org97deafd" class="outline-3">
+<h3 id="org97deafd">Q149: What is flaky test impact on Maven pipelines?</h3>
+<div class="outline-text-3" id="text-org97deafd">
 <p>
 Erodes trust and blocks reliable release automation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc525a02" class="outline-3">
-<h3 id="orgc525a02">Q150: How manage flaky tests?</h3>
-<div class="outline-text-3" id="text-orgc525a02">
+<div id="outline-container-org0494b65" class="outline-3">
+<h3 id="org0494b65">Q150: How manage flaky tests?</h3>
+<div class="outline-text-3" id="text-org0494b65">
 <p>
 Detection, quarantine with SLA, root-cause fix ownership.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c5d14a" class="outline-3">
-<h3 id="org0c5d14a">Q151: What is remote caching/proxy tuning at scale?</h3>
-<div class="outline-text-3" id="text-org0c5d14a">
+<div id="outline-container-org72e95c9" class="outline-3">
+<h3 id="org72e95c9">Q151: What is remote caching/proxy tuning at scale?</h3>
+<div class="outline-text-3" id="text-org72e95c9">
 <p>
 Optimize repository manager throughput, TTLs, and storage cleanup.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c5f0e2" class="outline-3">
-<h3 id="org8c5f0e2">Q152: What is checksum fail policy importance?</h3>
-<div class="outline-text-3" id="text-org8c5f0e2">
+<div id="outline-container-org6beaa17" class="outline-3">
+<h3 id="org6beaa17">Q152: What is checksum fail policy importance?</h3>
+<div class="outline-text-3" id="text-org6beaa17">
 <p>
 Prevents corrupted/tampered artifacts entering builds.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbf7c3de" class="outline-3">
-<h3 id="orgbf7c3de">Q153: What is namespace takeover/dependency confusion risk?</h3>
-<div class="outline-text-3" id="text-orgbf7c3de">
+<div id="outline-container-org1ae76bf" class="outline-3">
+<h3 id="org1ae76bf">Q153: What is namespace takeover/dependency confusion risk?</h3>
+<div class="outline-text-3" id="text-org1ae76bf">
 <p>
 Malicious artifact with similar coordinates/version hijacks resolution path.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba9ecc0" class="outline-3">
-<h3 id="orgba9ecc0">Q154: Mitigation for dependency confusion?</h3>
-<div class="outline-text-3" id="text-orgba9ecc0">
+<div id="outline-container-org9f51bf4" class="outline-3">
+<h3 id="org9f51bf4">Q154: Mitigation for dependency confusion?</h3>
+<div class="outline-text-3" id="text-org9f51bf4">
 <p>
 Use internal repos/mirrors strictly and control external resolution.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a5082c" class="outline-3">
-<h3 id="org6a5082c">Q155: What is plugin execution attack surface?</h3>
-<div class="outline-text-3" id="text-org6a5082c">
+<div id="outline-container-org9d84274" class="outline-3">
+<h3 id="org9d84274">Q155: What is plugin execution attack surface?</h3>
+<div class="outline-text-3" id="text-org9d84274">
 <p>
 Compromised plugin can execute arbitrary build-time code.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfc88770" class="outline-3">
-<h3 id="orgfc88770">Q156: Plugin security controls?</h3>
-<div class="outline-text-3" id="text-orgfc88770">
+<div id="outline-container-orgc98d94c" class="outline-3">
+<h3 id="orgc98d94c">Q156: Plugin security controls?</h3>
+<div class="outline-text-3" id="text-orgc98d94c">
 <p>
 Pin versions, approve sources, scan/sign artifacts, restrict network/permissions in CI.
 </p>
 </div>
 </div>
-<div id="outline-container-org477e10d" class="outline-3">
-<h3 id="org477e10d">Q157: What is reproducible timestamp control?</h3>
-<div class="outline-text-3" id="text-org477e10d">
+<div id="outline-container-org2b966b8" class="outline-3">
+<h3 id="org2b966b8">Q157: What is reproducible timestamp control?</h3>
+<div class="outline-text-3" id="text-org2b966b8">
 <p>
 Configure archiver/jar settings for deterministic file metadata.
 </p>
 </div>
 </div>
-<div id="outline-container-org8a1a074" class="outline-3">
-<h3 id="org8a1a074">Q158: What is bytecode target consistency issue?</h3>
-<div class="outline-text-3" id="text-org8a1a074">
+<div id="outline-container-orgcd2c41c" class="outline-3">
+<h3 id="orgcd2c41c">Q158: What is bytecode target consistency issue?</h3>
+<div class="outline-text-3" id="text-orgcd2c41c">
 <p>
 Mismatched compiler/source/target settings break runtime compatibility.
 </p>
 </div>
 </div>
-<div id="outline-container-org27471e9" class="outline-3">
-<h3 id="org27471e9">Q159: How enforce Java compatibility?</h3>
-<div class="outline-text-3" id="text-org27471e9">
+<div id="outline-container-orgacf8be4" class="outline-3">
+<h3 id="orgacf8be4">Q159: How enforce Java compatibility?</h3>
+<div class="outline-text-3" id="text-orgacf8be4">
 <p>
 maven-compiler-plugin + enforcer + toolchains.
 </p>
 </div>
 </div>
-<div id="outline-container-org111ba52" class="outline-3">
-<h3 id="org111ba52">Q160: What is multi-release JAR concept?</h3>
-<div class="outline-text-3" id="text-org111ba52">
+<div id="outline-container-orgcaa20a9" class="outline-3">
+<h3 id="orgcaa20a9">Q160: What is multi-release JAR concept?</h3>
+<div class="outline-text-3" id="text-orgcaa20a9">
 <p>
 JAR containing version-specific classes for different Java runtimes.
 </p>
 </div>
 </div>
-<div id="outline-container-org75e4d5f" class="outline-3">
-<h3 id="org75e4d5f">Q161: Multi-release JAR tradeoff?</h3>
-<div class="outline-text-3" id="text-org75e4d5f">
+<div id="outline-container-orga058954" class="outline-3">
+<h3 id="orga058954">Q161: Multi-release JAR tradeoff?</h3>
+<div class="outline-text-3" id="text-orga058954">
 <p>
 Flexibility vs increased build/test complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org4238d7f" class="outline-3">
-<h3 id="org4238d7f">Q162: What is advanced versioning strategy?</h3>
-<div class="outline-text-3" id="text-org4238d7f">
+<div id="outline-container-org2e88b24" class="outline-3">
+<h3 id="org2e88b24">Q162: What is advanced versioning strategy?</h3>
+<div class="outline-text-3" id="text-org2e88b24">
 <p>
 Semantic versioning + compatibility checks + automated release notes.
 </p>
 </div>
 </div>
-<div id="outline-container-org7839bdd" class="outline-3">
-<h3 id="org7839bdd">Q163: What is API compatibility enforcement?</h3>
-<div class="outline-text-3" id="text-org7839bdd">
+<div id="outline-container-org69895e7" class="outline-3">
+<h3 id="org69895e7">Q163: What is API compatibility enforcement?</h3>
+<div class="outline-text-3" id="text-org69895e7">
 <p>
 Binary/source compatibility checks in CI before release.
 </p>
 </div>
 </div>
-<div id="outline-container-org34caa61" class="outline-3">
-<h3 id="org34caa61">Q164: What is dependency lock concept in Maven?</h3>
-<div class="outline-text-3" id="text-org34caa61">
+<div id="outline-container-orgbaed493" class="outline-3">
+<h3 id="orgbaed493">Q164: What is dependency lock concept in Maven?</h3>
+<div class="outline-text-3" id="text-orgbaed493">
 <p>
 Not native like some tools; approximated via BOM/enforcer/fixed versions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf128dcd" class="outline-3">
-<h3 id="orgf128dcd">Q165: What is release train model?</h3>
-<div class="outline-text-3" id="text-orgf128dcd">
+<div id="outline-container-orge56d686" class="outline-3">
+<h3 id="orge56d686">Q165: What is release train model?</h3>
+<div class="outline-text-3" id="text-orge56d686">
 <p>
 Coordinated version set across many modules/services on regular cadence.
 </p>
 </div>
 </div>
-<div id="outline-container-org88e5340" class="outline-3">
-<h3 id="org88e5340">Q166: Release train risk?</h3>
-<div class="outline-text-3" id="text-org88e5340">
+<div id="outline-container-org0326048" class="outline-3">
+<h3 id="org0326048">Q166: Release train risk?</h3>
+<div class="outline-text-3" id="text-org0326048">
 <p>
 Coordination overhead and delayed independent delivery.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc8f428d" class="outline-3">
-<h3 id="orgc8f428d">Q167: What is polyglot build challenge with Maven?</h3>
-<div class="outline-text-3" id="text-orgc8f428d">
+<div id="outline-container-orgdb7dbcf" class="outline-3">
+<h3 id="orgdb7dbcf">Q167: What is polyglot build challenge with Maven?</h3>
+<div class="outline-text-3" id="text-orgdb7dbcf">
 <p>
 Integrating non-JVM assets/tools while preserving deterministic lifecycle.
 </p>
 </div>
 </div>
-<div id="outline-container-org18d5376" class="outline-3">
-<h3 id="org18d5376">Q168: What is containerized Maven build benefit?</h3>
-<div class="outline-text-3" id="text-org18d5376">
+<div id="outline-container-org71aac1b" class="outline-3">
+<h3 id="org71aac1b">Q168: What is containerized Maven build benefit?</h3>
+<div class="outline-text-3" id="text-org71aac1b">
 <p>
 Consistent build environment across dev/CI platforms.
 </p>
 </div>
 </div>
-<div id="outline-container-org7404636" class="outline-3">
-<h3 id="org7404636">Q169: Containerized build caveat?</h3>
-<div class="outline-text-3" id="text-org7404636">
+<div id="outline-container-org2230b16" class="outline-3">
+<h3 id="org2230b16">Q169: Containerized build caveat?</h3>
+<div class="outline-text-3" id="text-org2230b16">
 <p>
 Cache warm-up and I/O overhead if not optimized.
 </p>
 </div>
 </div>
-<div id="outline-container-org01133be" class="outline-3">
-<h3 id="org01133be">Q170: What is disaster recovery concern for Maven infra?</h3>
-<div class="outline-text-3" id="text-org01133be">
+<div id="outline-container-org29023cc" class="outline-3">
+<h3 id="org29023cc">Q170: What is disaster recovery concern for Maven infra?</h3>
+<div class="outline-text-3" id="text-org29023cc">
 <p>
 Repository manager outage can block builds/deploys organization-wide.
 </p>
 </div>
 </div>
-<div id="outline-container-orge7bc56e" class="outline-3">
-<h3 id="orge7bc56e">Q171: DR mitigation for artifact infrastructure?</h3>
-<div class="outline-text-3" id="text-orge7bc56e">
+<div id="outline-container-org9987242" class="outline-3">
+<h3 id="org9987242">Q171: DR mitigation for artifact infrastructure?</h3>
+<div class="outline-text-3" id="text-org9987242">
 <p>
 Backups, geo-replication, mirror failover, cache seeding.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbbf7864" class="outline-3">
-<h3 id="orgbbf7864">Q172: What is advanced anti-pattern in Maven ecosystems?</h3>
-<div class="outline-text-3" id="text-orgbbf7864">
+<div id="outline-container-org30eb400" class="outline-3">
+<h3 id="org30eb400">Q172: What is advanced anti-pattern in Maven ecosystems?</h3>
+<div class="outline-text-3" id="text-org30eb400">
 <p>
 Unbounded parent POM inheritance with opaque plugin side effects.
 </p>
 </div>
 </div>
-<div id="outline-container-org094f743" class="outline-3">
-<h3 id="org094f743">Q173: Better architectural principle?</h3>
-<div class="outline-text-3" id="text-org094f743">
+<div id="outline-container-org029c8b6" class="outline-3">
+<h3 id="org029c8b6">Q173: Better architectural principle?</h3>
+<div class="outline-text-3" id="text-org029c8b6">
 <p>
 Explicit minimal conventions + strong automated policy enforcement.
 </p>
 </div>
 </div>
-<div id="outline-container-org82172d4" class="outline-3">
-<h3 id="org82172d4">Q174: What is final reliability principle?</h3>
-<div class="outline-text-3" id="text-org82172d4">
+<div id="outline-container-orga86ee79" class="outline-3">
+<h3 id="orga86ee79">Q174: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-orga86ee79">
 <p>
 Builds must be deterministic, test-gated, and reproducible on demand.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcfcb51a" class="outline-3">
-<h3 id="orgcfcb51a">Q175: What is final security principle?</h3>
-<div class="outline-text-3" id="text-orgcfcb51a">
+<div id="outline-container-org4d4cc5d" class="outline-3">
+<h3 id="org4d4cc5d">Q175: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org4d4cc5d">
 <p>
 Trust nothing by default: verify dependencies, plugins, and artifacts continuously.
 </p>
 </div>
 </div>
-<div id="outline-container-org0ac2686" class="outline-3">
-<h3 id="org0ac2686">Q176: What is final performance principle?</h3>
-<div class="outline-text-3" id="text-org0ac2686">
+<div id="outline-container-orgb61af01" class="outline-3">
+<h3 id="orgb61af01">Q176: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-orgb61af01">
 <p>
 Optimize feedback loops via module design, selective CI, and cache strategy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgae009d9" class="outline-3">
-<h3 id="orgae009d9">Q177: What is final governance principle?</h3>
-<div class="outline-text-3" id="text-orgae009d9">
+<div id="outline-container-org25878dd" class="outline-3">
+<h3 id="org25878dd">Q177: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-org25878dd">
 <p>
 Central standards with team autonomy through well-defined extension points.
 </p>
 </div>
 </div>
-<div id="outline-container-orge61c1f8" class="outline-3">
-<h3 id="orge61c1f8">Q178: What is final operations principle?</h3>
-<div class="outline-text-3" id="text-orge61c1f8">
+<div id="outline-container-org8d746b3" class="outline-3">
+<h3 id="org8d746b3">Q178: What is final operations principle?</h3>
+<div class="outline-text-3" id="text-org8d746b3">
 <p>
 Continuously observe build health: duration, flake rate, failure taxonomy.
 </p>
 </div>
 </div>
-<div id="outline-container-org5568b13" class="outline-3">
-<h3 id="org5568b13">Q179: What is final architecture principle?</h3>
-<div class="outline-text-3" id="text-org5568b13">
+<div id="outline-container-org69fe0e9" class="outline-3">
+<h3 id="org69fe0e9">Q179: What is final architecture principle?</h3>
+<div class="outline-text-3" id="text-org69fe0e9">
 <p>
 Align module boundaries with domain boundaries to reduce build coupling.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf027d15" class="outline-3">
-<h3 id="orgf027d15">Q180: Final maturity principle?</h3>
-<div class="outline-text-3" id="text-orgf027d15">
+<div id="outline-container-org0b3c7c9" class="outline-3">
+<h3 id="org0b3c7c9">Q180: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org0b3c7c9">
 <p>
 Maven excellence is disciplined dependency governance plus fast, reproducible delivery.
 </p>
+<hr>
+
+<div class="site-footer">
+    <ul class="social-icons">
+        <li><a href="https://github.com/bdostumski" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
+        <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
+    </ul>
 </div>
-</div>
-</div>
-<div id="outline-container-orgb880114" class="outline-2">
-<h2 id="orgb880114">Commands:</h2>
-<div class="outline-text-2" id="text-orgb880114">
-<div class="org-src-container">
-<pre class="src src-bash">
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1) Check toolchain
-</span>mvn -v
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2) Clean + compile
-</span>mvn clean compile
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3) Run unit tests
-</span>mvn test
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4) Build artifact (JAR/WAR)
-</span>mvn clean package
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">5) Full CI-style validation
-</span>mvn clean verify
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">6) Install locally (for other local projects/modules)
-</span>mvn clean install
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Skip running tests (but still compile test code)
-</span>mvn clean package -DskipTests
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Skip compiling and running tests entirely
-</span>mvn clean package -Dmaven.test.skip=true
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use profile (e.g., prod settings in pom.xml)
-</span>mvn clean verify -Pprod
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build specific module + required dependencies (multi-module repo)
-</span>mvn -pl api-service -am clean install
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Parallel build using available cores
-</span>mvn -T 1C clean install
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force update SNAPSHOT/releases from remote repos
-</span>mvn -U clean verify
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Debug failed build
-</span>mvn -X clean test
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Quieter logs
-</span>mvn -q clean package
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Dependency troubleshooting
-</span>mvn dependency:tree
-mvn dependency:analyze
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Show final merged pom (very useful for debugging inheritance/profiles)
-</span>mvn help:effective-pom
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check for newer dependencies/plugins
-</span>mvn versions:display-dependency-updates versions:display-plugin-updates
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Publish artifact to remote repo (Nexus/Artifactory/GitHub Packages)
-</span>mvn clean deploy -Pprod
-
-mvn clean test
-mvn clean verify
-mvn clean deploy -Pprod
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Surefire/Failsafe (tests) ---
-</span>mvn surefire:test
-mvn -Dtest=UserServiceTest test
-mvn -Dtest=UserServiceTest#shouldCreateUser test
-mvn failsafe:integration-test failsafe:verify
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Dependency plugin ---
-</span>mvn dependency:tree
-mvn dependency:analyze
-mvn dependency:purge-local-repository
-mvn dependency:copy-dependencies -DoutputDirectory=target/deps
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Versions plugin ---
-</span>mvn versions:display-dependency-updates
-mvn versions:display-plugin-updates
-mvn versions:set -DnewVersion=1.2.0
-mvn versions:use-latest-releases
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Help plugin ---
-</span>mvn help:effective-pom
-mvn help:active-profiles
-mvn help:all-profiles
-mvn help:describe -Dplugin=compiler
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Exec plugin ---
-</span>mvn exec:java -Dexec.mainClass=<span style="font-style: italic;">"com.example.App"</span>
-mvn exec:exec -Dexec.executable=<span style="font-style: italic;">"java"</span> -Dexec.args=<span style="font-style: italic;">"-version"</span>
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Compiler/JAR plugins ---
-</span>mvn compiler:compile
-mvn compiler:testCompile
-mvn jar:jar
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Spring Boot plugin (if Spring Boot app) ---
-</span>mvn spring-boot:run
-mvn spring-boot:repackage
-mvn spring-boot:build-image
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- JaCoCo (coverage) ---
-</span>mvn jacoco:prepare-agent test jacoco:report
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- OWASP Dependency Check (security) ---
-</span>mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Enforcer plugin (build policy) ---
-</span>mvn enforcer:enforce
-
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">--- Site/Docs ---
-</span>mvn site
-mvn site:stage
-
-</pre>
 </div>
 </div>
 </div>
