@@ -23,1500 +23,2518 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org33cf23b" class="outline-2">
-<h2 id="org33cf23b">Gradle</h2>
-<div class="outline-text-2" id="text-org33cf23b">
+<div id="outline-container-orgb988125" class="outline-2">
+<h2 id="orgb988125">Gradle</h2>
+<div class="outline-text-2" id="text-orgb988125">
 <hr>
 </div>
 </div>
-<div id="outline-container-orge9b95dd" class="outline-2">
-<h2 id="orge9b95dd">Beginner</h2>
-<div class="outline-text-2" id="text-orge9b95dd">
+<div id="outline-container-orgecd2b1b" class="outline-2">
+<h2 id="orgecd2b1b">Gradle Command Handbook:</h2>
+<div class="outline-text-2" id="text-orgecd2b1b">
+<p>
+<b>1. Gradle Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Gradle version
+</span>gradle --version
+gradle -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Java version
+</span>java -version
+javac -version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Gradle installation path
+</span><span style="font-weight: bold;">which</span> gradle                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Linux / macOS
+</span>where gradle                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Windows
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Gradle help
+</span>gradle --help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Gradle tasks
+</span>gradle tasks
+
+</pre>
 </div>
-<div id="outline-container-orgd85e933" class="outline-3">
-<h3 id="orgd85e933">Q1: What is Gradle?</h3>
-<div class="outline-text-3" id="text-orgd85e933">
+
+<p>
+<b>2. Gradle Wrapper</b>
+</p>
+
+<p>
+Gradle Wrapper ensures that developers and CI/CD pipelines use a consistent Gradle version without requiring a global Gradle installation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate Gradle Wrapper
+</span>gradle wrapper
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set Gradle Wrapper version
+</span>gradle wrapper --gradle-version 8.10.2
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Upgrade Wrapper distribution
+</span>./gradlew wrapper --gradle-version 8.12
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run Gradle using Wrapper
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Linux / macOS:
+</span>./gradlew clean build
+./gradlew test
+./gradlew assemble
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Windows:
+</span>gradlew.bat clean build
+gradlew.bat test
+gradlew.bat assemble
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Note: Prefer `./gradlew` over a globally installed Gradle version.
+</span>
+</pre>
+</div>
+
+<p>
+<b>3. Understand the Gradle Project</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display project information
+</span>./gradlew projects
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display available tasks
+</span>./gradlew tasks
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all tasks, including hidden tasks
+</span>./gradlew tasks --all
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display task details
+</span>./gradlew help --task build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display project properties
+</span>./gradlew properties
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Gradle version
+</span>./gradlew --version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display build environment
+</span>./gradlew buildEnvironment
+
+</pre>
+</div>
+
+<p>
+<b>4. Gradle Build Lifecycle</b>
+</p>
+
+<p>
+Gradle organizes build execution around tasks and their dependency graph.
+</p>
+
+<p>
+Common lifecycle tasks:
+</p>
+
+<ul class="org-ul">
+<li>`clean` – Removes generated build files.</li>
+<li>`assemble` – Creates project artifacts.</li>
+<li>`check` – Executes verification tasks.</li>
+<li>`test` – Executes unit tests.</li>
+<li>`build` – Assembles and verifies the project.</li>
+<li>`publish` – Publishes configured artifacts.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Common Gradle lifecycle tasks
+</span>./gradlew clean
+./gradlew assemble
+./gradlew check
+./gradlew test
+./gradlew build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Typical build commands
+</span>./gradlew clean build
+./gradlew clean assemble
+./gradlew clean check
+
+</pre>
+</div>
+
+<p>
+Lifecycle differences
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Task</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`clean`</td>
+<td class="org-left">Remove generated build outputs</td>
+</tr>
+
+<tr>
+<td class="org-left">`assemble`</td>
+<td class="org-left">Create project artifacts</td>
+</tr>
+
+<tr>
+<td class="org-left">`check`</td>
+<td class="org-left">Run verification tasks</td>
+</tr>
+
+<tr>
+<td class="org-left">`test`</td>
+<td class="org-left">Execute unit tests</td>
+</tr>
+
+<tr>
+<td class="org-left">`build`</td>
+<td class="org-left">Assemble and verify project</td>
+</tr>
+
+<tr>
+<td class="org-left">`publish`</td>
+<td class="org-left">Publish configured artifacts</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Gradle executes prerequisite tasks automatically according to the task dependency graph. For example, `build` normally depends on `assemble` and `check`.
+</p>
+
+<p>
+<b>5. Profiles &amp; Environment Configuration</b>
+</p>
+
+<p>
+Gradle supports environment-specific configuration through project properties, system properties, and environment variables.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pass a project property
+</span>./gradlew build -Penv=dev
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a test environment
+</span>./gradlew build -Penv=test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a production environment
+</span>./gradlew build -Penv=prod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pass multiple project properties
+</span>./gradlew build -Penv=dev -Pregion=eu
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pass a system property
+</span>./gradlew test -Dspring.profiles.active=test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set an environment variable
+</span><span style="font-weight: bold; font-style: italic;">SPRING_PROFILES_ACTIVE</span>=dev ./gradlew bootRun
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pass Spring Boot application arguments
+</span>./gradlew bootRun --args=<span style="font-style: italic;">'--spring.profiles.active=dev --server.port=8081'</span>
+
+</pre>
+</div>
+
+<p>
+Note: Gradle project properties (`-P`), JVM system properties (`-D`), and environment variables serve different purposes.
+</p>
+
+<p>
+<b>6. Dependency Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display dependency tree
+</span>./gradlew dependencies
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display dependencies for a specific configuration
+</span>./gradlew dependencies --configuration runtimeClasspath
+./gradlew dependencies --configuration compileClasspath
+./gradlew dependencies --configuration testRuntimeClasspath
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Analyze a specific dependency
+</span>./gradlew dependencyInsight --dependency spring-core
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Analyze dependency in a configuration
+</span>./gradlew dependencyInsight <span style="font-style: italic;">\</span>
+  --dependency spring-core <span style="font-style: italic;">\</span>
+  --configuration runtimeClasspath
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display buildscript dependencies
+</span>./gradlew buildEnvironment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Refresh dependency cache
+</span>./gradlew build --refresh-dependencies
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resolve dependencies
+</span>./gradlew compileJava
+
+</pre>
+</div>
+
+<p>
+Useful dependency configurations
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Configuration</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`implementation`</td>
+<td class="org-left">Internal compile and runtime dependency</td>
+</tr>
+
+<tr>
+<td class="org-left">`api`</td>
+<td class="org-left">Dependency exposed to consumers (java-library)</td>
+</tr>
+
+<tr>
+<td class="org-left">`compileOnly`</td>
+<td class="org-left">Compile-time only dependency</td>
+</tr>
+
+<tr>
+<td class="org-left">`runtimeOnly`</td>
+<td class="org-left">Runtime-only dependency</td>
+</tr>
+
+<tr>
+<td class="org-left">`testImplementation`</td>
+<td class="org-left">Test compile and runtime dependency</td>
+</tr>
+
+<tr>
+<td class="org-left">`annotationProcessor`</td>
+<td class="org-left">Annotation processor dependency</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>7. Multi-Module Projects</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all projects
+</span>./gradlew projects
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build all modules
+</span>./gradlew clean build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build a specific module
+</span>./gradlew :module-name:build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run tests in a specific module
+</span>./gradlew :module-name:test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Compile a specific module
+</span>./gradlew :module-name:compileJava
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build multiple modules
+</span>./gradlew :module-a:build :module-b:build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a task in the root project
+</span>./gradlew build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run tasks in parallel
+</span>./gradlew build --parallel
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limit the number of workers
+</span>./gradlew build --max-workers=4
+
+</pre>
+</div>
+
+<p>
+Useful multi-project concepts
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Concept</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`settings.gradle`</td>
+<td class="org-left">Defines root project and included modules</td>
+</tr>
+
+<tr>
+<td class="org-left">`include()`</td>
+<td class="org-left">Adds subprojects to the build</td>
+</tr>
+
+<tr>
+<td class="org-left">`project(":module")`</td>
+<td class="org-left">References a subproject</td>
+</tr>
+
+<tr>
+<td class="org-left">`allprojects`</td>
+<td class="org-left">Configures root and subprojects</td>
+</tr>
+
+<tr>
+<td class="org-left">`subprojects`</td>
+<td class="org-left">Configures subprojects only</td>
+</tr>
+
+<tr>
+<td class="org-left">`dependsOn`</td>
+<td class="org-left">Declares task dependencies</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;parallel`</td>
+<td class="org-left">Enables parallel project execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;max-workers`</td>
+<td class="org-left">Limits Gradle worker count</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>8. Daily Development Commands</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Clean project
+</span>./gradlew clean
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Compile Java source code
+</span>./gradlew compileJava
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Compile test source code
+</span>./gradlew compileTestJava
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run unit tests
+</span>./gradlew test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package application
+</span>./gradlew assemble
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create JAR
+</span>./gradlew jar
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create complete build
+</span>./gradlew build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fast build without executing tests
+</span>./gradlew build -x test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build without cleaning
+</span>./gradlew build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build offline
+</span>./gradlew build --offline
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force dependency updates
+</span>./gradlew build --refresh-dependencies
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Continue building after task failures
+</span>./gradlew build --continue
+
+</pre>
+</div>
+
+<p>
+Useful command-line options
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Option</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`-x test`</td>
+<td class="org-left">Exclude test task</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;offline`</td>
+<td class="org-left">Use cached dependencies only</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;refresh-dependencies`</td>
+<td class="org-left">Refresh dependency resolution</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;continue`</td>
+<td class="org-left">Continue after task failures</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;parallel`</td>
+<td class="org-left">Execute independent projects in parallel</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;max-workers=4`</td>
+<td class="org-left">Limit worker threads</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;dry-run`</td>
+<td class="org-left">Display planned tasks without executing them</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;rerun-tasks`</td>
+<td class="org-left">Force task execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;no-daemon`</td>
+<td class="org-left">Do not use the Gradle daemon</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;quiet`</td>
+<td class="org-left">Reduce console output</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;console=plain`</td>
+<td class="org-left">Disable rich console output</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>9. Testing – JUnit &amp; Integration Tests</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run unit tests
+</span>./gradlew test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific test class
+</span>./gradlew test --tests UserServiceTest
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific test method
+</span>./gradlew test --tests <span style="font-style: italic;">'UserServiceTest.shouldCreateUser'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run tests matching a package
+</span>./gradlew test --tests <span style="font-style: italic;">'com.example.service.*'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Exclude tests
+</span>./gradlew test --exclude-task integrationTest
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Skip tests during build
+</span>./gradlew build -x test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate test reports
+</span>./gradlew test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run integration tests (when configured)
+</span>./gradlew integrationTest
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run verification tasks
+</span>./gradlew check
+
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>The `test` task normally executes unit tests.</li>
+<li>Integration tests typically use a separately configured `Test` task and source set.</li>
+<li>The `check` lifecycle task can be configured to include both unit and integration tests.</li>
+</ul>
+
+<p>
+<b>10. Debugging – Gradle, Tests &amp; Spring Boot</b>
+</p>
+
+<p>
+There are three different debugging scenarios: Gradle build debugging, test debugging, and Java application debugging.
+</p>
+
+<p>
+<b>10.1 Gradle Build Debugging</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable detailed Gradle debug logs
+</span>./gradlew --debug build
+./gradlew --debug test
+./gradlew --debug assemble
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable informational logs
+</span>./gradlew --info build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display exception stack traces
+</span>./gradlew --stacktrace build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display full exception information
+</span>./gradlew --full-stacktrace build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Debug Gradle configuration and execution
+</span>./gradlew --info clean build
+
+</pre>
+</div>
+
+<p>
+Difference:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`&#x2013;debug`</td>
+<td class="org-left">Detailed Gradle debug logs</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;info`</td>
+<td class="org-left">Informational build logs</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;stacktrace`</td>
+<td class="org-left">Display exception stack traces</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;full-stacktrace`</td>
+<td class="org-left">Display full stack traces</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>10.2 Debug Unit &amp; Integration Tests</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable test debugging
+</span>./gradlew test --debug-jvm
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable test debugging with a specific task
+</span>./gradlew integrationTest --debug-jvm
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a specific test with debugging
+</span>./gradlew test --tests UserServiceTest --debug-jvm
+
+</pre>
+</div>
+
+<p>
+The test JVM normally waits for a debugger connection on port `5005`.
+</p>
+
+<p>
+<b>10.3 Start Spring Boot in Debug Mode</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Option 1 &#8211; Start Spring Boot with debugging enabled
+</span>./gradlew bootRun <span style="font-style: italic;">\</span>
+  --debug-jvm
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Option 2 &#8211; Configure a custom debug port
+</span>./gradlew bootRun <span style="font-style: italic;">\</span>
+  --debug-jvm <span style="font-style: italic;">\</span>
+  -Dorg.gradle.debug=true
+
+</pre>
+</div>
+
+<p>
+For more control, configure the Spring Boot application JVM arguments directly:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start application with JVM debugging
+</span><span style="font-weight: bold; font-style: italic;">JAVA_TOOL_OPTIONS</span>=<span style="font-style: italic;">"-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"</span> <span style="font-style: italic;">\</span>
+  ./gradlew bootRun
+
+</pre>
+</div>
+
+<p>
+Note: `&#x2013;debug-jvm` on a `Test` task debugs the test JVM. It does not automatically debug the Spring Boot application started by `bootRun`.
+</p>
+
+<p>
+<b>10.4 Connect IntelliJ IDEA / Eclipse Debugger</b>
+</p>
+
+<p>
+Create a Remote JVM Debug configuration.
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Setting</th>
+<th scope="col" class="org-left">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Host</td>
+<td class="org-left">`localhost`</td>
+</tr>
+
+<tr>
+<td class="org-left">Port</td>
+<td class="org-left">`5005`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debugger mode</td>
+<td class="org-left">Attach to remote JVM</td>
+</tr>
+
+<tr>
+<td class="org-left">Transport</td>
+<td class="org-left">Socket</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Steps:
+</p>
+
+<ol class="org-ol">
+<li>Start the application or test JVM with debugging enabled.</li>
+<li>Create or select the Remote JVM Debug configuration in your IDE.</li>
+<li>Connect to `localhost:5005`.</li>
+<li>Set breakpoints in your Java code.</li>
+<li>Send a request to your application.</li>
+<li>Execution stops at the breakpoints.</li>
+</ol>
+
+<p>
+<b>10.5 Understand JVM Debugging Parameters</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+-agentlib:<span style="font-weight: bold; font-style: italic;">jdwp</span>=<span style="font-weight: bold; font-style: italic;">transport</span>=dt_socket,<span style="font-weight: bold; font-style: italic;">server</span>=y,<span style="font-weight: bold; font-style: italic;">suspend</span>=y,<span style="font-weight: bold; font-style: italic;">address</span>=*:5005
+
+</pre>
+</div>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`transport=dt<sub>socket</sub>`</td>
+<td class="org-left">Use socket communication</td>
+</tr>
+
+<tr>
+<td class="org-left">`server=y`</td>
+<td class="org-left">JVM listens for debugger connections</td>
+</tr>
+
+<tr>
+<td class="org-left">`suspend=y`</td>
+<td class="org-left">Wait for debugger before starting</td>
+</tr>
+
+<tr>
+<td class="org-left">`suspend=n`</td>
+<td class="org-left">Start application immediately</td>
+</tr>
+
+<tr>
+<td class="org-left">`address=*:5005`</td>
+<td class="org-left">Listen on port 5005 on available interfaces</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Security: Debug ports allow powerful control over the JVM. Restrict them to localhost or a trusted network. Never expose port 5005 publicly.
+</p>
+
+<p>
+<b>10.6 Quick Debugging Cheat Sheet</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Goal</th>
+<th scope="col" class="org-left">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Debug Gradle build</td>
+<td class="org-left">`./gradlew &#x2013;debug build`</td>
+</tr>
+
+<tr>
+<td class="org-left">Informational logs</td>
+<td class="org-left">`./gradlew &#x2013;info build`</td>
+</tr>
+
+<tr>
+<td class="org-left">Detailed errors</td>
+<td class="org-left">`./gradlew &#x2013;stacktrace build`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug unit tests</td>
+<td class="org-left">`./gradlew test &#x2013;debug-jvm`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug integration tests</td>
+<td class="org-left">`./gradlew integrationTest &#x2013;debug-jvm`</td>
+</tr>
+
+<tr>
+<td class="org-left">Debug Spring Boot</td>
+<td class="org-left">Configure application JVM JDWP arguments</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. Spring Boot Development &amp; Execution</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start Spring Boot application
+</span>./gradlew bootRun
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with a specific profile
+</span>./gradlew bootRun --args=<span style="font-style: italic;">'--spring.profiles.active=dev'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start on a custom port
+</span>./gradlew bootRun --args=<span style="font-style: italic;">'--server.port=8081'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with multiple application arguments
+</span>./gradlew bootRun <span style="font-style: italic;">\</span>
+  --args=<span style="font-style: italic;">'--server.port=8081 --spring.profiles.active=dev'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build Spring Boot executable JAR
+</span>./gradlew bootJar
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run packaged application
+</span>java -jar build/libs/application.jar
+
+</pre>
+</div>
+
+<p>
+<b>12. Gradle Performance &amp; Build Cache</b>
+</p>
+
+<p>
+Gradle provides several features to improve build performance, including the daemon, incremental builds, configuration cache, and build cache.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable Gradle daemon
+</span>./gradlew build --daemon
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable build cache
+</span>./gradlew build --build-cache
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable configuration cache
+</span>./gradlew build --configuration-cache
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable parallel execution
+</span>./gradlew build --parallel
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limit workers
+</span>./gradlew build --max-workers=4
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display task execution information
+</span>./gradlew build --profile
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate a build scan (requires scan service/setup)
+</span>./gradlew build --scan
+
+</pre>
+</div>
+
+<p>
+Useful performance options
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Option</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`&#x2013;daemon`</td>
+<td class="org-left">Use Gradle daemon</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;build-cache`</td>
+<td class="org-left">Reuse cached task outputs</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;configuration-cache`</td>
+<td class="org-left">Cache build configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;parallel`</td>
+<td class="org-left">Run independent projects concurrently</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;max-workers`</td>
+<td class="org-left">Control worker count</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;profile`</td>
+<td class="org-left">Generate build performance report</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;scan`</td>
+<td class="org-left">Generate detailed build diagnostics</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Build cache and configuration cache are different features. The former caches task outputs; the latter caches the configured build model.
+</p>
+
+<p>
+<b>13. Publishing &amp; Artifact Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create JAR artifact
+</span>./gradlew jar
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Spring Boot executable JAR
+</span>./gradlew bootJar
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Publish configured artifacts
+</span>./gradlew publish
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Publish to Maven Local
+</span>./gradlew publishToMavenLocal
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display publication-related tasks
+</span>./gradlew tasks --all
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build all artifacts
+</span>./gradlew assemble
+
+</pre>
+</div>
+
+<p>
+Note: Publishing tasks are available only when the relevant publishing plugin and publication repositories are configured.
+</p>
+
+<p>
+<b>14. Useful Gradle Properties &amp; Environment Settings</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text"># gradle.properties
+
+# Gradle daemon JVM arguments
+org.gradle.jvmargs=-Xmx2g -Dfile.encoding=UTF-8
+
+# Enable parallel execution
+org.gradle.parallel=true
+
+# Enable build cache
+org.gradle.caching=true
+
+# Enable configuration cache
+org.gradle.configuration-cache=true
+
+# Enable daemon
+org.gradle.daemon=true
+
+# Configure maximum workers
+org.gradle.workers.max=4
+</pre>
+</div>
+
+<p>
+Note: Configuration-cache compatibility depends on the plugins and build logic used by the project.
+</p>
+</div>
+</div>
+<div id="outline-container-orga9d94af" class="outline-2">
+<h2 id="orga9d94af">Beginner</h2>
+<div class="outline-text-2" id="text-orga9d94af">
+</div>
+<div id="outline-container-org4b6515e" class="outline-3">
+<h3 id="org4b6515e">Q1: What is Gradle?</h3>
+<div class="outline-text-3" id="text-org4b6515e">
 <p>
 Gradle is a flexible build automation tool supporting JVM and many other ecosystems.
 </p>
 </div>
 </div>
-<div id="outline-container-orga0ea052" class="outline-3">
-<h3 id="orga0ea052">Q2: Why use Gradle?</h3>
-<div class="outline-text-3" id="text-orga0ea052">
+<div id="outline-container-org4912fc6" class="outline-3">
+<h3 id="org4912fc6">Q2: Why use Gradle?</h3>
+<div class="outline-text-3" id="text-org4912fc6">
 <p>
 It provides fast incremental builds, rich dependency management, and programmable build logic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf30acd9" class="outline-3">
-<h3 id="orgf30acd9">Q3: Gradle vs Maven in one line?</h3>
-<div class="outline-text-3" id="text-orgf30acd9">
+<div id="outline-container-org30a4c39" class="outline-3">
+<h3 id="org30a4c39">Q3: Gradle vs Maven in one line?</h3>
+<div class="outline-text-3" id="text-org30a4c39">
 <p>
 Maven is convention-heavy and phase-based; Gradle is task-graph-based and highly customizable.
 </p>
 </div>
 </div>
-<div id="outline-container-org3bf2184" class="outline-3">
-<h3 id="org3bf2184">Q4: What is a build script in Gradle?</h3>
-<div class="outline-text-3" id="text-org3bf2184">
+<div id="outline-container-org3a0a28f" class="outline-3">
+<h3 id="org3a0a28f">Q4: What is a build script in Gradle?</h3>
+<div class="outline-text-3" id="text-org3a0a28f">
 <p>
 Configuration file defining plugins, dependencies, tasks, and build logic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7953dc" class="outline-3">
-<h3 id="orgc7953dc">Q5: Main Gradle DSL options?</h3>
-<div class="outline-text-3" id="text-orgc7953dc">
+<div id="outline-container-orgd78a224" class="outline-3">
+<h3 id="orgd78a224">Q5: Main Gradle DSL options?</h3>
+<div class="outline-text-3" id="text-orgd78a224">
 <p>
 Groovy DSL (<code>build.gradle</code>) and Kotlin DSL (<code>build.gradle.kts</code>).
 </p>
 </div>
 </div>
-<div id="outline-container-orgc558adb" class="outline-3">
-<h3 id="orgc558adb">Q6: What is settings file in Gradle?</h3>
-<div class="outline-text-3" id="text-orgc558adb">
+<div id="outline-container-orgd3d9870" class="outline-3">
+<h3 id="orgd3d9870">Q6: What is settings file in Gradle?</h3>
+<div class="outline-text-3" id="text-orgd3d9870">
 <p>
 <code>settings.gradle(.kts)</code> defines root project name and included subprojects.
 </p>
 </div>
 </div>
-<div id="outline-container-org124f00d" class="outline-3">
-<h3 id="org124f00d">Q7: What is a task in Gradle?</h3>
-<div class="outline-text-3" id="text-org124f00d">
+<div id="outline-container-org33ed911" class="outline-3">
+<h3 id="org33ed911">Q7: What is a task in Gradle?</h3>
+<div class="outline-text-3" id="text-org33ed911">
 <p>
 A unit of work (compile, test, jar, custom action).
 </p>
 </div>
 </div>
-<div id="outline-container-orgb1f9c54" class="outline-3">
-<h3 id="orgb1f9c54">Q8: What is task graph?</h3>
-<div class="outline-text-3" id="text-orgb1f9c54">
+<div id="outline-container-org90d6aee" class="outline-3">
+<h3 id="org90d6aee">Q8: What is task graph?</h3>
+<div class="outline-text-3" id="text-org90d6aee">
 <p>
 Directed graph of tasks and dependencies Gradle executes.
 </p>
 </div>
 </div>
-<div id="outline-container-org14e6533" class="outline-3">
-<h3 id="org14e6533">Q9: What does <code>gradle tasks</code> show?</h3>
-<div class="outline-text-3" id="text-org14e6533">
+<div id="outline-container-orgd4a46e8" class="outline-3">
+<h3 id="orgd4a46e8">Q9: What does <code>gradle tasks</code> show?</h3>
+<div class="outline-text-3" id="text-orgd4a46e8">
 <p>
 Available tasks in the project.
 </p>
 </div>
 </div>
-<div id="outline-container-org639f895" class="outline-3">
-<h3 id="org639f895">Q10: What does <code>gradle build</code> do?</h3>
-<div class="outline-text-3" id="text-org639f895">
+<div id="outline-container-orgfd4e245" class="outline-3">
+<h3 id="orgfd4e245">Q10: What does <code>gradle build</code> do?</h3>
+<div class="outline-text-3" id="text-orgfd4e245">
 <p>
 Runs lifecycle tasks to compile, test, and assemble artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org424a2ac" class="outline-3">
-<h3 id="org424a2ac">Q11: What does <code>gradle clean</code> do?</h3>
-<div class="outline-text-3" id="text-org424a2ac">
+<div id="outline-container-org8b40157" class="outline-3">
+<h3 id="org8b40157">Q11: What does <code>gradle clean</code> do?</h3>
+<div class="outline-text-3" id="text-org8b40157">
 <p>
 Deletes build outputs (usually <code>build/</code> directories).
 </p>
 </div>
 </div>
-<div id="outline-container-org38c5e3f" class="outline-3">
-<h3 id="org38c5e3f">Q12: What does <code>gradle test</code> do?</h3>
-<div class="outline-text-3" id="text-org38c5e3f">
+<div id="outline-container-orgf353c2c" class="outline-3">
+<h3 id="orgf353c2c">Q12: What does <code>gradle test</code> do?</h3>
+<div class="outline-text-3" id="text-orgf353c2c">
 <p>
 Executes test tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-org010e4cd" class="outline-3">
-<h3 id="org010e4cd">Q13: What does <code>gradle assemble</code> do?</h3>
-<div class="outline-text-3" id="text-org010e4cd">
+<div id="outline-container-orge2e49a0" class="outline-3">
+<h3 id="orge2e49a0">Q13: What does <code>gradle assemble</code> do?</h3>
+<div class="outline-text-3" id="text-orge2e49a0">
 <p>
 Builds artifacts without running all verification tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-org0e426ef" class="outline-3">
-<h3 id="org0e426ef">Q14: What does <code>gradle check</code> do?</h3>
-<div class="outline-text-3" id="text-org0e426ef">
+<div id="outline-container-org753af82" class="outline-3">
+<h3 id="org753af82">Q14: What does <code>gradle check</code> do?</h3>
+<div class="outline-text-3" id="text-org753af82">
 <p>
 Runs verification tasks (tests, static checks).
 </p>
 </div>
 </div>
-<div id="outline-container-org08efc76" class="outline-3">
-<h3 id="org08efc76">Q15: What does <code>gradle dependencies</code> do?</h3>
-<div class="outline-text-3" id="text-org08efc76">
+<div id="outline-container-orgb5e711e" class="outline-3">
+<h3 id="orgb5e711e">Q15: What does <code>gradle dependencies</code> do?</h3>
+<div class="outline-text-3" id="text-orgb5e711e">
 <p>
 Displays dependency tree for configurations.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ffe077" class="outline-3">
-<h3 id="org6ffe077">Q16: What is a plugin in Gradle?</h3>
-<div class="outline-text-3" id="text-org6ffe077">
+<div id="outline-container-orgfc8fc99" class="outline-3">
+<h3 id="orgfc8fc99">Q16: What is a plugin in Gradle?</h3>
+<div class="outline-text-3" id="text-orgfc8fc99">
 <p>
 Reusable build logic that adds tasks/configurations/conventions.
 </p>
 </div>
 </div>
-<div id="outline-container-org79d5e67" class="outline-3">
-<h3 id="org79d5e67">Q17: Common core plugins?</h3>
-<div class="outline-text-3" id="text-org79d5e67">
+<div id="outline-container-orge762cdc" class="outline-3">
+<h3 id="orge762cdc">Q17: Common core plugins?</h3>
+<div class="outline-text-3" id="text-orge762cdc">
 <p>
 <code>java</code>, <code>application</code>, <code>jacoco</code>, <code>maven-publish</code>, <code>checkstyle</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org10256e4" class="outline-3">
-<h3 id="org10256e4">Q18: What does Java plugin provide?</h3>
-<div class="outline-text-3" id="text-org10256e4">
+<div id="outline-container-org5a2718a" class="outline-3">
+<h3 id="org5a2718a">Q18: What does Java plugin provide?</h3>
+<div class="outline-text-3" id="text-org5a2718a">
 <p>
 Standard Java source sets, compile/test/jar tasks, dependency configurations.
 </p>
 </div>
 </div>
-<div id="outline-container-org8d31632" class="outline-3">
-<h3 id="org8d31632">Q19: What are source sets?</h3>
-<div class="outline-text-3" id="text-org8d31632">
+<div id="outline-container-orged2e3da" class="outline-3">
+<h3 id="orged2e3da">Q19: What are source sets?</h3>
+<div class="outline-text-3" id="text-orged2e3da">
 <p>
 Logical groups of sources/resources (main, test, custom).
 </p>
 </div>
 </div>
-<div id="outline-container-org0cd6029" class="outline-3">
-<h3 id="org0cd6029">Q20: Default source directories in Java plugin?</h3>
-<div class="outline-text-3" id="text-org0cd6029">
+<div id="outline-container-org4cf9c9a" class="outline-3">
+<h3 id="org4cf9c9a">Q20: Default source directories in Java plugin?</h3>
+<div class="outline-text-3" id="text-org4cf9c9a">
 <p>
 <code>src/main/java</code>, <code>src/test/java</code>, resources equivalents.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d29ca3" class="outline-3">
-<h3 id="org5d29ca3">Q21: What is repository in Gradle?</h3>
-<div class="outline-text-3" id="text-org5d29ca3">
+<div id="outline-container-org27ccf95" class="outline-3">
+<h3 id="org27ccf95">Q21: What is repository in Gradle?</h3>
+<div class="outline-text-3" id="text-org27ccf95">
 <p>
 Source location for resolving dependencies/plugins (Maven Central, internal repos).
 </p>
 </div>
 </div>
-<div id="outline-container-orga5e35e0" class="outline-3">
-<h3 id="orga5e35e0">Q22: What is dependency notation?</h3>
-<div class="outline-text-3" id="text-orga5e35e0">
+<div id="outline-container-org4b175a0" class="outline-3">
+<h3 id="org4b175a0">Q22: What is dependency notation?</h3>
+<div class="outline-text-3" id="text-org4b175a0">
 <p>
 Usually <code>group:name:version</code> coordinates.
 </p>
 </div>
 </div>
-<div id="outline-container-org3e21a67" class="outline-3">
-<h3 id="org3e21a67">Q23: What is configuration in Gradle?</h3>
-<div class="outline-text-3" id="text-org3e21a67">
+<div id="outline-container-orge129224" class="outline-3">
+<h3 id="orge129224">Q23: What is configuration in Gradle?</h3>
+<div class="outline-text-3" id="text-orge129224">
 <p>
 Named dependency bucket with specific usage semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb852cb0" class="outline-3">
-<h3 id="orgb852cb0">Q24: Common configurations?</h3>
-<div class="outline-text-3" id="text-orgb852cb0">
+<div id="outline-container-org90d0975" class="outline-3">
+<h3 id="org90d0975">Q24: Common configurations?</h3>
+<div class="outline-text-3" id="text-org90d0975">
 <p>
 <code>implementation</code>, <code>api</code>, <code>compileOnly</code>, <code>runtimeOnly</code>, <code>testImplementation</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfc5da38" class="outline-3">
-<h3 id="orgfc5da38">Q25: implementation vs api (java-library)?</h3>
-<div class="outline-text-3" id="text-orgfc5da38">
+<div id="outline-container-org2f7871a" class="outline-3">
+<h3 id="org2f7871a">Q25: implementation vs api (java-library)?</h3>
+<div class="outline-text-3" id="text-org2f7871a">
 <p>
 <code>api</code> leaks to consumers; <code>implementation</code> is internal to module.
 </p>
 </div>
 </div>
-<div id="outline-container-org53f1a64" class="outline-3">
-<h3 id="org53f1a64">Q26: What is transitive dependency?</h3>
-<div class="outline-text-3" id="text-org53f1a64">
+<div id="outline-container-org21d6516" class="outline-3">
+<h3 id="org21d6516">Q26: What is transitive dependency?</h3>
+<div class="outline-text-3" id="text-org21d6516">
 <p>
 Dependency brought indirectly through another dependency.
 </p>
 </div>
 </div>
-<div id="outline-container-orgae54515" class="outline-3">
-<h3 id="orgae54515">Q27: Why can transitive dependencies be risky?</h3>
-<div class="outline-text-3" id="text-orgae54515">
+<div id="outline-container-orgcee805f" class="outline-3">
+<h3 id="orgcee805f">Q27: Why can transitive dependencies be risky?</h3>
+<div class="outline-text-3" id="text-orgcee805f">
 <p>
 Version conflicts and hidden classpath changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org8f11e61" class="outline-3">
-<h3 id="org8f11e61">Q28: What is Gradle Wrapper?</h3>
-<div class="outline-text-3" id="text-org8f11e61">
+<div id="outline-container-org40bbbe1" class="outline-3">
+<h3 id="org40bbbe1">Q28: What is Gradle Wrapper?</h3>
+<div class="outline-text-3" id="text-org40bbbe1">
 <p>
 Project-local scripts and metadata pinning Gradle version.
 </p>
 </div>
 </div>
-<div id="outline-container-org5131c5c" class="outline-3">
-<h3 id="org5131c5c">Q29: Why use Wrapper?</h3>
-<div class="outline-text-3" id="text-org5131c5c">
+<div id="outline-container-org9d6ff68" class="outline-3">
+<h3 id="org9d6ff68">Q29: Why use Wrapper?</h3>
+<div class="outline-text-3" id="text-org9d6ff68">
 <p>
 Consistent Gradle version across all developers/CI.
 </p>
 </div>
 </div>
-<div id="outline-container-org93fc69e" class="outline-3">
-<h3 id="org93fc69e">Q30: Wrapper commands?</h3>
-<div class="outline-text-3" id="text-org93fc69e">
+<div id="outline-container-org19f42cc" class="outline-3">
+<h3 id="org19f42cc">Q30: Wrapper commands?</h3>
+<div class="outline-text-3" id="text-org19f42cc">
 <p>
 <code>./gradlew &lt;task&gt;</code> (Unix), <code>gradlew.bat &lt;task&gt;</code> (Windows).
 </p>
 </div>
 </div>
-<div id="outline-container-orgaff0ed1" class="outline-3">
-<h3 id="orgaff0ed1">Q31: What is Gradle daemon?</h3>
-<div class="outline-text-3" id="text-orgaff0ed1">
+<div id="outline-container-org46ec71b" class="outline-3">
+<h3 id="org46ec71b">Q31: What is Gradle daemon?</h3>
+<div class="outline-text-3" id="text-org46ec71b">
 <p>
 Background process speeding up subsequent builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org09c8ff6" class="outline-3">
-<h3 id="org09c8ff6">Q32: Why daemon improves performance?</h3>
-<div class="outline-text-3" id="text-org09c8ff6">
+<div id="outline-container-orgb298be1" class="outline-3">
+<h3 id="orgb298be1">Q32: Why daemon improves performance?</h3>
+<div class="outline-text-3" id="text-orgb298be1">
 <p>
 Reuses JVM and cached build state between runs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc10ebbe" class="outline-3">
-<h3 id="orgc10ebbe">Q33: What is incremental build?</h3>
-<div class="outline-text-3" id="text-orgc10ebbe">
+<div id="outline-container-org5d16892" class="outline-3">
+<h3 id="org5d16892">Q33: What is incremental build?</h3>
+<div class="outline-text-3" id="text-org5d16892">
 <p>
 Only re-running tasks whose inputs/outputs changed.
 </p>
 </div>
 </div>
-<div id="outline-container-org47f3eeb" class="outline-3">
-<h3 id="org47f3eeb">Q34: What is up-to-date check?</h3>
-<div class="outline-text-3" id="text-org47f3eeb">
+<div id="outline-container-orgac9799d" class="outline-3">
+<h3 id="orgac9799d">Q34: What is up-to-date check?</h3>
+<div class="outline-text-3" id="text-orgac9799d">
 <p>
 Gradle mechanism skipping task if inputs/outputs unchanged.
 </p>
 </div>
 </div>
-<div id="outline-container-org0155b3e" class="outline-3">
-<h3 id="org0155b3e">Q35: What is build cache?</h3>
-<div class="outline-text-3" id="text-org0155b3e">
+<div id="outline-container-org3d44916" class="outline-3">
+<h3 id="org3d44916">Q35: What is build cache?</h3>
+<div class="outline-text-3" id="text-org3d44916">
 <p>
 Reuses task outputs from local/remote cache when inputs match.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfce7b72" class="outline-3">
-<h3 id="orgfce7b72">Q36: Local vs remote build cache?</h3>
-<div class="outline-text-3" id="text-orgfce7b72">
+<div id="outline-container-orgaa4f80f" class="outline-3">
+<h3 id="orgaa4f80f">Q36: Local vs remote build cache?</h3>
+<div class="outline-text-3" id="text-orgaa4f80f">
 <p>
 Local on machine; remote shared across team/CI.
 </p>
 </div>
 </div>
-<div id="outline-container-org0094a81" class="outline-3">
-<h3 id="org0094a81">Q37: What is <code>--info</code> and <code>--debug</code>?</h3>
-<div class="outline-text-3" id="text-org0094a81">
+<div id="outline-container-orga6d18d9" class="outline-3">
+<h3 id="orga6d18d9">Q37: What is <code>--info</code> and <code>--debug</code>?</h3>
+<div class="outline-text-3" id="text-orga6d18d9">
 <p>
 More verbose logging levels for troubleshooting.
 </p>
 </div>
 </div>
-<div id="outline-container-orga934276" class="outline-3">
-<h3 id="orga934276">Q38: What is <code>--stacktrace</code>?</h3>
-<div class="outline-text-3" id="text-orga934276">
+<div id="outline-container-org5ea8920" class="outline-3">
+<h3 id="org5ea8920">Q38: What is <code>--stacktrace</code>?</h3>
+<div class="outline-text-3" id="text-org5ea8920">
 <p>
 Prints full exception stack traces on build failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ce699e" class="outline-3">
-<h3 id="org7ce699e">Q39: What is <code>--scan</code>?</h3>
-<div class="outline-text-3" id="text-org7ce699e">
+<div id="outline-container-orga134960" class="outline-3">
+<h3 id="orga134960">Q39: What is <code>--scan</code>?</h3>
+<div class="outline-text-3" id="text-orga134960">
 <p>
 Publishes build scan with detailed performance and diagnostics (service/setup dependent).
 </p>
 </div>
 </div>
-<div id="outline-container-org119b04d" class="outline-3">
-<h3 id="org119b04d">Q40: What is configuration phase?</h3>
-<div class="outline-text-3" id="text-org119b04d">
+<div id="outline-container-orgf43cb3a" class="outline-3">
+<h3 id="orgf43cb3a">Q40: What is configuration phase?</h3>
+<div class="outline-text-3" id="text-orgf43cb3a">
 <p>
 Gradle evaluates build scripts and configures tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f0ee03" class="outline-3">
-<h3 id="org3f0ee03">Q41: What is execution phase?</h3>
-<div class="outline-text-3" id="text-org3f0ee03">
+<div id="outline-container-org7304f57" class="outline-3">
+<h3 id="org7304f57">Q41: What is execution phase?</h3>
+<div class="outline-text-3" id="text-org7304f57">
 <p>
 Selected tasks are executed according to task graph.
 </p>
 </div>
 </div>
-<div id="outline-container-org9346baf" class="outline-3">
-<h3 id="org9346baf">Q42: Why avoid heavy work during configuration?</h3>
-<div class="outline-text-3" id="text-org9346baf">
+<div id="outline-container-org0f4f67b" class="outline-3">
+<h3 id="org0f4f67b">Q42: Why avoid heavy work during configuration?</h3>
+<div class="outline-text-3" id="text-org0f4f67b">
 <p>
 Slows every build invocation, even unrelated tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcd539bd" class="outline-3">
-<h3 id="orgcd539bd">Q43: What is lazy task configuration?</h3>
-<div class="outline-text-3" id="text-orgcd539bd">
+<div id="outline-container-org0097b04" class="outline-3">
+<h3 id="org0097b04">Q43: What is lazy task configuration?</h3>
+<div class="outline-text-3" id="text-org0097b04">
 <p>
 Deferring task creation/config until needed.
 </p>
 </div>
 </div>
-<div id="outline-container-orga28c03c" class="outline-3">
-<h3 id="orga28c03c">Q44: What APIs support lazy configuration?</h3>
-<div class="outline-text-3" id="text-orga28c03c">
+<div id="outline-container-org7eb33a2" class="outline-3">
+<h3 id="org7eb33a2">Q44: What APIs support lazy configuration?</h3>
+<div class="outline-text-3" id="text-org7eb33a2">
 <p>
 <code>tasks.register</code> and Provider API patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-orga7e7b0b" class="outline-3">
-<h3 id="orga7e7b0b">Q45: register vs create task?</h3>
-<div class="outline-text-3" id="text-orga7e7b0b">
+<div id="outline-container-orgfc82fdb" class="outline-3">
+<h3 id="orgfc82fdb">Q45: register vs create task?</h3>
+<div class="outline-text-3" id="text-orgfc82fdb">
 <p>
 <code>register</code> is lazy; <code>create</code> is eager.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4f7779" class="outline-3">
-<h3 id="orgd4f7779">Q46: What is ext/property in Gradle?</h3>
-<div class="outline-text-3" id="text-orgd4f7779">
+<div id="outline-container-org624e0b1" class="outline-3">
+<h3 id="org624e0b1">Q46: What is ext/property in Gradle?</h3>
+<div class="outline-text-3" id="text-org624e0b1">
 <p>
 Extra project properties for sharing values in scripts.
 </p>
 </div>
 </div>
-<div id="outline-container-orga54b77c" class="outline-3">
-<h3 id="orga54b77c">Q47: What is gradle.properties?</h3>
-<div class="outline-text-3" id="text-orga54b77c">
+<div id="outline-container-org3463977" class="outline-3">
+<h3 id="org3463977">Q47: What is gradle.properties?</h3>
+<div class="outline-text-3" id="text-org3463977">
 <p>
 File for build properties/JVM args/settings at project/user level.
 </p>
 </div>
 </div>
-<div id="outline-container-org9216584" class="outline-3">
-<h3 id="org9216584">Q48: What is org.gradle.jvmargs used for?</h3>
-<div class="outline-text-3" id="text-org9216584">
+<div id="outline-container-org834f002" class="outline-3">
+<h3 id="org834f002">Q48: What is org.gradle.jvmargs used for?</h3>
+<div class="outline-text-3" id="text-org834f002">
 <p>
 Configure JVM options for Gradle daemon.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb446f98" class="outline-3">
-<h3 id="orgb446f98">Q49: What is common beginner Gradle anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgb446f98">
+<div id="outline-container-org3ba8c98" class="outline-3">
+<h3 id="org3ba8c98">Q49: What is common beginner Gradle anti-pattern?</h3>
+<div class="outline-text-3" id="text-org3ba8c98">
 <p>
 Copying large script blocks without understanding task/config impacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org906003a" class="outline-3">
-<h3 id="org906003a">Q50: Another beginner anti-pattern?</h3>
-<div class="outline-text-3" id="text-org906003a">
+<div id="outline-container-orgf8b8b24" class="outline-3">
+<h3 id="orgf8b8b24">Q50: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgf8b8b24">
 <p>
 Using dynamic dependency versions in production builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c3a829" class="outline-3">
-<h3 id="org3c3a829">Q51: Why avoid dynamic versions (e.g., 1.+)?</h3>
-<div class="outline-text-3" id="text-org3c3a829">
+<div id="outline-container-orga987a93" class="outline-3">
+<h3 id="orga987a93">Q51: Why avoid dynamic versions (e.g., 1.+)?</h3>
+<div class="outline-text-3" id="text-orga987a93">
 <p>
 Hurts reproducibility and can cause surprise breakages.
 </p>
 </div>
 </div>
-<div id="outline-container-org50c4a73" class="outline-3">
-<h3 id="org50c4a73">Q52: What is dependency lock concept?</h3>
-<div class="outline-text-3" id="text-org50c4a73">
+<div id="outline-container-org6635270" class="outline-3">
+<h3 id="org6635270">Q52: What is dependency lock concept?</h3>
+<div class="outline-text-3" id="text-org6635270">
 <p>
 Pin resolved versions for reproducible dependency graphs.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d843ca" class="outline-3">
-<h3 id="org0d843ca">Q53: Beginner security baseline?</h3>
-<div class="outline-text-3" id="text-org0d843ca">
+<div id="outline-container-org3e3ed91" class="outline-3">
+<h3 id="org3e3ed91">Q53: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-org3e3ed91">
 <p>
 Trusted repositories, pinned versions, wrapper verification practices.
 </p>
 </div>
 </div>
-<div id="outline-container-org7932dbf" class="outline-3">
-<h3 id="org7932dbf">Q54: Beginner CI baseline?</h3>
-<div class="outline-text-3" id="text-org7932dbf">
+<div id="outline-container-org85f2aa3" class="outline-3">
+<h3 id="org85f2aa3">Q54: Beginner CI baseline?</h3>
+<div class="outline-text-3" id="text-org85f2aa3">
 <p>
 Run <code>./gradlew clean build</code> with wrapper in pipeline.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ac5285" class="outline-3">
-<h3 id="org7ac5285">Q55: Beginner performance baseline?</h3>
-<div class="outline-text-3" id="text-org7ac5285">
+<div id="outline-container-orgc7b2f47" class="outline-3">
+<h3 id="orgc7b2f47">Q55: Beginner performance baseline?</h3>
+<div class="outline-text-3" id="text-orgc7b2f47">
 <p>
 Enable daemon/build cache and avoid unnecessary clean builds.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc216df3" class="outline-3">
-<h3 id="orgc216df3">Q56: What is task dependency declaration?</h3>
-<div class="outline-text-3" id="text-orgc216df3">
+<div id="outline-container-orgd31c13d" class="outline-3">
+<h3 id="orgd31c13d">Q56: What is task dependency declaration?</h3>
+<div class="outline-text-3" id="text-orgd31c13d">
 <p>
 Using <code>dependsOn</code> to enforce execution prerequisites.
 </p>
 </div>
 </div>
-<div id="outline-container-orga9f6a2a" class="outline-3">
-<h3 id="orga9f6a2a">Q57: MustRunAfter vs dependsOn?</h3>
-<div class="outline-text-3" id="text-orga9f6a2a">
+<div id="outline-container-org3a496c4" class="outline-3">
+<h3 id="org3a496c4">Q57: MustRunAfter vs dependsOn?</h3>
+<div class="outline-text-3" id="text-org3a496c4">
 <p>
 Ordering hint vs actual dependency requirement.
 </p>
 </div>
 </div>
-<div id="outline-container-orga61debb" class="outline-3">
-<h3 id="orga61debb">Q58: finalizedBy usage?</h3>
-<div class="outline-text-3" id="text-orga61debb">
+<div id="outline-container-org2c130f6" class="outline-3">
+<h3 id="org2c130f6">Q58: finalizedBy usage?</h3>
+<div class="outline-text-3" id="text-org2c130f6">
 <p>
 Run cleanup/finalizer task after another task, even on failure scenarios.
 </p>
 </div>
 </div>
-<div id="outline-container-org67f96e3" class="outline-3">
-<h3 id="org67f96e3">Q59: Beginner project structure principle?</h3>
-<div class="outline-text-3" id="text-org67f96e3">
+<div id="outline-container-org0d05c51" class="outline-3">
+<h3 id="org0d05c51">Q59: Beginner project structure principle?</h3>
+<div class="outline-text-3" id="text-org0d05c51">
 <p>
 Keep build scripts small and readable; move shared logic out when needed.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf1fe8b0" class="outline-3">
-<h3 id="orgf1fe8b0">Q60: Beginner best practice?</h3>
-<div class="outline-text-3" id="text-orgf1fe8b0">
+<div id="outline-container-org90090a4" class="outline-3">
+<h3 id="org90090a4">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org90090a4">
 <p>
 Use wrapper, pin versions, and lean on conventions before custom complexity.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgea55e28" class="outline-2">
-<h2 id="orgea55e28">Intermediate</h2>
-<div class="outline-text-2" id="text-orgea55e28">
+<div id="outline-container-org2f1e390" class="outline-2">
+<h2 id="org2f1e390">Intermediate</h2>
+<div class="outline-text-2" id="text-org2f1e390">
 </div>
-<div id="outline-container-org47ebe7f" class="outline-3">
-<h3 id="org47ebe7f">Q61: What is multi-project build in Gradle?</h3>
-<div class="outline-text-3" id="text-org47ebe7f">
+<div id="outline-container-org0236c33" class="outline-3">
+<h3 id="org0236c33">Q61: What is multi-project build in Gradle?</h3>
+<div class="outline-text-3" id="text-org0236c33">
 <p>
 Single root build managing multiple subprojects/modules.
 </p>
 </div>
 </div>
-<div id="outline-container-org91d01be" class="outline-3">
-<h3 id="org91d01be">Q62: How include modules?</h3>
-<div class="outline-text-3" id="text-org91d01be">
+<div id="outline-container-orgc50ecff" class="outline-3">
+<h3 id="orgc50ecff">Q62: How include modules?</h3>
+<div class="outline-text-3" id="text-orgc50ecff">
 <p>
 Use <code>include("moduleA", "moduleB")</code> in settings file.
 </p>
 </div>
 </div>
-<div id="outline-container-org500f216" class="outline-3">
-<h3 id="org500f216">Q63: What is allprojects vs subprojects?</h3>
-<div class="outline-text-3" id="text-org500f216">
+<div id="outline-container-org846549e" class="outline-3">
+<h3 id="org846549e">Q63: What is allprojects vs subprojects?</h3>
+<div class="outline-text-3" id="text-org846549e">
 <p>
 Scope configuration to root+children vs children only.
 </p>
 </div>
 </div>
-<div id="outline-container-org63dee5e" class="outline-3">
-<h3 id="org63dee5e">Q64: Why avoid heavy allprojects blocks?</h3>
-<div class="outline-text-3" id="text-org63dee5e">
+<div id="outline-container-orgf76c6ac" class="outline-3">
+<h3 id="orgf76c6ac">Q64: Why avoid heavy allprojects blocks?</h3>
+<div class="outline-text-3" id="text-orgf76c6ac">
 <p>
 Can create tight coupling and configuration overhead.
 </p>
 </div>
 </div>
-<div id="outline-container-org48010b1" class="outline-3">
-<h3 id="org48010b1">Q65: Better alternative to giant shared blocks?</h3>
-<div class="outline-text-3" id="text-org48010b1">
+<div id="outline-container-orgdef1d94" class="outline-3">
+<h3 id="orgdef1d94">Q65: Better alternative to giant shared blocks?</h3>
+<div class="outline-text-3" id="text-orgdef1d94">
 <p>
 Convention plugins/build logic modules.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdddbb15" class="outline-3">
-<h3 id="orgdddbb15">Q66: What is buildSrc?</h3>
-<div class="outline-text-3" id="text-orgdddbb15">
+<div id="outline-container-org9d76359" class="outline-3">
+<h3 id="org9d76359">Q66: What is buildSrc?</h3>
+<div class="outline-text-3" id="text-org9d76359">
 <p>
 Special included build for reusable build logic compiled automatically.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc842b34" class="outline-3">
-<h3 id="orgc842b34">Q67: buildSrc downside?</h3>
-<div class="outline-text-3" id="text-orgc842b34">
+<div id="outline-container-orgc06356c" class="outline-3">
+<h3 id="orgc06356c">Q67: buildSrc downside?</h3>
+<div class="outline-text-3" id="text-orgc06356c">
 <p>
 Any change can invalidate configuration and slow builds.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2ecba1" class="outline-3">
-<h3 id="orgc2ecba1">Q68: Modern alternative to buildSrc?</h3>
-<div class="outline-text-3" id="text-orgc2ecba1">
+<div id="outline-container-org4c84957" class="outline-3">
+<h3 id="org4c84957">Q68: Modern alternative to buildSrc?</h3>
+<div class="outline-text-3" id="text-org4c84957">
 <p>
 Included builds/convention plugins (composite build approach).
 </p>
 </div>
 </div>
-<div id="outline-container-orgbdbf575" class="outline-3">
-<h3 id="orgbdbf575">Q69: What is version catalog?</h3>
-<div class="outline-text-3" id="text-orgbdbf575">
+<div id="outline-container-orgb1c4188" class="outline-3">
+<h3 id="orgb1c4188">Q69: What is version catalog?</h3>
+<div class="outline-text-3" id="text-orgb1c4188">
 <p>
 Centralized dependency coordinates in <code>libs.versions.toml</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org8886018" class="outline-3">
-<h3 id="org8886018">Q70: Why use version catalogs?</h3>
-<div class="outline-text-3" id="text-org8886018">
+<div id="outline-container-orga9bbefb" class="outline-3">
+<h3 id="orga9bbefb">Q70: Why use version catalogs?</h3>
+<div class="outline-text-3" id="text-orga9bbefb">
 <p>
 Consistent dependency declarations and easier upgrades.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e23bee" class="outline-3">
-<h3 id="org5e23bee">Q71: What is platform dependency in Gradle?</h3>
-<div class="outline-text-3" id="text-org5e23bee">
+<div id="outline-container-orgb72fc8d" class="outline-3">
+<h3 id="orgb72fc8d">Q71: What is platform dependency in Gradle?</h3>
+<div class="outline-text-3" id="text-orgb72fc8d">
 <p>
 BOM-style dependency alignment via <code>platform(...)</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e2ad30" class="outline-3">
-<h3 id="org8e2ad30">Q72: Enforced platform vs platform?</h3>
-<div class="outline-text-3" id="text-org8e2ad30">
+<div id="outline-container-org00e2c3f" class="outline-3">
+<h3 id="org00e2c3f">Q72: Enforced platform vs platform?</h3>
+<div class="outline-text-3" id="text-org00e2c3f">
 <p>
 Enforced strictly forces versions; regular platform participates in alignment.
 </p>
 </div>
 </div>
-<div id="outline-container-org9d86530" class="outline-3">
-<h3 id="org9d86530">Q73: What is dependency constraint?</h3>
-<div class="outline-text-3" id="text-org9d86530">
+<div id="outline-container-orgb2f8c2b" class="outline-3">
+<h3 id="orgb2f8c2b">Q73: What is dependency constraint?</h3>
+<div class="outline-text-3" id="text-orgb2f8c2b">
 <p>
 Rule constraining allowed dependency versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org89e31b6" class="outline-3">
-<h3 id="org89e31b6">Q74: Why use constraints?</h3>
-<div class="outline-text-3" id="text-org89e31b6">
+<div id="outline-container-org9c95db7" class="outline-3">
+<h3 id="org9c95db7">Q74: Why use constraints?</h3>
+<div class="outline-text-3" id="text-org9c95db7">
 <p>
 Prevent vulnerable/incompatible versions transitively.
 </p>
 </div>
 </div>
-<div id="outline-container-org65da515" class="outline-3">
-<h3 id="org65da515">Q75: What is resolution strategy?</h3>
-<div class="outline-text-3" id="text-org65da515">
+<div id="outline-container-org67ebbb1" class="outline-3">
+<h3 id="org67ebbb1">Q75: What is resolution strategy?</h3>
+<div class="outline-text-3" id="text-org67ebbb1">
 <p>
 Rules customizing dependency conflict resolution/substitution.
 </p>
 </div>
 </div>
-<div id="outline-container-org6822f08" class="outline-3">
-<h3 id="org6822f08">Q76: What is dependency substitution?</h3>
-<div class="outline-text-3" id="text-org6822f08">
+<div id="outline-container-org343174c" class="outline-3">
+<h3 id="org343174c">Q76: What is dependency substitution?</h3>
+<div class="outline-text-3" id="text-org343174c">
 <p>
 Replacing one module/project dependency with another.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcfd6174" class="outline-3">
-<h3 id="orgcfd6174">Q77: What is component metadata rule?</h3>
-<div class="outline-text-3" id="text-orgcfd6174">
+<div id="outline-container-org42a8b50" class="outline-3">
+<h3 id="org42a8b50">Q77: What is component metadata rule?</h3>
+<div class="outline-text-3" id="text-org42a8b50">
 <p>
 Customize metadata (status/variants/capabilities) during resolution.
 </p>
 </div>
 </div>
-<div id="outline-container-org3814c6f" class="outline-3">
-<h3 id="org3814c6f">Q78: What is capability conflict?</h3>
-<div class="outline-text-3" id="text-org3814c6f">
+<div id="outline-container-org26ab24c" class="outline-3">
+<h3 id="org26ab24c">Q78: What is capability conflict?</h3>
+<div class="outline-text-3" id="text-org26ab24c">
 <p>
 Multiple modules providing same capability causing ambiguity.
 </p>
 </div>
 </div>
-<div id="outline-container-orged04285" class="outline-3">
-<h3 id="orged04285">Q79: What is java-library plugin benefit?</h3>
-<div class="outline-text-3" id="text-orged04285">
+<div id="outline-container-orgd0950ab" class="outline-3">
+<h3 id="orgd0950ab">Q79: What is java-library plugin benefit?</h3>
+<div class="outline-text-3" id="text-orgd0950ab">
 <p>
 Separates API and implementation dependencies for proper consumer classpaths.
 </p>
 </div>
 </div>
-<div id="outline-container-org1578ffe" class="outline-3">
-<h3 id="org1578ffe">Q80: What is toolchain support in Gradle?</h3>
-<div class="outline-text-3" id="text-org1578ffe">
+<div id="outline-container-org97666e8" class="outline-3">
+<h3 id="org97666e8">Q80: What is toolchain support in Gradle?</h3>
+<div class="outline-text-3" id="text-org97666e8">
 <p>
 Declaratively selecting JDK version for compilation/testing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdd9717c" class="outline-3">
-<h3 id="orgdd9717c">Q81: Why use Java toolchains?</h3>
-<div class="outline-text-3" id="text-orgdd9717c">
+<div id="outline-container-org7ffe094" class="outline-3">
+<h3 id="org7ffe094">Q81: Why use Java toolchains?</h3>
+<div class="outline-text-3" id="text-org7ffe094">
 <p>
 Consistent builds independent of local JAVA<sub>HOME</sub>.
 </p>
 </div>
 </div>
-<div id="outline-container-orga7da4f1" class="outline-3">
-<h3 id="orga7da4f1">Q82: What is test task configuration?</h3>
-<div class="outline-text-3" id="text-orga7da4f1">
+<div id="outline-container-org7343940" class="outline-3">
+<h3 id="org7343940">Q82: What is test task configuration?</h3>
+<div class="outline-text-3" id="text-org7343940">
 <p>
 Customize test engine, parallelism, includes/excludes, JVM args.
 </p>
 </div>
 </div>
-<div id="outline-container-org9341a36" class="outline-3">
-<h3 id="org9341a36">Q83: How separate integration tests in Gradle?</h3>
-<div class="outline-text-3" id="text-org9341a36">
+<div id="outline-container-org61e1bb8" class="outline-3">
+<h3 id="org61e1bb8">Q83: How separate integration tests in Gradle?</h3>
+<div class="outline-text-3" id="text-org61e1bb8">
 <p>
 Create custom source set and Test task bound to check/verify workflow.
 </p>
 </div>
 </div>
-<div id="outline-container-org51ca650" class="outline-3">
-<h3 id="org51ca650">Q84: What is JaCoCo integration?</h3>
-<div class="outline-text-3" id="text-org51ca650">
+<div id="outline-container-orgcec616a" class="outline-3">
+<h3 id="orgcec616a">Q84: What is JaCoCo integration?</h3>
+<div class="outline-text-3" id="text-orgcec616a">
 <p>
 Coverage reports and verification thresholds in build.
 </p>
 </div>
 </div>
-<div id="outline-container-orga8c1870" class="outline-3">
-<h3 id="orga8c1870">Q85: What is publication in Gradle?</h3>
-<div class="outline-text-3" id="text-orga8c1870">
+<div id="outline-container-org04b8890" class="outline-3">
+<h3 id="org04b8890">Q85: What is publication in Gradle?</h3>
+<div class="outline-text-3" id="text-org04b8890">
 <p>
 Publishing artifacts/metadata to Maven/Ivy repositories.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf619855" class="outline-3">
-<h3 id="orgf619855">Q86: What plugin for Maven publishing?</h3>
-<div class="outline-text-3" id="text-orgf619855">
+<div id="outline-container-orgfe758e5" class="outline-3">
+<h3 id="orgfe758e5">Q86: What plugin for Maven publishing?</h3>
+<div class="outline-text-3" id="text-orgfe758e5">
 <p>
 <code>maven-publish</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org38e4d9f" class="outline-3">
-<h3 id="org38e4d9f">Q87: What is publication coordinates control?</h3>
-<div class="outline-text-3" id="text-org38e4d9f">
+<div id="outline-container-org3eecd18" class="outline-3">
+<h3 id="org3eecd18">Q87: What is publication coordinates control?</h3>
+<div class="outline-text-3" id="text-org3eecd18">
 <p>
 Define group/artifact/version and generated POM metadata.
 </p>
 </div>
 </div>
-<div id="outline-container-org279e3c6" class="outline-3">
-<h3 id="org279e3c6">Q88: What is signing plugin use?</h3>
-<div class="outline-text-3" id="text-org279e3c6">
+<div id="outline-container-orgc7cd07c" class="outline-3">
+<h3 id="orgc7cd07c">Q88: What is signing plugin use?</h3>
+<div class="outline-text-3" id="text-orgc7cd07c">
 <p>
 Cryptographically sign published artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org9573417" class="outline-3">
-<h3 id="org9573417">Q89: What is configuration cache?</h3>
-<div class="outline-text-3" id="text-org9573417">
+<div id="outline-container-org4e15c81" class="outline-3">
+<h3 id="org4e15c81">Q89: What is configuration cache?</h3>
+<div class="outline-text-3" id="text-org4e15c81">
 <p>
 Gradle feature caching configuration phase for faster subsequent runs.
 </p>
 </div>
 </div>
-<div id="outline-container-org80c721b" class="outline-3">
-<h3 id="org80c721b">Q90: Why config cache can fail?</h3>
-<div class="outline-text-3" id="text-org80c721b">
+<div id="outline-container-org210f5d7" class="outline-3">
+<h3 id="org210f5d7">Q90: Why config cache can fail?</h3>
+<div class="outline-text-3" id="text-org210f5d7">
 <p>
 Build logic/plugins using unsupported non-cache-safe patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbdffda5" class="outline-3">
-<h3 id="orgbdffda5">Q91: What is task avoidance API importance?</h3>
-<div class="outline-text-3" id="text-orgbdffda5">
+<div id="outline-container-org304b2a4" class="outline-3">
+<h3 id="org304b2a4">Q91: What is task avoidance API importance?</h3>
+<div class="outline-text-3" id="text-org304b2a4">
 <p>
 Reduces unnecessary task configuration, improving performance.
 </p>
 </div>
 </div>
-<div id="outline-container-org1ea3c33" class="outline-3">
-<h3 id="org1ea3c33">Q92: What is Provider API?</h3>
-<div class="outline-text-3" id="text-org1ea3c33">
+<div id="outline-container-org8e18694" class="outline-3">
+<h3 id="org8e18694">Q92: What is Provider API?</h3>
+<div class="outline-text-3" id="text-org8e18694">
 <p>
 Lazy value abstraction for safe deferred computation wiring.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0534ae" class="outline-3">
-<h3 id="orge0534ae">Q93: Why prefer Provider API over direct values?</h3>
-<div class="outline-text-3" id="text-orge0534ae">
+<div id="outline-container-org3c2d980" class="outline-3">
+<h3 id="org3c2d980">Q93: Why prefer Provider API over direct values?</h3>
+<div class="outline-text-3" id="text-org3c2d980">
 <p>
 Improves laziness, correctness, and configuration cache compatibility.
 </p>
 </div>
 </div>
-<div id="outline-container-org0dc2dfa" class="outline-3">
-<h3 id="org0dc2dfa">Q94: What is file system watching in Gradle?</h3>
-<div class="outline-text-3" id="text-org0dc2dfa">
+<div id="outline-container-org53386c5" class="outline-3">
+<h3 id="org53386c5">Q94: What is file system watching in Gradle?</h3>
+<div class="outline-text-3" id="text-org53386c5">
 <p>
 Tracks file changes to speed incremental behavior between builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d01939" class="outline-3">
-<h3 id="org3d01939">Q95: What is parallel execution in Gradle?</h3>
-<div class="outline-text-3" id="text-org3d01939">
+<div id="outline-container-orgb8ef440" class="outline-3">
+<h3 id="orgb8ef440">Q95: What is parallel execution in Gradle?</h3>
+<div class="outline-text-3" id="text-orgb8ef440">
 <p>
 Run independent tasks/projects concurrently (<code>--parallel</code>).
 </p>
 </div>
 </div>
-<div id="outline-container-org56481ce" class="outline-3">
-<h3 id="org56481ce">Q96: Parallel build caveat?</h3>
-<div class="outline-text-3" id="text-org56481ce">
+<div id="outline-container-org03954cf" class="outline-3">
+<h3 id="org03954cf">Q96: Parallel build caveat?</h3>
+<div class="outline-text-3" id="text-org03954cf">
 <p>
 Race conditions if tasks share mutable outputs/resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfac4d18" class="outline-3">
-<h3 id="orgfac4d18">Q97: What is max-workers?</h3>
-<div class="outline-text-3" id="text-orgfac4d18">
+<div id="outline-container-orgaf6bec5" class="outline-3">
+<h3 id="orgaf6bec5">Q97: What is max-workers?</h3>
+<div class="outline-text-3" id="text-orgaf6bec5">
 <p>
 Controls worker thread count for parallel task execution.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf23d26c" class="outline-3">
-<h3 id="orgf23d26c">Q98: What is build scan used for in performance tuning?</h3>
-<div class="outline-text-3" id="text-orgf23d26c">
+<div id="outline-container-org867fefc" class="outline-3">
+<h3 id="org867fefc">Q98: What is build scan used for in performance tuning?</h3>
+<div class="outline-text-3" id="text-org867fefc">
 <p>
 Identify slow tasks, cache misses, configuration hotspots.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcae8fd9" class="outline-3">
-<h3 id="orgcae8fd9">Q99: What is annotation processor configuration?</h3>
-<div class="outline-text-3" id="text-orgcae8fd9">
+<div id="outline-container-org50ad299" class="outline-3">
+<h3 id="org50ad299">Q99: What is annotation processor configuration?</h3>
+<div class="outline-text-3" id="text-org50ad299">
 <p>
 Use <code>annotationProcessor</code> and <code>testAnnotationProcessor</code> dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c55643" class="outline-3">
-<h3 id="org7c55643">Q100: compileOnly vs annotationProcessor?</h3>
-<div class="outline-text-3" id="text-org7c55643">
+<div id="outline-container-orgc9662fd" class="outline-3">
+<h3 id="orgc9662fd">Q100: compileOnly vs annotationProcessor?</h3>
+<div class="outline-text-3" id="text-orgc9662fd">
 <p>
 compileOnly adds compile classpath; annotationProcessor configures processor path.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c5b2e4" class="outline-3">
-<h3 id="org2c5b2e4">Q101: What is shading/relocation in Gradle?</h3>
-<div class="outline-text-3" id="text-org2c5b2e4">
+<div id="outline-container-org8f75229" class="outline-3">
+<h3 id="org8f75229">Q101: What is shading/relocation in Gradle?</h3>
+<div class="outline-text-3" id="text-org8f75229">
 <p>
 Packaging dependencies into uber jar and relocating packages to avoid clashes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc8b949" class="outline-3">
-<h3 id="orgcc8b949">Q102: Common plugin for shadow jar?</h3>
-<div class="outline-text-3" id="text-orgcc8b949">
+<div id="outline-container-org49aba64" class="outline-3">
+<h3 id="org49aba64">Q102: Common plugin for shadow jar?</h3>
+<div class="outline-text-3" id="text-org49aba64">
 <p>
 Shadow plugin (community).
 </p>
 </div>
 </div>
-<div id="outline-container-org468a76c" class="outline-3">
-<h3 id="org468a76c">Q103: What is reproducible archives setting?</h3>
-<div class="outline-text-3" id="text-org468a76c">
+<div id="outline-container-org2d62727" class="outline-3">
+<h3 id="org2d62727">Q103: What is reproducible archives setting?</h3>
+<div class="outline-text-3" id="text-org2d62727">
 <p>
 Deterministic file order/timestamps for stable artifact hashes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf912a19" class="outline-3">
-<h3 id="orgf912a19">Q104: Why reproducible artifacts matter?</h3>
-<div class="outline-text-3" id="text-orgf912a19">
+<div id="outline-container-org7aac8a3" class="outline-3">
+<h3 id="org7aac8a3">Q104: Why reproducible artifacts matter?</h3>
+<div class="outline-text-3" id="text-org7aac8a3">
 <p>
 Supply-chain trust, cache efficiency, and diff clarity.
 </p>
 </div>
 </div>
-<div id="outline-container-org913e75a" class="outline-3">
-<h3 id="org913e75a">Q105: What is dependency verification in Gradle?</h3>
-<div class="outline-text-3" id="text-org913e75a">
+<div id="outline-container-org59badb0" class="outline-3">
+<h3 id="org59badb0">Q105: What is dependency verification in Gradle?</h3>
+<div class="outline-text-3" id="text-org59badb0">
 <p>
 Checksum/signature verification of dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org91eaa36" class="outline-3">
-<h3 id="org91eaa36">Q106: Why dependency verification is important?</h3>
-<div class="outline-text-3" id="text-org91eaa36">
+<div id="outline-container-orgf473eb1" class="outline-3">
+<h3 id="orgf473eb1">Q106: Why dependency verification is important?</h3>
+<div class="outline-text-3" id="text-orgf473eb1">
 <p>
 Mitigates tampered artifact/supply-chain risks.
 </p>
 </div>
 </div>
-<div id="outline-container-org96da75b" class="outline-3">
-<h3 id="org96da75b">Q107: What is pluginManagement block?</h3>
-<div class="outline-text-3" id="text-org96da75b">
+<div id="outline-container-org01f3739" class="outline-3">
+<h3 id="org01f3739">Q107: What is pluginManagement block?</h3>
+<div class="outline-text-3" id="text-org01f3739">
 <p>
 Controls plugin repositories/versions in settings.
 </p>
 </div>
 </div>
-<div id="outline-container-org81c7d1e" class="outline-3">
-<h3 id="org81c7d1e">Q108: What is settings plugin resolution?</h3>
-<div class="outline-text-3" id="text-org81c7d1e">
+<div id="outline-container-org6a9836a" class="outline-3">
+<h3 id="org6a9836a">Q108: What is settings plugin resolution?</h3>
+<div class="outline-text-3" id="text-org6a9836a">
 <p>
 How Gradle resolves plugins before project build scripts execute.
 </p>
 </div>
 </div>
-<div id="outline-container-org8497fcc" class="outline-3">
-<h3 id="org8497fcc">Q109: What is init script?</h3>
-<div class="outline-text-3" id="text-org8497fcc">
+<div id="outline-container-orgcd8708c" class="outline-3">
+<h3 id="orgcd8708c">Q109: What is init script?</h3>
+<div class="outline-text-3" id="text-orgcd8708c">
 <p>
 Global script injecting logic/settings into Gradle builds (use carefully).
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe6cdea" class="outline-3">
-<h3 id="orgbe6cdea">Q110: What is composite build?</h3>
-<div class="outline-text-3" id="text-orgbe6cdea">
+<div id="outline-container-orga951891" class="outline-3">
+<h3 id="orga951891">Q110: What is composite build?</h3>
+<div class="outline-text-3" id="text-orga951891">
 <p>
 Combining independent builds for joint development without publishing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfadedab" class="outline-3">
-<h3 id="orgfadedab">Q111: Composite build use case?</h3>
-<div class="outline-text-3" id="text-orgfadedab">
+<div id="outline-container-orgd90f5ca" class="outline-3">
+<h3 id="orgd90f5ca">Q111: Composite build use case?</h3>
+<div class="outline-text-3" id="text-orgd90f5ca">
 <p>
 Develop app and local library together seamlessly.
 </p>
 </div>
 </div>
-<div id="outline-container-orge903d23" class="outline-3">
-<h3 id="orge903d23">Q112: What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-orge903d23">
+<div id="outline-container-orgb3a78fb" class="outline-3">
+<h3 id="orgb3a78fb">Q112: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgb3a78fb">
 <p>
 Monolithic root script with tangled conditional logic for all modules.
 </p>
 </div>
 </div>
-<div id="outline-container-org46fd0af" class="outline-3">
-<h3 id="org46fd0af">Q113: Better architecture for build logic?</h3>
-<div class="outline-text-3" id="text-org46fd0af">
+<div id="outline-container-orgd13c949" class="outline-3">
+<h3 id="orgd13c949">Q113: Better architecture for build logic?</h3>
+<div class="outline-text-3" id="text-orgd13c949">
 <p>
 Convention plugins + clear module ownership boundaries.
 </p>
 </div>
 </div>
-<div id="outline-container-orgab2879b" class="outline-3">
-<h3 id="orgab2879b">Q114: What is Gradle Enterprise/remote cache concept?</h3>
-<div class="outline-text-3" id="text-orgab2879b">
+<div id="outline-container-org9b95834" class="outline-3">
+<h3 id="org9b95834">Q114: What is Gradle Enterprise/remote cache concept?</h3>
+<div class="outline-text-3" id="text-org9b95834">
 <p>
 Centralized build analytics and shared cache infrastructure.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc273f66" class="outline-3">
-<h3 id="orgc273f66">Q115: CI optimization baseline with Gradle?</h3>
-<div class="outline-text-3" id="text-orgc273f66">
+<div id="outline-container-orga16ee64" class="outline-3">
+<h3 id="orga16ee64">Q115: CI optimization baseline with Gradle?</h3>
+<div class="outline-text-3" id="text-orga16ee64">
 <p>
 Remote cache, test splitting, parallel workers, configuration cache adoption.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdfbc67e" class="outline-3">
-<h3 id="orgdfbc67e">Q116: Why avoid always running clean in CI?</h3>
-<div class="outline-text-3" id="text-orgdfbc67e">
+<div id="outline-container-orgd4d23a8" class="outline-3">
+<h3 id="orgd4d23a8">Q116: Why avoid always running clean in CI?</h3>
+<div class="outline-text-3" id="text-orgd4d23a8">
 <p>
 Destroys incremental/cache benefits unless isolation requires it.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa9b268" class="outline-3">
-<h3 id="orgaa9b268">Q117: What is flaky test handling in Gradle pipelines?</h3>
-<div class="outline-text-3" id="text-orgaa9b268">
+<div id="outline-container-org3aac409" class="outline-3">
+<h3 id="org3aac409">Q117: What is flaky test handling in Gradle pipelines?</h3>
+<div class="outline-text-3" id="text-org3aac409">
 <p>
 Retry/quarantine carefully while fixing root causes quickly.
 </p>
 </div>
 </div>
-<div id="outline-container-org5594ba8" class="outline-3">
-<h3 id="org5594ba8">Q118: What is intermediate security baseline?</h3>
-<div class="outline-text-3" id="text-org5594ba8">
+<div id="outline-container-orgd83572e" class="outline-3">
+<h3 id="orgd83572e">Q118: What is intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-orgd83572e">
 <p>
 Repository allowlist, dependency verification, signed publishing, secret-safe CI.
 </p>
 </div>
 </div>
-<div id="outline-container-orge6391fb" class="outline-3">
-<h3 id="orge6391fb">Q119: What is intermediate reliability baseline?</h3>
-<div class="outline-text-3" id="text-orge6391fb">
+<div id="outline-container-org9e4828d" class="outline-3">
+<h3 id="org9e4828d">Q119: What is intermediate reliability baseline?</h3>
+<div class="outline-text-3" id="text-org9e4828d">
 <p>
 Deterministic builds with locked versions and policy checks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd46946" class="outline-3">
-<h3 id="orgfd46946">Q120: Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-orgfd46946">
+<div id="outline-container-orgafecac4" class="outline-3">
+<h3 id="orgafecac4">Q120: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-orgafecac4">
 <p>
 Team can explain dependency graph, cache behavior, and task graph performance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgddedee1" class="outline-3">
-<h3 id="orgddedee1">Q121: What is troubleshooting dependency conflicts flow?</h3>
-<div class="outline-text-3" id="text-orgddedee1">
+<div id="outline-container-orga5d4aef" class="outline-3">
+<h3 id="orga5d4aef">Q121: What is troubleshooting dependency conflicts flow?</h3>
+<div class="outline-text-3" id="text-orga5d4aef">
 <p>
 dependencyInsight -&gt; constraints/platform -&gt; lock update -&gt; verification.
 </p>
 </div>
 </div>
-<div id="outline-container-orge6c66d1" class="outline-3">
-<h3 id="orge6c66d1">Q122: What is <code>dependencyInsight</code> task for?</h3>
-<div class="outline-text-3" id="text-orge6c66d1">
+<div id="outline-container-org2bae449" class="outline-3">
+<h3 id="org2bae449">Q122: What is <code>dependencyInsight</code> task for?</h3>
+<div class="outline-text-3" id="text-org2bae449">
 <p>
 Detailed explanation of why a dependency/version is selected.
 </p>
 </div>
 </div>
-<div id="outline-container-org853fb1f" class="outline-3">
-<h3 id="org853fb1f">Q123: What is rich version constraint?</h3>
-<div class="outline-text-3" id="text-org853fb1f">
+<div id="outline-container-orgf52f399" class="outline-3">
+<h3 id="orgf52f399">Q123: What is rich version constraint?</h3>
+<div class="outline-text-3" id="text-orgf52f399">
 <p>
 Gradle syntax supporting preferred/strict/reject version semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a1f38e" class="outline-3">
-<h3 id="org9a1f38e">Q124: What is intermediate governance principle?</h3>
-<div class="outline-text-3" id="text-org9a1f38e">
+<div id="outline-container-org688bffa" class="outline-3">
+<h3 id="org688bffa">Q124: What is intermediate governance principle?</h3>
+<div class="outline-text-3" id="text-org688bffa">
 <p>
 Centralize standards, decentralize feature module implementation.
 </p>
 </div>
 </div>
-<div id="outline-container-org2281b12" class="outline-3">
-<h3 id="org2281b12">Q125: What is intermediate maintainability principle?</h3>
-<div class="outline-text-3" id="text-org2281b12">
+<div id="outline-container-org0556473" class="outline-3">
+<h3 id="org0556473">Q125: What is intermediate maintainability principle?</h3>
+<div class="outline-text-3" id="text-org0556473">
 <p>
 Keep custom build logic tested and versioned like application code.
 </p>
 </div>
 </div>
-<div id="outline-container-org8709d88" class="outline-3">
-<h3 id="org8709d88">Q126: What is intermediate release principle?</h3>
-<div class="outline-text-3" id="text-org8709d88">
+<div id="outline-container-orgeaccc73" class="outline-3">
+<h3 id="orgeaccc73">Q126: What is intermediate release principle?</h3>
+<div class="outline-text-3" id="text-orgeaccc73">
 <p>
 Publish immutable artifacts and promote them across environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbf8498b" class="outline-3">
-<h3 id="orgbf8498b">Q127: What is intermediate observability principle?</h3>
-<div class="outline-text-3" id="text-orgbf8498b">
+<div id="outline-container-org95bd03d" class="outline-3">
+<h3 id="org95bd03d">Q127: What is intermediate observability principle?</h3>
+<div class="outline-text-3" id="text-org95bd03d">
 <p>
 Track build duration, cache hit rate, flaky tests, and failure taxonomy.
 </p>
 </div>
 </div>
-<div id="outline-container-org39af55d" class="outline-3">
-<h3 id="org39af55d">Q128: What is intermediate DX principle?</h3>
-<div class="outline-text-3" id="text-org39af55d">
+<div id="outline-container-org269d12e" class="outline-3">
+<h3 id="org269d12e">Q128: What is intermediate DX principle?</h3>
+<div class="outline-text-3" id="text-org269d12e">
 <p>
 Fast local feedback with predictable wrapper-driven builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d27ab1" class="outline-3">
-<h3 id="org0d27ab1">Q129: What is intermediate migration concern (Groovy-&gt;Kotlin DSL)?</h3>
-<div class="outline-text-3" id="text-org0d27ab1">
+<div id="outline-container-org55bf972" class="outline-3">
+<h3 id="org55bf972">Q129: What is intermediate migration concern (Groovy-&gt;Kotlin DSL)?</h3>
+<div class="outline-text-3" id="text-org55bf972">
 <p>
 Type safety benefits vs migration effort and plugin compatibility checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org449ef0b" class="outline-3">
-<h3 id="org449ef0b">Q130: Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-org449ef0b">
+<div id="outline-container-org676f043" class="outline-3">
+<h3 id="org676f043">Q130: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org676f043">
 <p>
 Invest in build performance and governance early; it compounds over time.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc24b74a" class="outline-2">
-<h2 id="orgc24b74a">Advanced</h2>
-<div class="outline-text-2" id="text-orgc24b74a">
+<div id="outline-container-orgd8166e0" class="outline-2">
+<h2 id="orgd8166e0">Advanced</h2>
+<div class="outline-text-2" id="text-orgd8166e0">
 </div>
-<div id="outline-container-orga5b3663" class="outline-3">
-<h3 id="orga5b3663">Q131: What is enterprise Gradle platform engineering?</h3>
-<div class="outline-text-3" id="text-orga5b3663">
+<div id="outline-container-org8c410de" class="outline-3">
+<h3 id="org8c410de">Q131: What is enterprise Gradle platform engineering?</h3>
+<div class="outline-text-3" id="text-org8c410de">
 <p>
 Providing shared build conventions, tooling, and guardrails across many teams.
 </p>
 </div>
 </div>
-<div id="outline-container-org076f604" class="outline-3">
-<h3 id="org076f604">Q132: What is convention plugin?</h3>
-<div class="outline-text-3" id="text-org076f604">
+<div id="outline-container-orgba7f759" class="outline-3">
+<h3 id="orgba7f759">Q132: What is convention plugin?</h3>
+<div class="outline-text-3" id="text-orgba7f759">
 <p>
 Internal plugin encoding approved defaults/policies for projects.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd9b3d94" class="outline-3">
-<h3 id="orgd9b3d94">Q133: Why convention plugins over script copy-paste?</h3>
-<div class="outline-text-3" id="text-orgd9b3d94">
+<div id="outline-container-org778198c" class="outline-3">
+<h3 id="org778198c">Q133: Why convention plugins over script copy-paste?</h3>
+<div class="outline-text-3" id="text-org778198c">
 <p>
 Reusability, versioning, testing, and controlled evolution.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf184b7a" class="outline-3">
-<h3 id="orgf184b7a">Q134: What is binary plugin development?</h3>
-<div class="outline-text-3" id="text-orgf184b7a">
+<div id="outline-container-org467732e" class="outline-3">
+<h3 id="org467732e">Q134: What is binary plugin development?</h3>
+<div class="outline-text-3" id="text-org467732e">
 <p>
 Implementing Gradle plugins in Kotlin/Java with typed extensions/tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd621ab6" class="outline-3">
-<h3 id="orgd621ab6">Q135: Why test custom plugins?</h3>
-<div class="outline-text-3" id="text-orgd621ab6">
+<div id="outline-container-org6200541" class="outline-3">
+<h3 id="org6200541">Q135: Why test custom plugins?</h3>
+<div class="outline-text-3" id="text-org6200541">
 <p>
 Prevent organization-wide build breakages from shared logic changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org311455f" class="outline-3">
-<h3 id="org311455f">Q136: What is TestKit in Gradle?</h3>
-<div class="outline-text-3" id="text-org311455f">
+<div id="outline-container-orgdbb8abf" class="outline-3">
+<h3 id="orgdbb8abf">Q136: What is TestKit in Gradle?</h3>
+<div class="outline-text-3" id="text-orgdbb8abf">
 <p>
 Framework for functional testing of Gradle plugins/build logic.
 </p>
 </div>
 </div>
-<div id="outline-container-org967d1d5" class="outline-3">
-<h3 id="org967d1d5">Q137: What is build logic versioning strategy?</h3>
-<div class="outline-text-3" id="text-org967d1d5">
+<div id="outline-container-org06e66f2" class="outline-3">
+<h3 id="org06e66f2">Q137: What is build logic versioning strategy?</h3>
+<div class="outline-text-3" id="text-org06e66f2">
 <p>
 Release and consume internal plugins with semantic versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org879840d" class="outline-3">
-<h3 id="org879840d">Q138: What is compatibility matrix in build platform?</h3>
-<div class="outline-text-3" id="text-org879840d">
+<div id="outline-container-orgd15c817" class="outline-3">
+<h3 id="orgd15c817">Q138: What is compatibility matrix in build platform?</h3>
+<div class="outline-text-3" id="text-orgd15c817">
 <p>
 Mapping supported Gradle, JDK, plugin, framework versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org8afb10a" class="outline-3">
-<h3 id="org8afb10a">Q139: What is upgrade orchestration challenge?</h3>
-<div class="outline-text-3" id="text-org8afb10a">
+<div id="outline-container-orgf35f95d" class="outline-3">
+<h3 id="orgf35f95d">Q139: What is upgrade orchestration challenge?</h3>
+<div class="outline-text-3" id="text-orgf35f95d">
 <p>
 Coordinating Gradle/plugin/JDK upgrades across many repositories.
 </p>
 </div>
 </div>
-<div id="outline-container-org50a1c60" class="outline-3">
-<h3 id="org50a1c60">Q140: Mitigation for upgrade risk?</h3>
-<div class="outline-text-3" id="text-org50a1c60">
+<div id="outline-container-orgd42ac7d" class="outline-3">
+<h3 id="orgd42ac7d">Q140: Mitigation for upgrade risk?</h3>
+<div class="outline-text-3" id="text-orgd42ac7d">
 <p>
 Canary repos, automated validation, staged rollout waves.
 </p>
 </div>
 </div>
-<div id="outline-container-orge2c40c4" class="outline-3">
-<h3 id="orge2c40c4">Q141: What is hermetic build concept in Gradle?</h3>
-<div class="outline-text-3" id="text-orge2c40c4">
+<div id="outline-container-org74e456b" class="outline-3">
+<h3 id="org74e456b">Q141: What is hermetic build concept in Gradle?</h3>
+<div class="outline-text-3" id="text-org74e456b">
 <p>
 Builds isolated from undeclared external influences for reproducibility/security.
 </p>
 </div>
 </div>
-<div id="outline-container-org67ead54" class="outline-3">
-<h3 id="org67ead54">Q142: How improve hermeticity?</h3>
-<div class="outline-text-3" id="text-org67ead54">
+<div id="outline-container-org50c18af" class="outline-3">
+<h3 id="org50c18af">Q142: How improve hermeticity?</h3>
+<div class="outline-text-3" id="text-org50c18af">
 <p>
 Pinned deps/plugins, controlled repos, locked toolchains, minimal network variance.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c048d6" class="outline-3">
-<h3 id="org6c048d6">Q143: What is dependency locking at scale?</h3>
-<div class="outline-text-3" id="text-org6c048d6">
+<div id="outline-container-orgd411d4b" class="outline-3">
+<h3 id="orgd411d4b">Q143: What is dependency locking at scale?</h3>
+<div class="outline-text-3" id="text-orgd411d4b">
 <p>
 Committing lockfiles and controlled update workflows across modules.
 </p>
 </div>
 </div>
-<div id="outline-container-orge9eabd8" class="outline-3">
-<h3 id="orge9eabd8">Q144: Locking tradeoff?</h3>
-<div class="outline-text-3" id="text-orge9eabd8">
+<div id="outline-container-orgf655fa8" class="outline-3">
+<h3 id="orgf655fa8">Q144: Locking tradeoff?</h3>
+<div class="outline-text-3" id="text-orgf655fa8">
 <p>
 Stability vs operational overhead for coordinated upgrades.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf58c748" class="outline-3">
-<h3 id="orgf58c748">Q145: What is supply-chain risk in Gradle builds?</h3>
-<div class="outline-text-3" id="text-orgf58c748">
+<div id="outline-container-org3de6ce2" class="outline-3">
+<h3 id="org3de6ce2">Q145: What is supply-chain risk in Gradle builds?</h3>
+<div class="outline-text-3" id="text-org3de6ce2">
 <p>
 Compromised dependencies/plugins/repositories affecting build outputs.
 </p>
 </div>
 </div>
-<div id="outline-container-org22d78b2" class="outline-3">
-<h3 id="org22d78b2">Q146: Key Gradle supply-chain controls?</h3>
-<div class="outline-text-3" id="text-org22d78b2">
+<div id="outline-container-org650436f" class="outline-3">
+<h3 id="org650436f">Q146: Key Gradle supply-chain controls?</h3>
+<div class="outline-text-3" id="text-org650436f">
 <p>
 Dependency verification, repo allowlists, artifact signing, SBOM generation.
 </p>
 </div>
 </div>
-<div id="outline-container-orge7ec5e0" class="outline-3">
-<h3 id="orge7ec5e0">Q147: What is SBOM generation in Gradle pipelines?</h3>
-<div class="outline-text-3" id="text-orge7ec5e0">
+<div id="outline-container-orgeadc197" class="outline-3">
+<h3 id="orgeadc197">Q147: What is SBOM generation in Gradle pipelines?</h3>
+<div class="outline-text-3" id="text-orgeadc197">
 <p>
 Producing dependency inventory for compliance and vulnerability response.
 </p>
 </div>
 </div>
-<div id="outline-container-org951ba27" class="outline-3">
-<h3 id="org951ba27">Q148: What is provenance/attestation concept?</h3>
-<div class="outline-text-3" id="text-org951ba27">
+<div id="outline-container-orgfd7ca6f" class="outline-3">
+<h3 id="orgfd7ca6f">Q148: What is provenance/attestation concept?</h3>
+<div class="outline-text-3" id="text-orgfd7ca6f">
 <p>
 Cryptographic evidence describing how artifact was built.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba32d61" class="outline-3">
-<h3 id="orgba32d61">Q149: Why provenance matters?</h3>
-<div class="outline-text-3" id="text-orgba32d61">
+<div id="outline-container-orgdba9283" class="outline-3">
+<h3 id="orgdba9283">Q149: Why provenance matters?</h3>
+<div class="outline-text-3" id="text-orgdba9283">
 <p>
 Supports trust, auditability, and incident response.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd130f8b" class="outline-3">
-<h3 id="orgd130f8b">Q150: What is remote build cache poisoning risk?</h3>
-<div class="outline-text-3" id="text-orgd130f8b">
+<div id="outline-container-orgb57f44d" class="outline-3">
+<h3 id="orgb57f44d">Q150: What is remote build cache poisoning risk?</h3>
+<div class="outline-text-3" id="text-orgb57f44d">
 <p>
 Malicious/incorrect cached outputs reused across builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d3ffb4" class="outline-3">
-<h3 id="org0d3ffb4">Q151: How mitigate cache poisoning?</h3>
-<div class="outline-text-3" id="text-org0d3ffb4">
+<div id="outline-container-org153a9c4" class="outline-3">
+<h3 id="org153a9c4">Q151: How mitigate cache poisoning?</h3>
+<div class="outline-text-3" id="text-org153a9c4">
 <p>
 Authenticated cache, write restrictions, trust boundaries, reproducibility checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org75bc527" class="outline-3">
-<h3 id="org75bc527">Q152: What is configuration cache adoption strategy?</h3>
-<div class="outline-text-3" id="text-org75bc527">
+<div id="outline-container-orge950dcb" class="outline-3">
+<h3 id="orge950dcb">Q152: What is configuration cache adoption strategy?</h3>
+<div class="outline-text-3" id="text-orge950dcb">
 <p>
 Fix incompatible build logic/plugins incrementally with measurement.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd053f11" class="outline-3">
-<h3 id="orgd053f11">Q153: What is isolated projects concept (advanced Gradle)?</h3>
-<div class="outline-text-3" id="text-orgd053f11">
+<div id="outline-container-org6d3f749" class="outline-3">
+<h3 id="org6d3f749">Q153: What is isolated projects concept (advanced Gradle)?</h3>
+<div class="outline-text-3" id="text-org6d3f749">
 <p>
 Reducing cross-project configuration coupling for scalability/performance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd50fc5" class="outline-3">
-<h3 id="orgfd50fc5">Q154: What is task output normalization?</h3>
-<div class="outline-text-3" id="text-orgfd50fc5">
+<div id="outline-container-org9afe7f3" class="outline-3">
+<h3 id="org9afe7f3">Q154: What is task output normalization?</h3>
+<div class="outline-text-3" id="text-org9afe7f3">
 <p>
 Ensuring path/timestamp-independent outputs for better cache hits.
 </p>
 </div>
 </div>
-<div id="outline-container-org5947405" class="outline-3">
-<h3 id="org5947405">Q155: Why normalization improves cache reuse?</h3>
-<div class="outline-text-3" id="text-org5947405">
+<div id="outline-container-org0689080" class="outline-3">
+<h3 id="org0689080">Q155: Why normalization improves cache reuse?</h3>
+<div class="outline-text-3" id="text-org0689080">
 <p>
 Equivalent outputs hash consistently across machines/environments.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d53a65" class="outline-3">
-<h3 id="org6d53a65">Q156: What is deterministic test execution concern?</h3>
-<div class="outline-text-3" id="text-org6d53a65">
+<div id="outline-container-org7c89cbb" class="outline-3">
+<h3 id="org7c89cbb">Q156: What is deterministic test execution concern?</h3>
+<div class="outline-text-3" id="text-org7c89cbb">
 <p>
 Parallelism/random order/time dependencies can create flaky builds.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf27431a" class="outline-3">
-<h3 id="orgf27431a">Q157: How harden test determinism?</h3>
-<div class="outline-text-3" id="text-orgf27431a">
+<div id="outline-container-org966aec1" class="outline-3">
+<h3 id="org966aec1">Q157: How harden test determinism?</h3>
+<div class="outline-text-3" id="text-org966aec1">
 <p>
 Seed control, time abstraction, isolated resources, stable ordering.
 </p>
 </div>
 </div>
-<div id="outline-container-org9cbfbb2" class="outline-3">
-<h3 id="org9cbfbb2">Q158: What is graph pruning in large builds?</h3>
-<div class="outline-text-3" id="text-org9cbfbb2">
+<div id="outline-container-orgb64ffd6" class="outline-3">
+<h3 id="orgb64ffd6">Q158: What is graph pruning in large builds?</h3>
+<div class="outline-text-3" id="text-orgb64ffd6">
 <p>
 Executing only impacted tasks/modules via dependency graph analysis.
 </p>
 </div>
 </div>
-<div id="outline-container-org9561a8a" class="outline-3">
-<h3 id="org9561a8a">Q159: What is distributed test execution concept?</h3>
-<div class="outline-text-3" id="text-org9561a8a">
+<div id="outline-container-org62e5e1f" class="outline-3">
+<h3 id="org62e5e1f">Q159: What is distributed test execution concept?</h3>
+<div class="outline-text-3" id="text-org62e5e1f">
 <p>
 Split test workload across agents for faster CI feedback.
 </p>
 </div>
 </div>
-<div id="outline-container-org2eb3dbc" class="outline-3">
-<h3 id="org2eb3dbc">Q160: What is advanced monorepo Gradle challenge?</h3>
-<div class="outline-text-3" id="text-org2eb3dbc">
+<div id="outline-container-org712cf8e" class="outline-3">
+<h3 id="org712cf8e">Q160: What is advanced monorepo Gradle challenge?</h3>
+<div class="outline-text-3" id="text-org712cf8e">
 <p>
 Configuration time and memory pressure with many subprojects.
 </p>
 </div>
 </div>
-<div id="outline-container-org2540a2b" class="outline-3">
-<h3 id="org2540a2b">Q161: Monorepo mitigation patterns?</h3>
-<div class="outline-text-3" id="text-org2540a2b">
+<div id="outline-container-org6bf8ab3" class="outline-3">
+<h3 id="org6bf8ab3">Q161: Monorepo mitigation patterns?</h3>
+<div class="outline-text-3" id="text-org6bf8ab3">
 <p>
 Composite builds, convention plugins, strict modularization, selective CI builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org7b3befa" class="outline-3">
-<h3 id="org7b3befa">Q162: What is worker API in Gradle?</h3>
-<div class="outline-text-3" id="text-org7b3befa">
+<div id="outline-container-org5c60e84" class="outline-3">
+<h3 id="org5c60e84">Q162: What is worker API in Gradle?</h3>
+<div class="outline-text-3" id="text-org5c60e84">
 <p>
 Framework for parallelizable, isolated task work execution.
 </p>
 </div>
 </div>
-<div id="outline-container-orge2caa8d" class="outline-3">
-<h3 id="orge2caa8d">Q163: Why use Worker API in custom tasks?</h3>
-<div class="outline-text-3" id="text-orge2caa8d">
+<div id="outline-container-org2d16907" class="outline-3">
+<h3 id="org2d16907">Q163: Why use Worker API in custom tasks?</h3>
+<div class="outline-text-3" id="text-org2d16907">
 <p>
 Better parallelism and performance without blocking main build thread.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb2694d6" class="outline-3">
-<h3 id="orgb2694d6">Q164: What is build service in Gradle?</h3>
-<div class="outline-text-3" id="text-orgb2694d6">
+<div id="outline-container-orged907ca" class="outline-3">
+<h3 id="orged907ca">Q164: What is build service in Gradle?</h3>
+<div class="outline-text-3" id="text-orged907ca">
 <p>
 Shared, lifecycle-managed service object for tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-org43ed4c2" class="outline-3">
-<h3 id="org43ed4c2">Q165: Build service use case?</h3>
-<div class="outline-text-3" id="text-org43ed4c2">
+<div id="outline-container-orge0e9265" class="outline-3">
+<h3 id="orge0e9265">Q165: Build service use case?</h3>
+<div class="outline-text-3" id="text-orge0e9265">
 <p>
 Shared expensive resources (connections, tool processes) with controlled concurrency.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc5df3a" class="outline-3">
-<h3 id="orgbc5df3a">Q166: What is advanced publishing governance?</h3>
-<div class="outline-text-3" id="text-orgbc5df3a">
+<div id="outline-container-org22cf3cf" class="outline-3">
+<h3 id="org22cf3cf">Q166: What is advanced publishing governance?</h3>
+<div class="outline-text-3" id="text-org22cf3cf">
 <p>
 Policy checks for metadata, signatures, licenses, and vulnerability thresholds.
 </p>
 </div>
 </div>
-<div id="outline-container-org5dcbb6c" class="outline-3">
-<h3 id="org5dcbb6c">Q167: What is dependency substitution for incident response?</h3>
-<div class="outline-text-3" id="text-org5dcbb6c">
+<div id="outline-container-org1ccdcd2" class="outline-3">
+<h3 id="org1ccdcd2">Q167: What is dependency substitution for incident response?</h3>
+<div class="outline-text-3" id="text-org1ccdcd2">
 <p>
 Temporarily reroute vulnerable module to patched fork/build.
 </p>
 </div>
 </div>
-<div id="outline-container-org469027c" class="outline-3">
-<h3 id="org469027c">Q168: What is emergency unpublish/republish concern?</h3>
-<div class="outline-text-3" id="text-org469027c">
+<div id="outline-container-org1cb674c" class="outline-3">
+<h3 id="org1cb674c">Q168: What is emergency unpublish/republish concern?</h3>
+<div class="outline-text-3" id="text-org1cb674c">
 <p>
 Immutable artifact policy usually forbids overwrite; use new versions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdfbdb47" class="outline-3">
-<h3 id="orgdfbdb47">Q169: What is final fallback if build toolchain breaks broadly?</h3>
-<div class="outline-text-3" id="text-orgdfbdb47">
+<div id="outline-container-org2ee11de" class="outline-3">
+<h3 id="org2ee11de">Q169: What is final fallback if build toolchain breaks broadly?</h3>
+<div class="outline-text-3" id="text-org2ee11de">
 <p>
 Pinned wrapper + cached distributions + rollback of convention plugin versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org77374db" class="outline-3">
-<h3 id="org77374db">Q170: What is Gradle build observability gold standard?</h3>
-<div class="outline-text-3" id="text-org77374db">
+<div id="outline-container-orgbc48a09" class="outline-3">
+<h3 id="orgbc48a09">Q170: What is Gradle build observability gold standard?</h3>
+<div class="outline-text-3" id="text-orgbc48a09">
 <p>
 Dashboards for config time, cache hits, task critical path, flaky tests, failure causes.
 </p>
 </div>
 </div>
-<div id="outline-container-org60904c7" class="outline-3">
-<h3 id="org60904c7">Q171: What is SLO for build platforms?</h3>
-<div class="outline-text-3" id="text-org60904c7">
+<div id="outline-container-org7d743f6" class="outline-3">
+<h3 id="org7d743f6">Q171: What is SLO for build platforms?</h3>
+<div class="outline-text-3" id="text-org7d743f6">
 <p>
 Targets for median/percentile build duration and success rate.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca3238b" class="outline-3">
-<h3 id="orgca3238b">Q172: What is error budget for CI/build systems?</h3>
-<div class="outline-text-3" id="text-orgca3238b">
+<div id="outline-container-org8c5eeaf" class="outline-3">
+<h3 id="org8c5eeaf">Q172: What is error budget for CI/build systems?</h3>
+<div class="outline-text-3" id="text-org8c5eeaf">
 <p>
 Allowed instability guiding release pace and platform investments.
 </p>
 </div>
 </div>
-<div id="outline-container-org05a3345" class="outline-3">
-<h3 id="org05a3345">Q173: What is advanced anti-pattern in Gradle ecosystems?</h3>
-<div class="outline-text-3" id="text-org05a3345">
+<div id="outline-container-org45797d9" class="outline-3">
+<h3 id="org45797d9">Q173: What is advanced anti-pattern in Gradle ecosystems?</h3>
+<div class="outline-text-3" id="text-org45797d9">
 <p>
 Unbounded custom scripting without typed APIs/tests/governance.
 </p>
 </div>
 </div>
-<div id="outline-container-orge8a42e7" class="outline-3">
-<h3 id="orge8a42e7">Q174: Better long-term build architecture?</h3>
-<div class="outline-text-3" id="text-orge8a42e7">
+<div id="outline-container-org1d7172f" class="outline-3">
+<h3 id="org1d7172f">Q174: Better long-term build architecture?</h3>
+<div class="outline-text-3" id="text-org1d7172f">
 <p>
 Small tested convention plugins + strict dependency/repository policies.
 </p>
 </div>
 </div>
-<div id="outline-container-org4946f85" class="outline-3">
-<h3 id="org4946f85">Q175: What is final reliability principle?</h3>
-<div class="outline-text-3" id="text-org4946f85">
+<div id="outline-container-org5756de0" class="outline-3">
+<h3 id="org5756de0">Q175: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-org5756de0">
 <p>
 Builds must be reproducible, deterministic, and resilient to infra variance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbaec7f0" class="outline-3">
-<h3 id="orgbaec7f0">Q176: What is final security principle?</h3>
-<div class="outline-text-3" id="text-orgbaec7f0">
+<div id="outline-container-org71844c4" class="outline-3">
+<h3 id="org71844c4">Q176: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org71844c4">
 <p>
 Continuously verify dependencies, plugins, and produced artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd7b4cbf" class="outline-3">
-<h3 id="orgd7b4cbf">Q177: What is final performance principle?</h3>
-<div class="outline-text-3" id="text-orgd7b4cbf">
+<div id="outline-container-org6e2cb5f" class="outline-3">
+<h3 id="org6e2cb5f">Q177: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-org6e2cb5f">
 <p>
 Optimize the critical path: configuration, compilation, testing, and caching.
 </p>
 </div>
 </div>
-<div id="outline-container-org1979276" class="outline-3">
-<h3 id="org1979276">Q178: What is final governance principle?</h3>
-<div class="outline-text-3" id="text-org1979276">
+<div id="outline-container-orgb1cbeb8" class="outline-3">
+<h3 id="orgb1cbeb8">Q178: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-orgb1cbeb8">
 <p>
 Central guardrails with documented extension points for teams.
 </p>
 </div>
 </div>
-<div id="outline-container-orga4bd42f" class="outline-3">
-<h3 id="orga4bd42f">Q179: What is final developer-experience principle?</h3>
-<div class="outline-text-3" id="text-orga4bd42f">
+<div id="outline-container-orga688c3a" class="outline-3">
+<h3 id="orga688c3a">Q179: What is final developer-experience principle?</h3>
+<div class="outline-text-3" id="text-orga688c3a">
 <p>
 Fast local builds, clear errors, and minimal cognitive load.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d10dd1" class="outline-3">
-<h3 id="org0d10dd1">Q180: Final maturity principle?</h3>
-<div class="outline-text-3" id="text-org0d10dd1">
+<div id="outline-container-org97aafbd" class="outline-3">
+<h3 id="org97aafbd">Q180: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org97aafbd">
 <p>
 Gradle excellence is engineered build systems treated as core product infrastructure.
 </p>
-</div>
-</div>
-</div>
-<div id="outline-container-orge22193c" class="outline-2">
-<h2 id="orge22193c">Bonus: Minimal Gradle Kotlin DSL Template (Spring Boot style)</h2>
-<div class="outline-text-2" id="text-orge22193c">
-<div class="org-src-container">
-<pre class="src src-kotlin">plugins {
-    java
-    id("org.springframework.boot") version "3.3.2"
-    id("io.spring.dependency-management") version "1.1.6"
-}
-
-group = "com.example"
-version = "1.0.0"
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-</pre>
-</div>
 
 
 <hr>
@@ -1527,6 +2545,7 @@ tasks.test {
         <li><a href="https://www.linkedin.com/in/borislav-dostumski/" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> LinkedIn</a></li>
         <li><a href="https://www.youtube.com/@borislavdostumski6006" rel="nofollow noopener noreferrer"><i class="fab fa-linux" aria-hidden="true"></i> YouTube</a></li>
     </ul>
+</div>
 </div>
 </div>
 </div>

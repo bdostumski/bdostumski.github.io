@@ -10,6 +10,594 @@
 
 -----
 
+* Gradle Command Handbook:
+
+*1. Gradle Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check Gradle version
+gradle --version
+gradle -v
+
+# Check Java version
+java -version
+javac -version
+
+# Check Gradle installation path
+which gradle                 # Linux / macOS
+where gradle                 # Windows
+
+# Display Gradle help
+gradle --help
+
+# Display Gradle tasks
+gradle tasks
+
+#+END_SRC
+
+*2. Gradle Wrapper*
+
+Gradle Wrapper ensures that developers and CI/CD pipelines use a consistent Gradle version without requiring a global Gradle installation.
+
+#+BEGIN_SRC bash
+
+# Generate Gradle Wrapper
+gradle wrapper
+
+# Set Gradle Wrapper version
+gradle wrapper --gradle-version 8.10.2
+
+# Upgrade Wrapper distribution
+./gradlew wrapper --gradle-version 8.12
+
+# Run Gradle using Wrapper
+# Linux / macOS:
+./gradlew clean build
+./gradlew test
+./gradlew assemble
+
+# Windows:
+gradlew.bat clean build
+gradlew.bat test
+gradlew.bat assemble
+
+# Note: Prefer `./gradlew` over a globally installed Gradle version.
+    
+#+END_SRC
+
+*3. Understand the Gradle Project*
+
+#+BEGIN_SRC bash
+
+# Display project information
+./gradlew projects
+
+# Display available tasks
+./gradlew tasks
+
+# Display all tasks, including hidden tasks
+./gradlew tasks --all
+
+# Display task details
+./gradlew help --task build
+
+# Display project properties
+./gradlew properties
+
+# Display Gradle version
+./gradlew --version
+
+# Display build environment
+./gradlew buildEnvironment
+
+#+END_SRC
+
+*4. Gradle Build Lifecycle*
+
+Gradle organizes build execution around tasks and their dependency graph.
+
+Common lifecycle tasks:
+
+- `clean` – Removes generated build files.
+- `assemble` – Creates project artifacts.
+- `check` – Executes verification tasks.
+- `test` – Executes unit tests.
+- `build` – Assembles and verifies the project.
+- `publish` – Publishes configured artifacts.
+
+#+BEGIN_SRC bash
+  
+# Common Gradle lifecycle tasks
+./gradlew clean
+./gradlew assemble
+./gradlew check
+./gradlew test
+./gradlew build
+
+# Typical build commands
+./gradlew clean build
+./gradlew clean assemble
+./gradlew clean check
+
+#+END_SRC
+
+Lifecycle differences
+
+|Task | Purpose|
+|--- | ---|
+|`clean` | Remove generated build outputs|
+|`assemble` | Create project artifacts|
+|`check` | Run verification tasks|
+|`test` | Execute unit tests|
+|`build` | Assemble and verify project|
+|`publish` | Publish configured artifacts|
+
+Note: Gradle executes prerequisite tasks automatically according to the task dependency graph. For example, `build` normally depends on `assemble` and `check`.
+
+*5. Profiles & Environment Configuration*
+
+Gradle supports environment-specific configuration through project properties, system properties, and environment variables.
+
+#+BEGIN_SRC bash
+
+# Pass a project property
+./gradlew build -Penv=dev
+
+# Use a test environment
+./gradlew build -Penv=test
+
+# Use a production environment
+./gradlew build -Penv=prod
+
+# Pass multiple project properties
+./gradlew build -Penv=dev -Pregion=eu
+
+# Pass a system property
+./gradlew test -Dspring.profiles.active=test
+
+# Set an environment variable
+SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
+
+# Pass Spring Boot application arguments
+./gradlew bootRun --args='--spring.profiles.active=dev --server.port=8081'
+
+#+END_SRC
+
+Note: Gradle project properties (`-P`), JVM system properties (`-D`), and environment variables serve different purposes.
+
+*6. Dependency Management*
+
+#+BEGIN_SRC bash
+
+# Display dependency tree
+./gradlew dependencies
+
+# Display dependencies for a specific configuration
+./gradlew dependencies --configuration runtimeClasspath
+./gradlew dependencies --configuration compileClasspath
+./gradlew dependencies --configuration testRuntimeClasspath
+
+# Analyze a specific dependency
+./gradlew dependencyInsight --dependency spring-core
+
+# Analyze dependency in a configuration
+./gradlew dependencyInsight \
+  --dependency spring-core \
+  --configuration runtimeClasspath
+
+# Display buildscript dependencies
+./gradlew buildEnvironment
+
+# Refresh dependency cache
+./gradlew build --refresh-dependencies
+
+# Resolve dependencies
+./gradlew compileJava
+
+#+END_SRC
+
+Useful dependency configurations
+
+|Configuration | Purpose|
+|--- | ---|
+|`implementation` | Internal compile and runtime dependency|
+|`api` | Dependency exposed to consumers (java-library)|
+|`compileOnly` | Compile-time only dependency|
+|`runtimeOnly` | Runtime-only dependency|
+|`testImplementation` | Test compile and runtime dependency|
+|`annotationProcessor` | Annotation processor dependency|
+
+*7. Multi-Module Projects*
+
+#+BEGIN_SRC bash
+
+# Display all projects
+./gradlew projects
+
+# Build all modules
+./gradlew clean build
+
+# Build a specific module
+./gradlew :module-name:build
+
+# Run tests in a specific module
+./gradlew :module-name:test
+
+# Compile a specific module
+./gradlew :module-name:compileJava
+
+# Build multiple modules
+./gradlew :module-a:build :module-b:build
+
+# Run a task in the root project
+./gradlew build
+
+# Run tasks in parallel
+./gradlew build --parallel
+
+# Limit the number of workers
+./gradlew build --max-workers=4
+
+#+END_SRC
+
+ Useful multi-project concepts
+
+ |Concept | Meaning|
+ |--- | ---|
+ |`settings.gradle` | Defines root project and included modules|
+ |`include()` | Adds subprojects to the build|
+ |`project(":module")` | References a subproject|
+ |`allprojects` | Configures root and subprojects|
+ |`subprojects` | Configures subprojects only|
+ |`dependsOn` | Declares task dependencies|
+ |`--parallel` | Enables parallel project execution|
+ |`--max-workers` | Limits Gradle worker count|
+
+*8. Daily Development Commands*
+
+#+BEGIN_SRC bash
+
+# Clean project
+./gradlew clean
+
+# Compile Java source code
+./gradlew compileJava
+
+# Compile test source code
+./gradlew compileTestJava
+
+# Run unit tests
+./gradlew test
+
+# Package application
+./gradlew assemble
+
+# Create JAR
+./gradlew jar
+
+# Create complete build
+./gradlew build
+
+# Fast build without executing tests
+./gradlew build -x test
+
+# Build without cleaning
+./gradlew build
+
+# Build offline
+./gradlew build --offline
+
+# Force dependency updates
+./gradlew build --refresh-dependencies
+
+# Continue building after task failures
+./gradlew build --continue
+
+#+END_SRC
+
+Useful command-line options
+
+|Option | Purpose|
+|--- | ---|
+|`-x test` | Exclude test task|
+|`--offline` | Use cached dependencies only|
+|`--refresh-dependencies` | Refresh dependency resolution|
+|`--continue` | Continue after task failures|
+|`--parallel` | Execute independent projects in parallel|
+|`--max-workers=4` | Limit worker threads|
+|`--dry-run` | Display planned tasks without executing them|
+|`--rerun-tasks` | Force task execution|
+|`--no-daemon` | Do not use the Gradle daemon|
+|`--quiet` | Reduce console output|
+|`--console=plain` | Disable rich console output|
+
+*9. Testing – JUnit & Integration Tests*
+
+#+BEGIN_SRC bash
+
+# Run unit tests
+./gradlew test
+
+# Run a specific test class
+./gradlew test --tests UserServiceTest
+
+# Run a specific test method
+./gradlew test --tests 'UserServiceTest.shouldCreateUser'
+
+# Run tests matching a package
+./gradlew test --tests 'com.example.service.*'
+
+# Exclude tests
+./gradlew test --exclude-task integrationTest
+
+# Skip tests during build
+./gradlew build -x test
+
+# Generate test reports
+./gradlew test
+
+# Run integration tests (when configured)
+./gradlew integrationTest
+
+# Run verification tasks
+./gradlew check
+
+#+END_SRC
+
+- The `test` task normally executes unit tests.
+- Integration tests typically use a separately configured `Test` task and source set.
+- The `check` lifecycle task can be configured to include both unit and integration tests.
+
+*10. Debugging – Gradle, Tests & Spring Boot*
+
+There are three different debugging scenarios: Gradle build debugging, test debugging, and Java application debugging.
+
+*10.1 Gradle Build Debugging*
+
+#+BEGIN_SRC bash
+
+# Enable detailed Gradle debug logs
+./gradlew --debug build
+./gradlew --debug test
+./gradlew --debug assemble
+
+# Enable informational logs
+./gradlew --info build
+
+# Display exception stack traces
+./gradlew --stacktrace build
+
+# Display full exception information
+./gradlew --full-stacktrace build
+
+# Debug Gradle configuration and execution
+./gradlew --info clean build
+
+#+END_SRC
+
+Difference:
+
+|Command | Purpose|
+|--- | ---|
+|`--debug` | Detailed Gradle debug logs|
+|`--info` | Informational build logs|
+|`--stacktrace` | Display exception stack traces|
+|`--full-stacktrace` | Display full stack traces|
+
+*10.2 Debug Unit & Integration Tests*
+
+#+BEGIN_SRC bash
+
+# Enable test debugging
+./gradlew test --debug-jvm
+
+# Enable test debugging with a specific task
+./gradlew integrationTest --debug-jvm
+
+# Run a specific test with debugging
+./gradlew test --tests UserServiceTest --debug-jvm
+
+#+END_SRC
+
+The test JVM normally waits for a debugger connection on port `5005`.
+
+*10.3 Start Spring Boot in Debug Mode*
+
+#+BEGIN_SRC bash
+
+# Option 1 – Start Spring Boot with debugging enabled
+./gradlew bootRun \
+  --debug-jvm
+
+# Option 2 – Configure a custom debug port
+./gradlew bootRun \
+  --debug-jvm \
+  -Dorg.gradle.debug=true
+
+#+END_SRC
+
+For more control, configure the Spring Boot application JVM arguments directly:
+
+#+BEGIN_SRC bash
+
+# Start application with JVM debugging
+JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005" \
+  ./gradlew bootRun
+
+#+END_SRC
+
+Note: `--debug-jvm` on a `Test` task debugs the test JVM. It does not automatically debug the Spring Boot application started by `bootRun`.
+
+*10.4 Connect IntelliJ IDEA / Eclipse Debugger*
+
+Create a Remote JVM Debug configuration.
+
+|Setting | Value|
+|--- | ---|
+|Host | `localhost`|
+|Port | `5005`|
+|Debugger mode | Attach to remote JVM|
+|Transport | Socket|
+
+Steps:
+
+1. Start the application or test JVM with debugging enabled.
+2. Create or select the Remote JVM Debug configuration in your IDE.
+3. Connect to `localhost:5005`.
+4. Set breakpoints in your Java code.
+5. Send a request to your application.
+6. Execution stops at the breakpoints.
+
+*10.5 Understand JVM Debugging Parameters*
+
+#+BEGIN_SRC bash
+
+    -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005
+
+#+END_SRC
+
+|Parameter | Meaning|
+|--- | ---|
+|`transport=dt_socket` | Use socket communication|
+|`server=y` | JVM listens for debugger connections|
+|`suspend=y` | Wait for debugger before starting|
+|`suspend=n` | Start application immediately|
+|`address=*:5005` | Listen on port 5005 on available interfaces|
+
+Security: Debug ports allow powerful control over the JVM. Restrict them to localhost or a trusted network. Never expose port 5005 publicly.
+
+*10.6 Quick Debugging Cheat Sheet*
+
+|Goal | Command|
+|--- | ---|
+|Debug Gradle build | `./gradlew --debug build`|
+|Informational logs | `./gradlew --info build`|
+|Detailed errors | `./gradlew --stacktrace build`|
+|Debug unit tests | `./gradlew test --debug-jvm`|
+|Debug integration tests | `./gradlew integrationTest --debug-jvm`|
+|Debug Spring Boot | Configure application JVM JDWP arguments|
+
+*11. Spring Boot Development & Execution*
+
+#+BEGIN_SRC bash
+
+# Start Spring Boot application
+./gradlew bootRun
+
+# Start with a specific profile
+./gradlew bootRun --args='--spring.profiles.active=dev'
+
+# Start on a custom port
+./gradlew bootRun --args='--server.port=8081'
+
+# Start with multiple application arguments
+./gradlew bootRun \
+  --args='--server.port=8081 --spring.profiles.active=dev'
+
+# Build Spring Boot executable JAR
+./gradlew bootJar
+
+# Run packaged application
+java -jar build/libs/application.jar
+
+#+END_SRC
+
+*12. Gradle Performance & Build Cache*
+
+Gradle provides several features to improve build performance, including the daemon, incremental builds, configuration cache, and build cache.
+
+#+BEGIN_SRC bash
+
+# Enable Gradle daemon
+./gradlew build --daemon
+
+# Enable build cache
+./gradlew build --build-cache
+
+# Enable configuration cache
+./gradlew build --configuration-cache
+
+# Enable parallel execution
+./gradlew build --parallel
+
+# Limit workers
+./gradlew build --max-workers=4
+
+# Display task execution information
+./gradlew build --profile
+
+# Generate a build scan (requires scan service/setup)
+./gradlew build --scan
+
+#+END_SRC
+
+Useful performance options
+
+|Option | Purpose|
+|--- | ---|
+|`--daemon` | Use Gradle daemon|
+|`--build-cache` | Reuse cached task outputs|
+|`--configuration-cache` | Cache build configuration|
+|`--parallel` | Run independent projects concurrently|
+|`--max-workers` | Control worker count|
+|`--profile` | Generate build performance report|
+|`--scan` | Generate detailed build diagnostics|
+
+Note: Build cache and configuration cache are different features. The former caches task outputs; the latter caches the configured build model.
+
+*13. Publishing & Artifact Management*
+
+#+BEGIN_SRC bash
+
+# Create JAR artifact
+./gradlew jar
+
+# Create Spring Boot executable JAR
+./gradlew bootJar
+
+# Publish configured artifacts
+./gradlew publish
+
+# Publish to Maven Local
+./gradlew publishToMavenLocal
+
+# Display publication-related tasks
+./gradlew tasks --all
+
+# Build all artifacts
+./gradlew assemble
+
+#+END_SRC
+
+Note: Publishing tasks are available only when the relevant publishing plugin and publication repositories are configured.
+
+*14. Useful Gradle Properties & Environment Settings*
+
+#+BEGIN_SRC text
+# gradle.properties
+
+# Gradle daemon JVM arguments
+org.gradle.jvmargs=-Xmx2g -Dfile.encoding=UTF-8
+
+# Enable parallel execution
+org.gradle.parallel=true
+
+# Enable build cache
+org.gradle.caching=true
+
+# Enable configuration cache
+org.gradle.configuration-cache=true
+
+# Enable daemon
+org.gradle.daemon=true
+
+# Configure maximum workers
+org.gradle.workers.max=4
+#+END_SRC
+
+Note: Configuration-cache compatibility depends on the plugins and build logic used by the project.
+
 * Beginner
 
 ** Q1: What is Gradle?
@@ -555,38 +1143,6 @@ Fast local builds, clear errors, and minimal cognitive load.
 
 ** Q180: Final maturity principle?
 Gradle excellence is engineered build systems treated as core product infrastructure.
-
-* Bonus: Minimal Gradle Kotlin DSL Template (Spring Boot style)
-
-#+BEGIN_SRC kotlin
-plugins {
-    java
-    id("org.springframework.boot") version "3.3.2"
-    id("io.spring.dependency-management") version "1.1.6"
-}
-
-group = "com.example"
-version = "1.0.0"
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-#+END_SRC
 
 
 -----
