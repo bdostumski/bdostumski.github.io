@@ -8,6 +8,628 @@
 
 * Docker Volumes
 
+- [[https://docs.docker.com/reference/cli/docker/volume/][Docker Volume Documentation]]
+
+-----
+
+* Docker Volumes Command Handbook:
+
+*1. Docker Volume Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check Docker version
+docker --version
+docker version
+
+# Check Docker Compose version
+docker compose version
+
+# Check Docker system information
+docker info
+
+# Check Docker daemon status (Linux)
+sudo systemctl status docker
+
+# Start Docker daemon (Linux)
+sudo systemctl start docker
+
+# Enable Docker daemon at startup (Linux)
+sudo systemctl enable docker
+
+# Check Docker storage information
+docker info --format '{{.DockerRootDir}}'
+
+#+END_SRC
+
+*2. Docker Volume Management*
+
+#+BEGIN_SRC bash
+
+# List all Docker volumes
+docker volume ls
+
+# Create a named volume
+docker volume create myvolume
+
+# Create a volume with a specific name
+docker volume create app-data
+
+# Inspect a volume
+docker volume inspect myvolume
+
+# Inspect volume mountpoint
+docker volume inspect myvolume --format '{{.Mountpoint}}'
+
+# Display volume driver
+docker volume inspect myvolume --format '{{.Driver}}'
+
+# Display volume name
+docker volume inspect myvolume --format '{{.Name}}'
+
+# Remove a volume
+docker volume rm myvolume
+
+# Remove multiple volumes
+docker volume rm volume1 volume2
+
+# Check volume help
+docker volume --help
+
+#+END_SRC
+
+*3. Create & Run Containers with Volumes*
+
+#+BEGIN_SRC bash
+
+# Run container with a named volume
+docker run -d \
+  --name my-container \
+  -v myvolume:/app/data \
+  nginx
+
+# Run container with a named volume using --mount
+docker run -d \
+  --name my-container \
+  --mount source=myvolume,target=/app/data \
+  nginx
+
+# Run container with a read-only volume
+docker run -d \
+  --name readonly-container \
+  -v myvolume:/app/data:ro \
+  nginx
+
+# Run container with a specific volume
+docker run -d \
+  --name database \
+  -v db-data:/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=secret \
+  postgres
+
+# Run container with multiple volumes
+docker run -d \
+  --name app \
+  -v app-data:/app/data \
+  -v app-logs:/app/logs \
+  nginx
+
+# Run an interactive container with a volume
+docker run -it \
+  --name test-container \
+  -v myvolume:/data \
+  alpine sh
+
+#+END_SRC
+
+*4. Bind Mounts*
+
+Bind mounts connect a directory or file on the host filesystem to a path inside a container.
+
+#+BEGIN_SRC bash
+
+# Mount a host directory into a container
+docker run -d \
+  --name web \
+  -v /host/data:/app/data \
+  nginx
+
+# Mount a relative directory using Compose-style paths
+docker run -d \
+  --name web \
+  -v "$(pwd)/data:/app/data" \
+  nginx
+
+# Mount a directory using --mount
+docker run -d \
+  --name web \
+  --mount type=bind,source="$(pwd)/data",target=/app/data \
+  nginx
+
+# Mount a directory as read-only
+docker run -d \
+  --name web \
+  -v "$(pwd)/config:/app/config:ro" \
+  nginx
+
+# Mount a specific configuration file
+docker run -d \
+  --name web \
+  --mount type=bind,source="$(pwd)/nginx.conf",target=/etc/nginx/nginx.conf,readonly \
+  nginx
+
+# Create a host directory before mounting
+mkdir -p ./data
+
+# Display current working directory
+pwd
+
+#Windows PowerShell example:
+# Mount a Windows host directory
+docker run -d `
+  --name web `
+  -v "${PWD}/data:/app/data" `
+  nginx
+
+#+END_SRC
+ 
+*5. Named Volumes vs Bind Mounts*
+
+| Feature | Named Volume | Bind Mount |
+|---|---|---|
+| Storage management | Docker | Host filesystem |
+| Host path | Docker-managed | Explicit path |
+| Portability | More portable | Host-dependent |
+| Development | Useful | Very useful |
+| Database storage | Recommended | Possible |
+| Backup | Docker volume tools | Host filesystem tools |
+
+#+BEGIN_SRC bash
+
+# Named volume
+docker run -d \
+  -v app-data:/app/data \
+  nginx
+
+# Bind mount
+docker run -d \
+  -v "$(pwd)/data:/app/data" \
+  nginx
+
+# Named volume using --mount
+docker run -d \
+  --mount type=volume,source=app-data,target=/app/data \
+  nginx
+
+# Bind mount using --mount
+docker run -d \
+  --mount type=bind,source="$(pwd)/data",target=/app/data \
+  nginx
+
+#+END_SRC
+
+*6. Volume Inspection & Container Mount Information*
+
+#+BEGIN_SRC bash
+
+# Inspect volume details
+docker volume inspect app-data
+
+# List volumes
+docker volume ls
+
+# List volumes with a specific name
+docker volume ls --filter name=app
+
+# List dangling volumes
+docker volume ls --filter dangling=true
+
+# Inspect container mount information
+docker inspect my-container
+
+# Display only container mounts
+docker inspect my-container --format '{{json .Mounts}}'
+
+# Display mounted volume names
+docker inspect my-container \
+  --format '{{range .Mounts}}{{println .Name}}{{end}}'
+
+# Display container mount destinations
+docker inspect my-container \
+  --format '{{range .Mounts}}{{println .Destination}}{{end}}'
+
+# Display volume driver
+docker volume inspect app-data \
+  --format '{{.Driver}}'
+
+#+END_SRC
+
+*7. Copy Data Between Containers & Volumes*
+
+#+BEGIN_SRC bash
+
+# Copy a file from host into a container
+docker cp ./file.txt my-container:/app/data/file.txt
+
+# Copy a file from container to host
+docker cp my-container:/app/data/file.txt ./file.txt
+
+# Copy a directory from host into a container
+docker cp ./data my-container:/app/
+
+# Copy data from one container to another
+docker cp container1:/app/data/file.txt ./file.txt
+docker cp ./file.txt container2:/app/data/file.txt
+
+# Create a temporary container to inspect volume contents
+docker run --rm \
+  -v app-data:/data \
+  alpine ls -la /data
+
+# Copy data from one volume to another
+docker run --rm \
+  -v source-volume:/source:ro \
+  -v destination-volume:/destination \
+  alpine sh -c "cp -a /source/. /destination/"
+
+#+END_SRC
+
+*8. Docker Volume Backup*
+
+A Docker volume can be backed up by mounting it into a temporary container and creating a compressed archive.
+
+#+BEGIN_SRC bash
+
+# Create a backup directory on the host
+mkdir -p backups
+
+# Backup a Docker volume
+docker run --rm \
+  -v app-data:/source:ro \
+  -v "$(pwd)/backups:/backup" \
+  alpine \
+  tar -czf /backup/app-data-backup.tar.gz -C /source .
+
+# Backup with a timestamp
+docker run --rm \
+  -v app-data:/source:ro \
+  -v "$(pwd)/backups:/backup" \
+  alpine \
+  sh -c 'tar -czf /backup/app-data-$(date +%Y%m%d-%H%M%S).tar.gz -C /source .'
+
+# List backup files
+ls -lh backups/
+
+# Inspect backup archive contents
+tar -tzf backups/app-data-backup.tar.gz
+
+#+END_SRC
+
+Note: For databases, use database-native backup tools or create a consistent snapshot. A simple filesystem archive may capture inconsistent data while the database is actively writing.
+
+*9. Docker Volume Restore*
+
+#+BEGIN_SRC bash
+
+# Create a new volume for restoration
+docker volume create restored-data
+
+# Restore backup into a volume
+docker run --rm \
+  -v restored-data:/destination \
+  -v "$(pwd)/backups:/backup:ro" \
+  alpine \
+  tar -xzf /backup/app-data-backup.tar.gz -C /destination
+
+# Verify restored data
+docker run --rm \
+  -v restored-data:/data:ro \
+  alpine ls -lah /data
+
+# Run a container using the restored volume
+docker run -d \
+  --name restored-app \
+  -v restored-data:/app/data \
+  nginx
+
+#+END_SRC
+
+*10. Docker Volume Drivers*
+
+#+BEGIN_SRC bash
+
+# Create a volume using the local driver
+docker volume create \
+  --driver local \
+  local-volume
+
+# Inspect volume driver
+docker volume inspect local-volume
+
+# Create a volume with local driver options
+docker volume create \
+  --driver local \
+  --opt type=none \
+  --opt o=bind \
+  --opt device=/host/data \
+  bind-volume
+
+# Create an NFS-backed volume
+docker volume create \
+  --driver local \
+  --opt type=nfs \
+  --opt o=addr=192.168.1.100,rw,nfsvers=4 \
+  --opt device=:/exports/data \
+  nfs-volume
+
+# Inspect NFS volume
+docker volume inspect nfs-volume
+
+# List all volumes
+docker volume ls
+
+#+END_SRC
+
+Note: NFS examples require a reachable NFS server and appropriate client support on the Docker host. Driver options depend on the storage backend.
+
+*11. Docker Compose Volume Management*
+
+Docker Compose allows volumes to be declared and managed alongside application services.
+
+**Example: compose.yaml**
+
+#+BEGIN_SRC yaml
+
+services:
+  app:
+    image: nginx
+    container_name: web
+    ports:
+      - "8080:80"
+    volumes:
+      - app-data:/usr/share/nginx/html
+      - ./config:/etc/nginx/conf.d:ro
+
+volumes:
+  app-data:
+    
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Start services
+docker compose up -d
+
+# List Compose services
+docker compose ps
+
+# List Compose volumes
+docker volume ls
+
+# Display Compose configuration
+docker compose config
+
+# Inspect a Compose-managed volume
+docker volume inspect project_app-data
+
+# Stop services without removing volumes
+docker compose down
+
+# Start services again
+docker compose up -d
+
+# Stop services and remove named volumes declared by Compose
+docker compose down -v
+
+# Recreate containers without removing volumes
+docker compose up -d --force-recreate
+
+#+END_SRC
+
+Note: Compose automatically prefixes volume names with the project name unless an explicit name or external volume is configured.
+
+*12. Read-Only & Read-Write Volume Permissions*
+
+#+BEGIN_SRC bash
+
+# Mount a volume with read-write access (default)
+docker run -d \
+  --name app \
+  -v app-data:/app/data \
+  nginx
+
+# Mount a volume with read-only access
+docker run -d \
+  --name app-readonly \
+  -v app-data:/app/data:ro \
+  nginx
+
+# Read-only mount using --mount
+docker run -d \
+  --name app-readonly \
+  --mount type=volume,source=app-data,target=/app/data,readonly \
+  nginx
+
+# Inspect container user
+docker exec app id
+
+# Inspect mounted directory permissions
+docker exec app ls -ld /app/data
+
+# Inspect mounted directory ownership
+docker exec app stat /app/data
+
+# Change ownership (requires appropriate privileges)
+docker exec -u 0 app chown -R 1000:1000 /app/data
+
+# Change directory permissions (requires appropriate privileges)
+docker exec -u 0 app chmod -R 755 /app/data
+
+#+END_SRC
+
+Note: UID/GID ownership and permission behavior depends on the host OS, Docker configuration, and storage driver. Avoid changing permissions recursively without understanding the application requirements.
+
+*13. Temporary Storage – tmpfs Mounts*
+
+A tmpfs mount stores temporary data in memory instead of persistent disk storage.
+
+#+BEGIN_SRC bash
+
+# Run container with tmpfs mount
+docker run -d \
+  --name app \
+  --tmpfs /app/cache \
+  nginx
+
+# Specify tmpfs size
+docker run -d \
+  --name app \
+  --tmpfs /app/cache:size=100m \
+  nginx
+
+# Use --mount with tmpfs
+docker run -d \
+  --name app \
+  --mount type=tmpfs,destination=/app/cache,tmpfs-size=104857600 \
+  nginx
+
+# Inspect container mounts
+docker inspect app --format '{{json .Mounts}}'
+
+#+END_SRC
+
+Note: tmpfs data is temporary and disappears when the container stops. It is not a replacement for persistent Docker volumes.
+
+*14. Docker Volume Cleanup & Maintenance*
+
+#+BEGIN_SRC bash
+
+# List all volumes
+docker volume ls
+
+# List dangling volumes
+docker volume ls -f dangling=true
+
+# Remove a specific volume
+docker volume rm old-volume
+
+# Remove multiple unused volumes
+docker volume rm volume1 volume2
+
+# Remove all unused volumes
+docker volume prune
+
+# Remove all unused volumes without confirmation
+docker volume prune -f
+
+# Remove unused volumes, including named volumes
+docker volume prune -a
+
+# Remove unused volumes, including named volumes, without confirmation
+docker volume prune -a -f
+
+# Display Docker disk usage
+docker system df
+
+# Display detailed Docker disk usage
+docker system df -v
+
+#+END_SRC
+
+Note: Volume pruning can permanently delete data. Verify that volumes are not needed before running cleanup commands. Volumes attached to stopped containers may still be in use and are not necessarily dangling.
+
+*15. Docker Volume Troubleshooting & Debugging*
+
+#+BEGIN_SRC bash
+
+# Check whether a volume exists
+docker volume ls
+
+# Inspect a volume
+docker volume inspect app-data
+
+# Check Docker daemon information
+docker info
+
+# Check Docker disk usage
+docker system df -v
+
+# Inspect container mount configuration
+docker inspect my-container --format '{{json .Mounts}}'
+
+# Check container logs
+docker logs my-container
+
+# Follow container logs
+docker logs -f my-container
+
+# Execute a shell inside a container
+docker exec -it my-container sh
+
+# Inspect volume contents using Alpine
+docker run --rm \
+  -v app-data:/data:ro \
+  alpine ls -lah /data
+
+# Check directory ownership
+docker run --rm \
+  -v app-data:/data \
+  alpine ls -ld /data
+
+# Check mounted filesystem usage inside a container
+docker exec my-container df -h
+
+# Check container status
+docker ps -a
+
+#+END_SRC
+
+**Common volume problems**
+
+| Problem | Possible solution |
+|---|---|
+| Volume not found | Check `docker volume ls` |
+| Permission denied | Check UID/GID and directory permissions |
+| Empty mount directory | Verify mount source and destination |
+| Data not persisting | Use a named volume or bind mount |
+| Volume cannot be removed | Check containers referencing it |
+| Disk space exhausted | Inspect `docker system df -v` |
+| NFS mount failure | Check NFS server and driver options |
+| Incorrect container path | Inspect container mount configuration |
+
+*16. Docker Volume Command Cheat Sheet*
+
+| Goal | Command |
+|---|---|
+| List volumes | `docker volume ls` |
+| Create volume | `docker volume create myvolume` |
+| Inspect volume | `docker volume inspect myvolume` |
+| Remove volume | `docker volume rm myvolume` |
+| Remove unused volumes | `docker volume prune` |
+| Create named volume | `docker run -v myvolume:/data image` |
+| Create bind mount | `docker run -v /host:/data image` |
+| Read-only mount | `docker run -v myvolume:/data:ro image` |
+| Use `--mount` | `docker run --mount type=volume,source=myvolume,target=/data image` |
+| Copy container files | `docker cp container:/data ./data` |
+| Inspect container mounts | `docker inspect container` |
+| Check disk usage | `docker system df -v` |
+| Start Compose | `docker compose up -d` |
+| Stop Compose | `docker compose down` |
+| Remove Compose volumes | `docker compose down -v` |
+
+**Important Docker Volume Best Practices**
+
+- Use named volumes for persistent application and database data.
+- Prefer bind mounts for local development and source-code sharing.
+- Use read-only mounts for configuration files and immutable data.
+- Back up important volumes regularly.
+- Test volume restoration procedures.
+- Avoid storing persistent application data only in container writable layers.
+- Verify ownership and permissions when mounting host directories.
+- Use database-native backup tools for database consistency.
+- Avoid `docker volume prune` without checking which volumes will be removed.
+- Keep sensitive configuration and secrets outside container images.
+
 -----
 
 * Beginner

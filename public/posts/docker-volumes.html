@@ -23,91 +23,960 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org643f097" class="outline-2">
-<h2 id="org643f097">Docker Volumes</h2>
-<div class="outline-text-2" id="text-org643f097">
+<div id="outline-container-orgf1e922c" class="outline-2">
+<h2 id="orgf1e922c">Docker Volumes</h2>
+<div class="outline-text-2" id="text-orgf1e922c">
+<ul class="org-ul">
+<li><a href="https://docs.docker.com/reference/cli/docker/volume/">Docker Volume Documentation</a></li>
+</ul>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-orgf36f2c8" class="outline-2">
-<h2 id="orgf36f2c8">Beginner</h2>
-<div class="outline-text-2" id="text-orgf36f2c8">
+<div id="outline-container-org81ca310" class="outline-2">
+<h2 id="org81ca310">Docker Volumes Command Handbook:</h2>
+<div class="outline-text-2" id="text-org81ca310">
+<p>
+<b>1. Docker Volume Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker version
+</span>docker --version
+docker version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker Compose version
+</span>docker compose version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker system information
+</span>docker info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker daemon status (Linux)
+</span>sudo systemctl status docker
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start Docker daemon (Linux)
+</span>sudo systemctl start docker
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable Docker daemon at startup (Linux)
+</span>sudo systemctl enable docker
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker storage information
+</span>docker info --format <span style="font-style: italic;">'{{.DockerRootDir}}'</span>
+
+</pre>
 </div>
-<div id="outline-container-orgafcd62a" class="outline-3">
-<h3 id="orgafcd62a">Q1: What is a Docker volume?</h3>
-<div class="outline-text-3" id="text-orgafcd62a">
+
+<p>
+<b>2. Docker Volume Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all Docker volumes
+</span>docker volume ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a named volume
+</span>docker volume create myvolume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a volume with a specific name
+</span>docker volume create app-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a volume
+</span>docker volume inspect myvolume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect volume mountpoint
+</span>docker volume inspect myvolume --format <span style="font-style: italic;">'{{.Mountpoint}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display volume driver
+</span>docker volume inspect myvolume --format <span style="font-style: italic;">'{{.Driver}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display volume name
+</span>docker volume inspect myvolume --format <span style="font-style: italic;">'{{.Name}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a volume
+</span>docker volume rm myvolume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove multiple volumes
+</span>docker volume rm volume1 volume2
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check volume help
+</span>docker volume --help
+
+</pre>
+</div>
+
+<p>
+<b>3. Create &amp; Run Containers with Volumes</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run container with a named volume
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name my-container <span style="font-style: italic;">\</span>
+  -v myvolume:/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run container with a named volume using --mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name my-container <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">source</span>=myvolume,<span style="font-weight: bold; font-style: italic;">target</span>=/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run container with a read-only volume
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name readonly-container <span style="font-style: italic;">\</span>
+  -v myvolume:/app/data:ro <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run container with a specific volume
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name database <span style="font-style: italic;">\</span>
+  -v db-data:/var/lib/postgresql/data <span style="font-style: italic;">\</span>
+  -e <span style="font-weight: bold; font-style: italic;">POSTGRES_PASSWORD</span>=secret <span style="font-style: italic;">\</span>
+  postgres
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run container with multiple volumes
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app <span style="font-style: italic;">\</span>
+  -v app-data:/app/data <span style="font-style: italic;">\</span>
+  -v app-logs:/app/logs <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run an interactive container with a volume
+</span>docker run -it <span style="font-style: italic;">\</span>
+  --name test-container <span style="font-style: italic;">\</span>
+  -v myvolume:/data <span style="font-style: italic;">\</span>
+  alpine sh
+
+</pre>
+</div>
+
+<p>
+<b>4. Bind Mounts</b>
+</p>
+
+<p>
+Bind mounts connect a directory or file on the host filesystem to a path inside a container.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a host directory into a container
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name web <span style="font-style: italic;">\</span>
+  -v /host/data:/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a relative directory using Compose-style paths
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name web <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$(pwd)/data:/app/data"</span> <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a directory using --mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name web <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">type</span>=bind,<span style="font-weight: bold; font-style: italic;">source</span>=<span style="font-style: italic;">"$(pwd)/data"</span>,<span style="font-weight: bold; font-style: italic;">target</span>=/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a directory as read-only
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name web <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$(pwd)/config:/app/config:ro"</span> <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a specific configuration file
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name web <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">type</span>=bind,<span style="font-weight: bold; font-style: italic;">source</span>=<span style="font-style: italic;">"$(pwd)/nginx.conf"</span>,<span style="font-weight: bold; font-style: italic;">target</span>=/etc/nginx/nginx.conf,readonly <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a host directory before mounting
+</span>mkdir -p ./data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display current working directory
+</span><span style="font-weight: bold;">pwd</span>
+
+<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">Windows PowerShell example:
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a Windows host directory
+</span>docker run -d <span style="font-weight: bold;">`
+  --name web `</span>
+  -v <span style="font-style: italic;">"${PWD}/data:/app/data"</span> <span style="font-weight: bold;">`
+  nginx
+</span>
+</pre>
+</div>
+
+<p>
+<b>5. Named Volumes vs Bind Mounts</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Feature</th>
+<th scope="col" class="org-left">Named Volume</th>
+<th scope="col" class="org-left">Bind Mount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Storage management</td>
+<td class="org-left">Docker</td>
+<td class="org-left">Host filesystem</td>
+</tr>
+
+<tr>
+<td class="org-left">Host path</td>
+<td class="org-left">Docker-managed</td>
+<td class="org-left">Explicit path</td>
+</tr>
+
+<tr>
+<td class="org-left">Portability</td>
+<td class="org-left">More portable</td>
+<td class="org-left">Host-dependent</td>
+</tr>
+
+<tr>
+<td class="org-left">Development</td>
+<td class="org-left">Useful</td>
+<td class="org-left">Very useful</td>
+</tr>
+
+<tr>
+<td class="org-left">Database storage</td>
+<td class="org-left">Recommended</td>
+<td class="org-left">Possible</td>
+</tr>
+
+<tr>
+<td class="org-left">Backup</td>
+<td class="org-left">Docker volume tools</td>
+<td class="org-left">Host filesystem tools</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Named volume
+</span>docker run -d <span style="font-style: italic;">\</span>
+  -v app-data:/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Bind mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$(pwd)/data:/app/data"</span> <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Named volume using --mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">type</span>=volume,<span style="font-weight: bold; font-style: italic;">source</span>=app-data,<span style="font-weight: bold; font-style: italic;">target</span>=/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Bind mount using --mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">type</span>=bind,<span style="font-weight: bold; font-style: italic;">source</span>=<span style="font-style: italic;">"$(pwd)/data"</span>,<span style="font-weight: bold; font-style: italic;">target</span>=/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+</pre>
+</div>
+
+<p>
+<b>6. Volume Inspection &amp; Container Mount Information</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect volume details
+</span>docker volume inspect app-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List volumes
+</span>docker volume ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List volumes with a specific name
+</span>docker volume ls --filter <span style="font-weight: bold; font-style: italic;">name</span>=app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List dangling volumes
+</span>docker volume ls --filter <span style="font-weight: bold; font-style: italic;">dangling</span>=true
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect container mount information
+</span>docker inspect my-container
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display only container mounts
+</span>docker inspect my-container --format <span style="font-style: italic;">'{{json .Mounts}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display mounted volume names
+</span>docker inspect my-container <span style="font-style: italic;">\</span>
+  --format <span style="font-style: italic;">'{{range .Mounts}}{{println .Name}}{{end}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display container mount destinations
+</span>docker inspect my-container <span style="font-style: italic;">\</span>
+  --format <span style="font-style: italic;">'{{range .Mounts}}{{println .Destination}}{{end}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display volume driver
+</span>docker volume inspect app-data <span style="font-style: italic;">\</span>
+  --format <span style="font-style: italic;">'{{.Driver}}'</span>
+
+</pre>
+</div>
+
+<p>
+<b>7. Copy Data Between Containers &amp; Volumes</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy a file from host into a container
+</span>docker cp ./file.txt my-container:/app/data/file.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy a file from container to host
+</span>docker cp my-container:/app/data/file.txt ./file.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy a directory from host into a container
+</span>docker cp ./data my-container:/app/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy data from one container to another
+</span>docker cp container1:/app/data/file.txt ./file.txt
+docker cp ./file.txt container2:/app/data/file.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a temporary container to inspect volume contents
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v app-data:/data <span style="font-style: italic;">\</span>
+  alpine ls -la /data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy data from one volume to another
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v source-volume:/source:ro <span style="font-style: italic;">\</span>
+  -v destination-volume:/destination <span style="font-style: italic;">\</span>
+  alpine sh -c <span style="font-style: italic;">"cp -a /source/. /destination/"</span>
+
+</pre>
+</div>
+
+<p>
+<b>8. Docker Volume Backup</b>
+</p>
+
+<p>
+A Docker volume can be backed up by mounting it into a temporary container and creating a compressed archive.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a backup directory on the host
+</span>mkdir -p backups
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Backup a Docker volume
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v app-data:/source:ro <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$(pwd)/backups:/backup"</span> <span style="font-style: italic;">\</span>
+  alpine <span style="font-style: italic;">\</span>
+  tar -czf /backup/app-data-backup.tar.gz -C /source .
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Backup with a timestamp
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v app-data:/source:ro <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$(pwd)/backups:/backup"</span> <span style="font-style: italic;">\</span>
+  alpine <span style="font-style: italic;">\</span>
+  sh -c <span style="font-style: italic;">'tar -czf /backup/app-data-$(date +%Y%m%d-%H%M%S).tar.gz -C /source .'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List backup files
+</span>ls -lh backups/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect backup archive contents
+</span>tar -tzf backups/app-data-backup.tar.gz
+
+</pre>
+</div>
+
+<p>
+Note: For databases, use database-native backup tools or create a consistent snapshot. A simple filesystem archive may capture inconsistent data while the database is actively writing.
+</p>
+
+<p>
+<b>9. Docker Volume Restore</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a new volume for restoration
+</span>docker volume create restored-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restore backup into a volume
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v restored-data:/destination <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$(pwd)/backups:/backup:ro"</span> <span style="font-style: italic;">\</span>
+  alpine <span style="font-style: italic;">\</span>
+  tar -xzf /backup/app-data-backup.tar.gz -C /destination
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Verify restored data
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v restored-data:/data:ro <span style="font-style: italic;">\</span>
+  alpine ls -lah /data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a container using the restored volume
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name restored-app <span style="font-style: italic;">\</span>
+  -v restored-data:/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+</pre>
+</div>
+
+<p>
+<b>10. Docker Volume Drivers</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a volume using the local driver
+</span>docker volume create <span style="font-style: italic;">\</span>
+  --driver local <span style="font-style: italic;">\</span>
+  local-volume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect volume driver
+</span>docker volume inspect local-volume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a volume with local driver options
+</span>docker volume create <span style="font-style: italic;">\</span>
+  --driver local <span style="font-style: italic;">\</span>
+  --opt <span style="font-weight: bold; font-style: italic;">type</span>=none <span style="font-style: italic;">\</span>
+  --opt <span style="font-weight: bold; font-style: italic;">o</span>=bind <span style="font-style: italic;">\</span>
+  --opt <span style="font-weight: bold; font-style: italic;">device</span>=/host/data <span style="font-style: italic;">\</span>
+  bind-volume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create an NFS-backed volume
+</span>docker volume create <span style="font-style: italic;">\</span>
+  --driver local <span style="font-style: italic;">\</span>
+  --opt <span style="font-weight: bold; font-style: italic;">type</span>=nfs <span style="font-style: italic;">\</span>
+  --opt <span style="font-weight: bold; font-style: italic;">o</span>=<span style="font-weight: bold; font-style: italic;">addr</span>=192.168.1.100,rw,<span style="font-weight: bold; font-style: italic;">nfsvers</span>=4 <span style="font-style: italic;">\</span>
+  --opt <span style="font-weight: bold; font-style: italic;">device</span>=:/exports/data <span style="font-style: italic;">\</span>
+  nfs-volume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect NFS volume
+</span>docker volume inspect nfs-volume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all volumes
+</span>docker volume ls
+
+</pre>
+</div>
+
+<p>
+Note: NFS examples require a reachable NFS server and appropriate client support on the Docker host. Driver options depend on the storage backend.
+</p>
+
+<p>
+<b>11. Docker Compose Volume Management</b>
+</p>
+
+<p>
+Docker Compose allows volumes to be declared and managed alongside application services.
+</p>
+
+<p>
+<b><b>Example: compose.yaml</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml">
+services:
+  app:
+    image: nginx
+    container_name: web
+    ports:
+      - "8080:80"
+    volumes:
+      - app-data:/usr/share/nginx/html
+      - ./config:/etc/nginx/conf.d:ro
+
+volumes:
+  app-data:
+
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services
+</span>docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Compose services
+</span>docker compose ps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Compose volumes
+</span>docker volume ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Compose configuration
+</span>docker compose config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a Compose-managed volume
+</span>docker volume inspect project_app-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop services without removing volumes
+</span>docker compose down
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services again
+</span>docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop services and remove named volumes declared by Compose
+</span>docker compose down -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Recreate containers without removing volumes
+</span>docker compose up -d --force-recreate
+
+</pre>
+</div>
+
+<p>
+Note: Compose automatically prefixes volume names with the project name unless an explicit name or external volume is configured.
+</p>
+
+<p>
+<b>12. Read-Only &amp; Read-Write Volume Permissions</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a volume with read-write access (default)
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app <span style="font-style: italic;">\</span>
+  -v app-data:/app/data <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mount a volume with read-only access
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app-readonly <span style="font-style: italic;">\</span>
+  -v app-data:/app/data:ro <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Read-only mount using --mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app-readonly <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">type</span>=volume,<span style="font-weight: bold; font-style: italic;">source</span>=app-data,<span style="font-weight: bold; font-style: italic;">target</span>=/app/data,readonly <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect container user
+</span>docker exec app id
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect mounted directory permissions
+</span>docker exec app ls -ld /app/data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect mounted directory ownership
+</span>docker exec app stat /app/data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Change ownership (requires appropriate privileges)
+</span>docker exec -u 0 app chown -R 1000:1000 /app/data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Change directory permissions (requires appropriate privileges)
+</span>docker exec -u 0 app chmod -R 755 /app/data
+
+</pre>
+</div>
+
+<p>
+Note: UID/GID ownership and permission behavior depends on the host OS, Docker configuration, and storage driver. Avoid changing permissions recursively without understanding the application requirements.
+</p>
+
+<p>
+<b>13. Temporary Storage – tmpfs Mounts</b>
+</p>
+
+<p>
+A tmpfs mount stores temporary data in memory instead of persistent disk storage.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run container with tmpfs mount
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app <span style="font-style: italic;">\</span>
+  --tmpfs /app/cache <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Specify tmpfs size
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app <span style="font-style: italic;">\</span>
+  --tmpfs /app/cache:<span style="font-weight: bold; font-style: italic;">size</span>=100m <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use --mount with tmpfs
+</span>docker run -d <span style="font-style: italic;">\</span>
+  --name app <span style="font-style: italic;">\</span>
+  --mount <span style="font-weight: bold; font-style: italic;">type</span>=tmpfs,<span style="font-weight: bold; font-style: italic;">destination</span>=/app/cache,tmpfs-size=104857600 <span style="font-style: italic;">\</span>
+  nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect container mounts
+</span>docker inspect app --format <span style="font-style: italic;">'{{json .Mounts}}'</span>
+
+</pre>
+</div>
+
+<p>
+Note: tmpfs data is temporary and disappears when the container stops. It is not a replacement for persistent Docker volumes.
+</p>
+
+<p>
+<b>14. Docker Volume Cleanup &amp; Maintenance</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all volumes
+</span>docker volume ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List dangling volumes
+</span>docker volume ls -f <span style="font-weight: bold; font-style: italic;">dangling</span>=true
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a specific volume
+</span>docker volume rm old-volume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove multiple unused volumes
+</span>docker volume rm volume1 volume2
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove all unused volumes
+</span>docker volume prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove all unused volumes without confirmation
+</span>docker volume prune -f
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused volumes, including named volumes
+</span>docker volume prune -a
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused volumes, including named volumes, without confirmation
+</span>docker volume prune -a -f
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Docker disk usage
+</span>docker system df
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed Docker disk usage
+</span>docker system df -v
+
+</pre>
+</div>
+
+<p>
+Note: Volume pruning can permanently delete data. Verify that volumes are not needed before running cleanup commands. Volumes attached to stopped containers may still be in use and are not necessarily dangling.
+</p>
+
+<p>
+<b>15. Docker Volume Troubleshooting &amp; Debugging</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check whether a volume exists
+</span>docker volume ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a volume
+</span>docker volume inspect app-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker daemon information
+</span>docker info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker disk usage
+</span>docker system df -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect container mount configuration
+</span>docker inspect my-container --format <span style="font-style: italic;">'{{json .Mounts}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check container logs
+</span>docker logs my-container
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow container logs
+</span>docker logs -f my-container
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a shell inside a container
+</span>docker exec -it my-container sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect volume contents using Alpine
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v app-data:/data:ro <span style="font-style: italic;">\</span>
+  alpine ls -lah /data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check directory ownership
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v app-data:/data <span style="font-style: italic;">\</span>
+  alpine ls -ld /data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check mounted filesystem usage inside a container
+</span>docker exec my-container df -h
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check container status
+</span>docker ps -a
+
+</pre>
+</div>
+
+<p>
+<b><b>Common volume problems</b></b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Problem</th>
+<th scope="col" class="org-left">Possible solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Volume not found</td>
+<td class="org-left">Check `docker volume ls`</td>
+</tr>
+
+<tr>
+<td class="org-left">Permission denied</td>
+<td class="org-left">Check UID/GID and directory permissions</td>
+</tr>
+
+<tr>
+<td class="org-left">Empty mount directory</td>
+<td class="org-left">Verify mount source and destination</td>
+</tr>
+
+<tr>
+<td class="org-left">Data not persisting</td>
+<td class="org-left">Use a named volume or bind mount</td>
+</tr>
+
+<tr>
+<td class="org-left">Volume cannot be removed</td>
+<td class="org-left">Check containers referencing it</td>
+</tr>
+
+<tr>
+<td class="org-left">Disk space exhausted</td>
+<td class="org-left">Inspect `docker system df -v`</td>
+</tr>
+
+<tr>
+<td class="org-left">NFS mount failure</td>
+<td class="org-left">Check NFS server and driver options</td>
+</tr>
+
+<tr>
+<td class="org-left">Incorrect container path</td>
+<td class="org-left">Inspect container mount configuration</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>16. Docker Volume Command Cheat Sheet</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Goal</th>
+<th scope="col" class="org-left">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">List volumes</td>
+<td class="org-left">`docker volume ls`</td>
+</tr>
+
+<tr>
+<td class="org-left">Create volume</td>
+<td class="org-left">`docker volume create myvolume`</td>
+</tr>
+
+<tr>
+<td class="org-left">Inspect volume</td>
+<td class="org-left">`docker volume inspect myvolume`</td>
+</tr>
+
+<tr>
+<td class="org-left">Remove volume</td>
+<td class="org-left">`docker volume rm myvolume`</td>
+</tr>
+
+<tr>
+<td class="org-left">Remove unused volumes</td>
+<td class="org-left">`docker volume prune`</td>
+</tr>
+
+<tr>
+<td class="org-left">Create named volume</td>
+<td class="org-left">`docker run -v myvolume:/data image`</td>
+</tr>
+
+<tr>
+<td class="org-left">Create bind mount</td>
+<td class="org-left">`docker run -v /host:/data image`</td>
+</tr>
+
+<tr>
+<td class="org-left">Read-only mount</td>
+<td class="org-left">`docker run -v myvolume:/data:ro image`</td>
+</tr>
+
+<tr>
+<td class="org-left">Use `&#x2013;mount`</td>
+<td class="org-left">`docker run &#x2013;mount type=volume,source=myvolume,target=/data image`</td>
+</tr>
+
+<tr>
+<td class="org-left">Copy container files</td>
+<td class="org-left">`docker cp container:/data ./data`</td>
+</tr>
+
+<tr>
+<td class="org-left">Inspect container mounts</td>
+<td class="org-left">`docker inspect container`</td>
+</tr>
+
+<tr>
+<td class="org-left">Check disk usage</td>
+<td class="org-left">`docker system df -v`</td>
+</tr>
+
+<tr>
+<td class="org-left">Start Compose</td>
+<td class="org-left">`docker compose up -d`</td>
+</tr>
+
+<tr>
+<td class="org-left">Stop Compose</td>
+<td class="org-left">`docker compose down`</td>
+</tr>
+
+<tr>
+<td class="org-left">Remove Compose volumes</td>
+<td class="org-left">`docker compose down -v`</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b><b>Important Docker Volume Best Practices</b></b>
+</p>
+
+<ul class="org-ul">
+<li>Use named volumes for persistent application and database data.</li>
+<li>Prefer bind mounts for local development and source-code sharing.</li>
+<li>Use read-only mounts for configuration files and immutable data.</li>
+<li>Back up important volumes regularly.</li>
+<li>Test volume restoration procedures.</li>
+<li>Avoid storing persistent application data only in container writable layers.</li>
+<li>Verify ownership and permissions when mounting host directories.</li>
+<li>Use database-native backup tools for database consistency.</li>
+<li>Avoid `docker volume prune` without checking which volumes will be removed.</li>
+<li>Keep sensitive configuration and secrets outside container images.</li>
+</ul>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgf05d09d" class="outline-2">
+<h2 id="orgf05d09d">Beginner</h2>
+<div class="outline-text-2" id="text-orgf05d09d">
+</div>
+<div id="outline-container-org9dee9aa" class="outline-3">
+<h3 id="org9dee9aa">Q1: What is a Docker volume?</h3>
+<div class="outline-text-3" id="text-org9dee9aa">
 <p>
 A Docker volume is a persistent storage mechanism for containers that allows data to survive container restarts and removals.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd501fff" class="outline-3">
-<h3 id="orgd501fff">Q2: Why do containers need persistent storage?</h3>
-<div class="outline-text-3" id="text-orgd501fff">
+<div id="outline-container-orgf5e46f3" class="outline-3">
+<h3 id="orgf5e46f3">Q2: Why do containers need persistent storage?</h3>
+<div class="outline-text-3" id="text-orgf5e46f3">
 <p>
 Containers are ephemeral by design, and their writable filesystem is usually lost when the container is removed.
 </p>
 </div>
 </div>
-<div id="outline-container-org4910e40" class="outline-3">
-<h3 id="org4910e40">Q3: What is the writable layer in Docker?</h3>
-<div class="outline-text-3" id="text-org4910e40">
+<div id="outline-container-orgcd549d5" class="outline-3">
+<h3 id="orgcd549d5">Q3: What is the writable layer in Docker?</h3>
+<div class="outline-text-3" id="text-orgcd549d5">
 <p>
 The writable layer is the filesystem layer added on top of the read-only image layers, where container changes are stored.
 </p>
 </div>
 </div>
-<div id="outline-container-org7474340" class="outline-3">
-<h3 id="org7474340">Q4: What is the problem with storing data only in the writable layer?</h3>
-<div class="outline-text-3" id="text-org7474340">
+<div id="outline-container-orgf46e5b4" class="outline-3">
+<h3 id="orgf46e5b4">Q4: What is the problem with storing data only in the writable layer?</h3>
+<div class="outline-text-3" id="text-orgf46e5b4">
 <p>
 Data can be lost when the container is recreated, restarted without preserving the filesystem, or removed.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b02b38" class="outline-3">
-<h3 id="org9b02b38">Q5: What is a volume mount?</h3>
-<div class="outline-text-3" id="text-org9b02b38">
+<div id="outline-container-org084fdb4" class="outline-3">
+<h3 id="org084fdb4">Q5: What is a volume mount?</h3>
+<div class="outline-text-3" id="text-org084fdb4">
 <p>
 A volume mount attaches a persistent Docker volume or host path to a container directory.
 </p>
 </div>
 </div>
-<div id="outline-container-org3905f08" class="outline-3">
-<h3 id="org3905f08">Q6: What is a bind mount?</h3>
-<div class="outline-text-3" id="text-org3905f08">
+<div id="outline-container-orgb3ddde9" class="outline-3">
+<h3 id="orgb3ddde9">Q6: What is a bind mount?</h3>
+<div class="outline-text-3" id="text-orgb3ddde9">
 <p>
 A bind mount mounts a file or directory from the host filesystem into a container.
 </p>
 </div>
 </div>
-<div id="outline-container-org36921b3" class="outline-3">
-<h3 id="org36921b3">Q7: What is the difference between a volume and a bind mount?</h3>
-<div class="outline-text-3" id="text-org36921b3">
+<div id="outline-container-org0a9810c" class="outline-3">
+<h3 id="org0a9810c">Q7: What is the difference between a volume and a bind mount?</h3>
+<div class="outline-text-3" id="text-org0a9810c">
 <p>
 A volume is managed by Docker, while a bind mount maps an explicit host path into the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org94555f4" class="outline-3">
-<h3 id="org94555f4">Q8: What is a named volume?</h3>
-<div class="outline-text-3" id="text-org94555f4">
+<div id="outline-container-org5ec5bbe" class="outline-3">
+<h3 id="org5ec5bbe">Q8: What is a named volume?</h3>
+<div class="outline-text-3" id="text-org5ec5bbe">
 <p>
 A named volume is a Docker-managed volume with a user-defined or auto-generated name.
 </p>
 </div>
 </div>
-<div id="outline-container-orge760014" class="outline-3">
-<h3 id="orge760014">Q9: What is data persistence?</h3>
-<div class="outline-text-3" id="text-orge760014">
+<div id="outline-container-orgc3a9bec" class="outline-3">
+<h3 id="orgc3a9bec">Q9: What is data persistence?</h3>
+<div class="outline-text-3" id="text-orgc3a9bec">
 <p>
 Data persistence means the data remains available across container lifecycles.
 </p>
 </div>
 </div>
-<div id="outline-container-org036b640" class="outline-3">
-<h3 id="org036b640">Q10: What is the docker volume command?</h3>
-<div class="outline-text-3" id="text-org036b640">
+<div id="outline-container-org6817849" class="outline-3">
+<h3 id="org6817849">Q10: What is the docker volume command?</h3>
+<div class="outline-text-3" id="text-org6817849">
 <p>
 The main Docker volume commands include:
 </p>
@@ -119,419 +988,419 @@ The main Docker volume commands include:
 </ul>
 </div>
 </div>
-<div id="outline-container-org471f3eb" class="outline-3">
-<h3 id="org471f3eb">Q11: What is docker run -v?</h3>
-<div class="outline-text-3" id="text-org471f3eb">
+<div id="outline-container-org94b2107" class="outline-3">
+<h3 id="org94b2107">Q11: What is docker run -v?</h3>
+<div class="outline-text-3" id="text-org94b2107">
 <p>
 The -v option mounts a volume or bind mount into a container.
 </p>
 </div>
 </div>
-<div id="outline-container-orge57c829" class="outline-3">
-<h3 id="orge57c829">Q12: What is the syntax of a named volume mount?</h3>
-<div class="outline-text-3" id="text-orge57c829">
+<div id="outline-container-org0b57601" class="outline-3">
+<h3 id="org0b57601">Q12: What is the syntax of a named volume mount?</h3>
+<div class="outline-text-3" id="text-org0b57601">
 <p>
 Example:
 <code>docker run -v mydata:/app/data image</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org07e6cb9" class="outline-3">
-<h3 id="org07e6cb9">Q13: What is the syntax of a bind mount?</h3>
-<div class="outline-text-3" id="text-org07e6cb9">
+<div id="outline-container-org87c1ac0" class="outline-3">
+<h3 id="org87c1ac0">Q13: What is the syntax of a bind mount?</h3>
+<div class="outline-text-3" id="text-org87c1ac0">
 <p>
 Example:
 <code>docker run -v /host/path:/container/path image</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org9450789" class="outline-3">
-<h3 id="org9450789">Q14: What is a container path?</h3>
-<div class="outline-text-3" id="text-org9450789">
+<div id="outline-container-orge91877f" class="outline-3">
+<h3 id="orge91877f">Q14: What is a container path?</h3>
+<div class="outline-text-3" id="text-orge91877f">
 <p>
 A container path is the filesystem path inside the container where the volume is mounted.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9753d5" class="outline-3">
-<h3 id="orgc9753d5">Q15: What is a host path?</h3>
-<div class="outline-text-3" id="text-orgc9753d5">
+<div id="outline-container-org38936f5" class="outline-3">
+<h3 id="org38936f5">Q15: What is a host path?</h3>
+<div class="outline-text-3" id="text-org38936f5">
 <p>
 A host path is the file or directory path on the Docker host that is mounted into the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a63a8a" class="outline-3">
-<h3 id="org2a63a8a">Q16: What is the difference between read-only and read-write mounts?</h3>
-<div class="outline-text-3" id="text-org2a63a8a">
+<div id="outline-container-org321a72d" class="outline-3">
+<h3 id="org321a72d">Q16: What is the difference between read-only and read-write mounts?</h3>
+<div class="outline-text-3" id="text-org321a72d">
 <p>
 A read-only mount prevents writes from the container to that mount.
 A read-write mount allows data to be modified by the container.
 </p>
 </div>
 </div>
-<div id="outline-container-orga515890" class="outline-3">
-<h3 id="orga515890">Q17: What is a read-only volume mount?</h3>
-<div class="outline-text-3" id="text-orga515890">
+<div id="outline-container-org0c52e4d" class="outline-3">
+<h3 id="org0c52e4d">Q17: What is a read-only volume mount?</h3>
+<div class="outline-text-3" id="text-org0c52e4d">
 <p>
 A read-only mount is used for immutable configuration, certificates, or source code.
 </p>
 </div>
 </div>
-<div id="outline-container-org3432d57" class="outline-3">
-<h3 id="org3432d57">Q18: What is a read-write volume mount?</h3>
-<div class="outline-text-3" id="text-org3432d57">
+<div id="outline-container-org3706493" class="outline-3">
+<h3 id="org3706493">Q18: What is a read-write volume mount?</h3>
+<div class="outline-text-3" id="text-org3706493">
 <p>
 A read-write mount is used for application state, logs, databases, or cache storage.
 </p>
 </div>
 </div>
-<div id="outline-container-org62e69ee" class="outline-3">
-<h3 id="org62e69ee">Q19: What is data volume?</h3>
-<div class="outline-text-3" id="text-org62e69ee">
+<div id="outline-container-org0a22b69" class="outline-3">
+<h3 id="org0a22b69">Q19: What is data volume?</h3>
+<div class="outline-text-3" id="text-org0a22b69">
 <p>
 A data volume is a Docker-managed storage volume used to persist data independently of the container filesystem.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbcfa054" class="outline-3">
-<h3 id="orgbcfa054">Q20: What is a volume driver?</h3>
-<div class="outline-text-3" id="text-orgbcfa054">
+<div id="outline-container-org2b69242" class="outline-3">
+<h3 id="org2b69242">Q20: What is a volume driver?</h3>
+<div class="outline-text-3" id="text-org2b69242">
 <p>
 A volume driver is a plugin or implementation that creates and manages volumes.
 </p>
 </div>
 </div>
-<div id="outline-container-org163d325" class="outline-3">
-<h3 id="org163d325">Q21: What is the default storage driver?</h3>
-<div class="outline-text-3" id="text-org163d325">
+<div id="outline-container-orgef889f1" class="outline-3">
+<h3 id="orgef889f1">Q21: What is the default storage driver?</h3>
+<div class="outline-text-3" id="text-orgef889f1">
 <p>
 Docker often uses the local driver by default for volumes on a single host.
 </p>
 </div>
 </div>
-<div id="outline-container-org19e8166" class="outline-3">
-<h3 id="org19e8166">Q22: Why are volumes useful for databases?</h3>
-<div class="outline-text-3" id="text-org19e8166">
+<div id="outline-container-orgd2cd17b" class="outline-3">
+<h3 id="orgd2cd17b">Q22: Why are volumes useful for databases?</h3>
+<div class="outline-text-3" id="text-orgd2cd17b">
 <p>
 Databases need durable storage for data files, journal files, and transaction logs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdb210fe" class="outline-3">
-<h3 id="orgdb210fe">Q23: What is a container data directory?</h3>
-<div class="outline-text-3" id="text-orgdb210fe">
+<div id="outline-container-org49c7e36" class="outline-3">
+<h3 id="org49c7e36">Q23: What is a container data directory?</h3>
+<div class="outline-text-3" id="text-org49c7e36">
 <p>
 A data directory is a folder inside the container where application data is stored.
 </p>
 </div>
 </div>
-<div id="outline-container-orge9e5489" class="outline-3">
-<h3 id="orge9e5489">Q24: Why not store data in the container image?</h3>
-<div class="outline-text-3" id="text-orge9e5489">
+<div id="outline-container-orgb9c975f" class="outline-3">
+<h3 id="orgb9c975f">Q24: Why not store data in the container image?</h3>
+<div class="outline-text-3" id="text-orgb9c975f">
 <p>
 Because image layers are meant to be immutable and not for writable application state.
 </p>
 </div>
 </div>
-<div id="outline-container-org17924ab" class="outline-3">
-<h3 id="org17924ab">Q25: What happens when a container is deleted?</h3>
-<div class="outline-text-3" id="text-org17924ab">
+<div id="outline-container-orged94afb" class="outline-3">
+<h3 id="orged94afb">Q25: What happens when a container is deleted?</h3>
+<div class="outline-text-3" id="text-orged94afb">
 <p>
 If data is stored only in the writable layer, it is typically lost when the container is deleted.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd80e311" class="outline-3">
-<h3 id="orgd80e311">Q26: What is the benefit of a named volume?</h3>
-<div class="outline-text-3" id="text-orgd80e311">
+<div id="outline-container-orgd89b194" class="outline-3">
+<h3 id="orgd89b194">Q26: What is the benefit of a named volume?</h3>
+<div class="outline-text-3" id="text-orgd89b194">
 <p>
 A named volume provides a stable storage identifier that persists across container recreation.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e8e4a4" class="outline-3">
-<h3 id="org9e8e4a4">Q27: What is a bind mount advantage?</h3>
-<div class="outline-text-3" id="text-org9e8e4a4">
+<div id="outline-container-org49b027d" class="outline-3">
+<h3 id="org49b027d">Q27: What is a bind mount advantage?</h3>
+<div class="outline-text-3" id="text-org49b027d">
 <p>
 It allows direct access to a directory on the host filesystem, useful for development and debugging.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff40a51" class="outline-3">
-<h3 id="orgff40a51">Q28: What is a bind mount disadvantage?</h3>
-<div class="outline-text-3" id="text-orgff40a51">
+<div id="outline-container-org46577fd" class="outline-3">
+<h3 id="org46577fd">Q28: What is a bind mount disadvantage?</h3>
+<div class="outline-text-3" id="text-org46577fd">
 <p>
 It tightly couples the container to the host filesystem layout and can create portability issues.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0b591f" class="outline-3">
-<h3 id="orge0b591f">Q29: What is the volume lifecycle?</h3>
-<div class="outline-text-3" id="text-orge0b591f">
+<div id="outline-container-org2caa69f" class="outline-3">
+<h3 id="org2caa69f">Q29: What is the volume lifecycle?</h3>
+<div class="outline-text-3" id="text-org2caa69f">
 <p>
 A volume is created, attached to one or more containers, used, and later removed manually or with cleanup policies.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd3ce34d" class="outline-3">
-<h3 id="orgd3ce34d">Q30: What is a dangling volume?</h3>
-<div class="outline-text-3" id="text-orgd3ce34d">
+<div id="outline-container-org5dc9a32" class="outline-3">
+<h3 id="org5dc9a32">Q30: What is a dangling volume?</h3>
+<div class="outline-text-3" id="text-org5dc9a32">
 <p>
 A dangling volume is an unused Docker volume not attached to a running container.
 </p>
 </div>
 </div>
-<div id="outline-container-orgabd877a" class="outline-3">
-<h3 id="orgabd877a">Q31: What is docker volume prune?</h3>
-<div class="outline-text-3" id="text-orgabd877a">
+<div id="outline-container-org1a87212" class="outline-3">
+<h3 id="org1a87212">Q31: What is docker volume prune?</h3>
+<div class="outline-text-3" id="text-org1a87212">
 <p>
 <code>docker volume prune</code> removes unused volumes.
 </p>
 </div>
 </div>
-<div id="outline-container-orga7ae846" class="outline-3">
-<h3 id="orga7ae846">Q32: Why prune unused volumes?</h3>
-<div class="outline-text-3" id="text-orga7ae846">
+<div id="outline-container-orga069621" class="outline-3">
+<h3 id="orga069621">Q32: Why prune unused volumes?</h3>
+<div class="outline-text-3" id="text-orga069621">
 <p>
 To reclaim disk space from old or abandoned data.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc80791e" class="outline-3">
-<h3 id="orgc80791e">Q33: What is a volume mount in Compose?</h3>
-<div class="outline-text-3" id="text-orgc80791e">
+<div id="outline-container-orgcce929a" class="outline-3">
+<h3 id="orgcce929a">Q33: What is a volume mount in Compose?</h3>
+<div class="outline-text-3" id="text-orgcce929a">
 <p>
 Compose can declare volumes in the YAML specification and mount them into services.
 </p>
 </div>
 </div>
-<div id="outline-container-org1491eed" class="outline-3">
-<h3 id="org1491eed">Q34: What is the compose syntax for a named volume?</h3>
-<div class="outline-text-3" id="text-org1491eed">
+<div id="outline-container-orgccba131" class="outline-3">
+<h3 id="orgccba131">Q34: What is the compose syntax for a named volume?</h3>
+<div class="outline-text-3" id="text-orgccba131">
 <p>
 Example:
 <code>volumes: mydata:</code> in a service definition.
 </p>
 </div>
 </div>
-<div id="outline-container-orga05ff37" class="outline-3">
-<h3 id="orga05ff37">Q35: What is the compose syntax for a bind mount?</h3>
-<div class="outline-text-3" id="text-orga05ff37">
+<div id="outline-container-org378b0b5" class="outline-3">
+<h3 id="org378b0b5">Q35: What is the compose syntax for a bind mount?</h3>
+<div class="outline-text-3" id="text-org378b0b5">
 <p>
 Example:
 <code>volumes: - ./data:/var/lib/app/data</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org60d6eff" class="outline-3">
-<h3 id="org60d6eff">Q36: What is the difference between a data volume and a bind mount in Compose?</h3>
-<div class="outline-text-3" id="text-org60d6eff">
+<div id="outline-container-org687a7f8" class="outline-3">
+<h3 id="org687a7f8">Q36: What is the difference between a data volume and a bind mount in Compose?</h3>
+<div class="outline-text-3" id="text-org687a7f8">
 <p>
 A data volume is managed by Docker; a bind mount is tied to a host path.
 </p>
 </div>
 </div>
-<div id="outline-container-org57a3ffd" class="outline-3">
-<h3 id="org57a3ffd">Q37: Why should database files be persisted?</h3>
-<div class="outline-text-3" id="text-org57a3ffd">
+<div id="outline-container-org9dcf0fb" class="outline-3">
+<h3 id="org9dcf0fb">Q37: Why should database files be persisted?</h3>
+<div class="outline-text-3" id="text-org9dcf0fb">
 <p>
 To prevent losing data on container rebuilds or crashes.
 </p>
 </div>
 </div>
-<div id="outline-container-org9fbda37" class="outline-3">
-<h3 id="org9fbda37">Q38: What is application cache in Docker?</h3>
-<div class="outline-text-3" id="text-org9fbda37">
+<div id="outline-container-orgad3c384" class="outline-3">
+<h3 id="orgad3c384">Q38: What is application cache in Docker?</h3>
+<div class="outline-text-3" id="text-orgad3c384">
 <p>
 A cache is temporary data used to speed up builds or runtime operations, but sometimes needs persistence.
 </p>
 </div>
 </div>
-<div id="outline-container-org66f6c26" class="outline-3">
-<h3 id="org66f6c26">Q39: What is file-based storage?</h3>
-<div class="outline-text-3" id="text-org66f6c26">
+<div id="outline-container-orgc0e68bd" class="outline-3">
+<h3 id="orgc0e68bd">Q39: What is file-based storage?</h3>
+<div class="outline-text-3" id="text-orgc0e68bd">
 <p>
 File-based storage means data is stored as files in a filesystem, such as logs, uploads, or configuration files.
 </p>
 </div>
 </div>
-<div id="outline-container-orga743494" class="outline-3">
-<h3 id="orga743494">Q40: What is block storage?</h3>
-<div class="outline-text-3" id="text-orga743494">
+<div id="outline-container-org542a284" class="outline-3">
+<h3 id="org542a284">Q40: What is block storage?</h3>
+<div class="outline-text-3" id="text-org542a284">
 <p>
 Block storage exposes storage as blocks that can be used by filesystems or databases, often more appropriate for high-performance workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org36f6305" class="outline-3">
-<h3 id="org36f6305">Q41: What is volume driver plugin?</h3>
-<div class="outline-text-3" id="text-org36f6305">
+<div id="outline-container-org36ebdb1" class="outline-3">
+<h3 id="org36ebdb1">Q41: What is volume driver plugin?</h3>
+<div class="outline-text-3" id="text-org36ebdb1">
 <p>
 A volume driver plugin adds custom volume behavior or external storage backends.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ebf6b2" class="outline-3">
-<h3 id="org7ebf6b2">Q42: What is a local driver?</h3>
-<div class="outline-text-3" id="text-org7ebf6b2">
+<div id="outline-container-org0f4df61" class="outline-3">
+<h3 id="org0f4df61">Q42: What is a local driver?</h3>
+<div class="outline-text-3" id="text-org0f4df61">
 <p>
 The local driver uses disk space on the host machine.
 </p>
 </div>
 </div>
-<div id="outline-container-org089da8a" class="outline-3">
-<h3 id="org089da8a">Q43: What is an NFS-backed volume?</h3>
-<div class="outline-text-3" id="text-org089da8a">
+<div id="outline-container-orge44b4b7" class="outline-3">
+<h3 id="orge44b4b7">Q43: What is an NFS-backed volume?</h3>
+<div class="outline-text-3" id="text-orge44b4b7">
 <p>
 An NFS-backed volume stores data on a remote filesystem shared across multiple hosts.
 </p>
 </div>
 </div>
-<div id="outline-container-orge1e00f5" class="outline-3">
-<h3 id="orge1e00f5">Q44: What is an external storage driver?</h3>
-<div class="outline-text-3" id="text-orge1e00f5">
+<div id="outline-container-org7cc4838" class="outline-3">
+<h3 id="org7cc4838">Q44: What is an external storage driver?</h3>
+<div class="outline-text-3" id="text-org7cc4838">
 <p>
 An external storage driver integrates Docker with cloud or SAN/NAS storage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3c255c" class="outline-3">
-<h3 id="orgc3c255c">Q45: What is a host path volume?</h3>
-<div class="outline-text-3" id="text-orgc3c255c">
+<div id="outline-container-org725e7d8" class="outline-3">
+<h3 id="org725e7d8">Q45: What is a host path volume?</h3>
+<div class="outline-text-3" id="text-org725e7d8">
 <p>
 A host path volume is essentially a bind mount from the Docker host.
 </p>
 </div>
 </div>
-<div id="outline-container-org93f341c" class="outline-3">
-<h3 id="org93f341c">Q46: What is a tmpfs mount?</h3>
-<div class="outline-text-3" id="text-org93f341c">
+<div id="outline-container-org6c076e9" class="outline-3">
+<h3 id="org6c076e9">Q46: What is a tmpfs mount?</h3>
+<div class="outline-text-3" id="text-org6c076e9">
 <p>
 A tmpfs mount stores data in memory instead of on disk.
 </p>
 </div>
 </div>
-<div id="outline-container-org2547091" class="outline-3">
-<h3 id="org2547091">Q47: What is a volume mount and ownership issue?</h3>
-<div class="outline-text-3" id="text-org2547091">
+<div id="outline-container-org434816a" class="outline-3">
+<h3 id="org434816a">Q47: What is a volume mount and ownership issue?</h3>
+<div class="outline-text-3" id="text-org434816a">
 <p>
 The mounted directory may have incorrect UID/GID ownership, causing permission errors in the container.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd13d92f" class="outline-3">
-<h3 id="orgd13d92f">Q48: What is the risk of root-owned mounted directories?</h3>
-<div class="outline-text-3" id="text-orgd13d92f">
+<div id="outline-container-org630fee6" class="outline-3">
+<h3 id="org630fee6">Q48: What is the risk of root-owned mounted directories?</h3>
+<div class="outline-text-3" id="text-org630fee6">
 <p>
 The container process may not have permission to write to the mounted content.
 </p>
 </div>
 </div>
-<div id="outline-container-org7cce1b7" class="outline-3">
-<h3 id="org7cce1b7">Q49: What is a mounted file permission problem?</h3>
-<div class="outline-text-3" id="text-org7cce1b7">
+<div id="outline-container-org83d3b3e" class="outline-3">
+<h3 id="org83d3b3e">Q49: What is a mounted file permission problem?</h3>
+<div class="outline-text-3" id="text-org83d3b3e">
 <p>
 It occurs when files or folders are mounted with restrictive permissions or wrong ownership.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d3c9e7" class="outline-3">
-<h3 id="org6d3c9e7">Q50: What is Docker volume backup?</h3>
-<div class="outline-text-3" id="text-org6d3c9e7">
+<div id="outline-container-orgd5acf3a" class="outline-3">
+<h3 id="orgd5acf3a">Q50: What is Docker volume backup?</h3>
+<div class="outline-text-3" id="text-orgd5acf3a">
 <p>
 Backing up a Docker volume means copying the data for restore or disaster recovery.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc27773c" class="outline-3">
-<h3 id="orgc27773c">Q51: Why is volume backup important?</h3>
-<div class="outline-text-3" id="text-orgc27773c">
+<div id="outline-container-org818e1c5" class="outline-3">
+<h3 id="org818e1c5">Q51: Why is volume backup important?</h3>
+<div class="outline-text-3" id="text-org818e1c5">
 <p>
 Because losing a volume can lose application data.
 </p>
 </div>
 </div>
-<div id="outline-container-org83939ed" class="outline-3">
-<h3 id="org83939ed">Q52: What is volume restore?</h3>
-<div class="outline-text-3" id="text-org83939ed">
+<div id="outline-container-orgf2c1692" class="outline-3">
+<h3 id="orgf2c1692">Q52: What is volume restore?</h3>
+<div class="outline-text-3" id="text-orgf2c1692">
 <p>
 Volume restore recreates a volume from a backup or snapshot.
 </p>
 </div>
 </div>
-<div id="outline-container-org75dbda8" class="outline-3">
-<h3 id="org75dbda8">Q53: What is a Docker data directory backup?</h3>
-<div class="outline-text-3" id="text-org75dbda8">
+<div id="outline-container-orgd794532" class="outline-3">
+<h3 id="orgd794532">Q53: What is a Docker data directory backup?</h3>
+<div class="outline-text-3" id="text-orgd794532">
 <p>
 A backup of the persisted directory or volume used by the application.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdeb743a" class="outline-3">
-<h3 id="orgdeb743a">Q54: What is the difference between ephemeral and persistent data?</h3>
-<div class="outline-text-3" id="text-orgdeb743a">
+<div id="outline-container-org47d5184" class="outline-3">
+<h3 id="org47d5184">Q54: What is the difference between ephemeral and persistent data?</h3>
+<div class="outline-text-3" id="text-org47d5184">
 <p>
 Ephemeral data is lost when the container is deleted; persistent data survives.
 </p>
 </div>
 </div>
-<div id="outline-container-org52810cd" class="outline-3">
-<h3 id="org52810cd">Q55: What is a log volume?</h3>
-<div class="outline-text-3" id="text-org52810cd">
+<div id="outline-container-org5e200f6" class="outline-3">
+<h3 id="org5e200f6">Q55: What is a log volume?</h3>
+<div class="outline-text-3" id="text-org5e200f6">
 <p>
 A log volume stores logs outside the container filesystem so they survive restarts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb32694b" class="outline-3">
-<h3 id="orgb32694b">Q56: What is an upload directory?</h3>
-<div class="outline-text-3" id="text-orgb32694b">
+<div id="outline-container-org0a47dbe" class="outline-3">
+<h3 id="org0a47dbe">Q56: What is an upload directory?</h3>
+<div class="outline-text-3" id="text-org0a47dbe">
 <p>
 An upload directory stores files uploaded by users or external systems.
 </p>
 </div>
 </div>
-<div id="outline-container-orged79235" class="outline-3">
-<h3 id="orged79235">Q57: What is a configuration file mount?</h3>
-<div class="outline-text-3" id="text-orged79235">
+<div id="outline-container-org82ee501" class="outline-3">
+<h3 id="org82ee501">Q57: What is a configuration file mount?</h3>
+<div class="outline-text-3" id="text-org82ee501">
 <p>
 It mounts configuration files from the host or a secret source into the container.
 </p>
 </div>
 </div>
-<div id="outline-container-orga2e15a9" class="outline-3">
-<h3 id="orga2e15a9">Q58: What is a secrets mount?</h3>
-<div class="outline-text-3" id="text-orga2e15a9">
+<div id="outline-container-org61e7925" class="outline-3">
+<h3 id="org61e7925">Q58: What is a secrets mount?</h3>
+<div class="outline-text-3" id="text-org61e7925">
 <p>
 A secrets mount injects sensitive values as files or environment variables without baking them into the image.
 </p>
 </div>
 </div>
-<div id="outline-container-orga5174b2" class="outline-3">
-<h3 id="orga5174b2">Q59: What is Docker volume vs bind mount in production?</h3>
-<div class="outline-text-3" id="text-orga5174b2">
+<div id="outline-container-org33b30fd" class="outline-3">
+<h3 id="org33b30fd">Q59: What is Docker volume vs bind mount in production?</h3>
+<div class="outline-text-3" id="text-org33b30fd">
 <p>
 Volumes are generally preferred for container-managed data storage; bind mounts are common for development work.
 </p>
 </div>
 </div>
-<div id="outline-container-org6be7e3e" class="outline-3">
-<h3 id="org6be7e3e">Q60: Why is using volumes better for database persistence?</h3>
-<div class="outline-text-3" id="text-org6be7e3e">
+<div id="outline-container-org2ef6a92" class="outline-3">
+<h3 id="org2ef6a92">Q60: Why is using volumes better for database persistence?</h3>
+<div class="outline-text-3" id="text-org2ef6a92">
 <p>
 Because they isolate application data from image layers and survive container lifecycle events.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org51d6085" class="outline-2">
-<h2 id="org51d6085">Intermediate</h2>
-<div class="outline-text-2" id="text-org51d6085">
+<div id="outline-container-org98c0e4e" class="outline-2">
+<h2 id="org98c0e4e">Intermediate</h2>
+<div class="outline-text-2" id="text-org98c0e4e">
 </div>
-<div id="outline-container-orgc5df94b" class="outline-3">
-<h3 id="orgc5df94b">Q61: What are Docker volume types?</h3>
-<div class="outline-text-3" id="text-orgc5df94b">
+<div id="outline-container-org67d7dd7" class="outline-3">
+<h3 id="org67d7dd7">Q61: What are Docker volume types?</h3>
+<div class="outline-text-3" id="text-org67d7dd7">
 <p>
 Common types include:
 </p>
@@ -543,1123 +1412,1123 @@ Common types include:
 </ul>
 </div>
 </div>
-<div id="outline-container-orgfba26b3" class="outline-3">
-<h3 id="orgfba26b3">Q62: What is the docker volume create command?</h3>
-<div class="outline-text-3" id="text-orgfba26b3">
+<div id="outline-container-org3678827" class="outline-3">
+<h3 id="org3678827">Q62: What is the docker volume create command?</h3>
+<div class="outline-text-3" id="text-org3678827">
 <p>
 Example:
 <code>docker volume create myvolume</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org6ed7f60" class="outline-3">
-<h3 id="org6ed7f60">Q63: What is docker volume inspect?</h3>
-<div class="outline-text-3" id="text-org6ed7f60">
+<div id="outline-container-org12b6fa9" class="outline-3">
+<h3 id="org12b6fa9">Q63: What is docker volume inspect?</h3>
+<div class="outline-text-3" id="text-org12b6fa9">
 <p>
 It shows the details of a volume, including mountpoint and driver.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf9210c5" class="outline-3">
-<h3 id="orgf9210c5">Q64: What is the mountpoint of a Docker volume?</h3>
-<div class="outline-text-3" id="text-orgf9210c5">
+<div id="outline-container-org3ffd06d" class="outline-3">
+<h3 id="org3ffd06d">Q64: What is the mountpoint of a Docker volume?</h3>
+<div class="outline-text-3" id="text-org3ffd06d">
 <p>
 The mountpoint is the physical path on the Docker host where the volume data is stored.
 </p>
 </div>
 </div>
-<div id="outline-container-orga7490f4" class="outline-3">
-<h3 id="orga7490f4">Q65: What is the default volume location on Linux?</h3>
-<div class="outline-text-3" id="text-orga7490f4">
+<div id="outline-container-orgc1fd5f4" class="outline-3">
+<h3 id="orgc1fd5f4">Q65: What is the default volume location on Linux?</h3>
+<div class="outline-text-3" id="text-orgc1fd5f4">
 <p>
 Usually under <i>var/lib/docker/volumes</i>&#x2026;
 </p>
 </div>
 </div>
-<div id="outline-container-orge87fb10" class="outline-3">
-<h3 id="orge87fb10">Q66: What is a Docker volume driver backend?</h3>
-<div class="outline-text-3" id="text-orge87fb10">
+<div id="outline-container-org851d8d2" class="outline-3">
+<h3 id="org851d8d2">Q66: What is a Docker volume driver backend?</h3>
+<div class="outline-text-3" id="text-org851d8d2">
 <p>
 It is the underlying implementation that stores and manages the data, such as local, NFS, or cloud storage.
 </p>
 </div>
 </div>
-<div id="outline-container-org7a63e39" class="outline-3">
-<h3 id="org7a63e39">Q67: What is a volume option?</h3>
-<div class="outline-text-3" id="text-org7a63e39">
+<div id="outline-container-org6dae320" class="outline-3">
+<h3 id="org6dae320">Q67: What is a volume option?</h3>
+<div class="outline-text-3" id="text-org6dae320">
 <p>
 A volume option provides settings such as driver, o=&#x2026;, or mount configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org2060911" class="outline-3">
-<h3 id="org2060911">Q68: What is the -o option for Docker volumes?</h3>
-<div class="outline-text-3" id="text-org2060911">
+<div id="outline-container-orgc93b28a" class="outline-3">
+<h3 id="orgc93b28a">Q68: What is the -o option for Docker volumes?</h3>
+<div class="outline-text-3" id="text-orgc93b28a">
 <p>
 The -o option passes driver-specific options to the volume driver.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ec0223" class="outline-3">
-<h3 id="org6ec0223">Q69: What is a local volume driver?</h3>
-<div class="outline-text-3" id="text-org6ec0223">
+<div id="outline-container-orga38da22" class="outline-3">
+<h3 id="orga38da22">Q69: What is a local volume driver?</h3>
+<div class="outline-text-3" id="text-orga38da22">
 <p>
 The local volume driver stores data on the local filesystem, often on the host.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc44a4b" class="outline-3">
-<h3 id="orgdc44a4b">Q70: What is a remote volume?</h3>
-<div class="outline-text-3" id="text-orgdc44a4b">
+<div id="outline-container-orge6224f4" class="outline-3">
+<h3 id="orge6224f4">Q70: What is a remote volume?</h3>
+<div class="outline-text-3" id="text-orge6224f4">
 <p>
 A remote volume stores data on a remote filesystem or storage system, such as NFS or cloud storage.
 </p>
 </div>
 </div>
-<div id="outline-container-org7954b8f" class="outline-3">
-<h3 id="org7954b8f">Q71: What is the difference between a local and remote volume?</h3>
-<div class="outline-text-3" id="text-org7954b8f">
+<div id="outline-container-org8a32954" class="outline-3">
+<h3 id="org8a32954">Q71: What is the difference between a local and remote volume?</h3>
+<div class="outline-text-3" id="text-org8a32954">
 <p>
 A local volume is on the host filesystem; a remote volume is on a network filesystem or remote backend.
 </p>
 </div>
 </div>
-<div id="outline-container-org978e224" class="outline-3">
-<h3 id="org978e224">Q72: What is a volume plugin?</h3>
-<div class="outline-text-3" id="text-org978e224">
+<div id="outline-container-orge24bfe6" class="outline-3">
+<h3 id="orge24bfe6">Q72: What is a volume plugin?</h3>
+<div class="outline-text-3" id="text-orge24bfe6">
 <p>
 A volume plugin implements a storage backend for Docker volumes beyond the default local driver.
 </p>
 </div>
 </div>
-<div id="outline-container-org399178c" class="outline-3">
-<h3 id="org399178c">Q73: What is an NFS driver for Docker?</h3>
-<div class="outline-text-3" id="text-org399178c">
+<div id="outline-container-org4373625" class="outline-3">
+<h3 id="org4373625">Q73: What is an NFS driver for Docker?</h3>
+<div class="outline-text-3" id="text-org4373625">
 <p>
 NFS allows multiple hosts to share the same persistent storage across containers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdcfa16f" class="outline-3">
-<h3 id="orgdcfa16f">Q74: What is a shared volume?</h3>
-<div class="outline-text-3" id="text-orgdcfa16f">
+<div id="outline-container-orge33a2ad" class="outline-3">
+<h3 id="orge33a2ad">Q74: What is a shared volume?</h3>
+<div class="outline-text-3" id="text-orge33a2ad">
 <p>
 A shared volume is mounted by more than one container or host, often for shared files or clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org886dccc" class="outline-3">
-<h3 id="org886dccc">Q75: What is a Docker Compose volume declaration?</h3>
-<div class="outline-text-3" id="text-org886dccc">
+<div id="outline-container-org17561c7" class="outline-3">
+<h3 id="org17561c7">Q75: What is a Docker Compose volume declaration?</h3>
+<div class="outline-text-3" id="text-org17561c7">
 <p>
 Example:
 <code>volumes: dbdata:</code> inside a Compose file.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd105dec" class="outline-3">
-<h3 id="orgd105dec">Q76: What is a bind mount relative path in Compose?</h3>
-<div class="outline-text-3" id="text-orgd105dec">
+<div id="outline-container-org3866b1b" class="outline-3">
+<h3 id="org3866b1b">Q76: What is a bind mount relative path in Compose?</h3>
+<div class="outline-text-3" id="text-org3866b1b">
 <p>
 Example:
 <code>./app-data:/var/lib/app/data</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org8461f1d" class="outline-3">
-<h3 id="org8461f1d">Q77: What is absolute host path bind mount?</h3>
-<div class="outline-text-3" id="text-org8461f1d">
+<div id="outline-container-org4238026" class="outline-3">
+<h3 id="org4238026">Q77: What is absolute host path bind mount?</h3>
+<div class="outline-text-3" id="text-org4238026">
 <p>
 Example:
 <code>/data:/container/data</code>
 </p>
 </div>
 </div>
-<div id="outline-container-org4e089c8" class="outline-3">
-<h3 id="org4e089c8">Q78: Why is bind mount sometimes used in development?</h3>
-<div class="outline-text-3" id="text-org4e089c8">
+<div id="outline-container-org2aa58c1" class="outline-3">
+<h3 id="org2aa58c1">Q78: Why is bind mount sometimes used in development?</h3>
+<div class="outline-text-3" id="text-org2aa58c1">
 <p>
 It allows live code changes on the host to be visible inside the container without rebuilding the image.
 </p>
 </div>
 </div>
-<div id="outline-container-org579823d" class="outline-3">
-<h3 id="org579823d">Q79: What is the risk of using bind mounts in production?</h3>
-<div class="outline-text-3" id="text-org579823d">
+<div id="outline-container-orgb103b90" class="outline-3">
+<h3 id="orgb103b90">Q79: What is the risk of using bind mounts in production?</h3>
+<div class="outline-text-3" id="text-orgb103b90">
 <p>
 It tightly couples the container runtime to host paths and may expose host files outside the intended boundary.
 </p>
 </div>
 </div>
-<div id="outline-container-org9408726" class="outline-3">
-<h3 id="org9408726">Q80: What is data migration?</h3>
-<div class="outline-text-3" id="text-org9408726">
+<div id="outline-container-orgf621037" class="outline-3">
+<h3 id="orgf621037">Q80: What is data migration?</h3>
+<div class="outline-text-3" id="text-orgf621037">
 <p>
 Data migration is moving data from one storage backend to another without losing information.
 </p>
 </div>
 </div>
-<div id="outline-container-org5208f4d" class="outline-3">
-<h3 id="org5208f4d">Q81: What is a volume snapshot?</h3>
-<div class="outline-text-3" id="text-org5208f4d">
+<div id="outline-container-org2a76bfe" class="outline-3">
+<h3 id="org2a76bfe">Q81: What is a volume snapshot?</h3>
+<div class="outline-text-3" id="text-org2a76bfe">
 <p>
 A snapshot is a point-in-time copy of a volume, useful for backups or rollback.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb499d90" class="outline-3">
-<h3 id="orgb499d90">Q82: What is copy-on-write?</h3>
-<div class="outline-text-3" id="text-orgb499d90">
+<div id="outline-container-org01886bb" class="outline-3">
+<h3 id="org01886bb">Q82: What is copy-on-write?</h3>
+<div class="outline-text-3" id="text-org01886bb">
 <p>
 Copy-on-write snapshots only copy blocks when writing changes, saving space and time.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a8cbf7" class="outline-3">
-<h3 id="org9a8cbf7">Q83: What is a container filesystem overlay?</h3>
-<div class="outline-text-3" id="text-org9a8cbf7">
+<div id="outline-container-org83e0c42" class="outline-3">
+<h3 id="org83e0c42">Q83: What is a container filesystem overlay?</h3>
+<div class="outline-text-3" id="text-org83e0c42">
 <p>
 The container filesystem is a layered union of the image layers plus the writable layer.
 </p>
 </div>
 </div>
-<div id="outline-container-org77d9d6c" class="outline-3">
-<h3 id="org77d9d6c">Q84: Why are volumes not part of the image layer?</h3>
-<div class="outline-text-3" id="text-org77d9d6c">
+<div id="outline-container-org0feb672" class="outline-3">
+<h3 id="org0feb672">Q84: Why are volumes not part of the image layer?</h3>
+<div class="outline-text-3" id="text-org0feb672">
 <p>
 Because volumes are meant to hold state outside the immutable image layers.
 </p>
 </div>
 </div>
-<div id="outline-container-orga75991d" class="outline-3">
-<h3 id="orga75991d">Q85: What is a Docker image layer?</h3>
-<div class="outline-text-3" id="text-orga75991d">
+<div id="outline-container-orgc22fe92" class="outline-3">
+<h3 id="orgc22fe92">Q85: What is a Docker image layer?</h3>
+<div class="outline-text-3" id="text-orgc22fe92">
 <p>
 A Docker image is composed of read-only layers stacked on top of each other.
 </p>
 </div>
 </div>
-<div id="outline-container-org7d19bba" class="outline-3">
-<h3 id="org7d19bba">Q86: Why should logs be on volumes?</h3>
-<div class="outline-text-3" id="text-org7d19bba">
+<div id="outline-container-org46d0436" class="outline-3">
+<h3 id="org46d0436">Q86: Why should logs be on volumes?</h3>
+<div class="outline-text-3" id="text-org46d0436">
 <p>
 Logs can be inspected after the container stops, and storing them outside the writable layer helps with retention.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb62f7ca" class="outline-3">
-<h3 id="orgb62f7ca">Q87: What is a data volume container?</h3>
-<div class="outline-text-3" id="text-orgb62f7ca">
+<div id="outline-container-org4ebe874" class="outline-3">
+<h3 id="org4ebe874">Q87: What is a data volume container?</h3>
+<div class="outline-text-3" id="text-org4ebe874">
 <p>
 A data volume container is an older Docker pattern where a container exists only to hold shared volumes.
 </p>
 </div>
 </div>
-<div id="outline-container-org16c2094" class="outline-3">
-<h3 id="org16c2094">Q88: Why are data volume containers legacy?</h3>
-<div class="outline-text-3" id="text-org16c2094">
+<div id="outline-container-orgb52e31a" class="outline-3">
+<h3 id="orgb52e31a">Q88: Why are data volume containers legacy?</h3>
+<div class="outline-text-3" id="text-orgb52e31a">
 <p>
 They are older patterns and less favored compared to named volumes and modern orchestrator storage abstractions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb10221" class="outline-3">
-<h3 id="orgcb10221">Q89: What is volume ownership in Docker?</h3>
-<div class="outline-text-3" id="text-orgcb10221">
+<div id="outline-container-orgfffb985" class="outline-3">
+<h3 id="orgfffb985">Q89: What is volume ownership in Docker?</h3>
+<div class="outline-text-3" id="text-orgfffb985">
 <p>
 Ownership of a mounted volume determines which user and group can read or write the files.
 </p>
 </div>
 </div>
-<div id="outline-container-org67f464f" class="outline-3">
-<h3 id="org67f464f">Q90: What is UID/GID mapping?</h3>
-<div class="outline-text-3" id="text-org67f464f">
+<div id="outline-container-org660e329" class="outline-3">
+<h3 id="org660e329">Q90: What is UID/GID mapping?</h3>
+<div class="outline-text-3" id="text-org660e329">
 <p>
 UID/GID mapping matches host user IDs and container user IDs so files are accessible without permission issues.
 </p>
 </div>
 </div>
-<div id="outline-container-org4871ebd" class="outline-3">
-<h3 id="org4871ebd">Q91: What is container permissions with bind mounts?</h3>
-<div class="outline-text-3" id="text-org4871ebd">
+<div id="outline-container-org47e10c4" class="outline-3">
+<h3 id="org47e10c4">Q91: What is container permissions with bind mounts?</h3>
+<div class="outline-text-3" id="text-org47e10c4">
 <p>
 Permissions can become problematic when host files are mounted with restrictive ownership or modes.
 </p>
 </div>
 </div>
-<div id="outline-container-org7b21572" class="outline-3">
-<h3 id="org7b21572">Q92: What is user namespace remapping?</h3>
-<div class="outline-text-3" id="text-org7b21572">
+<div id="outline-container-orgb4773d1" class="outline-3">
+<h3 id="orgb4773d1">Q92: What is user namespace remapping?</h3>
+<div class="outline-text-3" id="text-orgb4773d1">
 <p>
 User namespace remapping can isolate host and container UIDs to reduce the risk of privilege escalation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf0f5b8f" class="outline-3">
-<h3 id="orgf0f5b8f">Q93: What is a mount propagation?</h3>
-<div class="outline-text-3" id="text-orgf0f5b8f">
+<div id="outline-container-org0887dec" class="outline-3">
+<h3 id="org0887dec">Q93: What is a mount propagation?</h3>
+<div class="outline-text-3" id="text-org0887dec">
 <p>
 Mount propagation controls whether changes in one mount are shared with other mounts in the same namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org121d25b" class="outline-3">
-<h3 id="org121d25b">Q94: What is rshared, rslave, rprivate?</h3>
-<div class="outline-text-3" id="text-org121d25b">
+<div id="outline-container-orgf90fce2" class="outline-3">
+<h3 id="orgf90fce2">Q94: What is rshared, rslave, rprivate?</h3>
+<div class="outline-text-3" id="text-orgf90fce2">
 <p>
 These are Linux mount propagation modes controlling how mounts propagate between containers and hosts.
 </p>
 </div>
 </div>
-<div id="outline-container-org5c71763" class="outline-3">
-<h3 id="org5c71763">Q95: What is a bind mount propagation issue?</h3>
-<div class="outline-text-3" id="text-org5c71763">
+<div id="outline-container-orgb3f763b" class="outline-3">
+<h3 id="orgb3f763b">Q95: What is a bind mount propagation issue?</h3>
+<div class="outline-text-3" id="text-orgb3f763b">
 <p>
 It can unexpectedly share or hide host directories due to propagation settings.
 </p>
 </div>
 </div>
-<div id="outline-container-org76a4cea" class="outline-3">
-<h3 id="org76a4cea">Q96: What is a volume cache?</h3>
-<div class="outline-text-3" id="text-org76a4cea">
+<div id="outline-container-orgfb7df20" class="outline-3">
+<h3 id="orgfb7df20">Q96: What is a volume cache?</h3>
+<div class="outline-text-3" id="text-orgfb7df20">
 <p>
 A volume can be used to store caches or build artifacts across container runs.
 </p>
 </div>
 </div>
-<div id="outline-container-org723cb9d" class="outline-3">
-<h3 id="org723cb9d">Q97: What is temporary data?</h3>
-<div class="outline-text-3" id="text-org723cb9d">
+<div id="outline-container-orgb84dd77" class="outline-3">
+<h3 id="orgb84dd77">Q97: What is temporary data?</h3>
+<div class="outline-text-3" id="text-orgb84dd77">
 <p>
 Temporary data is short-lived and may not need persistence.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e20aa0" class="outline-3">
-<h3 id="org5e20aa0">Q98: What is a data-only container?</h3>
-<div class="outline-text-3" id="text-org5e20aa0">
+<div id="outline-container-orge408391" class="outline-3">
+<h3 id="orge408391">Q98: What is a data-only container?</h3>
+<div class="outline-text-3" id="text-orge408391">
 <p>
 A data-only container is a container designed to store shared data and is often not running services.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c578bb" class="outline-3">
-<h3 id="org0c578bb">Q99: Why not use data-only containers in modern Docker?</h3>
-<div class="outline-text-3" id="text-org0c578bb">
+<div id="outline-container-org2554f6c" class="outline-3">
+<h3 id="org2554f6c">Q99: Why not use data-only containers in modern Docker?</h3>
+<div class="outline-text-3" id="text-org2554f6c">
 <p>
 Because named volumes and orchestrator storage abstractions are clearer and more maintainable.
 </p>
 </div>
 </div>
-<div id="outline-container-org429c66d" class="outline-3">
-<h3 id="org429c66d">Q100: What is a volume’s physical storage backend?</h3>
-<div class="outline-text-3" id="text-org429c66d">
+<div id="outline-container-org152d4ce" class="outline-3">
+<h3 id="org152d4ce">Q100: What is a volume’s physical storage backend?</h3>
+<div class="outline-text-3" id="text-org152d4ce">
 <p>
 It can be the local filesystem, a network filesystem, a cloud disk, or a storage driver backend.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd054eb1" class="outline-3">
-<h3 id="orgd054eb1">Q101: What is docker volume ls output?</h3>
-<div class="outline-text-3" id="text-orgd054eb1">
+<div id="outline-container-org8038e02" class="outline-3">
+<h3 id="org8038e02">Q101: What is docker volume ls output?</h3>
+<div class="outline-text-3" id="text-org8038e02">
 <p>
 It lists all Docker-managed volumes available on the host.
 </p>
 </div>
 </div>
-<div id="outline-container-org226ac27" class="outline-3">
-<h3 id="org226ac27">Q102: What is docker volume rm?</h3>
-<div class="outline-text-3" id="text-org226ac27">
+<div id="outline-container-orgf52dddd" class="outline-3">
+<h3 id="orgf52dddd">Q102: What is docker volume rm?</h3>
+<div class="outline-text-3" id="text-orgf52dddd">
 <p>
 It removes a specific Docker volume.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ac4bf6" class="outline-3">
-<h3 id="org2ac4bf6">Q103: What is the effect of removing a volume?</h3>
-<div class="outline-text-3" id="text-org2ac4bf6">
+<div id="outline-container-org29dd288" class="outline-3">
+<h3 id="org29dd288">Q103: What is the effect of removing a volume?</h3>
+<div class="outline-text-3" id="text-org29dd288">
 <p>
 It deletes the underlying contents associated with that volume.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf69b890" class="outline-3">
-<h3 id="orgf69b890">Q104: Why is volume deletion dangerous?</h3>
-<div class="outline-text-3" id="text-orgf69b890">
+<div id="outline-container-orgc6508db" class="outline-3">
+<h3 id="orgc6508db">Q104: Why is volume deletion dangerous?</h3>
+<div class="outline-text-3" id="text-orgc6508db">
 <p>
 Because it can permanently destroy application data if not backed up correctly.
 </p>
 </div>
 </div>
-<div id="outline-container-org863cc60" class="outline-3">
-<h3 id="org863cc60">Q105: What is the importance of volume naming?</h3>
-<div class="outline-text-3" id="text-org863cc60">
+<div id="outline-container-org7e259b6" class="outline-3">
+<h3 id="org7e259b6">Q105: What is the importance of volume naming?</h3>
+<div class="outline-text-3" id="text-org7e259b6">
 <p>
 A meaningful volume name helps operations, backup, and cleanup processes.
 </p>
 </div>
 </div>
-<div id="outline-container-org0832955" class="outline-3">
-<h3 id="org0832955">Q106: What is a volume label in Docker?</h3>
-<div class="outline-text-3" id="text-org0832955">
+<div id="outline-container-orgb28a45c" class="outline-3">
+<h3 id="orgb28a45c">Q106: What is a volume label in Docker?</h3>
+<div class="outline-text-3" id="text-orgb28a45c">
 <p>
 A label can help group or identify volumes for management and automation.
 </p>
 </div>
 </div>
-<div id="outline-container-orga75f7b3" class="outline-3">
-<h3 id="orga75f7b3">Q107: Why keep one service per volume?</h3>
-<div class="outline-text-3" id="text-orga75f7b3">
+<div id="outline-container-orgf27afec" class="outline-3">
+<h3 id="orgf27afec">Q107: Why keep one service per volume?</h3>
+<div class="outline-text-3" id="text-orgf27afec">
 <p>
 Separation of concerns helps isolate state, simplify backups, and increase resilience.
 </p>
 </div>
 </div>
-<div id="outline-container-org9279444" class="outline-3">
-<h3 id="org9279444">Q108: What is data scoping?</h3>
-<div class="outline-text-3" id="text-org9279444">
+<div id="outline-container-org7ed3f53" class="outline-3">
+<h3 id="org7ed3f53">Q108: What is data scoping?</h3>
+<div class="outline-text-3" id="text-org7ed3f53">
 <p>
 Data scoping is the practice of defining which service or environment owns a volume.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c4b679" class="outline-3">
-<h3 id="org7c4b679">Q109: What is a volume for configuration?</h3>
-<div class="outline-text-3" id="text-org7c4b679">
+<div id="outline-container-org5302aa5" class="outline-3">
+<h3 id="org5302aa5">Q109: What is a volume for configuration?</h3>
+<div class="outline-text-3" id="text-org5302aa5">
 <p>
 Configuration files stored in a volume can be changed without rebuilding the application image.
 </p>
 </div>
 </div>
-<div id="outline-container-org1e820d8" class="outline-3">
-<h3 id="org1e820d8">Q110: What is a secret volume?</h3>
-<div class="outline-text-3" id="text-org1e820d8">
+<div id="outline-container-org927f815" class="outline-3">
+<h3 id="org927f815">Q110: What is a secret volume?</h3>
+<div class="outline-text-3" id="text-org927f815">
 <p>
 A secret volume may mount sensitive files like TLS certificates or keys into a container.
 </p>
 </div>
 </div>
-<div id="outline-container-org2fcae54" class="outline-3">
-<h3 id="org2fcae54">Q111: Why mount secrets as files rather than environment variables?</h3>
-<div class="outline-text-3" id="text-org2fcae54">
+<div id="outline-container-org6a4d300" class="outline-3">
+<h3 id="org6a4d300">Q111: Why mount secrets as files rather than environment variables?</h3>
+<div class="outline-text-3" id="text-org6a4d300">
 <p>
 Because some systems handle certificates and keys more securely as files.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a5d66a" class="outline-3">
-<h3 id="org9a5d66a">Q112: What is a docker secret?</h3>
-<div class="outline-text-3" id="text-org9a5d66a">
+<div id="outline-container-orgbc752a4" class="outline-3">
+<h3 id="orgbc752a4">Q112: What is a docker secret?</h3>
+<div class="outline-text-3" id="text-orgbc752a4">
 <p>
 Docker secrets are a secure way to inject sensitive data to services, especially in Swarm mode.
 </p>
 </div>
 </div>
-<div id="outline-container-org07451a4" class="outline-3">
-<h3 id="org07451a4">Q113: What is a Docker volume vs Docker secret?</h3>
-<div class="outline-text-3" id="text-org07451a4">
+<div id="outline-container-orga6e10ec" class="outline-3">
+<h3 id="orga6e10ec">Q113: What is a Docker volume vs Docker secret?</h3>
+<div class="outline-text-3" id="text-orga6e10ec">
 <p>
 A volume stores data for general persistence; a secret is meant for confidential configuration and is managed securely.
 </p>
 </div>
 </div>
-<div id="outline-container-org4475511" class="outline-3">
-<h3 id="org4475511">Q114: What is the difference between a config and a volume?</h3>
-<div class="outline-text-3" id="text-org4475511">
+<div id="outline-container-org74365a4" class="outline-3">
+<h3 id="org74365a4">Q114: What is the difference between a config and a volume?</h3>
+<div class="outline-text-3" id="text-org74365a4">
 <p>
 A config is typically metadata or static config; a volume is persistent data or state.
 </p>
 </div>
 </div>
-<div id="outline-container-org6fe3242" class="outline-3">
-<h3 id="org6fe3242">Q115: What is database data directory?</h3>
-<div class="outline-text-3" id="text-org6fe3242">
+<div id="outline-container-orgd9042d2" class="outline-3">
+<h3 id="orgd9042d2">Q115: What is database data directory?</h3>
+<div class="outline-text-3" id="text-orgd9042d2">
 <p>
 The database data directory often contains tables, indexes, and metadata and must persist.
 </p>
 </div>
 </div>
-<div id="outline-container-org9762baf" class="outline-3">
-<h3 id="org9762baf">Q116: What is log volume retention?</h3>
-<div class="outline-text-3" id="text-org9762baf">
+<div id="outline-container-org1e72927" class="outline-3">
+<h3 id="org1e72927">Q116: What is log volume retention?</h3>
+<div class="outline-text-3" id="text-org1e72927">
 <p>
 Retention policies determine how long logs remain on persistent storage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb6ec7f0" class="outline-3">
-<h3 id="orgb6ec7f0">Q117: What is file ownership mismatch in volumes?</h3>
-<div class="outline-text-3" id="text-orgb6ec7f0">
+<div id="outline-container-org040c122" class="outline-3">
+<h3 id="org040c122">Q117: What is file ownership mismatch in volumes?</h3>
+<div class="outline-text-3" id="text-org040c122">
 <p>
 It occurs when host files are mounted with owner IDs that do not match the container’s runtime user.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb7f7424" class="outline-3">
-<h3 id="orgb7f7424">Q118: Why is volume cleanup important?</h3>
-<div class="outline-text-3" id="text-orgb7f7424">
+<div id="outline-container-org0d22342" class="outline-3">
+<h3 id="org0d22342">Q118: Why is volume cleanup important?</h3>
+<div class="outline-text-3" id="text-org0d22342">
 <p>
 It avoids disk exhaustion and stale data accumulation.
 </p>
 </div>
 </div>
-<div id="outline-container-org34b4116" class="outline-3">
-<h3 id="org34b4116">Q119: What is volume backup automation?</h3>
-<div class="outline-text-3" id="text-org34b4116">
+<div id="outline-container-org17c65d5" class="outline-3">
+<h3 id="org17c65d5">Q119: What is volume backup automation?</h3>
+<div class="outline-text-3" id="text-org17c65d5">
 <p>
 Automated scripts or orchestrators can snapshot or archive volumes regularly.
 </p>
 </div>
 </div>
-<div id="outline-container-orge4431d5" class="outline-3">
-<h3 id="orge4431d5">Q120: What is restore verification?</h3>
-<div class="outline-text-3" id="text-orge4431d5">
+<div id="outline-container-orga24ddb4" class="outline-3">
+<h3 id="orga24ddb4">Q120: What is restore verification?</h3>
+<div class="outline-text-3" id="text-orga24ddb4">
 <p>
 Restore verification ensures a backup can actually be used to bring the system back.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org81c86b8" class="outline-2">
-<h2 id="org81c86b8">Advanced / Expert</h2>
-<div class="outline-text-2" id="text-org81c86b8">
+<div id="outline-container-orge5ad04e" class="outline-2">
+<h2 id="orge5ad04e">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-orge5ad04e">
 </div>
-<div id="outline-container-orga8d5ac2" class="outline-3">
-<h3 id="orga8d5ac2">Q121: What is Docker storage driver?</h3>
-<div class="outline-text-3" id="text-orga8d5ac2">
+<div id="outline-container-org0deac7e" class="outline-3">
+<h3 id="org0deac7e">Q121: What is Docker storage driver?</h3>
+<div class="outline-text-3" id="text-org0deac7e">
 <p>
 The storage driver is the system used by Docker to manage image layers and container write layers.
 </p>
 </div>
 </div>
-<div id="outline-container-org3701563" class="outline-3">
-<h3 id="org3701563">Q122: What is overlayfs?</h3>
-<div class="outline-text-3" id="text-org3701563">
+<div id="outline-container-org5b5d28f" class="outline-3">
+<h3 id="org5b5d28f">Q122: What is overlayfs?</h3>
+<div class="outline-text-3" id="text-org5b5d28f">
 <p>
 Overlayfs is a union filesystem used by Docker for layered filesystem management.
 </p>
 </div>
 </div>
-<div id="outline-container-org0984d28" class="outline-3">
-<h3 id="org0984d28">Q123: Why is overlayfs relevant to volumes?</h3>
-<div class="outline-text-3" id="text-org0984d28">
+<div id="outline-container-orgf46e248" class="outline-3">
+<h3 id="orgf46e248">Q123: Why is overlayfs relevant to volumes?</h3>
+<div class="outline-text-3" id="text-orgf46e248">
 <p>
 Because it affects how writable layers and mount points behave along with persistent storage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgde4059e" class="outline-3">
-<h3 id="orgde4059e">Q124: What is filesystem performance impact?</h3>
-<div class="outline-text-3" id="text-orgde4059e">
+<div id="outline-container-org09dcea5" class="outline-3">
+<h3 id="org09dcea5">Q124: What is filesystem performance impact?</h3>
+<div class="outline-text-3" id="text-org09dcea5">
 <p>
 Persistent volumes may have different latency, throughput, and IOPS characteristics depending on the backend.
 </p>
 </div>
 </div>
-<div id="outline-container-org209f038" class="outline-3">
-<h3 id="org209f038">Q125: What is IOPS?</h3>
-<div class="outline-text-3" id="text-org209f038">
+<div id="outline-container-org19555c1" class="outline-3">
+<h3 id="org19555c1">Q125: What is IOPS?</h3>
+<div class="outline-text-3" id="text-org19555c1">
 <p>
 IOPS (Input/Output Operations Per Second) is a measure of storage performance.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d6416e" class="outline-3">
-<h3 id="org3d6416e">Q126: What is block-level storage?</h3>
-<div class="outline-text-3" id="text-org3d6416e">
+<div id="outline-container-orga0ec282" class="outline-3">
+<h3 id="orga0ec282">Q126: What is block-level storage?</h3>
+<div class="outline-text-3" id="text-orga0ec282">
 <p>
 Block-level storage exposes raw storage blocks, common in cloud volumes and SAN arrays.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff32895" class="outline-3">
-<h3 id="orgff32895">Q127: What is file-level storage?</h3>
-<div class="outline-text-3" id="text-orgff32895">
+<div id="outline-container-orgdb89875" class="outline-3">
+<h3 id="orgdb89875">Q127: What is file-level storage?</h3>
+<div class="outline-text-3" id="text-orgdb89875">
 <p>
 File-level storage exposes a filesystem tree, common in NFS and network-shared directories.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca70d2c" class="outline-3">
-<h3 id="orgca70d2c">Q128: What is volume performance tuning?</h3>
-<div class="outline-text-3" id="text-orgca70d2c">
+<div id="outline-container-org3d0767a" class="outline-3">
+<h3 id="org3d0767a">Q128: What is volume performance tuning?</h3>
+<div class="outline-text-3" id="text-org3d0767a">
 <p>
 Performance tuning may involve choosing the correct storage backend, using SSDs, and monitoring latency.
 </p>
 </div>
 </div>
-<div id="outline-container-org525687d" class="outline-3">
-<h3 id="org525687d">Q129: What is volume snapshot strategy?</h3>
-<div class="outline-text-3" id="text-org525687d">
+<div id="outline-container-orgd663423" class="outline-3">
+<h3 id="orgd663423">Q129: What is volume snapshot strategy?</h3>
+<div class="outline-text-3" id="text-orgd663423">
 <p>
 It defines how and when backups or snapshots are taken and retained.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c844cf" class="outline-3">
-<h3 id="org8c844cf">Q130: What is a parent-child filesystem relationship?</h3>
-<div class="outline-text-3" id="text-org8c844cf">
+<div id="outline-container-orgdd237ed" class="outline-3">
+<h3 id="orgdd237ed">Q130: What is a parent-child filesystem relationship?</h3>
+<div class="outline-text-3" id="text-orgdd237ed">
 <p>
 Some filesystems allow snapshots or clones to be created from base volumes with efficient copy-on-write semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-orga401668" class="outline-3">
-<h3 id="orga401668">Q131: What is storage replication?</h3>
-<div class="outline-text-3" id="text-orga401668">
+<div id="outline-container-org7f56fb3" class="outline-3">
+<h3 id="org7f56fb3">Q131: What is storage replication?</h3>
+<div class="outline-text-3" id="text-org7f56fb3">
 <p>
 Replication copies volume data across nodes or storage systems for resilience.
 </p>
 </div>
 </div>
-<div id="outline-container-org06e7304" class="outline-3">
-<h3 id="org06e7304">Q132: What is volume consistency?</h3>
-<div class="outline-text-3" id="text-org06e7304">
+<div id="outline-container-org6faaf98" class="outline-3">
+<h3 id="org6faaf98">Q132: What is volume consistency?</h3>
+<div class="outline-text-3" id="text-org6faaf98">
 <p>
 Consistency means the stored data matches the intended state without partial writes or corruption.
 </p>
 </div>
 </div>
-<div id="outline-container-org897be8d" class="outline-3">
-<h3 id="org897be8d">Q133: What is crash consistency?</h3>
-<div class="outline-text-3" id="text-org897be8d">
+<div id="outline-container-orgba667aa" class="outline-3">
+<h3 id="orgba667aa">Q133: What is crash consistency?</h3>
+<div class="outline-text-3" id="text-orgba667aa">
 <p>
 Crash consistency ensures data remains usable after unexpected stops or power failures.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb0ec137" class="outline-3">
-<h3 id="orgb0ec137">Q134: What is fsync?</h3>
-<div class="outline-text-3" id="text-orgb0ec137">
+<div id="outline-container-orge33abfb" class="outline-3">
+<h3 id="orge33abfb">Q134: What is fsync?</h3>
+<div class="outline-text-3" id="text-orge33abfb">
 <p>
 <code>fsync</code> ensures data is flushed to stable storage before acknowledgment.
 </p>
 </div>
 </div>
-<div id="outline-container-org5c0551b" class="outline-3">
-<h3 id="org5c0551b">Q135: Why is fsync important for database data?</h3>
-<div class="outline-text-3" id="text-org5c0551b">
+<div id="outline-container-org3e09d90" class="outline-3">
+<h3 id="org3e09d90">Q135: Why is fsync important for database data?</h3>
+<div class="outline-text-3" id="text-org3e09d90">
 <p>
 Databases rely on it to safely persist writes and recover after crashes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9b48de" class="outline-3">
-<h3 id="orgc9b48de">Q136: What is journaling?</h3>
-<div class="outline-text-3" id="text-orgc9b48de">
+<div id="outline-container-orgd87c6da" class="outline-3">
+<h3 id="orgd87c6da">Q136: What is journaling?</h3>
+<div class="outline-text-3" id="text-orgd87c6da">
 <p>
 Journaling is the process of logging writes so a system can recover cleanly after a crash.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbf473bf" class="outline-3">
-<h3 id="orgbf473bf">Q137: What is a write-ahead log?</h3>
-<div class="outline-text-3" id="text-orgbf473bf">
+<div id="outline-container-org6a3db54" class="outline-3">
+<h3 id="org6a3db54">Q137: What is a write-ahead log?</h3>
+<div class="outline-text-3" id="text-org6a3db54">
 <p>
 A WAL is a log that records changes before the final data is written, common in databases.
 </p>
 </div>
 </div>
-<div id="outline-container-org127f542" class="outline-3">
-<h3 id="org127f542">Q138: Why do databases care about volume mounts?</h3>
-<div class="outline-text-3" id="text-org127f542">
+<div id="outline-container-org589fa59" class="outline-3">
+<h3 id="org589fa59">Q138: Why do databases care about volume mounts?</h3>
+<div class="outline-text-3" id="text-org589fa59">
 <p>
 Because database consistency and durability depend heavily on storage performance and crash safety.
 </p>
 </div>
 </div>
-<div id="outline-container-org0170d22" class="outline-3">
-<h3 id="org0170d22">Q139: What is Postgres data persistence?</h3>
-<div class="outline-text-3" id="text-org0170d22">
+<div id="outline-container-orgfb38be1" class="outline-3">
+<h3 id="orgfb38be1">Q139: What is Postgres data persistence?</h3>
+<div class="outline-text-3" id="text-orgfb38be1">
 <p>
 Postgres stores database files on persistent storage so data is retained across restarts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfa44630" class="outline-3">
-<h3 id="orgfa44630">Q140: What is a volume for application state?</h3>
-<div class="outline-text-3" id="text-orgfa44630">
+<div id="outline-container-orga11fe31" class="outline-3">
+<h3 id="orga11fe31">Q140: What is a volume for application state?</h3>
+<div class="outline-text-3" id="text-orga11fe31">
 <p>
 An application state volume stores user data, uploads, generated files, and caches.
 </p>
 </div>
 </div>
-<div id="outline-container-org559f19b" class="outline-3">
-<h3 id="org559f19b">Q141: What is a stateful workload?</h3>
-<div class="outline-text-3" id="text-org559f19b">
+<div id="outline-container-org1c77cb0" class="outline-3">
+<h3 id="org1c77cb0">Q141: What is a stateful workload?</h3>
+<div class="outline-text-3" id="text-org1c77cb0">
 <p>
 A stateful workload depends on persistent storage to retain information across restarts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgda1572d" class="outline-3">
-<h3 id="orgda1572d">Q142: What is a stateless workload?</h3>
-<div class="outline-text-3" id="text-orgda1572d">
+<div id="outline-container-org875b2cc" class="outline-3">
+<h3 id="org875b2cc">Q142: What is a stateless workload?</h3>
+<div class="outline-text-3" id="text-org875b2cc">
 <p>
 A stateless workload is fine with ephemeral data and can be recreated easily.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6d1931" class="outline-3">
-<h3 id="orgd6d1931">Q143: What is ephemeral storage in containers?</h3>
-<div class="outline-text-3" id="text-orgd6d1931">
+<div id="outline-container-org87fc78a" class="outline-3">
+<h3 id="org87fc78a">Q143: What is ephemeral storage in containers?</h3>
+<div class="outline-text-3" id="text-org87fc78a">
 <p>
 It is storage that exists only for the lifetime of the container or pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org63f0da0" class="outline-3">
-<h3 id="org63f0da0">Q144: Why is stateful vs stateless design important?</h3>
-<div class="outline-text-3" id="text-org63f0da0">
+<div id="outline-container-org67937d6" class="outline-3">
+<h3 id="org67937d6">Q144: Why is stateful vs stateless design important?</h3>
+<div class="outline-text-3" id="text-org67937d6">
 <p>
 It determines how deployments handle persistence, backups, scaling, and disaster recovery.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b12f01" class="outline-3">
-<h3 id="org6b12f01">Q145: What is volume access mode?</h3>
-<div class="outline-text-3" id="text-org6b12f01">
+<div id="outline-container-org224b4e6" class="outline-3">
+<h3 id="org224b4e6">Q145: What is volume access mode?</h3>
+<div class="outline-text-3" id="text-org224b4e6">
 <p>
 Volume access mode defines whether a volume is read-write by one node or multiple nodes, such as RWO or RWX.
 </p>
 </div>
 </div>
-<div id="outline-container-org846d188" class="outline-3">
-<h3 id="org846d188">Q146: What is RWO?</h3>
-<div class="outline-text-3" id="text-org846d188">
+<div id="outline-container-org1740efa" class="outline-3">
+<h3 id="org1740efa">Q146: What is RWO?</h3>
+<div class="outline-text-3" id="text-org1740efa">
 <p>
 RWO (ReadWriteOnce) means the volume can be mounted by one node in read-write mode.
 </p>
 </div>
 </div>
-<div id="outline-container-org7bd7ca2" class="outline-3">
-<h3 id="org7bd7ca2">Q147: What is RWX?</h3>
-<div class="outline-text-3" id="text-org7bd7ca2">
+<div id="outline-container-org5b59e87" class="outline-3">
+<h3 id="org5b59e87">Q147: What is RWX?</h3>
+<div class="outline-text-3" id="text-org5b59e87">
 <p>
 RWX (ReadWriteMany) means the volume can be mounted by multiple nodes in read-write mode.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa675ae" class="outline-3">
-<h3 id="orgaa675ae">Q148: What is volume topology?</h3>
-<div class="outline-text-3" id="text-orgaa675ae">
+<div id="outline-container-org2a8a6cf" class="outline-3">
+<h3 id="org2a8a6cf">Q148: What is volume topology?</h3>
+<div class="outline-text-3" id="text-org2a8a6cf">
 <p>
 Volume topology describes which nodes or availability zones can access a volume.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbd47c95" class="outline-3">
-<h3 id="orgbd47c95">Q149: What is a storage class?</h3>
-<div class="outline-text-3" id="text-orgbd47c95">
+<div id="outline-container-orgd0d1314" class="outline-3">
+<h3 id="orgd0d1314">Q149: What is a storage class?</h3>
+<div class="outline-text-3" id="text-orgd0d1314">
 <p>
 A storage class is a policy describing the type of storage backend and performance profile to use.
 </p>
 </div>
 </div>
-<div id="outline-container-org26ea03b" class="outline-3">
-<h3 id="org26ea03b">Q150: What is cluster storage?</h3>
-<div class="outline-text-3" id="text-org26ea03b">
+<div id="outline-container-org5f58264" class="outline-3">
+<h3 id="org5f58264">Q150: What is cluster storage?</h3>
+<div class="outline-text-3" id="text-org5f58264">
 <p>
 Cluster storage provides durable storage shared across nodes in distributed systems.
 </p>
 </div>
 </div>
-<div id="outline-container-org7731147" class="outline-3">
-<h3 id="org7731147">Q151: What is persistent volume?</h3>
-<div class="outline-text-3" id="text-org7731147">
+<div id="outline-container-orgad7ff25" class="outline-3">
+<h3 id="orgad7ff25">Q151: What is persistent volume?</h3>
+<div class="outline-text-3" id="text-orgad7ff25">
 <p>
 A persistent volume is storage that outlives individual container or pod lifecycles.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc82f4c" class="outline-3">
-<h3 id="orgcc82f4c">Q152: What is a persistent volume claim?</h3>
-<div class="outline-text-3" id="text-orgcc82f4c">
+<div id="outline-container-org19cfe08" class="outline-3">
+<h3 id="org19cfe08">Q152: What is a persistent volume claim?</h3>
+<div class="outline-text-3" id="text-org19cfe08">
 <p>
 A PVC requests storage from the cluster with required capacity and access mode.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf50cd46" class="outline-3">
-<h3 id="orgf50cd46">Q153: What is dynamic provisioning?</h3>
-<div class="outline-text-3" id="text-orgf50cd46">
+<div id="outline-container-orgccf7d7c" class="outline-3">
+<h3 id="orgccf7d7c">Q153: What is dynamic provisioning?</h3>
+<div class="outline-text-3" id="text-orgccf7d7c">
 <p>
 Dynamic provisioning creates persistent volumes automatically when a PVC is requested.
 </p>
 </div>
 </div>
-<div id="outline-container-org030ebe3" class="outline-3">
-<h3 id="org030ebe3">Q154: What is volume scheduler?</h3>
-<div class="outline-text-3" id="text-org030ebe3">
+<div id="outline-container-org7d6baf5" class="outline-3">
+<h3 id="org7d6baf5">Q154: What is volume scheduler?</h3>
+<div class="outline-text-3" id="text-org7d6baf5">
 <p>
 A storage scheduler decides which underlying storage backend should satisfy a volume request.
 </p>
 </div>
 </div>
-<div id="outline-container-org363c056" class="outline-3">
-<h3 id="org363c056">Q155: What is volume binding?</h3>
-<div class="outline-text-3" id="text-org363c056">
+<div id="outline-container-orga0cd036" class="outline-3">
+<h3 id="orga0cd036">Q155: What is volume binding?</h3>
+<div class="outline-text-3" id="text-orga0cd036">
 <p>
 Binding is the association of a PVC to a matching persistent volume.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c74169" class="outline-3">
-<h3 id="org0c74169">Q156: Why are volumes tricky in orchestrators?</h3>
-<div class="outline-text-3" id="text-org0c74169">
+<div id="outline-container-orga29bf55" class="outline-3">
+<h3 id="orga29bf55">Q156: Why are volumes tricky in orchestrators?</h3>
+<div class="outline-text-3" id="text-orga29bf55">
 <p>
 Because multiple nodes, replicas, PVCs, and storage backends increase complexity and failure modes.
 </p>
 </div>
 </div>
-<div id="outline-container-org3bbbf25" class="outline-3">
-<h3 id="org3bbbf25">Q157: What is a remote volume mount under Kubernetes?</h3>
-<div class="outline-text-3" id="text-org3bbbf25">
+<div id="outline-container-org5f1ff09" class="outline-3">
+<h3 id="org5f1ff09">Q157: What is a remote volume mount under Kubernetes?</h3>
+<div class="outline-text-3" id="text-org5f1ff09">
 <p>
 A Kubernetes pod can mount a persistent volume provided by a cloud disk, NFS, or CSI driver.
 </p>
 </div>
 </div>
-<div id="outline-container-org9008782" class="outline-3">
-<h3 id="org9008782">Q158: What is a container storage interface (CSI)?</h3>
-<div class="outline-text-3" id="text-org9008782">
+<div id="outline-container-orgc1f6727" class="outline-3">
+<h3 id="orgc1f6727">Q158: What is a container storage interface (CSI)?</h3>
+<div class="outline-text-3" id="text-orgc1f6727">
 <p>
 CSI is a standard interface for storage drivers in Kubernetes and container orchestrators.
 </p>
 </div>
 </div>
-<div id="outline-container-org17efbfc" class="outline-3">
-<h3 id="org17efbfc">Q159: What is storage backend compatibility?</h3>
-<div class="outline-text-3" id="text-org17efbfc">
+<div id="outline-container-org9b5e1f0" class="outline-3">
+<h3 id="org9b5e1f0">Q159: What is storage backend compatibility?</h3>
+<div class="outline-text-3" id="text-org9b5e1f0">
 <p>
 It means the chosen storage system works with the container runtime and orchestration tools.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb87853a" class="outline-3">
-<h3 id="orgb87853a">Q160: What is data locality?</h3>
-<div class="outline-text-3" id="text-orgb87853a">
+<div id="outline-container-org36d5a3b" class="outline-3">
+<h3 id="org36d5a3b">Q160: What is data locality?</h3>
+<div class="outline-text-3" id="text-org36d5a3b">
 <p>
 Data locality means storing data close to the compute that needs it to reduce latency and network overhead.
 </p>
 </div>
 </div>
-<div id="outline-container-org689a53a" class="outline-3">
-<h3 id="org689a53a">Q161: What is volume performance contention?</h3>
-<div class="outline-text-3" id="text-org689a53a">
+<div id="outline-container-org50f3f67" class="outline-3">
+<h3 id="org50f3f67">Q161: What is volume performance contention?</h3>
+<div class="outline-text-3" id="text-org50f3f67">
 <p>
 It occurs when many workloads share the same storage backend and compete for bandwidth or IOPS.
 </p>
 </div>
 </div>
-<div id="outline-container-org648a296" class="outline-3">
-<h3 id="org648a296">Q162: What is snapshot retention policy?</h3>
-<div class="outline-text-3" id="text-org648a296">
+<div id="outline-container-orgdd9e78c" class="outline-3">
+<h3 id="orgdd9e78c">Q162: What is snapshot retention policy?</h3>
+<div class="outline-text-3" id="text-orgdd9e78c">
 <p>
 It defines how long snapshots are kept and their rotation schedule.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbba3522" class="outline-3">
-<h3 id="orgbba3522">Q163: What is encryption at rest for volumes?</h3>
-<div class="outline-text-3" id="text-orgbba3522">
+<div id="outline-container-orge754d40" class="outline-3">
+<h3 id="orge754d40">Q163: What is encryption at rest for volumes?</h3>
+<div class="outline-text-3" id="text-orge754d40">
 <p>
 It encrypts stored data so that it remains protected even if the underlying storage is compromised.
 </p>
 </div>
 </div>
-<div id="outline-container-org002f8d8" class="outline-3">
-<h3 id="org002f8d8">Q164: What is volume encryption key management?</h3>
-<div class="outline-text-3" id="text-org002f8d8">
+<div id="outline-container-org9cd9534" class="outline-3">
+<h3 id="org9cd9534">Q164: What is volume encryption key management?</h3>
+<div class="outline-text-3" id="text-org9cd9534">
 <p>
 It includes where the keys are stored, how they are rotated, and how access is controlled.
 </p>
 </div>
 </div>
-<div id="outline-container-orge8a9c7f" class="outline-3">
-<h3 id="orge8a9c7f">Q165: What is secret injection for volume data?</h3>
-<div class="outline-text-3" id="text-orge8a9c7f">
+<div id="outline-container-orga7b15ed" class="outline-3">
+<h3 id="orga7b15ed">Q165: What is secret injection for volume data?</h3>
+<div class="outline-text-3" id="text-orga7b15ed">
 <p>
 It often uses secrets or config maps to mount credentials or sensitive files into containers securely.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd83a112" class="outline-3">
-<h3 id="orgd83a112">Q166: Why is volume security important?</h3>
-<div class="outline-text-3" id="text-orgd83a112">
+<div id="outline-container-orgea3fa5b" class="outline-3">
+<h3 id="orgea3fa5b">Q166: Why is volume security important?</h3>
+<div class="outline-text-3" id="text-orgea3fa5b">
 <p>
 Because data stored in Docker volumes may include sensitive application data, logs, certificates, or DB contents.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c3213b" class="outline-3">
-<h3 id="org0c3213b">Q167: What is volume-level access control?</h3>
-<div class="outline-text-3" id="text-org0c3213b">
+<div id="outline-container-orgfa1f5be" class="outline-3">
+<h3 id="orgfa1f5be">Q167: What is volume-level access control?</h3>
+<div class="outline-text-3" id="text-orgfa1f5be">
 <p>
 It restricts which containers, hosts, or users can read or write a volume.
 </p>
 </div>
 </div>
-<div id="outline-container-org1717b30" class="outline-3">
-<h3 id="org1717b30">Q168: What is a read-only bind mount for certificates?</h3>
-<div class="outline-text-3" id="text-org1717b30">
+<div id="outline-container-org77ef2d0" class="outline-3">
+<h3 id="org77ef2d0">Q168: What is a read-only bind mount for certificates?</h3>
+<div class="outline-text-3" id="text-org77ef2d0">
 <p>
 A certificate volume is often mounted read-only so the app can read the cert without modifying it.
 </p>
 </div>
 </div>
-<div id="outline-container-org6f6a268" class="outline-3">
-<h3 id="org6f6a268">Q169: What is a config-volume pattern?</h3>
-<div class="outline-text-3" id="text-org6f6a268">
+<div id="outline-container-org727f477" class="outline-3">
+<h3 id="org727f477">Q169: What is a config-volume pattern?</h3>
+<div class="outline-text-3" id="text-org727f477">
 <p>
 It is where configuration files are injected via mounts rather than baked into the image.
 </p>
 </div>
 </div>
-<div id="outline-container-org630e0b3" class="outline-3">
-<h3 id="org630e0b3">Q170: What is a log rotation strategy?</h3>
-<div class="outline-text-3" id="text-org630e0b3">
+<div id="outline-container-org4e342b5" class="outline-3">
+<h3 id="org4e342b5">Q170: What is a log rotation strategy?</h3>
+<div class="outline-text-3" id="text-org4e342b5">
 <p>
 It determines how long logs remain and when they are archived or cleaned up.
 </p>
 </div>
 </div>
-<div id="outline-container-org93550c5" class="outline-3">
-<h3 id="org93550c5">Q171: What is volume garbage collection?</h3>
-<div class="outline-text-3" id="text-org93550c5">
+<div id="outline-container-orgd5970c9" class="outline-3">
+<h3 id="orgd5970c9">Q171: What is volume garbage collection?</h3>
+<div class="outline-text-3" id="text-orgd5970c9">
 <p>
 It removes stale or abandoned data volumes that are no longer in use.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc5fd05e" class="outline-3">
-<h3 id="orgc5fd05e">Q172: What is a volume leak?</h3>
-<div class="outline-text-3" id="text-orgc5fd05e">
+<div id="outline-container-org1c1b3a2" class="outline-3">
+<h3 id="org1c1b3a2">Q172: What is a volume leak?</h3>
+<div class="outline-text-3" id="text-org1c1b3a2">
 <p>
 A volume leak happens when data remains in a volume after a service or environment is removed.
 </p>
 </div>
 </div>
-<div id="outline-container-org566d933" class="outline-3">
-<h3 id="org566d933">Q173: What is storage lifecycle management?</h3>
-<div class="outline-text-3" id="text-org566d933">
+<div id="outline-container-org725f6ee" class="outline-3">
+<h3 id="org725f6ee">Q173: What is storage lifecycle management?</h3>
+<div class="outline-text-3" id="text-org725f6ee">
 <p>
 It is the process of creating, retaining, backing up, rotating, and deleting storage over time.
 </p>
 </div>
 </div>
-<div id="outline-container-org140acab" class="outline-3">
-<h3 id="org140acab">Q174: Why does data placement matter?</h3>
-<div class="outline-text-3" id="text-org140acab">
+<div id="outline-container-orge2d6151" class="outline-3">
+<h3 id="orge2d6151">Q174: Why does data placement matter?</h3>
+<div class="outline-text-3" id="text-orge2d6151">
 <p>
 Because correct placement affects performance, durability, and disaster recovery capabilities.
 </p>
 </div>
 </div>
-<div id="outline-container-org1e7e496" class="outline-3">
-<h3 id="org1e7e496">Q175: What is backup verification test?</h3>
-<div class="outline-text-3" id="text-org1e7e496">
+<div id="outline-container-org3524db5" class="outline-3">
+<h3 id="org3524db5">Q175: What is backup verification test?</h3>
+<div class="outline-text-3" id="text-org3524db5">
 <p>
 It confirms the backup can be restored successfully and contains valid data.
 </p>
 </div>
 </div>
-<div id="outline-container-orgddbe159" class="outline-3">
-<h3 id="orgddbe159">Q176: What is volume deduplication?</h3>
-<div class="outline-text-3" id="text-orgddbe159">
+<div id="outline-container-org2e0e81c" class="outline-3">
+<h3 id="org2e0e81c">Q176: What is volume deduplication?</h3>
+<div class="outline-text-3" id="text-org2e0e81c">
 <p>
 Deduplication reduces storage space by removing duplicate data blocks across volumes or snapshots.
 </p>
 </div>
 </div>
-<div id="outline-container-orge096fad" class="outline-3">
-<h3 id="orge096fad">Q177: What is data retention compliance?</h3>
-<div class="outline-text-3" id="text-orge096fad">
+<div id="outline-container-orgc3f16e5" class="outline-3">
+<h3 id="orgc3f16e5">Q177: What is data retention compliance?</h3>
+<div class="outline-text-3" id="text-orgc3f16e5">
 <p>
 It ensures data is retained for required periods and then properly deleted or archived.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf25fa1b" class="outline-3">
-<h3 id="orgf25fa1b">Q178: What is the super important operational rule about volumes?</h3>
-<div class="outline-text-3" id="text-orgf25fa1b">
+<div id="outline-container-org24992cd" class="outline-3">
+<h3 id="org24992cd">Q178: What is the super important operational rule about volumes?</h3>
+<div class="outline-text-3" id="text-org24992cd">
 <p>
 Volumes are the persistence boundary of a containerized workload; if the state is important, it must be on a deliberately managed volume or external storage system.
 </p>
 </div>
 </div>
-<div id="outline-container-org7bcb2dd" class="outline-3">
-<h3 id="org7bcb2dd">Q179: What is the risk of ignoring Docker volumes?</h3>
-<div class="outline-text-3" id="text-org7bcb2dd">
+<div id="outline-container-org6784ec9" class="outline-3">
+<h3 id="org6784ec9">Q179: What is the risk of ignoring Docker volumes?</h3>
+<div class="outline-text-3" id="text-org6784ec9">
 <p>
 Ignoring volumes leads to data loss, unstable deployments, brittle backups, and poor recovery workflows.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe97a1b" class="outline-3">
-<h3 id="orgbe97a1b">Q180: What is the difference between persistence and backup?</h3>
-<div class="outline-text-3" id="text-orgbe97a1b">
+<div id="outline-container-org5178eb0" class="outline-3">
+<h3 id="org5178eb0">Q180: What is the difference between persistence and backup?</h3>
+<div class="outline-text-3" id="text-org5178eb0">
 <p>
 Persistence keeps data alive through container lifecycle.
 Backup protects against loss, corruption, and disasters.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd5aa69e" class="outline-3">
-<h3 id="orgd5aa69e">Q181: What is importance of monitoring volume health?</h3>
-<div class="outline-text-3" id="text-orgd5aa69e">
+<div id="outline-container-org15f360a" class="outline-3">
+<h3 id="org15f360a">Q181: What is importance of monitoring volume health?</h3>
+<div class="outline-text-3" id="text-org15f360a">
 <p>
 Storage latency, full disks, and failed mounts can silently break applications.
 </p>
 </div>
 </div>
-<div id="outline-container-org301f6d5" class="outline-3">
-<h3 id="org301f6d5">Q182: Why do developers often need to monitor Docker volume consumption?</h3>
-<div class="outline-text-3" id="text-org301f6d5">
+<div id="outline-container-org6904287" class="outline-3">
+<h3 id="org6904287">Q182: Why do developers often need to monitor Docker volume consumption?</h3>
+<div class="outline-text-3" id="text-org6904287">
 <p>
 Because volume growth can cause outages, broken deployments, and performance degradation.
 </p>
 </div>
 </div>
-<div id="outline-container-org60c458f" class="outline-3">
-<h3 id="org60c458f">Q183: What is volume expansion?</h3>
-<div class="outline-text-3" id="text-org60c458f">
+<div id="outline-container-org96d64c9" class="outline-3">
+<h3 id="org96d64c9">Q183: What is volume expansion?</h3>
+<div class="outline-text-3" id="text-org96d64c9">
 <p>
 Volume expansion increases the storage size of an existing volume without data loss.
 </p>
 </div>
 </div>
-<div id="outline-container-org29d62ef" class="outline-3">
-<h3 id="org29d62ef">Q184: What is storage quota?</h3>
-<div class="outline-text-3" id="text-org29d62ef">
+<div id="outline-container-org7339c06" class="outline-3">
+<h3 id="org7339c06">Q184: What is storage quota?</h3>
+<div class="outline-text-3" id="text-org7339c06">
 <p>
 A storage quota limits how much data a volume or workload can consume.
 </p>
 </div>
 </div>
-<div id="outline-container-org031f1b0" class="outline-3">
-<h3 id="org031f1b0">Q185: What is the relationship between Docker volumes and application resilience?</h3>
-<div class="outline-text-3" id="text-org031f1b0">
+<div id="outline-container-orgd606809" class="outline-3">
+<h3 id="orgd606809">Q185: What is the relationship between Docker volumes and application resilience?</h3>
+<div class="outline-text-3" id="text-orgd606809">
 <p>
 Good volume design improves resiliency by allowing services to recover, scale, and restore without losing their state.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf324bec" class="outline-3">
-<h3 id="orgf324bec">Q186: What is the role of volumes in microservices?</h3>
-<div class="outline-text-3" id="text-orgf324bec">
+<div id="outline-container-orgbee6b79" class="outline-3">
+<h3 id="orgbee6b79">Q186: What is the role of volumes in microservices?</h3>
+<div class="outline-text-3" id="text-orgbee6b79">
 <p>
 Volumes help persist database data, user uploads, caches, generated content, and application state independently of service churn.
 </p>
 </div>
 </div>
-<div id="outline-container-org76120e3" class="outline-3">
-<h3 id="org76120e3">Q187: What is a stateful service pattern?</h3>
-<div class="outline-text-3" id="text-org76120e3">
+<div id="outline-container-org65c9db7" class="outline-3">
+<h3 id="org65c9db7">Q187: What is a stateful service pattern?</h3>
+<div class="outline-text-3" id="text-org65c9db7">
 <p>
 It involves persistent storage, explicit backup schemes, and careful recovery procedures.
 </p>
 </div>
 </div>
-<div id="outline-container-orgee0fa48" class="outline-3">
-<h3 id="orgee0fa48">Q188: What is a stateless service pattern?</h3>
-<div class="outline-text-3" id="text-orgee0fa48">
+<div id="outline-container-org341528e" class="outline-3">
+<h3 id="org341528e">Q188: What is a stateless service pattern?</h3>
+<div class="outline-text-3" id="text-org341528e">
 <p>
 It favors immutable images and ephemeral state, making scaling simpler and safer.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a6ae4f" class="outline-3">
-<h3 id="org2a6ae4f">Q189: What is operational complexity in storage?</h3>
-<div class="outline-text-3" id="text-org2a6ae4f">
+<div id="outline-container-orgbf879e8" class="outline-3">
+<h3 id="orgbf879e8">Q189: What is operational complexity in storage?</h3>
+<div class="outline-text-3" id="text-orgbf879e8">
 <p>
 The more volume backends and drivers you add, the more complexity and failure modes appear.
 </p>
 </div>
 </div>
-<div id="outline-container-org4c64460" class="outline-3">
-<h3 id="org4c64460">Q190: What is the most common Docker storage mistake?</h3>
-<div class="outline-text-3" id="text-org4c64460">
+<div id="outline-container-org8215113" class="outline-3">
+<h3 id="org8215113">Q190: What is the most common Docker storage mistake?</h3>
+<div class="outline-text-3" id="text-org8215113">
 <p>
 Using the container filesystem for persistent application data instead of a defined Docker volume.
 </p>
 </div>
 </div>
-<div id="outline-container-org8fde79d" class="outline-3">
-<h3 id="org8fde79d">Q191: What is the second most common mistake?</h3>
-<div class="outline-text-3" id="text-org8fde79d">
+<div id="outline-container-org3574319" class="outline-3">
+<h3 id="org3574319">Q191: What is the second most common mistake?</h3>
+<div class="outline-text-3" id="text-org3574319">
 <p>
 Using bind mounts where managed volumes or external storage would be safer and more portable.
 </p>
 </div>
 </div>
-<div id="outline-container-org7b093c2" class="outline-3">
-<h3 id="org7b093c2">Q192: What is a recommended volume design pattern?</h3>
-<div class="outline-text-3" id="text-org7b093c2">
+<div id="outline-container-orgfc7d63b" class="outline-3">
+<h3 id="orgfc7d63b">Q192: What is a recommended volume design pattern?</h3>
+<div class="outline-text-3" id="text-orgfc7d63b">
 <p>
 Use named volumes or external storage for data, bind mounts for development convenience, and secrets/configs as specialized mounts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3025af" class="outline-3">
-<h3 id="orgc3025af">Q193: What is a good backup strategy for Docker volumes?</h3>
-<div class="outline-text-3" id="text-orgc3025af">
+<div id="outline-container-orgfa86170" class="outline-3">
+<h3 id="orgfa86170">Q193: What is a good backup strategy for Docker volumes?</h3>
+<div class="outline-text-3" id="text-orgfa86170">
 <p>
 Regular snapshots, verification, retention policy, and tested restore procedures.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2f4283" class="outline-3">
-<h3 id="orgc2f4283">Q194: What is safe volume deletion?</h3>
-<div class="outline-text-3" id="text-orgc2f4283">
+<div id="outline-container-org390e5a3" class="outline-3">
+<h3 id="org390e5a3">Q194: What is safe volume deletion?</h3>
+<div class="outline-text-3" id="text-org390e5a3">
 <p>
 Only delete a volume after verifying that no service still depends on it and a backup exists.
 </p>
 </div>
 </div>
-<div id="outline-container-org28dfae7" class="outline-3">
-<h3 id="org28dfae7">Q195: What is the long-term value of learning Docker volumes?</h3>
-<div class="outline-text-3" id="text-org28dfae7">
+<div id="outline-container-org302a1a0" class="outline-3">
+<h3 id="org302a1a0">Q195: What is the long-term value of learning Docker volumes?</h3>
+<div class="outline-text-3" id="text-org302a1a0">
 <p>
 It teaches the difference between application state and immutable images and helps build deployable, durable systems.
 </p>
 </div>
 </div>
-<div id="outline-container-orgec08c94" class="outline-3">
-<h3 id="orgec08c94">Q196: What is the “state boundary” concept?</h3>
-<div class="outline-text-3" id="text-orgec08c94">
+<div id="outline-container-org4c4a9f5" class="outline-3">
+<h3 id="org4c4a9f5">Q196: What is the “state boundary” concept?</h3>
+<div class="outline-text-3" id="text-org4c4a9f5">
 <p>
 The state boundary is the part of the system that persists across lifecycle events; volumes define that boundary.
 </p>
 </div>
 </div>
-<div id="outline-container-orga120fc9" class="outline-3">
-<h3 id="orga120fc9">Q197: Why are volumes a core part of Docker operations?</h3>
-<div class="outline-text-3" id="text-orga120fc9">
+<div id="outline-container-org819f25c" class="outline-3">
+<h3 id="org819f25c">Q197: Why are volumes a core part of Docker operations?</h3>
+<div class="outline-text-3" id="text-org819f25c">
 <p>
 Because operational reliability depends on understanding what survives container restarts and what does not.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb272011" class="outline-3">
-<h3 id="orgb272011">Q198: What is volume observability?</h3>
-<div class="outline-text-3" id="text-orgb272011">
+<div id="outline-container-org8119e73" class="outline-3">
+<h3 id="org8119e73">Q198: What is volume observability?</h3>
+<div class="outline-text-3" id="text-org8119e73">
 <p>
 It is the visibility into capacity, attached services, mount health, and storage performance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc713227" class="outline-3">
-<h3 id="orgc713227">Q199: What is the final engineering principle?</h3>
-<div class="outline-text-3" id="text-orgc713227">
+<div id="outline-container-org3d09b35" class="outline-3">
+<h3 id="org3d09b35">Q199: What is the final engineering principle?</h3>
+<div class="outline-text-3" id="text-org3d09b35">
 <p>
 If the data matters, it should not live only in the container writable layer. Use volumes or external storage intentionally.
 </p>
 </div>
 </div>
-<div id="outline-container-org80c6f04" class="outline-3">
-<h3 id="org80c6f04">Q200: What is the core lesson of Docker volumes?</h3>
-<div class="outline-text-3" id="text-org80c6f04">
+<div id="outline-container-orgc98fc0f" class="outline-3">
+<h3 id="orgc98fc0f">Q200: What is the core lesson of Docker volumes?</h3>
+<div class="outline-text-3" id="text-orgc98fc0f">
 <p>
 Docker volumes are how you separate ephemeral runtime from durable state, which is essential for dependable containerized workloads.
 </p>
