@@ -8,7 +8,694 @@
 
 * Docker
 
+- [[https://www.docker.com/][Docker Official Website]]
+- [[https://docs.docker.com/][Docker Documentation]]
+- [[https://hub.docker.com/][Docker Images Repository]]
 -----
+
+
+* Docker Command Handbook:
+
+*1. Docker Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check Docker version
+docker --version
+docker version
+
+# Display Docker system information
+docker info
+
+# Check Docker daemon status (Linux)
+sudo systemctl status docker
+
+# Start Docker daemon (Linux)
+sudo systemctl start docker
+
+# Enable Docker at startup
+sudo systemctl enable docker
+
+# Check Docker Compose version
+docker compose version
+
+# Display Docker CLI configuration
+docker context ls
+
+#+END_SRC
+
+*2. Docker Images*
+
+#+BEGIN_SRC bash
+
+# List local images
+docker images
+docker image ls
+
+# Download an image
+docker pull nginx
+docker pull nginx:alpine
+
+# Search Docker Hub
+docker search nginx
+
+# Inspect an image
+docker image inspect nginx
+
+# Display image history
+docker history nginx
+
+# Tag an image
+docker tag nginx myregistry/myapp:1.0
+
+# Remove an image
+docker rmi nginx
+
+# Remove unused images
+docker image prune
+
+# Remove all unused images
+docker image prune -a
+
+#+END_SRC
+
+*3. Docker Container Lifecycle*
+
+#+BEGIN_SRC bash
+
+# Run a container
+docker run nginx
+
+# Run in detached mode
+docker run -d nginx
+
+# Run with a custom name
+docker run -d --name web-server nginx
+
+# Run interactively
+docker run -it ubuntu bash
+
+# Run and automatically remove container
+docker run --rm ubuntu echo "Hello Docker"
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Stop a container
+docker stop web-server
+
+# Start a stopped container
+docker start web-server
+
+# Restart a container
+docker restart web-server
+
+# Forcefully terminate a container
+docker kill web-server
+
+# Remove a container
+docker rm web-server
+
+# Remove all stopped containers
+docker container prune
+
+#+END_SRC
+
+*4. Port Mapping & Environment Variables*
+
+#+BEGIN_SRC bash
+
+# Map host port 8080 to container port 80
+docker run -d -p 8080:80 nginx
+
+# Map a specific host IP and port
+docker run -d -p 127.0.0.1:8080:80 nginx
+
+# Publish multiple ports
+docker run -d -p 8080:80 -p 8443:443 nginx
+
+# Set environment variables
+docker run -d \
+  --name myapp \
+  -e SPRING_PROFILES_ACTIVE=dev \
+  -e SERVER_PORT=8080 \
+  myapp:1.0
+
+# Load environment variables from file
+docker run -d \
+  --env-file .env \
+  myapp:1.0
+
+# Display container port mappings
+docker port web-server
+
+#+END_SRC
+
+*5. Container Logs & Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Display container logs
+docker logs web-server
+
+# Follow logs in real time
+docker logs -f web-server
+
+# Show the last 100 lines
+docker logs --tail 100 web-server
+
+# Show timestamps
+docker logs -t web-server
+
+# Display logs since a specific time
+docker logs --since 10m web-server
+
+# Execute a command inside a running container
+docker exec web-server ls
+
+# Open an interactive shell
+docker exec -it web-server bash
+
+# Use sh when bash is unavailable
+docker exec -it web-server sh
+
+# Inspect container configuration
+docker inspect web-server
+
+# Display container resource usage
+docker stats
+
+# Display running processes
+docker top web-server
+
+# Display container filesystem changes
+docker diff web-server
+
+#+END_SRC
+
+*6. Dockerfile & Image Building*
+
+#+BEGIN_SRC bash
+
+# Build an image from the current directory
+docker build -t myapp:1.0 .
+
+# Build without using cache
+docker build --no-cache -t myapp:1.0 .
+
+# Build with a specific Dockerfile
+docker build -f Dockerfile.prod -t myapp:prod .
+
+# Pass build arguments
+docker build \
+  --build-arg APP_VERSION=1.0 \
+  -t myapp:1.0 .
+
+# Build a specific target stage
+docker build --target build -t myapp:build .
+
+# Display build history
+docker history myapp:1.0
+
+# Display build cache usage
+docker buildx du
+
+# Remove unused build cache
+docker builder prune
+
+Important Dockerfile instructions:
+
+FROM        - Define the base image
+RUN         - Execute commands during image build
+COPY        - Copy files into the image
+ADD         - Copy files with additional extraction features
+WORKDIR     - Set the working directory
+ENV         - Define environment variables
+ARG         - Define build-time variables
+EXPOSE      - Document intended container ports
+USER        - Set the runtime user
+VOLUME      - Declare a mount point
+HEALTHCHECK - Configure container health checks
+CMD         - Define the default command
+ENTRYPOINT  - Define the main executable
+
+#+END_SRC
+
+*7. Docker Volumes & Persistent Storage*
+
+#+BEGIN_SRC bash 
+
+# List volumes
+docker volume ls
+
+# Create a named volume
+docker volume create app-data
+
+# Inspect a volume
+docker volume inspect app-data
+
+# Mount a named volume
+docker run -d \
+  --name database \
+  -v app-data:/var/lib/mysql \
+  mysql:8
+
+# Mount using the --mount syntax
+docker run -d \
+  --name database \
+  --mount source=app-data,target=/var/lib/mysql \
+  mysql:8
+
+# Mount a host directory (bind mount)
+docker run -d \
+  -v $(pwd)/data:/app/data \
+  myapp:1.0
+
+# Read-only bind mount
+docker run -d \
+  --mount type=bind,source="$(pwd)/config",target=/app/config,readonly \
+  myapp:1.0
+
+# Remove a volume
+docker volume rm app-data
+
+# Remove unused volumes
+docker volume prune
+
+#+END_SRC
+
+Volume vs Bind Mount:
+
+|Type        | Purpose|
+|------------|--------------------------------|
+|Volume      | Managed by Docker|
+|Bind Mount  | Uses an explicit host directory|
+|tmpfs       | Stores temporary data in memory|
+
+*8. Docker Networking*
+
+#+BEGIN_SRC bash
+
+# List networks
+docker network ls
+
+# Create a bridge network
+docker network create app-network
+
+# Inspect a network
+docker network inspect app-network
+
+# Run a container on a network
+docker run -d \
+  --name backend \
+  --network app-network \
+  myapp:1.0
+
+# Connect an existing container
+docker network connect app-network backend
+
+# Disconnect a container
+docker network disconnect app-network backend
+
+# Create a network with a custom subnet
+docker network create \
+  --subnet 172.20.0.0/16 \
+  custom-network
+
+# Run using host networking (Linux)
+docker run --network host nginx
+
+# Remove a network
+docker network rm app-network
+
+# Remove unused networks
+docker network prune
+
+Common network drivers:
+
+bridge    - Communication between containers on one host
+host      - Shares the host network namespace
+overlay   - Multi-host container networking
+macvlan   - Assigns containers MAC addresses
+
+#+END_SRC
+
+*9. Docker Compose*
+
+Docker Compose allows you to define and run multi-container applications
+using a declarative YAML configuration file.
+
+#+BEGIN_SRC bash
+
+# Start all services
+docker compose up
+
+# Start in detached mode
+docker compose up -d
+
+# Build and start services
+docker compose up --build -d
+
+# List services
+docker compose ps
+
+# Display service logs
+docker compose logs
+
+# Follow logs for a specific service
+docker compose logs -f backend
+
+# Stop services
+docker compose stop
+
+# Start existing services
+docker compose start
+
+# Restart services
+docker compose restart
+
+# Stop and remove containers and networks
+docker compose down
+
+# Remove containers, networks, and named volumes
+docker compose down -v
+
+# Rebuild a specific service
+docker compose build backend
+
+# Execute a command inside a service
+docker compose exec backend sh
+
+# Run a one-time command
+docker compose run --rm backend ./mvnw test
+
+# Validate Compose configuration
+docker compose config
+
+# Display running processes
+docker compose top
+
+#+END_SRC
+
+*10. Docker Resource Management*
+
+#+BEGIN_SRC bash
+
+# Set memory limit
+docker run -d \
+  --memory="512m" \
+  nginx
+
+# Set CPU limit
+docker run -d \
+  --cpus="1.5" \
+  nginx
+
+# Set memory and CPU limits
+docker run -d \
+  --memory="512m" \
+  --cpus="1.0" \
+  --name limited-app \
+  myapp:1.0
+
+# Set memory reservation
+docker run -d \
+  --memory="1g" \
+  --memory-reservation="512m" \
+  nginx
+
+# Display resource usage
+docker stats
+
+# Display Docker disk usage
+docker system df
+
+# Detailed disk usage
+docker system df -v
+
+# Inspect Docker resource limits
+docker inspect limited-app
+
+#+END_SRC
+
+*11. Docker Security & Runtime Configuration*
+
+#+BEGIN_SRC bash
+
+# Run a container as a non-root user
+docker run -d \
+  --user 10001:10001 \
+  myapp:1.0
+
+# Drop Linux capabilities
+docker run -d \
+  --cap-drop ALL \
+  nginx
+
+# Add only required capabilities
+docker run -d \
+  --cap-drop ALL \
+  --cap-add NET_BIND_SERVICE \
+  nginx
+
+# Enable read-only root filesystem
+docker run -d \
+  --read-only \
+  nginx
+
+# Use a temporary writable filesystem
+docker run -d \
+  --read-only \
+  --tmpfs /tmp \
+  nginx
+
+# Apply a restart policy
+docker run -d \
+  --restart unless-stopped \
+  nginx
+
+# Configure health check
+docker run -d \
+  --health-cmd="curl -f http://localhost/ || exit 1" \
+  --health-interval=30s \
+  --health-timeout=5s \
+  --health-retries=3 \
+  nginx
+
+# Run with a custom security profile
+docker run -d \
+  --security-opt no-new-privileges:true \
+  nginx
+
+# Scan an image (where Docker Scout is available)
+docker scout quickview myapp:1.0
+docker scout cves myapp:1.0
+
+#+END_SRC
+
+Security recommendations:
+
+- Prefer trusted and version-pinned base images.
+- Avoid running applications as root.
+- Never store secrets in Dockerfiles or image layers.
+- Drop unnecessary Linux capabilities.
+- Avoid privileged containers.
+- Regularly scan images for vulnerabilities.
+
+*12. Docker Registry & Image Distribution*
+
+#+BEGIN_SRC bash
+
+# Log in to Docker Hub
+docker login
+
+# Log in to a specific registry
+docker login registry.example.com
+
+# Tag an image for Docker Hub
+docker tag myapp:1.0 username/myapp:1.0
+
+# Push an image
+docker push username/myapp:1.0
+
+# Pull an image
+docker pull username/myapp:1.0
+
+# Save an image to a tar archive
+docker save -o myapp.tar myapp:1.0
+
+# Load an image from an archive
+docker load -i myapp.tar
+
+# Export a container filesystem
+docker export web-server -o container.tar
+
+# Import a filesystem as an image
+docker import container.tar myapp:imported
+
+# Inspect image metadata
+docker image inspect myapp:1.0
+
+#+END_SRC
+
+*13. Docker Buildx & Multi-Platform Builds*
+
+#+BEGIN_SRC bash
+
+# List available builders
+docker buildx ls
+
+# Inspect current builder
+docker buildx inspect
+
+# Create a builder
+docker buildx create --name multiarch --use
+
+# Bootstrap builder
+docker buildx inspect --bootstrap
+
+# Build for multiple architectures
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t username/myapp:1.0 \
+  --push .
+
+# Build and load a single-platform image locally
+docker buildx build \
+  --platform linux/amd64 \
+  -t myapp:1.0 \
+  --load .
+
+# Build and push an image
+docker buildx build \
+  -t username/myapp:1.0 \
+  --push .
+
+# Display build cache
+docker buildx du
+
+#+END_SRC
+
+*14. Docker System Maintenance & Cleanup*
+
+#+BEGIN_SRC bash
+
+# Display Docker disk usage
+docker system df
+
+# Remove stopped containers
+docker container prune
+
+# Remove unused images
+docker image prune
+
+# Remove unused networks
+docker network prune
+
+# Remove unused volumes
+docker volume prune
+
+# Remove unused build cache
+docker builder prune
+
+# Remove all unused resources
+docker system prune
+
+# Remove unused images as well
+docker system prune -a
+
+# Include unused volumes (potentially destructive)
+docker system prune -a --volumes
+
+# Display Docker events
+docker events
+
+Warning: Prune commands can permanently remove resources.
+Always inspect volumes and containers before performing cleanup.
+
+#+END_SRC
+
+*15. Docker Debugging & Advanced Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Display Docker daemon information
+docker info
+
+# Inspect container configuration
+docker inspect web-server
+
+# Display container processes
+docker top web-server
+
+# Display container logs with timestamps
+docker logs -t --tail 200 web-server
+
+# Copy files from a container
+docker cp web-server:/app/logs ./logs
+
+# Copy files into a container
+docker cp ./config.yml web-server:/app/config.yml
+
+# Display container filesystem changes
+docker diff web-server
+
+# Display Docker daemon events
+docker events --since 10m
+
+# Display detailed Docker daemon logs (Linux)
+sudo journalctl -u docker -f
+
+# Validate Docker Compose configuration
+docker compose config
+
+# Display container exit status
+docker inspect \
+  --format='{{.State.ExitCode}}' \
+  web-server
+
+# Display container health status
+docker inspect \
+  --format='{{.State.Health.Status}}' \
+  web-server
+
+# Display restart count
+docker inspect \
+  --format='{{.RestartCount}}' \
+  web-server
+
+#+END_SRC
+
+*16. Docker Quick Reference Cheat Sheet*
+
+|Goal                         | Command|
+|-----------------------------|-----------------------------|
+|Docker version               | docker version|
+|System information           | docker info|
+|List images                  | docker images|
+|Download image               | docker pull nginx|
+|Build image                  | docker build -t app .|
+|Run container                | docker run -d nginx|
+|List running containers      | docker ps|
+|List all containers          | docker ps -a|
+|Stop container               | docker stop container|
+|Remove container             | docker rm container|
+|Remove image                 | docker rmi image|
+|Container logs               | docker logs container|
+|Execute container command    | docker exec -it container sh|
+|Inspect container            | docker inspect container|
+|Container statistics         | docker stats|
+|Create volume                | docker volume create data|
+|Create network               | docker network create app-net|
+|Start Compose                | docker compose up -d|
+|Stop Compose                 | docker compose down|
+|Docker disk usage             | docker system df|
+|Clean unused resources       | docker system prune|
+
+------
 
 * Beginner
 
