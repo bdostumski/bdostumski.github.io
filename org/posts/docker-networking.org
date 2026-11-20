@@ -8,6 +8,1320 @@
 
 * Docker Networking
 
+[[https://docs.docker.com/engine/network/][Docker Networking Documentation]]
+
+-----
+
+* Docker Networking Command Handbook:
+
+*1. Docker Networking Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check Docker version
+docker --version
+docker version
+
+# Check Docker Compose version
+docker compose version
+
+# Display Docker system information
+docker info
+
+# Display Docker network information
+docker network --help
+
+# Check Docker daemon status (Linux)
+sudo systemctl status docker
+
+# Start Docker daemon (Linux)
+sudo systemctl start docker
+
+# Enable Docker daemon at startup (Linux)
+sudo systemctl enable docker
+
+# Display Docker network configuration
+docker info | grep -i network
+
+# Display Docker root directory
+docker info --format '{{.DockerRootDir}}'
+
+#+END_SRC
+
+*2. Docker Network Management*
+
+#+BEGIN_SRC bash
+
+# List all Docker networks
+docker network ls
+
+# Create a network
+docker network create my-network
+
+# Create a network with a specific name
+docker network create app-network
+
+# Inspect a network
+docker network inspect my-network
+
+# Display network driver
+docker network inspect my-network --format '{{.Driver}}'
+
+# Display network subnet
+docker network inspect my-network \
+  --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
+
+# Display network gateway
+docker network inspect my-network \
+  --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}'
+
+# Display network scope
+docker network inspect my-network --format '{{.Scope}}'
+
+# Display network IDs
+docker network ls --no-trunc
+
+# Remove a network
+docker network rm my-network
+
+# Remove multiple networks
+docker network rm network1 network2
+
+# Display network help
+docker network --help
+
+#+END_SRC
+
+*3. Docker Network Drivers*
+
+Docker provides several built-in network drivers:
+
+| Driver | Description | Use case |
+|---|---|---|
+| bridge | Connects containers on one Docker host | Default application networking |
+| host | Shares the host network namespace | Performance-sensitive networking |
+| none | Disables container networking | Isolated workloads |
+| overlay | Connects containers across multiple hosts | Docker Swarm |
+| macvlan | Assigns containers individual MAC addresses | Physical LAN integration |
+| ipvlan | Uses parent interface with IPvlan networking | Advanced network integration |
+
+#+BEGIN_SRC bash
+
+# Create a bridge network
+docker network create \
+  --driver bridge \
+  bridge-network
+
+# Create a host network
+docker network create \
+  --driver host \
+  host-network
+
+# Create an overlay network
+docker network create \
+  --driver overlay \
+  overlay-network
+
+# Create an internal network
+docker network create \
+  --internal \
+  internal-network
+
+# Create a network with no container connectivity
+docker network create \
+  --driver bridge \
+  isolated-network
+
+# Inspect network drivers
+docker network inspect bridge
+
+# List all networks and their drivers
+docker network ls
+
+#+END_SRC
+
+Note: The host driver is a special built-in network mode. On Linux it shares the host network namespace; behavior and availability differ on Docker Desktop. Overlay networking is primarily used with Swarm.
+
+*4. Docker Bridge Networking*
+
+The bridge driver creates an isolated virtual network that allows containers on the same Docker host to communicate.
+
+#+BEGIN_SRC bash
+
+# List Docker networks
+docker network ls
+
+# Inspect the default bridge network
+docker network inspect bridge
+
+# Create a custom bridge network
+docker network create my-bridge
+
+# Create a container on a bridge network
+docker run -d \
+  --name web1 \
+  --network my-bridge \
+  nginx
+
+# Create another container on the same bridge
+docker run -d \
+  --name web2 \
+  --network my-bridge \
+  nginx
+
+# Test container-to-container communication
+docker exec web1 ping -c 4 web2
+
+# Display bridge network containers
+docker network inspect my-bridge
+
+# Display Linux bridge interfaces (Linux)
+ip link show type bridge
+
+# Display Docker bridge interface
+ip addr show docker0
+
+# Display bridge networking routes (Linux)
+ip route
+
+#+END_SRC
+
+*5. Default Bridge vs User-Defined Bridge*
+
+#+BEGIN_SRC bash
+
+# Run container on default bridge
+docker run -d \
+  --name default-web \
+  nginx
+
+# Create a user-defined bridge
+docker network create app-network
+
+# Run container on user-defined bridge
+docker run -d \
+  --name app-web \
+  --network app-network \
+  nginx
+
+# Run another container on the same network
+docker run -d \
+  --name app-api \
+  --network app-network \
+  alpine sleep infinity
+
+# Resolve container name through Docker DNS
+docker exec app-api ping -c 4 app-web
+
+# Inspect default bridge
+docker network inspect bridge
+
+# Inspect custom bridge
+docker network inspect app-network
+
+#+END_SRC
+
+| Feature | Default Bridge | User-Defined Bridge |
+|---|---|---|
+| Automatic DNS | Limited | Supported |
+| Container name resolution | Not automatic in the same way | Supported |
+| Network isolation | Default network | Custom isolation |
+| Network aliases | Limited | Supported |
+| Runtime connection | Supported | Supported |
+| Recommended usage | Simple testing | Application environments |
+
+*6. Container-to-Container Communication*
+
+#+BEGIN_SRC bash
+
+# Create application network
+docker network create app-network
+
+# Start web container
+docker run -d \
+  --name web \
+  --network app-network \
+  nginx
+
+# Start API container
+docker run -d \
+  --name api \
+  --network app-network \
+  alpine sleep infinity
+
+# Start database container
+docker run -d \
+  --name database \
+  --network app-network \
+  postgres
+
+# Check containers
+docker ps
+
+# Test communication by container name
+docker exec api ping -c 4 web
+
+# Test HTTP connectivity
+docker exec api wget -qO- http://web
+
+# Inspect container IP addresses
+docker inspect web \
+  --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+
+# Inspect network connections
+docker network inspect app-network
+
+#+END_SRC
+
+Note: The PostgreSQL example above is for network demonstration; a production database also requires appropriate initialization and credentials.
+
+*7. Docker Port Publishing & Port Mapping*
+
+#+BEGIN_SRC bash
+
+# Publish container port 80 to host port 8080
+docker run -d \
+  --name web \
+  -p 8080:80 \
+  nginx
+
+# Publish a specific host IP and port
+docker run -d \
+  --name web \
+  -p 127.0.0.1:8080:80 \
+  nginx
+
+# Publish multiple ports
+docker run -d \
+  --name app \
+  -p 8080:80 \
+  -p 8443:443 \
+  nginx
+
+# Publish UDP port
+docker run -d \
+  --name dns \
+  -p 5353:53/udp \
+  alpine sleep infinity
+
+# Publish a random host port
+docker run -d \
+  --name web \
+  -P \
+  nginx
+
+# Display published ports
+docker port web
+
+# Display container port mappings
+docker ps
+
+# Inspect port bindings
+docker inspect web \
+  --format '{{json .NetworkSettings.Ports}}'
+
+# Test published HTTP port
+curl http://localhost:8080
+
+#+END_SRC
+
+Port mapping syntax:
+
+| Syntax | Description |
+|---|---|
+| `-p 8080:80` | Host port 8080 to container port 80 |
+| `-p 127.0.0.1:8080:80` | Bind only to host localhost |
+| `-p 8080:80/udp` | Publish UDP port |
+| `-p 8080-8085:80-85` | Publish a range of ports |
+| `-P` | Publish image-exposed ports to random host ports |
+
+*8. Docker Network Connect & Disconnect*
+
+#+BEGIN_SRC bash
+
+# Create a network
+docker network create backend
+
+# Start container
+docker run -d \
+  --name app \
+  nginx
+
+# Connect running container to a network
+docker network connect backend app
+
+# Inspect network connections
+docker network inspect backend
+
+# Disconnect container from a network
+docker network disconnect backend app
+
+# Connect container with an alias
+docker network connect \
+  --alias application \
+  backend \
+  app
+
+# Connect container with a specific IP
+docker network connect \
+  --ip 172.20.0.10 \
+  backend \
+  app
+
+# Reconnect container to network
+docker network connect backend app
+
+#+END_SRC
+
+Note: The requested static IP must belong to the network's configured subnet and must be available.
+
+*9. Docker Network Aliases & DNS Resolution*
+
+#+BEGIN_SRC bash
+
+# Create network
+docker network create app-network
+
+# Run container with network alias
+docker run -d \
+  --name web \
+  --network app-network \
+  --network-alias frontend \
+  nginx
+
+# Run another container
+docker run -d \
+  --name client \
+  --network app-network \
+  alpine sleep infinity
+
+# Resolve container by name
+docker exec client ping -c 4 web
+
+# Resolve container by network alias
+docker exec client ping -c 4 frontend
+
+# Inspect container DNS configuration
+docker exec client cat /etc/resolv.conf
+
+# Inspect container hosts file
+docker exec client cat /etc/hosts
+
+# Inspect network aliases
+docker network inspect app-network
+
+#+END_SRC
+
+*10. Docker IPAM – IP Address Management*
+
+IPAM manages IP address allocation, subnets, gateways, and IP ranges for Docker networks.
+
+#+BEGIN_SRC bash
+
+# Create network with a custom subnet
+docker network create \
+  --subnet 172.20.0.0/16 \
+  custom-network
+
+# Create network with a custom gateway
+docker network create \
+  --subnet 172.21.0.0/16 \
+  --gateway 172.21.0.1 \
+  custom-network
+
+# Create network with a restricted IP range
+docker network create \
+  --subnet 172.22.0.0/16 \
+  --ip-range 172.22.1.0/24 \
+  ipam-network
+
+# Create network with a specific auxiliary address
+docker network create \
+  --subnet 172.23.0.0/16 \
+  --gateway 172.23.0.1 \
+  --aux-address reserved=172.23.0.10 \
+  reserved-network
+
+# Run container with static IP
+docker run -d \
+  --name app \
+  --network custom-network \
+  --ip 172.20.0.10 \
+  nginx
+
+# Inspect IPAM configuration
+docker network inspect custom-network \
+  --format '{{json .IPAM}}'
+
+# Display container IP
+docker inspect app \
+  --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+
+# Display network subnet and gateway
+docker network inspect custom-network \
+  --format '{{range .IPAM.Config}}{{.Subnet}} {{.Gateway}}{{end}}'
+
+#+END_SRC
+
+*11. Docker Host Network Mode*
+
+Host networking allows a container to share the host's network namespace.
+
+#+BEGIN_SRC bash
+
+# Run container using host network
+docker run -d \
+  --name host-nginx \
+  --network host \
+  nginx
+
+# Inspect container network mode
+docker inspect host-nginx \
+  --format '{{.HostConfig.NetworkMode}}'
+
+# Display host network interfaces (Linux)
+ip addr
+
+# Display host routing table (Linux)
+ip route
+
+# Display listening ports (Linux)
+ss -tulnp
+
+# Check container processes
+docker top host-nginx
+
+#+END_SRC
+
+Note: With host networking, the container uses host ports directly. Docker port publishing (`-p`) is not applicable. Host networking behaves differently on Docker Desktop and may require additional configuration.
+
+*12. Docker None Network Mode*
+
+The none network driver disables normal external container networking.
+
+#+BEGIN_SRC bash
+
+# Run container with no network
+docker run -d \
+  --name isolated \
+  --network none \
+  alpine sleep infinity
+
+# Inspect container network configuration
+docker inspect isolated \
+  --format '{{json .NetworkSettings.Networks}}'
+
+# Display container network interfaces
+docker exec isolated ip addr
+
+# Display container routing table
+docker exec isolated ip route
+
+# Check network mode
+docker inspect isolated \
+  --format '{{.HostConfig.NetworkMode}}'
+
+#+END_SRC
+  
+*13. Docker Internal Networks & Network Isolation*
+
+Internal networks are useful for isolating backend services from external connectivity.
+
+#+BEGIN_SRC bash
+
+# Create an internal network
+docker network create \
+  --internal \
+  backend-network
+
+# Create a frontend network
+docker network create frontend-network
+
+# Run database on internal network
+docker run -d \
+  --name database \
+  --network backend-network \
+  postgres
+
+# Run application on backend network
+docker run -d \
+  --name app \
+  --network backend-network \
+  alpine sleep infinity
+
+# Attach application to frontend network
+docker network connect frontend-network app
+
+# Inspect backend network
+docker network inspect backend-network
+
+# Inspect frontend network
+docker network inspect frontend-network
+
+# Disconnect application from frontend network
+docker network disconnect frontend-network app
+
+#+END_SRC
+
+Note: An internal network restricts external connectivity through that network, but it should not be treated as a complete security boundary. Containers attached to additional networks may still have external access.
+
+*14. Docker Overlay Networking*
+
+Overlay networking connects containers across multiple Docker hosts, typically using Docker Swarm.
+
+#+BEGIN_SRC bash
+
+# Initialize Docker Swarm
+docker swarm init
+
+# List Swarm nodes
+docker node ls
+
+# Create an overlay network
+docker network create \
+  --driver overlay \
+  app-overlay
+
+# Create an attachable overlay network
+docker network create \
+  --driver overlay \
+  --attachable \
+  app-overlay
+
+# Inspect overlay network
+docker network inspect app-overlay
+
+# Create a service on the overlay network
+docker service create \
+  --name web \
+  --network app-overlay \
+  nginx
+
+# List services
+docker service ls
+
+# Inspect service
+docker service inspect web
+
+# Display service tasks
+docker service ps web
+
+# Remove service
+docker service rm web
+
+# Remove overlay network
+docker network rm app-overlay
+
+#+END_SRC
+
+*15. Docker Swarm Networking & Service Discovery*
+
+#+BEGIN_SRC bash
+
+# Initialize Swarm
+docker swarm init
+
+# Display Swarm information
+docker info
+
+# Display Swarm nodes
+docker node ls
+
+# Create overlay network
+docker network create \
+  --driver overlay \
+  --attachable \
+  swarm-network
+
+# Create replicated service
+docker service create \
+  --name web \
+  --replicas 3 \
+  --network swarm-network \
+  nginx
+
+# List services
+docker service ls
+
+# Display service details
+docker service inspect web
+
+# Display service tasks
+docker service ps web
+
+# Scale service
+docker service scale web=5
+
+# Display service logs
+docker service logs web
+
+# Remove service
+docker service rm web
+
+# Leave Swarm (worker or manager)
+docker swarm leave
+
+# Force a manager to leave
+docker swarm leave --force
+
+#+END_SRC
+
+Note: On multi-node Swarm clusters, the relevant networking ports must be allowed between nodes. Common requirements include TCP 2377 for cluster management, TCP/UDP 7946 for node communication, and UDP 4789 for overlay traffic.
+
+*16. Docker Swarm Ingress & Published Ports*
+
+#+BEGIN_SRC bash
+
+# Create a service with a published port
+docker service create \
+  --name web \
+  --publish published=8080,target=80 \
+  nginx
+
+# Publish using ingress mode
+docker service create \
+  --name web \
+  --publish mode=ingress,published=8080,target=80 \
+  nginx
+
+# Publish using host mode
+docker service create \
+  --name web \
+  --publish mode=host,published=8081,target=80 \
+  nginx
+
+# Display service information
+docker service inspect web
+
+# Display service ports
+docker service inspect web \
+  --format '{{json .Endpoint.Spec.Ports}}'
+
+# List services
+docker service ls
+
+# Remove service
+docker service rm web
+
+#+END_SRC
+
+| Publish mode | Description |
+|---|---|
+| ingress | Routes traffic through the Swarm routing mesh |
+| host | Publishes the port directly on nodes running service tasks |
+
+*17. Docker Macvlan Networking*
+
+Macvlan allows containers to appear as separate devices on a physical network, each with its own MAC address.
+
+#+BEGIN_SRC bash
+
+# Display available network interfaces (Linux)
+ip link show
+
+# Create macvlan network
+docker network create \
+  -d macvlan \
+  --subnet=192.168.1.0/24 \
+  --gateway=192.168.1.1 \
+  -o parent=eth0 \
+  macvlan-network
+
+# Create container with macvlan
+docker run -d \
+  --name macvlan-app \
+  --network macvlan-network \
+  --ip 192.168.1.100 \
+  nginx
+
+# Inspect macvlan network
+docker network inspect macvlan-network
+
+# Inspect container IP
+docker inspect macvlan-app \
+  --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+
+# Remove container
+docker rm -f macvlan-app
+
+# Remove network
+docker network rm macvlan-network
+
+#+END_SRC
+
+Note: Replace `eth0` with the actual parent interface and use an unused IP address from the LAN subnet. The physical network must support the additional MAC addresses. Host-to-container communication may require additional host configuration.
+
+*18. Docker IPvlan Networking*
+
+IPvlan connects containers through a parent interface while using IPvlan L2 or L3 networking modes.
+
+#+BEGIN_SRC bash
+
+# Display network interfaces (Linux)
+ip link show
+
+# Create IPvlan L2 network
+docker network create \
+  -d ipvlan \
+  --subnet=192.168.1.0/24 \
+  --gateway=192.168.1.1 \
+  -o parent=eth0 \
+  -o ipvlan_mode=l2 \
+  ipvlan-network
+
+# Create IPvlan L3 network
+docker network create \
+  -d ipvlan \
+  --subnet=192.168.1.0/24 \
+  -o parent=eth0 \
+  -o ipvlan_mode=l3 \
+  ipvlan-l3
+
+# Run container using IPvlan
+docker run -d \
+  --name ipvlan-app \
+  --network ipvlan-network \
+  nginx
+
+# Inspect IPvlan network
+docker network inspect ipvlan-network
+
+# Inspect container network information
+docker inspect ipvlan-app
+
+# Remove container
+docker rm -f ipvlan-app
+
+# Remove network
+docker network rm ipvlan-network
+
+#+END_SRC
+
+Note: IPvlan L3 deployments require appropriate routing configuration. The subnet and gateway examples must match the actual network design.
+
+*19. Docker Network Labels & Driver Options*
+
+#+BEGIN_SRC bash
+
+# Create network with labels
+docker network create \
+  --label environment=production \
+  --label team=backend \
+  app-network
+
+# Inspect network labels
+docker network inspect app-network \
+  --format '{{json .Labels}}'
+
+# Filter networks by name
+docker network ls --filter name=app
+
+# Filter networks by driver
+docker network ls --filter driver=bridge
+
+# Filter networks by scope
+docker network ls --filter scope=local
+
+# Create bridge with custom MTU
+docker network create \
+  --driver bridge \
+  -o com.docker.network.driver.mtu=1450 \
+  custom-mtu-network
+
+# Inspect network driver options
+docker network inspect custom-mtu-network \
+  --format '{{json .Options}}'
+
+# Remove network
+docker network rm app-network custom-mtu-network
+
+#+END_SRC
+
+Note: Network options are driver-specific. Changing the MTU may be necessary in VPN or overlay environments, but should match the underlying network.
+
+*20. Docker IPv6 Networking*
+
+#+BEGIN_SRC bash
+
+# Create an IPv6-enabled bridge network
+docker network create \
+  --ipv6 \
+  --subnet=2001:db8:1::/64 \
+  ipv6-network
+
+# Create a dual-stack network
+docker network create \
+  --ipv6 \
+  --subnet=172.30.0.0/16 \
+  --gateway=172.30.0.1 \
+  --subnet=2001:db8:2::/64 \
+  ipv6-dualstack
+
+# Run container on IPv6 network
+docker run -d \
+  --name ipv6-app \
+  --network ipv6-network \
+  nginx
+
+# Inspect IPv6 address
+docker inspect ipv6-app
+
+# Display container interfaces
+docker exec ipv6-app ip -6 addr
+
+# Display IPv6 routing table
+docker exec ipv6-app ip -6 route
+
+# Inspect IPv6 network configuration
+docker network inspect ipv6-network
+
+#+END_SRC
+
+Note: IPv6 requires host and Docker daemon support. The documentation subnet `2001:db8::/32` is reserved for examples and must not be used as a real public production address range.
+
+*21. Docker Compose Networking*
+
+Docker Compose automatically creates a project network and connects services to it.
+
+Example: compose.yaml
+
+#+BEGIN_SRC yaml
+
+services:
+  frontend:
+    image: nginx
+    container_name: frontend
+    ports:
+      - "8080:80"
+    networks:
+      - frontend-network
+
+  backend:
+    image: alpine
+    command: sleep infinity
+    networks:
+      - frontend-network
+      - backend-network
+
+  database:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: example
+    networks:
+      - backend-network
+
+networks:
+  frontend-network:
+    driver: bridge
+
+  backend-network:
+    driver: bridge
+    internal: true
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Start Compose services
+docker compose up -d
+
+# List Compose services
+docker compose ps
+
+# Display Compose configuration
+docker compose config
+
+# List Docker networks
+docker network ls
+
+# Inspect frontend network
+docker network inspect project_frontend-network
+
+# Inspect backend network
+docker network inspect project_backend-network
+
+# View Compose logs
+docker compose logs
+
+# Follow Compose logs
+docker compose logs -f
+
+# Execute command in a service
+docker compose exec backend sh
+
+# Restart services
+docker compose restart
+
+# Stop services
+docker compose down
+
+# Remove project networks and containers
+docker compose down --remove-orphans
+
+#+END_SRC
+
+Note: Replace `project` with the actual Compose project name. Compose network names are prefixed by the project name by default.
+
+*22. Docker Compose Network Configuration*
+
+#+BEGIN_SRC yaml
+
+services:
+  app:
+    image: nginx
+    networks:
+      app-network:
+        aliases:
+          - frontend
+    ports:
+      - "8080:80"
+
+  api:
+    image: alpine
+    command: sleep infinity
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Start services
+docker compose up -d
+
+# Inspect Compose network
+docker network inspect project_app-network
+
+# Resolve service name
+docker compose exec api ping -c 4 app
+
+# Resolve network alias
+docker compose exec api ping -c 4 frontend
+
+# Check service IP address
+docker inspect project-api-1 \
+  --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+
+# Stop Compose
+docker compose down
+
+#+END_SRC
+
+*23. Linux Networking Commands for Docker*
+
+These commands are particularly useful when troubleshooting Docker networking on Linux hosts.
+
+#+BEGIN_SRC bash
+
+# Display network interfaces
+ip addr
+
+# Display network links
+ip link show
+
+# Display routing table
+ip route
+
+# Display IPv6 routing table
+ip -6 route
+
+# Display bridge interfaces
+ip link show type bridge
+
+# Display bridge forwarding information
+bridge link
+
+# Display bridge forwarding database
+bridge fdb show
+
+# Display network namespaces
+ip netns list
+
+# Display network connections
+ss -tulnp
+
+# Display listening TCP ports
+ss -tlnp
+
+# Display listening UDP ports
+ss -ulnp
+
+# Display DNS configuration
+cat /etc/resolv.conf
+
+# Display ARP neighbor table
+ip neigh
+
+# Test connectivity
+ping -c 4 8.8.8.8
+
+# Test DNS resolution
+nslookup google.com
+
+# Trace network route
+traceroute google.com
+
+# Display network statistics
+ip -s link
+
+#+END_SRC
+
+*24. Docker Firewall, NAT & IPtables*
+
+Docker uses firewall and NAT rules to implement network isolation, port publishing, and outbound connectivity.
+
+#+BEGIN_SRC bash
+
+# Display IPtables rules
+sudo iptables -L -n -v
+
+# Display NAT rules
+sudo iptables -t nat -L -n -v
+
+# Display Docker firewall chains
+sudo iptables -L DOCKER -n -v
+
+# Display Docker forwarding rules
+sudo iptables -L DOCKER-USER -n -v
+
+# Display Docker NAT rules
+sudo iptables -t nat -L DOCKER -n -v
+
+# Display IP forwarding configuration
+sysctl net.ipv4.ip_forward
+
+# Enable IPv4 forwarding temporarily
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# Display nftables rules
+sudo nft list ruleset
+
+# Display network connection tracking
+sudo conntrack -L
+
+# Check firewall status (Ubuntu)
+sudo ufw status verbose
+
+#+END_SRC
+
+Note: Docker may use iptables or nftables-backed firewall management depending on its configuration. Avoid flushing Docker-managed firewall rules because doing so can break container connectivity and published ports. Firewall inspection and changes should be performed carefully.
+
+*25. Docker Network Packet Capture & Debugging*
+
+#+BEGIN_SRC bash
+
+# Install network debugging tools in Alpine
+docker run --rm \
+  --network host \
+  alpine sh -c "apk add --no-cache curl bind-tools iputils"
+
+# Test connectivity from a container
+docker exec app ping -c 4 database
+
+# Test HTTP connectivity
+docker exec app wget -qO- http://frontend
+
+# Test DNS resolution
+docker exec app nslookup frontend
+
+# Check open TCP connections
+docker exec app ss -tulnp
+
+# Check container routing table
+docker exec app ip route
+
+# Check container network interfaces
+docker exec app ip addr
+
+# Capture traffic on host interface (Linux)
+sudo tcpdump -i any -n
+
+# Capture traffic on a specific port
+sudo tcpdump -i any -n port 8080
+
+# Capture DNS traffic
+sudo tcpdump -i any -n port 53
+
+# Capture traffic on Docker bridge
+sudo tcpdump -i docker0 -n
+
+# Display container logs
+docker logs app
+
+# Inspect container network settings
+docker inspect app
+
+# Inspect Docker network
+docker network inspect app-network
+
+#+END_SRC
+
+Note: The `app` container must have the relevant diagnostic utilities installed. `tcpdump` must also be installed on the host for host-level packet capture.
+
+*26. Docker Network Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# List all networks
+docker network ls
+
+# Inspect a network
+docker network inspect app-network
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Inspect container network mode
+docker inspect app \
+  --format '{{.HostConfig.NetworkMode}}'
+
+# Display container IP addresses
+docker inspect app \
+  --format '{{json .NetworkSettings.Networks}}'
+
+# Display published ports
+docker port app
+
+# Check container logs
+docker logs app
+
+# Test DNS resolution
+docker exec app nslookup database
+
+# Test connectivity
+docker exec app ping -c 4 database
+
+# Test HTTP connectivity
+docker exec app wget -qO- http://frontend
+
+# Check host listening ports (Linux)
+sudo ss -tulnp
+
+# Check Docker daemon logs (Linux)
+sudo journalctl -u docker -n 100
+
+# Restart Docker daemon (Linux)
+sudo systemctl restart docker
+
+#+END_SRC
+
+Common Docker networking problems
+
+| Problem | Possible solution |
+|---|---|
+| Container cannot resolve another container | Use a user-defined network |
+| Connection refused | Check whether the application is listening |
+| Port already allocated | Choose another host port |
+| Container cannot access the internet | Check DNS, routes, firewall and IP forwarding |
+| Container cannot reach host service | Check host address and firewall configuration |
+| Network creation fails | Check subnet overlap |
+| Overlay network not working | Check Swarm status and required ports |
+| DNS resolution fails | Inspect `/etc/resolv.conf` |
+| Container has no IP | Inspect network and IPAM configuration |
+| Published port inaccessible | Check host firewall and port bindings |
+| macvlan communication fails | Check parent interface and host connectivity |
+| MTU connectivity problems | Verify MTU across the network path |
+
+*27. Docker Network Cleanup & Maintenance*
+
+#+BEGIN_SRC bash
+
+# List all networks
+docker network ls
+
+# Display unused networks
+docker network ls --filter dangling=true
+
+# Inspect network
+docker network inspect old-network
+
+# Remove specific network
+docker network rm old-network
+
+# Remove multiple networks
+docker network rm network1 network2
+
+# Remove all unused networks
+docker network prune
+
+# Remove unused networks without confirmation
+docker network prune -f
+
+# Remove unused networks older than 24 hours
+docker network prune --filter "until=24h"
+
+# Display Docker disk usage
+docker system df
+
+# Display detailed Docker disk usage
+docker system df -v
+
+# Remove stopped containers
+docker container prune
+
+#+END_SRC
+
+Important: `docker network prune` removes unused networks, not networks currently attached to containers. Review the network list before cleanup.
+
+*28. Docker Network Command Cheat Sheet*
+
+| Goal | Command |
+|---|---|
+| List networks | `docker network ls` |
+| Create network | `docker network create my-network` |
+| Inspect network | `docker network inspect my-network` |
+| Remove network | `docker network rm my-network` |
+| Remove unused networks | `docker network prune` |
+| Create bridge network | `docker network create -d bridge my-network` |
+| Create overlay network | `docker network create -d overlay my-network` |
+| Create internal network | `docker network create --internal my-network` |
+| Connect container | `docker network connect my-network app` |
+| Disconnect container | `docker network disconnect my-network app` |
+| Publish port | `docker run -p 8080:80 nginx` |
+| Use host networking | `docker run --network host nginx` |
+| Disable networking | `docker run --network none alpine` |
+| Inspect container IP | `docker inspect app` |
+| Display published ports | `docker port app` |
+| Display host interfaces | `ip addr` |
+| Display routing table | `ip route` |
+| Display listening ports | `ss -tulnp` |
+| Inspect firewall rules | `sudo iptables -L -n -v` |
+| Inspect NAT rules | `sudo iptables -t nat -L -n -v` |
+| Start Compose | `docker compose up -d` |
+| Stop Compose | `docker compose down` |
+| Initialize Swarm | `docker swarm init` |
+| List Swarm nodes | `docker node ls` |
+| List Swarm services | `docker service ls` |
+
+Important Docker Networking Best Practices
+ 
+- Use user-defined bridge networks instead of relying on the default bridge for application environments.
+- Use container and service names instead of hardcoded IP addresses.
+- Separate frontend, backend, and database networks where appropriate.
+- Publish only the ports that need to be accessible from outside Docker.
+- Bind published ports to `127.0.0.1` when access should be restricted to the local host.
+- Use internal networks for backend services that do not need external connectivity.
+- Avoid overlapping Docker subnets with existing LAN, VPN, and cloud networks.
+- Use overlay networks when connecting services across multiple Swarm nodes.
+- Monitor firewall rules and Docker-managed NAT configuration.
+- Use macvlan and ipvlan only when direct physical network integration is required.
+- Configure IPv6 deliberately and verify host support.
+- Use DNS aliases and service discovery for stable communication.
+- Regularly inspect and remove unused networks.
+- Avoid modifying Docker-managed firewall rules without understanding their impact.
+- Use network segmentation and least-privilege connectivity to reduce unnecessary communication between services.
+
 -----
 
 * Beginner
