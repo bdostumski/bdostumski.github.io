@@ -22,1390 +22,3055 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org4434b36" class="outline-2">
-<h2 id="org4434b36">Vagrant</h2>
-<div class="outline-text-2" id="text-org4434b36">
+<div id="outline-container-orgc648c57" class="outline-2">
+<h2 id="orgc648c57">Vagrant</h2>
+<div class="outline-text-2" id="text-orgc648c57">
+<ul class="org-ul">
+<li><a href="https://developer.hashicorp.com/vagrant/docs">Vagrant Documentation</a></li>
+</ul>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-org9eb8a44" class="outline-2">
-<h2 id="org9eb8a44">Beginner</h2>
-<div class="outline-text-2" id="text-org9eb8a44">
+<div id="outline-container-orgd9f27c8" class="outline-2">
+<h2 id="orgd9f27c8">Vagrant Command Handbook:</h2>
+<div class="outline-text-2" id="text-orgd9f27c8">
+<p>
+<b>1. Vagrant Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Vagrant version
+</span>vagrant --version
+vagrant -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Vagrant help
+</span>vagrant help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display help for a specific command
+</span>vagrant help up
+vagrant help provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Vagrant environment
+</span>vagrant version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Vagrant home directory
+</span><span style="font-weight: bold;">echo</span> $<span style="font-weight: bold; font-style: italic;">VAGRANT_HOME</span>                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Linux / macOS
+</span><span style="font-weight: bold;">echo</span> %VAGRANT_HOME%               <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Windows
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set custom Vagrant home directory (Linux / macOS)
+</span><span style="font-weight: bold;">export</span> <span style="font-weight: bold; font-style: italic;">VAGRANT_HOME</span>=/path/to/vagrant
+
+</pre>
 </div>
-<div id="outline-container-org4071fe2" class="outline-3">
-<h3 id="org4071fe2">Q1: What is Vagrant?</h3>
-<div class="outline-text-3" id="text-org4071fe2">
+
+<p>
+<b>2. Vagrant Project Initialization</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create project directory
+</span>mkdir vagrant-project
+<span style="font-weight: bold;">cd</span> vagrant-project
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Initialize Vagrantfile
+</span>vagrant init
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Initialize with a specific box
+</span>vagrant init ubuntu/jammy64
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Initialize with a specific box version
+</span>vagrant init ubuntu/jammy64 --box-version 20241002.0.0
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate Vagrantfile syntax and configuration
+</span>vagrant validate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display project configuration
+</span>cat Vagrantfile
+
+</pre>
+</div>
+
+<p>
+Note: `vagrant init` generates a Vagrantfile. The VM is not created until `vagrant up` is executed.
+</p>
+
+<p>
+<b>3. Vagrant Box Management</b>
+</p>
+
+<p>
+Boxes are reusable base images used to create virtual machines.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Search for boxes
+</span>vagrant cloud search ubuntu
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add a box
+</span>vagrant box add ubuntu/jammy64
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add a specific box version
+</span>vagrant box add ubuntu/jammy64 --box-version 20241002.0.0
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List installed boxes
+</span>vagrant box list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display box information
+</span>vagrant box list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check whether boxes are outdated
+</span>vagrant box outdated
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check a specific box
+</span>vagrant box outdated --global
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update boxes
+</span>vagrant box update
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update a specific box
+</span>vagrant box update --box ubuntu/jammy64
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a box
+</span>vagrant box remove ubuntu/jammy64
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a specific box version
+</span>vagrant box remove ubuntu/jammy64 --box-version 20241002.0.0
+
+</pre>
+</div>
+
+<p>
+Useful box commands:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box add`</td>
+<td class="org-left">Download and register a box</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box list`</td>
+<td class="org-left">List installed boxes</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box outdated`</td>
+<td class="org-left">Check for newer versions</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box update`</td>
+<td class="org-left">Update box used by an environment</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box remove`</td>
+<td class="org-left">Remove a local box</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant cloud search`</td>
+<td class="org-left">Search available cloud boxes</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>4. VM Lifecycle Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create and start VM
+</span>vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start a specific VM
+</span>vagrant up app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start using a specific provider
+</span>vagrant up --provider=virtualbox
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check VM status
+</span>vagrant status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check all Vagrant environments
+</span>vagrant global-status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Gracefully stop VM
+</span>vagrant halt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop a specific VM
+</span>vagrant halt app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart VM
+</span>vagrant reload
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart and reprovision VM
+</span>vagrant reload --provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Suspend VM
+</span>vagrant suspend
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resume suspended VM
+</span>vagrant resume
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Destroy VM
+</span>vagrant destroy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Destroy without confirmation
+</span>vagrant destroy -f
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Destroy a specific VM
+</span>vagrant destroy app
+
+</pre>
+</div>
+
+<p>
+Lifecycle differences:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant up`</td>
+<td class="org-left">Create and start VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant halt`</td>
+<td class="org-left">Gracefully shut down VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant reload`</td>
+<td class="org-left">Restart VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant suspend`</td>
+<td class="org-left">Save VM runtime state</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant resume`</td>
+<td class="org-left">Resume suspended VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant destroy`</td>
+<td class="org-left">Remove VM resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant status`</td>
+<td class="org-left">Display current VM state</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: `vagrant destroy` removes the managed VM instance, not the project's Vagrantfile or source code.
+</p>
+
+<p>
+<b>5. SSH &amp; Remote VM Access</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect to VM through SSH
+</span>vagrant ssh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect to a specific machine
+</span>vagrant ssh app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a command inside VM
+</span>vagrant ssh -c <span style="font-style: italic;">"hostname"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute multiple commands
+</span>vagrant ssh -c <span style="font-style: italic;">"whoami &amp;&amp; uname -a"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display SSH connection configuration
+</span>vagrant ssh-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display SSH configuration for a specific machine
+</span>vagrant ssh-config app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a command using SSH configuration
+</span>ssh -F &lt;(vagrant ssh-config) default <span style="font-style: italic;">"hostname"</span>
+
+</pre>
+</div>
+
+<p>
+Windows PowerShell alternative:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display SSH configuration
+</span>vagrant ssh-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect to VM
+</span>vagrant ssh
+
+</pre>
+</div>
+
+<p>
+<b>6. Provisioning &amp; Configuration Management</b>
+</p>
+
+<p>
+Provisioning automates software installation and system configuration inside virtual machines.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run configured provisioners
+</span>vagrant provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Provision a specific machine
+</span>vagrant provision app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start VM and force provisioning
+</span>vagrant up --provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart VM and provision
+</span>vagrant reload --provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run provisioners with a specific provisioner name
+</span>vagrant provision --provision-with shell
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run multiple provisioners
+</span>vagrant provision --provision-with shell,ansible
+
+</pre>
+</div>
+
+<p>
+Example shell provisioner:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
+  config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>
+
+  config.vm.provision <span style="font-style: italic;">"shell"</span>, <span style="font-weight: bold; text-decoration: underline;">inline:</span> <span style="font-style: italic;">&lt;&lt;-SHELL
+    apt-get update
+    apt-get install -y nginx
+    systemctl enable nginx
+    systemctl start nginx
+  SHELL
+</span><span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Example external shell script:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
+  config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>
+
+  config.vm.provision <span style="font-style: italic;">"shell"</span>,
+    <span style="font-weight: bold; text-decoration: underline;">path:</span> <span style="font-style: italic;">"scripts/bootstrap.sh"</span>
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Useful provisioning options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`inline`</td>
+<td class="org-left">Execute an inline script</td>
+</tr>
+
+<tr>
+<td class="org-left">`path`</td>
+<td class="org-left">Execute an external script</td>
+</tr>
+
+<tr>
+<td class="org-left">`privileged`</td>
+<td class="org-left">Run with elevated privileges</td>
+</tr>
+
+<tr>
+<td class="org-left">`run: "always"`</td>
+<td class="org-left">Run provisioner on every applicable provisioning run</td>
+</tr>
+
+<tr>
+<td class="org-left">`run: "once"`</td>
+<td class="org-left">Run provisioner only once during initial creation</td>
+</tr>
+
+<tr>
+<td class="org-left">`name`</td>
+<td class="org-left">Identify a provisioner</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>7. Networking &amp; Port Forwarding</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward guest port 80 to host port 8080
+</span>
+</pre>
+</div>
+
+<p>
+Vagrantfile configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
+  config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>
+
+  config.vm.network <span style="font-style: italic;">"forwarded_port"</span>,
+    <span style="font-weight: bold; text-decoration: underline;">guest:</span> 80,
+    <span style="font-weight: bold; text-decoration: underline;">host:</span> 8080
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Additional networking examples:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward application port
+</span>config.vm.network <span style="font-style: italic;">"forwarded_port"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">guest:</span> 8080,
+  <span style="font-weight: bold; text-decoration: underline;">host:</span> 8080
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward SSH port
+</span>config.vm.network <span style="font-style: italic;">"forwarded_port"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">guest:</span> 22,
+  <span style="font-weight: bold; text-decoration: underline;">host:</span> 2222
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Private network with static IP
+</span>config.vm.network <span style="font-style: italic;">"private_network"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">ip:</span> <span style="font-style: italic;">"192.168.56.10"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Private network with DHCP
+</span>config.vm.network <span style="font-style: italic;">"private_network"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">type:</span> <span style="font-style: italic;">"dhcp"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Public / bridged network
+</span>config.vm.network <span style="font-style: italic;">"public_network"</span>
+
+</pre>
+</div>
+
+<p>
+Useful networking options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`forwarded<sub>port</sub>`</td>
+<td class="org-left">Forward host traffic to guest</td>
+</tr>
+
+<tr>
+<td class="org-left">`private<sub>network</sub>`</td>
+<td class="org-left">Create a private network</td>
+</tr>
+
+<tr>
+<td class="org-left">`public<sub>network</sub>`</td>
+<td class="org-left">Connect VM to an external network</td>
+</tr>
+
+<tr>
+<td class="org-left">`guest`</td>
+<td class="org-left">Guest VM port</td>
+</tr>
+
+<tr>
+<td class="org-left">`host`</td>
+<td class="org-left">Host machine port</td>
+</tr>
+
+<tr>
+<td class="org-left">`ip`</td>
+<td class="org-left">Assign a static IP address</td>
+</tr>
+
+<tr>
+<td class="org-left">`auto<sub>correct</sub>`</td>
+<td class="org-left">Automatically resolve host port conflicts</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Public networks can expose VMs to other devices on the network. Use them carefully.
+</p>
+
+<p>
+<b>8. Synced Folders &amp; File Sharing</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Default synced folder
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Host project directory -&gt; Guest /vagrant
+</span>
+</pre>
+</div>
+
+<p>
+Vagrantfile examples:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Default synced folder
+</span>config.vm.synced_folder <span style="font-style: italic;">"."</span>, <span style="font-style: italic;">"/vagrant"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Map a specific host directory
+</span>config.vm.synced_folder <span style="font-style: italic;">"./data"</span>, <span style="font-style: italic;">"/var/www"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Disable default synced folder
+</span>config.vm.synced_folder <span style="font-style: italic;">"."</span>, <span style="font-style: italic;">"/vagrant"</span>, <span style="font-weight: bold; text-decoration: underline;">disabled:</span> <span style="font-weight: bold; text-decoration: underline;">true</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set owner and group
+</span>config.vm.synced_folder <span style="font-style: italic;">"./data"</span>, <span style="font-style: italic;">"/var/www"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">owner:</span> <span style="font-style: italic;">"www-data"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">group:</span> <span style="font-style: italic;">"www-data"</span>
+
+</pre>
+</div>
+
+<p>
+Synced folder types:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Type</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">VirtualBox shared folders</td>
+<td class="org-left">Default shared folder mechanism for VirtualBox</td>
+</tr>
+
+<tr>
+<td class="org-left">NFS</td>
+<td class="org-left">High-performance file sharing on supported Unix-like hosts</td>
+</tr>
+
+<tr>
+<td class="org-left">SMB</td>
+<td class="org-left">File sharing commonly used with Windows hosts</td>
+</tr>
+
+<tr>
+<td class="org-left">Rsync</td>
+<td class="org-left">One-way synchronization from host to guest</td>
+</tr>
+
+<tr>
+<td class="org-left">9p</td>
+<td class="org-left">File sharing supported by certain providers</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Example NFS configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+config.vm.synced_folder <span style="font-style: italic;">"./data"</span>, <span style="font-style: italic;">"/var/www"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">type:</span> <span style="font-style: italic;">"nfs"</span>
+
+</pre>
+</div>
+
+<p>
+Example Rsync configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+config.vm.synced_folder <span style="font-style: italic;">"./data"</span>, <span style="font-style: italic;">"/var/www"</span>,
+  <span style="font-weight: bold; text-decoration: underline;">type:</span> <span style="font-style: italic;">"rsync"</span>
+
+</pre>
+</div>
+
+<p>
+Note: Synced folder support depends on the selected provider and host operating system.
+</p>
+
+<p>
+<b>9. Provider Configuration – VirtualBox, VMware &amp; Hyper-V</b>
+</p>
+
+<p>
+Vagrant supports multiple virtualization providers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with VirtualBox
+</span>vagrant up --provider=virtualbox
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with VMware
+</span>vagrant up --provider=vmware_desktop
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start with Hyper-V
+</span>vagrant up --provider=hyperv
+
+</pre>
+</div>
+
+<p>
+VirtualBox configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
+  config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>
+
+  config.vm.provider <span style="font-style: italic;">"virtualbox"</span> <span style="font-weight: bold;">do</span> |vb|
+    vb.name = <span style="font-style: italic;">"development-vm"</span>
+    vb.memory = 4096
+    vb.cpus = 2
+    vb.gui = <span style="font-weight: bold; text-decoration: underline;">false</span>
+  <span style="font-weight: bold;">end</span>
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+VMware configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+config.vm.provider <span style="font-style: italic;">"vmware_desktop"</span> <span style="font-weight: bold;">do</span> |v|
+  v.vmx[<span style="font-style: italic;">"memsize"</span>] = <span style="font-style: italic;">"4096"</span>
+  v.vmx[<span style="font-style: italic;">"numvcpus"</span>] = <span style="font-style: italic;">"2"</span>
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Hyper-V configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+config.vm.provider <span style="font-style: italic;">"hyperv"</span> <span style="font-weight: bold;">do</span> |h|
+  h.memory = 4096
+  h.cpus = 2
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Provider resource options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`memory`</td>
+<td class="org-left">Allocate VM RAM</td>
+</tr>
+
+<tr>
+<td class="org-left">`cpus`</td>
+<td class="org-left">Allocate virtual CPUs</td>
+</tr>
+
+<tr>
+<td class="org-left">`gui`</td>
+<td class="org-left">Enable or disable graphical interface</td>
+</tr>
+
+<tr>
+<td class="org-left">`name`</td>
+<td class="org-left">Set VM name</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;provider`</td>
+<td class="org-left">Select virtualization provider</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Provider-specific settings are not interchangeable. Verify that the provider supports each option.
+</p>
+
+<p>
+<b>10. Multi-Machine Environments</b>
+</p>
+
+<p>
+Vagrant can manage multiple coordinated virtual machines using a single Vagrantfile.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start all machines
+</span>vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start database machine
+</span>vagrant up db
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start application machine
+</span>vagrant up app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check all machine statuses
+</span>vagrant status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect to database machine
+</span>vagrant ssh db
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect to application machine
+</span>vagrant ssh app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Provision a specific machine
+</span>vagrant provision db
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop all machines
+</span>vagrant halt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Destroy all machines
+</span>vagrant destroy
+
+</pre>
+</div>
+
+<p>
+Example multi-machine Vagrantfile:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
+  config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>
+
+  config.vm.define <span style="font-style: italic;">"db"</span> <span style="font-weight: bold;">do</span> |db|
+    db.vm.hostname = <span style="font-style: italic;">"db.local"</span>
+    db.vm.network <span style="font-style: italic;">"private_network"</span>,
+      <span style="font-weight: bold; text-decoration: underline;">ip:</span> <span style="font-style: italic;">"192.168.56.10"</span>
+
+    db.vm.provider <span style="font-style: italic;">"virtualbox"</span> <span style="font-weight: bold;">do</span> |vb|
+      vb.memory = 1024
+      vb.cpus = 1
+    <span style="font-weight: bold;">end</span>
+  <span style="font-weight: bold;">end</span>
+
+  config.vm.define <span style="font-style: italic;">"app"</span> <span style="font-weight: bold;">do</span> |app|
+    app.vm.hostname = <span style="font-style: italic;">"app.local"</span>
+    app.vm.network <span style="font-style: italic;">"private_network"</span>,
+      <span style="font-weight: bold; text-decoration: underline;">ip:</span> <span style="font-style: italic;">"192.168.56.11"</span>
+
+    app.vm.network <span style="font-style: italic;">"forwarded_port"</span>,
+      <span style="font-weight: bold; text-decoration: underline;">guest:</span> 8080,
+      <span style="font-weight: bold; text-decoration: underline;">host:</span> 8080
+
+    app.vm.provider <span style="font-style: italic;">"virtualbox"</span> <span style="font-weight: bold;">do</span> |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    <span style="font-weight: bold;">end</span>
+  <span style="font-weight: bold;">end</span>
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Useful multi-machine commands:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant up db`</td>
+<td class="org-left">Start database VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant up app`</td>
+<td class="org-left">Start application VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant ssh db`</td>
+<td class="org-left">Connect to database</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant provision app`</td>
+<td class="org-left">Provision application VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant halt`</td>
+<td class="org-left">Stop all machines</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant destroy`</td>
+<td class="org-left">Destroy all machines</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. Snapshots &amp; VM Recovery</b>
+</p>
+
+<p>
+Snapshot functionality depends on the selected provider.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create snapshot
+</span>vagrant snapshot save clean-install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create snapshot with description
+</span>vagrant snapshot save clean-install <span style="font-style: italic;">"Initial configuration"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List snapshots
+</span>vagrant snapshot list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restore snapshot
+</span>vagrant snapshot restore clean-install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete snapshot
+</span>vagrant snapshot delete clean-install
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Push snapshot
+</span>vagrant snapshot push
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restore pushed snapshot
+</span>vagrant snapshot pop
+
+</pre>
+</div>
+
+<p>
+Snapshot workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start VM
+</span>vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install application dependencies
+</span>vagrant provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Save clean state
+</span>vagrant snapshot save before-upgrade
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Perform changes
+</span>vagrant ssh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restore previous state if needed
+</span>vagrant snapshot restore before-upgrade
+
+</pre>
+</div>
+
+<p>
+Note: Snapshot commands and capabilities depend on provider support. Snapshots should not replace backups.
+</p>
+
+<p>
+<b>12. Plugins &amp; Extensions</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List installed plugins
+</span>vagrant plugin list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Search available plugins
+</span>vagrant plugin search vagrant
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install plugin
+</span>vagrant plugin install vagrant-vbguest
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install a specific plugin version
+</span>vagrant plugin install vagrant-vbguest --plugin-version 0.32.0
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update plugins
+</span>vagrant plugin update
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update a specific plugin
+</span>vagrant plugin update vagrant-vbguest
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Repair plugin installation
+</span>vagrant plugin repair
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Uninstall plugin
+</span>vagrant plugin uninstall vagrant-vbguest
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Uninstall all plugins
+</span>vagrant plugin expunge
+
+</pre>
+</div>
+
+<p>
+Useful plugin commands:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin list`</td>
+<td class="org-left">List installed plugins</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin search`</td>
+<td class="org-left">Search plugin registry</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin install`</td>
+<td class="org-left">Install plugin</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin update`</td>
+<td class="org-left">Update plugins</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin repair`</td>
+<td class="org-left">Repair plugin installation</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin uninstall`</td>
+<td class="org-left">Remove plugin</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin expunge`</td>
+<td class="org-left">Remove all installed plugins</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>13. Packaging &amp; Distribution – Custom Boxes</b>
+</p>
+
+<p>
+Vagrant supports packaging configured virtual machines into reusable boxes.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package a running machine
+</span>vagrant package
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package a specific machine
+</span>vagrant package app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package with custom output filename
+</span>vagrant package --output custom-ubuntu.box
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package with additional metadata
+</span>vagrant package --output custom.box <span style="font-style: italic;">\</span>
+  --vagrantfile Vagrantfile
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add packaged box locally
+</span>vagrant box add custom-ubuntu custom-ubuntu.box
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List available boxes
+</span>vagrant box list
+
+</pre>
+</div>
+
+<p>
+Custom box workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start and configure VM
+</span>vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install required packages
+</span>vagrant provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Halt VM
+</span>vagrant halt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Package VM
+</span>vagrant package --output development.box
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Register packaged box
+</span>vagrant box add development development.box
+
+</pre>
+</div>
+
+<p>
+Note: Box packaging requires a compatible provider and a suitable machine state. Avoid distributing boxes containing credentials, private keys, or sensitive data.
+</p>
+
+<p>
+<b>14. Logging, Debugging &amp; Troubleshooting</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable debug logging
+</span><span style="font-weight: bold; font-style: italic;">VAGRANT_LOG</span>=debug vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable info logging
+</span><span style="font-weight: bold; font-style: italic;">VAGRANT_LOG</span>=info vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable detailed trace logging
+</span><span style="font-weight: bold; font-style: italic;">VAGRANT_LOG</span>=trace vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Vagrant help
+</span>vagrant help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate Vagrantfile
+</span>vagrant validate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check VM status
+</span>vagrant status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all environments
+</span>vagrant global-status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove stale global status entries
+</span>vagrant global-status --prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display SSH configuration
+</span>vagrant ssh-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check box updates
+</span>vagrant box outdated
+
+</pre>
+</div>
+
+<p>
+Useful troubleshooting commands:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Problem</td>
+<td class="org-left">Command / Solution</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">VM does not start</td>
+<td class="org-left">`vagrant up &#x2013;debug`</td>
+</tr>
+
+<tr>
+<td class="org-left">Invalid Vagrantfile</td>
+<td class="org-left">`vagrant validate`</td>
+</tr>
+
+<tr>
+<td class="org-left">SSH connection issue</td>
+<td class="org-left">`vagrant ssh-config`</td>
+</tr>
+
+<tr>
+<td class="org-left">Port conflict</td>
+<td class="org-left">Change host port or enable `auto<sub>correct</sub>`</td>
+</tr>
+
+<tr>
+<td class="org-left">Provisioning failure</td>
+<td class="org-left">`vagrant provision`</td>
+</tr>
+
+<tr>
+<td class="org-left">VM configuration issue</td>
+<td class="org-left">`vagrant reload`</td>
+</tr>
+
+<tr>
+<td class="org-left">Stale VM entries</td>
+<td class="org-left">`vagrant global-status &#x2013;prune`</td>
+</tr>
+
+<tr>
+<td class="org-left">Outdated base box</td>
+<td class="org-left">`vagrant box outdated`</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Debug logs may contain environment details and configuration values. Review logs before sharing them.
+</p>
+
+<p>
+<b>15. Security &amp; SSH Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">
+<span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
+  config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>
+
+  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable unique SSH key insertion
+</span>  config.ssh.insert_key = <span style="font-weight: bold; text-decoration: underline;">true</span>
+
+  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Configure SSH username
+</span>  config.ssh.username = <span style="font-style: italic;">"vagrant"</span>
+
+  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Configure SSH connection timeout
+</span>  config.ssh.connect_timeout = 30
+
+  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Disable SSH agent forwarding unless needed
+</span>  config.ssh.forward_agent = <span style="font-weight: bold; text-decoration: underline;">false</span>
+<span style="font-weight: bold;">end</span>
+
+</pre>
+</div>
+
+<p>
+Security recommendations:
+</p>
+
+<ul class="org-ul">
+<li>Use trusted and maintained base boxes.</li>
+<li>Pin box versions for reproducible environments.</li>
+<li>Avoid committing passwords, private keys, or tokens.</li>
+<li>Use least-privilege provisioning.</li>
+<li>Restrict forwarded ports and public network exposure.</li>
+<li>Avoid exposing SSH or application debugging ports to untrusted networks.</li>
+<li>Update base boxes regularly.</li>
+<li>Review third-party plugins before installing them.</li>
+</ul>
+
+<p>
+<b>16. Environment Variables &amp; Automation</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Vagrant home
+</span><span style="font-weight: bold;">echo</span> $<span style="font-weight: bold; font-style: italic;">VAGRANT_HOME</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set Vagrant home
+</span><span style="font-weight: bold;">export</span> <span style="font-weight: bold; font-style: italic;">VAGRANT_HOME</span>=<span style="font-style: italic;">"$HOME/.vagrant.d"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run Vagrant with debug logging
+</span><span style="font-weight: bold; font-style: italic;">VAGRANT_LOG</span>=debug vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start environment
+</span>vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run provisioning
+</span>vagrant provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check environment
+</span>vagrant status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop environment
+</span>vagrant halt
+
+</pre>
+</div>
+
+<p>
+Example CI/CD workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate configuration
+</span>vagrant validate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start environment
+</span>vagrant up --provider=virtualbox
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run provisioning
+</span>vagrant provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute integration tests inside VM
+</span>vagrant ssh -c <span style="font-style: italic;">"cd /vagrant &amp;&amp; ./run-tests.sh"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Destroy environment
+</span>vagrant destroy -f
+
+</pre>
+</div>
+
+<p>
+Note: CI runners must support the selected virtualization provider and its hardware or nested virtualization requirements.
+</p>
+
+<p>
+<b>17. Real-World Development &amp; DevOps Workflows</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A. Initialize a new development environment
+</span>mkdir project
+<span style="font-weight: bold;">cd</span> project
+vagrant init ubuntu/jammy64
+vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">B. Connect to development VM
+</span>vagrant ssh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">C. Reprovision development environment
+</span>vagrant provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">D. Restart and reprovision
+</span>vagrant reload --provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">E. Check environment status
+</span>vagrant status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">F. Update base box
+</span>vagrant box outdated
+vagrant box update
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">G. Inspect SSH connection
+</span>vagrant ssh-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">H. Start multi-machine environment
+</span>vagrant up db
+vagrant up app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">I. Check all VMs
+</span>vagrant global-status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">J. Debug startup problems
+</span><span style="font-weight: bold; font-style: italic;">VAGRANT_LOG</span>=debug vagrant up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">K. Save VM snapshot
+</span>vagrant snapshot save before-upgrade
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">L. Rebuild environment from scratch
+</span>vagrant destroy -f
+vagrant up --provision
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">M. Run automated integration tests
+</span>vagrant ssh -c <span style="font-style: italic;">"cd /vagrant &amp;&amp; ./run-tests.sh"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">N. Package custom VM
+</span>vagrant package --output development.box
+
+</pre>
+</div>
+
+<p>
+<b>18. Vagrant Command-Line Options</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;help`</td>
+<td class="org-left">Display command help</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;version`</td>
+<td class="org-left">Display Vagrant version</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;provider`</td>
+<td class="org-left">Select virtualization provider</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;provision`</td>
+<td class="org-left">Force provisioning</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;no-provision`</td>
+<td class="org-left">Skip provisioning</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;provision-with`</td>
+<td class="org-left">Select provisioners</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;debug`</td>
+<td class="org-left">Enable debug output</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;machine-readable`</td>
+<td class="org-left">Produce machine-readable output where supported</td>
+</tr>
+
+<tr>
+<td class="org-left">`-f`</td>
+<td class="org-left">Force operation where supported</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;box-version`</td>
+<td class="org-left">Select a box version</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Options are command-specific. Not every option applies to every Vagrant command.
+</p>
+
+<p>
+<b>19. Commands Every Developer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant &#x2013;version`</td>
+<td class="org-left">Check Vagrant version</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant init`</td>
+<td class="org-left">Initialize project</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant validate`</td>
+<td class="org-left">Validate Vagrantfile</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant up`</td>
+<td class="org-left">Create and start VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant status`</td>
+<td class="org-left">Check VM status</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant ssh`</td>
+<td class="org-left">Connect to VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant ssh-config`</td>
+<td class="org-left">Display SSH configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant halt`</td>
+<td class="org-left">Stop VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant reload`</td>
+<td class="org-left">Restart VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant suspend`</td>
+<td class="org-left">Suspend VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant resume`</td>
+<td class="org-left">Resume VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant provision`</td>
+<td class="org-left">Run provisioners</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant destroy`</td>
+<td class="org-left">Destroy VM</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box list`</td>
+<td class="org-left">List installed boxes</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box update`</td>
+<td class="org-left">Update environment box</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant box outdated`</td>
+<td class="org-left">Check box updates</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant plugin list`</td>
+<td class="org-left">List plugins</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant global-status`</td>
+<td class="org-left">List all Vagrant environments</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant snapshot save`</td>
+<td class="org-left">Save snapshot</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant snapshot restore`</td>
+<td class="org-left">Restore snapshot</td>
+</tr>
+
+<tr>
+<td class="org-left">`vagrant package`</td>
+<td class="org-left">Package VM as a box</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>20. Best Practices for Technical Leads &amp; DevOps</b>
+</p>
+
+<ol class="org-ol">
+<li>Keep the Vagrantfile under version control.</li>
+<li>Use trusted and version-pinned base boxes.</li>
+<li>Automate all environment setup through provisioning.</li>
+<li>Prefer idempotent provisioning scripts.</li>
+<li>Keep provisioning logic modular and maintainable.</li>
+<li>Avoid manual configuration changes inside running VMs.</li>
+<li>Use appropriate CPU and memory allocations.</li>
+<li>Minimize unnecessary forwarded ports.</li>
+<li>Prefer private networking for internal VM communication.</li>
+<li>Avoid exposing SSH and debugging ports publicly.</li>
+<li>Use secure secret-management mechanisms.</li>
+<li>Test environments from a clean state regularly.</li>
+<li>Use snapshots for short-term recovery, not as a backup strategy.</li>
+<li>Keep plugins updated and review their security.</li>
+<li>Use consistent provider configurations across development teams.</li>
+<li>Automate VM creation and destruction in CI/CD where appropriate.</li>
+<li>Monitor resource consumption and synced-folder performance.</li>
+<li>Document common Vagrant commands and troubleshooting procedures.</li>
+<li>Treat development VMs as disposable infrastructure.</li>
+<li>Ensure every developer can reproduce the environment from the Vagrantfile and provisioning code.</li>
+</ol>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org910a67f" class="outline-2">
+<h2 id="org910a67f">Beginner</h2>
+<div class="outline-text-2" id="text-org910a67f">
+</div>
+<div id="outline-container-orgfbd0626" class="outline-3">
+<h3 id="orgfbd0626">Q1: What is Vagrant?</h3>
+<div class="outline-text-3" id="text-orgfbd0626">
 <p>
 Vagrant is a tool for building and managing reproducible virtualized development environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orge641066" class="outline-3">
-<h3 id="orge641066">Q2: Why use Vagrant?</h3>
-<div class="outline-text-3" id="text-orge641066">
+<div id="outline-container-org5330989" class="outline-3">
+<h3 id="org5330989">Q2: Why use Vagrant?</h3>
+<div class="outline-text-3" id="text-org5330989">
 <p>
 It standardizes local environments and reduces “works on my machine” problems.
 </p>
 </div>
 </div>
-<div id="outline-container-org6bccee1" class="outline-3">
-<h3 id="org6bccee1">Q3: What is a Vagrant box?</h3>
-<div class="outline-text-3" id="text-org6bccee1">
+<div id="outline-container-orga146701" class="outline-3">
+<h3 id="orga146701">Q3: What is a Vagrant box?</h3>
+<div class="outline-text-3" id="text-orga146701">
 <p>
 A packaged base VM image used to create Vagrant machines.
 </p>
 </div>
 </div>
-<div id="outline-container-org72f91ed" class="outline-3">
-<h3 id="org72f91ed">Q4: What file defines a Vagrant environment?</h3>
-<div class="outline-text-3" id="text-org72f91ed">
+<div id="outline-container-org0f2de34" class="outline-3">
+<h3 id="org0f2de34">Q4: What file defines a Vagrant environment?</h3>
+<div class="outline-text-3" id="text-org0f2de34">
 <p>
 <code>Vagrantfile</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org37a3acf" class="outline-3">
-<h3 id="org37a3acf">Q5: What language is Vagrantfile written in?</h3>
-<div class="outline-text-3" id="text-org37a3acf">
+<div id="outline-container-orgd3f1e4c" class="outline-3">
+<h3 id="orgd3f1e4c">Q5: What language is Vagrantfile written in?</h3>
+<div class="outline-text-3" id="text-orgd3f1e4c">
 <p>
 Ruby-based DSL.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b74b1f" class="outline-3">
-<h3 id="org2b74b1f">Q6: What does <code>vagrant init</code> do?</h3>
-<div class="outline-text-3" id="text-org2b74b1f">
+<div id="outline-container-org19f6b06" class="outline-3">
+<h3 id="org19f6b06">Q6: What does <code>vagrant init</code> do?</h3>
+<div class="outline-text-3" id="text-org19f6b06">
 <p>
 Creates a starter Vagrantfile.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf5ec23e" class="outline-3">
-<h3 id="orgf5ec23e">Q7: What does <code>vagrant up</code> do?</h3>
-<div class="outline-text-3" id="text-orgf5ec23e">
+<div id="outline-container-org707efe6" class="outline-3">
+<h3 id="org707efe6">Q7: What does <code>vagrant up</code> do?</h3>
+<div class="outline-text-3" id="text-org707efe6">
 <p>
 Creates and starts configured VM(s).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd17b08d" class="outline-3">
-<h3 id="orgd17b08d">Q8: What does <code>vagrant ssh</code> do?</h3>
-<div class="outline-text-3" id="text-orgd17b08d">
+<div id="outline-container-org474d4b3" class="outline-3">
+<h3 id="org474d4b3">Q8: What does <code>vagrant ssh</code> do?</h3>
+<div class="outline-text-3" id="text-org474d4b3">
 <p>
 SSH into running Vagrant VM.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a7d921" class="outline-3">
-<h3 id="org2a7d921">Q9: What does <code>vagrant halt</code> do?</h3>
-<div class="outline-text-3" id="text-org2a7d921">
+<div id="outline-container-orgf9116cc" class="outline-3">
+<h3 id="orgf9116cc">Q9: What does <code>vagrant halt</code> do?</h3>
+<div class="outline-text-3" id="text-orgf9116cc">
 <p>
 Gracefully stops VM.
 </p>
 </div>
 </div>
-<div id="outline-container-org8955f34" class="outline-3">
-<h3 id="org8955f34">Q10: What does <code>vagrant reload</code> do?</h3>
-<div class="outline-text-3" id="text-org8955f34">
+<div id="outline-container-org9ece825" class="outline-3">
+<h3 id="org9ece825">Q10: What does <code>vagrant reload</code> do?</h3>
+<div class="outline-text-3" id="text-org9ece825">
 <p>
 Restarts VM and reapplies Vagrantfile config (as needed).
 </p>
 </div>
 </div>
-<div id="outline-container-org316e956" class="outline-3">
-<h3 id="org316e956">Q11: What does <code>vagrant destroy</code> do?</h3>
-<div class="outline-text-3" id="text-org316e956">
+<div id="outline-container-orge7b1ded" class="outline-3">
+<h3 id="orge7b1ded">Q11: What does <code>vagrant destroy</code> do?</h3>
+<div class="outline-text-3" id="text-orge7b1ded">
 <p>
 Deletes VM instance resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org54b7fda" class="outline-3">
-<h3 id="org54b7fda">Q12: What does <code>vagrant suspend</code> do?</h3>
-<div class="outline-text-3" id="text-org54b7fda">
+<div id="outline-container-org1f59d05" class="outline-3">
+<h3 id="org1f59d05">Q12: What does <code>vagrant suspend</code> do?</h3>
+<div class="outline-text-3" id="text-org1f59d05">
 <p>
 Pauses VM, preserving memory state.
 </p>
 </div>
 </div>
-<div id="outline-container-org305d894" class="outline-3">
-<h3 id="org305d894">Q13: Suspend vs halt?</h3>
-<div class="outline-text-3" id="text-org305d894">
+<div id="outline-container-org3a1a002" class="outline-3">
+<h3 id="org3a1a002">Q13: Suspend vs halt?</h3>
+<div class="outline-text-3" id="text-org3a1a002">
 <p>
 Suspend saves runtime state; halt performs full shutdown.
 </p>
 </div>
 </div>
-<div id="outline-container-org70501b3" class="outline-3">
-<h3 id="org70501b3">Q14: What does <code>vagrant status</code> show?</h3>
-<div class="outline-text-3" id="text-org70501b3">
+<div id="outline-container-orgeed2fd2" class="outline-3">
+<h3 id="orgeed2fd2">Q14: What does <code>vagrant status</code> show?</h3>
+<div class="outline-text-3" id="text-orgeed2fd2">
 <p>
 Current state of managed machine(s).
 </p>
 </div>
 </div>
-<div id="outline-container-org0f6e76d" class="outline-3">
-<h3 id="org0f6e76d">Q15: What does <code>vagrant provision</code> do?</h3>
-<div class="outline-text-3" id="text-org0f6e76d">
+<div id="outline-container-orgb9f6fd1" class="outline-3">
+<h3 id="orgb9f6fd1">Q15: What does <code>vagrant provision</code> do?</h3>
+<div class="outline-text-3" id="text-orgb9f6fd1">
 <p>
 Runs configured provisioners on VM.
 </p>
 </div>
 </div>
-<div id="outline-container-org42203fc" class="outline-3">
-<h3 id="org42203fc">Q16: What is a provider in Vagrant?</h3>
-<div class="outline-text-3" id="text-org42203fc">
+<div id="outline-container-org516d68b" class="outline-3">
+<h3 id="org516d68b">Q16: What is a provider in Vagrant?</h3>
+<div class="outline-text-3" id="text-org516d68b">
 <p>
 Backend virtualization platform (VirtualBox, VMware, Hyper-V, libvirt, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-orgf30ec88" class="outline-3">
-<h3 id="orgf30ec88">Q17: Is Vagrant itself a hypervisor?</h3>
-<div class="outline-text-3" id="text-orgf30ec88">
+<div id="outline-container-org8cbc0d6" class="outline-3">
+<h3 id="org8cbc0d6">Q17: Is Vagrant itself a hypervisor?</h3>
+<div class="outline-text-3" id="text-org8cbc0d6">
 <p>
 No, it orchestrates existing providers/hypervisors.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e816eb" class="outline-3">
-<h3 id="org6e816eb">Q18: What is provisioning?</h3>
-<div class="outline-text-3" id="text-org6e816eb">
+<div id="outline-container-org9fe57bc" class="outline-3">
+<h3 id="org9fe57bc">Q18: What is provisioning?</h3>
+<div class="outline-text-3" id="text-org9fe57bc">
 <p>
 Automated setup of software/configuration inside VM.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6bb35b" class="outline-3">
-<h3 id="orgf6bb35b">Q19: Common provisioners in Vagrant?</h3>
-<div class="outline-text-3" id="text-orgf6bb35b">
+<div id="outline-container-org2a2bdbf" class="outline-3">
+<h3 id="org2a2bdbf">Q19: Common provisioners in Vagrant?</h3>
+<div class="outline-text-3" id="text-org2a2bdbf">
 <p>
 Shell, Ansible, Chef, Puppet (and others/plugins).
 </p>
 </div>
 </div>
-<div id="outline-container-orgba2e689" class="outline-3">
-<h3 id="orgba2e689">Q20: What is synced folder?</h3>
-<div class="outline-text-3" id="text-orgba2e689">
+<div id="outline-container-org201952b" class="outline-3">
+<h3 id="org201952b">Q20: What is synced folder?</h3>
+<div class="outline-text-3" id="text-org201952b">
 <p>
 Folder shared between host and guest VM.
 </p>
 </div>
 </div>
-<div id="outline-container-org94a5e8a" class="outline-3">
-<h3 id="org94a5e8a">Q21: Why synced folders useful?</h3>
-<div class="outline-text-3" id="text-org94a5e8a">
+<div id="outline-container-org35d4cd1" class="outline-3">
+<h3 id="org35d4cd1">Q21: Why synced folders useful?</h3>
+<div class="outline-text-3" id="text-org35d4cd1">
 <p>
 Edit code on host, run it inside VM environment.
 </p>
 </div>
 </div>
-<div id="outline-container-org850cc0e" class="outline-3">
-<h3 id="org850cc0e">Q22: Default synced folder path in guest?</h3>
-<div class="outline-text-3" id="text-org850cc0e">
+<div id="outline-container-org9b54c97" class="outline-3">
+<h3 id="org9b54c97">Q22: Default synced folder path in guest?</h3>
+<div class="outline-text-3" id="text-org9b54c97">
 <p>
 Typically <code>/vagrant</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orge5e2976" class="outline-3">
-<h3 id="orge5e2976">Q23: What is forwarded port?</h3>
-<div class="outline-text-3" id="text-orge5e2976">
+<div id="outline-container-org719a693" class="outline-3">
+<h3 id="org719a693">Q23: What is forwarded port?</h3>
+<div class="outline-text-3" id="text-org719a693">
 <p>
 Maps host port to guest port.
 </p>
 </div>
 </div>
-<div id="outline-container-org0e04ac1" class="outline-3">
-<h3 id="org0e04ac1">Q24: Why use port forwarding?</h3>
-<div class="outline-text-3" id="text-org0e04ac1">
+<div id="outline-container-orga16215f" class="outline-3">
+<h3 id="orga16215f">Q24: Why use port forwarding?</h3>
+<div class="outline-text-3" id="text-orga16215f">
 <p>
 Access guest services from host browser/tools.
 </p>
 </div>
 </div>
-<div id="outline-container-orgad3e692" class="outline-3">
-<h3 id="orgad3e692">Q25: What is private network in Vagrant?</h3>
-<div class="outline-text-3" id="text-orgad3e692">
+<div id="outline-container-org1067bb7" class="outline-3">
+<h3 id="org1067bb7">Q25: What is private network in Vagrant?</h3>
+<div class="outline-text-3" id="text-org1067bb7">
 <p>
 Host-only network between host and guest(s).
 </p>
 </div>
 </div>
-<div id="outline-container-org71d4128" class="outline-3">
-<h3 id="org71d4128">Q26: What is public network in Vagrant?</h3>
-<div class="outline-text-3" id="text-org71d4128">
+<div id="outline-container-org81637a7" class="outline-3">
+<h3 id="org81637a7">Q26: What is public network in Vagrant?</h3>
+<div class="outline-text-3" id="text-org81637a7">
 <p>
 Bridged network exposing VM on external LAN.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e548f1" class="outline-3">
-<h3 id="org5e548f1">Q27: Why be careful with public networks?</h3>
-<div class="outline-text-3" id="text-org5e548f1">
+<div id="outline-container-orgf63b379" class="outline-3">
+<h3 id="orgf63b379">Q27: Why be careful with public networks?</h3>
+<div class="outline-text-3" id="text-orgf63b379">
 <p>
 They increase exposure to external network threats.
 </p>
 </div>
 </div>
-<div id="outline-container-org784c680" class="outline-3">
-<h3 id="org784c680">Q28: What is multi-machine Vagrant setup?</h3>
-<div class="outline-text-3" id="text-org784c680">
+<div id="outline-container-org5f54c9f" class="outline-3">
+<h3 id="org5f54c9f">Q28: What is multi-machine Vagrant setup?</h3>
+<div class="outline-text-3" id="text-org5f54c9f">
 <p>
 Single Vagrantfile defining multiple coordinated VMs.
 </p>
 </div>
 </div>
-<div id="outline-container-org60e69fb" class="outline-3">
-<h3 id="org60e69fb">Q29: Why use multi-machine?</h3>
-<div class="outline-text-3" id="text-org60e69fb">
+<div id="outline-container-org8502e01" class="outline-3">
+<h3 id="org8502e01">Q29: Why use multi-machine?</h3>
+<div class="outline-text-3" id="text-org8502e01">
 <p>
 Simulate distributed systems locally (app/db/cache clusters).
 </p>
 </div>
 </div>
-<div id="outline-container-orgdfa6841" class="outline-3">
-<h3 id="orgdfa6841">Q30: What is box versioning?</h3>
-<div class="outline-text-3" id="text-orgdfa6841">
+<div id="outline-container-org06e0021" class="outline-3">
+<h3 id="org06e0021">Q30: What is box versioning?</h3>
+<div class="outline-text-3" id="text-org06e0021">
 <p>
 Using specific box versions for reproducibility.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfc11dd0" class="outline-3">
-<h3 id="orgfc11dd0">Q31: Why pin box versions?</h3>
-<div class="outline-text-3" id="text-orgfc11dd0">
+<div id="outline-container-org5ba342a" class="outline-3">
+<h3 id="org5ba342a">Q31: Why pin box versions?</h3>
+<div class="outline-text-3" id="text-org5ba342a">
 <p>
 Avoid unexpected changes from box updates.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f65ee6" class="outline-3">
-<h3 id="org3f65ee6">Q32: What does <code>vagrant box add</code> do?</h3>
-<div class="outline-text-3" id="text-org3f65ee6">
+<div id="outline-container-orgeabaac9" class="outline-3">
+<h3 id="orgeabaac9">Q32: What does <code>vagrant box add</code> do?</h3>
+<div class="outline-text-3" id="text-orgeabaac9">
 <p>
 Downloads/registers box locally.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdae5902" class="outline-3">
-<h3 id="orgdae5902">Q33: What does <code>vagrant box list</code> do?</h3>
-<div class="outline-text-3" id="text-orgdae5902">
+<div id="outline-container-orgef3ef89" class="outline-3">
+<h3 id="orgef3ef89">Q33: What does <code>vagrant box list</code> do?</h3>
+<div class="outline-text-3" id="text-orgef3ef89">
 <p>
 Lists installed local boxes.
 </p>
 </div>
 </div>
-<div id="outline-container-org79f09e0" class="outline-3">
-<h3 id="org79f09e0">Q34: What does <code>vagrant box remove</code> do?</h3>
-<div class="outline-text-3" id="text-org79f09e0">
+<div id="outline-container-org83b5479" class="outline-3">
+<h3 id="org83b5479">Q34: What does <code>vagrant box remove</code> do?</h3>
+<div class="outline-text-3" id="text-org83b5479">
 <p>
 Removes local box copy.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a8609d" class="outline-3">
-<h3 id="org9a8609d">Q35: What is <code>config.vm.box</code>?</h3>
-<div class="outline-text-3" id="text-org9a8609d">
+<div id="outline-container-org9a87263" class="outline-3">
+<h3 id="org9a87263">Q35: What is <code>config.vm.box</code>?</h3>
+<div class="outline-text-3" id="text-org9a87263">
 <p>
 Sets base box name in Vagrantfile.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbab78b3" class="outline-3">
-<h3 id="orgbab78b3">Q36: What is <code>config.vm.hostname</code>?</h3>
-<div class="outline-text-3" id="text-orgbab78b3">
+<div id="outline-container-org4f74981" class="outline-3">
+<h3 id="org4f74981">Q36: What is <code>config.vm.hostname</code>?</h3>
+<div class="outline-text-3" id="text-org4f74981">
 <p>
 Sets VM hostname.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba02bff" class="outline-3">
-<h3 id="orgba02bff">Q37: What is <code>config.vm.provider</code> block?</h3>
-<div class="outline-text-3" id="text-orgba02bff">
+<div id="outline-container-org69f9531" class="outline-3">
+<h3 id="org69f9531">Q37: What is <code>config.vm.provider</code> block?</h3>
+<div class="outline-text-3" id="text-org69f9531">
 <p>
 Provider-specific resource/settings customization.
 </p>
 </div>
 </div>
-<div id="outline-container-org24ae977" class="outline-3">
-<h3 id="org24ae977">Q38: How set VM memory/CPU?</h3>
-<div class="outline-text-3" id="text-org24ae977">
+<div id="outline-container-orgb49aee2" class="outline-3">
+<h3 id="orgb49aee2">Q38: How set VM memory/CPU?</h3>
+<div class="outline-text-3" id="text-orgb49aee2">
 <p>
 Provider-specific config in Vagrantfile.
 </p>
 </div>
 </div>
-<div id="outline-container-org135e322" class="outline-3">
-<h3 id="org135e322">Q39: What is idempotent provisioning?</h3>
-<div class="outline-text-3" id="text-org135e322">
+<div id="outline-container-org9d7040f" class="outline-3">
+<h3 id="org9d7040f">Q39: What is idempotent provisioning?</h3>
+<div class="outline-text-3" id="text-org9d7040f">
 <p>
 Provisioning that can run multiple times safely.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d64eef" class="outline-3">
-<h3 id="org3d64eef">Q40: Why idempotency matters?</h3>
-<div class="outline-text-3" id="text-org3d64eef">
+<div id="outline-container-org6596fa5" class="outline-3">
+<h3 id="org6596fa5">Q40: Why idempotency matters?</h3>
+<div class="outline-text-3" id="text-org6596fa5">
 <p>
 Reliable reprovisioning and reduced environment drift.
 </p>
 </div>
 </div>
-<div id="outline-container-org8738503" class="outline-3">
-<h3 id="org8738503">Q41: What is Vagrant plugin?</h3>
-<div class="outline-text-3" id="text-org8738503">
+<div id="outline-container-org8090477" class="outline-3">
+<h3 id="org8090477">Q41: What is Vagrant plugin?</h3>
+<div class="outline-text-3" id="text-org8090477">
 <p>
 Extension adding capabilities to Vagrant.
 </p>
 </div>
 </div>
-<div id="outline-container-org9369189" class="outline-3">
-<h3 id="org9369189">Q42: How list plugins?</h3>
-<div class="outline-text-3" id="text-org9369189">
+<div id="outline-container-org758f58c" class="outline-3">
+<h3 id="org758f58c">Q42: How list plugins?</h3>
+<div class="outline-text-3" id="text-org758f58c">
 <p>
 <code>vagrant plugin list</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org2f798dd" class="outline-3">
-<h3 id="org2f798dd">Q43: What is common beginner Vagrant anti-pattern?</h3>
-<div class="outline-text-3" id="text-org2f798dd">
+<div id="outline-container-orge3841ed" class="outline-3">
+<h3 id="orge3841ed">Q43: What is common beginner Vagrant anti-pattern?</h3>
+<div class="outline-text-3" id="text-orge3841ed">
 <p>
 Manual in-VM changes not captured in provisioning scripts.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d75c31" class="outline-3">
-<h3 id="org1d75c31">Q44: Why avoid manual drift?</h3>
-<div class="outline-text-3" id="text-org1d75c31">
+<div id="outline-container-orgd390f23" class="outline-3">
+<h3 id="orgd390f23">Q44: Why avoid manual drift?</h3>
+<div class="outline-text-3" id="text-orgd390f23">
 <p>
 Destroys reproducibility and team consistency.
 </p>
 </div>
 </div>
-<div id="outline-container-org13d3b3c" class="outline-3">
-<h3 id="org13d3b3c">Q45: What is box trust concern?</h3>
-<div class="outline-text-3" id="text-org13d3b3c">
+<div id="outline-container-orgb9c9818" class="outline-3">
+<h3 id="orgb9c9818">Q45: What is box trust concern?</h3>
+<div class="outline-text-3" id="text-orgb9c9818">
 <p>
 Untrusted boxes may contain insecure/malicious configurations.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf49b845" class="outline-3">
-<h3 id="orgf49b845">Q46: Beginner security baseline?</h3>
-<div class="outline-text-3" id="text-orgf49b845">
+<div id="outline-container-orgebea226" class="outline-3">
+<h3 id="orgebea226">Q46: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-orgebea226">
 <p>
 Use trusted boxes, SSH keys, and least-exposed networking.
 </p>
 </div>
 </div>
-<div id="outline-container-orgae4bc22" class="outline-3">
-<h3 id="orgae4bc22">Q47: Beginner performance baseline?</h3>
-<div class="outline-text-3" id="text-orgae4bc22">
+<div id="outline-container-orgbf86ffa" class="outline-3">
+<h3 id="orgbf86ffa">Q47: Beginner performance baseline?</h3>
+<div class="outline-text-3" id="text-orgbf86ffa">
 <p>
 Allocate reasonable CPU/RAM and avoid heavy unnecessary services.
 </p>
 </div>
 </div>
-<div id="outline-container-org4f69612" class="outline-3">
-<h3 id="org4f69612">Q48: What is snapshot concept (provider-dependent)?</h3>
-<div class="outline-text-3" id="text-org4f69612">
+<div id="outline-container-orgc9ef0a8" class="outline-3">
+<h3 id="orgc9ef0a8">Q48: What is snapshot concept (provider-dependent)?</h3>
+<div class="outline-text-3" id="text-orgc9ef0a8">
 <p>
 Save VM state checkpoint for quick restore.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc555b39" class="outline-3">
-<h3 id="orgc555b39">Q49: Why snapshots useful?</h3>
-<div class="outline-text-3" id="text-orgc555b39">
+<div id="outline-container-org2165e24" class="outline-3">
+<h3 id="org2165e24">Q49: Why snapshots useful?</h3>
+<div class="outline-text-3" id="text-org2165e24">
 <p>
 Fast recovery during experiments.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf3b165" class="outline-3">
-<h3 id="orgdf3b165">Q50: What is <code>vagrant global-status</code>?</h3>
-<div class="outline-text-3" id="text-orgdf3b165">
+<div id="outline-container-orgb420801" class="outline-3">
+<h3 id="orgb420801">Q50: What is <code>vagrant global-status</code>?</h3>
+<div class="outline-text-3" id="text-orgb420801">
 <p>
 Shows VMs across all Vagrant environments on host.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a36849" class="outline-3">
-<h3 id="org5a36849">Q51: What is VAGRANT<sub>HOME</sub>?</h3>
-<div class="outline-text-3" id="text-org5a36849">
+<div id="outline-container-orgb59cc61" class="outline-3">
+<h3 id="orgb59cc61">Q51: What is VAGRANT<sub>HOME</sub>?</h3>
+<div class="outline-text-3" id="text-orgb59cc61">
 <p>
 Directory storing global Vagrant data/boxes/plugins.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbae716e" class="outline-3">
-<h3 id="orgbae716e">Q52: Why keep Vagrantfile in version control?</h3>
-<div class="outline-text-3" id="text-orgbae716e">
+<div id="outline-container-orga0d2371" class="outline-3">
+<h3 id="orga0d2371">Q52: Why keep Vagrantfile in version control?</h3>
+<div class="outline-text-3" id="text-orga0d2371">
 <p>
 Team-shared environment definition and change history.
 </p>
 </div>
 </div>
-<div id="outline-container-orge525bf2" class="outline-3">
-<h3 id="orge525bf2">Q53: Beginner testing baseline?</h3>
-<div class="outline-text-3" id="text-orge525bf2">
+<div id="outline-container-orgbb84a96" class="outline-3">
+<h3 id="orgbb84a96">Q53: Beginner testing baseline?</h3>
+<div class="outline-text-3" id="text-orgbb84a96">
 <p>
 Bring environment up from scratch regularly to verify reproducibility.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7bcbd6" class="outline-3">
-<h3 id="orgc7bcbd6">Q54: Beginner operations principle?</h3>
-<div class="outline-text-3" id="text-orgc7bcbd6">
+<div id="outline-container-org1790891" class="outline-3">
+<h3 id="org1790891">Q54: Beginner operations principle?</h3>
+<div class="outline-text-3" id="text-org1790891">
 <p>
 Automate everything needed after <code>vagrant up</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org65a59be" class="outline-3">
-<h3 id="org65a59be">Q55: Beginner best practice?</h3>
-<div class="outline-text-3" id="text-org65a59be">
+<div id="outline-container-org682592a" class="outline-3">
+<h3 id="org682592a">Q55: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org682592a">
 <p>
 Treat Vagrant environments as disposable and fully scripted.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org2f4c691" class="outline-2">
-<h2 id="org2f4c691">Intermediate</h2>
-<div class="outline-text-2" id="text-org2f4c691">
+<div id="outline-container-org1840eac" class="outline-2">
+<h2 id="org1840eac">Intermediate</h2>
+<div class="outline-text-2" id="text-org1840eac">
 </div>
-<div id="outline-container-orgdf214e1" class="outline-3">
-<h3 id="orgdf214e1">Q56: What is provisioning order in Vagrant?</h3>
-<div class="outline-text-3" id="text-orgdf214e1">
+<div id="outline-container-org588e0b1" class="outline-3">
+<h3 id="org588e0b1">Q56: What is provisioning order in Vagrant?</h3>
+<div class="outline-text-3" id="text-org588e0b1">
 <p>
 Provisioners run in configured sequence; order affects final state.
 </p>
 </div>
 </div>
-<div id="outline-container-orga8cb9dd" class="outline-3">
-<h3 id="orga8cb9dd">Q57: Why split provisioning into stages?</h3>
-<div class="outline-text-3" id="text-orga8cb9dd">
+<div id="outline-container-org3acb50d" class="outline-3">
+<h3 id="org3acb50d">Q57: Why split provisioning into stages?</h3>
+<div class="outline-text-3" id="text-org3acb50d">
 <p>
 Improves clarity, reuse, and troubleshooting.
 </p>
 </div>
 </div>
-<div id="outline-container-org308b4b4" class="outline-3">
-<h3 id="org308b4b4">Q58: Inline shell vs external script provisioner?</h3>
-<div class="outline-text-3" id="text-org308b4b4">
+<div id="outline-container-orge2c04f7" class="outline-3">
+<h3 id="orge2c04f7">Q58: Inline shell vs external script provisioner?</h3>
+<div class="outline-text-3" id="text-orge2c04f7">
 <p>
 Inline for small tasks; external scripts for maintainability.
 </p>
 </div>
 </div>
-<div id="outline-container-orge11b31b" class="outline-3">
-<h3 id="orge11b31b">Q59: What is privileged shell provisioning?</h3>
-<div class="outline-text-3" id="text-orge11b31b">
+<div id="outline-container-org96b440b" class="outline-3">
+<h3 id="org96b440b">Q59: What is privileged shell provisioning?</h3>
+<div class="outline-text-3" id="text-org96b440b">
 <p>
 Runs script with elevated privileges (root/admin).
 </p>
 </div>
 </div>
-<div id="outline-container-org3a71a23" class="outline-3">
-<h3 id="org3a71a23">Q60: Why limit privileged provisioning?</h3>
-<div class="outline-text-3" id="text-org3a71a23">
+<div id="outline-container-org430bd24" class="outline-3">
+<h3 id="org430bd24">Q60: Why limit privileged provisioning?</h3>
+<div class="outline-text-3" id="text-org430bd24">
 <p>
 Reduce security risk and accidental system-wide changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org702f0ea" class="outline-3">
-<h3 id="org702f0ea">Q61: What is run: "always" provision option?</h3>
-<div class="outline-text-3" id="text-org702f0ea">
+<div id="outline-container-org9b7602a" class="outline-3">
+<h3 id="org9b7602a">Q61: What is run: "always" provision option?</h3>
+<div class="outline-text-3" id="text-org9b7602a">
 <p>
 Forces provisioner on every up/reload/provision as configured.
 </p>
 </div>
 </div>
-<div id="outline-container-org2d1b15e" class="outline-3">
-<h3 id="org2d1b15e">Q62: run: "once" behavior?</h3>
-<div class="outline-text-3" id="text-org2d1b15e">
+<div id="outline-container-orgf1a270d" class="outline-3">
+<h3 id="orgf1a270d">Q62: run: "once" behavior?</h3>
+<div class="outline-text-3" id="text-orgf1a270d">
 <p>
 Provisioner runs only first creation unless explicitly reprovisioned.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbfbf96f" class="outline-3">
-<h3 id="orgbfbf96f">Q63: What is trigger in Vagrant?</h3>
-<div class="outline-text-3" id="text-orgbfbf96f">
+<div id="outline-container-orgf3e0da9" class="outline-3">
+<h3 id="orgf3e0da9">Q63: What is trigger in Vagrant?</h3>
+<div class="outline-text-3" id="text-orgf3e0da9">
 <p>
 Hook to run commands before/after lifecycle actions.
 </p>
 </div>
 </div>
-<div id="outline-container-org120ede4" class="outline-3">
-<h3 id="org120ede4">Q64: Trigger use cases?</h3>
-<div class="outline-text-3" id="text-org120ede4">
+<div id="outline-container-orgba49503" class="outline-3">
+<h3 id="orgba49503">Q64: Trigger use cases?</h3>
+<div class="outline-text-3" id="text-orgba49503">
 <p>
 Pre-flight checks, notifications, local setup tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d66dff" class="outline-3">
-<h3 id="org1d66dff">Q65: What is config.ssh.insert<sub>key</sub>?</h3>
-<div class="outline-text-3" id="text-org1d66dff">
+<div id="outline-container-orgd8a07f2" class="outline-3">
+<h3 id="orgd8a07f2">Q65: What is config.ssh.insert<sub>key</sub>?</h3>
+<div class="outline-text-3" id="text-orgd8a07f2">
 <p>
 Controls replacement of insecure default key with unique key.
 </p>
 </div>
 </div>
-<div id="outline-container-org45017b1" class="outline-3">
-<h3 id="org45017b1">Q66: Why enable unique SSH keys?</h3>
-<div class="outline-text-3" id="text-org45017b1">
+<div id="outline-container-orgfa53428" class="outline-3">
+<h3 id="orgfa53428">Q66: Why enable unique SSH keys?</h3>
+<div class="outline-text-3" id="text-orgfa53428">
 <p>
 Improved security over shared default keys.
 </p>
 </div>
 </div>
-<div id="outline-container-orgec7ca96" class="outline-3">
-<h3 id="orgec7ca96">Q67: What is agent forwarding concern?</h3>
-<div class="outline-text-3" id="text-orgec7ca96">
+<div id="outline-container-orgc249251" class="outline-3">
+<h3 id="orgc249251">Q67: What is agent forwarding concern?</h3>
+<div class="outline-text-3" id="text-orgc249251">
 <p>
 Can expose host SSH agent to guest; use only when necessary.
 </p>
 </div>
 </div>
-<div id="outline-container-org0506c41" class="outline-3">
-<h3 id="org0506c41">Q68: What is synced folder type variation?</h3>
-<div class="outline-text-3" id="text-org0506c41">
+<div id="outline-container-org779eff1" class="outline-3">
+<h3 id="org779eff1">Q68: What is synced folder type variation?</h3>
+<div class="outline-text-3" id="text-org779eff1">
 <p>
 VirtualBox shared folders, NFS, SMB, rsync, 9p (provider-dependent).
 </p>
 </div>
 </div>
-<div id="outline-container-org04143bd" class="outline-3">
-<h3 id="org04143bd">Q69: NFS synced folder advantage?</h3>
-<div class="outline-text-3" id="text-org04143bd">
+<div id="outline-container-orgea3fd12" class="outline-3">
+<h3 id="orgea3fd12">Q69: NFS synced folder advantage?</h3>
+<div class="outline-text-3" id="text-orgea3fd12">
 <p>
 Often faster file I/O on Unix-like hosts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgde1ac89" class="outline-3">
-<h3 id="orgde1ac89">Q70: NFS caveat?</h3>
-<div class="outline-text-3" id="text-orgde1ac89">
+<div id="outline-container-org88fe3b3" class="outline-3">
+<h3 id="org88fe3b3">Q70: NFS caveat?</h3>
+<div class="outline-text-3" id="text-org88fe3b3">
 <p>
 Host setup/permissions complexity and platform differences.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf8ed8bf" class="outline-3">
-<h3 id="orgf8ed8bf">Q71: Rsync synced folder model?</h3>
-<div class="outline-text-3" id="text-orgf8ed8bf">
+<div id="outline-container-org4ded42e" class="outline-3">
+<h3 id="org4ded42e">Q71: Rsync synced folder model?</h3>
+<div class="outline-text-3" id="text-org4ded42e">
 <p>
 One-way host-to-guest sync (manual/auto with triggers).
 </p>
 </div>
 </div>
-<div id="outline-container-orgad94085" class="outline-3">
-<h3 id="orgad94085">Q72: Why use rsync?</h3>
-<div class="outline-text-3" id="text-orgad94085">
+<div id="outline-container-org517a6fd" class="outline-3">
+<h3 id="org517a6fd">Q72: Why use rsync?</h3>
+<div class="outline-text-3" id="text-org517a6fd">
 <p>
 Performance for large codebases where shared FS is slow.
 </p>
 </div>
 </div>
-<div id="outline-container-orgad52417" class="outline-3">
-<h3 id="orgad52417">Q73: SMB synced folder typical use?</h3>
-<div class="outline-text-3" id="text-orgad52417">
+<div id="outline-container-orgf402756" class="outline-3">
+<h3 id="orgf402756">Q73: SMB synced folder typical use?</h3>
+<div class="outline-text-3" id="text-orgf402756">
 <p>
 Common choice on Windows hosts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb6d92a3" class="outline-3">
-<h3 id="orgb6d92a3">Q74: What is synced folder ownership mapping?</h3>
-<div class="outline-text-3" id="text-orgb6d92a3">
+<div id="outline-container-org2488d00" class="outline-3">
+<h3 id="org2488d00">Q74: What is synced folder ownership mapping?</h3>
+<div class="outline-text-3" id="text-org2488d00">
 <p>
 UID/GID/permissions mapping between host and guest files.
 </p>
 </div>
 </div>
-<div id="outline-container-org1f2bf09" class="outline-3">
-<h3 id="org1f2bf09">Q75: Why permissions mapping matters?</h3>
-<div class="outline-text-3" id="text-org1f2bf09">
+<div id="outline-container-org05f0237" class="outline-3">
+<h3 id="org05f0237">Q75: Why permissions mapping matters?</h3>
+<div class="outline-text-3" id="text-org05f0237">
 <p>
 Prevents build/runtime permission errors.
 </p>
 </div>
 </div>
-<div id="outline-container-org0a7de05" class="outline-3">
-<h3 id="org0a7de05">Q76: What is static IP private network?</h3>
-<div class="outline-text-3" id="text-org0a7de05">
+<div id="outline-container-org2980d61" class="outline-3">
+<h3 id="org2980d61">Q76: What is static IP private network?</h3>
+<div class="outline-text-3" id="text-org2980d61">
 <p>
 Fixed host-only IP for predictable inter-VM communication.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcfa5a39" class="outline-3">
-<h3 id="orgcfa5a39">Q77: DHCP private network use?</h3>
-<div class="outline-text-3" id="text-orgcfa5a39">
+<div id="outline-container-orgee024a6" class="outline-3">
+<h3 id="orgee024a6">Q77: DHCP private network use?</h3>
+<div class="outline-text-3" id="text-orgee024a6">
 <p>
 Automatically assigned private IP simpler for some setups.
 </p>
 </div>
 </div>
-<div id="outline-container-org16445dc" class="outline-3">
-<h3 id="org16445dc">Q78: Port collision issue in Vagrant?</h3>
-<div class="outline-text-3" id="text-org16445dc">
+<div id="outline-container-orgcac37c4" class="outline-3">
+<h3 id="orgcac37c4">Q78: Port collision issue in Vagrant?</h3>
+<div class="outline-text-3" id="text-orgcac37c4">
 <p>
 Forwarded host port already in use.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf95c97a" class="outline-3">
-<h3 id="orgf95c97a">Q79: How handle port collisions?</h3>
-<div class="outline-text-3" id="text-orgf95c97a">
+<div id="outline-container-org6d61f26" class="outline-3">
+<h3 id="org6d61f26">Q79: How handle port collisions?</h3>
+<div class="outline-text-3" id="text-org6d61f26">
 <p>
 Change host port or use auto-correct options.
 </p>
 </div>
 </div>
-<div id="outline-container-org0f7cf99" class="outline-3">
-<h3 id="org0f7cf99">Q80: What is auto<sub>correct</sub> for forwarded ports?</h3>
-<div class="outline-text-3" id="text-org0f7cf99">
+<div id="outline-container-orge020790" class="outline-3">
+<h3 id="orge020790">Q80: What is auto<sub>correct</sub> for forwarded ports?</h3>
+<div class="outline-text-3" id="text-orge020790">
 <p>
 Automatically finds alternate host port when conflict occurs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfc76f24" class="outline-3">
-<h3 id="orgfc76f24">Q81: What is multi-machine dependency orchestration?</h3>
-<div class="outline-text-3" id="text-orgfc76f24">
+<div id="outline-container-orgc4adc23" class="outline-3">
+<h3 id="orgc4adc23">Q81: What is multi-machine dependency orchestration?</h3>
+<div class="outline-text-3" id="text-orgc4adc23">
 <p>
 Ensure service VMs start in useful order (db before app, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org076b0f5" class="outline-3">
-<h3 id="org076b0f5">Q82: Does Vagrant guarantee service readiness?</h3>
-<div class="outline-text-3" id="text-org076b0f5">
+<div id="outline-container-org95f389e" class="outline-3">
+<h3 id="org95f389e">Q82: Does Vagrant guarantee service readiness?</h3>
+<div class="outline-text-3" id="text-org95f389e">
 <p>
 No, startup order is not full readiness check.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe40239" class="outline-3">
-<h3 id="orgbe40239">Q83: How handle readiness?</h3>
-<div class="outline-text-3" id="text-orgbe40239">
+<div id="outline-container-orgacc30f3" class="outline-3">
+<h3 id="orgacc30f3">Q83: How handle readiness?</h3>
+<div class="outline-text-3" id="text-orgacc30f3">
 <p>
 Provision scripts with health checks/retries.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfdb8ed2" class="outline-3">
-<h3 id="orgfdb8ed2">Q84: What is immutable VM workflow concept?</h3>
-<div class="outline-text-3" id="text-orgfdb8ed2">
+<div id="outline-container-org49aa0f4" class="outline-3">
+<h3 id="org49aa0f4">Q84: What is immutable VM workflow concept?</h3>
+<div class="outline-text-3" id="text-org49aa0f4">
 <p>
 Recreate VM from code instead of patching long-lived instances.
 </p>
 </div>
 </div>
-<div id="outline-container-org77b57e7" class="outline-3">
-<h3 id="org77b57e7">Q85: Why immutable-style helps in Vagrant?</h3>
-<div class="outline-text-3" id="text-org77b57e7">
+<div id="outline-container-org13d3253" class="outline-3">
+<h3 id="org13d3253">Q85: Why immutable-style helps in Vagrant?</h3>
+<div class="outline-text-3" id="text-org13d3253">
 <p>
 Reduces drift and hidden state issues.
 </p>
 </div>
 </div>
-<div id="outline-container-org1420f63" class="outline-3">
-<h3 id="org1420f63">Q86: What is packaging custom box?</h3>
-<div class="outline-text-3" id="text-org1420f63">
+<div id="outline-container-org989205f" class="outline-3">
+<h3 id="org989205f">Q86: What is packaging custom box?</h3>
+<div class="outline-text-3" id="text-org989205f">
 <p>
 Creating reusable base image from configured VM.
 </p>
 </div>
 </div>
-<div id="outline-container-org13b6d82" class="outline-3">
-<h3 id="org13b6d82">Q87: Why create custom boxes?</h3>
-<div class="outline-text-3" id="text-org13b6d82">
+<div id="outline-container-org00dc16f" class="outline-3">
+<h3 id="org00dc16f">Q87: Why create custom boxes?</h3>
+<div class="outline-text-3" id="text-org00dc16f">
 <p>
 Faster onboarding and standardized pre-baked dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb924b17" class="outline-3">
-<h3 id="orgb924b17">Q88: Custom box tradeoff?</h3>
-<div class="outline-text-3" id="text-orgb924b17">
+<div id="outline-container-org40b5f03" class="outline-3">
+<h3 id="org40b5f03">Q88: Custom box tradeoff?</h3>
+<div class="outline-text-3" id="text-org40b5f03">
 <p>
 Maintenance overhead for updates/security patches.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbdc4e05" class="outline-3">
-<h3 id="orgbdc4e05">Q89: What is box update strategy?</h3>
-<div class="outline-text-3" id="text-orgbdc4e05">
+<div id="outline-container-org864608c" class="outline-3">
+<h3 id="org864608c">Q89: What is box update strategy?</h3>
+<div class="outline-text-3" id="text-org864608c">
 <p>
 Controlled updates with version pinning and testing.
 </p>
 </div>
 </div>
-<div id="outline-container-org7e6ddd1" class="outline-3">
-<h3 id="org7e6ddd1">Q90: What does <code>vagrant box outdated</code> do?</h3>
-<div class="outline-text-3" id="text-org7e6ddd1">
+<div id="outline-container-org65d48d7" class="outline-3">
+<h3 id="org65d48d7">Q90: What does <code>vagrant box outdated</code> do?</h3>
+<div class="outline-text-3" id="text-org65d48d7">
 <p>
 Checks whether newer box versions exist.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeecfeaa" class="outline-3">
-<h3 id="orgeecfeaa">Q91: What is <code>vagrant up --provision</code>?</h3>
-<div class="outline-text-3" id="text-orgeecfeaa">
+<div id="outline-container-org48634e0" class="outline-3">
+<h3 id="org48634e0">Q91: What is <code>vagrant up --provision</code>?</h3>
+<div class="outline-text-3" id="text-org48634e0">
 <p>
 Starts VM and forces provisioning run.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ce20e4" class="outline-3">
-<h3 id="org7ce20e4">Q92: What is <code>vagrant reload --provision</code>?</h3>
-<div class="outline-text-3" id="text-org7ce20e4">
+<div id="outline-container-org0cfcdf5" class="outline-3">
+<h3 id="org0cfcdf5">Q92: What is <code>vagrant reload --provision</code>?</h3>
+<div class="outline-text-3" id="text-org0cfcdf5">
 <p>
 Restarts VM and reprovisions in one step.
 </p>
 </div>
 </div>
-<div id="outline-container-orge509e26" class="outline-3">
-<h3 id="orge509e26">Q93: What is <code>vagrant provision &lt;name&gt;</code>?</h3>
-<div class="outline-text-3" id="text-orge509e26">
+<div id="outline-container-orge1782ff" class="outline-3">
+<h3 id="orge1782ff">Q93: What is <code>vagrant provision &lt;name&gt;</code>?</h3>
+<div class="outline-text-3" id="text-orge1782ff">
 <p>
 Provision specific machine in multi-machine setup.
 </p>
 </div>
 </div>
-<div id="outline-container-org6dd36b7" class="outline-3">
-<h3 id="org6dd36b7">Q94: What is provider-specific tuning example?</h3>
-<div class="outline-text-3" id="text-org6dd36b7">
+<div id="outline-container-org45c0155" class="outline-3">
+<h3 id="org45c0155">Q94: What is provider-specific tuning example?</h3>
+<div class="outline-text-3" id="text-org45c0155">
 <p>
 VirtualBox guest additions, linked clones, IO APIC, nested VT-x flags.
 </p>
 </div>
 </div>
-<div id="outline-container-org17306b8" class="outline-3">
-<h3 id="org17306b8">Q95: What is linked clone concept?</h3>
-<div class="outline-text-3" id="text-org17306b8">
+<div id="outline-container-org0286779" class="outline-3">
+<h3 id="org0286779">Q95: What is linked clone concept?</h3>
+<div class="outline-text-3" id="text-org0286779">
 <p>
 Fast VM creation referencing base disk snapshots (provider-specific).
 </p>
 </div>
 </div>
-<div id="outline-container-org3aa2be0" class="outline-3">
-<h3 id="org3aa2be0">Q96: Linked clone tradeoff?</h3>
-<div class="outline-text-3" id="text-org3aa2be0">
+<div id="outline-container-org801e003" class="outline-3">
+<h3 id="org801e003">Q96: Linked clone tradeoff?</h3>
+<div class="outline-text-3" id="text-org801e003">
 <p>
 Disk efficiency and speed vs snapshot/base dependency complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org679be38" class="outline-3">
-<h3 id="org679be38">Q97: What is Hyper-V specific concern?</h3>
-<div class="outline-text-3" id="text-org679be38">
+<div id="outline-container-org9ffeffa" class="outline-3">
+<h3 id="org9ffeffa">Q97: What is Hyper-V specific concern?</h3>
+<div class="outline-text-3" id="text-org9ffeffa">
 <p>
 Networking and privilege requirements differ from VirtualBox/libvirt.
 </p>
 </div>
 </div>
-<div id="outline-container-org6801107" class="outline-3">
-<h3 id="org6801107">Q98: What is libvirt provider advantage?</h3>
-<div class="outline-text-3" id="text-org6801107">
+<div id="outline-container-org791c16d" class="outline-3">
+<h3 id="org791c16d">Q98: What is libvirt provider advantage?</h3>
+<div class="outline-text-3" id="text-org791c16d">
 <p>
 Strong Linux-native virtualization performance/flexibility.
 </p>
 </div>
 </div>
-<div id="outline-container-org2f1e58b" class="outline-3">
-<h3 id="org2f1e58b">Q99: What is Windows host path issue with Vagrant?</h3>
-<div class="outline-text-3" id="text-org2f1e58b">
+<div id="outline-container-orgde9597c" class="outline-3">
+<h3 id="orgde9597c">Q99: What is Windows host path issue with Vagrant?</h3>
+<div class="outline-text-3" id="text-orgde9597c">
 <p>
 Path normalization/line endings/permissions can affect scripts/tools.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a77c8e" class="outline-3">
-<h3 id="org5a77c8e">Q100: How reduce cross-platform script issues?</h3>
-<div class="outline-text-3" id="text-org5a77c8e">
+<div id="outline-container-org5797c4c" class="outline-3">
+<h3 id="org5797c4c">Q100: How reduce cross-platform script issues?</h3>
+<div class="outline-text-3" id="text-org5797c4c">
 <p>
 Use portable shell scripts, explicit line endings, and environment checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org8709725" class="outline-3">
-<h3 id="org8709725">Q101: What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-org8709725">
+<div id="outline-container-orgc532750" class="outline-3">
+<h3 id="orgc532750">Q101: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgc532750">
 <p>
 Huge monolithic provisioning script without idempotency or error handling.
 </p>
 </div>
 </div>
-<div id="outline-container-org454887c" class="outline-3">
-<h3 id="org454887c">Q102: Better provisioning design?</h3>
-<div class="outline-text-3" id="text-org454887c">
+<div id="outline-container-org13330a4" class="outline-3">
+<h3 id="org13330a4">Q102: Better provisioning design?</h3>
+<div class="outline-text-3" id="text-org13330a4">
 <p>
 Modular scripts + configuration management + clear logs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbfce1de" class="outline-3">
-<h3 id="orgbfce1de">Q103: What is Ansible local provisioner?</h3>
-<div class="outline-text-3" id="text-orgbfce1de">
+<div id="outline-container-org77d492c" class="outline-3">
+<h3 id="org77d492c">Q103: What is Ansible local provisioner?</h3>
+<div class="outline-text-3" id="text-org77d492c">
 <p>
 Runs Ansible on guest without external control node complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org4280832" class="outline-3">
-<h3 id="org4280832">Q104: Ansible provisioner benefit?</h3>
-<div class="outline-text-3" id="text-org4280832">
+<div id="outline-container-org7aecc63" class="outline-3">
+<h3 id="org7aecc63">Q104: Ansible provisioner benefit?</h3>
+<div class="outline-text-3" id="text-org7aecc63">
 <p>
 Declarative idempotent provisioning and role reuse.
 </p>
 </div>
 </div>
-<div id="outline-container-org65df4f1" class="outline-3">
-<h3 id="org65df4f1">Q105: What is Chef/Puppet provisioner use case?</h3>
-<div class="outline-text-3" id="text-org65df4f1">
+<div id="outline-container-orgb302563" class="outline-3">
+<h3 id="orgb302563">Q105: What is Chef/Puppet provisioner use case?</h3>
+<div class="outline-text-3" id="text-orgb302563">
 <p>
 Teams already using those ecosystems for infra consistency.
 </p>
 </div>
 </div>
-<div id="outline-container-org041a8de" class="outline-3">
-<h3 id="org041a8de">Q106: What is environment variable injection pattern?</h3>
-<div class="outline-text-3" id="text-org041a8de">
+<div id="outline-container-org6cf8e45" class="outline-3">
+<h3 id="org6cf8e45">Q106: What is environment variable injection pattern?</h3>
+<div class="outline-text-3" id="text-org6cf8e45">
 <p>
 Pass host/CI variables into provisioning cautiously.
 </p>
 </div>
 </div>
-<div id="outline-container-org1cb2d92" class="outline-3">
-<h3 id="org1cb2d92">Q107: Security risk of env injection?</h3>
-<div class="outline-text-3" id="text-org1cb2d92">
+<div id="outline-container-orgaddee27" class="outline-3">
+<h3 id="orgaddee27">Q107: Security risk of env injection?</h3>
+<div class="outline-text-3" id="text-orgaddee27">
 <p>
 Leaking secrets into logs or shell history.
 </p>
 </div>
 </div>
-<div id="outline-container-org0bb1d9d" class="outline-3">
-<h3 id="org0bb1d9d">Q108: What is Vagrant cloud box registry concept?</h3>
-<div class="outline-text-3" id="text-org0bb1d9d">
+<div id="outline-container-org3a4209e" class="outline-3">
+<h3 id="org3a4209e">Q108: What is Vagrant cloud box registry concept?</h3>
+<div class="outline-text-3" id="text-org3a4209e">
 <p>
 Hosted catalog/distribution for versioned boxes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf099acb" class="outline-3">
-<h3 id="orgf099acb">Q109: Why sign/verify box sources?</h3>
-<div class="outline-text-3" id="text-orgf099acb">
+<div id="outline-container-orgfde3c6b" class="outline-3">
+<h3 id="orgfde3c6b">Q109: Why sign/verify box sources?</h3>
+<div class="outline-text-3" id="text-orgfde3c6b">
 <p>
 Supply-chain security and trust assurance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaaae1a4" class="outline-3">
-<h3 id="orgaaae1a4">Q110: What is intermediate observability baseline?</h3>
-<div class="outline-text-3" id="text-orgaaae1a4">
+<div id="outline-container-org987b65f" class="outline-3">
+<h3 id="org987b65f">Q110: What is intermediate observability baseline?</h3>
+<div class="outline-text-3" id="text-org987b65f">
 <p>
 Provision logs, startup timing, resource utilization, service health checks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc072091" class="outline-3">
-<h3 id="orgc072091">Q111: What is VM clock/time sync concern?</h3>
-<div class="outline-text-3" id="text-orgc072091">
+<div id="outline-container-org8c661b0" class="outline-3">
+<h3 id="org8c661b0">Q111: What is VM clock/time sync concern?</h3>
+<div class="outline-text-3" id="text-org8c661b0">
 <p>
 Drift can break certs, builds, distributed tests.
 </p>
 </div>
 </div>
-<div id="outline-container-orgce392b0" class="outline-3">
-<h3 id="orgce392b0">Q112: Mitigation for time drift?</h3>
-<div class="outline-text-3" id="text-orgce392b0">
+<div id="outline-container-org245ae1a" class="outline-3">
+<h3 id="org245ae1a">Q112: Mitigation for time drift?</h3>
+<div class="outline-text-3" id="text-org245ae1a">
 <p>
 Enable NTP/time-sync services in guests.
 </p>
 </div>
 </div>
-<div id="outline-container-org83440f1" class="outline-3">
-<h3 id="org83440f1">Q113: What is intermediate reliability baseline?</h3>
-<div class="outline-text-3" id="text-org83440f1">
+<div id="outline-container-org74aefa3" class="outline-3">
+<h3 id="org74aefa3">Q113: What is intermediate reliability baseline?</h3>
+<div class="outline-text-3" id="text-org74aefa3">
 <p>
 Rebuild-from-scratch success, deterministic provisioning, health-checked services.
 </p>
 </div>
 </div>
-<div id="outline-container-org6fe1edb" class="outline-3">
-<h3 id="org6fe1edb">Q114: What is intermediate security baseline?</h3>
-<div class="outline-text-3" id="text-org6fe1edb">
+<div id="outline-container-org324c4bc" class="outline-3">
+<h3 id="org324c4bc">Q114: What is intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-org324c4bc">
 <p>
 Minimal exposed ports, rotated keys, trusted base boxes.
 </p>
 </div>
 </div>
-<div id="outline-container-orga68e6c5" class="outline-3">
-<h3 id="orga68e6c5">Q115: What is intermediate team workflow?</h3>
-<div class="outline-text-3" id="text-orga68e6c5">
+<div id="outline-container-org39f78ad" class="outline-3">
+<h3 id="org39f78ad">Q115: What is intermediate team workflow?</h3>
+<div class="outline-text-3" id="text-org39f78ad">
 <p>
 Versioned Vagrantfile + scripted bootstrap + documented commands.
 </p>
 </div>
 </div>
-<div id="outline-container-orged53768" class="outline-3">
-<h3 id="orged53768">Q116: What is CI use case for Vagrant?</h3>
-<div class="outline-text-3" id="text-orged53768">
+<div id="outline-container-org85195a9" class="outline-3">
+<h3 id="org85195a9">Q116: What is CI use case for Vagrant?</h3>
+<div class="outline-text-3" id="text-org85195a9">
 <p>
 Ephemeral VM-based integration tests matching local environments.
 </p>
 </div>
 </div>
-<div id="outline-container-org0fdaf9e" class="outline-3">
-<h3 id="org0fdaf9e">Q117: CI caveat with Vagrant?</h3>
-<div class="outline-text-3" id="text-org0fdaf9e">
+<div id="outline-container-org00f347e" class="outline-3">
+<h3 id="org00f347e">Q117: CI caveat with Vagrant?</h3>
+<div class="outline-text-3" id="text-org00f347e">
 <p>
 Slower startup/resource-heavy vs containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org8067383" class="outline-3">
-<h3 id="org8067383">Q118: Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-org8067383">
+<div id="outline-container-orgde7475f" class="outline-3">
+<h3 id="orgde7475f">Q118: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-orgde7475f">
 <p>
 Team can recreate full environment quickly on new machine with minimal manual steps.
 </p>
 </div>
 </div>
-<div id="outline-container-org9c5942a" class="outline-3">
-<h3 id="org9c5942a">Q119: Intermediate operations principle?</h3>
-<div class="outline-text-3" id="text-org9c5942a">
+<div id="outline-container-org6f00c64" class="outline-3">
+<h3 id="org6f00c64">Q119: Intermediate operations principle?</h3>
+<div class="outline-text-3" id="text-org6f00c64">
 <p>
 Destroy/recreate regularly to detect hidden drift.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d87232" class="outline-3">
-<h3 id="org0d87232">Q120: Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-org0d87232">
+<div id="outline-container-orgb10aba6" class="outline-3">
+<h3 id="orgb10aba6">Q120: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-orgb10aba6">
 <p>
 Prefer declarative, idempotent provisioning with explicit network/resource design.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgfedc773" class="outline-2">
-<h2 id="orgfedc773">Advanced</h2>
-<div class="outline-text-2" id="text-orgfedc773">
+<div id="outline-container-org768fc06" class="outline-2">
+<h2 id="org768fc06">Advanced</h2>
+<div class="outline-text-2" id="text-org768fc06">
 </div>
-<div id="outline-container-orgbc28662" class="outline-3">
-<h3 id="orgbc28662">Q121: What is enterprise use case for Vagrant today?</h3>
-<div class="outline-text-3" id="text-orgbc28662">
+<div id="outline-container-org80e7f0d" class="outline-3">
+<h3 id="org80e7f0d">Q121: What is enterprise use case for Vagrant today?</h3>
+<div class="outline-text-3" id="text-org80e7f0d">
 <p>
 Reproducible dev/test VMs for complex stacks, legacy systems, or kernel-level dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org677e476" class="outline-3">
-<h3 id="org677e476">Q122: Vagrant vs containers for dev environments?</h3>
-<div class="outline-text-3" id="text-org677e476">
+<div id="outline-container-org1ebbe92" class="outline-3">
+<h3 id="org1ebbe92">Q122: Vagrant vs containers for dev environments?</h3>
+<div class="outline-text-3" id="text-org1ebbe92">
 <p>
 VMs provide full OS isolation; containers are lighter but share host kernel.
 </p>
 </div>
 </div>
-<div id="outline-container-org73f9d9e" class="outline-3">
-<h3 id="org73f9d9e">Q123: When prefer Vagrant over Docker?</h3>
-<div class="outline-text-3" id="text-org73f9d9e">
+<div id="outline-container-org12fc7dd" class="outline-3">
+<h3 id="org12fc7dd">Q123: When prefer Vagrant over Docker?</h3>
+<div class="outline-text-3" id="text-org12fc7dd">
 <p>
 Need different kernel/systemd/full init behavior or strong OS parity.
 </p>
 </div>
 </div>
-<div id="outline-container-org936a117" class="outline-3">
-<h3 id="org936a117">Q124: What is hybrid workflow pattern?</h3>
-<div class="outline-text-3" id="text-org936a117">
+<div id="outline-container-org702e764" class="outline-3">
+<h3 id="org702e764">Q124: What is hybrid workflow pattern?</h3>
+<div class="outline-text-3" id="text-org702e764">
 <p>
 Vagrant VM hosts Docker/Kubernetes tools for consistent host-independent dev platform.
 </p>
 </div>
 </div>
-<div id="outline-container-org948d61b" class="outline-3">
-<h3 id="org948d61b">Q125: Why hybrid can help teams?</h3>
-<div class="outline-text-3" id="text-org948d61b">
+<div id="outline-container-org5e62e58" class="outline-3">
+<h3 id="org5e62e58">Q125: Why hybrid can help teams?</h3>
+<div class="outline-text-3" id="text-org5e62e58">
 <p>
 Uniform tooling across macOS/Windows/Linux hosts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc0b0ca" class="outline-3">
-<h3 id="orgcc0b0ca">Q126: What is nested virtualization concern?</h3>
-<div class="outline-text-3" id="text-orgcc0b0ca">
+<div id="outline-container-org829412e" class="outline-3">
+<h3 id="org829412e">Q126: What is nested virtualization concern?</h3>
+<div class="outline-text-3" id="text-org829412e">
 <p>
 Running virtualization inside VM may require provider/hardware support and impacts performance.
 </p>
 </div>
 </div>
-<div id="outline-container-org1381202" class="outline-3">
-<h3 id="org1381202">Q127: What is performance bottleneck in VM dev stacks?</h3>
-<div class="outline-text-3" id="text-org1381202">
+<div id="outline-container-org6cbcbfd" class="outline-3">
+<h3 id="org6cbcbfd">Q127: What is performance bottleneck in VM dev stacks?</h3>
+<div class="outline-text-3" id="text-org6cbcbfd">
 <p>
 Disk I/O (especially synced folders), limited RAM, CPU overcommit.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc8a2c78" class="outline-3">
-<h3 id="orgc8a2c78">Q128: Advanced performance tuning levers?</h3>
-<div class="outline-text-3" id="text-orgc8a2c78">
+<div id="outline-container-org5cc8f28" class="outline-3">
+<h3 id="org5cc8f28">Q128: Advanced performance tuning levers?</h3>
+<div class="outline-text-3" id="text-org5cc8f28">
 <p>
 NFS/rsync mounts, tuned VM resources, minimized background services.
 </p>
 </div>
 </div>
-<div id="outline-container-org68b3cee" class="outline-3">
-<h3 id="org68b3cee">Q129: What is NUMA/CPU topology relevance (advanced)?</h3>
-<div class="outline-text-3" id="text-org68b3cee">
+<div id="outline-container-org6cdfbe5" class="outline-3">
+<h3 id="org6cdfbe5">Q129: What is NUMA/CPU topology relevance (advanced)?</h3>
+<div class="outline-text-3" id="text-org6cdfbe5">
 <p>
 Can affect performance realism for heavy multi-threaded workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org9ff533a" class="outline-3">
-<h3 id="org9ff533a">Q130: What is secure baseline image pipeline?</h3>
-<div class="outline-text-3" id="text-org9ff533a">
+<div id="outline-container-org0fa5109" class="outline-3">
+<h3 id="org0fa5109">Q130: What is secure baseline image pipeline?</h3>
+<div class="outline-text-3" id="text-org0fa5109">
 <p>
 Hardened base box creation with patching, scanning, and versioned release.
 </p>
 </div>
 </div>
-<div id="outline-container-org29fc38d" class="outline-3">
-<h3 id="org29fc38d">Q131: What is box provenance?</h3>
-<div class="outline-text-3" id="text-org29fc38d">
+<div id="outline-container-org53e75bf" class="outline-3">
+<h3 id="org53e75bf">Q131: What is box provenance?</h3>
+<div class="outline-text-3" id="text-org53e75bf">
 <p>
 Traceability of box origin, build process, and integrity checks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd91a3b" class="outline-3">
-<h3 id="orgfd91a3b">Q132: How improve box supply-chain security?</h3>
-<div class="outline-text-3" id="text-orgfd91a3b">
+<div id="outline-container-orgbc57c3d" class="outline-3">
+<h3 id="orgbc57c3d">Q132: How improve box supply-chain security?</h3>
+<div class="outline-text-3" id="text-orgbc57c3d">
 <p>
 Signed artifacts, trusted registries, reproducible Packer builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f908e3" class="outline-3">
-<h3 id="org3f908e3">Q133: What is Packer + Vagrant relationship?</h3>
-<div class="outline-text-3" id="text-org3f908e3">
+<div id="outline-container-org7117181" class="outline-3">
+<h3 id="org7117181">Q133: What is Packer + Vagrant relationship?</h3>
+<div class="outline-text-3" id="text-org7117181">
 <p>
 Packer builds base VM images/boxes consumed by Vagrant.
 </p>
 </div>
 </div>
-<div id="outline-container-orge9be0d6" class="outline-3">
-<h3 id="orge9be0d6">Q134: Why use Packer for boxes?</h3>
-<div class="outline-text-3" id="text-orge9be0d6">
+<div id="outline-container-org41fd5ca" class="outline-3">
+<h3 id="org41fd5ca">Q134: Why use Packer for boxes?</h3>
+<div class="outline-text-3" id="text-org41fd5ca">
 <p>
 Automated repeatable image baking and patch pipelines.
 </p>
 </div>
 </div>
-<div id="outline-container-org20ace0a" class="outline-3">
-<h3 id="org20ace0a">Q135: What is drift detection in Vagrant environments?</h3>
-<div class="outline-text-3" id="text-org20ace0a">
+<div id="outline-container-org9df8009" class="outline-3">
+<h3 id="org9df8009">Q135: What is drift detection in Vagrant environments?</h3>
+<div class="outline-text-3" id="text-org9df8009">
 <p>
 Detect config/state differences from declared provisioning.
 </p>
 </div>
 </div>
-<div id="outline-container-org2765cb1" class="outline-3">
-<h3 id="org2765cb1">Q136: Drift mitigation strategy?</h3>
-<div class="outline-text-3" id="text-org2765cb1">
+<div id="outline-container-org9ed1098" class="outline-3">
+<h3 id="org9ed1098">Q136: Drift mitigation strategy?</h3>
+<div class="outline-text-3" id="text-org9ed1098">
 <p>
 Frequent reprovision/rebuild and immutable workflow discipline.
 </p>
 </div>
 </div>
-<div id="outline-container-org41f0fe4" class="outline-3">
-<h3 id="org41f0fe4">Q137: What is secret management pattern for Vagrant provisioning?</h3>
-<div class="outline-text-3" id="text-org41f0fe4">
+<div id="outline-container-orga75c061" class="outline-3">
+<h3 id="orga75c061">Q137: What is secret management pattern for Vagrant provisioning?</h3>
+<div class="outline-text-3" id="text-orga75c061">
 <p>
 Fetch secrets at runtime from secure store, avoid hardcoding.
 </p>
 </div>
 </div>
-<div id="outline-container-org020fd30" class="outline-3">
-<h3 id="org020fd30">Q138: Why avoid storing secrets in Vagrantfile?</h3>
-<div class="outline-text-3" id="text-org020fd30">
+<div id="outline-container-orgde49ef5" class="outline-3">
+<h3 id="orgde49ef5">Q138: Why avoid storing secrets in Vagrantfile?</h3>
+<div class="outline-text-3" id="text-orgde49ef5">
 <p>
 Version-control leakage and broad exposure risk.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb3eee83" class="outline-3">
-<h3 id="orgb3eee83">Q139: What is network segmentation in multi-VM labs?</h3>
-<div class="outline-text-3" id="text-orgb3eee83">
+<div id="outline-container-org1f82972" class="outline-3">
+<h3 id="org1f82972">Q139: What is network segmentation in multi-VM labs?</h3>
+<div class="outline-text-3" id="text-org1f82972">
 <p>
 Separate management, app, and data networks for realism/security.
 </p>
 </div>
 </div>
-<div id="outline-container-org8724eec" class="outline-3">
-<h3 id="org8724eec">Q140: What is zero-trust mindset in local labs?</h3>
-<div class="outline-text-3" id="text-org8724eec">
+<div id="outline-container-org000c985" class="outline-3">
+<h3 id="org000c985">Q140: What is zero-trust mindset in local labs?</h3>
+<div class="outline-text-3" id="text-org000c985">
 <p>
 Authenticate/authorize service communication even in dev environments.
 </p>
 </div>
 </div>
-<div id="outline-container-org6501aee" class="outline-3">
-<h3 id="org6501aee">Q141: What is service discovery simulation in Vagrant labs?</h3>
-<div class="outline-text-3" id="text-org6501aee">
+<div id="outline-container-orgb273b2c" class="outline-3">
+<h3 id="orgb273b2c">Q141: What is service discovery simulation in Vagrant labs?</h3>
+<div class="outline-text-3" id="text-orgb273b2c">
 <p>
 Emulate DNS/registry behavior for distributed-system testing.
 </p>
 </div>
 </div>
-<div id="outline-container-org520df07" class="outline-3">
-<h3 id="org520df07">Q142: What is failure injection use case?</h3>
-<div class="outline-text-3" id="text-org520df07">
+<div id="outline-container-orga5be7da" class="outline-3">
+<h3 id="orga5be7da">Q142: What is failure injection use case?</h3>
+<div class="outline-text-3" id="text-orga5be7da">
 <p>
 Test resilience by stopping VMs, adding latency, or breaking dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org88e3790" class="outline-3">
-<h3 id="org88e3790">Q143: How simulate network faults in VM labs?</h3>
-<div class="outline-text-3" id="text-org88e3790">
+<div id="outline-container-org71c31d4" class="outline-3">
+<h3 id="org71c31d4">Q143: How simulate network faults in VM labs?</h3>
+<div class="outline-text-3" id="text-org71c31d4">
 <p>
 Traffic control/firewall tooling within guest networks.
 </p>
 </div>
 </div>
-<div id="outline-container-org2be4024" class="outline-3">
-<h3 id="org2be4024">Q144: What is reproducibility SLO for developer platforms?</h3>
-<div class="outline-text-3" id="text-org2be4024">
+<div id="outline-container-orgdb93876" class="outline-3">
+<h3 id="orgdb93876">Q144: What is reproducibility SLO for developer platforms?</h3>
+<div class="outline-text-3" id="text-orgdb93876">
 <p>
 Target setup time/success rate across fresh machines.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9d4096" class="outline-3">
-<h3 id="orgc9d4096">Q145: What is onboarding optimization metric?</h3>
-<div class="outline-text-3" id="text-orgc9d4096">
+<div id="outline-container-org02aff10" class="outline-3">
+<h3 id="org02aff10">Q145: What is onboarding optimization metric?</h3>
+<div class="outline-text-3" id="text-org02aff10">
 <p>
 Time from clone to fully working environment.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb4178c4" class="outline-3">
-<h3 id="orgb4178c4">Q146: What is golden Vagrant template?</h3>
-<div class="outline-text-3" id="text-orgb4178c4">
+<div id="outline-container-org49f1370" class="outline-3">
+<h3 id="org49f1370">Q146: What is golden Vagrant template?</h3>
+<div class="outline-text-3" id="text-org49f1370">
 <p>
 Org-maintained starter Vagrantfile/provisioning standards.
 </p>
 </div>
 </div>
-<div id="outline-container-org5b2c74d" class="outline-3">
-<h3 id="org5b2c74d">Q147: Golden template risk?</h3>
-<div class="outline-text-3" id="text-org5b2c74d">
+<div id="outline-container-orgd09c61d" class="outline-3">
+<h3 id="orgd09c61d">Q147: Golden template risk?</h3>
+<div class="outline-text-3" id="text-orgd09c61d">
 <p>
 Over-standardization can hinder team-specific needs.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e16928" class="outline-3">
-<h3 id="org8e16928">Q148: Mitigation for template rigidity?</h3>
-<div class="outline-text-3" id="text-org8e16928">
+<div id="outline-container-orgd681df9" class="outline-3">
+<h3 id="orgd681df9">Q148: Mitigation for template rigidity?</h3>
+<div class="outline-text-3" id="text-orgd681df9">
 <p>
 Composable modules and documented extension points.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b5a041" class="outline-3">
-<h3 id="org6b5a041">Q149: What is multi-provider compatibility challenge?</h3>
-<div class="outline-text-3" id="text-org6b5a041">
+<div id="outline-container-orgca3f36d" class="outline-3">
+<h3 id="orgca3f36d">Q149: What is multi-provider compatibility challenge?</h3>
+<div class="outline-text-3" id="text-orgca3f36d">
 <p>
 Different providers support features/networking differently.
 </p>
 </div>
 </div>
-<div id="outline-container-org71d2488" class="outline-3">
-<h3 id="org71d2488">Q150: Strategy for provider portability?</h3>
-<div class="outline-text-3" id="text-org71d2488">
+<div id="outline-container-org8198287" class="outline-3">
+<h3 id="org8198287">Q150: Strategy for provider portability?</h3>
+<div class="outline-text-3" id="text-org8198287">
 <p>
 Use lowest-common-denominator config + provider-specific optional blocks.
 </p>
 </div>
 </div>
-<div id="outline-container-org7205c75" class="outline-3">
-<h3 id="org7205c75">Q151: What is stateful test data management challenge?</h3>
-<div class="outline-text-3" id="text-org7205c75">
+<div id="outline-container-org461a062" class="outline-3">
+<h3 id="org461a062">Q151: What is stateful test data management challenge?</h3>
+<div class="outline-text-3" id="text-org461a062">
 <p>
 Persisted VM disks may hide flaky setup dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org3cd6a37" class="outline-3">
-<h3 id="org3cd6a37">Q152: Better data strategy?</h3>
-<div class="outline-text-3" id="text-org3cd6a37">
+<div id="outline-container-org4cb6c64" class="outline-3">
+<h3 id="org4cb6c64">Q152: Better data strategy?</h3>
+<div class="outline-text-3" id="text-org4cb6c64">
 <p>
 Seed scripts and resettable fixtures as part of provisioning.
 </p>
 </div>
 </div>
-<div id="outline-container-org95d9ac2" class="outline-3">
-<h3 id="org95d9ac2">Q153: What is snapshot governance issue?</h3>
-<div class="outline-text-3" id="text-org95d9ac2">
+<div id="outline-container-org61e1f0c" class="outline-3">
+<h3 id="org61e1f0c">Q153: What is snapshot governance issue?</h3>
+<div class="outline-text-3" id="text-org61e1f0c">
 <p>
 Too many stale snapshots consume disk and confuse workflows.
 </p>
 </div>
 </div>
-<div id="outline-container-org82c5cf3" class="outline-3">
-<h3 id="org82c5cf3">Q154: Snapshot best practice?</h3>
-<div class="outline-text-3" id="text-org82c5cf3">
+<div id="outline-container-org2a5fc2e" class="outline-3">
+<h3 id="org2a5fc2e">Q154: Snapshot best practice?</h3>
+<div class="outline-text-3" id="text-org2a5fc2e">
 <p>
 Use short-lived snapshots with naming conventions and cleanup policy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaea3caf" class="outline-3">
-<h3 id="orgaea3caf">Q155: What is compliance angle for dev VMs?</h3>
-<div class="outline-text-3" id="text-orgaea3caf">
+<div id="outline-container-orgd3cb4b1" class="outline-3">
+<h3 id="orgd3cb4b1">Q155: What is compliance angle for dev VMs?</h3>
+<div class="outline-text-3" id="text-orgd3cb4b1">
 <p>
 Local environments may still handle sensitive code/data requiring controls.
 </p>
 </div>
 </div>
-<div id="outline-container-org06825ce" class="outline-3">
-<h3 id="org06825ce">Q156: Required controls for sensitive dev VMs?</h3>
-<div class="outline-text-3" id="text-org06825ce">
+<div id="outline-container-orgc04bd1a" class="outline-3">
+<h3 id="orgc04bd1a">Q156: Required controls for sensitive dev VMs?</h3>
+<div class="outline-text-3" id="text-orgc04bd1a">
 <p>
 Disk encryption, access control, patching, minimal data retention.
 </p>
 </div>
 </div>
-<div id="outline-container-org4d02187" class="outline-3">
-<h3 id="org4d02187">Q157: What is remote development alternative to Vagrant?</h3>
-<div class="outline-text-3" id="text-org4d02187">
+<div id="outline-container-orga799c46" class="outline-3">
+<h3 id="orga799c46">Q157: What is remote development alternative to Vagrant?</h3>
+<div class="outline-text-3" id="text-orga799c46">
 <p>
 Cloud dev environments/workspaces with centralized management.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb2a34b" class="outline-3">
-<h3 id="orgcb2a34b">Q158: Why still keep Vagrant in some orgs?</h3>
-<div class="outline-text-3" id="text-orgcb2a34b">
+<div id="outline-container-org0134527" class="outline-3">
+<h3 id="org0134527">Q158: Why still keep Vagrant in some orgs?</h3>
+<div class="outline-text-3" id="text-org0134527">
 <p>
 Offline capability, local performance, legacy stack compatibility.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa0b6fd" class="outline-3">
-<h3 id="orgaa0b6fd">Q159: What is advanced anti-pattern in Vagrant usage?</h3>
-<div class="outline-text-3" id="text-orgaa0b6fd">
+<div id="outline-container-orgc229d7a" class="outline-3">
+<h3 id="orgc229d7a">Q159: What is advanced anti-pattern in Vagrant usage?</h3>
+<div class="outline-text-3" id="text-orgc229d7a">
 <p>
 Treating long-lived VMs as pets with manual patching.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf5ef7fd" class="outline-3">
-<h3 id="orgf5ef7fd">Q160: Better operational principle?</h3>
-<div class="outline-text-3" id="text-orgf5ef7fd">
+<div id="outline-container-orge4c2e90" class="outline-3">
+<h3 id="orge4c2e90">Q160: Better operational principle?</h3>
+<div class="outline-text-3" id="text-orge4c2e90">
 <p>
 Disposable cattle-style VMs rebuilt from code.
 </p>
 </div>
 </div>
-<div id="outline-container-org83e7f99" class="outline-3">
-<h3 id="org83e7f99">Q161: What is incident reproduction advantage?</h3>
-<div class="outline-text-3" id="text-org83e7f99">
+<div id="outline-container-orgf6b6497" class="outline-3">
+<h3 id="orgf6b6497">Q161: What is incident reproduction advantage?</h3>
+<div class="outline-text-3" id="text-orgf6b6497">
 <p>
 Pin exact box/provision versions to recreate historical environments.
 </p>
 </div>
 </div>
-<div id="outline-container-org173b45a" class="outline-3">
-<h3 id="org173b45a">Q162: What is release parity strategy?</h3>
-<div class="outline-text-3" id="text-org173b45a">
+<div id="outline-container-orgf37e67a" class="outline-3">
+<h3 id="orgf37e67a">Q162: What is release parity strategy?</h3>
+<div class="outline-text-3" id="text-orgf37e67a">
 <p>
 Align Vagrant OS/runtime versions with production-like baselines.
 </p>
 </div>
 </div>
-<div id="outline-container-org63ab2ca" class="outline-3">
-<h3 id="org63ab2ca">Q163: What is testing strategy for provisioning code?</h3>
-<div class="outline-text-3" id="text-org63ab2ca">
+<div id="outline-container-orgbf774bd" class="outline-3">
+<h3 id="orgbf774bd">Q163: What is testing strategy for provisioning code?</h3>
+<div class="outline-text-3" id="text-orgbf774bd">
 <p>
 Linting + idempotency tests + full create/destroy CI cycle.
 </p>
 </div>
 </div>
-<div id="outline-container-org5b9fa16" class="outline-3">
-<h3 id="org5b9fa16">Q164: Why test destroy/recreate regularly?</h3>
-<div class="outline-text-3" id="text-org5b9fa16">
+<div id="outline-container-orge5f40fd" class="outline-3">
+<h3 id="orge5f40fd">Q164: Why test destroy/recreate regularly?</h3>
+<div class="outline-text-3" id="text-orge5f40fd">
 <p>
 Ensures no hidden manual dependency in environment setup.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb08a24f" class="outline-3">
-<h3 id="orgb08a24f">Q165: What is final reliability principle?</h3>
-<div class="outline-text-3" id="text-orgb08a24f">
+<div id="outline-container-orgabd2f7b" class="outline-3">
+<h3 id="orgabd2f7b">Q165: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-orgabd2f7b">
 <p>
 Environment must be rebuildable quickly and consistently.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd1b6c7d" class="outline-3">
-<h3 id="orgd1b6c7d">Q166: What is final security principle?</h3>
-<div class="outline-text-3" id="text-orgd1b6c7d">
+<div id="outline-container-org76cdfe8" class="outline-3">
+<h3 id="org76cdfe8">Q166: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org76cdfe8">
 <p>
 Trust only verified base boxes and least-privilege network access.
 </p>
 </div>
 </div>
-<div id="outline-container-org87ad9ad" class="outline-3">
-<h3 id="org87ad9ad">Q167: What is final performance principle?</h3>
-<div class="outline-text-3" id="text-org87ad9ad">
+<div id="outline-container-orgb21f6d2" class="outline-3">
+<h3 id="orgb21f6d2">Q167: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-orgb21f6d2">
 <p>
 Optimize synced storage and resource allocation empirically.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c10078" class="outline-3">
-<h3 id="org7c10078">Q168: What is final governance principle?</h3>
-<div class="outline-text-3" id="text-org7c10078">
+<div id="outline-container-org8a32447" class="outline-3">
+<h3 id="org8a32447">Q168: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-org8a32447">
 <p>
 Version and review environment code like production infrastructure.
 </p>
 </div>
 </div>
-<div id="outline-container-org4c29c5e" class="outline-3">
-<h3 id="org4c29c5e">Q169: What is final team principle?</h3>
-<div class="outline-text-3" id="text-org4c29c5e">
+<div id="outline-container-org8bd659c" class="outline-3">
+<h3 id="org8bd659c">Q169: What is final team principle?</h3>
+<div class="outline-text-3" id="text-org8bd659c">
 <p>
 Shared tooling ownership beats ad-hoc local customization.
 </p>
 </div>
 </div>
-<div id="outline-container-org70005f1" class="outline-3">
-<h3 id="org70005f1">Q170: Final maturity principle?</h3>
-<div class="outline-text-3" id="text-org70005f1">
+<div id="outline-container-org60d71dd" class="outline-3">
+<h3 id="org60d71dd">Q170: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org60d71dd">
 <p>
 Vagrant excellence is reproducible, secure, and disposable VM automation at scale.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org4d8b3c5" class="outline-2">
-<h2 id="org4d8b3c5">Bonus: Minimal Multi-VM Vagrantfile Template</h2>
-<div class="outline-text-2" id="text-org4d8b3c5">
+<div id="outline-container-org352ecc4" class="outline-2">
+<h2 id="org352ecc4">Bonus: Minimal Multi-VM Vagrantfile Template</h2>
+<div class="outline-text-2" id="text-org352ecc4">
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="font-weight: bold; text-decoration: underline;">Vagrant</span>.configure(<span style="font-style: italic;">"2"</span>) <span style="font-weight: bold;">do</span> |config|
   config.vm.box = <span style="font-style: italic;">"ubuntu/jammy64"</span>

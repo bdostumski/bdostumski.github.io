@@ -8,6 +8,959 @@
 
 * Vagrant
 
+- [[https://developer.hashicorp.com/vagrant/docs][Vagrant Documentation]]
+
+-----
+
+* Vagrant Command Handbook:
+
+*1. Vagrant Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check Vagrant version
+vagrant --version
+vagrant -v
+
+# Display Vagrant help
+vagrant help
+
+# Display help for a specific command
+vagrant help up
+vagrant help provision
+
+# Check Vagrant environment
+vagrant version
+
+# Display Vagrant home directory
+echo $VAGRANT_HOME                 # Linux / macOS
+echo %VAGRANT_HOME%               # Windows
+
+# Set custom Vagrant home directory (Linux / macOS)
+export VAGRANT_HOME=/path/to/vagrant
+
+#+END_SRC
+
+*2. Vagrant Project Initialization*
+
+#+BEGIN_SRC bash
+
+# Create project directory
+mkdir vagrant-project
+cd vagrant-project
+
+# Initialize Vagrantfile
+vagrant init
+
+# Initialize with a specific box
+vagrant init ubuntu/jammy64
+
+# Initialize with a specific box version
+vagrant init ubuntu/jammy64 --box-version 20241002.0.0
+
+# Validate Vagrantfile syntax and configuration
+vagrant validate
+
+# Display project configuration
+cat Vagrantfile
+
+#+END_SRC
+
+Note: `vagrant init` generates a Vagrantfile. The VM is not created until `vagrant up` is executed.
+
+*3. Vagrant Box Management*
+
+Boxes are reusable base images used to create virtual machines.
+
+#+BEGIN_SRC bash
+
+# Search for boxes
+vagrant cloud search ubuntu
+
+# Add a box
+vagrant box add ubuntu/jammy64
+
+# Add a specific box version
+vagrant box add ubuntu/jammy64 --box-version 20241002.0.0
+
+# List installed boxes
+vagrant box list
+
+# Display box information
+vagrant box list
+
+# Check whether boxes are outdated
+vagrant box outdated
+
+# Check a specific box
+vagrant box outdated --global
+
+# Update boxes
+vagrant box update
+
+# Update a specific box
+vagrant box update --box ubuntu/jammy64
+
+# Remove a box
+vagrant box remove ubuntu/jammy64
+
+# Remove a specific box version
+vagrant box remove ubuntu/jammy64 --box-version 20241002.0.0
+
+#+END_SRC
+
+Useful box commands:
+
+| Command | Purpose |
+| --- | --- |
+| `vagrant box add` | Download and register a box |
+| `vagrant box list` | List installed boxes |
+| `vagrant box outdated` | Check for newer versions |
+| `vagrant box update` | Update box used by an environment |
+| `vagrant box remove` | Remove a local box |
+| `vagrant cloud search` | Search available cloud boxes |
+
+*4. VM Lifecycle Management*
+
+#+BEGIN_SRC bash
+
+# Create and start VM
+vagrant up
+
+# Start a specific VM
+vagrant up app
+
+# Start using a specific provider
+vagrant up --provider=virtualbox
+
+# Check VM status
+vagrant status
+
+# Check all Vagrant environments
+vagrant global-status
+
+# Gracefully stop VM
+vagrant halt
+
+# Stop a specific VM
+vagrant halt app
+
+# Restart VM
+vagrant reload
+
+# Restart and reprovision VM
+vagrant reload --provision
+
+# Suspend VM
+vagrant suspend
+
+# Resume suspended VM
+vagrant resume
+
+# Destroy VM
+vagrant destroy
+
+# Destroy without confirmation
+vagrant destroy -f
+
+# Destroy a specific VM
+vagrant destroy app
+
+#+END_SRC
+
+Lifecycle differences:
+
+| Command | Purpose |
+| --- | --- |
+| `vagrant up` | Create and start VM |
+| `vagrant halt` | Gracefully shut down VM |
+| `vagrant reload` | Restart VM |
+| `vagrant suspend` | Save VM runtime state |
+| `vagrant resume` | Resume suspended VM |
+| `vagrant destroy` | Remove VM resources |
+| `vagrant status` | Display current VM state |
+
+Note: `vagrant destroy` removes the managed VM instance, not the project's Vagrantfile or source code.
+
+*5. SSH & Remote VM Access*
+
+#+BEGIN_SRC bash
+
+# Connect to VM through SSH
+vagrant ssh
+
+# Connect to a specific machine
+vagrant ssh app
+
+# Execute a command inside VM
+vagrant ssh -c "hostname"
+
+# Execute multiple commands
+vagrant ssh -c "whoami && uname -a"
+
+# Display SSH connection configuration
+vagrant ssh-config
+
+# Display SSH configuration for a specific machine
+vagrant ssh-config app
+
+# Execute a command using SSH configuration
+ssh -F <(vagrant ssh-config) default "hostname"
+
+#+END_SRC
+
+Windows PowerShell alternative:
+
+#+BEGIN_SRC shell
+
+# Display SSH configuration
+vagrant ssh-config
+
+# Connect to VM
+vagrant ssh
+
+#+END_SRC
+
+*6. Provisioning & Configuration Management*
+
+Provisioning automates software installation and system configuration inside virtual machines.
+
+#+BEGIN_SRC bash
+
+# Run configured provisioners
+vagrant provision
+
+# Provision a specific machine
+vagrant provision app
+
+# Start VM and force provisioning
+vagrant up --provision
+
+# Restart VM and provision
+vagrant reload --provision
+
+# Run provisioners with a specific provisioner name
+vagrant provision --provision-with shell
+
+# Run multiple provisioners
+vagrant provision --provision-with shell,ansible
+
+#+END_SRC
+
+Example shell provisioner:
+
+#+BEGIN_SRC ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y nginx
+    systemctl enable nginx
+    systemctl start nginx
+  SHELL
+end
+
+#+END_SRC
+
+Example external shell script:
+
+#+BEGIN_SRC ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.provision "shell",
+    path: "scripts/bootstrap.sh"
+end
+
+#+END_SRC
+
+Useful provisioning options:
+
+| Option | Purpose |
+| --- | --- |
+| `inline` | Execute an inline script |
+| `path` | Execute an external script |
+| `privileged` | Run with elevated privileges |
+| `run: "always"` | Run provisioner on every applicable provisioning run |
+| `run: "once"` | Run provisioner only once during initial creation |
+| `name` | Identify a provisioner |
+
+*7. Networking & Port Forwarding*
+
+#+BEGIN_SRC bash
+
+# Forward guest port 80 to host port 8080
+
+#+END_SRC
+
+Vagrantfile configuration:
+
+#+BEGIN_SRC ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.network "forwarded_port",
+    guest: 80,
+    host: 8080
+end
+
+#+END_SRC
+
+Additional networking examples:
+
+#+BEGIN_SRC ruby
+
+# Forward application port
+config.vm.network "forwarded_port",
+  guest: 8080,
+  host: 8080
+
+# Forward SSH port
+config.vm.network "forwarded_port",
+  guest: 22,
+  host: 2222
+
+# Private network with static IP
+config.vm.network "private_network",
+  ip: "192.168.56.10"
+
+# Private network with DHCP
+config.vm.network "private_network",
+  type: "dhcp"
+
+# Public / bridged network
+config.vm.network "public_network"
+
+#+END_SRC
+
+Useful networking options:
+
+| Option | Purpose |
+| --- | --- |
+| `forwarded_port` | Forward host traffic to guest |
+| `private_network` | Create a private network |
+| `public_network` | Connect VM to an external network |
+| `guest` | Guest VM port |
+| `host` | Host machine port |
+| `ip` | Assign a static IP address |
+| `auto_correct` | Automatically resolve host port conflicts |
+
+Note: Public networks can expose VMs to other devices on the network. Use them carefully.
+
+*8. Synced Folders & File Sharing*
+
+#+BEGIN_SRC bash
+
+# Default synced folder
+# Host project directory -> Guest /vagrant
+
+#+END_SRC
+
+Vagrantfile examples:
+
+#+BEGIN_SRC ruby
+
+# Default synced folder
+config.vm.synced_folder ".", "/vagrant"
+
+# Map a specific host directory
+config.vm.synced_folder "./data", "/var/www"
+
+# Disable default synced folder
+config.vm.synced_folder ".", "/vagrant", disabled: true
+
+# Set owner and group
+config.vm.synced_folder "./data", "/var/www",
+  owner: "www-data",
+  group: "www-data"
+
+#+END_SRC
+
+Synced folder types:
+
+| Type | Purpose |
+| --- | --- |
+| VirtualBox shared folders | Default shared folder mechanism for VirtualBox |
+| NFS | High-performance file sharing on supported Unix-like hosts |
+| SMB | File sharing commonly used with Windows hosts |
+| Rsync | One-way synchronization from host to guest |
+| 9p | File sharing supported by certain providers |
+
+Example NFS configuration:
+
+#+BEGIN_SRC ruby 
+
+config.vm.synced_folder "./data", "/var/www",
+  type: "nfs"
+
+#+END_SRC
+  
+Example Rsync configuration:
+
+#+BEGIN_SRC ruby
+
+config.vm.synced_folder "./data", "/var/www",
+  type: "rsync"
+
+#+END_SRC
+
+Note: Synced folder support depends on the selected provider and host operating system.
+
+*9. Provider Configuration – VirtualBox, VMware & Hyper-V*
+
+Vagrant supports multiple virtualization providers.
+
+#+BEGIN_SRC bash
+
+# Start with VirtualBox
+vagrant up --provider=virtualbox
+
+# Start with VMware
+vagrant up --provider=vmware_desktop
+
+# Start with Hyper-V
+vagrant up --provider=hyperv
+
+#+END_SRC
+
+VirtualBox configuration:
+
+#+BEGIN_SRC ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "development-vm"
+    vb.memory = 4096
+    vb.cpus = 2
+    vb.gui = false
+  end
+end
+
+#+END_SRC
+
+VMware configuration:
+
+#+BEGIN_SRC ruby 
+
+config.vm.provider "vmware_desktop" do |v|
+  v.vmx["memsize"] = "4096"
+  v.vmx["numvcpus"] = "2"
+end
+
+#+END_SRC
+
+Hyper-V configuration:
+
+#+BEGIN_SRC ruby 
+
+config.vm.provider "hyperv" do |h|
+  h.memory = 4096
+  h.cpus = 2
+end
+
+#+END_SRC
+
+Provider resource options:
+
+| Option | Purpose |
+| --- | --- |
+| `memory` | Allocate VM RAM |
+| `cpus` | Allocate virtual CPUs |
+| `gui` | Enable or disable graphical interface |
+| `name` | Set VM name |
+| `--provider` | Select virtualization provider |
+
+Note: Provider-specific settings are not interchangeable. Verify that the provider supports each option.
+
+*10. Multi-Machine Environments*
+
+Vagrant can manage multiple coordinated virtual machines using a single Vagrantfile.
+
+#+BEGIN_SRC bash
+
+# Start all machines
+vagrant up
+
+# Start database machine
+vagrant up db
+
+# Start application machine
+vagrant up app
+
+# Check all machine statuses
+vagrant status
+
+# Connect to database machine
+vagrant ssh db
+
+# Connect to application machine
+vagrant ssh app
+
+# Provision a specific machine
+vagrant provision db
+
+# Stop all machines
+vagrant halt
+
+# Destroy all machines
+vagrant destroy
+
+#+END_SRC
+
+Example multi-machine Vagrantfile:
+
+#+BEGIN_SRC ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.define "db" do |db|
+    db.vm.hostname = "db.local"
+    db.vm.network "private_network",
+      ip: "192.168.56.10"
+
+    db.vm.provider "virtualbox" do |vb|
+      vb.memory = 1024
+      vb.cpus = 1
+    end
+  end
+
+  config.vm.define "app" do |app|
+    app.vm.hostname = "app.local"
+    app.vm.network "private_network",
+      ip: "192.168.56.11"
+
+    app.vm.network "forwarded_port",
+      guest: 8080,
+      host: 8080
+
+    app.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+  end
+end
+
+#+END_SRC
+
+Useful multi-machine commands:
+
+| Command | Purpose |
+| --- | --- |
+| `vagrant up db` | Start database VM |
+| `vagrant up app` | Start application VM |
+| `vagrant ssh db` | Connect to database |
+| `vagrant provision app` | Provision application VM |
+| `vagrant halt` | Stop all machines |
+| `vagrant destroy` | Destroy all machines |
+
+*11. Snapshots & VM Recovery*
+
+Snapshot functionality depends on the selected provider.
+
+#+BEGIN_SRC bash
+
+# Create snapshot
+vagrant snapshot save clean-install
+
+# Create snapshot with description
+vagrant snapshot save clean-install "Initial configuration"
+
+# List snapshots
+vagrant snapshot list
+
+# Restore snapshot
+vagrant snapshot restore clean-install
+
+# Delete snapshot
+vagrant snapshot delete clean-install
+
+# Push snapshot
+vagrant snapshot push
+
+# Restore pushed snapshot
+vagrant snapshot pop
+
+#+END_SRC
+
+Snapshot workflow:
+
+#+BEGIN_SRC bash
+
+# Start VM
+vagrant up
+
+# Install application dependencies
+vagrant provision
+
+# Save clean state
+vagrant snapshot save before-upgrade
+
+# Perform changes
+vagrant ssh
+
+# Restore previous state if needed
+vagrant snapshot restore before-upgrade
+
+#+END_SRC
+
+Note: Snapshot commands and capabilities depend on provider support. Snapshots should not replace backups.
+
+*12. Plugins & Extensions*
+
+#+BEGIN_SRC bash
+
+# List installed plugins
+vagrant plugin list
+
+# Search available plugins
+vagrant plugin search vagrant
+
+# Install plugin
+vagrant plugin install vagrant-vbguest
+
+# Install a specific plugin version
+vagrant plugin install vagrant-vbguest --plugin-version 0.32.0
+
+# Update plugins
+vagrant plugin update
+
+# Update a specific plugin
+vagrant plugin update vagrant-vbguest
+
+# Repair plugin installation
+vagrant plugin repair
+
+# Uninstall plugin
+vagrant plugin uninstall vagrant-vbguest
+
+# Uninstall all plugins
+vagrant plugin expunge
+
+#+END_SRC
+
+Useful plugin commands:
+
+| Command | Purpose |
+| --- | --- |
+| `vagrant plugin list` | List installed plugins |
+| `vagrant plugin search` | Search plugin registry |
+| `vagrant plugin install` | Install plugin |
+| `vagrant plugin update` | Update plugins |
+| `vagrant plugin repair` | Repair plugin installation |
+| `vagrant plugin uninstall` | Remove plugin |
+| `vagrant plugin expunge` | Remove all installed plugins |
+
+*13. Packaging & Distribution – Custom Boxes*
+
+Vagrant supports packaging configured virtual machines into reusable boxes.
+
+#+BEGIN_SRC bash
+
+# Package a running machine
+vagrant package
+
+# Package a specific machine
+vagrant package app
+
+# Package with custom output filename
+vagrant package --output custom-ubuntu.box
+
+# Package with additional metadata
+vagrant package --output custom.box \
+  --vagrantfile Vagrantfile
+
+# Add packaged box locally
+vagrant box add custom-ubuntu custom-ubuntu.box
+
+# List available boxes
+vagrant box list
+
+#+END_SRC
+
+Custom box workflow:
+
+#+BEGIN_SRC bash
+
+# Start and configure VM
+vagrant up
+
+# Install required packages
+vagrant provision
+
+# Halt VM
+vagrant halt
+
+# Package VM
+vagrant package --output development.box
+
+# Register packaged box
+vagrant box add development development.box
+
+#+END_SRC
+
+Note: Box packaging requires a compatible provider and a suitable machine state. Avoid distributing boxes containing credentials, private keys, or sensitive data.
+
+*14. Logging, Debugging & Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Enable debug logging
+VAGRANT_LOG=debug vagrant up
+
+# Enable info logging
+VAGRANT_LOG=info vagrant up
+
+# Enable detailed trace logging
+VAGRANT_LOG=trace vagrant up
+
+# Display Vagrant help
+vagrant help
+
+# Validate Vagrantfile
+vagrant validate
+
+# Check VM status
+vagrant status
+
+# Display all environments
+vagrant global-status
+
+# Remove stale global status entries
+vagrant global-status --prune
+
+# Display SSH configuration
+vagrant ssh-config
+
+# Check box updates
+vagrant box outdated
+
+#+END_SRC
+
+Useful troubleshooting commands:
+
+| Problem | Command / Solution |
+| --- | --- |
+| VM does not start | `vagrant up --debug` |
+| Invalid Vagrantfile | `vagrant validate` |
+| SSH connection issue | `vagrant ssh-config` |
+| Port conflict | Change host port or enable `auto_correct` |
+| Provisioning failure | `vagrant provision` |
+| VM configuration issue | `vagrant reload` |
+| Stale VM entries | `vagrant global-status --prune` |
+| Outdated base box | `vagrant box outdated` |
+
+Note: Debug logs may contain environment details and configuration values. Review logs before sharing them.
+
+*15. Security & SSH Configuration*
+
+#+BEGIN_SRC ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  # Enable unique SSH key insertion
+  config.ssh.insert_key = true
+
+  # Configure SSH username
+  config.ssh.username = "vagrant"
+
+  # Configure SSH connection timeout
+  config.ssh.connect_timeout = 30
+
+  # Disable SSH agent forwarding unless needed
+  config.ssh.forward_agent = false
+end
+
+#+END_SRC
+
+Security recommendations:
+
+- Use trusted and maintained base boxes.
+- Pin box versions for reproducible environments.
+- Avoid committing passwords, private keys, or tokens.
+- Use least-privilege provisioning.
+- Restrict forwarded ports and public network exposure.
+- Avoid exposing SSH or application debugging ports to untrusted networks.
+- Update base boxes regularly.
+- Review third-party plugins before installing them.
+
+*16. Environment Variables & Automation*
+
+#+BEGIN_SRC bash
+
+# Display Vagrant home
+echo $VAGRANT_HOME
+
+# Set Vagrant home
+export VAGRANT_HOME="$HOME/.vagrant.d"
+
+# Run Vagrant with debug logging
+VAGRANT_LOG=debug vagrant up
+
+# Start environment
+vagrant up
+
+# Run provisioning
+vagrant provision
+
+# Check environment
+vagrant status
+
+# Stop environment
+vagrant halt
+
+#+END_SRC
+
+Example CI/CD workflow:
+
+#+BEGIN_SRC bash
+
+# Validate configuration
+vagrant validate
+
+# Start environment
+vagrant up --provider=virtualbox
+
+# Run provisioning
+vagrant provision
+
+# Execute integration tests inside VM
+vagrant ssh -c "cd /vagrant && ./run-tests.sh"
+
+# Destroy environment
+vagrant destroy -f
+
+#+END_SRC
+
+Note: CI runners must support the selected virtualization provider and its hardware or nested virtualization requirements.
+
+*17. Real-World Development & DevOps Workflows*
+
+#+BEGIN_SRC bash
+
+# A. Initialize a new development environment
+mkdir project
+cd project
+vagrant init ubuntu/jammy64
+vagrant up
+
+# B. Connect to development VM
+vagrant ssh
+
+# C. Reprovision development environment
+vagrant provision
+
+# D. Restart and reprovision
+vagrant reload --provision
+
+# E. Check environment status
+vagrant status
+
+# F. Update base box
+vagrant box outdated
+vagrant box update
+
+# G. Inspect SSH connection
+vagrant ssh-config
+
+# H. Start multi-machine environment
+vagrant up db
+vagrant up app
+
+# I. Check all VMs
+vagrant global-status
+
+# J. Debug startup problems
+VAGRANT_LOG=debug vagrant up
+
+# K. Save VM snapshot
+vagrant snapshot save before-upgrade
+
+# L. Rebuild environment from scratch
+vagrant destroy -f
+vagrant up --provision
+
+# M. Run automated integration tests
+vagrant ssh -c "cd /vagrant && ./run-tests.sh"
+
+# N. Package custom VM
+vagrant package --output development.box
+
+#+END_SRC
+
+*18. Vagrant Command-Line Options*
+
+| Option | Purpose |
+| --- | --- |
+| `--help` | Display command help |
+| `--version` | Display Vagrant version |
+| `--provider` | Select virtualization provider |
+| `--provision` | Force provisioning |
+| `--no-provision` | Skip provisioning |
+| `--provision-with` | Select provisioners |
+| `--debug` | Enable debug output |
+| `--machine-readable` | Produce machine-readable output where supported |
+| `-f` | Force operation where supported |
+| `--box-version` | Select a box version |
+
+Note: Options are command-specific. Not every option applies to every Vagrant command.
+
+*19. Commands Every Developer Should Memorize*
+
+| Command | Purpose |
+| --- | --- |
+| `vagrant --version` | Check Vagrant version |
+| `vagrant init` | Initialize project |
+| `vagrant validate` | Validate Vagrantfile |
+| `vagrant up` | Create and start VM |
+| `vagrant status` | Check VM status |
+| `vagrant ssh` | Connect to VM |
+| `vagrant ssh-config` | Display SSH configuration |
+| `vagrant halt` | Stop VM |
+| `vagrant reload` | Restart VM |
+| `vagrant suspend` | Suspend VM |
+| `vagrant resume` | Resume VM |
+| `vagrant provision` | Run provisioners |
+| `vagrant destroy` | Destroy VM |
+| `vagrant box list` | List installed boxes |
+| `vagrant box update` | Update environment box |
+| `vagrant box outdated` | Check box updates |
+| `vagrant plugin list` | List plugins |
+| `vagrant global-status` | List all Vagrant environments |
+| `vagrant snapshot save` | Save snapshot |
+| `vagrant snapshot restore` | Restore snapshot |
+| `vagrant package` | Package VM as a box |
+
+*20. Best Practices for Technical Leads & DevOps*
+
+1. Keep the Vagrantfile under version control.
+2. Use trusted and version-pinned base boxes.
+3. Automate all environment setup through provisioning.
+4. Prefer idempotent provisioning scripts.
+5. Keep provisioning logic modular and maintainable.
+6. Avoid manual configuration changes inside running VMs.
+7. Use appropriate CPU and memory allocations.
+8. Minimize unnecessary forwarded ports.
+9. Prefer private networking for internal VM communication.
+10. Avoid exposing SSH and debugging ports publicly.
+11. Use secure secret-management mechanisms.
+12. Test environments from a clean state regularly.
+13. Use snapshots for short-term recovery, not as a backup strategy.
+14. Keep plugins updated and review their security.
+15. Use consistent provider configurations across development teams.
+16. Automate VM creation and destruction in CI/CD where appropriate.
+17. Monitor resource consumption and synced-folder performance.
+18. Document common Vagrant commands and troubleshooting procedures.
+19. Treat development VMs as disposable infrastructure.
+20. Ensure every developer can reproduce the environment from the Vagrantfile and provisioning code.
+
 -----
 
 * Beginner
