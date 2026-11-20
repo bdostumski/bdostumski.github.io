@@ -8,6 +8,904 @@
 
 * Docker Compose
 
+- [[https://docs.docker.com/compose/][Docker Compose Documentation]]
+
+-----
+
+* Docker Compose Command Handbook:
+
+*1. Docker Compose Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check Docker version
+docker --version
+
+# Check Docker Compose version
+docker compose version
+
+# Display Docker system information
+docker info
+
+# Check Docker Compose help
+docker compose --help
+
+# Check available Compose commands
+docker compose config --help
+docker compose up --help
+
+# Check Docker installation
+docker run hello-world
+
+# Display Docker context
+docker context ls
+
+# Display active Docker context
+docker context show
+
+# Switch Docker context
+docker context use default
+
+#+END_SRC
+
+*2. Docker Compose File & Configuration*
+
+#+BEGIN_SRC bash
+
+# Validate Compose configuration
+docker compose config
+
+# Display resolved Compose configuration
+docker compose config --no-interpolate
+
+# Display configuration with resolved variables
+docker compose config --environment
+
+# Display only service names
+docker compose config --services
+
+# Display configured volumes
+docker compose config --volumes
+
+# Display configuration in JSON format
+docker compose config --format json
+
+# Validate a specific Compose file
+docker compose -f docker-compose.yml config
+
+# Use multiple Compose files
+docker compose -f compose.yml -f compose.override.yml config
+
+# Use a custom environment file
+docker compose --env-file .env.dev config
+
+#+END_SRC
+
+Important Compose configuration files
+
+| File | Purpose |
+|---|---|
+| `compose.yaml` | Main Compose configuration |
+| `compose.yml` | Alternative Compose configuration |
+| `docker-compose.yml` | Legacy-compatible filename |
+| `compose.override.yaml` | Default local override configuration |
+| `.env` | Variable substitution values |
+| `.env.dev` | Development environment variables |
+| `docker-compose.prod.yml` | Production-specific configuration |
+
+*3. Starting & Stopping Services*
+
+#+BEGIN_SRC bash
+
+# Start all services
+docker compose up
+
+# Start services in detached mode
+docker compose up -d
+
+# Start a specific service
+docker compose up app
+
+# Start multiple services
+docker compose up app db redis
+
+# Build images before starting
+docker compose up --build
+
+# Force recreate containers
+docker compose up --force-recreate
+
+# Recreate containers without rebuilding images
+docker compose up --no-build --force-recreate
+
+# Start services without starting dependencies
+docker compose up --no-deps app
+
+# Start services and remove orphan containers
+docker compose up -d --remove-orphans
+
+# Stop all services
+docker compose stop
+
+# Stop a specific service
+docker compose stop app
+
+# Start stopped services
+docker compose start
+
+# Restart all services
+docker compose restart
+
+# Restart a specific service
+docker compose restart app
+
+# Stop and remove containers and networks
+docker compose down
+
+# Stop and remove containers, networks and orphans
+docker compose down --remove-orphans
+
+# Stop and remove everything, including named volumes
+docker compose down -v
+
+#+END_SRC
+
+Common lifecycle commands
+
+| Command | Purpose |
+|---|---|
+| `up` | Create and start services |
+| `up -d` | Start services in background |
+| `start` | Start existing stopped containers |
+| `stop` | Stop containers without removing them |
+| `restart` | Restart services |
+| `down` | Stop and remove containers and networks |
+| `down -v` | Also remove Compose-managed named volumes |
+| `pause` | Suspend running containers |
+| `unpause` | Resume paused containers |
+
+*4. Service Management & Inspection*
+
+#+BEGIN_SRC bash
+
+# List services and their status
+docker compose ps
+
+# List all containers, including stopped ones
+docker compose ps -a
+
+# List service names
+docker compose config --services
+
+# Display running services
+docker compose ps --status running
+
+# Display container IDs
+docker compose ps -q
+
+# Display service processes
+docker compose top
+
+# Display service processes for a specific service
+docker compose top app
+
+# Display detailed container information
+docker inspect $(docker compose ps -q app)
+
+# Display container resource usage
+docker stats
+
+# Display Compose project name
+docker compose ls
+
+# Display all Compose projects
+docker compose ls -a
+
+# Display service events
+docker compose events
+
+#+END_SRC
+
+*5. Logs & Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Display logs from all services
+docker compose logs
+
+# Follow logs in real time
+docker compose logs -f
+
+# Display logs from a specific service
+docker compose logs app
+
+# Follow logs from a specific service
+docker compose logs -f app
+
+# Display the last 100 log lines
+docker compose logs --tail=100
+
+# Display timestamps in logs
+docker compose logs -t
+
+# Display logs since a specific time
+docker compose logs --since=30m
+
+# Display logs until a specific time
+docker compose logs --until=2026-11-20T18:00:00
+
+# Display logs from multiple services
+docker compose logs app db redis
+
+# Display logs without color
+docker compose logs --no-color
+
+# Display container events
+docker events
+
+# Inspect a container
+docker inspect <container_id>
+
+# Display container resource usage
+docker stats <container_id>
+
+#+END_SRC
+
+Useful troubleshooting commands
+
+| Command | Purpose |
+|---|---|
+| `docker compose logs -f` | Follow service logs |
+| `docker compose ps -a` | Inspect service status |
+| `docker compose top` | Inspect running processes |
+| `docker compose events` | Monitor Compose events |
+| `docker compose config` | Validate resolved configuration |
+| `docker inspect` | Inspect container configuration |
+| `docker stats` | Monitor CPU and memory usage |
+
+*6. Building & Managing Images*
+
+#+BEGIN_SRC bash
+
+# Build all services
+docker compose build
+
+# Build a specific service
+docker compose build app
+
+# Build without cache
+docker compose build --no-cache
+
+# Pull images before building
+docker compose build --pull
+
+# Build with a specific build argument
+docker compose build --build-arg APP_ENV=dev
+
+# Build a specific service without dependencies
+docker compose build --no-deps app
+
+# Build and start services
+docker compose up --build
+
+# Pull all service images
+docker compose pull
+
+# Pull a specific service image
+docker compose pull app
+
+# Pull images quietly
+docker compose pull -q
+
+# Push service images to a registry
+docker compose push
+
+# Push a specific service image
+docker compose push app
+
+# List Docker images
+docker images
+
+# Remove unused images
+docker image prune
+
+# Remove unused images, including unreferenced tagged images
+docker image prune -a
+
+#+END_SRC
+
+Useful image commands
+
+| Command | Purpose |
+|---|---|
+| `build` | Build service images |
+| `build --no-cache` | Build without cached layers |
+| `build --pull` | Attempt to pull newer base images |
+| `pull` | Download service images |
+| `push` | Upload service images |
+| `images` | List local images |
+| `image prune` | Remove unused images |
+
+*7. Executing Commands Inside Containers*
+
+#+BEGIN_SRC bash
+
+# Execute a command in a running service
+docker compose exec app ls
+
+# Open a shell inside a running container
+docker compose exec app sh
+
+# Open Bash shell
+docker compose exec app bash
+
+# Execute command as root
+docker compose exec -u root app sh
+
+# Execute command in a specific working directory
+docker compose exec -w /app app pwd
+
+# Execute command without allocating a TTY
+docker compose exec -T app ls
+
+# Execute a command with environment variables
+docker compose exec -e DEBUG=true app printenv
+
+# Execute a one-off command
+docker compose run app echo "Hello Docker"
+
+# Run a one-off command without starting dependencies
+docker compose run --no-deps app echo "Hello"
+
+# Run a one-off container and remove it afterward
+docker compose run --rm app npm test
+
+# Run database migrations
+docker compose exec app ./migrate.sh
+
+# Execute a PostgreSQL command
+docker compose exec db psql -U app -d app
+
+# Execute Redis CLI
+docker compose exec redis redis-cli
+
+#+END_SRC
+
+Difference between `exec` and `run`
+
+| Command | Behavior |
+|---|---|
+| `docker compose exec` | Runs a command inside an existing running container |
+| `docker compose run` | Creates a new one-off container for a command |
+| `docker compose run --rm` | Removes the one-off container after execution |
+
+*8. Networks & Service Communication*
+
+#+BEGIN_SRC bash
+
+# List Docker networks
+docker network ls
+
+# Inspect a network
+docker network inspect <network_name>
+
+# Display Compose networks
+docker compose config
+
+# Create a Docker network
+docker network create app-network
+
+# Connect a container to a network
+docker network connect app-network <container_id>
+
+# Disconnect a container from a network
+docker network disconnect app-network <container_id>
+
+# Remove a Docker network
+docker network rm app-network
+
+# Remove unused networks
+docker network prune
+
+# Inspect a service container
+docker inspect $(docker compose ps -q app)
+
+# Test connectivity between services
+docker compose exec app ping db
+
+# Test DNS resolution
+docker compose exec app nslookup db
+
+# Test HTTP connectivity
+docker compose exec app curl http://db:5432
+
+#+END_SRC
+
+Important networking concepts
+
+| Concept | Description |
+|---|---|
+| Default network | Automatically created for a Compose project |
+| Service discovery | Services can communicate using service names |
+| `ports` | Publishes container ports to the host |
+| `expose` | Documents internal service ports |
+| `networks` | Connects services to specified networks |
+| `network_mode` | Controls container network mode |
+| `aliases` | Defines alternative network DNS names |
+
+*9. Volumes & Persistent Storage*
+
+#+BEGIN_SRC bash
+
+# List Docker volumes
+docker volume ls
+
+# Inspect a volume
+docker volume inspect <volume_name>
+
+# Create a Docker volume
+docker volume create app-data
+
+# Remove a Docker volume
+docker volume rm app-data
+
+# Remove unused volumes
+docker volume prune
+
+# Display volumes used by a service
+docker inspect $(docker compose ps -q db)
+
+# Display Compose project volumes
+docker compose config --volumes
+
+# Stop services without removing volumes
+docker compose down
+
+# Remove services and named volumes
+docker compose down -v
+
+# Copy files from container to host
+docker compose cp app:/app/logs ./logs
+
+# Copy files from host to container
+docker compose cp ./config app:/app/config
+
+# Backup a named volume using a temporary container
+docker run --rm \
+  -v app-data:/data \
+  -v "$PWD":/backup \
+  alpine \
+  tar czf /backup/app-data.tar.gz -C /data .
+
+#+END_SRC
+
+Volume types
+
+| Type | Purpose |
+|---|---|
+| Named volume | Docker-managed persistent storage |
+| Anonymous volume | Automatically generated volume |
+| Bind mount | Maps a host filesystem path into a container |
+| tmpfs | Temporary in-memory filesystem |
+
+Warning: `docker compose down -v` deletes Compose-managed named volumes. Always back up important data before running it.
+
+*10. Environment Variables & Profiles*
+
+#+BEGIN_SRC bash
+
+# Use the default .env file
+docker compose up -d
+
+# Use a custom environment file
+docker compose --env-file .env.dev up -d
+
+# Use a production environment file
+docker compose --env-file .env.prod up -d
+
+# Set a variable for a single command
+APP_ENV=dev docker compose up -d
+
+# Set multiple environment variables
+APP_ENV=dev DB_PORT=5432 docker compose up -d
+
+# Display resolved environment variables
+docker compose config --environment
+
+# Start services with a specific profile
+docker compose --profile debug up -d
+
+# Start services with multiple profiles
+docker compose --profile debug --profile monitoring up -d
+
+# Enable all profiles
+docker compose --profile "*" up -d
+
+# Start services without activating optional profiles
+docker compose up -d
+
+# List configured profiles through resolved configuration
+docker compose config
+
+#+END_SRC
+
+Variable substitution examples
+
+#+BEGIN_SRC yaml
+
+services:
+  app:
+    image: my-app:${APP_VERSION:-latest}
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+
+#+END_SRC
+
+| Syntax | Meaning |
+|---|---|
+| `${VAR}` | Substitute variable |
+| `${VAR:-default}` | Use default if variable is unset or empty |
+| `${VAR-default}` | Use default if variable is unset |
+| `${VAR:?error}` | Fail if variable is unset or empty |
+| `${VAR?error}` | Fail if variable is unset |
+| `${VAR:+value}` | Use value if variable is set and non-empty |
+
+*11. Multiple Compose Files & Project Management*
+
+#+BEGIN_SRC
+
+# Use the default Compose file
+docker compose up -d
+
+# Specify a Compose file
+docker compose -f compose.yml up -d
+
+# Combine base and development files
+docker compose -f compose.yml -f compose.dev.yml up -d
+
+# Combine base and production files
+docker compose -f compose.yml -f compose.prod.yml up -d
+
+# Validate merged configuration
+docker compose -f compose.yml -f compose.dev.yml config
+
+# Build using multiple Compose files
+docker compose -f compose.yml -f compose.dev.yml build
+
+# Stop a stack using multiple files
+docker compose -f compose.yml -f compose.dev.yml down
+
+# Specify a project name
+docker compose -p my-project up -d
+
+# Stop a specific project
+docker compose -p my-project down
+
+# Display Compose projects
+docker compose ls
+
+# Display project containers
+docker compose -p my-project ps
+
+# Set project name through environment variable
+COMPOSE_PROJECT_NAME=my-project docker compose up -d
+
+# Specify project directory
+docker compose --project-directory ./deployment up -d
+
+#+END_SRC
+
+Compose file merge rules
+
+| Rule | Behavior |
+|---|---|
+| First file | Defines the base configuration |
+| Later files | Override or extend previous configuration |
+| `-f` | Specifies Compose files |
+| `-p` | Specifies project name |
+| `--project-directory` | Sets project working directory |
+| `--profile` | Enables optional service profiles |
+
+*12. Scaling & Resource Management*
+
+#+BEGIN_SRC bash
+
+# Scale application service to three instances
+docker compose up -d --scale app=3
+
+# Scale multiple services
+docker compose up -d --scale app=3 --scale worker=2
+
+# Display service instances
+docker compose ps
+
+# Monitor container resources
+docker stats
+
+# Display processes in a service
+docker compose top app
+
+# Pause a service
+docker compose pause app
+
+# Resume a service
+docker compose unpause app
+
+# Stop a service with a timeout
+docker compose stop -t 30 app
+
+# Display container resource limits
+docker inspect $(docker compose ps -q app)
+
+#+END_SRC
+
+Resource configuration example
+
+#+BEGIN_SRC yaml
+
+services:
+  app:
+    image: my-app:1.0
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+          
+#+END_SRC
+          
+Note: Scaling a service requires avoiding fixed `container_name` values. Services that publish the same fixed host port also need an appropriate port allocation strategy.
+
+*13. Health Checks & Dependency Management*
+
+#+BEGIN_SRC bash
+
+# Display service status
+docker compose ps
+
+# Inspect container health status
+docker inspect \
+  --format='{{.State.Health.Status}}' \
+  $(docker compose ps -q app)
+
+# Display health check details
+docker inspect \
+  --format='{{json .State.Health}}' \
+  $(docker compose ps -q app)
+
+# Display service logs
+docker compose logs -f app
+
+# Restart an unhealthy service manually
+docker compose restart app
+
+# Display service dependencies
+docker compose config
+
+#+END_SRC
+
+Health check configuration
+
+#+BEGIN_SRC yaml
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  app:
+    image: my-app:1.0
+    depends_on:
+      db:
+        condition: service_healthy
+
+#+END_SRC
+
+Health check parameters
+
+| Parameter | Purpose |
+|---|---|
+| `test` | Command used to check service health |
+| `interval` | Time between checks |
+| `timeout` | Maximum time for a check |
+| `retries` | Consecutive failures before unhealthy status |
+| `start_period` | Startup grace period |
+
+Important: `depends_on` with `service_healthy` helps coordinate startup, but applications should still implement connection retries and recovery logic.
+
+*14. Cleanup & Maintenance*
+
+#+BEGIN_SRC bash
+
+# Stop and remove Compose containers
+docker compose down
+
+# Remove orphan containers
+docker compose down --remove-orphans
+
+# Remove stopped service containers
+docker compose rm
+
+# Force remove stopped service containers
+docker compose rm -f
+
+# Remove containers and named volumes
+docker compose down -v
+
+# Remove unused containers
+docker container prune
+
+# Remove unused images
+docker image prune
+
+# Remove unused volumes
+docker volume prune
+
+# Remove unused networks
+docker network prune
+
+# Remove unused Docker resources
+docker system prune
+
+# Remove all unused resources, including unused images
+docker system prune -a
+
+# Display Docker disk usage
+docker system df
+
+# Display detailed Docker disk usage
+docker system df -v
+
+# Display Docker system information
+docker info
+
+#+END_SRC
+
+Cleanup command differences
+
+| Command | What it removes |
+|---|---|
+| `docker compose down` | Project containers and networks |
+| `docker compose down -v` | Also removes Compose-managed named volumes |
+| `docker compose rm` | Stopped service containers |
+| `docker container prune` | All stopped containers |
+| `docker image prune` | Unused images |
+| `docker volume prune` | Unused volumes |
+| `docker network prune` | Unused networks |
+| `docker system prune` | Unused containers, networks, build cache and dangling images |
+
+*15. Docker Compose Debugging & CI/CD*
+
+#+BEGIN_SRC bash
+
+# Validate Compose configuration
+docker compose config
+
+# Validate configuration quietly
+docker compose config -q
+
+# Start services and rebuild images
+docker compose up -d --build
+
+# Wait for services to become running or healthy
+docker compose up -d --wait
+
+# Set a maximum startup wait time
+docker compose up -d --wait --wait-timeout 120
+
+# Display service status
+docker compose ps
+
+# Follow service logs
+docker compose logs -f --tail=200
+
+# Execute tests inside a service
+docker compose exec app ./run-tests.sh
+
+# Run integration tests in a one-off container
+docker compose run --rm app ./run-integration-tests.sh
+
+# Display Docker events
+docker compose events
+
+# Stop services after CI execution
+docker compose down --remove-orphans
+
+# Stop services and remove test volumes
+docker compose down -v --remove-orphans
+
+#+END_SRC
+
+Example CI/CD workflow
+
+#+BEGIN_SRC bash
+
+# 1. Validate configuration
+docker compose config -q
+
+# 2. Build application and dependencies
+docker compose build
+
+# 3. Start services
+docker compose up -d --wait
+
+# 4. Run integration tests
+docker compose run --rm app ./run-tests.sh
+
+# 5. Display logs if troubleshooting is needed
+docker compose logs --tail=200
+
+# 6. Stop and clean up
+docker compose down -v --remove-orphans
+
+#+END_SRC
+
+Important: In CI pipelines, use unique project names for parallel executions to avoid container, network, volume, and port conflicts.
+
+*16. Quick Docker Compose Cheat Sheet*
+
+| Goal | Command |
+|---|---|
+| Check Compose version | `docker compose version` |
+| Validate configuration | `docker compose config` |
+| Start services | `docker compose up` |
+| Start in background | `docker compose up -d` |
+| Build and start | `docker compose up --build -d` |
+| Stop services | `docker compose stop` |
+| Restart services | `docker compose restart` |
+| Remove stack | `docker compose down` |
+| List containers | `docker compose ps` |
+| Follow logs | `docker compose logs -f` |
+| Open container shell | `docker compose exec app sh` |
+| Run one-off command | `docker compose run --rm app command` |
+| Build images | `docker compose build` |
+| Pull images | `docker compose pull` |
+| Push images | `docker compose push` |
+| List services | `docker compose config --services` |
+| List volumes | `docker volume ls` |
+| List networks | `docker network ls` |
+| Scale service | `docker compose up -d --scale app=3` |
+| Enable profile | `docker compose --profile debug up -d` |
+| Use custom file | `docker compose -f compose.prod.yml up -d` |
+| Use custom project | `docker compose -p my-project up -d` |
+| Remove orphans | `docker compose down --remove-orphans` |
+| Remove volumes | `docker compose down -v` |
+| Check disk usage | `docker system df` |
+
+Best Practices
+
+- Prefer the modern `docker compose` command over the legacy `docker-compose` syntax.
+- Keep Compose configuration in version control.
+- Pin image versions instead of relying on mutable `latest` tags.
+- Use `.env` files for configuration and keep sensitive values out of Git.
+- Use Docker secrets or an external secret manager for sensitive credentials.
+- Add health checks for stateful services and critical dependencies.
+- Use named volumes for persistent application data.
+- Use separate Compose override files or profiles for development, testing, and production.
+- Avoid fixed `container_name` values when scaling services.
+- Use `docker compose config` before deploying changes.
+- Use `docker compose down -v` only when deleting persistent data is intentional.
+- Use unique project names in CI/CD pipelines.
+- Implement application-level retries for database and service connections.
+- Configure resource limits and logging rotation where appropriate.
+- Keep containers running with non-root users and least-privilege permissions.
+
+Note: These examples use the modern Docker Compose V2 CLI (`docker compose`). Some options and behaviors depend on the installed Docker Compose version and runtime.
+
 -----
 
 * Beginner

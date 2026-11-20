@@ -22,1381 +22,2920 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org8e88bbe" class="outline-2">
-<h2 id="org8e88bbe">Docker Compose</h2>
-<div class="outline-text-2" id="text-org8e88bbe">
+<div id="outline-container-orge3a526a" class="outline-2">
+<h2 id="orge3a526a">Docker Compose</h2>
+<div class="outline-text-2" id="text-orge3a526a">
+<ul class="org-ul">
+<li><a href="https://docs.docker.com/compose/">Docker Compose Documentation</a></li>
+</ul>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-org8818931" class="outline-2">
-<h2 id="org8818931">Beginner</h2>
-<div class="outline-text-2" id="text-org8818931">
+<div id="outline-container-orgc1b573c" class="outline-2">
+<h2 id="orgc1b573c">Docker Compose Command Handbook:</h2>
+<div class="outline-text-2" id="text-orgc1b573c">
+<p>
+<b>1. Docker Compose Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker version
+</span>docker --version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker Compose version
+</span>docker compose version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Docker system information
+</span>docker info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker Compose help
+</span>docker compose --help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check available Compose commands
+</span>docker compose config --help
+docker compose up --help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Docker installation
+</span>docker run hello-world
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Docker context
+</span>docker context ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display active Docker context
+</span>docker context show
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Switch Docker context
+</span>docker context use default
+
+</pre>
 </div>
-<div id="outline-container-org4f35e07" class="outline-3">
-<h3 id="org4f35e07">Q1: What is Docker Compose?</h3>
-<div class="outline-text-3" id="text-org4f35e07">
+
+<p>
+<b>2. Docker Compose File &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate Compose configuration
+</span>docker compose config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resolved Compose configuration
+</span>docker compose config --no-interpolate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display configuration with resolved variables
+</span>docker compose config --environment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display only service names
+</span>docker compose config --services
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display configured volumes
+</span>docker compose config --volumes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display configuration in JSON format
+</span>docker compose config --format json
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate a specific Compose file
+</span>docker compose -f docker-compose.yml config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use multiple Compose files
+</span>docker compose -f compose.yml -f compose.override.yml config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a custom environment file
+</span>docker compose --env-file .env.dev config
+
+</pre>
+</div>
+
+<p>
+Important Compose configuration files
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">File</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`compose.yaml`</td>
+<td class="org-left">Main Compose configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`compose.yml`</td>
+<td class="org-left">Alternative Compose configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker-compose.yml`</td>
+<td class="org-left">Legacy-compatible filename</td>
+</tr>
+
+<tr>
+<td class="org-left">`compose.override.yaml`</td>
+<td class="org-left">Default local override configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`.env`</td>
+<td class="org-left">Variable substitution values</td>
+</tr>
+
+<tr>
+<td class="org-left">`.env.dev`</td>
+<td class="org-left">Development environment variables</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker-compose.prod.yml`</td>
+<td class="org-left">Production-specific configuration</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>3. Starting &amp; Stopping Services</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start all services
+</span>docker compose up
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services in detached mode
+</span>docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start a specific service
+</span>docker compose up app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start multiple services
+</span>docker compose up app db redis
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build images before starting
+</span>docker compose up --build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force recreate containers
+</span>docker compose up --force-recreate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Recreate containers without rebuilding images
+</span>docker compose up --no-build --force-recreate
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services without starting dependencies
+</span>docker compose up --no-deps app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services and remove orphan containers
+</span>docker compose up -d --remove-orphans
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop all services
+</span>docker compose stop
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop a specific service
+</span>docker compose stop app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start stopped services
+</span>docker compose start
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart all services
+</span>docker compose restart
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart a specific service
+</span>docker compose restart app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop and remove containers and networks
+</span>docker compose down
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop and remove containers, networks and orphans
+</span>docker compose down --remove-orphans
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop and remove everything, including named volumes
+</span>docker compose down -v
+
+</pre>
+</div>
+
+<p>
+Common lifecycle commands
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`up`</td>
+<td class="org-left">Create and start services</td>
+</tr>
+
+<tr>
+<td class="org-left">`up -d`</td>
+<td class="org-left">Start services in background</td>
+</tr>
+
+<tr>
+<td class="org-left">`start`</td>
+<td class="org-left">Start existing stopped containers</td>
+</tr>
+
+<tr>
+<td class="org-left">`stop`</td>
+<td class="org-left">Stop containers without removing them</td>
+</tr>
+
+<tr>
+<td class="org-left">`restart`</td>
+<td class="org-left">Restart services</td>
+</tr>
+
+<tr>
+<td class="org-left">`down`</td>
+<td class="org-left">Stop and remove containers and networks</td>
+</tr>
+
+<tr>
+<td class="org-left">`down -v`</td>
+<td class="org-left">Also remove Compose-managed named volumes</td>
+</tr>
+
+<tr>
+<td class="org-left">`pause`</td>
+<td class="org-left">Suspend running containers</td>
+</tr>
+
+<tr>
+<td class="org-left">`unpause`</td>
+<td class="org-left">Resume paused containers</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>4. Service Management &amp; Inspection</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services and their status
+</span>docker compose ps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all containers, including stopped ones
+</span>docker compose ps -a
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List service names
+</span>docker compose config --services
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display running services
+</span>docker compose ps --status running
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display container IDs
+</span>docker compose ps -q
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service processes
+</span>docker compose top
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service processes for a specific service
+</span>docker compose top app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed container information
+</span>docker inspect $(docker compose ps -q app)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display container resource usage
+</span>docker stats
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Compose project name
+</span>docker compose ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all Compose projects
+</span>docker compose ls -a
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service events
+</span>docker compose events
+
+</pre>
+</div>
+
+<p>
+<b>5. Logs &amp; Troubleshooting</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs from all services
+</span>docker compose logs
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow logs in real time
+</span>docker compose logs -f
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs from a specific service
+</span>docker compose logs app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow logs from a specific service
+</span>docker compose logs -f app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display the last 100 log lines
+</span>docker compose logs --tail=100
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display timestamps in logs
+</span>docker compose logs -t
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs since a specific time
+</span>docker compose logs --since=30m
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs until a specific time
+</span>docker compose logs --until=2026-11-20T18:00:00
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs from multiple services
+</span>docker compose logs app db redis
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs without color
+</span>docker compose logs --no-color
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display container events
+</span>docker events
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a container
+</span>docker inspect &lt;container_id&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display container resource usage
+</span>docker stats &lt;container_id&gt;
+
+</pre>
+</div>
+
+<p>
+Useful troubleshooting commands
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`docker compose logs -f`</td>
+<td class="org-left">Follow service logs</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose ps -a`</td>
+<td class="org-left">Inspect service status</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose top`</td>
+<td class="org-left">Inspect running processes</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose events`</td>
+<td class="org-left">Monitor Compose events</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose config`</td>
+<td class="org-left">Validate resolved configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker inspect`</td>
+<td class="org-left">Inspect container configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker stats`</td>
+<td class="org-left">Monitor CPU and memory usage</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>6. Building &amp; Managing Images</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build all services
+</span>docker compose build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build a specific service
+</span>docker compose build app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build without cache
+</span>docker compose build --no-cache
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pull images before building
+</span>docker compose build --pull
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build with a specific build argument
+</span>docker compose build --build-arg <span style="font-weight: bold; font-style: italic;">APP_ENV</span>=dev
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build a specific service without dependencies
+</span>docker compose build --no-deps app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build and start services
+</span>docker compose up --build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pull all service images
+</span>docker compose pull
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pull a specific service image
+</span>docker compose pull app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pull images quietly
+</span>docker compose pull -q
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Push service images to a registry
+</span>docker compose push
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Push a specific service image
+</span>docker compose push app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Docker images
+</span>docker images
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused images
+</span>docker image prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused images, including unreferenced tagged images
+</span>docker image prune -a
+
+</pre>
+</div>
+
+<p>
+Useful image commands
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`build`</td>
+<td class="org-left">Build service images</td>
+</tr>
+
+<tr>
+<td class="org-left">`build &#x2013;no-cache`</td>
+<td class="org-left">Build without cached layers</td>
+</tr>
+
+<tr>
+<td class="org-left">`build &#x2013;pull`</td>
+<td class="org-left">Attempt to pull newer base images</td>
+</tr>
+
+<tr>
+<td class="org-left">`pull`</td>
+<td class="org-left">Download service images</td>
+</tr>
+
+<tr>
+<td class="org-left">`push`</td>
+<td class="org-left">Upload service images</td>
+</tr>
+
+<tr>
+<td class="org-left">`images`</td>
+<td class="org-left">List local images</td>
+</tr>
+
+<tr>
+<td class="org-left">`image prune`</td>
+<td class="org-left">Remove unused images</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>7. Executing Commands Inside Containers</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a command in a running service
+</span>docker compose exec app ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Open a shell inside a running container
+</span>docker compose exec app sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Open Bash shell
+</span>docker compose exec app bash
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute command as root
+</span>docker compose exec -u root app sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute command in a specific working directory
+</span>docker compose exec -w /app app pwd
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute command without allocating a TTY
+</span>docker compose exec -T app ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a command with environment variables
+</span>docker compose exec -e <span style="font-weight: bold; font-style: italic;">DEBUG</span>=true app printenv
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a one-off command
+</span>docker compose run app echo <span style="font-style: italic;">"Hello Docker"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a one-off command without starting dependencies
+</span>docker compose run --no-deps app echo <span style="font-style: italic;">"Hello"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a one-off container and remove it afterward
+</span>docker compose run --rm app npm test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run database migrations
+</span>docker compose exec app ./migrate.sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute a PostgreSQL command
+</span>docker compose exec db psql -U app -d app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute Redis CLI
+</span>docker compose exec redis redis-cli
+
+</pre>
+</div>
+
+<p>
+Difference between `exec` and `run`
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`docker compose exec`</td>
+<td class="org-left">Runs a command inside an existing running container</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose run`</td>
+<td class="org-left">Creates a new one-off container for a command</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose run &#x2013;rm`</td>
+<td class="org-left">Removes the one-off container after execution</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>8. Networks &amp; Service Communication</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Docker networks
+</span>docker network ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a network
+</span>docker network inspect &lt;network_name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Compose networks
+</span>docker compose config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a Docker network
+</span>docker network create app-network
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Connect a container to a network
+</span>docker network connect app-network &lt;container_id&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Disconnect a container from a network
+</span>docker network disconnect app-network &lt;container_id&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a Docker network
+</span>docker network rm app-network
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused networks
+</span>docker network prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a service container
+</span>docker inspect $(docker compose ps -q app)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test connectivity between services
+</span>docker compose exec app ping db
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test DNS resolution
+</span>docker compose exec app nslookup db
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTP connectivity
+</span>docker compose exec app curl http://db:5432
+
+</pre>
+</div>
+
+<p>
+Important networking concepts
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Concept</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Default network</td>
+<td class="org-left">Automatically created for a Compose project</td>
+</tr>
+
+<tr>
+<td class="org-left">Service discovery</td>
+<td class="org-left">Services can communicate using service names</td>
+</tr>
+
+<tr>
+<td class="org-left">`ports`</td>
+<td class="org-left">Publishes container ports to the host</td>
+</tr>
+
+<tr>
+<td class="org-left">`expose`</td>
+<td class="org-left">Documents internal service ports</td>
+</tr>
+
+<tr>
+<td class="org-left">`networks`</td>
+<td class="org-left">Connects services to specified networks</td>
+</tr>
+
+<tr>
+<td class="org-left">`network<sub>mode</sub>`</td>
+<td class="org-left">Controls container network mode</td>
+</tr>
+
+<tr>
+<td class="org-left">`aliases`</td>
+<td class="org-left">Defines alternative network DNS names</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>9. Volumes &amp; Persistent Storage</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Docker volumes
+</span>docker volume ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a volume
+</span>docker volume inspect &lt;volume_name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a Docker volume
+</span>docker volume create app-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a Docker volume
+</span>docker volume rm app-data
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused volumes
+</span>docker volume prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display volumes used by a service
+</span>docker inspect $(docker compose ps -q db)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Compose project volumes
+</span>docker compose config --volumes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop services without removing volumes
+</span>docker compose down
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove services and named volumes
+</span>docker compose down -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy files from container to host
+</span>docker compose cp app:/app/logs ./logs
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy files from host to container
+</span>docker compose cp ./config app:/app/config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Backup a named volume using a temporary container
+</span>docker run --rm <span style="font-style: italic;">\</span>
+  -v app-data:/data <span style="font-style: italic;">\</span>
+  -v <span style="font-style: italic;">"$PWD"</span>:/backup <span style="font-style: italic;">\</span>
+  alpine <span style="font-style: italic;">\</span>
+  tar czf /backup/app-data.tar.gz -C /data .
+
+</pre>
+</div>
+
+<p>
+Volume types
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Named volume</td>
+<td class="org-left">Docker-managed persistent storage</td>
+</tr>
+
+<tr>
+<td class="org-left">Anonymous volume</td>
+<td class="org-left">Automatically generated volume</td>
+</tr>
+
+<tr>
+<td class="org-left">Bind mount</td>
+<td class="org-left">Maps a host filesystem path into a container</td>
+</tr>
+
+<tr>
+<td class="org-left">tmpfs</td>
+<td class="org-left">Temporary in-memory filesystem</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Warning: `docker compose down -v` deletes Compose-managed named volumes. Always back up important data before running it.
+</p>
+
+<p>
+<b>10. Environment Variables &amp; Profiles</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use the default .env file
+</span>docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a custom environment file
+</span>docker compose --env-file .env.dev up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Use a production environment file
+</span>docker compose --env-file .env.prod up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set a variable for a single command
+</span><span style="font-weight: bold; font-style: italic;">APP_ENV</span>=dev docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set multiple environment variables
+</span><span style="font-weight: bold; font-style: italic;">APP_ENV</span>=dev <span style="font-weight: bold; font-style: italic;">DB_PORT</span>=5432 docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resolved environment variables
+</span>docker compose config --environment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services with a specific profile
+</span>docker compose --profile debug up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services with multiple profiles
+</span>docker compose --profile debug --profile monitoring up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable all profiles
+</span>docker compose --profile <span style="font-style: italic;">"*"</span> up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services without activating optional profiles
+</span>docker compose up -d
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List configured profiles through resolved configuration
+</span>docker compose config
+
+</pre>
+</div>
+
+<p>
+Variable substitution examples
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml">
+services:
+  app:
+    image: my-app:${APP_VERSION:-latest}
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+
+</pre>
+</div>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Syntax</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`${VAR}`</td>
+<td class="org-left">Substitute variable</td>
+</tr>
+
+<tr>
+<td class="org-left">`${VAR:-default}`</td>
+<td class="org-left">Use default if variable is unset or empty</td>
+</tr>
+
+<tr>
+<td class="org-left">`${VAR-default}`</td>
+<td class="org-left">Use default if variable is unset</td>
+</tr>
+
+<tr>
+<td class="org-left">`${VAR:?error}`</td>
+<td class="org-left">Fail if variable is unset or empty</td>
+</tr>
+
+<tr>
+<td class="org-left">`${VAR?error}`</td>
+<td class="org-left">Fail if variable is unset</td>
+</tr>
+
+<tr>
+<td class="org-left">`${VAR:+value}`</td>
+<td class="org-left">Use value if variable is set and non-empty</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. Multiple Compose Files &amp; Project Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">
+# Use the default Compose file
+docker compose up -d
+
+# Specify a Compose file
+docker compose -f compose.yml up -d
+
+# Combine base and development files
+docker compose -f compose.yml -f compose.dev.yml up -d
+
+# Combine base and production files
+docker compose -f compose.yml -f compose.prod.yml up -d
+
+# Validate merged configuration
+docker compose -f compose.yml -f compose.dev.yml config
+
+# Build using multiple Compose files
+docker compose -f compose.yml -f compose.dev.yml build
+
+# Stop a stack using multiple files
+docker compose -f compose.yml -f compose.dev.yml down
+
+# Specify a project name
+docker compose -p my-project up -d
+
+# Stop a specific project
+docker compose -p my-project down
+
+# Display Compose projects
+docker compose ls
+
+# Display project containers
+docker compose -p my-project ps
+
+# Set project name through environment variable
+COMPOSE_PROJECT_NAME=my-project docker compose up -d
+
+# Specify project directory
+docker compose --project-directory ./deployment up -d
+
+</pre>
+</div>
+
+<p>
+Compose file merge rules
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Rule</th>
+<th scope="col" class="org-left">Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">First file</td>
+<td class="org-left">Defines the base configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">Later files</td>
+<td class="org-left">Override or extend previous configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`-f`</td>
+<td class="org-left">Specifies Compose files</td>
+</tr>
+
+<tr>
+<td class="org-left">`-p`</td>
+<td class="org-left">Specifies project name</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;project-directory`</td>
+<td class="org-left">Sets project working directory</td>
+</tr>
+
+<tr>
+<td class="org-left">`&#x2013;profile`</td>
+<td class="org-left">Enables optional service profiles</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>12. Scaling &amp; Resource Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale application service to three instances
+</span>docker compose up -d --scale <span style="font-weight: bold; font-style: italic;">app</span>=3
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale multiple services
+</span>docker compose up -d --scale <span style="font-weight: bold; font-style: italic;">app</span>=3 --scale <span style="font-weight: bold; font-style: italic;">worker</span>=2
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service instances
+</span>docker compose ps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Monitor container resources
+</span>docker stats
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display processes in a service
+</span>docker compose top app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pause a service
+</span>docker compose pause app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resume a service
+</span>docker compose unpause app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop a service with a timeout
+</span>docker compose stop -t 30 app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display container resource limits
+</span>docker inspect $(docker compose ps -q app)
+
+</pre>
+</div>
+
+<p>
+Resource configuration example
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml">
+services:
+  app:
+    image: my-app:1.0
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+</pre>
+</div>
+
+<p>
+Note: Scaling a service requires avoiding fixed `container<sub>name</sub>` values. Services that publish the same fixed host port also need an appropriate port allocation strategy.
+</p>
+
+<p>
+<b>13. Health Checks &amp; Dependency Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service status
+</span>docker compose ps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect container health status
+</span>docker inspect <span style="font-style: italic;">\</span>
+  --format=<span style="font-style: italic;">'{{.State.Health.Status}}'</span> <span style="font-style: italic;">\</span>
+  $(docker compose ps -q app)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display health check details
+</span>docker inspect <span style="font-style: italic;">\</span>
+  --format=<span style="font-style: italic;">'{{json .State.Health}}'</span> <span style="font-style: italic;">\</span>
+  $(docker compose ps -q app)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service logs
+</span>docker compose logs -f app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart an unhealthy service manually
+</span>docker compose restart app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service dependencies
+</span>docker compose config
+
+</pre>
+</div>
+
+<p>
+Health check configuration
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml">
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  app:
+    image: my-app:1.0
+    depends_on:
+      db:
+        condition: service_healthy
+
+</pre>
+</div>
+
+<p>
+Health check parameters
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`test`</td>
+<td class="org-left">Command used to check service health</td>
+</tr>
+
+<tr>
+<td class="org-left">`interval`</td>
+<td class="org-left">Time between checks</td>
+</tr>
+
+<tr>
+<td class="org-left">`timeout`</td>
+<td class="org-left">Maximum time for a check</td>
+</tr>
+
+<tr>
+<td class="org-left">`retries`</td>
+<td class="org-left">Consecutive failures before unhealthy status</td>
+</tr>
+
+<tr>
+<td class="org-left">`start<sub>period</sub>`</td>
+<td class="org-left">Startup grace period</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Important: `depends<sub>on</sub>` with `service<sub>healthy</sub>` helps coordinate startup, but applications should still implement connection retries and recovery logic.
+</p>
+
+<p>
+<b>14. Cleanup &amp; Maintenance</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop and remove Compose containers
+</span>docker compose down
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove orphan containers
+</span>docker compose down --remove-orphans
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove stopped service containers
+</span>docker compose rm
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Force remove stopped service containers
+</span>docker compose rm -f
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove containers and named volumes
+</span>docker compose down -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused containers
+</span>docker container prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused images
+</span>docker image prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused volumes
+</span>docker volume prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused networks
+</span>docker network prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove unused Docker resources
+</span>docker system prune
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove all unused resources, including unused images
+</span>docker system prune -a
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Docker disk usage
+</span>docker system df
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed Docker disk usage
+</span>docker system df -v
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Docker system information
+</span>docker info
+
+</pre>
+</div>
+
+<p>
+Cleanup command differences
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">What it removes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`docker compose down`</td>
+<td class="org-left">Project containers and networks</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose down -v`</td>
+<td class="org-left">Also removes Compose-managed named volumes</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker compose rm`</td>
+<td class="org-left">Stopped service containers</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker container prune`</td>
+<td class="org-left">All stopped containers</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker image prune`</td>
+<td class="org-left">Unused images</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker volume prune`</td>
+<td class="org-left">Unused volumes</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker network prune`</td>
+<td class="org-left">Unused networks</td>
+</tr>
+
+<tr>
+<td class="org-left">`docker system prune`</td>
+<td class="org-left">Unused containers, networks, build cache and dangling images</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>15. Docker Compose Debugging &amp; CI/CD</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate Compose configuration
+</span>docker compose config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate configuration quietly
+</span>docker compose config -q
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Start services and rebuild images
+</span>docker compose up -d --build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Wait for services to become running or healthy
+</span>docker compose up -d --wait
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set a maximum startup wait time
+</span>docker compose up -d --wait --wait-timeout 120
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service status
+</span>docker compose ps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow service logs
+</span>docker compose logs -f --tail=200
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute tests inside a service
+</span>docker compose exec app ./run-tests.sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run integration tests in a one-off container
+</span>docker compose run --rm app ./run-integration-tests.sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Docker events
+</span>docker compose events
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop services after CI execution
+</span>docker compose down --remove-orphans
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Stop services and remove test volumes
+</span>docker compose down -v --remove-orphans
+
+</pre>
+</div>
+
+<p>
+Example CI/CD workflow
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1. Validate configuration
+</span>docker compose config -q
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2. Build application and dependencies
+</span>docker compose build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3. Start services
+</span>docker compose up -d --wait
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4. Run integration tests
+</span>docker compose run --rm app ./run-tests.sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">5. Display logs if troubleshooting is needed
+</span>docker compose logs --tail=200
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">6. Stop and clean up
+</span>docker compose down -v --remove-orphans
+
+</pre>
+</div>
+
+<p>
+Important: In CI pipelines, use unique project names for parallel executions to avoid container, network, volume, and port conflicts.
+</p>
+
+<p>
+<b>16. Quick Docker Compose Cheat Sheet</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Goal</th>
+<th scope="col" class="org-left">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Check Compose version</td>
+<td class="org-left">`docker compose version`</td>
+</tr>
+
+<tr>
+<td class="org-left">Validate configuration</td>
+<td class="org-left">`docker compose config`</td>
+</tr>
+
+<tr>
+<td class="org-left">Start services</td>
+<td class="org-left">`docker compose up`</td>
+</tr>
+
+<tr>
+<td class="org-left">Start in background</td>
+<td class="org-left">`docker compose up -d`</td>
+</tr>
+
+<tr>
+<td class="org-left">Build and start</td>
+<td class="org-left">`docker compose up &#x2013;build -d`</td>
+</tr>
+
+<tr>
+<td class="org-left">Stop services</td>
+<td class="org-left">`docker compose stop`</td>
+</tr>
+
+<tr>
+<td class="org-left">Restart services</td>
+<td class="org-left">`docker compose restart`</td>
+</tr>
+
+<tr>
+<td class="org-left">Remove stack</td>
+<td class="org-left">`docker compose down`</td>
+</tr>
+
+<tr>
+<td class="org-left">List containers</td>
+<td class="org-left">`docker compose ps`</td>
+</tr>
+
+<tr>
+<td class="org-left">Follow logs</td>
+<td class="org-left">`docker compose logs -f`</td>
+</tr>
+
+<tr>
+<td class="org-left">Open container shell</td>
+<td class="org-left">`docker compose exec app sh`</td>
+</tr>
+
+<tr>
+<td class="org-left">Run one-off command</td>
+<td class="org-left">`docker compose run &#x2013;rm app command`</td>
+</tr>
+
+<tr>
+<td class="org-left">Build images</td>
+<td class="org-left">`docker compose build`</td>
+</tr>
+
+<tr>
+<td class="org-left">Pull images</td>
+<td class="org-left">`docker compose pull`</td>
+</tr>
+
+<tr>
+<td class="org-left">Push images</td>
+<td class="org-left">`docker compose push`</td>
+</tr>
+
+<tr>
+<td class="org-left">List services</td>
+<td class="org-left">`docker compose config &#x2013;services`</td>
+</tr>
+
+<tr>
+<td class="org-left">List volumes</td>
+<td class="org-left">`docker volume ls`</td>
+</tr>
+
+<tr>
+<td class="org-left">List networks</td>
+<td class="org-left">`docker network ls`</td>
+</tr>
+
+<tr>
+<td class="org-left">Scale service</td>
+<td class="org-left">`docker compose up -d &#x2013;scale app=3`</td>
+</tr>
+
+<tr>
+<td class="org-left">Enable profile</td>
+<td class="org-left">`docker compose &#x2013;profile debug up -d`</td>
+</tr>
+
+<tr>
+<td class="org-left">Use custom file</td>
+<td class="org-left">`docker compose -f compose.prod.yml up -d`</td>
+</tr>
+
+<tr>
+<td class="org-left">Use custom project</td>
+<td class="org-left">`docker compose -p my-project up -d`</td>
+</tr>
+
+<tr>
+<td class="org-left">Remove orphans</td>
+<td class="org-left">`docker compose down &#x2013;remove-orphans`</td>
+</tr>
+
+<tr>
+<td class="org-left">Remove volumes</td>
+<td class="org-left">`docker compose down -v`</td>
+</tr>
+
+<tr>
+<td class="org-left">Check disk usage</td>
+<td class="org-left">`docker system df`</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Best Practices
+</p>
+
+<ul class="org-ul">
+<li>Prefer the modern `docker compose` command over the legacy `docker-compose` syntax.</li>
+<li>Keep Compose configuration in version control.</li>
+<li>Pin image versions instead of relying on mutable `latest` tags.</li>
+<li>Use `.env` files for configuration and keep sensitive values out of Git.</li>
+<li>Use Docker secrets or an external secret manager for sensitive credentials.</li>
+<li>Add health checks for stateful services and critical dependencies.</li>
+<li>Use named volumes for persistent application data.</li>
+<li>Use separate Compose override files or profiles for development, testing, and production.</li>
+<li>Avoid fixed `container<sub>name</sub>` values when scaling services.</li>
+<li>Use `docker compose config` before deploying changes.</li>
+<li>Use `docker compose down -v` only when deleting persistent data is intentional.</li>
+<li>Use unique project names in CI/CD pipelines.</li>
+<li>Implement application-level retries for database and service connections.</li>
+<li>Configure resource limits and logging rotation where appropriate.</li>
+<li>Keep containers running with non-root users and least-privilege permissions.</li>
+</ul>
+
+<p>
+Note: These examples use the modern Docker Compose V2 CLI (`docker compose`). Some options and behaviors depend on the installed Docker Compose version and runtime.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgd78d144" class="outline-2">
+<h2 id="orgd78d144">Beginner</h2>
+<div class="outline-text-2" id="text-orgd78d144">
+</div>
+<div id="outline-container-orgc67ca0c" class="outline-3">
+<h3 id="orgc67ca0c">Q1: What is Docker Compose?</h3>
+<div class="outline-text-3" id="text-orgc67ca0c">
 <p>
 Docker Compose is a tool for defining and running multi-container Docker applications.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf884c7" class="outline-3">
-<h3 id="orgdf884c7">Q2: Why use Docker Compose?</h3>
-<div class="outline-text-3" id="text-orgdf884c7">
+<div id="outline-container-orge687bb9" class="outline-3">
+<h3 id="orge687bb9">Q2: Why use Docker Compose?</h3>
+<div class="outline-text-3" id="text-orge687bb9">
 <p>
 It lets you manage multiple services declaratively in one YAML file.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc92298" class="outline-3">
-<h3 id="orgdc92298">Q3: What file does Compose use by default?</h3>
-<div class="outline-text-3" id="text-orgdc92298">
+<div id="outline-container-org7905044" class="outline-3">
+<h3 id="org7905044">Q3: What file does Compose use by default?</h3>
+<div class="outline-text-3" id="text-org7905044">
 <p>
 <code>docker-compose.yml</code> (and Compose specification-compatible file names).
 </p>
 </div>
 </div>
-<div id="outline-container-org88c6e3d" class="outline-3">
-<h3 id="org88c6e3d">Q4: What is a service in Compose?</h3>
-<div class="outline-text-3" id="text-org88c6e3d">
+<div id="outline-container-org6ed366f" class="outline-3">
+<h3 id="org6ed366f">Q4: What is a service in Compose?</h3>
+<div class="outline-text-3" id="text-org6ed366f">
 <p>
 A containerized application component defined in Compose config.
 </p>
 </div>
 </div>
-<div id="outline-container-org3afb5ae" class="outline-3">
-<h3 id="org3afb5ae">Q5: What is a project in Compose?</h3>
-<div class="outline-text-3" id="text-org3afb5ae">
+<div id="outline-container-orgbd59b85" class="outline-3">
+<h3 id="orgbd59b85">Q5: What is a project in Compose?</h3>
+<div class="outline-text-3" id="text-orgbd59b85">
 <p>
 A group of services/networks/volumes created from one Compose configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org8805842" class="outline-3">
-<h3 id="org8805842">Q6: How do you start services with Compose?</h3>
-<div class="outline-text-3" id="text-org8805842">
+<div id="outline-container-org887ad2e" class="outline-3">
+<h3 id="org887ad2e">Q6: How do you start services with Compose?</h3>
+<div class="outline-text-3" id="text-org887ad2e">
 <p>
 Use <code>docker compose up</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf1d920d" class="outline-3">
-<h3 id="orgf1d920d">Q7: How do you stop and remove Compose services?</h3>
-<div class="outline-text-3" id="text-orgf1d920d">
+<div id="outline-container-org93d5ecb" class="outline-3">
+<h3 id="org93d5ecb">Q7: How do you stop and remove Compose services?</h3>
+<div class="outline-text-3" id="text-org93d5ecb">
 <p>
 Use <code>docker compose down</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org7f27e17" class="outline-3">
-<h3 id="org7f27e17">Q8: Difference between stop and down?</h3>
-<div class="outline-text-3" id="text-org7f27e17">
+<div id="outline-container-org0bcc875" class="outline-3">
+<h3 id="org0bcc875">Q8: Difference between stop and down?</h3>
+<div class="outline-text-3" id="text-org0bcc875">
 <p>
 <code>stop</code> halts containers; <code>down</code> removes containers/networks (and optionally volumes).
 </p>
 </div>
 </div>
-<div id="outline-container-org10612ee" class="outline-3">
-<h3 id="org10612ee">Q9: What does <code>docker compose up -d</code> do?</h3>
-<div class="outline-text-3" id="text-org10612ee">
+<div id="outline-container-orgeba3bca" class="outline-3">
+<h3 id="orgeba3bca">Q9: What does <code>docker compose up -d</code> do?</h3>
+<div class="outline-text-3" id="text-orgeba3bca">
 <p>
 Starts services in detached (background) mode.
 </p>
 </div>
 </div>
-<div id="outline-container-org0520e5a" class="outline-3">
-<h3 id="org0520e5a">Q10: How view running Compose services?</h3>
-<div class="outline-text-3" id="text-org0520e5a">
+<div id="outline-container-orgddec743" class="outline-3">
+<h3 id="orgddec743">Q10: How view running Compose services?</h3>
+<div class="outline-text-3" id="text-orgddec743">
 <p>
 Use <code>docker compose ps</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org823fcbc" class="outline-3">
-<h3 id="org823fcbc">Q11: How view logs for services?</h3>
-<div class="outline-text-3" id="text-org823fcbc">
+<div id="outline-container-org977a23e" class="outline-3">
+<h3 id="org977a23e">Q11: How view logs for services?</h3>
+<div class="outline-text-3" id="text-org977a23e">
 <p>
 Use <code>docker compose logs</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org712762c" class="outline-3">
-<h3 id="org712762c">Q12: How follow logs in real time?</h3>
-<div class="outline-text-3" id="text-org712762c">
+<div id="outline-container-org35a3ac4" class="outline-3">
+<h3 id="org35a3ac4">Q12: How follow logs in real time?</h3>
+<div class="outline-text-3" id="text-org35a3ac4">
 <p>
 Use <code>docker compose logs -f</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa1d537" class="outline-3">
-<h3 id="orgaa1d537">Q13: How rebuild images before startup?</h3>
-<div class="outline-text-3" id="text-orgaa1d537">
+<div id="outline-container-org0090acd" class="outline-3">
+<h3 id="org0090acd">Q13: How rebuild images before startup?</h3>
+<div class="outline-text-3" id="text-org0090acd">
 <p>
 Use <code>docker compose up --build</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orge526c80" class="outline-3">
-<h3 id="orge526c80">Q14: What is <code>build:</code> in Compose?</h3>
-<div class="outline-text-3" id="text-orge526c80">
+<div id="outline-container-orga091f4a" class="outline-3">
+<h3 id="orga091f4a">Q14: What is <code>build:</code> in Compose?</h3>
+<div class="outline-text-3" id="text-orga091f4a">
 <p>
 Instructions for building image from local Dockerfile/context.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7d5619" class="outline-3">
-<h3 id="orgf7d5619">Q15: What is <code>image:</code> in Compose?</h3>
-<div class="outline-text-3" id="text-orgf7d5619">
+<div id="outline-container-org8a4b9aa" class="outline-3">
+<h3 id="org8a4b9aa">Q15: What is <code>image:</code> in Compose?</h3>
+<div class="outline-text-3" id="text-org8a4b9aa">
 <p>
 Specifies prebuilt image to run for a service.
 </p>
 </div>
 </div>
-<div id="outline-container-org074ec14" class="outline-3">
-<h3 id="org074ec14">Q16: Can a service use both build and image?</h3>
-<div class="outline-text-3" id="text-org074ec14">
+<div id="outline-container-org082983b" class="outline-3">
+<h3 id="org082983b">Q16: Can a service use both build and image?</h3>
+<div class="outline-text-3" id="text-org082983b">
 <p>
 Yes, commonly for tagging built result.
 </p>
 </div>
 </div>
-<div id="outline-container-org807b376" class="outline-3">
-<h3 id="org807b376">Q17: What is <code>ports:</code> in Compose?</h3>
-<div class="outline-text-3" id="text-org807b376">
+<div id="outline-container-org072e44d" class="outline-3">
+<h3 id="org072e44d">Q17: What is <code>ports:</code> in Compose?</h3>
+<div class="outline-text-3" id="text-org072e44d">
 <p>
 Maps host ports to container ports.
 </p>
 </div>
 </div>
-<div id="outline-container-org5fff12e" class="outline-3">
-<h3 id="org5fff12e">Q18: What is <code>expose:</code> in Compose?</h3>
-<div class="outline-text-3" id="text-org5fff12e">
+<div id="outline-container-org60ac947" class="outline-3">
+<h3 id="org60ac947">Q18: What is <code>expose:</code> in Compose?</h3>
+<div class="outline-text-3" id="text-org60ac947">
 <p>
 Documents/internally exposes ports to linked services without host publishing.
 </p>
 </div>
 </div>
-<div id="outline-container-org13b8ee7" class="outline-3">
-<h3 id="org13b8ee7">Q19: What is <code>environment:</code> in Compose?</h3>
-<div class="outline-text-3" id="text-org13b8ee7">
+<div id="outline-container-org71dcee3" class="outline-3">
+<h3 id="org71dcee3">Q19: What is <code>environment:</code> in Compose?</h3>
+<div class="outline-text-3" id="text-org71dcee3">
 <p>
 Sets environment variables in service containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org814f57d" class="outline-3">
-<h3 id="org814f57d">Q20: What is <code>env_file:</code>?</h3>
-<div class="outline-text-3" id="text-org814f57d">
+<div id="outline-container-org06f781f" class="outline-3">
+<h3 id="org06f781f">Q20: What is <code>env_file:</code>?</h3>
+<div class="outline-text-3" id="text-org06f781f">
 <p>
 Loads environment variables from external file(s).
 </p>
 </div>
 </div>
-<div id="outline-container-org141683c" class="outline-3">
-<h3 id="org141683c">Q21: What is .env file in Compose?</h3>
-<div class="outline-text-3" id="text-org141683c">
+<div id="outline-container-orgb93f393" class="outline-3">
+<h3 id="orgb93f393">Q21: What is .env file in Compose?</h3>
+<div class="outline-text-3" id="text-orgb93f393">
 <p>
 File for variable substitution and/or env defaults in Compose context.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd72e705" class="outline-3">
-<h3 id="orgd72e705">Q22: What is variable substitution syntax?</h3>
-<div class="outline-text-3" id="text-orgd72e705">
+<div id="outline-container-org592af0b" class="outline-3">
+<h3 id="org592af0b">Q22: What is variable substitution syntax?</h3>
+<div class="outline-text-3" id="text-org592af0b">
 <p>
 Like <code>${VAR}</code> or <code>${VAR:-default}</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb8baaf" class="outline-3">
-<h3 id="orgeb8baaf">Q23: What is a Compose network?</h3>
-<div class="outline-text-3" id="text-orgeb8baaf">
+<div id="outline-container-org6d9e44e" class="outline-3">
+<h3 id="org6d9e44e">Q23: What is a Compose network?</h3>
+<div class="outline-text-3" id="text-org6d9e44e">
 <p>
 Virtual network enabling service-to-service communication.
 </p>
 </div>
 </div>
-<div id="outline-container-org2e87034" class="outline-3">
-<h3 id="org2e87034">Q24: Default networking behavior in Compose?</h3>
-<div class="outline-text-3" id="text-org2e87034">
+<div id="outline-container-orgcf88eb2" class="outline-3">
+<h3 id="orgcf88eb2">Q24: Default networking behavior in Compose?</h3>
+<div class="outline-text-3" id="text-orgcf88eb2">
 <p>
 Creates project-scoped default network; services can reach each other by service name.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcec6e23" class="outline-3">
-<h3 id="orgcec6e23">Q25: What is a Compose volume?</h3>
-<div class="outline-text-3" id="text-orgcec6e23">
+<div id="outline-container-org02834b2" class="outline-3">
+<h3 id="org02834b2">Q25: What is a Compose volume?</h3>
+<div class="outline-text-3" id="text-org02834b2">
 <p>
 Persistent storage managed by Docker and attachable to services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf357920" class="outline-3">
-<h3 id="orgf357920">Q26: Why use volumes in Compose?</h3>
-<div class="outline-text-3" id="text-orgf357920">
+<div id="outline-container-org0df99fc" class="outline-3">
+<h3 id="org0df99fc">Q26: Why use volumes in Compose?</h3>
+<div class="outline-text-3" id="text-org0df99fc">
 <p>
 Persist data across container restarts/recreation.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ccbca1" class="outline-3">
-<h3 id="org6ccbca1">Q27: Bind mount vs volume in Compose?</h3>
-<div class="outline-text-3" id="text-org6ccbca1">
+<div id="outline-container-org51854c8" class="outline-3">
+<h3 id="org51854c8">Q27: Bind mount vs volume in Compose?</h3>
+<div class="outline-text-3" id="text-org51854c8">
 <p>
 Bind mount uses host path; volume is Docker-managed storage.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0dcfc5" class="outline-3">
-<h3 id="orge0dcfc5">Q28: What is <code>depends_on</code>?</h3>
-<div class="outline-text-3" id="text-orge0dcfc5">
+<div id="outline-container-orgccf319a" class="outline-3">
+<h3 id="orgccf319a">Q28: What is <code>depends_on</code>?</h3>
+<div class="outline-text-3" id="text-orgccf319a">
 <p>
 Defines startup dependency order between services.
 </p>
 </div>
 </div>
-<div id="outline-container-org9536207" class="outline-3">
-<h3 id="org9536207">Q29: Does depends<sub>on</sub> guarantee app readiness?</h3>
-<div class="outline-text-3" id="text-org9536207">
+<div id="outline-container-org1910f22" class="outline-3">
+<h3 id="org1910f22">Q29: Does depends<sub>on</sub> guarantee app readiness?</h3>
+<div class="outline-text-3" id="text-org1910f22">
 <p>
 No, it does not guarantee dependency is fully ready.
 </p>
 </div>
 </div>
-<div id="outline-container-org98853a2" class="outline-3">
-<h3 id="org98853a2">Q30: How run one-off command in a service?</h3>
-<div class="outline-text-3" id="text-org98853a2">
+<div id="outline-container-orgaa23c71" class="outline-3">
+<h3 id="orgaa23c71">Q30: How run one-off command in a service?</h3>
+<div class="outline-text-3" id="text-orgaa23c71">
 <p>
 Use <code>docker compose run</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orge999ce7" class="outline-3">
-<h3 id="orge999ce7">Q31: What is difference between run and exec?</h3>
-<div class="outline-text-3" id="text-orge999ce7">
+<div id="outline-container-orgdc6abeb" class="outline-3">
+<h3 id="orgdc6abeb">Q31: What is difference between run and exec?</h3>
+<div class="outline-text-3" id="text-orgdc6abeb">
 <p>
 <code>run</code> starts new container; <code>exec</code> runs command in existing container.
 </p>
 </div>
 </div>
-<div id="outline-container-org35a4831" class="outline-3">
-<h3 id="org35a4831">Q32: How execute shell inside running service?</h3>
-<div class="outline-text-3" id="text-org35a4831">
+<div id="outline-container-orgf8e01ee" class="outline-3">
+<h3 id="orgf8e01ee">Q32: How execute shell inside running service?</h3>
+<div class="outline-text-3" id="text-orgf8e01ee">
 <p>
 Use <code>docker compose exec &lt;service&gt; sh</code> (or bash if available).
 </p>
 </div>
 </div>
-<div id="outline-container-orgb58b55f" class="outline-3">
-<h3 id="orgb58b55f">Q33: How scale a service quickly?</h3>
-<div class="outline-text-3" id="text-orgb58b55f">
+<div id="outline-container-org84fffbc" class="outline-3">
+<h3 id="org84fffbc">Q33: How scale a service quickly?</h3>
+<div class="outline-text-3" id="text-org84fffbc">
 <p>
 Use <code>docker compose up --scale service=n</code> (where applicable).
 </p>
 </div>
 </div>
-<div id="outline-container-orgf590c95" class="outline-3">
-<h3 id="orgf590c95">Q34: What is container<sub>name</sub> in Compose?</h3>
-<div class="outline-text-3" id="text-orgf590c95">
+<div id="outline-container-orgb09e138" class="outline-3">
+<h3 id="orgb09e138">Q34: What is container<sub>name</sub> in Compose?</h3>
+<div class="outline-text-3" id="text-orgb09e138">
 <p>
 Custom fixed container name (often avoided in scalable setups).
 </p>
 </div>
 </div>
-<div id="outline-container-orgf26c8e9" class="outline-3">
-<h3 id="orgf26c8e9">Q35: Why avoid fixed container<sub>name</sub> often?</h3>
-<div class="outline-text-3" id="text-orgf26c8e9">
+<div id="outline-container-orga13a88f" class="outline-3">
+<h3 id="orga13a88f">Q35: Why avoid fixed container<sub>name</sub> often?</h3>
+<div class="outline-text-3" id="text-orga13a88f">
 <p>
 Can cause naming collisions and reduce flexibility.
 </p>
 </div>
 </div>
-<div id="outline-container-org11252b2" class="outline-3">
-<h3 id="org11252b2">Q36: What is restart policy in Compose?</h3>
-<div class="outline-text-3" id="text-org11252b2">
+<div id="outline-container-org1f239f9" class="outline-3">
+<h3 id="org1f239f9">Q36: What is restart policy in Compose?</h3>
+<div class="outline-text-3" id="text-org1f239f9">
 <p>
 Controls automatic restart behavior (no, always, on-failure, unless-stopped).
 </p>
 </div>
 </div>
-<div id="outline-container-org7e37a28" class="outline-3">
-<h3 id="org7e37a28">Q37: What is healthcheck in Compose?</h3>
-<div class="outline-text-3" id="text-org7e37a28">
+<div id="outline-container-org3ff6428" class="outline-3">
+<h3 id="org3ff6428">Q37: What is healthcheck in Compose?</h3>
+<div class="outline-text-3" id="text-org3ff6428">
 <p>
 Command-based liveness/readiness signal for container health.
 </p>
 </div>
 </div>
-<div id="outline-container-orge73e6b4" class="outline-3">
-<h3 id="orge73e6b4">Q38: Why healthchecks matter in local stacks?</h3>
-<div class="outline-text-3" id="text-orge73e6b4">
+<div id="outline-container-org855902c" class="outline-3">
+<h3 id="org855902c">Q38: Why healthchecks matter in local stacks?</h3>
+<div class="outline-text-3" id="text-org855902c">
 <p>
 Improve reliability and dependency coordination.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7c53ef" class="outline-3">
-<h3 id="orgc7c53ef">Q39: What is command override in Compose?</h3>
-<div class="outline-text-3" id="text-orgc7c53ef">
+<div id="outline-container-org8156fe2" class="outline-3">
+<h3 id="org8156fe2">Q39: What is command override in Compose?</h3>
+<div class="outline-text-3" id="text-org8156fe2">
 <p>
 Override Dockerfile CMD per environment/service need.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc147d41" class="outline-3">
-<h3 id="orgc147d41">Q40: What is entrypoint override?</h3>
-<div class="outline-text-3" id="text-orgc147d41">
+<div id="outline-container-org211634c" class="outline-3">
+<h3 id="org211634c">Q40: What is entrypoint override?</h3>
+<div class="outline-text-3" id="text-org211634c">
 <p>
 Replace image entrypoint command.
 </p>
 </div>
 </div>
-<div id="outline-container-orgef107ab" class="outline-3">
-<h3 id="orgef107ab">Q41: What is tty: true used for?</h3>
-<div class="outline-text-3" id="text-orgef107ab">
+<div id="outline-container-org47c2a1f" class="outline-3">
+<h3 id="org47c2a1f">Q41: What is tty: true used for?</h3>
+<div class="outline-text-3" id="text-org47c2a1f">
 <p>
 Allocates TTY for interactive/debug workflows.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcbf26e5" class="outline-3">
-<h3 id="orgcbf26e5">Q42: What is stdin<sub>open</sub>: true?</h3>
-<div class="outline-text-3" id="text-orgcbf26e5">
+<div id="outline-container-org0b2a310" class="outline-3">
+<h3 id="org0b2a310">Q42: What is stdin<sub>open</sub>: true?</h3>
+<div class="outline-text-3" id="text-org0b2a310">
 <p>
 Keeps STDIN open for interactive containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org161f1f5" class="outline-3">
-<h3 id="org161f1f5">Q43: What is profiles in Compose?</h3>
-<div class="outline-text-3" id="text-org161f1f5">
+<div id="outline-container-org580fbd8" class="outline-3">
+<h3 id="org580fbd8">Q43: What is profiles in Compose?</h3>
+<div class="outline-text-3" id="text-org580fbd8">
 <p>
 Feature to enable optional service groups (e.g., debug, monitoring).
 </p>
 </div>
 </div>
-<div id="outline-container-org719b759" class="outline-3">
-<h3 id="org719b759">Q44: How start only selected profiles?</h3>
-<div class="outline-text-3" id="text-org719b759">
+<div id="outline-container-org3dd9b5f" class="outline-3">
+<h3 id="org3dd9b5f">Q44: How start only selected profiles?</h3>
+<div class="outline-text-3" id="text-org3dd9b5f">
 <p>
 Use <code>--profile</code> flag.
 </p>
 </div>
 </div>
-<div id="outline-container-org230b624" class="outline-3">
-<h3 id="org230b624">Q45: What is pull policy behavior concept?</h3>
-<div class="outline-text-3" id="text-org230b624">
+<div id="outline-container-org70caf63" class="outline-3">
+<h3 id="org70caf63">Q45: What is pull policy behavior concept?</h3>
+<div class="outline-text-3" id="text-org70caf63">
 <p>
 Controls when images are pulled vs reused locally.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb33d669" class="outline-3">
-<h3 id="orgb33d669">Q46: What is beginner Compose anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgb33d669">
+<div id="outline-container-org90e575e" class="outline-3">
+<h3 id="org90e575e">Q46: What is beginner Compose anti-pattern?</h3>
+<div class="outline-text-3" id="text-org90e575e">
 <p>
 Putting secrets directly in compose YAML committed to git.
 </p>
 </div>
 </div>
-<div id="outline-container-orge05e2a9" class="outline-3">
-<h3 id="orge05e2a9">Q47: Another beginner anti-pattern?</h3>
-<div class="outline-text-3" id="text-orge05e2a9">
+<div id="outline-container-org7aa3b74" class="outline-3">
+<h3 id="org7aa3b74">Q47: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-org7aa3b74">
 <p>
 Using latest tags everywhere without version pinning.
 </p>
 </div>
 </div>
-<div id="outline-container-org36b5a50" class="outline-3">
-<h3 id="org36b5a50">Q48: Beginner security baseline?</h3>
-<div class="outline-text-3" id="text-org36b5a50">
+<div id="outline-container-org9f1894d" class="outline-3">
+<h3 id="org9f1894d">Q48: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-org9f1894d">
 <p>
 Use minimal images, non-root users, and keep secrets outside source.
 </p>
 </div>
 </div>
-<div id="outline-container-org776f733" class="outline-3">
-<h3 id="org776f733">Q49: Beginner performance baseline?</h3>
-<div class="outline-text-3" id="text-org776f733">
+<div id="outline-container-orga7982da" class="outline-3">
+<h3 id="orga7982da">Q49: Beginner performance baseline?</h3>
+<div class="outline-text-3" id="text-orga7982da">
 <p>
 Use build cache and avoid oversized bind mounts.
 </p>
 </div>
 </div>
-<div id="outline-container-org9f4c62a" class="outline-3">
-<h3 id="org9f4c62a">Q50: Beginner reliability baseline?</h3>
-<div class="outline-text-3" id="text-org9f4c62a">
+<div id="outline-container-org1684be8" class="outline-3">
+<h3 id="org1684be8">Q50: Beginner reliability baseline?</h3>
+<div class="outline-text-3" id="text-org1684be8">
 <p>
 Healthchecks + restart policies + persistent data volumes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd97d452" class="outline-3">
-<h3 id="orgd97d452">Q51: What command validates Compose config?</h3>
-<div class="outline-text-3" id="text-orgd97d452">
+<div id="outline-container-org9f502fb" class="outline-3">
+<h3 id="org9f502fb">Q51: What command validates Compose config?</h3>
+<div class="outline-text-3" id="text-org9f502fb">
 <p>
 <code>docker compose config</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org66125a9" class="outline-3">
-<h3 id="org66125a9">Q52: Why use docker compose config?</h3>
-<div class="outline-text-3" id="text-org66125a9">
+<div id="outline-container-org48cc7da" class="outline-3">
+<h3 id="org48cc7da">Q52: Why use docker compose config?</h3>
+<div class="outline-text-3" id="text-org48cc7da">
 <p>
 Shows merged, resolved final configuration for debugging.
 </p>
 </div>
 </div>
-<div id="outline-container-org78e8a06" class="outline-3">
-<h3 id="org78e8a06">Q53: How remove stopped containers only?</h3>
-<div class="outline-text-3" id="text-org78e8a06">
+<div id="outline-container-org77e565f" class="outline-3">
+<h3 id="org77e565f">Q53: How remove stopped containers only?</h3>
+<div class="outline-text-3" id="text-org77e565f">
 <p>
 Use <code>docker compose rm</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcba5758" class="outline-3">
-<h3 id="orgcba5758">Q54: How remove volumes with stack?</h3>
-<div class="outline-text-3" id="text-orgcba5758">
+<div id="outline-container-org0222ef1" class="outline-3">
+<h3 id="org0222ef1">Q54: How remove volumes with stack?</h3>
+<div class="outline-text-3" id="text-org0222ef1">
 <p>
 Use <code>docker compose down -v</code> carefully.
 </p>
 </div>
 </div>
-<div id="outline-container-org79b63f4" class="outline-3">
-<h3 id="org79b63f4">Q55: Beginner best practice?</h3>
-<div class="outline-text-3" id="text-org79b63f4">
+<div id="outline-container-org0987157" class="outline-3">
+<h3 id="org0987157">Q55: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org0987157">
 <p>
 Keep compose files clear, versioned, and environment-specific via overrides/profiles.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org78ec5fe" class="outline-2">
-<h2 id="org78ec5fe">Intermediate</h2>
-<div class="outline-text-2" id="text-org78ec5fe">
+<div id="outline-container-org09dd412" class="outline-2">
+<h2 id="org09dd412">Intermediate</h2>
+<div class="outline-text-2" id="text-org09dd412">
 </div>
-<div id="outline-container-orgb9a13ef" class="outline-3">
-<h3 id="orgb9a13ef">Q56: What is multiple Compose file merge?</h3>
-<div class="outline-text-3" id="text-orgb9a13ef">
+<div id="outline-container-org4dc9a4c" class="outline-3">
+<h3 id="org4dc9a4c">Q56: What is multiple Compose file merge?</h3>
+<div class="outline-text-3" id="text-org4dc9a4c">
 <p>
 Combining base and override files via multiple <code>-f</code> flags.
 </p>
 </div>
 </div>
-<div id="outline-container-org21d08c1" class="outline-3">
-<h3 id="org21d08c1">Q57: Why use override files?</h3>
-<div class="outline-text-3" id="text-org21d08c1">
+<div id="outline-container-org4e99f1c" class="outline-3">
+<h3 id="org4e99f1c">Q57: Why use override files?</h3>
+<div class="outline-text-3" id="text-org4e99f1c">
 <p>
 Separate common config from dev/test/ci-specific settings.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4d2f34" class="outline-3">
-<h3 id="orgd4d2f34">Q58: Merge order rule?</h3>
-<div class="outline-text-3" id="text-orgd4d2f34">
+<div id="outline-container-orge09992a" class="outline-3">
+<h3 id="orge09992a">Q58: Merge order rule?</h3>
+<div class="outline-text-3" id="text-orge09992a">
 <p>
 Later files override/extend earlier ones.
 </p>
 </div>
 </div>
-<div id="outline-container-org7865204" class="outline-3">
-<h3 id="org7865204">Q59: What is extension fields pattern (x-*)?</h3>
-<div class="outline-text-3" id="text-org7865204">
+<div id="outline-container-orgb2254ab" class="outline-3">
+<h3 id="orgb2254ab">Q59: What is extension fields pattern (x-*)?</h3>
+<div class="outline-text-3" id="text-orgb2254ab">
 <p>
 Reusable YAML fragments for DRY configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org5ac2c51" class="outline-3">
-<h3 id="org5ac2c51">Q60: What is YAML anchor/alias use in Compose?</h3>
-<div class="outline-text-3" id="text-org5ac2c51">
+<div id="outline-container-orgb6698ed" class="outline-3">
+<h3 id="orgb6698ed">Q60: What is YAML anchor/alias use in Compose?</h3>
+<div class="outline-text-3" id="text-orgb6698ed">
 <p>
 Reuse repeated config blocks safely.
 </p>
 </div>
 </div>
-<div id="outline-container-org7157a9f" class="outline-3">
-<h3 id="org7157a9f">Q61: What is project name control?</h3>
-<div class="outline-text-3" id="text-org7157a9f">
+<div id="outline-container-orgc4f2d9d" class="outline-3">
+<h3 id="orgc4f2d9d">Q61: What is project name control?</h3>
+<div class="outline-text-3" id="text-orgc4f2d9d">
 <p>
 Use <code>-p</code> flag or environment variable to isolate stacks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb51178f" class="outline-3">
-<h3 id="orgb51178f">Q62: Why customize project name?</h3>
-<div class="outline-text-3" id="text-orgb51178f">
+<div id="outline-container-org7efa277" class="outline-3">
+<h3 id="org7efa277">Q62: Why customize project name?</h3>
+<div class="outline-text-3" id="text-org7efa277">
 <p>
 Avoid collisions across branches/teams on shared hosts.
 </p>
 </div>
 </div>
-<div id="outline-container-org19ddbaa" class="outline-3">
-<h3 id="org19ddbaa">Q63: What is internal-only network?</h3>
-<div class="outline-text-3" id="text-org19ddbaa">
+<div id="outline-container-orgc332fe2" class="outline-3">
+<h3 id="orgc332fe2">Q63: What is internal-only network?</h3>
+<div class="outline-text-3" id="text-orgc332fe2">
 <p>
 Network not exposed externally; limits service reachability.
 </p>
 </div>
 </div>
-<div id="outline-container-org0f018e9" class="outline-3">
-<h3 id="org0f018e9">Q64: How connect service to multiple networks?</h3>
-<div class="outline-text-3" id="text-org0f018e9">
+<div id="outline-container-org5df143f" class="outline-3">
+<h3 id="org5df143f">Q64: How connect service to multiple networks?</h3>
+<div class="outline-text-3" id="text-org5df143f">
 <p>
 Declare multiple networks under service.
 </p>
 </div>
 </div>
-<div id="outline-container-org263f4b8" class="outline-3">
-<h3 id="org263f4b8">Q65: Why use multiple networks?</h3>
-<div class="outline-text-3" id="text-org263f4b8">
+<div id="outline-container-orgc5f0533" class="outline-3">
+<h3 id="orgc5f0533">Q65: Why use multiple networks?</h3>
+<div class="outline-text-3" id="text-orgc5f0533">
 <p>
 Segment traffic (frontend/backend/data-plane) for security/isolation.
 </p>
 </div>
 </div>
-<div id="outline-container-org2d3380d" class="outline-3">
-<h3 id="org2d3380d">Q66: What is network alias?</h3>
-<div class="outline-text-3" id="text-org2d3380d">
+<div id="outline-container-orgcdc5046" class="outline-3">
+<h3 id="orgcdc5046">Q66: What is network alias?</h3>
+<div class="outline-text-3" id="text-orgcdc5046">
 <p>
 Alternative DNS name for service on specific network.
 </p>
 </div>
 </div>
-<div id="outline-container-orgac8ca57" class="outline-3">
-<h3 id="orgac8ca57">Q67: What is extra<sub>hosts</sub> in Compose?</h3>
-<div class="outline-text-3" id="text-orgac8ca57">
+<div id="outline-container-org18a7309" class="outline-3">
+<h3 id="org18a7309">Q67: What is extra<sub>hosts</sub> in Compose?</h3>
+<div class="outline-text-3" id="text-org18a7309">
 <p>
 Adds custom host-to-IP mappings inside container.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f5a945" class="outline-3">
-<h3 id="org5f5a945">Q68: What is DNS config in Compose?</h3>
-<div class="outline-text-3" id="text-org5f5a945">
+<div id="outline-container-orgd701ab4" class="outline-3">
+<h3 id="orgd701ab4">Q68: What is DNS config in Compose?</h3>
+<div class="outline-text-3" id="text-orgd701ab4">
 <p>
 Customize resolvers/search domains/options for containers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb8f7ec" class="outline-3">
-<h3 id="orgcb8f7ec">Q69: What is init: true?</h3>
-<div class="outline-text-3" id="text-orgcb8f7ec">
+<div id="outline-container-org587e315" class="outline-3">
+<h3 id="org587e315">Q69: What is init: true?</h3>
+<div class="outline-text-3" id="text-org587e315">
 <p>
 Runs tiny init process for signal forwarding/zombie reaping.
 </p>
 </div>
 </div>
-<div id="outline-container-org2392823" class="outline-3">
-<h3 id="org2392823">Q70: Why init is useful?</h3>
-<div class="outline-text-3" id="text-org2392823">
+<div id="outline-container-org3e965ad" class="outline-3">
+<h3 id="org3e965ad">Q70: Why init is useful?</h3>
+<div class="outline-text-3" id="text-org3e965ad">
 <p>
 Improves process lifecycle behavior in containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org7987e5a" class="outline-3">
-<h3 id="org7987e5a">Q71: What is stop<sub>grace</sub><sub>period</sub>?</h3>
-<div class="outline-text-3" id="text-org7987e5a">
+<div id="outline-container-org844e6d1" class="outline-3">
+<h3 id="org844e6d1">Q71: What is stop<sub>grace</sub><sub>period</sub>?</h3>
+<div class="outline-text-3" id="text-org844e6d1">
 <p>
 Time allowed for graceful shutdown before force kill.
 </p>
 </div>
 </div>
-<div id="outline-container-org102ae27" class="outline-3">
-<h3 id="org102ae27">Q72: Why tune stop<sub>grace</sub><sub>period</sub>?</h3>
-<div class="outline-text-3" id="text-org102ae27">
+<div id="outline-container-org9c36284" class="outline-3">
+<h3 id="org9c36284">Q72: Why tune stop<sub>grace</sub><sub>period</sub>?</h3>
+<div class="outline-text-3" id="text-org9c36284">
 <p>
 Stateful services may need extra flush/cleanup time.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbaac9e3" class="outline-3">
-<h3 id="orgbaac9e3">Q73: What is ulimits in Compose?</h3>
-<div class="outline-text-3" id="text-orgbaac9e3">
+<div id="outline-container-orgc8039ba" class="outline-3">
+<h3 id="orgc8039ba">Q73: What is ulimits in Compose?</h3>
+<div class="outline-text-3" id="text-orgc8039ba">
 <p>
 Sets process resource limits (nofile, nproc, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org6bb5380" class="outline-3">
-<h3 id="org6bb5380">Q74: Why configure ulimits?</h3>
-<div class="outline-text-3" id="text-org6bb5380">
+<div id="outline-container-org240e3a4" class="outline-3">
+<h3 id="org240e3a4">Q74: Why configure ulimits?</h3>
+<div class="outline-text-3" id="text-org240e3a4">
 <p>
 Prevent runtime failures under high load.
 </p>
 </div>
 </div>
-<div id="outline-container-orgea8267d" class="outline-3">
-<h3 id="orgea8267d">Q75: What is sysctls in Compose?</h3>
-<div class="outline-text-3" id="text-orgea8267d">
+<div id="outline-container-org7434abf" class="outline-3">
+<h3 id="org7434abf">Q75: What is sysctls in Compose?</h3>
+<div class="outline-text-3" id="text-org7434abf">
 <p>
 Kernel parameter tweaks at container runtime (where supported).
 </p>
 </div>
 </div>
-<div id="outline-container-orgfa3bb5c" class="outline-3">
-<h3 id="orgfa3bb5c">Q76: What is cap<sub>add</sub>/cap<sub>drop</sub>?</h3>
-<div class="outline-text-3" id="text-orgfa3bb5c">
+<div id="outline-container-org94a8d7b" class="outline-3">
+<h3 id="org94a8d7b">Q76: What is cap<sub>add</sub>/cap<sub>drop</sub>?</h3>
+<div class="outline-text-3" id="text-org94a8d7b">
 <p>
 Add/remove Linux capabilities for least-privilege tuning.
 </p>
 </div>
 </div>
-<div id="outline-container-org7270986" class="outline-3">
-<h3 id="org7270986">Q77: Why drop capabilities?</h3>
-<div class="outline-text-3" id="text-org7270986">
+<div id="outline-container-org2e619f2" class="outline-3">
+<h3 id="org2e619f2">Q77: Why drop capabilities?</h3>
+<div class="outline-text-3" id="text-org2e619f2">
 <p>
 Reduce attack surface for compromised containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org3ef5d72" class="outline-3">
-<h3 id="org3ef5d72">Q78: What is read<sub>only</sub>: true?</h3>
-<div class="outline-text-3" id="text-org3ef5d72">
+<div id="outline-container-orgb461e67" class="outline-3">
+<h3 id="orgb461e67">Q78: What is read<sub>only</sub>: true?</h3>
+<div class="outline-text-3" id="text-orgb461e67">
 <p>
 Mounts container root filesystem read-only.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf710370" class="outline-3">
-<h3 id="orgf710370">Q79: How write data with read-only root?</h3>
-<div class="outline-text-3" id="text-orgf710370">
+<div id="outline-container-orga29504c" class="outline-3">
+<h3 id="orga29504c">Q79: How write data with read-only root?</h3>
+<div class="outline-text-3" id="text-orga29504c">
 <p>
 Use writable volumes/tmpfs for specific paths.
 </p>
 </div>
 </div>
-<div id="outline-container-org0e815ac" class="outline-3">
-<h3 id="org0e815ac">Q80: What is tmpfs in Compose?</h3>
-<div class="outline-text-3" id="text-org0e815ac">
+<div id="outline-container-org6f48852" class="outline-3">
+<h3 id="org6f48852">Q80: What is tmpfs in Compose?</h3>
+<div class="outline-text-3" id="text-org6f48852">
 <p>
 In-memory filesystem mount for ephemeral data.
 </p>
 </div>
 </div>
-<div id="outline-container-org386c0f3" class="outline-3">
-<h3 id="org386c0f3">Q81: What is secrets support in Compose (concept)?</h3>
-<div class="outline-text-3" id="text-org386c0f3">
+<div id="outline-container-org5ad64fc" class="outline-3">
+<h3 id="org5ad64fc">Q81: What is secrets support in Compose (concept)?</h3>
+<div class="outline-text-3" id="text-org5ad64fc">
 <p>
 Inject secret material without hardcoding in image/environment.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff79938" class="outline-3">
-<h3 id="orgff79938">Q82: Configs vs secrets conceptually?</h3>
-<div class="outline-text-3" id="text-orgff79938">
+<div id="outline-container-org9fe1668" class="outline-3">
+<h3 id="org9fe1668">Q82: Configs vs secrets conceptually?</h3>
+<div class="outline-text-3" id="text-org9fe1668">
 <p>
 Both inject data; secrets intended for sensitive values with stricter handling.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c0838d" class="outline-3">
-<h3 id="org2c0838d">Q83: What is develop/watch workflow concept?</h3>
-<div class="outline-text-3" id="text-org2c0838d">
+<div id="outline-container-org733cf31" class="outline-3">
+<h3 id="org733cf31">Q83: What is develop/watch workflow concept?</h3>
+<div class="outline-text-3" id="text-org733cf31">
 <p>
 Auto-sync/rebuild behavior for local development iterations.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd88a655" class="outline-3">
-<h3 id="orgd88a655">Q84: Why bind mounts can be slow on some platforms?</h3>
-<div class="outline-text-3" id="text-orgd88a655">
+<div id="outline-container-org4b923e7" class="outline-3">
+<h3 id="org4b923e7">Q84: Why bind mounts can be slow on some platforms?</h3>
+<div class="outline-text-3" id="text-org4b923e7">
 <p>
 Host&lt;-&gt;VM filesystem bridging overhead (especially desktop virtualization setups).
 </p>
 </div>
 </div>
-<div id="outline-container-org3af1d7e" class="outline-3">
-<h3 id="org3af1d7e">Q85: Mitigation for slow bind mounts?</h3>
-<div class="outline-text-3" id="text-org3af1d7e">
+<div id="outline-container-org03eee02" class="outline-3">
+<h3 id="org03eee02">Q85: Mitigation for slow bind mounts?</h3>
+<div class="outline-text-3" id="text-org03eee02">
 <p>
 Use cached/delegated options (where supported), smaller mounts, sync tools.
 </p>
 </div>
 </div>
-<div id="outline-container-org790e504" class="outline-3">
-<h3 id="org790e504">Q86: What is platform field in Compose?</h3>
-<div class="outline-text-3" id="text-org790e504">
+<div id="outline-container-org13cd43c" class="outline-3">
+<h3 id="org13cd43c">Q86: What is platform field in Compose?</h3>
+<div class="outline-text-3" id="text-org13cd43c">
 <p>
 Specifies target architecture/OS for image run.
 </p>
 </div>
 </div>
-<div id="outline-container-orga604aaa" class="outline-3">
-<h3 id="orga604aaa">Q87: Why set platform explicitly?</h3>
-<div class="outline-text-3" id="text-orga604aaa">
+<div id="outline-container-org5e25c26" class="outline-3">
+<h3 id="org5e25c26">Q87: Why set platform explicitly?</h3>
+<div class="outline-text-3" id="text-org5e25c26">
 <p>
 Consistency across mixed-architecture developer machines.
 </p>
 </div>
 </div>
-<div id="outline-container-org6fba9c8" class="outline-3">
-<h3 id="org6fba9c8">Q88: What is build target in Compose?</h3>
-<div class="outline-text-3" id="text-org6fba9c8">
+<div id="outline-container-org43affd1" class="outline-3">
+<h3 id="org43affd1">Q88: What is build target in Compose?</h3>
+<div class="outline-text-3" id="text-org43affd1">
 <p>
 Select specific Dockerfile multi-stage target.
 </p>
 </div>
 </div>
-<div id="outline-container-org747467d" class="outline-3">
-<h3 id="org747467d">Q89: Why use build target?</h3>
-<div class="outline-text-3" id="text-org747467d">
+<div id="outline-container-org3b082f6" class="outline-3">
+<h3 id="org3b082f6">Q89: Why use build target?</h3>
+<div class="outline-text-3" id="text-org3b082f6">
 <p>
 Different images for dev/test/prod from one Dockerfile.
 </p>
 </div>
 </div>
-<div id="outline-container-org51389b8" class="outline-3">
-<h3 id="org51389b8">Q90: What is cache<sub>from</sub>/cache<sub>to</sub> concept?</h3>
-<div class="outline-text-3" id="text-org51389b8">
+<div id="outline-container-org2c0638e" class="outline-3">
+<h3 id="org2c0638e">Q90: What is cache<sub>from</sub>/cache<sub>to</sub> concept?</h3>
+<div class="outline-text-3" id="text-org2c0638e">
 <p>
 Leverage external build caches to speed CI builds.
 </p>
 </div>
 </div>
-<div id="outline-container-org98a6a09" class="outline-3">
-<h3 id="org98a6a09">Q91: What is no-cache build?</h3>
-<div class="outline-text-3" id="text-org98a6a09">
+<div id="outline-container-org8bbbe76" class="outline-3">
+<h3 id="org8bbbe76">Q91: What is no-cache build?</h3>
+<div class="outline-text-3" id="text-org8bbbe76">
 <p>
 Forces rebuild without using cached layers.
 </p>
 </div>
 </div>
-<div id="outline-container-org10259d2" class="outline-3">
-<h3 id="org10259d2">Q92: When use no-cache?</h3>
-<div class="outline-text-3" id="text-org10259d2">
+<div id="outline-container-org47c6aaa" class="outline-3">
+<h3 id="org47c6aaa">Q92: When use no-cache?</h3>
+<div class="outline-text-3" id="text-org47c6aaa">
 <p>
 Dependency freshness debugging or cache corruption suspicion.
 </p>
 </div>
 </div>
-<div id="outline-container-org97b96b1" class="outline-3">
-<h3 id="org97b96b1">Q93: What is depends<sub>on</sub> condition support concept?</h3>
-<div class="outline-text-3" id="text-org97b96b1">
+<div id="outline-container-org7efd8dc" class="outline-3">
+<h3 id="org7efd8dc">Q93: What is depends<sub>on</sub> condition support concept?</h3>
+<div class="outline-text-3" id="text-org7efd8dc">
 <p>
 Can coordinate based on service<sub>started</sub>/service<sub>healthy</sub> semantics (spec/runtime dependent).
 </p>
 </div>
 </div>
-<div id="outline-container-orgcdc9888" class="outline-3">
-<h3 id="orgcdc9888">Q94: Why still use app-level retries?</h3>
-<div class="outline-text-3" id="text-orgcdc9888">
+<div id="outline-container-org0ff803c" class="outline-3">
+<h3 id="org0ff803c">Q94: Why still use app-level retries?</h3>
+<div class="outline-text-3" id="text-org0ff803c">
 <p>
 Infra ordering is insufficient for real readiness guarantees.
 </p>
 </div>
 </div>
-<div id="outline-container-org75c3f9f" class="outline-3">
-<h3 id="org75c3f9f">Q95: What is wait-for script pattern?</h3>
-<div class="outline-text-3" id="text-org75c3f9f">
+<div id="outline-container-org66f419a" class="outline-3">
+<h3 id="org66f419a">Q95: What is wait-for script pattern?</h3>
+<div class="outline-text-3" id="text-org66f419a">
 <p>
 Entry command waits for dependency port/health before app start.
 </p>
 </div>
 </div>
-<div id="outline-container-org9f9aaf8" class="outline-3">
-<h3 id="org9f9aaf8">Q96: What is one-shot init service pattern?</h3>
-<div class="outline-text-3" id="text-org9f9aaf8">
+<div id="outline-container-orgff315c1" class="outline-3">
+<h3 id="orgff315c1">Q96: What is one-shot init service pattern?</h3>
+<div class="outline-text-3" id="text-orgff315c1">
 <p>
 Dedicated service runs migrations/setup before app services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb65b8e9" class="outline-3">
-<h3 id="orgb65b8e9">Q97: How share artifacts between services?</h3>
-<div class="outline-text-3" id="text-orgb65b8e9">
+<div id="outline-container-org9cd41bc" class="outline-3">
+<h3 id="org9cd41bc">Q97: How share artifacts between services?</h3>
+<div class="outline-text-3" id="text-org9cd41bc">
 <p>
 Named volumes or object storage, depending workflow.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb98213e" class="outline-3">
-<h3 id="orgb98213e">Q98: What is logging section in Compose?</h3>
-<div class="outline-text-3" id="text-orgb98213e">
+<div id="outline-container-org9c9ad37" class="outline-3">
+<h3 id="org9c9ad37">Q98: What is logging section in Compose?</h3>
+<div class="outline-text-3" id="text-org9c9ad37">
 <p>
 Configures log driver and options per service.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe6e3dd" class="outline-3">
-<h3 id="orgbe6e3dd">Q99: Why configure logging options?</h3>
-<div class="outline-text-3" id="text-orgbe6e3dd">
+<div id="outline-container-org64feaa2" class="outline-3">
+<h3 id="org64feaa2">Q99: Why configure logging options?</h3>
+<div class="outline-text-3" id="text-org64feaa2">
 <p>
 Control size/rotation and centralization behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ffa16d" class="outline-3">
-<h3 id="org2ffa16d">Q100: What is json-file max-size/max-file?</h3>
-<div class="outline-text-3" id="text-org2ffa16d">
+<div id="outline-container-orgafcd362" class="outline-3">
+<h3 id="orgafcd362">Q100: What is json-file max-size/max-file?</h3>
+<div class="outline-text-3" id="text-orgafcd362">
 <p>
 Limits local log file growth.
 </p>
 </div>
 </div>
-<div id="outline-container-org542ac98" class="outline-3">
-<h3 id="org542ac98">Q101: What is resource constraints in Compose?</h3>
-<div class="outline-text-3" id="text-org542ac98">
+<div id="outline-container-orgc4c1b6a" class="outline-3">
+<h3 id="orgc4c1b6a">Q101: What is resource constraints in Compose?</h3>
+<div class="outline-text-3" id="text-orgc4c1b6a">
 <p>
 CPU/memory/pids limits to prevent host exhaustion.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb0d9e76" class="outline-3">
-<h3 id="orgb0d9e76">Q102: Why set memory limits in dev too?</h3>
-<div class="outline-text-3" id="text-orgb0d9e76">
+<div id="outline-container-org254db1a" class="outline-3">
+<h3 id="org254db1a">Q102: Why set memory limits in dev too?</h3>
+<div class="outline-text-3" id="text-org254db1a">
 <p>
 Catch memory issues early and protect workstation stability.
 </p>
 </div>
 </div>
-<div id="outline-container-org61af95c" class="outline-3">
-<h3 id="org61af95c">Q103: What is healthcheck retry/start<sub>period</sub>?</h3>
-<div class="outline-text-3" id="text-org61af95c">
+<div id="outline-container-org0b2c886" class="outline-3">
+<h3 id="org0b2c886">Q103: What is healthcheck retry/start<sub>period</sub>?</h3>
+<div class="outline-text-3" id="text-org0b2c886">
 <p>
 Tuning for startup grace and transient failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org278be8f" class="outline-3">
-<h3 id="org278be8f">Q104: What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-org278be8f">
+<div id="outline-container-orgf81e99d" class="outline-3">
+<h3 id="orgf81e99d">Q104: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgf81e99d">
 <p>
 Single compose file trying to cover all envs with heavy conditionals.
 </p>
 </div>
 </div>
-<div id="outline-container-org4f48fe6" class="outline-3">
-<h3 id="org4f48fe6">Q105: Better pattern?</h3>
-<div class="outline-text-3" id="text-org4f48fe6">
+<div id="outline-container-orgfcb871e" class="outline-3">
+<h3 id="orgfcb871e">Q105: Better pattern?</h3>
+<div class="outline-text-3" id="text-orgfcb871e">
 <p>
 Base compose + targeted overrides/profiles per environment.
 </p>
 </div>
 </div>
-<div id="outline-container-org90dff1e" class="outline-3">
-<h3 id="org90dff1e">Q106: What is image immutability practice in Compose workflows?</h3>
-<div class="outline-text-3" id="text-org90dff1e">
+<div id="outline-container-org0751d50" class="outline-3">
+<h3 id="org0751d50">Q106: What is image immutability practice in Compose workflows?</h3>
+<div class="outline-text-3" id="text-org0751d50">
 <p>
 Pin explicit versions/digests for reproducible runs.
 </p>
 </div>
 </div>
-<div id="outline-container-org730158c" class="outline-3">
-<h3 id="org730158c">Q107: Why avoid mutable tags in CI integration tests?</h3>
-<div class="outline-text-3" id="text-org730158c">
+<div id="outline-container-org34910f9" class="outline-3">
+<h3 id="org34910f9">Q107: Why avoid mutable tags in CI integration tests?</h3>
+<div class="outline-text-3" id="text-org34910f9">
 <p>
 Can cause nondeterministic failures across runs.
 </p>
 </div>
 </div>
-<div id="outline-container-org25c50f5" class="outline-3">
-<h3 id="org25c50f5">Q108: What is Compose in CI use case?</h3>
-<div class="outline-text-3" id="text-org25c50f5">
+<div id="outline-container-orge8bbc00" class="outline-3">
+<h3 id="orge8bbc00">Q108: What is Compose in CI use case?</h3>
+<div class="outline-text-3" id="text-orge8bbc00">
 <p>
 Spin up integration dependencies for automated test suites.
 </p>
 </div>
 </div>
-<div id="outline-container-org858a587" class="outline-3">
-<h3 id="org858a587">Q109: How ensure clean CI state?</h3>
-<div class="outline-text-3" id="text-org858a587">
+<div id="outline-container-org5dfd22a" class="outline-3">
+<h3 id="org5dfd22a">Q109: How ensure clean CI state?</h3>
+<div class="outline-text-3" id="text-org5dfd22a">
 <p>
 Use unique project names and always teardown after tests.
 </p>
 </div>
 </div>
-<div id="outline-container-orgad013aa" class="outline-3">
-<h3 id="orgad013aa">Q110: What is orphan container warning?</h3>
-<div class="outline-text-3" id="text-orgad013aa">
+<div id="outline-container-orge82b115" class="outline-3">
+<h3 id="orge82b115">Q110: What is orphan container warning?</h3>
+<div class="outline-text-3" id="text-orge82b115">
 <p>
 Containers from old config no longer referenced by current compose set.
 </p>
 </div>
 </div>
-<div id="outline-container-org9aff459" class="outline-3">
-<h3 id="org9aff459">Q111: How remove orphans?</h3>
-<div class="outline-text-3" id="text-org9aff459">
+<div id="outline-container-org37bf418" class="outline-3">
+<h3 id="org37bf418">Q111: How remove orphans?</h3>
+<div class="outline-text-3" id="text-org37bf418">
 <p>
 Use <code>--remove-orphans</code> when bringing stack up/down as appropriate.
 </p>
 </div>
 </div>
-<div id="outline-container-org8f790eb" class="outline-3">
-<h3 id="org8f790eb">Q112: What is volume migration concern?</h3>
-<div class="outline-text-3" id="text-org8f790eb">
+<div id="outline-container-orgf8b2820" class="outline-3">
+<h3 id="orgf8b2820">Q112: What is volume migration concern?</h3>
+<div class="outline-text-3" id="text-orgf8b2820">
 <p>
 Schema/data upgrades must be managed between image versions.
 </p>
 </div>
 </div>
-<div id="outline-container-org8d0ad15" class="outline-3">
-<h3 id="org8d0ad15">Q113: Why backup named volumes?</h3>
-<div class="outline-text-3" id="text-org8d0ad15">
+<div id="outline-container-org6d7fcd5" class="outline-3">
+<h3 id="org6d7fcd5">Q113: Why backup named volumes?</h3>
+<div class="outline-text-3" id="text-org6d7fcd5">
 <p>
 Protect state before destructive changes.
 </p>
 </div>
 </div>
-<div id="outline-container-orge64c03d" class="outline-3">
-<h3 id="orge64c03d">Q114: What is intermediate debugging toolkit?</h3>
-<div class="outline-text-3" id="text-orge64c03d">
+<div id="outline-container-org052ac06" class="outline-3">
+<h3 id="org052ac06">Q114: What is intermediate debugging toolkit?</h3>
+<div class="outline-text-3" id="text-org052ac06">
 <p>
 compose logs, exec, top, events, inspect, config output.
 </p>
 </div>
 </div>
-<div id="outline-container-org8faf9be" class="outline-3">
-<h3 id="org8faf9be">Q115: What is intermediate security concern?</h3>
-<div class="outline-text-3" id="text-org8faf9be">
+<div id="outline-container-orgbc79ea7" class="outline-3">
+<h3 id="orgbc79ea7">Q115: What is intermediate security concern?</h3>
+<div class="outline-text-3" id="text-orgbc79ea7">
 <p>
 Excessive host mounts exposing sensitive filesystem paths.
 </p>
 </div>
 </div>
-<div id="outline-container-org2312da5" class="outline-3">
-<h3 id="org2312da5">Q116: Mitigation for mount risk?</h3>
-<div class="outline-text-3" id="text-org2312da5">
+<div id="outline-container-orga773c99" class="outline-3">
+<h3 id="orga773c99">Q116: Mitigation for mount risk?</h3>
+<div class="outline-text-3" id="text-orga773c99">
 <p>
 Mount least required paths read-only where possible.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf557c72" class="outline-3">
-<h3 id="orgf557c72">Q117: What is intermediate reliability principle?</h3>
-<div class="outline-text-3" id="text-orgf557c72">
+<div id="outline-container-org671b24a" class="outline-3">
+<h3 id="org671b24a">Q117: What is intermediate reliability principle?</h3>
+<div class="outline-text-3" id="text-org671b24a">
 <p>
 Design services to start independently and retry dependencies gracefully.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c60804" class="outline-3">
-<h3 id="org8c60804">Q118: Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-org8c60804">
+<div id="outline-container-org15b2397" class="outline-3">
+<h3 id="org15b2397">Q118: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-org15b2397">
 <p>
 Team can reproduce full local stack with one command and deterministic behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org28eb269" class="outline-3">
-<h3 id="org28eb269">Q119: Intermediate operations principle?</h3>
-<div class="outline-text-3" id="text-org28eb269">
+<div id="outline-container-orgec3743b" class="outline-3">
+<h3 id="orgec3743b">Q119: Intermediate operations principle?</h3>
+<div class="outline-text-3" id="text-orgec3743b">
 <p>
 Standardize compose templates and document service contracts/ports/health.
 </p>
 </div>
 </div>
-<div id="outline-container-org3a2d430" class="outline-3">
-<h3 id="org3a2d430">Q120: Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-org3a2d430">
+<div id="outline-container-org28faf29" class="outline-3">
+<h3 id="org28faf29">Q120: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org28faf29">
 <p>
 Use Compose as declarative environment contract, not ad-hoc scripts.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org07896b9" class="outline-2">
-<h2 id="org07896b9">Advanced</h2>
-<div class="outline-text-2" id="text-org07896b9">
+<div id="outline-container-org1e13895" class="outline-2">
+<h2 id="org1e13895">Advanced</h2>
+<div class="outline-text-2" id="text-org1e13895">
 </div>
-<div id="outline-container-org2dbf1af" class="outline-3">
-<h3 id="org2dbf1af">Q121: What is Compose as “platform interface” concept?</h3>
-<div class="outline-text-3" id="text-org2dbf1af">
+<div id="outline-container-org7b484f9" class="outline-3">
+<h3 id="org7b484f9">Q121: What is Compose as “platform interface” concept?</h3>
+<div class="outline-text-3" id="text-org7b484f9">
 <p>
 A stable developer-facing contract abstracting infra complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org298c644" class="outline-3">
-<h3 id="org298c644">Q122: Why treat Compose files as product assets?</h3>
-<div class="outline-text-3" id="text-org298c644">
+<div id="outline-container-org2bb4ab3" class="outline-3">
+<h3 id="org2bb4ab3">Q122: Why treat Compose files as product assets?</h3>
+<div class="outline-text-3" id="text-org2bb4ab3">
 <p>
 They define reproducible onboarding, testing, and incident-debug environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfcbcfe1" class="outline-3">
-<h3 id="orgfcbcfe1">Q123: What is drift between local and prod concern?</h3>
-<div class="outline-text-3" id="text-orgfcbcfe1">
+<div id="outline-container-orga249cf8" class="outline-3">
+<h3 id="orga249cf8">Q123: What is drift between local and prod concern?</h3>
+<div class="outline-text-3" id="text-orga249cf8">
 <p>
 Differences in config/dependencies cause “works on my machine” failures.
 </p>
 </div>
 </div>
-<div id="outline-container-orge37cbd4" class="outline-3">
-<h3 id="orge37cbd4">Q124: How reduce environment drift?</h3>
-<div class="outline-text-3" id="text-orge37cbd4">
+<div id="outline-container-org3e0c5c1" class="outline-3">
+<h3 id="org3e0c5c1">Q124: How reduce environment drift?</h3>
+<div class="outline-text-3" id="text-org3e0c5c1">
 <p>
 Use shared images, pinned versions, and prod-like settings in dev profiles.
 </p>
 </div>
 </div>
-<div id="outline-container-org1745543" class="outline-3">
-<h3 id="org1745543">Q125: What is multi-arch development challenge?</h3>
-<div class="outline-text-3" id="text-org1745543">
+<div id="outline-container-org4119d9a" class="outline-3">
+<h3 id="org4119d9a">Q125: What is multi-arch development challenge?</h3>
+<div class="outline-text-3" id="text-org4119d9a">
 <p>
 Different host CPUs (amd64/arm64) can change behavior/performance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb95c233" class="outline-3">
-<h3 id="orgb95c233">Q126: Mitigation for multi-arch issues?</h3>
-<div class="outline-text-3" id="text-orgb95c233">
+<div id="outline-container-orgc69da96" class="outline-3">
+<h3 id="orgc69da96">Q126: Mitigation for multi-arch issues?</h3>
+<div class="outline-text-3" id="text-orgc69da96">
 <p>
 Buildx multi-platform images and explicit platform testing matrix.
 </p>
 </div>
 </div>
-<div id="outline-container-org671e9fc" class="outline-3">
-<h3 id="org671e9fc">Q127: What is hermetic integration test environment?</h3>
-<div class="outline-text-3" id="text-org671e9fc">
+<div id="outline-container-orgaf6a48d" class="outline-3">
+<h3 id="orgaf6a48d">Q127: What is hermetic integration test environment?</h3>
+<div class="outline-text-3" id="text-orgaf6a48d">
 <p>
 Self-contained stack with controlled dependencies and deterministic inputs.
 </p>
 </div>
 </div>
-<div id="outline-container-org48116aa" class="outline-3">
-<h3 id="org48116aa">Q128: Why hermetic CI stacks matter?</h3>
-<div class="outline-text-3" id="text-org48116aa">
+<div id="outline-container-org45e4f0c" class="outline-3">
+<h3 id="org45e4f0c">Q128: Why hermetic CI stacks matter?</h3>
+<div class="outline-text-3" id="text-org45e4f0c">
 <p>
 Reduce flaky tests caused by shared external services.
 </p>
 </div>
 </div>
-<div id="outline-container-org54c2bc1" class="outline-3">
-<h3 id="org54c2bc1">Q129: What is ephemeral preview environment pattern?</h3>
-<div class="outline-text-3" id="text-org54c2bc1">
+<div id="outline-container-org389ca5e" class="outline-3">
+<h3 id="org389ca5e">Q129: What is ephemeral preview environment pattern?</h3>
+<div class="outline-text-3" id="text-org389ca5e">
 <p>
 Per-branch isolated Compose stack for validation/review.
 </p>
 </div>
 </div>
-<div id="outline-container-org10408f0" class="outline-3">
-<h3 id="org10408f0">Q130: What is project namespace collision risk?</h3>
-<div class="outline-text-3" id="text-org10408f0">
+<div id="outline-container-org016bbe2" class="outline-3">
+<h3 id="org016bbe2">Q130: What is project namespace collision risk?</h3>
+<div class="outline-text-3" id="text-org016bbe2">
 <p>
 Shared host conflicts in container/network/volume names.
 </p>
 </div>
 </div>
-<div id="outline-container-org010dd43" class="outline-3">
-<h3 id="org010dd43">Q131: How prevent collisions?</h3>
-<div class="outline-text-3" id="text-org010dd43">
+<div id="outline-container-org71f0f07" class="outline-3">
+<h3 id="org71f0f07">Q131: How prevent collisions?</h3>
+<div class="outline-text-3" id="text-org71f0f07">
 <p>
 Unique project names plus automated lifecycle cleanup.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfebeee4" class="outline-3">
-<h3 id="orgfebeee4">Q132: What is advanced secret management pattern with Compose?</h3>
-<div class="outline-text-3" id="text-orgfebeee4">
+<div id="outline-container-orga29b3c3" class="outline-3">
+<h3 id="orga29b3c3">Q132: What is advanced secret management pattern with Compose?</h3>
+<div class="outline-text-3" id="text-orga29b3c3">
 <p>
 External secret store injection at runtime, not committed plaintext values.
 </p>
 </div>
 </div>
-<div id="outline-container-org6999aa0" class="outline-3">
-<h3 id="org6999aa0">Q133: What is supply-chain security for Compose workflows?</h3>
-<div class="outline-text-3" id="text-org6999aa0">
+<div id="outline-container-org4e7e7fd" class="outline-3">
+<h3 id="org4e7e7fd">Q133: What is supply-chain security for Compose workflows?</h3>
+<div class="outline-text-3" id="text-org4e7e7fd">
 <p>
 Signed images, SBOMs, vulnerability scanning, trusted registries.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d43ec4" class="outline-3">
-<h3 id="org0d43ec4">Q134: Why verify image provenance in Compose stacks?</h3>
-<div class="outline-text-3" id="text-org0d43ec4">
+<div id="outline-container-org56f7283" class="outline-3">
+<h3 id="org56f7283">Q134: Why verify image provenance in Compose stacks?</h3>
+<div class="outline-text-3" id="text-org56f7283">
 <p>
 Prevent pulling tampered or untrusted artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgebdc392" class="outline-3">
-<h3 id="orgebdc392">Q135: What is policy-as-code for Compose?</h3>
-<div class="outline-text-3" id="text-orgebdc392">
+<div id="outline-container-orgba4dd43" class="outline-3">
+<h3 id="orgba4dd43">Q135: What is policy-as-code for Compose?</h3>
+<div class="outline-text-3" id="text-orgba4dd43">
 <p>
 Automated checks enforcing rules (no root, pinned tags, limits required).
 </p>
 </div>
 </div>
-<div id="outline-container-org7d16bb4" class="outline-3">
-<h3 id="org7d16bb4">Q136: What is least-privilege runtime in Compose?</h3>
-<div class="outline-text-3" id="text-org7d16bb4">
+<div id="outline-container-org008f4fe" class="outline-3">
+<h3 id="org008f4fe">Q136: What is least-privilege runtime in Compose?</h3>
+<div class="outline-text-3" id="text-org008f4fe">
 <p>
 Drop caps, read-only FS, non-root user, minimal mounts/networks.
 </p>
 </div>
 </div>
-<div id="outline-container-org5b9a385" class="outline-3">
-<h3 id="org5b9a385">Q137: What is egress restriction challenge in Compose?</h3>
-<div class="outline-text-3" id="text-org5b9a385">
+<div id="outline-container-org71cb946" class="outline-3">
+<h3 id="org71cb946">Q137: What is egress restriction challenge in Compose?</h3>
+<div class="outline-text-3" id="text-org71cb946">
 <p>
 Limit outbound access for sensitive services to reduce exfiltration risk.
 </p>
 </div>
 </div>
-<div id="outline-container-org295b041" class="outline-3">
-<h3 id="org295b041">Q138: What is sidecar pattern in Compose?</h3>
-<div class="outline-text-3" id="text-org295b041">
+<div id="outline-container-org987cb5c" class="outline-3">
+<h3 id="org987cb5c">Q138: What is sidecar pattern in Compose?</h3>
+<div class="outline-text-3" id="text-org987cb5c">
 <p>
 Auxiliary container (proxy/agent/exporter) paired with main service.
 </p>
 </div>
 </div>
-<div id="outline-container-org3089aa6" class="outline-3">
-<h3 id="org3089aa6">Q139: Sidecar tradeoff?</h3>
-<div class="outline-text-3" id="text-org3089aa6">
+<div id="outline-container-org391ad6a" class="outline-3">
+<h3 id="org391ad6a">Q139: Sidecar tradeoff?</h3>
+<div class="outline-text-3" id="text-org391ad6a">
 <p>
 Better modularity/observability but more operational complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7e2feb" class="outline-3">
-<h3 id="orgf7e2feb">Q140: What is service mesh simulation in Compose?</h3>
-<div class="outline-text-3" id="text-orgf7e2feb">
+<div id="outline-container-orgd443188" class="outline-3">
+<h3 id="orgd443188">Q140: What is service mesh simulation in Compose?</h3>
+<div class="outline-text-3" id="text-orgd443188">
 <p>
 Local emulation of proxies/policies for integration testing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb553d13" class="outline-3">
-<h3 id="orgb553d13">Q141: What is advanced health orchestration pattern?</h3>
-<div class="outline-text-3" id="text-orgb553d13">
+<div id="outline-container-orgcdc0bfa" class="outline-3">
+<h3 id="orgcdc0bfa">Q141: What is advanced health orchestration pattern?</h3>
+<div class="outline-text-3" id="text-orgcdc0bfa">
 <p>
 Dependency graph with healthchecks + init jobs + retry-capable apps.
 </p>
 </div>
 </div>
-<div id="outline-container-orga929e8b" class="outline-3">
-<h3 id="orga929e8b">Q142: Why startup order alone fails at scale?</h3>
-<div class="outline-text-3" id="text-orga929e8b">
+<div id="outline-container-org709beb9" class="outline-3">
+<h3 id="org709beb9">Q142: Why startup order alone fails at scale?</h3>
+<div class="outline-text-3" id="text-org709beb9">
 <p>
 Real readiness depends on migrations, warmups, and external dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org1650669" class="outline-3">
-<h3 id="org1650669">Q143: What is chaos testing with Compose?</h3>
-<div class="outline-text-3" id="text-org1650669">
+<div id="outline-container-org86d0130" class="outline-3">
+<h3 id="org86d0130">Q143: What is chaos testing with Compose?</h3>
+<div class="outline-text-3" id="text-org86d0130">
 <p>
 Inject failures (kill, delay, packet loss) to validate resilience behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org6cd7c2d" class="outline-3">
-<h3 id="org6cd7c2d">Q144: Tooling for network fault injection concept?</h3>
-<div class="outline-text-3" id="text-org6cd7c2d">
+<div id="outline-container-org75918e6" class="outline-3">
+<h3 id="org75918e6">Q144: Tooling for network fault injection concept?</h3>
+<div class="outline-text-3" id="text-org75918e6">
 <p>
 Traffic control/proxy tools can emulate latency/loss in local stacks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaeb11df" class="outline-3">
-<h3 id="orgaeb11df">Q145: What is observability stack in Compose?</h3>
-<div class="outline-text-3" id="text-orgaeb11df">
+<div id="outline-container-org3c1fa6f" class="outline-3">
+<h3 id="org3c1fa6f">Q145: What is observability stack in Compose?</h3>
+<div class="outline-text-3" id="text-org3c1fa6f">
 <p>
 Local Prometheus/Grafana/ELK/OTel services alongside app for diagnostics.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb647d38" class="outline-3">
-<h3 id="orgb647d38">Q146: Why include observability in local compose?</h3>
-<div class="outline-text-3" id="text-orgb647d38">
+<div id="outline-container-orgefe9905" class="outline-3">
+<h3 id="orgefe9905">Q146: Why include observability in local compose?</h3>
+<div class="outline-text-3" id="text-orgefe9905">
 <p>
 Catch telemetry gaps before production.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcbad95b" class="outline-3">
-<h3 id="orgcbad95b">Q147: What is performance testing with Compose caveat?</h3>
-<div class="outline-text-3" id="text-orgcbad95b">
+<div id="outline-container-org51edd21" class="outline-3">
+<h3 id="org51edd21">Q147: What is performance testing with Compose caveat?</h3>
+<div class="outline-text-3" id="text-org51edd21">
 <p>
 Local host limits may not reflect production infrastructure accurately.
 </p>
 </div>
 </div>
-<div id="outline-container-org1c090cb" class="outline-3">
-<h3 id="org1c090cb">Q148: How still gain value from local perf tests?</h3>
-<div class="outline-text-3" id="text-org1c090cb">
+<div id="outline-container-orgb18a8e9" class="outline-3">
+<h3 id="orgb18a8e9">Q148: How still gain value from local perf tests?</h3>
+<div class="outline-text-3" id="text-orgb18a8e9">
 <p>
 Trend comparisons and bottleneck discovery under controlled scenarios.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9fd9ab" class="outline-3">
-<h3 id="orgc9fd9ab">Q149: What is data lifecycle governance for Compose volumes?</h3>
-<div class="outline-text-3" id="text-orgc9fd9ab">
+<div id="outline-container-orgb140988" class="outline-3">
+<h3 id="orgb140988">Q149: What is data lifecycle governance for Compose volumes?</h3>
+<div class="outline-text-3" id="text-orgb140988">
 <p>
 Backup/restore/versioning/cleanup policies for persistent local/CI data.
 </p>
 </div>
 </div>
-<div id="outline-container-org21d8019" class="outline-3">
-<h3 id="org21d8019">Q150: What is migration-safe workflow for stateful services?</h3>
-<div class="outline-text-3" id="text-org21d8019">
+<div id="outline-container-org9de9d5e" class="outline-3">
+<h3 id="org9de9d5e">Q150: What is migration-safe workflow for stateful services?</h3>
+<div class="outline-text-3" id="text-org9de9d5e">
 <p>
 Versioned migrations + compatibility checks + rollback plans.
 </p>
 </div>
 </div>
-<div id="outline-container-org35a0739" class="outline-3">
-<h3 id="org35a0739">Q151: What is blue/green style testing with Compose?</h3>
-<div class="outline-text-3" id="text-org35a0739">
+<div id="outline-container-org123b1ff" class="outline-3">
+<h3 id="org123b1ff">Q151: What is blue/green style testing with Compose?</h3>
+<div class="outline-text-3" id="text-org123b1ff">
 <p>
 Run old/new service versions concurrently and switch traffic route locally.
 </p>
 </div>
 </div>
-<div id="outline-container-org000742a" class="outline-3">
-<h3 id="org000742a">Q152: What is canary simulation in Compose?</h3>
-<div class="outline-text-3" id="text-org000742a">
+<div id="outline-container-org52afc43" class="outline-3">
+<h3 id="org52afc43">Q152: What is canary simulation in Compose?</h3>
+<div class="outline-text-3" id="text-org52afc43">
 <p>
 Route subset of test traffic to new container version.
 </p>
 </div>
 </div>
-<div id="outline-container-org9021ddb" class="outline-3">
-<h3 id="org9021ddb">Q153: What is dependency pinning governance?</h3>
-<div class="outline-text-3" id="text-org9021ddb">
+<div id="outline-container-orga357dd7" class="outline-3">
+<h3 id="orga357dd7">Q153: What is dependency pinning governance?</h3>
+<div class="outline-text-3" id="text-orga357dd7">
 <p>
 Central policy for approved base images and versions.
 </p>
 </div>
 </div>
-<div id="outline-container-orge9b3c55" class="outline-3">
-<h3 id="orge9b3c55">Q154: What is advanced anti-pattern in Compose ecosystems?</h3>
-<div class="outline-text-3" id="text-orge9b3c55">
+<div id="outline-container-org3580f8c" class="outline-3">
+<h3 id="org3580f8c">Q154: What is advanced anti-pattern in Compose ecosystems?</h3>
+<div class="outline-text-3" id="text-org3580f8c">
 <p>
 Using Compose as production orchestrator substitute beyond its intended scope.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb1b9c26" class="outline-3">
-<h3 id="orgb1b9c26">Q155: Better production direction?</h3>
-<div class="outline-text-3" id="text-orgb1b9c26">
+<div id="outline-container-orgd16a33a" class="outline-3">
+<h3 id="orgd16a33a">Q155: Better production direction?</h3>
+<div class="outline-text-3" id="text-orgd16a33a">
 <p>
 Use Compose for dev/test; use full orchestrator for large-scale production needs.
 </p>
 </div>
 </div>
-<div id="outline-container-org2dfbdde" class="outline-3">
-<h3 id="org2dfbdde">Q156: What is incident reproduction advantage of Compose?</h3>
-<div class="outline-text-3" id="text-org2dfbdde">
+<div id="outline-container-orgd6fa497" class="outline-3">
+<h3 id="orgd6fa497">Q156: What is incident reproduction advantage of Compose?</h3>
+<div class="outline-text-3" id="text-orgd6fa497">
 <p>
 Recreate prod-like bug scenarios quickly on engineer machines.
 </p>
 </div>
 </div>
-<div id="outline-container-org886b41e" class="outline-3">
-<h3 id="org886b41e">Q157: What is runbook codification in Compose?</h3>
-<div class="outline-text-3" id="text-org886b41e">
+<div id="outline-container-orgd78c968" class="outline-3">
+<h3 id="orgd78c968">Q157: What is runbook codification in Compose?</h3>
+<div class="outline-text-3" id="text-orgd78c968">
 <p>
 Encode operational steps (init, debug, recovery) as repeatable service tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd7cf69c" class="outline-3">
-<h3 id="orgd7cf69c">Q158: What is security scanning integration point?</h3>
-<div class="outline-text-3" id="text-orgd7cf69c">
+<div id="outline-container-orgd903798" class="outline-3">
+<h3 id="orgd903798">Q158: What is security scanning integration point?</h3>
+<div class="outline-text-3" id="text-orgd903798">
 <p>
 Pre-merge CI validates compose config and referenced images.
 </p>
 </div>
 </div>
-<div id="outline-container-orgebbdd1b" class="outline-3">
-<h3 id="orgebbdd1b">Q159: What is compliance evidence for Compose-based workflows?</h3>
-<div class="outline-text-3" id="text-orgebbdd1b">
+<div id="outline-container-org9247851" class="outline-3">
+<h3 id="org9247851">Q159: What is compliance evidence for Compose-based workflows?</h3>
+<div class="outline-text-3" id="text-org9247851">
 <p>
 Versioned configs, scan reports, signed artifacts, audit trails.
 </p>
 </div>
 </div>
-<div id="outline-container-org581d661" class="outline-3">
-<h3 id="org581d661">Q160: What is cost-awareness in Compose CI pipelines?</h3>
-<div class="outline-text-3" id="text-org581d661">
+<div id="outline-container-orgdea8752" class="outline-3">
+<h3 id="orgdea8752">Q160: What is cost-awareness in Compose CI pipelines?</h3>
+<div class="outline-text-3" id="text-orgdea8752">
 <p>
 Optimize parallel stack counts, cache reuse, and teardown discipline.
 </p>
 </div>
 </div>
-<div id="outline-container-org1ca1e0a" class="outline-3">
-<h3 id="org1ca1e0a">Q161: What is flakiness root cause in Compose CI?</h3>
-<div class="outline-text-3" id="text-org1ca1e0a">
+<div id="outline-container-org509b5e1" class="outline-3">
+<h3 id="org509b5e1">Q161: What is flakiness root cause in Compose CI?</h3>
+<div class="outline-text-3" id="text-org509b5e1">
 <p>
 Port collisions, shared resources, weak readiness checks, orphaned state.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaf72346" class="outline-3">
-<h3 id="orgaf72346">Q162: Flakiness mitigation checklist?</h3>
-<div class="outline-text-3" id="text-orgaf72346">
+<div id="outline-container-org9d84f33" class="outline-3">
+<h3 id="org9d84f33">Q162: Flakiness mitigation checklist?</h3>
+<div class="outline-text-3" id="text-org9d84f33">
 <p>
 Unique namespaces, health-gated startup, deterministic seeds, strict cleanup.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb6ddfe" class="outline-3">
-<h3 id="orgeb6ddfe">Q163: What is advanced debugging pattern?</h3>
-<div class="outline-text-3" id="text-orgeb6ddfe">
+<div id="outline-container-org197bd93" class="outline-3">
+<h3 id="org197bd93">Q163: What is advanced debugging pattern?</h3>
+<div class="outline-text-3" id="text-org197bd93">
 <p>
 Capture full compose events/logs/config snapshot as CI artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org76d7b5a" class="outline-3">
-<h3 id="org76d7b5a">Q164: What is recovery strategy for corrupted local volumes?</h3>
-<div class="outline-text-3" id="text-org76d7b5a">
+<div id="outline-container-orgf87e64a" class="outline-3">
+<h3 id="orgf87e64a">Q164: What is recovery strategy for corrupted local volumes?</h3>
+<div class="outline-text-3" id="text-orgf87e64a">
 <p>
 Documented reset scripts plus optional seed data restore.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a22816" class="outline-3">
-<h3 id="org5a22816">Q165: What is platform team role for Compose?</h3>
-<div class="outline-text-3" id="text-org5a22816">
+<div id="outline-container-orgebd8a62" class="outline-3">
+<h3 id="orgebd8a62">Q165: What is platform team role for Compose?</h3>
+<div class="outline-text-3" id="text-orgebd8a62">
 <p>
 Provide golden templates, lint rules, and shared service definitions.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c792b2" class="outline-3">
-<h3 id="org3c792b2">Q166: What is final reliability principle?</h3>
-<div class="outline-text-3" id="text-org3c792b2">
+<div id="outline-container-orga2f4ca0" class="outline-3">
+<h3 id="orga2f4ca0">Q166: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-orga2f4ca0">
 <p>
 Stacks must be reproducible, restartable, and dependency-failure tolerant.
 </p>
 </div>
 </div>
-<div id="outline-container-org4a9c60f" class="outline-3">
-<h3 id="org4a9c60f">Q167: What is final security principle?</h3>
-<div class="outline-text-3" id="text-org4a9c60f">
+<div id="outline-container-orgbed41f1" class="outline-3">
+<h3 id="orgbed41f1">Q167: What is final security principle?</h3>
+<div class="outline-text-3" id="text-orgbed41f1">
 <p>
 No plaintext secrets, least privilege everywhere, trusted artifacts only.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd8d8b58" class="outline-3">
-<h3 id="orgd8d8b58">Q168: What is final maintainability principle?</h3>
-<div class="outline-text-3" id="text-orgd8d8b58">
+<div id="outline-container-org1db1e36" class="outline-3">
+<h3 id="org1db1e36">Q168: What is final maintainability principle?</h3>
+<div class="outline-text-3" id="text-org1db1e36">
 <p>
 Keep Compose files modular, documented, and policy-validated.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c87b7e" class="outline-3">
-<h3 id="org0c87b7e">Q169: What is final developer-experience principle?</h3>
-<div class="outline-text-3" id="text-org0c87b7e">
+<div id="outline-container-orgbad261e" class="outline-3">
+<h3 id="orgbad261e">Q169: What is final developer-experience principle?</h3>
+<div class="outline-text-3" id="text-orgbad261e">
 <p>
 One command up/down with predictable behavior across machines.
 </p>
 </div>
 </div>
-<div id="outline-container-org0f68f1f" class="outline-3">
-<h3 id="org0f68f1f">Q170: Final maturity principle?</h3>
-<div class="outline-text-3" id="text-org0f68f1f">
+<div id="outline-container-org6bbe7c0" class="outline-3">
+<h3 id="org6bbe7c0">Q170: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org6bbe7c0">
 <p>
 Compose excellence is deterministic multi-service environments with strong guardrails.
 </p>
