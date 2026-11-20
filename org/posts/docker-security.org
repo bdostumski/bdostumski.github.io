@@ -8,6 +8,617 @@
 
 * Docker Security
 
+- [[https://docs.docker.com/dhi/explore/security-concepts/][Docker Security Documentation]]
+
+-----
+
+
+*1. Docker Security Inspection & Auditing*
+
+#+BEGIN_SRC bash
+
+# Display Docker system information
+docker info
+
+# Display Docker version
+docker version
+
+# Display security options enabled on Docker
+docker info --format '{{json .SecurityOptions}}'
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Inspect a container
+docker inspect <container_id>
+
+# Inspect container security configuration
+docker inspect --format '{{json .HostConfig.SecurityOpt}}' <container_id>
+
+# Display container user
+docker inspect --format '{{.Config.User}}' <container_id>
+
+# Display privileged mode status
+docker inspect --format '{{.HostConfig.Privileged}}' <container_id>
+
+# Display container capabilities
+docker inspect --format '{{json .HostConfig.CapAdd}}' <container_id>
+
+# Display container mounts
+docker inspect --format '{{json .Mounts}}' <container_id>
+
+# Display Docker daemon configuration
+sudo cat /etc/docker/daemon.json
+
+#+END_SRC
+
+*2. Image Vulnerability Scanning*
+
+#+BEGIN_SRC bash
+
+# List Docker images
+docker images
+
+# Inspect an image
+docker image inspect nginx:latest
+
+# Scan an image using Docker Scout
+docker scout quickview nginx:latest
+
+# Display image vulnerabilities
+docker scout cves nginx:latest
+
+# Display only critical vulnerabilities
+docker scout cves --only-severity critical nginx:latest
+
+# Display critical and high vulnerabilities
+docker scout cves --only-severity critical,high nginx:latest
+
+# Compare two image versions
+docker scout compare nginx:latest --to nginx:stable
+
+# Display image packages
+docker scout sbom nginx:latest
+
+# Analyze an image
+docker scout recommendations nginx:latest
+
+#+END_SRC
+
+*3. Container Security & Isolation*
+
+#+BEGIN_SRC bash
+
+# Run container as a non-root user
+docker run --user 1000:1000 nginx
+
+# Run container with a read-only filesystem
+docker run --read-only nginx
+
+# Run container with no new privileges
+docker run --security-opt no-new-privileges:true nginx
+
+# Disable privilege escalation
+docker run --security-opt no-new-privileges nginx
+
+# Limit container memory
+docker run --memory=512m nginx
+
+# Limit container CPU
+docker run --cpus=1.0 nginx
+
+# Limit container process count
+docker run --pids-limit=100 nginx
+
+# Disable interactive privileges
+docker run --cap-drop=ALL nginx
+
+# Run container with restricted capabilities
+docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx
+
+# Run container without privileged mode
+docker run --privileged=false nginx
+
+# Use a read-only root filesystem with temporary storage
+docker run --read-only --tmpfs /tmp nginx
+
+# Prevent automatic container privilege escalation
+docker run --security-opt no-new-privileges:true --cap-drop=ALL nginx
+
+#+END_SRC
+
+*4. Docker User & Permissions Management*
+
+#+BEGIN_SRC bash
+
+# Display current user
+whoami
+
+# Display user ID and groups
+id
+
+# Display Docker socket permissions
+ls -l /var/run/docker.sock
+
+# Display Docker group members
+getent group docker
+
+# Add a user to the Docker group
+sudo usermod -aG docker <username>
+
+# Remove a user from the Docker group
+sudo gpasswd -d <username> docker
+
+# Display file permissions
+stat /var/run/docker.sock
+
+# Check current Docker context
+docker context show
+
+# Inspect Docker socket
+sudo ls -l /var/run/docker.sock
+
+# Check user namespaces
+docker info | grep -i userns
+
+#+END_SRC
+
+Important: Membership in the `docker` group effectively grants root-level privileges on a conventional rootful Docker installation. Only trusted users should receive this permission.
+
+*5. Linux Capabilities & Privileges*
+
+#+BEGIN_SRC bash
+
+# Display container capabilities
+docker inspect --format '{{json .HostConfig.CapAdd}}' <container_id>
+
+# Display dropped capabilities
+docker inspect --format '{{json .HostConfig.CapDrop}}' <container_id>
+
+# Drop all capabilities
+docker run --cap-drop=ALL nginx
+
+# Add a specific capability
+docker run --cap-add=NET_BIND_SERVICE nginx
+
+# Drop specific capabilities
+docker run --cap-drop=NET_RAW nginx
+
+# Drop all and add only required capabilities
+docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx
+
+# Check Linux capabilities on host
+capsh --print
+
+# Display process capabilities
+grep Cap /proc/self/status
+
+# Inspect container security configuration
+docker inspect <container_id>
+
+#+END_SRC
+
+*6. Docker Secrets Management*
+
+#+BEGIN_SRC bash
+
+# Create a secret from standard input
+printf 'my-secret-password' | docker secret create db_password -
+
+# Create a secret from a file
+docker secret create db_password ./db_password.txt
+
+# List Docker secrets
+docker secret ls
+
+# Inspect a secret
+docker secret inspect db_password
+
+# Remove a secret
+docker secret rm db_password
+
+# List secrets available to a service
+docker service inspect <service_name>
+
+# Create a service using a secret
+docker service create \
+  --name app \
+  --secret db_password \
+  nginx
+
+# Remove a service
+docker service rm app
+
+#+END_SRC
+
+Important: Docker secrets are designed for Docker Swarm services. For standalone containers, use appropriate external secret management or secure file injection mechanisms rather than assuming `docker secret` works with `docker run`.
+
+*7. Network Security*
+
+#+BEGIN_SRC bash
+
+# List Docker networks
+docker network ls
+
+# Inspect a network
+docker network inspect bridge
+
+# Create an isolated network
+docker network create --internal secure-network
+
+# Create a custom bridge network
+docker network create secure-network
+
+# Run container on an isolated network
+docker run --network secure-network nginx
+
+# Display published container ports
+docker port <container_id>
+
+# Inspect exposed ports
+docker inspect --format '{{json .NetworkSettings.Ports}}' <container_id>
+
+# Bind application port to localhost only
+docker run -p 127.0.0.1:8080:80 nginx
+
+# Remove container from a network
+docker network disconnect secure-network <container_id>
+
+# Remove unused networks
+docker network prune
+
+#+END_SRC
+
+*8. Dockerfile Security*
+
+#+BEGIN_SRC bash
+
+# Build an image
+docker build -t secure-app .
+
+# Build without cache
+docker build --no-cache -t secure-app .
+
+# Build with a specific Dockerfile
+docker build -f Dockerfile.prod -t secure-app .
+
+# Inspect image configuration
+docker image inspect secure-app
+
+# Inspect image history
+docker history secure-app
+
+# Check image size
+docker images secure-app
+
+# Run as a non-root user
+docker run --user 1000:1000 secure-app
+
+# Run with a read-only filesystem
+docker run --read-only secure-app
+
+# Scan image for vulnerabilities
+docker scout cves secure-app
+
+#+END_SRC
+
+Secure Dockerfile example
+
+#+BEGIN_SRC dockerfile
+
+# Use a trusted, pinned base image
+FROM nginx:1.27-alpine
+
+# Create an application user where needed
+# Prefer an image that already provides a suitable non-root user
+
+# Copy only required application files
+COPY --chown=nginx:nginx ./dist/ /usr/share/nginx/html/
+
+# Avoid unnecessary packages and tools
+
+# Run as a non-root user
+USER nginx
+
+# Document application port
+EXPOSE 8080
+
+# Start application
+CMD ["nginx", "-g", "daemon off;"]
+
+#+END_SRC
+
+*9. Image Signing & Verification*
+
+#+BEGIN_SRC bash
+
+# Inspect image metadata
+docker image inspect nginx:latest
+
+# Inspect image digest
+docker image inspect --format '{{index .RepoDigests 0}}' nginx:latest
+
+# Pull an image by digest
+docker pull nginx@sha256:<digest>
+
+# Inspect image history
+docker history nginx:latest
+
+# Inspect image layers
+docker image inspect nginx:latest
+
+# Analyze image using Docker Scout
+docker scout quickview nginx:latest
+
+# Compare image versions
+docker scout compare nginx:latest --to nginx:stable
+
+#+END_SRC
+
+*10. Docker Content Trust*
+
+#+BEGIN_SRC bash
+
+# Enable Docker Content Trust for a shell session
+export DOCKER_CONTENT_TRUST=1
+
+# Pull a signed image
+docker pull <repository>:<tag>
+
+# Push a signed image
+docker push <repository>:<tag>
+
+# Disable Docker Content Trust for a shell session
+export DOCKER_CONTENT_TRUST=0
+
+# Check Content Trust environment variable
+echo $DOCKER_CONTENT_TRUST
+
+#+END_SRC
+
+Note: Docker Content Trust is based on Notary v1 and is deprecated. For new supply-chain security workflows, evaluate current image-signing solutions such as Sigstore Cosign and the relevant registry verification policies.
+
+*11. Runtime Security & Monitoring*
+
+#+BEGIN_SRC bash
+
+# Display running containers
+docker ps
+
+# Monitor container resource usage
+docker stats
+
+# Display container logs
+docker logs <container_id>
+
+# Follow container logs
+docker logs -f <container_id>
+
+# Inspect container processes
+docker top <container_id>
+
+# Inspect container configuration
+docker inspect <container_id>
+
+# Display Docker events
+docker events
+
+# Display events for a specific container
+docker events --filter container=<container_id>
+
+# Display container health status
+docker inspect --format '{{.State.Health.Status}}' <container_id>
+
+# Display container restart policy
+docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' <container_id>
+
+#+END_SRC
+
+*12. Security Policies & Compliance*
+
+#+BEGIN_SRC bash
+
+# Check Docker security options
+docker info
+
+# Check Linux kernel version
+uname -r
+
+# Check whether Seccomp is enabled in the kernel
+grep CONFIG_SECCOMP= /boot/config-$(uname -r)
+
+# Check AppArmor status
+sudo aa-status
+
+# Check SELinux status
+getenforce
+
+# Check user namespace configuration
+docker info | grep -i userns
+
+# Inspect container capabilities
+docker inspect <container_id>
+
+# Inspect privileged mode
+docker inspect --format '{{.HostConfig.Privileged}}' <container_id>
+
+# Inspect mounted host paths
+docker inspect --format '{{json .Mounts}}' <container_id>
+
+# Inspect security options
+docker inspect --format '{{json .HostConfig.SecurityOpt}}' <container_id>
+
+#+END_SRC
+
+*13. Docker Daemon Security*
+
+#+BEGIN_SRC bash
+
+# Check Docker daemon status
+sudo systemctl status docker
+
+# Restart Docker daemon
+sudo systemctl restart docker
+
+# Display Docker daemon configuration
+sudo cat /etc/docker/daemon.json
+
+# Edit Docker daemon configuration
+sudo nano /etc/docker/daemon.json
+
+# Validate daemon configuration by restarting
+sudo systemctl restart docker
+
+# Display Docker daemon logs
+sudo journalctl -u docker
+
+# Follow Docker daemon logs
+sudo journalctl -u docker -f
+
+# Check Docker socket permissions
+ls -l /var/run/docker.sock
+
+# Check Docker API listening sockets
+sudo ss -lntp | grep dockerd
+
+# Display Docker contexts
+docker context ls
+
+# Switch Docker context
+docker context use default
+
+#+END_SRC
+
+*14. Rootless Docker Security*
+
+#+BEGIN_SRC bash
+
+# Install rootless Docker prerequisites (Ubuntu/Debian)
+sudo apt-get install -y uidmap
+
+# Install rootless Docker configuration
+dockerd-rootless-setuptool.sh install
+
+# Start rootless Docker service
+systemctl --user start docker
+
+# Enable rootless Docker on startup
+systemctl --user enable docker
+
+# Switch to rootless Docker context
+docker context use rootless
+
+# Display Docker security information
+docker info
+
+# Display Docker context
+docker context show
+
+# Check rootless Docker service
+systemctl --user status docker
+
+# Switch back to default Docker context
+docker context use default
+
+# Uninstall rootless Docker configuration
+dockerd-rootless-setuptool.sh uninstall
+
+#+END_SRC
+
+*15. Security Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Display Docker daemon logs
+sudo journalctl -u docker -n 100
+
+# Inspect container errors
+docker inspect <container_id>
+
+# Display container logs
+docker logs --tail=100 <container_id>
+
+# Check container exit status
+docker inspect --format '{{.State.ExitCode}}' <container_id>
+
+# Check container user
+docker inspect --format '{{.Config.User}}' <container_id>
+
+# Check privileged mode
+docker inspect --format '{{.HostConfig.Privileged}}' <container_id>
+
+# Check container security options
+docker inspect --format '{{json .HostConfig.SecurityOpt}}' <container_id>
+
+# Check mounted directories
+docker inspect --format '{{json .Mounts}}' <container_id>
+
+# Check resource consumption
+docker stats
+
+# Check Docker socket permissions
+ls -l /var/run/docker.sock
+
+# Check daemon status
+sudo systemctl status docker
+
+# Validate daemon configuration
+sudo dockerd --validate --config-file=/etc/docker/daemon.json
+
+#+END_SRC
+
+*16. Quick Docker Security Cheat Sheet*
+
+| Goal | Command |
+|---|---|
+| Inspect Docker security | `docker info` |
+| Inspect container | `docker inspect <container>` |
+| Scan image | `docker scout cves <image>` |
+| Check image vulnerabilities | `docker scout quickview <image>` |
+| Run as non-root | `docker run --user 1000:1000 <image>` |
+| Read-only filesystem | `docker run --read-only <image>` |
+| Drop all capabilities | `docker run --cap-drop=ALL <image>` |
+| Prevent privilege escalation | `docker run --security-opt no-new-privileges:true <image>` |
+| Limit memory | `docker run --memory=512m <image>` |
+| Limit CPU | `docker run --cpus=1 <image>` |
+| Limit processes | `docker run --pids-limit=100 <image>` |
+| Inspect container user | `docker inspect --format '{{.Config.User}}' <container>` |
+| Inspect privileged mode | `docker inspect --format '{{.HostConfig.Privileged}}' <container>` |
+| Inspect Docker socket | `ls -l /var/run/docker.sock` |
+| Check AppArmor | `sudo aa-status` |
+| Check SELinux | `getenforce` |
+| Create internal network | `docker network create --internal secure-network` |
+| Inspect Docker secrets | `docker secret ls` |
+| Check daemon logs | `sudo journalctl -u docker` |
+| Check Docker disk usage | `docker system df` |
+| Check rootless mode | `docker info` |
+
+Docker Security Best Practices
+
+- Run containers as non-root users whenever possible.
+- Avoid `--privileged` unless absolutely necessary.
+- Drop unnecessary Linux capabilities using `--cap-drop`.
+- Keep the default Seccomp profile enabled.
+- Use AppArmor or SELinux where supported.
+- Enable rootless Docker when appropriate.
+- Scan images regularly for known vulnerabilities.
+- Use trusted and pinned base images.
+- Keep images and Docker Engine updated.
+- Never expose the Docker API without appropriate authentication and transport security.
+- Restrict access to the Docker socket.
+- Use read-only root filesystems where practical.
+- Avoid embedding passwords, API keys, and tokens in Dockerfiles.
+- Use Docker secrets for Swarm workloads or an appropriate external secret manager.
+- Restrict container network access.
+- Monitor container activity and resource usage.
+- Apply least-privilege permissions to containers and users.
+- Regularly audit container configuration and mounted host directories.
+
+Note: Some commands require Linux, Docker Engine, Docker Scout, or Docker Swarm. Verify feature availability and test security restrictions against application requirements before applying them in production.
+
 -----
 
 * Beginner
