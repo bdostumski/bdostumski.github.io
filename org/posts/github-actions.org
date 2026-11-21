@@ -8,6 +8,1270 @@
 
 * GitHub Actions
 
+- [[https://docs.github.com/en][GitHub Documentation]]
+  
+-----
+
+* GitHub Actions Command Handbook:
+
+*1. GitHub CLI Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check GitHub CLI version
+gh --version
+
+# Display help
+gh help
+
+# Display help for a specific command
+gh help workflow
+gh help run
+gh help secret
+
+# Check authentication status
+gh auth status
+
+# Authenticate with GitHub
+gh auth login
+
+# Authenticate using a token
+gh auth login --with-token
+
+# Log out
+gh auth logout
+
+# Display current GitHub account
+gh api user
+
+# Display current repository
+gh repo view
+
+#+END_SRC
+
+*2. GitHub Repository Management*
+
+#+BEGIN_SRC bash
+
+# Display repository information
+gh repo view
+
+# Display repository in browser
+gh repo view --web
+
+# Clone repository
+gh repo clone OWNER/REPOSITORY
+
+# Create repository
+gh repo create my-project
+
+# Create public repository
+gh repo create my-project --public
+
+# Create private repository
+gh repo create my-project --private
+
+# Fork repository
+gh repo fork OWNER/REPOSITORY
+
+# List repositories
+gh repo list
+
+# List repositories for an organization
+gh repo list ORGANIZATION
+
+# Display repository branches
+gh api repos/OWNER/REPOSITORY/branches
+
+# Display repository settings
+gh repo view OWNER/REPOSITORY --json name,visibility,url
+
+#+END_SRC
+
+*3. GitHub Actions Workflow Initialization*
+
+#+BEGIN_SRC bash
+
+# Create workflow directory
+mkdir -p .github/workflows
+
+# Create workflow file
+touch .github/workflows/ci.yml
+
+# List workflow files
+ls -la .github/workflows/
+
+# Display workflow configuration
+cat .github/workflows/ci.yml
+
+# Check GitHub CLI workflow support
+gh workflow --help
+
+# List available workflows
+gh workflow list
+
+# Validate workflow YAML locally
+yamllint .github/workflows/ci.yml
+
+#+END_SRC
+
+Example basic workflow:
+
+#+BEGIN_SRC yaml
+
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display environment
+        run: |
+          echo "Building application"
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Branch: $GITHUB_REF_NAME"
+
+#+END_SRC
+
+*4. Workflow Triggers & Events*
+
+Common workflow triggers:
+
+#+BEGIN_SRC yaml
+
+# Trigger on push
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+# Trigger on pull requests
+on:
+  pull_request:
+    branches:
+      - main
+
+# Trigger on release
+on:
+  release:
+    types: [published]
+
+# Trigger manually
+on:
+  workflow_dispatch:
+
+# Trigger on schedule
+on:
+  schedule:
+    - cron: "0 2 * * *"
+
+# Trigger on tags
+on:
+  push:
+    tags:
+      - "v*"
+
+# Trigger on issue creation
+on:
+  issues:
+    types: [opened]
+
+# Trigger on deployment
+on:
+  deployment:
+
+# Trigger when another workflow completes
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+
+#+END_SRC
+
+Combined trigger example:
+
+#+BEGIN_SRC yaml
+
+name: Application CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
+
+#+END_SRC
+
+Useful event filters:
+
+| Option | Purpose |
+| --- | --- |
+| `branches` | Include specific branches |
+| `branches-ignore` | Exclude branches |
+| `tags` | Include specific tags |
+| `paths` | Trigger when specified files change |
+| `paths-ignore` | Ignore specified file changes |
+| `types` | Select event activity types |
+| `cron` | Define scheduled execution |
+| `workflow_dispatch` | Enable manual execution |
+
+*5. Workflow Execution & Monitoring*
+
+#+BEGIN_SRC bash
+
+# List workflows
+gh workflow list
+
+# Display workflow details
+gh workflow view
+
+# Display a specific workflow
+gh workflow view ci.yml
+
+# Display workflow in browser
+gh workflow view ci.yml --web
+
+# Run workflow manually
+gh workflow run ci.yml
+
+# Run workflow on a specific branch
+gh workflow run ci.yml --ref develop
+
+# Run workflow with input parameters
+gh workflow run deploy.yml \
+  -f environment=staging \
+  -f version=1.0.0
+
+# List workflow runs
+gh run list
+
+# List runs for a specific workflow
+gh run list --workflow ci.yml
+
+# List runs for a specific branch
+gh run list --branch main
+
+# List failed runs
+gh run list --status failure
+
+# List successful runs
+gh run list --status success
+
+# View latest workflow run
+gh run view
+
+# View a specific run
+gh run view RUN_ID
+
+# View run in browser
+gh run view RUN_ID --web
+
+# Watch workflow execution
+gh run watch RUN_ID
+
+# Display workflow logs
+gh run view RUN_ID --log
+
+# Display failed step logs
+gh run view RUN_ID --log-failed
+
+#+END_SRC
+
+Useful workflow commands:
+
+| Command | Purpose |
+| --- | --- |
+| `gh workflow list` | List workflows |
+| `gh workflow view` | Display workflow details |
+| `gh workflow run` | Manually trigger workflow |
+| `gh workflow enable` | Enable workflow |
+| `gh workflow disable` | Disable workflow |
+| `gh run list` | List workflow executions |
+| `gh run view` | Inspect execution |
+| `gh run watch` | Monitor execution |
+| `gh run rerun` | Rerun execution |
+| `gh run cancel` | Cancel execution |
+| `gh run delete` | Delete execution |
+
+*6. Workflow Jobs & Steps Configuration*
+
+Example workflow with multiple jobs:
+
+#+BEGIN_SRC yaml
+
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          echo "Building application"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Run tests
+        run: |
+          echo "Running tests"
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Deploy application
+        run: |
+          echo "Deploying application"
+
+#+END_SRC
+
+Useful job configuration:
+
+| Option | Purpose |
+| --- | --- |
+| `name` | Set workflow or job name |
+| `runs-on` | Select runner |
+| `needs` | Define job dependencies |
+| `steps` | Define job execution steps |
+| `if` | Conditional execution |
+| `env` | Define environment variables |
+| `timeout-minutes` | Set execution timeout |
+| `continue-on-error` | Continue after a step failure |
+| `strategy` | Configure job execution strategy |
+| `container` | Run job inside a container |
+| `services` | Define service containers |
+| `outputs` | Export job outputs |
+| `permissions` | Configure token permissions |
+
+*7. Environment Variables & Contexts*
+
+#+BEGIN_SRC yaml
+
+name: Environment Variables
+
+on:
+  push:
+
+env:
+  APP_NAME: my-application
+  ENVIRONMENT: development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_VERSION: 1.0.0
+
+    steps:
+      - name: Display variables
+        env:
+          MESSAGE: "Hello GitHub Actions"
+        run: |
+          echo "$APP_NAME"
+          echo "$ENVIRONMENT"
+          echo "$BUILD_VERSION"
+          echo "$MESSAGE"
+
+#+END_SRC
+
+Useful GitHub-provided environment variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `GITHUB_REPOSITORY` | Repository name |
+| `GITHUB_REPOSITORY_OWNER` | Repository owner |
+| `GITHUB_WORKSPACE` | Workspace directory |
+| `GITHUB_SHA` | Commit SHA |
+| `GITHUB_REF` | Full Git reference |
+| `GITHUB_REF_NAME` | Branch or tag name |
+| `GITHUB_RUN_ID` | Workflow run ID |
+| `GITHUB_RUN_NUMBER` | Workflow run number |
+| `GITHUB_ACTOR` | User or application that initiated the run |
+| `GITHUB_EVENT_NAME` | Triggering event |
+| `GITHUB_JOB` | Current job ID |
+| `RUNNER_OS` | Runner operating system |
+| `RUNNER_TEMP` | Temporary directory |
+
+Common contexts:
+
+#+BEGIN_SRC yaml
+
+${{ github.repository }}
+${{ github.ref }}
+${{ github.sha }}
+${{ github.actor }}
+${{ github.event_name }}
+${{ github.workflow }}
+${{ github.run_id }}
+${{ github.job }}
+
+${{ runner.os }}
+${{ runner.arch }}
+
+${{ job.status }}
+${{ steps.build.outcome }}
+${{ needs.build.result }}
+
+${{ vars.APP_ENVIRONMENT }}
+${{ secrets.DEPLOY_TOKEN }}
+${{ inputs.environment }}
+
+#+END_SRC
+
+*8. Secrets & Variables Management*
+
+GitHub CLI commands:
+
+#+BEGIN_SRC bash
+
+# List repository secrets
+gh secret list
+
+# Create repository secret interactively
+gh secret set DEPLOY_TOKEN
+
+# Create secret from environment variable
+gh secret set DEPLOY_TOKEN --body "$DEPLOY_TOKEN"
+
+# Create organization secret
+gh secret set DEPLOY_TOKEN --org ORGANIZATION
+
+# Delete repository secret
+gh secret delete DEPLOY_TOKEN
+
+# List repository variables
+gh variable list
+
+# Create repository variable
+gh variable set APP_ENVIRONMENT --body "production"
+
+# Create organization variable
+gh variable set APP_ENVIRONMENT \
+  --org ORGANIZATION \
+  --body "production"
+
+# Delete repository variable
+gh variable delete APP_ENVIRONMENT
+
+#+END_SRC
+
+Example workflow:
+
+#+BEGIN_SRC yaml
+
+name: Deploy Application
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          APP_ENVIRONMENT: ${{ vars.APP_ENVIRONMENT }}
+        run: |
+          echo "Deploying to $APP_ENVIRONMENT"
+          ./deploy.sh
+
+#+END_SRC
+
+Secret and variable scopes:
+
+| Scope | Description |
+| --- | --- |
+| Repository | Available to a specific repository |
+| Environment | Available to jobs using a configured environment |
+| Organization | Shared across authorized repositories |
+
+Note: Never print secrets in workflow logs. Prefer environment-scoped secrets and restrict access to deployment credentials.
+
+*9. Artifacts & Build Management*
+
+#+BEGIN_SRC yaml
+
+name: Build Artifacts
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          mkdir -p dist
+          echo "Application build" > dist/app.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-build
+          path: dist/
+          retention-days: 7
+
+#+END_SRC
+
+Download artifact example:
+
+#+BEGIN_SRC yaml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-build
+          path: dist/
+
+      - name: Display artifact
+        run: ls -la dist/
+
+#+END_SRC
+
+Artifact commands:
+
+#+BEGIN_SRC bash
+
+# List workflow runs
+gh run list
+
+# View run details
+gh run view RUN_ID
+
+# Download all artifacts from a run
+gh run download RUN_ID
+
+# Download a specific artifact
+gh run download RUN_ID -n application-build
+
+# Download artifact to a directory
+gh run download RUN_ID -n application-build -D ./artifacts
+
+#+END_SRC
+
+*10. Dependency Caching*
+
+Example Node.js dependency caching:
+
+#+BEGIN_SRC yaml
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+#+END_SRC
+
+Manual cache configuration:
+
+#+BEGIN_SRC yaml
+
+- name: Cache dependencies
+  uses: actions/cache@v4
+  with:
+    path: ~/.npm
+    key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    restore-keys: |
+      npm-${{ runner.os }}-
+
+#+END_SRC
+
+Common cache options:
+
+| Option | Purpose |
+| --- | --- |
+| `path` | Files or directories to cache |
+| `key` | Unique cache identifier |
+| `restore-keys` | Fallback cache keys |
+| `enableCrossOsArchive` | Enable cross-OS archive support |
+
+*11. Matrix Builds & Parallel Execution*
+
+Matrix builds allow the same job to run against multiple versions or operating systems.
+
+#+BEGIN_SRC yaml
+
+name: Multi-Version Testing
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests
+        run: npm test
+
+#+END_SRC
+
+Useful matrix options:
+
+| Option | Purpose |
+| --- | --- |
+| `matrix` | Define combinations |
+| `fail-fast` | Cancel remaining jobs after failure |
+| `max-parallel` | Limit concurrent jobs |
+| `include` | Add specific combinations |
+| `exclude` | Remove combinations |
+
+Example include and exclude:
+
+#+BEGIN_SRC yaml
+
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest]
+    node: [20, 22]
+    exclude:
+      - os: windows-latest
+        node: 20
+    include:
+      - os: ubuntu-latest
+        node: 24
+
+#+END_SRC
+
+*12. Reusable Workflows & Composite Actions*
+
+Reusable workflows help standardize CI/CD pipelines across repositories.
+
+Reusable workflow:
+
+#+BEGIN_SRC yaml
+
+# .github/workflows/reusable-build.yml
+
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+#+END_SRC
+
+Calling reusable workflow:
+
+#+BEGIN_SRC yaml
+
+name: Application CI
+
+on:
+  push:
+
+jobs:
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      node-version: "22"
+
+#+END_SRC
+
+Composite action example:
+
+#+BEGIN_SRC yaml
+
+# .github/actions/setup-project/action.yml
+
+name: Setup Project
+description: Install project dependencies
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Build project
+      shell: bash
+      run: npm run build
+
+#+END_SRC
+
+Calling composite action:
+
+#+BEGIN_SRC yaml
+
+- name: Setup project
+  uses: ./.github/actions/setup-project
+
+#+END_SRC
+
+*13. Containers & Service Dependencies*
+
+Run jobs inside Docker containers:
+
+#+BEGIN_SRC yaml
+
+name: Container CI
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: node:22
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+#+END_SRC
+
+Example with PostgreSQL service:
+
+#+BEGIN_SRC yaml
+
+name: Integration Tests
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/app
+        run: npm run test:integration
+
+#+END_SRC
+
+*14. Deployment Environments & Approvals*
+
+Example production deployment:
+
+#+BEGIN_SRC yaml
+
+name: Production Deployment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy application
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: ./deploy.sh
+
+#+END_SRC
+
+Environment configuration:
+
+| Feature | Purpose |
+| --- | --- |
+| Environment name | Identify deployment target |
+| Environment secrets | Store environment-specific credentials |
+| Environment variables | Store configuration values |
+| Required reviewers | Require approval before deployment |
+| Deployment branches | Restrict eligible branches |
+| Wait timer | Delay deployment |
+
+Create deployment environments through repository Settings → Environments.
+
+*15. GitHub Actions Permissions & Security*
+
+Example least-privilege configuration:
+
+#+BEGIN_SRC yaml
+
+name: Secure CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: npm ci && npm run build
+
+#+END_SRC
+
+Useful permissions:
+
+| Permission | Purpose |
+| --- | --- |
+| `contents` | Repository contents |
+| `actions` | Workflow and action management |
+| `checks` | Check runs |
+| `deployments` | Deployment management |
+| `issues` | Issue management |
+| `packages` | GitHub Packages |
+| `pull-requests` | Pull request management |
+| `security-events` | Security event management |
+| `id-token` | OpenID Connect authentication |
+
+Security recommendations:
+
+1. Use minimum required `GITHUB_TOKEN` permissions.
+2. Pin third-party actions to full commit SHAs.
+3. Avoid exposing secrets to untrusted pull request code.
+4. Use GitHub Environments for production deployments.
+5. Prefer OpenID Connect over long-lived cloud credentials.
+6. Restrict deployment permissions.
+7. Review third-party actions before using them.
+8. Avoid executing untrusted expressions directly in shell scripts.
+9. Use Dependabot to monitor GitHub Actions dependencies.
+10. Audit workflow permissions regularly.
+
+*16. OpenID Connect (OIDC) & Cloud Authentication*
+
+OIDC enables workflows to authenticate with supported cloud providers without storing long-lived cloud credentials as GitHub secrets.
+
+Example configuration:
+
+#+BEGIN_SRC yaml
+
+name: Cloud Deployment
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate with cloud provider
+        run: |
+          echo "Configure cloud provider OIDC authentication here"
+
+      - name: Deploy
+        run: ./deploy.sh
+
+#+END_SRC
+
+Important OIDC requirements:
+
+| Setting | Purpose |
+| --- | --- |
+| `id-token: write` | Allow requesting an OIDC token |
+| Cloud identity provider | Trust GitHub's OIDC issuer |
+| Trust conditions | Restrict repository, branch, or environment |
+| Audience | Identify intended token recipient |
+
+Note: The cloud provider must be configured to trust the expected GitHub repository and workflow identity.
+
+*17. Workflow Debugging & Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# List recent workflow runs
+gh run list
+
+# List failed runs
+gh run list --status failure
+
+# View failed workflow run
+gh run view RUN_ID
+
+# Display complete logs
+gh run view RUN_ID --log
+
+# Display failed step logs
+gh run view RUN_ID --log-failed
+
+# Watch execution
+gh run watch RUN_ID
+
+# Rerun failed jobs
+gh run rerun RUN_ID --failed
+
+# Rerun entire workflow
+gh run rerun RUN_ID
+
+# Cancel workflow run
+gh run cancel RUN_ID
+
+# Delete workflow run
+gh run delete RUN_ID
+
+# View workflow configuration
+gh workflow view ci.yml
+
+# View workflow in browser
+gh workflow view ci.yml --web
+
+#+END_SRC
+
+Common troubleshooting scenarios:
+
+| Problem | Possible solution |
+| --- | --- |
+| Workflow does not trigger | Check event configuration and branch filters |
+| YAML syntax error | Validate indentation and YAML structure |
+| Permission denied | Review `permissions` and repository settings |
+| Secret unavailable | Verify secret name and scope |
+| Dependency installation failure | Review lockfile and package registry access |
+| Cache not restored | Check cache key and cache paths |
+| Artifact not found | Verify upload/download names and job dependencies |
+| Deployment approval pending | Check environment protection rules |
+| Workflow timeout | Review `timeout-minutes` and long-running steps |
+| Action version failure | Check action version and compatibility |
+| Runner unavailable | Verify runner labels and availability |
+
+*18. Workflow Automation & Scheduling*
+
+#+BEGIN_SRC yaml
+
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Every day at 02:00 UTC
+    - cron: "0 2 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run maintenance
+        run: ./scripts/maintenance.sh
+
+#+END_SRC
+
+Common cron expressions:
+
+| Expression | Schedule |
+| --- | --- |
+| `0 * * * *` | Every hour |
+| `0 2 * * *` | Every day at 02:00 UTC |
+| `0 0 * * 1` | Every Monday |
+| `0 0 1 * *` | First day of every month |
+| `*/15 * * * *` | Every 15 minutes |
+| `30 8 * * 1-5` | Weekdays at 08:30 UTC |
+
+Note: Scheduled workflows use UTC and may be delayed during periods of high GitHub Actions load.
+
+*19. GitHub Actions CI/CD Real-World Workflows*
+
+Example Node.js CI/CD pipeline:
+
+#+BEGIN_SRC yaml
+
+name: Node.js CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: ./deploy.sh
+
+#+END_SRC
+
+Useful CI/CD workflow patterns:
+
+| Pattern | Purpose |
+| --- | --- |
+| CI on pull request | Validate changes before merging |
+| Build on push | Build application after commits |
+| Matrix testing | Test multiple versions and platforms |
+| Artifact publishing | Store build outputs |
+| Container publishing | Build and publish Docker images |
+| Release automation | Publish application releases |
+| Environment deployment | Deploy to staging or production |
+| Scheduled maintenance | Run automated maintenance tasks |
+
+*20. GitHub Actions Commands Every DevOps Engineer Should Memorize*
+
+| Command | Purpose |
+| --- | --- |
+| `gh auth login` | Authenticate GitHub CLI |
+| `gh auth status` | Check authentication |
+| `gh repo view` | Display repository information |
+| `gh workflow list` | List workflows |
+| `gh workflow view` | View workflow details |
+| `gh workflow run` | Trigger workflow |
+| `gh workflow enable` | Enable workflow |
+| `gh workflow disable` | Disable workflow |
+| `gh run list` | List workflow runs |
+| `gh run view` | Inspect workflow run |
+| `gh run watch` | Monitor workflow |
+| `gh run rerun` | Rerun workflow |
+| `gh run cancel` | Cancel workflow |
+| `gh run download` | Download workflow artifacts |
+| `gh secret list` | List repository secrets |
+| `gh secret set` | Create or update secret |
+| `gh secret delete` | Delete secret |
+| `gh variable list` | List repository variables |
+| `gh variable set` | Create or update variable |
+| `gh api` | Access GitHub REST or GraphQL APIs |
+
+*21. Best Practices for Technical Leads & DevOps Engineers*
+
+1. Keep workflows organized inside `.github/workflows/`.
+2. Use descriptive workflow and job names.
+3. Separate build, test, security scanning, and deployment jobs.
+4. Use reusable workflows for common CI/CD processes.
+5. Use composite actions for repeated step sequences.
+6. Define explicit `GITHUB_TOKEN` permissions.
+7. Pin third-party actions to immutable commit SHAs.
+8. Use dependency caching to reduce execution time.
+9. Use artifacts to transfer build outputs between jobs.
+10. Use matrix builds for multi-version testing.
+11. Use environments to protect production deployments.
+12. Require approval for sensitive production deployments.
+13. Prefer OIDC for cloud authentication.
+14. Never expose credentials in logs.
+15. Use concurrency groups to prevent conflicting deployments.
+16. Set appropriate job and step timeouts.
+17. Use `if`, `needs`, and status functions carefully.
+18. Monitor failed workflow runs and execution time.
+19. Keep workflow dependencies and actions updated.
+20. Test workflows using pull requests before production rollout.
+21. Use self-hosted runners only with appropriate isolation and security controls.
+22. Document reusable workflow inputs and outputs.
+23. Avoid unnecessary workflow executions using path and branch filters.
+24. Use Dependabot to maintain action dependencies.
+25. Regularly review workflow security and deployment permissions.
+
 -----
 
 * Beginner

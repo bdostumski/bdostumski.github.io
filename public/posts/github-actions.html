@@ -23,1512 +23,3679 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org2a19bb9" class="outline-2">
-<h2 id="org2a19bb9">GitHub Actions</h2>
-<div class="outline-text-2" id="text-org2a19bb9">
+<div id="outline-container-orgb542fd2" class="outline-2">
+<h2 id="orgb542fd2">GitHub Actions</h2>
+<div class="outline-text-2" id="text-orgb542fd2">
+<ul class="org-ul">
+<li><a href="https://docs.github.com/en">GitHub Documentation</a></li>
+</ul>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-org86c5730" class="outline-2">
-<h2 id="org86c5730">Beginner</h2>
-<div class="outline-text-2" id="text-org86c5730">
+<div id="outline-container-org7d6c265" class="outline-2">
+<h2 id="org7d6c265">GitHub Actions Command Handbook:</h2>
+<div class="outline-text-2" id="text-org7d6c265">
+<p>
+<b>1. GitHub CLI Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check GitHub CLI version
+</span>gh --version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display help
+</span>gh help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display help for a specific command
+</span>gh help workflow
+gh help run
+gh help secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check authentication status
+</span>gh auth status
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Authenticate with GitHub
+</span>gh auth login
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Authenticate using a token
+</span>gh auth login --with-token
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Log out
+</span>gh auth logout
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display current GitHub account
+</span>gh api user
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display current repository
+</span>gh repo view
+
+</code></pre>
 </div>
-<div id="outline-container-orgba17264" class="outline-3">
-<h3 id="orgba17264">Q1: What is GitHub Actions?</h3>
-<div class="outline-text-3" id="text-orgba17264">
+
+<p>
+<b>2. GitHub Repository Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display repository information
+</span>gh repo view
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display repository in browser
+</span>gh repo view --web
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Clone repository
+</span>gh repo clone OWNER/REPOSITORY
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create repository
+</span>gh repo create my-project
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create public repository
+</span>gh repo create my-project --public
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create private repository
+</span>gh repo create my-project --private
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fork repository
+</span>gh repo fork OWNER/REPOSITORY
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List repositories
+</span>gh repo list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List repositories for an organization
+</span>gh repo list ORGANIZATION
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display repository branches
+</span>gh api repos/OWNER/REPOSITORY/branches
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display repository settings
+</span>gh repo view OWNER/REPOSITORY --json name,visibility,url
+
+</code></pre>
+</div>
+
+<p>
+<b>3. GitHub Actions Workflow Initialization</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create workflow directory
+</span>mkdir -p .github/workflows
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create workflow file
+</span>touch .github/workflows/ci.yml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List workflow files
+</span>ls -la .github/workflows/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display workflow configuration
+</span>cat .github/workflows/ci.yml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check GitHub CLI workflow support
+</span>gh workflow --help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List available workflows
+</span>gh workflow list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate workflow YAML locally
+</span>yamllint .github/workflows/ci.yml
+
+</code></pre>
+</div>
+
+<p>
+Example basic workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display environment
+        run: |
+          echo "Building application"
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Branch: $GITHUB_REF_NAME"
+
+</code></pre>
+</div>
+
+<p>
+<b>4. Workflow Triggers &amp; Events</b>
+</p>
+
+<p>
+Common workflow triggers:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+# Trigger on push
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+# Trigger on pull requests
+on:
+  pull_request:
+    branches:
+      - main
+
+# Trigger on release
+on:
+  release:
+    types: [published]
+
+# Trigger manually
+on:
+  workflow_dispatch:
+
+# Trigger on schedule
+on:
+  schedule:
+    - cron: "0 2 * * *"
+
+# Trigger on tags
+on:
+  push:
+    tags:
+      - "v*"
+
+# Trigger on issue creation
+on:
+  issues:
+    types: [opened]
+
+# Trigger on deployment
+on:
+  deployment:
+
+# Trigger when another workflow completes
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+
+</code></pre>
+</div>
+
+<p>
+Combined trigger example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Application CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
+
+</code></pre>
+</div>
+
+<p>
+Useful event filters:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`branches`</td>
+<td class="org-left">Include specific branches</td>
+</tr>
+
+<tr>
+<td class="org-left">`branches-ignore`</td>
+<td class="org-left">Exclude branches</td>
+</tr>
+
+<tr>
+<td class="org-left">`tags`</td>
+<td class="org-left">Include specific tags</td>
+</tr>
+
+<tr>
+<td class="org-left">`paths`</td>
+<td class="org-left">Trigger when specified files change</td>
+</tr>
+
+<tr>
+<td class="org-left">`paths-ignore`</td>
+<td class="org-left">Ignore specified file changes</td>
+</tr>
+
+<tr>
+<td class="org-left">`types`</td>
+<td class="org-left">Select event activity types</td>
+</tr>
+
+<tr>
+<td class="org-left">`cron`</td>
+<td class="org-left">Define scheduled execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`workflow<sub>dispatch</sub>`</td>
+<td class="org-left">Enable manual execution</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>5. Workflow Execution &amp; Monitoring</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List workflows
+</span>gh workflow list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display workflow details
+</span>gh workflow view
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display a specific workflow
+</span>gh workflow view ci.yml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display workflow in browser
+</span>gh workflow view ci.yml --web
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run workflow manually
+</span>gh workflow run ci.yml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run workflow on a specific branch
+</span>gh workflow run ci.yml --ref develop
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run workflow with input parameters
+</span>gh workflow run deploy.yml <span style="font-style: italic;">\</span>
+  -f <span style="font-weight: bold; font-style: italic;">environment</span>=staging <span style="font-style: italic;">\</span>
+  -f <span style="font-weight: bold; font-style: italic;">version</span>=1.0.0
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List workflow runs
+</span>gh run list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List runs for a specific workflow
+</span>gh run list --workflow ci.yml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List runs for a specific branch
+</span>gh run list --branch main
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List failed runs
+</span>gh run list --status failure
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List successful runs
+</span>gh run list --status success
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View latest workflow run
+</span>gh run view
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View a specific run
+</span>gh run view RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View run in browser
+</span>gh run view RUN_ID --web
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch workflow execution
+</span>gh run watch RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display workflow logs
+</span>gh run view RUN_ID --log
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display failed step logs
+</span>gh run view RUN_ID --log-failed
+
+</code></pre>
+</div>
+
+<p>
+Useful workflow commands:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow list`</td>
+<td class="org-left">List workflows</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow view`</td>
+<td class="org-left">Display workflow details</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow run`</td>
+<td class="org-left">Manually trigger workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow enable`</td>
+<td class="org-left">Enable workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow disable`</td>
+<td class="org-left">Disable workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run list`</td>
+<td class="org-left">List workflow executions</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run view`</td>
+<td class="org-left">Inspect execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run watch`</td>
+<td class="org-left">Monitor execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run rerun`</td>
+<td class="org-left">Rerun execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run cancel`</td>
+<td class="org-left">Cancel execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run delete`</td>
+<td class="org-left">Delete execution</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>6. Workflow Jobs &amp; Steps Configuration</b>
+</p>
+
+<p>
+Example workflow with multiple jobs:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          echo "Building application"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Run tests
+        run: |
+          echo "Running tests"
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Deploy application
+        run: |
+          echo "Deploying application"
+
+</code></pre>
+</div>
+
+<p>
+Useful job configuration:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`name`</td>
+<td class="org-left">Set workflow or job name</td>
+</tr>
+
+<tr>
+<td class="org-left">`runs-on`</td>
+<td class="org-left">Select runner</td>
+</tr>
+
+<tr>
+<td class="org-left">`needs`</td>
+<td class="org-left">Define job dependencies</td>
+</tr>
+
+<tr>
+<td class="org-left">`steps`</td>
+<td class="org-left">Define job execution steps</td>
+</tr>
+
+<tr>
+<td class="org-left">`if`</td>
+<td class="org-left">Conditional execution</td>
+</tr>
+
+<tr>
+<td class="org-left">`env`</td>
+<td class="org-left">Define environment variables</td>
+</tr>
+
+<tr>
+<td class="org-left">`timeout-minutes`</td>
+<td class="org-left">Set execution timeout</td>
+</tr>
+
+<tr>
+<td class="org-left">`continue-on-error`</td>
+<td class="org-left">Continue after a step failure</td>
+</tr>
+
+<tr>
+<td class="org-left">`strategy`</td>
+<td class="org-left">Configure job execution strategy</td>
+</tr>
+
+<tr>
+<td class="org-left">`container`</td>
+<td class="org-left">Run job inside a container</td>
+</tr>
+
+<tr>
+<td class="org-left">`services`</td>
+<td class="org-left">Define service containers</td>
+</tr>
+
+<tr>
+<td class="org-left">`outputs`</td>
+<td class="org-left">Export job outputs</td>
+</tr>
+
+<tr>
+<td class="org-left">`permissions`</td>
+<td class="org-left">Configure token permissions</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>7. Environment Variables &amp; Contexts</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Environment Variables
+
+on:
+  push:
+
+env:
+  APP_NAME: my-application
+  ENVIRONMENT: development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_VERSION: 1.0.0
+
+    steps:
+      - name: Display variables
+        env:
+          MESSAGE: "Hello GitHub Actions"
+        run: |
+          echo "$APP_NAME"
+          echo "$ENVIRONMENT"
+          echo "$BUILD_VERSION"
+          echo "$MESSAGE"
+
+</code></pre>
+</div>
+
+<p>
+Useful GitHub-provided environment variables:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Variable</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>REPOSITORY</sub>`</td>
+<td class="org-left">Repository name</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>REPOSITORY</sub><sub>OWNER</sub>`</td>
+<td class="org-left">Repository owner</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>WORKSPACE</sub>`</td>
+<td class="org-left">Workspace directory</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>SHA</sub>`</td>
+<td class="org-left">Commit SHA</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>REF</sub>`</td>
+<td class="org-left">Full Git reference</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>REF</sub><sub>NAME</sub>`</td>
+<td class="org-left">Branch or tag name</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>RUN</sub><sub>ID</sub>`</td>
+<td class="org-left">Workflow run ID</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>RUN</sub><sub>NUMBER</sub>`</td>
+<td class="org-left">Workflow run number</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>ACTOR</sub>`</td>
+<td class="org-left">User or application that initiated the run</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>EVENT</sub><sub>NAME</sub>`</td>
+<td class="org-left">Triggering event</td>
+</tr>
+
+<tr>
+<td class="org-left">`GITHUB<sub>JOB</sub>`</td>
+<td class="org-left">Current job ID</td>
+</tr>
+
+<tr>
+<td class="org-left">`RUNNER<sub>OS</sub>`</td>
+<td class="org-left">Runner operating system</td>
+</tr>
+
+<tr>
+<td class="org-left">`RUNNER<sub>TEMP</sub>`</td>
+<td class="org-left">Temporary directory</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Common contexts:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+${{ github.repository }}
+${{ github.ref }}
+${{ github.sha }}
+${{ github.actor }}
+${{ github.event_name }}
+${{ github.workflow }}
+${{ github.run_id }}
+${{ github.job }}
+
+${{ runner.os }}
+${{ runner.arch }}
+
+${{ job.status }}
+${{ steps.build.outcome }}
+${{ needs.build.result }}
+
+${{ vars.APP_ENVIRONMENT }}
+${{ secrets.DEPLOY_TOKEN }}
+${{ inputs.environment }}
+
+</code></pre>
+</div>
+
+<p>
+<b>8. Secrets &amp; Variables Management</b>
+</p>
+
+<p>
+GitHub CLI commands:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List repository secrets
+</span>gh secret list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create repository secret interactively
+</span>gh secret set DEPLOY_TOKEN
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create secret from environment variable
+</span>gh secret set DEPLOY_TOKEN --body <span style="font-style: italic;">"$DEPLOY_TOKEN"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create organization secret
+</span>gh secret set DEPLOY_TOKEN --org ORGANIZATION
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete repository secret
+</span>gh secret delete DEPLOY_TOKEN
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List repository variables
+</span>gh variable list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create repository variable
+</span>gh variable set APP_ENVIRONMENT --body <span style="font-style: italic;">"production"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create organization variable
+</span>gh variable set APP_ENVIRONMENT <span style="font-style: italic;">\</span>
+  --org ORGANIZATION <span style="font-style: italic;">\</span>
+  --body <span style="font-style: italic;">"production"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete repository variable
+</span>gh variable delete APP_ENVIRONMENT
+
+</code></pre>
+</div>
+
+<p>
+Example workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Deploy Application
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          APP_ENVIRONMENT: ${{ vars.APP_ENVIRONMENT }}
+        run: |
+          echo "Deploying to $APP_ENVIRONMENT"
+          ./deploy.sh
+
+</code></pre>
+</div>
+
+<p>
+Secret and variable scopes:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Scope</td>
+<td class="org-left">Description</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">Repository</td>
+<td class="org-left">Available to a specific repository</td>
+</tr>
+
+<tr>
+<td class="org-left">Environment</td>
+<td class="org-left">Available to jobs using a configured environment</td>
+</tr>
+
+<tr>
+<td class="org-left">Organization</td>
+<td class="org-left">Shared across authorized repositories</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Never print secrets in workflow logs. Prefer environment-scoped secrets and restrict access to deployment credentials.
+</p>
+
+<p>
+<b>9. Artifacts &amp; Build Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Build Artifacts
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          mkdir -p dist
+          echo "Application build" &gt; dist/app.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-build
+          path: dist/
+          retention-days: 7
+
+</code></pre>
+</div>
+
+<p>
+Download artifact example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-build
+          path: dist/
+
+      - name: Display artifact
+        run: ls -la dist/
+
+</code></pre>
+</div>
+
+<p>
+Artifact commands:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List workflow runs
+</span>gh run list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View run details
+</span>gh run view RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Download all artifacts from a run
+</span>gh run download RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Download a specific artifact
+</span>gh run download RUN_ID -n application-build
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Download artifact to a directory
+</span>gh run download RUN_ID -n application-build -D ./artifacts
+
+</code></pre>
+</div>
+
+<p>
+<b>10. Dependency Caching</b>
+</p>
+
+<p>
+Example Node.js dependency caching:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+</code></pre>
+</div>
+
+<p>
+Manual cache configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+- name: Cache dependencies
+  uses: actions/cache@v4
+  with:
+    path: ~/.npm
+    key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    restore-keys: |
+      npm-${{ runner.os }}-
+
+</code></pre>
+</div>
+
+<p>
+Common cache options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`path`</td>
+<td class="org-left">Files or directories to cache</td>
+</tr>
+
+<tr>
+<td class="org-left">`key`</td>
+<td class="org-left">Unique cache identifier</td>
+</tr>
+
+<tr>
+<td class="org-left">`restore-keys`</td>
+<td class="org-left">Fallback cache keys</td>
+</tr>
+
+<tr>
+<td class="org-left">`enableCrossOsArchive`</td>
+<td class="org-left">Enable cross-OS archive support</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. Matrix Builds &amp; Parallel Execution</b>
+</p>
+
+<p>
+Matrix builds allow the same job to run against multiple versions or operating systems.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Multi-Version Testing
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests
+        run: npm test
+
+</code></pre>
+</div>
+
+<p>
+Useful matrix options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Option</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`matrix`</td>
+<td class="org-left">Define combinations</td>
+</tr>
+
+<tr>
+<td class="org-left">`fail-fast`</td>
+<td class="org-left">Cancel remaining jobs after failure</td>
+</tr>
+
+<tr>
+<td class="org-left">`max-parallel`</td>
+<td class="org-left">Limit concurrent jobs</td>
+</tr>
+
+<tr>
+<td class="org-left">`include`</td>
+<td class="org-left">Add specific combinations</td>
+</tr>
+
+<tr>
+<td class="org-left">`exclude`</td>
+<td class="org-left">Remove combinations</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Example include and exclude:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest]
+    node: [20, 22]
+    exclude:
+      - os: windows-latest
+        node: 20
+    include:
+      - os: ubuntu-latest
+        node: 24
+
+</code></pre>
+</div>
+
+<p>
+<b>12. Reusable Workflows &amp; Composite Actions</b>
+</p>
+
+<p>
+Reusable workflows help standardize CI/CD pipelines across repositories.
+</p>
+
+<p>
+Reusable workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+# .github/workflows/reusable-build.yml
+
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+</code></pre>
+</div>
+
+<p>
+Calling reusable workflow:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Application CI
+
+on:
+  push:
+
+jobs:
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      node-version: "22"
+
+</code></pre>
+</div>
+
+<p>
+Composite action example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+# .github/actions/setup-project/action.yml
+
+name: Setup Project
+description: Install project dependencies
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Build project
+      shell: bash
+      run: npm run build
+
+</code></pre>
+</div>
+
+<p>
+Calling composite action:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+- name: Setup project
+  uses: ./.github/actions/setup-project
+
+</code></pre>
+</div>
+
+<p>
+<b>13. Containers &amp; Service Dependencies</b>
+</p>
+
+<p>
+Run jobs inside Docker containers:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Container CI
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: node:22
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+</code></pre>
+</div>
+
+<p>
+Example with PostgreSQL service:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Integration Tests
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: &gt;-
+          --health-cmd "pg_isready -U test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/app
+        run: npm run test:integration
+
+</code></pre>
+</div>
+
+<p>
+<b>14. Deployment Environments &amp; Approvals</b>
+</p>
+
+<p>
+Example production deployment:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Production Deployment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy application
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: ./deploy.sh
+
+</code></pre>
+</div>
+
+<p>
+Environment configuration:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Feature</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">Environment name</td>
+<td class="org-left">Identify deployment target</td>
+</tr>
+
+<tr>
+<td class="org-left">Environment secrets</td>
+<td class="org-left">Store environment-specific credentials</td>
+</tr>
+
+<tr>
+<td class="org-left">Environment variables</td>
+<td class="org-left">Store configuration values</td>
+</tr>
+
+<tr>
+<td class="org-left">Required reviewers</td>
+<td class="org-left">Require approval before deployment</td>
+</tr>
+
+<tr>
+<td class="org-left">Deployment branches</td>
+<td class="org-left">Restrict eligible branches</td>
+</tr>
+
+<tr>
+<td class="org-left">Wait timer</td>
+<td class="org-left">Delay deployment</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Create deployment environments through repository Settings → Environments.
+</p>
+
+<p>
+<b>15. GitHub Actions Permissions &amp; Security</b>
+</p>
+
+<p>
+Example least-privilege configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Secure CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: npm ci &amp;&amp; npm run build
+
+</code></pre>
+</div>
+
+<p>
+Useful permissions:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Permission</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`contents`</td>
+<td class="org-left">Repository contents</td>
+</tr>
+
+<tr>
+<td class="org-left">`actions`</td>
+<td class="org-left">Workflow and action management</td>
+</tr>
+
+<tr>
+<td class="org-left">`checks`</td>
+<td class="org-left">Check runs</td>
+</tr>
+
+<tr>
+<td class="org-left">`deployments`</td>
+<td class="org-left">Deployment management</td>
+</tr>
+
+<tr>
+<td class="org-left">`issues`</td>
+<td class="org-left">Issue management</td>
+</tr>
+
+<tr>
+<td class="org-left">`packages`</td>
+<td class="org-left">GitHub Packages</td>
+</tr>
+
+<tr>
+<td class="org-left">`pull-requests`</td>
+<td class="org-left">Pull request management</td>
+</tr>
+
+<tr>
+<td class="org-left">`security-events`</td>
+<td class="org-left">Security event management</td>
+</tr>
+
+<tr>
+<td class="org-left">`id-token`</td>
+<td class="org-left">OpenID Connect authentication</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Security recommendations:
+</p>
+
+<ol class="org-ol">
+<li>Use minimum required `GITHUB<sub>TOKEN</sub>` permissions.</li>
+<li>Pin third-party actions to full commit SHAs.</li>
+<li>Avoid exposing secrets to untrusted pull request code.</li>
+<li>Use GitHub Environments for production deployments.</li>
+<li>Prefer OpenID Connect over long-lived cloud credentials.</li>
+<li>Restrict deployment permissions.</li>
+<li>Review third-party actions before using them.</li>
+<li>Avoid executing untrusted expressions directly in shell scripts.</li>
+<li>Use Dependabot to monitor GitHub Actions dependencies.</li>
+<li>Audit workflow permissions regularly.</li>
+</ol>
+
+<p>
+<b>16. OpenID Connect (OIDC) &amp; Cloud Authentication</b>
+</p>
+
+<p>
+OIDC enables workflows to authenticate with supported cloud providers without storing long-lived cloud credentials as GitHub secrets.
+</p>
+
+<p>
+Example configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Cloud Deployment
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate with cloud provider
+        run: |
+          echo "Configure cloud provider OIDC authentication here"
+
+      - name: Deploy
+        run: ./deploy.sh
+
+</code></pre>
+</div>
+
+<p>
+Important OIDC requirements:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Setting</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`id-token: write`</td>
+<td class="org-left">Allow requesting an OIDC token</td>
+</tr>
+
+<tr>
+<td class="org-left">Cloud identity provider</td>
+<td class="org-left">Trust GitHub's OIDC issuer</td>
+</tr>
+
+<tr>
+<td class="org-left">Trust conditions</td>
+<td class="org-left">Restrict repository, branch, or environment</td>
+</tr>
+
+<tr>
+<td class="org-left">Audience</td>
+<td class="org-left">Identify intended token recipient</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: The cloud provider must be configured to trust the expected GitHub repository and workflow identity.
+</p>
+
+<p>
+<b>17. Workflow Debugging &amp; Troubleshooting</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List recent workflow runs
+</span>gh run list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List failed runs
+</span>gh run list --status failure
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View failed workflow run
+</span>gh run view RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display complete logs
+</span>gh run view RUN_ID --log
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display failed step logs
+</span>gh run view RUN_ID --log-failed
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch execution
+</span>gh run watch RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Rerun failed jobs
+</span>gh run rerun RUN_ID --failed
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Rerun entire workflow
+</span>gh run rerun RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Cancel workflow run
+</span>gh run cancel RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete workflow run
+</span>gh run delete RUN_ID
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View workflow configuration
+</span>gh workflow view ci.yml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">View workflow in browser
+</span>gh workflow view ci.yml --web
+
+</code></pre>
+</div>
+
+<p>
+Common troubleshooting scenarios:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Problem</td>
+<td class="org-left">Possible solution</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">Workflow does not trigger</td>
+<td class="org-left">Check event configuration and branch filters</td>
+</tr>
+
+<tr>
+<td class="org-left">YAML syntax error</td>
+<td class="org-left">Validate indentation and YAML structure</td>
+</tr>
+
+<tr>
+<td class="org-left">Permission denied</td>
+<td class="org-left">Review `permissions` and repository settings</td>
+</tr>
+
+<tr>
+<td class="org-left">Secret unavailable</td>
+<td class="org-left">Verify secret name and scope</td>
+</tr>
+
+<tr>
+<td class="org-left">Dependency installation failure</td>
+<td class="org-left">Review lockfile and package registry access</td>
+</tr>
+
+<tr>
+<td class="org-left">Cache not restored</td>
+<td class="org-left">Check cache key and cache paths</td>
+</tr>
+
+<tr>
+<td class="org-left">Artifact not found</td>
+<td class="org-left">Verify upload/download names and job dependencies</td>
+</tr>
+
+<tr>
+<td class="org-left">Deployment approval pending</td>
+<td class="org-left">Check environment protection rules</td>
+</tr>
+
+<tr>
+<td class="org-left">Workflow timeout</td>
+<td class="org-left">Review `timeout-minutes` and long-running steps</td>
+</tr>
+
+<tr>
+<td class="org-left">Action version failure</td>
+<td class="org-left">Check action version and compatibility</td>
+</tr>
+
+<tr>
+<td class="org-left">Runner unavailable</td>
+<td class="org-left">Verify runner labels and availability</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>18. Workflow Automation &amp; Scheduling</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Every day at 02:00 UTC
+    - cron: "0 2 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run maintenance
+        run: ./scripts/maintenance.sh
+
+</code></pre>
+</div>
+
+<p>
+Common cron expressions:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Expression</td>
+<td class="org-left">Schedule</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`0 * * * *`</td>
+<td class="org-left">Every hour</td>
+</tr>
+
+<tr>
+<td class="org-left">`0 2 * * *`</td>
+<td class="org-left">Every day at 02:00 UTC</td>
+</tr>
+
+<tr>
+<td class="org-left">`0 0 * * 1`</td>
+<td class="org-left">Every Monday</td>
+</tr>
+
+<tr>
+<td class="org-left">`0 0 1 * *`</td>
+<td class="org-left">First day of every month</td>
+</tr>
+
+<tr>
+<td class="org-left">`*/15 * * * *`</td>
+<td class="org-left">Every 15 minutes</td>
+</tr>
+
+<tr>
+<td class="org-left">`30 8 * * 1-5`</td>
+<td class="org-left">Weekdays at 08:30 UTC</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Scheduled workflows use UTC and may be delayed during periods of high GitHub Actions load.
+</p>
+
+<p>
+<b>19. GitHub Actions CI/CD Real-World Workflows</b>
+</p>
+
+<p>
+Example Node.js CI/CD pipeline:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+name: Node.js CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' &amp;&amp; github.ref == 'refs/heads/main'
+
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: ./deploy.sh
+
+</code></pre>
+</div>
+
+<p>
+Useful CI/CD workflow patterns:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Pattern</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">CI on pull request</td>
+<td class="org-left">Validate changes before merging</td>
+</tr>
+
+<tr>
+<td class="org-left">Build on push</td>
+<td class="org-left">Build application after commits</td>
+</tr>
+
+<tr>
+<td class="org-left">Matrix testing</td>
+<td class="org-left">Test multiple versions and platforms</td>
+</tr>
+
+<tr>
+<td class="org-left">Artifact publishing</td>
+<td class="org-left">Store build outputs</td>
+</tr>
+
+<tr>
+<td class="org-left">Container publishing</td>
+<td class="org-left">Build and publish Docker images</td>
+</tr>
+
+<tr>
+<td class="org-left">Release automation</td>
+<td class="org-left">Publish application releases</td>
+</tr>
+
+<tr>
+<td class="org-left">Environment deployment</td>
+<td class="org-left">Deploy to staging or production</td>
+</tr>
+
+<tr>
+<td class="org-left">Scheduled maintenance</td>
+<td class="org-left">Run automated maintenance tasks</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>20. GitHub Actions Commands Every DevOps Engineer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">---</td>
+<td class="org-left">---</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh auth login`</td>
+<td class="org-left">Authenticate GitHub CLI</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh auth status`</td>
+<td class="org-left">Check authentication</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh repo view`</td>
+<td class="org-left">Display repository information</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow list`</td>
+<td class="org-left">List workflows</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow view`</td>
+<td class="org-left">View workflow details</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow run`</td>
+<td class="org-left">Trigger workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow enable`</td>
+<td class="org-left">Enable workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh workflow disable`</td>
+<td class="org-left">Disable workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run list`</td>
+<td class="org-left">List workflow runs</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run view`</td>
+<td class="org-left">Inspect workflow run</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run watch`</td>
+<td class="org-left">Monitor workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run rerun`</td>
+<td class="org-left">Rerun workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run cancel`</td>
+<td class="org-left">Cancel workflow</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh run download`</td>
+<td class="org-left">Download workflow artifacts</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh secret list`</td>
+<td class="org-left">List repository secrets</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh secret set`</td>
+<td class="org-left">Create or update secret</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh secret delete`</td>
+<td class="org-left">Delete secret</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh variable list`</td>
+<td class="org-left">List repository variables</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh variable set`</td>
+<td class="org-left">Create or update variable</td>
+</tr>
+
+<tr>
+<td class="org-left">`gh api`</td>
+<td class="org-left">Access GitHub REST or GraphQL APIs</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>21. Best Practices for Technical Leads &amp; DevOps Engineers</b>
+</p>
+
+<ol class="org-ol">
+<li>Keep workflows organized inside `.github/workflows/`.</li>
+<li>Use descriptive workflow and job names.</li>
+<li>Separate build, test, security scanning, and deployment jobs.</li>
+<li>Use reusable workflows for common CI/CD processes.</li>
+<li>Use composite actions for repeated step sequences.</li>
+<li>Define explicit `GITHUB<sub>TOKEN</sub>` permissions.</li>
+<li>Pin third-party actions to immutable commit SHAs.</li>
+<li>Use dependency caching to reduce execution time.</li>
+<li>Use artifacts to transfer build outputs between jobs.</li>
+<li>Use matrix builds for multi-version testing.</li>
+<li>Use environments to protect production deployments.</li>
+<li>Require approval for sensitive production deployments.</li>
+<li>Prefer OIDC for cloud authentication.</li>
+<li>Never expose credentials in logs.</li>
+<li>Use concurrency groups to prevent conflicting deployments.</li>
+<li>Set appropriate job and step timeouts.</li>
+<li>Use `if`, `needs`, and status functions carefully.</li>
+<li>Monitor failed workflow runs and execution time.</li>
+<li>Keep workflow dependencies and actions updated.</li>
+<li>Test workflows using pull requests before production rollout.</li>
+<li>Use self-hosted runners only with appropriate isolation and security controls.</li>
+<li>Document reusable workflow inputs and outputs.</li>
+<li>Avoid unnecessary workflow executions using path and branch filters.</li>
+<li>Use Dependabot to maintain action dependencies.</li>
+<li>Regularly review workflow security and deployment permissions.</li>
+</ol>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org340315d" class="outline-2">
+<h2 id="org340315d">Beginner</h2>
+<div class="outline-text-2" id="text-org340315d">
+</div>
+<div id="outline-container-org42071fa" class="outline-3">
+<h3 id="org42071fa">Q1: What is GitHub Actions?</h3>
+<div class="outline-text-3" id="text-org42071fa">
 <p>
 GitHub Actions is GitHub’s automation platform for CI/CD and repository workflows.
 </p>
 </div>
 </div>
-<div id="outline-container-org8fc24d5" class="outline-3">
-<h3 id="org8fc24d5">Q2: What can GitHub Actions automate?</h3>
-<div class="outline-text-3" id="text-org8fc24d5">
+<div id="outline-container-orgbe46514" class="outline-3">
+<h3 id="orgbe46514">Q2: What can GitHub Actions automate?</h3>
+<div class="outline-text-3" id="text-orgbe46514">
 <p>
 Builds, tests, releases, deployments, issue/PR workflows, and custom operational tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orge6ebcaa" class="outline-3">
-<h3 id="orge6ebcaa">Q3: What is a workflow?</h3>
-<div class="outline-text-3" id="text-orge6ebcaa">
+<div id="outline-container-org061bb88" class="outline-3">
+<h3 id="org061bb88">Q3: What is a workflow?</h3>
+<div class="outline-text-3" id="text-org061bb88">
 <p>
 A YAML-defined automation process stored in <code>.github/workflows/</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orge675ce9" class="outline-3">
-<h3 id="orge675ce9">Q4: What is an event in Actions?</h3>
-<div class="outline-text-3" id="text-orge675ce9">
+<div id="outline-container-org558baae" class="outline-3">
+<h3 id="org558baae">Q4: What is an event in Actions?</h3>
+<div class="outline-text-3" id="text-org558baae">
 <p>
 A trigger that starts workflows (<code>push</code>, <code>pull_request</code>, <code>schedule</code>, <code>workflow_dispatch</code>, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org620e1db" class="outline-3">
-<h3 id="org620e1db">Q5: What is a job?</h3>
-<div class="outline-text-3" id="text-org620e1db">
+<div id="outline-container-org360d9f0" class="outline-3">
+<h3 id="org360d9f0">Q5: What is a job?</h3>
+<div class="outline-text-3" id="text-org360d9f0">
 <p>
 A set of steps executed on the same runner.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6862dd" class="outline-3">
-<h3 id="orgf6862dd">Q6: What is a step?</h3>
-<div class="outline-text-3" id="text-orgf6862dd">
+<div id="outline-container-org3df1291" class="outline-3">
+<h3 id="org3df1291">Q6: What is a step?</h3>
+<div class="outline-text-3" id="text-org3df1291">
 <p>
 An individual task in a job (run command or use action).
 </p>
 </div>
 </div>
-<div id="outline-container-org43ddffa" class="outline-3">
-<h3 id="org43ddffa">Q7: What is an action?</h3>
-<div class="outline-text-3" id="text-org43ddffa">
+<div id="outline-container-orgec65264" class="outline-3">
+<h3 id="orgec65264">Q7: What is an action?</h3>
+<div class="outline-text-3" id="text-orgec65264">
 <p>
 Reusable unit of automation logic used in workflow steps.
 </p>
 </div>
 </div>
-<div id="outline-container-org7df6326" class="outline-3">
-<h3 id="org7df6326">Q8: Where are workflow files stored?</h3>
-<div class="outline-text-3" id="text-org7df6326">
+<div id="outline-container-orgc015dfd" class="outline-3">
+<h3 id="orgc015dfd">Q8: Where are workflow files stored?</h3>
+<div class="outline-text-3" id="text-orgc015dfd">
 <p>
 In repository path <code>.github/workflows/*.yml</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd125d47" class="outline-3">
-<h3 id="orgd125d47">Q9: What is a runner?</h3>
-<div class="outline-text-3" id="text-orgd125d47">
+<div id="outline-container-orgecd9b2e" class="outline-3">
+<h3 id="orgecd9b2e">Q9: What is a runner?</h3>
+<div class="outline-text-3" id="text-orgecd9b2e">
 <p>
 Compute environment that executes workflow jobs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd03f248" class="outline-3">
-<h3 id="orgd03f248">Q10: Hosted vs self-hosted runner?</h3>
-<div class="outline-text-3" id="text-orgd03f248">
+<div id="outline-container-org29a01c7" class="outline-3">
+<h3 id="org29a01c7">Q10: Hosted vs self-hosted runner?</h3>
+<div class="outline-text-3" id="text-org29a01c7">
 <p>
 GitHub-hosted is managed by GitHub; self-hosted is managed by your team.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a288af" class="outline-3">
-<h3 id="org9a288af">Q11: What does <code>runs-on</code> specify?</h3>
-<div class="outline-text-3" id="text-org9a288af">
+<div id="outline-container-orgddce3a4" class="outline-3">
+<h3 id="orgddce3a4">Q11: What does <code>runs-on</code> specify?</h3>
+<div class="outline-text-3" id="text-orgddce3a4">
 <p>
 Runner environment label (e.g., ubuntu-latest).
 </p>
 </div>
 </div>
-<div id="outline-container-orgfdf11e7" class="outline-3">
-<h3 id="orgfdf11e7">Q12: Common GitHub-hosted runner images?</h3>
-<div class="outline-text-3" id="text-orgfdf11e7">
+<div id="outline-container-org9dc0f43" class="outline-3">
+<h3 id="org9dc0f43">Q12: Common GitHub-hosted runner images?</h3>
+<div class="outline-text-3" id="text-org9dc0f43">
 <p>
 Ubuntu, Windows, and macOS variants.
 </p>
 </div>
 </div>
-<div id="outline-container-org9f8ad24" class="outline-3">
-<h3 id="org9f8ad24">Q13: What is <code>workflow_dispatch</code>?</h3>
-<div class="outline-text-3" id="text-org9f8ad24">
+<div id="outline-container-org1007485" class="outline-3">
+<h3 id="org1007485">Q13: What is <code>workflow_dispatch</code>?</h3>
+<div class="outline-text-3" id="text-org1007485">
 <p>
 Manual workflow trigger with optional inputs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdbf8178" class="outline-3">
-<h3 id="orgdbf8178">Q14: What is <code>schedule</code> trigger?</h3>
-<div class="outline-text-3" id="text-orgdbf8178">
+<div id="outline-container-org797b7b3" class="outline-3">
+<h3 id="org797b7b3">Q14: What is <code>schedule</code> trigger?</h3>
+<div class="outline-text-3" id="text-org797b7b3">
 <p>
 Cron-based workflow execution.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc99ec12" class="outline-3">
-<h3 id="orgc99ec12">Q15: What is <code>push</code> trigger?</h3>
-<div class="outline-text-3" id="text-orgc99ec12">
+<div id="outline-container-org55aa42a" class="outline-3">
+<h3 id="org55aa42a">Q15: What is <code>push</code> trigger?</h3>
+<div class="outline-text-3" id="text-org55aa42a">
 <p>
 Runs workflow when commits are pushed to matching branches/tags.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf02dc53" class="outline-3">
-<h3 id="orgf02dc53">Q16: What is <code>pull_request</code> trigger?</h3>
-<div class="outline-text-3" id="text-orgf02dc53">
+<div id="outline-container-org8bba730" class="outline-3">
+<h3 id="org8bba730">Q16: What is <code>pull_request</code> trigger?</h3>
+<div class="outline-text-3" id="text-org8bba730">
 <p>
 Runs workflow on PR lifecycle events.
 </p>
 </div>
 </div>
-<div id="outline-container-org94e8f64" class="outline-3">
-<h3 id="org94e8f64">Q17: What is branch filter in workflow?</h3>
-<div class="outline-text-3" id="text-org94e8f64">
+<div id="outline-container-org5885d03" class="outline-3">
+<h3 id="org5885d03">Q17: What is branch filter in workflow?</h3>
+<div class="outline-text-3" id="text-org5885d03">
 <p>
 Limits triggers to selected branches.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb60c37f" class="outline-3">
-<h3 id="orgb60c37f">Q18: What is path filter?</h3>
-<div class="outline-text-3" id="text-orgb60c37f">
+<div id="outline-container-orgf395c43" class="outline-3">
+<h3 id="orgf395c43">Q18: What is path filter?</h3>
+<div class="outline-text-3" id="text-orgf395c43">
 <p>
 Triggers workflow only when specific files/paths change.
 </p>
 </div>
 </div>
-<div id="outline-container-orgced2b39" class="outline-3">
-<h3 id="orgced2b39">Q19: Why use path filters?</h3>
-<div class="outline-text-3" id="text-orgced2b39">
+<div id="outline-container-orgf0ea801" class="outline-3">
+<h3 id="orgf0ea801">Q19: Why use path filters?</h3>
+<div class="outline-text-3" id="text-orgf0ea801">
 <p>
 Reduce unnecessary runs and CI cost.
 </p>
 </div>
 </div>
-<div id="outline-container-orge6f316b" class="outline-3">
-<h3 id="orge6f316b">Q20: What is matrix strategy?</h3>
-<div class="outline-text-3" id="text-orge6f316b">
+<div id="outline-container-orge136da9" class="outline-3">
+<h3 id="orge136da9">Q20: What is matrix strategy?</h3>
+<div class="outline-text-3" id="text-orge136da9">
 <p>
 Runs a job across multiple variable combinations (OS, JDK, Node versions).
 </p>
 </div>
 </div>
-<div id="outline-container-org450830e" class="outline-3">
-<h3 id="org450830e">Q21: Why use matrix builds?</h3>
-<div class="outline-text-3" id="text-org450830e">
+<div id="outline-container-orgbedb0a4" class="outline-3">
+<h3 id="orgbedb0a4">Q21: Why use matrix builds?</h3>
+<div class="outline-text-3" id="text-orgbedb0a4">
 <p>
 Parallel cross-environment validation.
 </p>
 </div>
 </div>
-<div id="outline-container-org786a01e" class="outline-3">
-<h3 id="org786a01e">Q22: What is <code>needs</code> in jobs?</h3>
-<div class="outline-text-3" id="text-org786a01e">
+<div id="outline-container-orgb3b4afb" class="outline-3">
+<h3 id="orgb3b4afb">Q22: What is <code>needs</code> in jobs?</h3>
+<div class="outline-text-3" id="text-orgb3b4afb">
 <p>
 Defines job dependencies and execution order.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a62612" class="outline-3">
-<h3 id="org9a62612">Q23: What happens if dependency job fails?</h3>
-<div class="outline-text-3" id="text-org9a62612">
+<div id="outline-container-org3534ca6" class="outline-3">
+<h3 id="org3534ca6">Q23: What happens if dependency job fails?</h3>
+<div class="outline-text-3" id="text-org3534ca6">
 <p>
 Dependent jobs are skipped unless configured otherwise.
 </p>
 </div>
 </div>
-<div id="outline-container-orge782f14" class="outline-3">
-<h3 id="orge782f14">Q24: What is <code>if:</code> condition?</h3>
-<div class="outline-text-3" id="text-orge782f14">
+<div id="outline-container-orgd376854" class="outline-3">
+<h3 id="orgd376854">Q24: What is <code>if:</code> condition?</h3>
+<div class="outline-text-3" id="text-orgd376854">
 <p>
 Conditional execution for jobs/steps.
 </p>
 </div>
 </div>
-<div id="outline-container-org27dcb93" class="outline-3">
-<h3 id="org27dcb93">Q25: What is context in Actions?</h3>
-<div class="outline-text-3" id="text-org27dcb93">
+<div id="outline-container-orgf8d57f3" class="outline-3">
+<h3 id="orgf8d57f3">Q25: What is context in Actions?</h3>
+<div class="outline-text-3" id="text-orgf8d57f3">
 <p>
 Structured metadata available in expressions (github, env, job, steps, secrets, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org3d9f8eb" class="outline-3">
-<h3 id="org3d9f8eb">Q26: What is environment variable in workflow?</h3>
-<div class="outline-text-3" id="text-org3d9f8eb">
+<div id="outline-container-org89c2d5b" class="outline-3">
+<h3 id="org89c2d5b">Q26: What is environment variable in workflow?</h3>
+<div class="outline-text-3" id="text-org89c2d5b">
 <p>
 Key-value config defined via <code>env</code> at workflow/job/step scope.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7604fd" class="outline-3">
-<h3 id="orgf7604fd">Q27: What is secret in GitHub Actions?</h3>
-<div class="outline-text-3" id="text-orgf7604fd">
+<div id="outline-container-org28f1362" class="outline-3">
+<h3 id="org28f1362">Q27: What is secret in GitHub Actions?</h3>
+<div class="outline-text-3" id="text-org28f1362">
 <p>
 Encrypted value injected securely into workflows.
 </p>
 </div>
 </div>
-<div id="outline-container-org788322c" class="outline-3">
-<h3 id="org788322c">Q28: Where can secrets be defined?</h3>
-<div class="outline-text-3" id="text-org788322c">
+<div id="outline-container-orga9e2c1d" class="outline-3">
+<h3 id="orga9e2c1d">Q28: Where can secrets be defined?</h3>
+<div class="outline-text-3" id="text-orga9e2c1d">
 <p>
 Repository, environment, or organization level.
 </p>
 </div>
 </div>
-<div id="outline-container-org80afbb0" class="outline-3">
-<h3 id="org80afbb0">Q29: What is <code>GITHUB_TOKEN</code>?</h3>
-<div class="outline-text-3" id="text-org80afbb0">
+<div id="outline-container-orgf5d3efa" class="outline-3">
+<h3 id="orgf5d3efa">Q29: What is <code>GITHUB_TOKEN</code>?</h3>
+<div class="outline-text-3" id="text-orgf5d3efa">
 <p>
 Auto-generated token for workflow authentication to GitHub APIs.
 </p>
 </div>
 </div>
-<div id="outline-container-org6789bca" class="outline-3">
-<h3 id="org6789bca">Q30: Why limit <code>GITHUB_TOKEN</code> permissions?</h3>
-<div class="outline-text-3" id="text-org6789bca">
+<div id="outline-container-org8a4325e" class="outline-3">
+<h3 id="org8a4325e">Q30: Why limit <code>GITHUB_TOKEN</code> permissions?</h3>
+<div class="outline-text-3" id="text-org8a4325e">
 <p>
 Principle of least privilege reduces blast radius.
 </p>
 </div>
 </div>
-<div id="outline-container-org8548b7d" class="outline-3">
-<h3 id="org8548b7d">Q31: What is <code>permissions:</code> block?</h3>
-<div class="outline-text-3" id="text-org8548b7d">
+<div id="outline-container-orgc798db3" class="outline-3">
+<h3 id="orgc798db3">Q31: What is <code>permissions:</code> block?</h3>
+<div class="outline-text-3" id="text-orgc798db3">
 <p>
 Explicitly scopes token permissions for workflow/job.
 </p>
 </div>
 </div>
-<div id="outline-container-orgde84528" class="outline-3">
-<h3 id="orgde84528">Q32: What is artifact in Actions?</h3>
-<div class="outline-text-3" id="text-orgde84528">
+<div id="outline-container-org7125ca6" class="outline-3">
+<h3 id="org7125ca6">Q32: What is artifact in Actions?</h3>
+<div class="outline-text-3" id="text-org7125ca6">
 <p>
 File bundle uploaded from run for later download/use.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc78641b" class="outline-3">
-<h3 id="orgc78641b">Q33: Artifact vs cache?</h3>
-<div class="outline-text-3" id="text-orgc78641b">
+<div id="outline-container-org19b4903" class="outline-3">
+<h3 id="org19b4903">Q33: Artifact vs cache?</h3>
+<div class="outline-text-3" id="text-org19b4903">
 <p>
 Artifacts store run outputs; cache speeds dependency/tool reuse across runs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca4571c" class="outline-3">
-<h3 id="orgca4571c">Q34: What is cache action used for?</h3>
-<div class="outline-text-3" id="text-orgca4571c">
+<div id="outline-container-org9cbda63" class="outline-3">
+<h3 id="org9cbda63">Q34: What is cache action used for?</h3>
+<div class="outline-text-3" id="text-org9cbda63">
 <p>
 Caching dependencies/build outputs to reduce runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-org91591c5" class="outline-3">
-<h3 id="org91591c5">Q35: Common cache keys?</h3>
-<div class="outline-text-3" id="text-org91591c5">
+<div id="outline-container-org2071a8e" class="outline-3">
+<h3 id="org2071a8e">Q35: Common cache keys?</h3>
+<div class="outline-text-3" id="text-org2071a8e">
 <p>
 Hash of lockfiles + OS/tool version identifiers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc38a33" class="outline-3">
-<h3 id="orgcc38a33">Q36: What is checkout action?</h3>
-<div class="outline-text-3" id="text-orgcc38a33">
+<div id="outline-container-orgae05253" class="outline-3">
+<h3 id="orgae05253">Q36: What is checkout action?</h3>
+<div class="outline-text-3" id="text-orgae05253">
 <p>
 <code>actions/checkout</code> clones repository into runner workspace.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfe27296" class="outline-3">
-<h3 id="orgfe27296">Q37: What is setup action example?</h3>
-<div class="outline-text-3" id="text-orgfe27296">
+<div id="outline-container-org5021164" class="outline-3">
+<h3 id="org5021164">Q37: What is setup action example?</h3>
+<div class="outline-text-3" id="text-org5021164">
 <p>
 <code>actions/setup-java</code>, <code>setup-node</code> install/configure toolchains.
 </p>
 </div>
 </div>
-<div id="outline-container-org54af3cb" class="outline-3">
-<h3 id="org54af3cb">Q38: What is workflow log?</h3>
-<div class="outline-text-3" id="text-org54af3cb">
+<div id="outline-container-org4b00bf1" class="outline-3">
+<h3 id="org4b00bf1">Q38: What is workflow log?</h3>
+<div class="outline-text-3" id="text-org4b00bf1">
 <p>
 Step-by-step output for debugging runs.
 </p>
 </div>
 </div>
-<div id="outline-container-org501653e" class="outline-3">
-<h3 id="org501653e">Q39: How rerun failed jobs?</h3>
-<div class="outline-text-3" id="text-org501653e">
+<div id="outline-container-orgcbf9a4c" class="outline-3">
+<h3 id="orgcbf9a4c">Q39: How rerun failed jobs?</h3>
+<div class="outline-text-3" id="text-orgcbf9a4c">
 <p>
 Use GitHub UI rerun options (failed jobs/all jobs).
 </p>
 </div>
 </div>
-<div id="outline-container-orge244e26" class="outline-3">
-<h3 id="orge244e26">Q40: What is fail-fast in matrix?</h3>
-<div class="outline-text-3" id="text-orge244e26">
+<div id="outline-container-org55c071f" class="outline-3">
+<h3 id="org55c071f">Q40: What is fail-fast in matrix?</h3>
+<div class="outline-text-3" id="text-org55c071f">
 <p>
 Cancel remaining matrix jobs when one fails (configurable).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd9b536d" class="outline-3">
-<h3 id="orgd9b536d">Q41: What is timeout-minutes?</h3>
-<div class="outline-text-3" id="text-orgd9b536d">
+<div id="outline-container-org445695f" class="outline-3">
+<h3 id="org445695f">Q41: What is timeout-minutes?</h3>
+<div class="outline-text-3" id="text-org445695f">
 <p>
 Maximum allowed runtime for job before forced cancellation.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ece9b7" class="outline-3">
-<h3 id="org6ece9b7">Q42: Why set timeouts?</h3>
-<div class="outline-text-3" id="text-org6ece9b7">
+<div id="outline-container-org3a7e872" class="outline-3">
+<h3 id="org3a7e872">Q42: Why set timeouts?</h3>
+<div class="outline-text-3" id="text-org3a7e872">
 <p>
 Prevent hung jobs and wasted runner cost.
 </p>
 </div>
 </div>
-<div id="outline-container-org84a2ef7" class="outline-3">
-<h3 id="org84a2ef7">Q43: What is concurrency group?</h3>
-<div class="outline-text-3" id="text-org84a2ef7">
+<div id="outline-container-orgdf8e183" class="outline-3">
+<h3 id="orgdf8e183">Q43: What is concurrency group?</h3>
+<div class="outline-text-3" id="text-orgdf8e183">
 <p>
 Limits overlapping workflow/job runs for same key.
 </p>
 </div>
 </div>
-<div id="outline-container-org08ff15a" class="outline-3">
-<h3 id="org08ff15a">Q44: Why use concurrency control?</h3>
-<div class="outline-text-3" id="text-org08ff15a">
+<div id="outline-container-orgef9b119" class="outline-3">
+<h3 id="orgef9b119">Q44: Why use concurrency control?</h3>
+<div class="outline-text-3" id="text-orgef9b119">
 <p>
 Avoid duplicate deployments or conflicting operations.
 </p>
 </div>
 </div>
-<div id="outline-container-org6224cad" class="outline-3">
-<h3 id="org6224cad">Q45: What is cancel-in-progress?</h3>
-<div class="outline-text-3" id="text-org6224cad">
+<div id="outline-container-org86de77b" class="outline-3">
+<h3 id="org86de77b">Q45: What is cancel-in-progress?</h3>
+<div class="outline-text-3" id="text-org86de77b">
 <p>
 Cancels previous in-progress run in same concurrency group.
 </p>
 </div>
 </div>
-<div id="outline-container-org54097c2" class="outline-3">
-<h3 id="org54097c2">Q46: What is environment protection rule?</h3>
-<div class="outline-text-3" id="text-org54097c2">
+<div id="outline-container-org468a592" class="outline-3">
+<h3 id="org468a592">Q46: What is environment protection rule?</h3>
+<div class="outline-text-3" id="text-org468a592">
 <p>
 Required reviewers/waits/secrets boundary before deployment jobs proceed.
 </p>
 </div>
 </div>
-<div id="outline-container-org230a224" class="outline-3">
-<h3 id="org230a224">Q47: What is manual approval in Actions?</h3>
-<div class="outline-text-3" id="text-org230a224">
+<div id="outline-container-orge8abec5" class="outline-3">
+<h3 id="orge8abec5">Q47: What is manual approval in Actions?</h3>
+<div class="outline-text-3" id="text-orge8abec5">
 <p>
 Environment protection requiring reviewer approval pre-deploy.
 </p>
 </div>
 </div>
-<div id="outline-container-org39334da" class="outline-3">
-<h3 id="org39334da">Q48: What is reusable workflow?</h3>
-<div class="outline-text-3" id="text-org39334da">
+<div id="outline-container-orgfc38f16" class="outline-3">
+<h3 id="orgfc38f16">Q48: What is reusable workflow?</h3>
+<div class="outline-text-3" id="text-orgfc38f16">
 <p>
 Workflow invoked by other workflows via <code>workflow_call</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb10f6e8" class="outline-3">
-<h3 id="orgb10f6e8">Q49: What is composite action?</h3>
-<div class="outline-text-3" id="text-orgb10f6e8">
+<div id="outline-container-orgb6cdb9d" class="outline-3">
+<h3 id="orgb6cdb9d">Q49: What is composite action?</h3>
+<div class="outline-text-3" id="text-orgb6cdb9d">
 <p>
 Action bundling multiple steps into reusable local/remote unit.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb2d4dba" class="outline-3">
-<h3 id="orgb2d4dba">Q50: Composite action vs reusable workflow?</h3>
-<div class="outline-text-3" id="text-orgb2d4dba">
+<div id="outline-container-orgafe4c4c" class="outline-3">
+<h3 id="orgafe4c4c">Q50: Composite action vs reusable workflow?</h3>
+<div class="outline-text-3" id="text-orgafe4c4c">
 <p>
 Composite runs as step; reusable workflow orchestrates full jobs.
 </p>
 </div>
 </div>
-<div id="outline-container-org40608d4" class="outline-3">
-<h3 id="org40608d4">Q51: What is beginner anti-pattern in Actions?</h3>
-<div class="outline-text-3" id="text-org40608d4">
+<div id="outline-container-orgc478819" class="outline-3">
+<h3 id="orgc478819">Q51: What is beginner anti-pattern in Actions?</h3>
+<div class="outline-text-3" id="text-orgc478819">
 <p>
 Single huge workflow doing everything without modularity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5849ef" class="outline-3">
-<h3 id="orgb5849ef">Q52: Another beginner anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgb5849ef">
+<div id="outline-container-org46a08f7" class="outline-3">
+<h3 id="org46a08f7">Q52: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-org46a08f7">
 <p>
 Using broad write permissions by default.
 </p>
 </div>
 </div>
-<div id="outline-container-org5343991" class="outline-3">
-<h3 id="org5343991">Q53: Beginner security baseline?</h3>
-<div class="outline-text-3" id="text-org5343991">
+<div id="outline-container-orgdf0f63a" class="outline-3">
+<h3 id="orgdf0f63a">Q53: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-orgdf0f63a">
 <p>
 Pin action versions, least-privilege tokens, protected secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org821945a" class="outline-3">
-<h3 id="org821945a">Q54: Why pin action versions?</h3>
-<div class="outline-text-3" id="text-org821945a">
+<div id="outline-container-org708b375" class="outline-3">
+<h3 id="org708b375">Q54: Why pin action versions?</h3>
+<div class="outline-text-3" id="text-org708b375">
 <p>
 Prevent unexpected or malicious upstream changes from mutable tags.
 </p>
 </div>
 </div>
-<div id="outline-container-org22486c9" class="outline-3">
-<h3 id="org22486c9">Q55: What is immutable pin best practice?</h3>
-<div class="outline-text-3" id="text-org22486c9">
+<div id="outline-container-org897dd6a" class="outline-3">
+<h3 id="org897dd6a">Q55: What is immutable pin best practice?</h3>
+<div class="outline-text-3" id="text-org897dd6a">
 <p>
 Pin to full commit SHA for strongest integrity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd18ff99" class="outline-3">
-<h3 id="orgd18ff99">Q56: Beginner reliability baseline?</h3>
-<div class="outline-text-3" id="text-orgd18ff99">
+<div id="outline-container-orgbec97e1" class="outline-3">
+<h3 id="orgbec97e1">Q56: Beginner reliability baseline?</h3>
+<div class="outline-text-3" id="text-orgbec97e1">
 <p>
 Separate build/test/deploy jobs with clear dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org5374859" class="outline-3">
-<h3 id="org5374859">Q57: Beginner performance baseline?</h3>
-<div class="outline-text-3" id="text-org5374859">
+<div id="outline-container-org52c44d1" class="outline-3">
+<h3 id="org52c44d1">Q57: Beginner performance baseline?</h3>
+<div class="outline-text-3" id="text-org52c44d1">
 <p>
 Use caching, path filters, and parallel matrix where useful.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc64272f" class="outline-3">
-<h3 id="orgc64272f">Q58: What is CI vs CD in Actions context?</h3>
-<div class="outline-text-3" id="text-orgc64272f">
+<div id="outline-container-org082644a" class="outline-3">
+<h3 id="org082644a">Q58: What is CI vs CD in Actions context?</h3>
+<div class="outline-text-3" id="text-org082644a">
 <p>
 CI validates code; CD automates delivery/deployment.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ef91e4" class="outline-3">
-<h3 id="org6ef91e4">Q59: Beginner observability baseline?</h3>
-<div class="outline-text-3" id="text-org6ef91e4">
+<div id="outline-container-org67be8b6" class="outline-3">
+<h3 id="org67be8b6">Q59: Beginner observability baseline?</h3>
+<div class="outline-text-3" id="text-org67be8b6">
 <p>
 Track workflow duration, failure rate, flaky jobs, queue delays.
 </p>
 </div>
 </div>
-<div id="outline-container-orge99e47f" class="outline-3">
-<h3 id="orge99e47f">Q60: What is first workflow usually?</h3>
-<div class="outline-text-3" id="text-orge99e47f">
+<div id="outline-container-org7690a20" class="outline-3">
+<h3 id="org7690a20">Q60: What is first workflow usually?</h3>
+<div class="outline-text-3" id="text-org7690a20">
 <p>
 Build + unit test on pull requests.
 </p>
 </div>
 </div>
-<div id="outline-container-org96a39cf" class="outline-3">
-<h3 id="org96a39cf">Q61: What is PR status check?</h3>
-<div class="outline-text-3" id="text-org96a39cf">
+<div id="outline-container-org47d3068" class="outline-3">
+<h3 id="org47d3068">Q61: What is PR status check?</h3>
+<div class="outline-text-3" id="text-org47d3068">
 <p>
 Workflow result required before merge (branch protection integration).
 </p>
 </div>
 </div>
-<div id="outline-container-org2f2a50b" class="outline-3">
-<h3 id="org2f2a50b">Q62: Why require status checks?</h3>
-<div class="outline-text-3" id="text-org2f2a50b">
+<div id="outline-container-orgf9d7045" class="outline-3">
+<h3 id="orgf9d7045">Q62: Why require status checks?</h3>
+<div class="outline-text-3" id="text-orgf9d7045">
 <p>
 Prevents merging unvalidated/broken changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c07b8e" class="outline-3">
-<h3 id="org6c07b8e">Q63: What is <code>continue-on-error</code>?</h3>
-<div class="outline-text-3" id="text-org6c07b8e">
+<div id="outline-container-org7ad9dae" class="outline-3">
+<h3 id="org7ad9dae">Q63: What is <code>continue-on-error</code>?</h3>
+<div class="outline-text-3" id="text-org7ad9dae">
 <p>
 Allows step/job failure without failing entire run (use carefully).
 </p>
 </div>
 </div>
-<div id="outline-container-org963a2ab" class="outline-3">
-<h3 id="org963a2ab">Q64: When use continue-on-error?</h3>
-<div class="outline-text-3" id="text-org963a2ab">
+<div id="outline-container-org0344263" class="outline-3">
+<h3 id="org0344263">Q64: When use continue-on-error?</h3>
+<div class="outline-text-3" id="text-org0344263">
 <p>
 Non-blocking experiments or optional checks, clearly labeled.
 </p>
 </div>
 </div>
-<div id="outline-container-org77f8f60" class="outline-3">
-<h3 id="org77f8f60">Q65: Beginner best practice?</h3>
-<div class="outline-text-3" id="text-org77f8f60">
+<div id="outline-container-orga54b401" class="outline-3">
+<h3 id="orga54b401">Q65: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-orga54b401">
 <p>
 Start simple, secure defaults, and iterate with measurable improvements.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc8e373a" class="outline-2">
-<h2 id="orgc8e373a">Intermediate</h2>
-<div class="outline-text-2" id="text-orgc8e373a">
+<div id="outline-container-orgb16fea3" class="outline-2">
+<h2 id="orgb16fea3">Intermediate</h2>
+<div class="outline-text-2" id="text-orgb16fea3">
 </div>
-<div id="outline-container-org9fae2f6" class="outline-3">
-<h3 id="org9fae2f6">Q66: What is <code>workflow_call</code> input/output?</h3>
-<div class="outline-text-3" id="text-org9fae2f6">
+<div id="outline-container-orgf2968f7" class="outline-3">
+<h3 id="orgf2968f7">Q66: What is <code>workflow_call</code> input/output?</h3>
+<div class="outline-text-3" id="text-orgf2968f7">
 <p>
 Reusable workflow parameters and returned values to callers.
 </p>
 </div>
 </div>
-<div id="outline-container-org0bf5ad0" class="outline-3">
-<h3 id="org0bf5ad0">Q67: Why adopt reusable workflows?</h3>
-<div class="outline-text-3" id="text-org0bf5ad0">
+<div id="outline-container-org149b579" class="outline-3">
+<h3 id="org149b579">Q67: Why adopt reusable workflows?</h3>
+<div class="outline-text-3" id="text-org149b579">
 <p>
 Standardization, DRY pipelines, centralized governance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba3f727" class="outline-3">
-<h3 id="orgba3f727">Q68: What is composite action best use case?</h3>
-<div class="outline-text-3" id="text-orgba3f727">
+<div id="outline-container-org70c7e19" class="outline-3">
+<h3 id="org70c7e19">Q68: What is composite action best use case?</h3>
+<div class="outline-text-3" id="text-org70c7e19">
 <p>
 Share repeated step sequences (setup/lint/package helper logic).
 </p>
 </div>
 </div>
-<div id="outline-container-org2c3d3ea" class="outline-3">
-<h3 id="org2c3d3ea">Q69: What is job output?</h3>
-<div class="outline-text-3" id="text-org2c3d3ea">
+<div id="outline-container-orgfec29e4" class="outline-3">
+<h3 id="orgfec29e4">Q69: What is job output?</h3>
+<div class="outline-text-3" id="text-orgfec29e4">
 <p>
 Named value produced by a job for downstream jobs.
 </p>
 </div>
 </div>
-<div id="outline-container-org6047f22" class="outline-3">
-<h3 id="org6047f22">Q70: What is step output?</h3>
-<div class="outline-text-3" id="text-org6047f22">
+<div id="outline-container-org2ee38b3" class="outline-3">
+<h3 id="org2ee38b3">Q70: What is step output?</h3>
+<div class="outline-text-3" id="text-org2ee38b3">
 <p>
 Value set by step for use later in same job.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb6c172" class="outline-3">
-<h3 id="orgeb6c172">Q71: How set outputs in modern Actions?</h3>
-<div class="outline-text-3" id="text-orgeb6c172">
+<div id="outline-container-org8bbd595" class="outline-3">
+<h3 id="org8bbd595">Q71: How set outputs in modern Actions?</h3>
+<div class="outline-text-3" id="text-org8bbd595">
 <p>
 Write to <code>$GITHUB_OUTPUT</code> file.
 </p>
 </div>
 </div>
-<div id="outline-container-org768e269" class="outline-3">
-<h3 id="org768e269">Q72: What is environment file mechanism?</h3>
-<div class="outline-text-3" id="text-org768e269">
+<div id="outline-container-org26d99ce" class="outline-3">
+<h3 id="org26d99ce">Q72: What is environment file mechanism?</h3>
+<div class="outline-text-3" id="text-org26d99ce">
 <p>
 Special files (<code>GITHUB_ENV</code>, <code>GITHUB_OUTPUT</code>, etc.) for workflow communication.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f5bcc7" class="outline-3">
-<h3 id="org5f5bcc7">Q73: What is expression syntax in Actions?</h3>
-<div class="outline-text-3" id="text-org5f5bcc7">
+<div id="outline-container-org94fd58c" class="outline-3">
+<h3 id="org94fd58c">Q73: What is expression syntax in Actions?</h3>
+<div class="outline-text-3" id="text-org94fd58c">
 <p>
 <code>${{ ..: }}</code> for evaluation of contexts/functions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb7e7e27" class="outline-3">
-<h3 id="orgb7e7e27">Q74: Common expression functions?</h3>
-<div class="outline-text-3" id="text-orgb7e7e27">
+<div id="outline-container-org292c508" class="outline-3">
+<h3 id="org292c508">Q74: Common expression functions?</h3>
+<div class="outline-text-3" id="text-org292c508">
 <p>
 <code>contains</code>, <code>startsWith</code>, <code>endsWith</code>, <code>hashFiles</code>, <code>always</code>, <code>failure</code>, <code>success</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca8c06c" class="outline-3">
-<h3 id="orgca8c06c">Q75: What is <code>always()</code> used for?</h3>
-<div class="outline-text-3" id="text-orgca8c06c">
+<div id="outline-container-org22bba41" class="outline-3">
+<h3 id="org22bba41">Q75: What is <code>always()</code> used for?</h3>
+<div class="outline-text-3" id="text-org22bba41">
 <p>
 Run cleanup/reporting even if previous steps failed.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc6751d6" class="outline-3">
-<h3 id="orgc6751d6">Q76: What is <code>failure()</code> condition?</h3>
-<div class="outline-text-3" id="text-orgc6751d6">
+<div id="outline-container-org9c17962" class="outline-3">
+<h3 id="org9c17962">Q76: What is <code>failure()</code> condition?</h3>
+<div class="outline-text-3" id="text-org9c17962">
 <p>
 Run step only when earlier failure occurred.
 </p>
 </div>
 </div>
-<div id="outline-container-org9120785" class="outline-3">
-<h3 id="org9120785">Q77: What is <code>hashFiles()</code> use case?</h3>
-<div class="outline-text-3" id="text-org9120785">
+<div id="outline-container-org561d82c" class="outline-3">
+<h3 id="org561d82c">Q77: What is <code>hashFiles()</code> use case?</h3>
+<div class="outline-text-3" id="text-org561d82c">
 <p>
 Generate cache key segment from file contents.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb75279" class="outline-3">
-<h3 id="orgeb75279">Q78: What is dependency caching pitfall?</h3>
-<div class="outline-text-3" id="text-orgeb75279">
+<div id="outline-container-org270626e" class="outline-3">
+<h3 id="org270626e">Q78: What is dependency caching pitfall?</h3>
+<div class="outline-text-3" id="text-org270626e">
 <p>
 Overly broad keys causing stale/incompatible cache restores.
 </p>
 </div>
 </div>
-<div id="outline-container-org7fa1537" class="outline-3">
-<h3 id="org7fa1537">Q79: Cache restore-keys purpose?</h3>
-<div class="outline-text-3" id="text-org7fa1537">
+<div id="outline-container-org8fc9ca0" class="outline-3">
+<h3 id="org8fc9ca0">Q79: Cache restore-keys purpose?</h3>
+<div class="outline-text-3" id="text-org8fc9ca0">
 <p>
 Fallback matching when exact cache key not found.
 </p>
 </div>
 </div>
-<div id="outline-container-org1758338" class="outline-3">
-<h3 id="org1758338">Q80: What is artifact retention period?</h3>
-<div class="outline-text-3" id="text-org1758338">
+<div id="outline-container-org32ef875" class="outline-3">
+<h3 id="org32ef875">Q80: What is artifact retention period?</h3>
+<div class="outline-text-3" id="text-org32ef875">
 <p>
 How long uploaded artifacts are stored before expiry.
 </p>
 </div>
 </div>
-<div id="outline-container-org4e84396" class="outline-3">
-<h3 id="org4e84396">Q81: What is self-hosted runner advantage?</h3>
-<div class="outline-text-3" id="text-org4e84396">
+<div id="outline-container-orga8bc2c1" class="outline-3">
+<h3 id="orga8bc2c1">Q81: What is self-hosted runner advantage?</h3>
+<div class="outline-text-3" id="text-orga8bc2c1">
 <p>
 Custom hardware/network access and potentially lower cost at scale.
 </p>
 </div>
 </div>
-<div id="outline-container-org9be6baf" class="outline-3">
-<h3 id="org9be6baf">Q82: Self-hosted runner risk?</h3>
-<div class="outline-text-3" id="text-org9be6baf">
+<div id="outline-container-orge162eea" class="outline-3">
+<h3 id="orge162eea">Q82: Self-hosted runner risk?</h3>
+<div class="outline-text-3" id="text-orge162eea">
 <p>
 Security hardening, maintenance, and secret exposure responsibility.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb4a225" class="outline-3">
-<h3 id="orgcb4a225">Q83: What is ephemeral self-hosted runner pattern?</h3>
-<div class="outline-text-3" id="text-orgcb4a225">
+<div id="outline-container-orga671d23" class="outline-3">
+<h3 id="orga671d23">Q83: What is ephemeral self-hosted runner pattern?</h3>
+<div class="outline-text-3" id="text-orga671d23">
 <p>
 Short-lived runner instance per job for isolation.
 </p>
 </div>
 </div>
-<div id="outline-container-org49adc00" class="outline-3">
-<h3 id="org49adc00">Q84: Why ephemeral runners improve security?</h3>
-<div class="outline-text-3" id="text-org49adc00">
+<div id="outline-container-orgf2b5d0e" class="outline-3">
+<h3 id="orgf2b5d0e">Q84: Why ephemeral runners improve security?</h3>
+<div class="outline-text-3" id="text-orgf2b5d0e">
 <p>
 Reduce persistence of compromised state between jobs.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0d5506" class="outline-3">
-<h3 id="orge0d5506">Q85: What is runner label?</h3>
-<div class="outline-text-3" id="text-orge0d5506">
+<div id="outline-container-org161af12" class="outline-3">
+<h3 id="org161af12">Q85: What is runner label?</h3>
+<div class="outline-text-3" id="text-org161af12">
 <p>
 Tag used to route jobs to appropriate self-hosted runners.
 </p>
 </div>
 </div>
-<div id="outline-container-org61f5b00" class="outline-3">
-<h3 id="org61f5b00">Q86: What is service container in Actions?</h3>
-<div class="outline-text-3" id="text-org61f5b00">
+<div id="outline-container-org8625e7d" class="outline-3">
+<h3 id="org8625e7d">Q86: What is service container in Actions?</h3>
+<div class="outline-text-3" id="text-org8625e7d">
 <p>
 Sidecar container (e.g., DB/Redis) available during job.
 </p>
 </div>
 </div>
-<div id="outline-container-org5716abd" class="outline-3">
-<h3 id="org5716abd">Q87: Why use service containers?</h3>
-<div class="outline-text-3" id="text-org5716abd">
+<div id="outline-container-org9bba653" class="outline-3">
+<h3 id="org9bba653">Q87: Why use service containers?</h3>
+<div class="outline-text-3" id="text-org9bba653">
 <p>
 Integration tests with disposable dependencies in CI.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5c368b" class="outline-3">
-<h3 id="orgb5c368b">Q88: What is container job?</h3>
-<div class="outline-text-3" id="text-orgb5c368b">
+<div id="outline-container-org3f7e1e0" class="outline-3">
+<h3 id="org3f7e1e0">Q88: What is container job?</h3>
+<div class="outline-text-3" id="text-org3f7e1e0">
 <p>
 Run job steps inside specified container image.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b28e94" class="outline-3">
-<h3 id="org2b28e94">Q89: Container job benefit?</h3>
-<div class="outline-text-3" id="text-org2b28e94">
+<div id="outline-container-org6f40fa3" class="outline-3">
+<h3 id="org6f40fa3">Q89: Container job benefit?</h3>
+<div class="outline-text-3" id="text-org6f40fa3">
 <p>
 Consistent runtime environment across runners.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd23d2eb" class="outline-3">
-<h3 id="orgd23d2eb">Q90: What is strategy.max-parallel?</h3>
-<div class="outline-text-3" id="text-orgd23d2eb">
+<div id="outline-container-org14d0b5d" class="outline-3">
+<h3 id="org14d0b5d">Q90: What is strategy.max-parallel?</h3>
+<div class="outline-text-3" id="text-org14d0b5d">
 <p>
 Limits concurrent matrix job executions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbd1f38d" class="outline-3">
-<h3 id="orgbd1f38d">Q91: Why cap matrix parallelism?</h3>
-<div class="outline-text-3" id="text-orgbd1f38d">
+<div id="outline-container-org040db69" class="outline-3">
+<h3 id="org040db69">Q91: Why cap matrix parallelism?</h3>
+<div class="outline-text-3" id="text-org040db69">
 <p>
 Control cost and avoid overloading external systems.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcece725" class="outline-3">
-<h3 id="orgcece725">Q92: What is dependency graph of jobs?</h3>
-<div class="outline-text-3" id="text-orgcece725">
+<div id="outline-container-org38427b8" class="outline-3">
+<h3 id="org38427b8">Q92: What is dependency graph of jobs?</h3>
+<div class="outline-text-3" id="text-org38427b8">
 <p>
 DAG defined by <code>needs</code> relationships.
 </p>
 </div>
 </div>
-<div id="outline-container-org19d6508" class="outline-3">
-<h3 id="org19d6508">Q93: What is required workflow concept?</h3>
-<div class="outline-text-3" id="text-org19d6508">
+<div id="outline-container-org858068a" class="outline-3">
+<h3 id="org858068a">Q93: What is required workflow concept?</h3>
+<div class="outline-text-3" id="text-org858068a">
 <p>
 Org-level enforced workflows/controls (policy-dependent setup).
 </p>
 </div>
 </div>
-<div id="outline-container-org558f61a" class="outline-3">
-<h3 id="org558f61a">Q94: What is CODEOWNERS relation to Actions?</h3>
-<div class="outline-text-3" id="text-org558f61a">
+<div id="outline-container-org9b668a6" class="outline-3">
+<h3 id="org9b668a6">Q94: What is CODEOWNERS relation to Actions?</h3>
+<div class="outline-text-3" id="text-org9b668a6">
 <p>
 Can require specific reviewers for workflow file changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org8fed1d3" class="outline-3">
-<h3 id="org8fed1d3">Q95: Why protect workflow files specially?</h3>
-<div class="outline-text-3" id="text-org8fed1d3">
+<div id="outline-container-org4e8d5b7" class="outline-3">
+<h3 id="org4e8d5b7">Q95: Why protect workflow files specially?</h3>
+<div class="outline-text-3" id="text-org4e8d5b7">
 <p>
 Pipeline changes can alter security/deployment behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org0ec9840" class="outline-3">
-<h3 id="org0ec9840">Q96: What is <code>pull_request_target</code> caution?</h3>
-<div class="outline-text-3" id="text-org0ec9840">
+<div id="outline-container-org8d16432" class="outline-3">
+<h3 id="org8d16432">Q96: What is <code>pull_request_target</code> caution?</h3>
+<div class="outline-text-3" id="text-org8d16432">
 <p>
 Runs in base repo context; dangerous with untrusted code if misused.
 </p>
 </div>
 </div>
-<div id="outline-container-org9949f11" class="outline-3">
-<h3 id="org9949f11">Q97: Safe use principle for <code>pull_request_target</code>?</h3>
-<div class="outline-text-3" id="text-org9949f11">
+<div id="outline-container-orga02014d" class="outline-3">
+<h3 id="orga02014d">Q97: Safe use principle for <code>pull_request_target</code>?</h3>
+<div class="outline-text-3" id="text-orga02014d">
 <p>
 Never execute untrusted PR code with elevated tokens/secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org392b57b" class="outline-3">
-<h3 id="org392b57b">Q98: What is OIDC in GitHub Actions?</h3>
-<div class="outline-text-3" id="text-org392b57b">
+<div id="outline-container-org70a9a93" class="outline-3">
+<h3 id="org70a9a93">Q98: What is OIDC in GitHub Actions?</h3>
+<div class="outline-text-3" id="text-org70a9a93">
 <p>
 Federated identity to cloud providers without long-lived static secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org82db838" class="outline-3">
-<h3 id="org82db838">Q99: Why prefer OIDC over stored cloud keys?</h3>
-<div class="outline-text-3" id="text-org82db838">
+<div id="outline-container-orgab17a49" class="outline-3">
+<h3 id="orgab17a49">Q99: Why prefer OIDC over stored cloud keys?</h3>
+<div class="outline-text-3" id="text-orgab17a49">
 <p>
 Short-lived credentials reduce secret leakage risk.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b9fcb7" class="outline-3">
-<h3 id="org3b9fcb7">Q100: What is id-token permission?</h3>
-<div class="outline-text-3" id="text-org3b9fcb7">
+<div id="outline-container-org1a84e2c" class="outline-3">
+<h3 id="org1a84e2c">Q100: What is id-token permission?</h3>
+<div class="outline-text-3" id="text-org1a84e2c">
 <p>
 Required permission to request OIDC tokens.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ce0209" class="outline-3">
-<h3 id="org2ce0209">Q101: What is environment URL in deployments?</h3>
-<div class="outline-text-3" id="text-org2ce0209">
+<div id="outline-container-org3bf0f03" class="outline-3">
+<h3 id="org3bf0f03">Q101: What is environment URL in deployments?</h3>
+<div class="outline-text-3" id="text-org3bf0f03">
 <p>
 Link shown in GitHub deployment UI to target environment.
 </p>
 </div>
 </div>
-<div id="outline-container-org2957347" class="outline-3">
-<h3 id="org2957347">Q102: What is deployment job pattern?</h3>
-<div class="outline-text-3" id="text-org2957347">
+<div id="outline-container-org039a490" class="outline-3">
+<h3 id="org039a490">Q102: What is deployment job pattern?</h3>
+<div class="outline-text-3" id="text-org039a490">
 <p>
 Build artifact once, then deploy immutable artifact across environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orga47a82e" class="outline-3">
-<h3 id="orga47a82e">Q103: Why immutable artifact promotion?</h3>
-<div class="outline-text-3" id="text-orga47a82e">
+<div id="outline-container-org330f29a" class="outline-3">
+<h3 id="org330f29a">Q103: Why immutable artifact promotion?</h3>
+<div class="outline-text-3" id="text-org330f29a">
 <p>
 Consistency between tested and deployed binary.
 </p>
 </div>
 </div>
-<div id="outline-container-org99342d3" class="outline-3">
-<h3 id="org99342d3">Q104: What is monorepo CI challenge in Actions?</h3>
-<div class="outline-text-3" id="text-org99342d3">
+<div id="outline-container-org9f8103d" class="outline-3">
+<h3 id="org9f8103d">Q104: What is monorepo CI challenge in Actions?</h3>
+<div class="outline-text-3" id="text-org9f8103d">
 <p>
 Unnecessary runs for unaffected components.
 </p>
 </div>
 </div>
-<div id="outline-container-org7596c11" class="outline-3">
-<h3 id="org7596c11">Q105: Monorepo optimization strategy?</h3>
-<div class="outline-text-3" id="text-org7596c11">
+<div id="outline-container-org546e1e9" class="outline-3">
+<h3 id="org546e1e9">Q105: Monorepo optimization strategy?</h3>
+<div class="outline-text-3" id="text-org546e1e9">
 <p>
 Path-based workflows, selective matrices, reusable component pipelines.
 </p>
 </div>
 </div>
-<div id="outline-container-orga433577" class="outline-3">
-<h3 id="orga433577">Q106: What is <code>workflow_run</code> trigger?</h3>
-<div class="outline-text-3" id="text-orga433577">
+<div id="outline-container-org4f50f17" class="outline-3">
+<h3 id="org4f50f17">Q106: What is <code>workflow_run</code> trigger?</h3>
+<div class="outline-text-3" id="text-org4f50f17">
 <p>
 Trigger workflow based on completion of another workflow.
 </p>
 </div>
 </div>
-<div id="outline-container-org6eaded0" class="outline-3">
-<h3 id="org6eaded0">Q107: When use <code>workflow_run</code>?</h3>
-<div class="outline-text-3" id="text-org6eaded0">
+<div id="outline-container-org28737ee" class="outline-3">
+<h3 id="org28737ee">Q107: When use <code>workflow_run</code>?</h3>
+<div class="outline-text-3" id="text-org28737ee">
 <p>
 Pipeline chaining with privilege separation (build then deploy).
 </p>
 </div>
 </div>
-<div id="outline-container-org495329a" class="outline-3">
-<h3 id="org495329a">Q108: What is privilege separation in CI/CD?</h3>
-<div class="outline-text-3" id="text-org495329a">
+<div id="outline-container-org0a6f7fc" class="outline-3">
+<h3 id="org0a6f7fc">Q108: What is privilege separation in CI/CD?</h3>
+<div class="outline-text-3" id="text-org0a6f7fc">
 <p>
 Untrusted build job separated from privileged deployment job.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc6dc871" class="outline-3">
-<h3 id="orgc6dc871">Q109: What is SARIF upload use?</h3>
-<div class="outline-text-3" id="text-orgc6dc871">
+<div id="outline-container-orgc77a2f8" class="outline-3">
+<h3 id="orgc77a2f8">Q109: What is SARIF upload use?</h3>
+<div class="outline-text-3" id="text-orgc77a2f8">
 <p>
 Publish static analysis/security findings in GitHub code scanning.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2a004c" class="outline-3">
-<h3 id="orgc2a004c">Q110: What is problem matcher concept?</h3>
-<div class="outline-text-3" id="text-orgc2a004c">
+<div id="outline-container-org907faee" class="outline-3">
+<h3 id="org907faee">Q110: What is problem matcher concept?</h3>
+<div class="outline-text-3" id="text-org907faee">
 <p>
 Parse logs and annotate source lines in PR checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org2d156d5" class="outline-3">
-<h3 id="org2d156d5">Q111: What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-org2d156d5">
+<div id="outline-container-orga74d90c" class="outline-3">
+<h3 id="orga74d90c">Q111: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orga74d90c">
 <p>
 Single workflow handles PR CI and production deploy with shared broad secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org319eee7" class="outline-3">
-<h3 id="org319eee7">Q112: Better pipeline architecture?</h3>
-<div class="outline-text-3" id="text-org319eee7">
+<div id="outline-container-orgf191883" class="outline-3">
+<h3 id="orgf191883">Q112: Better pipeline architecture?</h3>
+<div class="outline-text-3" id="text-orgf191883">
 <p>
 Separate CI, release, and deploy workflows with scoped permissions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf65767d" class="outline-3">
-<h3 id="orgf65767d">Q113: What is flaky workflow symptom?</h3>
-<div class="outline-text-3" id="text-orgf65767d">
+<div id="outline-container-org8d19c60" class="outline-3">
+<h3 id="org8d19c60">Q113: What is flaky workflow symptom?</h3>
+<div class="outline-text-3" id="text-org8d19c60">
 <p>
 Intermittent failures unrelated to code changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org0facb99" class="outline-3">
-<h3 id="org0facb99">Q114: Common flake causes in Actions?</h3>
-<div class="outline-text-3" id="text-org0facb99">
+<div id="outline-container-org853fcc1" class="outline-3">
+<h3 id="org853fcc1">Q114: Common flake causes in Actions?</h3>
+<div class="outline-text-3" id="text-org853fcc1">
 <p>
 Network instability, race conditions, shared external state, timeouts.
 </p>
 </div>
 </div>
-<div id="outline-container-org2413ffc" class="outline-3">
-<h3 id="org2413ffc">Q115: Flake mitigation baseline?</h3>
-<div class="outline-text-3" id="text-org2413ffc">
+<div id="outline-container-orge0f6fe1" class="outline-3">
+<h3 id="orge0f6fe1">Q115: Flake mitigation baseline?</h3>
+<div class="outline-text-3" id="text-orge0f6fe1">
 <p>
 Retries (targeted), deterministic tests, isolated environments, observability.
 </p>
 </div>
 </div>
-<div id="outline-container-org5359ee7" class="outline-3">
-<h3 id="org5359ee7">Q116: What is concurrency for deployments?</h3>
-<div class="outline-text-3" id="text-org5359ee7">
+<div id="outline-container-org757a543" class="outline-3">
+<h3 id="org757a543">Q116: What is concurrency for deployments?</h3>
+<div class="outline-text-3" id="text-org757a543">
 <p>
 Serialize per environment/service to avoid overlapping releases.
 </p>
 </div>
 </div>
-<div id="outline-container-org48769a5" class="outline-3">
-<h3 id="org48769a5">Q117: What is rollback workflow pattern?</h3>
-<div class="outline-text-3" id="text-org48769a5">
+<div id="outline-container-org5a125cb" class="outline-3">
+<h3 id="org5a125cb">Q117: What is rollback workflow pattern?</h3>
+<div class="outline-text-3" id="text-org5a125cb">
 <p>
 Manual/automated workflow to redeploy previous known-good version.
 </p>
 </div>
 </div>
-<div id="outline-container-org2149bcf" class="outline-3">
-<h3 id="org2149bcf">Q118: What is intermediate security baseline?</h3>
-<div class="outline-text-3" id="text-org2149bcf">
+<div id="outline-container-org754da68" class="outline-3">
+<h3 id="org754da68">Q118: What is intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-org754da68">
 <p>
 SHA-pinned actions, OIDC, restricted permissions, protected environments.
 </p>
 </div>
 </div>
-<div id="outline-container-org73020b0" class="outline-3">
-<h3 id="org73020b0">Q119: What is intermediate reliability baseline?</h3>
-<div class="outline-text-3" id="text-org73020b0">
+<div id="outline-container-orga1bc400" class="outline-3">
+<h3 id="orga1bc400">Q119: What is intermediate reliability baseline?</h3>
+<div class="outline-text-3" id="text-orga1bc400">
 <p>
 Deterministic builds, artifact promotion, guarded deploy gates.
 </p>
 </div>
 </div>
-<div id="outline-container-org6930706" class="outline-3">
-<h3 id="org6930706">Q120: What is intermediate observability baseline?</h3>
-<div class="outline-text-3" id="text-org6930706">
+<div id="outline-container-orga1a1b0f" class="outline-3">
+<h3 id="orga1a1b0f">Q120: What is intermediate observability baseline?</h3>
+<div class="outline-text-3" id="text-orga1a1b0f">
 <p>
 DORA-ish metrics: lead time, deployment frequency, MTTR, change failure rate.
 </p>
 </div>
 </div>
-<div id="outline-container-org8525d71" class="outline-3">
-<h3 id="org8525d71">Q121: What is workflow performance bottleneck analysis?</h3>
-<div class="outline-text-3" id="text-org8525d71">
+<div id="outline-container-org9285372" class="outline-3">
+<h3 id="org9285372">Q121: What is workflow performance bottleneck analysis?</h3>
+<div class="outline-text-3" id="text-org9285372">
 <p>
 Identify longest critical-path jobs and cache misses.
 </p>
 </div>
 </div>
-<div id="outline-container-orga53fbe4" class="outline-3">
-<h3 id="orga53fbe4">Q122: What is intermediate cost optimization?</h3>
-<div class="outline-text-3" id="text-orga53fbe4">
+<div id="outline-container-org531510b" class="outline-3">
+<h3 id="org531510b">Q122: What is intermediate cost optimization?</h3>
+<div class="outline-text-3" id="text-org531510b">
 <p>
 Runner right-sizing, reduced duplicate runs, smarter matrix scope.
 </p>
 </div>
 </div>
-<div id="outline-container-orge461559" class="outline-3">
-<h3 id="orge461559">Q123: Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-orge461559">
+<div id="outline-container-org0406d98" class="outline-3">
+<h3 id="org0406d98">Q123: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-org0406d98">
 <p>
 Team can explain trust boundaries and token permissions for each workflow.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd10c8cb" class="outline-3">
-<h3 id="orgd10c8cb">Q124: Intermediate governance principle?</h3>
-<div class="outline-text-3" id="text-orgd10c8cb">
+<div id="outline-container-org473bb58" class="outline-3">
+<h3 id="org473bb58">Q124: Intermediate governance principle?</h3>
+<div class="outline-text-3" id="text-org473bb58">
 <p>
 CI/CD templates with controlled extension points.
 </p>
 </div>
 </div>
-<div id="outline-container-org09c687c" class="outline-3">
-<h3 id="org09c687c">Q125: Intermediate DX principle?</h3>
-<div class="outline-text-3" id="text-org09c687c">
+<div id="outline-container-orgb662a22" class="outline-3">
+<h3 id="orgb662a22">Q125: Intermediate DX principle?</h3>
+<div class="outline-text-3" id="text-orgb662a22">
 <p>
 Fast PR feedback and clear failure diagnostics.
 </p>
 </div>
 </div>
-<div id="outline-container-orge327758" class="outline-3">
-<h3 id="orge327758">Q126: What is intermediate release principle?</h3>
-<div class="outline-text-3" id="text-orge327758">
+<div id="outline-container-org770aa16" class="outline-3">
+<h3 id="org770aa16">Q126: What is intermediate release principle?</h3>
+<div class="outline-text-3" id="text-org770aa16">
 <p>
 Tag-driven versioned releases with changelog and provenance.
 </p>
 </div>
 </div>
-<div id="outline-container-org5794123" class="outline-3">
-<h3 id="org5794123">Q127: What is release artifact signing?</h3>
-<div class="outline-text-3" id="text-org5794123">
+<div id="outline-container-org19d8bff" class="outline-3">
+<h3 id="org19d8bff">Q127: What is release artifact signing?</h3>
+<div class="outline-text-3" id="text-org19d8bff">
 <p>
 Cryptographically signing binaries/images during pipeline.
 </p>
 </div>
 </div>
-<div id="outline-container-org4fa5cbf" class="outline-3">
-<h3 id="org4fa5cbf">Q128: Why sign artifacts?</h3>
-<div class="outline-text-3" id="text-org4fa5cbf">
+<div id="outline-container-org8c48d01" class="outline-3">
+<h3 id="org8c48d01">Q128: Why sign artifacts?</h3>
+<div class="outline-text-3" id="text-org8c48d01">
 <p>
 Integrity verification and supply-chain trust.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd51cfed" class="outline-3">
-<h3 id="orgd51cfed">Q129: What is intermediate compliance principle?</h3>
-<div class="outline-text-3" id="text-orgd51cfed">
+<div id="outline-container-org2e4fde0" class="outline-3">
+<h3 id="org2e4fde0">Q129: What is intermediate compliance principle?</h3>
+<div class="outline-text-3" id="text-org2e4fde0">
 <p>
 Audit trail for who approved and deployed what, when.
 </p>
 </div>
 </div>
-<div id="outline-container-org7434680" class="outline-3">
-<h3 id="org7434680">Q130: Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-org7434680">
+<div id="outline-container-org943e463" class="outline-3">
+<h3 id="org943e463">Q130: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org943e463">
 <p>
 Design workflows as secure software systems, not just YAML scripts.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgd8b3ff5" class="outline-2">
-<h2 id="orgd8b3ff5">Advanced</h2>
-<div class="outline-text-2" id="text-orgd8b3ff5">
+<div id="outline-container-org938e3a6" class="outline-2">
+<h2 id="org938e3a6">Advanced</h2>
+<div class="outline-text-2" id="text-org938e3a6">
 </div>
-<div id="outline-container-orge1f62c5" class="outline-3">
-<h3 id="orge1f62c5">Q131: What is CI/CD platform engineering with Actions?</h3>
-<div class="outline-text-3" id="text-orge1f62c5">
+<div id="outline-container-org326e823" class="outline-3">
+<h3 id="org326e823">Q131: What is CI/CD platform engineering with Actions?</h3>
+<div class="outline-text-3" id="text-org326e823">
 <p>
 Providing centralized reusable workflows, runners, policies, and observability for many teams.
 </p>
 </div>
 </div>
-<div id="outline-container-org5bdab08" class="outline-3">
-<h3 id="org5bdab08">Q132: What is workflow template strategy?</h3>
-<div class="outline-text-3" id="text-org5bdab08">
+<div id="outline-container-org2ba4393" class="outline-3">
+<h3 id="org2ba4393">Q132: What is workflow template strategy?</h3>
+<div class="outline-text-3" id="text-org2ba4393">
 <p>
 Org-standard starter workflows for common stacks/use cases.
 </p>
 </div>
 </div>
-<div id="outline-container-org745b22a" class="outline-3">
-<h3 id="org745b22a">Q133: What is reusable workflow versioning model?</h3>
-<div class="outline-text-3" id="text-org745b22a">
+<div id="outline-container-org3657ff7" class="outline-3">
+<h3 id="org3657ff7">Q133: What is reusable workflow versioning model?</h3>
+<div class="outline-text-3" id="text-org3657ff7">
 <p>
 Pin callers to tagged/sha versions and roll out updates progressively.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b917a0" class="outline-3">
-<h3 id="org6b917a0">Q134: Why avoid floating main reference for central workflows?</h3>
-<div class="outline-text-3" id="text-org6b917a0">
+<div id="outline-container-org14144b9" class="outline-3">
+<h3 id="org14144b9">Q134: Why avoid floating main reference for central workflows?</h3>
+<div class="outline-text-3" id="text-org14144b9">
 <p>
 Uncontrolled breaking changes across dependent repositories.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc245ce9" class="outline-3">
-<h3 id="orgc245ce9">Q135: What is supply-chain risk in GitHub Actions?</h3>
-<div class="outline-text-3" id="text-orgc245ce9">
+<div id="outline-container-org3751ad9" class="outline-3">
+<h3 id="org3751ad9">Q135: What is supply-chain risk in GitHub Actions?</h3>
+<div class="outline-text-3" id="text-org3751ad9">
 <p>
 Compromised third-party actions, tampered dependencies, malicious workflow changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org66073cd" class="outline-3">
-<h3 id="org66073cd">Q136: Core supply-chain mitigations?</h3>
-<div class="outline-text-3" id="text-org66073cd">
+<div id="outline-container-orga3c2581" class="outline-3">
+<h3 id="orga3c2581">Q136: Core supply-chain mitigations?</h3>
+<div class="outline-text-3" id="text-orga3c2581">
 <p>
 SHA pinning, action allowlists, artifact attestations, dependency scanning.
 </p>
 </div>
 </div>
-<div id="outline-container-org8147872" class="outline-3">
-<h3 id="org8147872">Q137: What is artifact attestation concept?</h3>
-<div class="outline-text-3" id="text-org8147872">
+<div id="outline-container-org536d5b0" class="outline-3">
+<h3 id="org536d5b0">Q137: What is artifact attestation concept?</h3>
+<div class="outline-text-3" id="text-org536d5b0">
 <p>
 Cryptographic metadata linking artifact to trusted build process/source.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc5bcc28" class="outline-3">
-<h3 id="orgc5bcc28">Q138: Why provenance matters in CI/CD?</h3>
-<div class="outline-text-3" id="text-orgc5bcc28">
+<div id="outline-container-orgd1e9e3e" class="outline-3">
+<h3 id="orgd1e9e3e">Q138: Why provenance matters in CI/CD?</h3>
+<div class="outline-text-3" id="text-orgd1e9e3e">
 <p>
 Enables verification and incident response for released artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org6595088" class="outline-3">
-<h3 id="org6595088">Q139: What is SLSA relevance to Actions?</h3>
-<div class="outline-text-3" id="text-org6595088">
+<div id="outline-container-orgb488836" class="outline-3">
+<h3 id="orgb488836">Q139: What is SLSA relevance to Actions?</h3>
+<div class="outline-text-3" id="text-orgb488836">
 <p>
 Framework for software supply-chain maturity and build integrity controls.
 </p>
 </div>
 </div>
-<div id="outline-container-org3ca9a79" class="outline-3">
-<h3 id="org3ca9a79">Q140: What is hardened runner baseline?</h3>
-<div class="outline-text-3" id="text-org3ca9a79">
+<div id="outline-container-org4445c1b" class="outline-3">
+<h3 id="org4445c1b">Q140: What is hardened runner baseline?</h3>
+<div class="outline-text-3" id="text-org4445c1b">
 <p>
 Ephemeral instances, minimal tools, locked egress, patched OS, least privilege.
 </p>
 </div>
 </div>
-<div id="outline-container-org2f6a9f6" class="outline-3">
-<h3 id="org2f6a9f6">Q141: What is network egress control for runners?</h3>
-<div class="outline-text-3" id="text-org2f6a9f6">
+<div id="outline-container-org74695b7" class="outline-3">
+<h3 id="org74695b7">Q141: What is network egress control for runners?</h3>
+<div class="outline-text-3" id="text-org74695b7">
 <p>
 Restrict outbound destinations to reduce exfiltration risk.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd5b695e" class="outline-3">
-<h3 id="orgd5b695e">Q142: What is secret zero challenge in CI/CD?</h3>
-<div class="outline-text-3" id="text-orgd5b695e">
+<div id="outline-container-orgc4244f8" class="outline-3">
+<h3 id="orgc4244f8">Q142: What is secret zero challenge in CI/CD?</h3>
+<div class="outline-text-3" id="text-orgc4244f8">
 <p>
 Securely bootstrapping initial auth without exposing long-lived credentials.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ad1644" class="outline-3">
-<h3 id="org6ad1644">Q143: OIDC trust policy hardening?</h3>
-<div class="outline-text-3" id="text-org6ad1644">
+<div id="outline-container-orgb4794ec" class="outline-3">
+<h3 id="orgb4794ec">Q143: OIDC trust policy hardening?</h3>
+<div class="outline-text-3" id="text-orgb4794ec">
 <p>
 Bind cloud role assumptions to repo, branch, workflow, and environment claims.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe45a51" class="outline-3">
-<h3 id="orgbe45a51">Q144: What is policy-as-code for workflows?</h3>
-<div class="outline-text-3" id="text-orgbe45a51">
+<div id="outline-container-org8166d72" class="outline-3">
+<h3 id="org8166d72">Q144: What is policy-as-code for workflows?</h3>
+<div class="outline-text-3" id="text-org8166d72">
 <p>
 Automated checks enforcing CI/CD security and compliance rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b9cc78" class="outline-3">
-<h3 id="org3b9cc78">Q145: Example policy checks?</h3>
-<div class="outline-text-3" id="text-org3b9cc78">
+<div id="outline-container-org59184d9" class="outline-3">
+<h3 id="org59184d9">Q145: Example policy checks?</h3>
+<div class="outline-text-3" id="text-org59184d9">
 <p>
 No unpinned actions, no broad write perms, required approvals for prod deploy.
 </p>
 </div>
 </div>
-<div id="outline-container-org305266b" class="outline-3">
-<h3 id="org305266b">Q146: What is multi-tenant runner isolation issue?</h3>
-<div class="outline-text-3" id="text-org305266b">
+<div id="outline-container-orge973ba1" class="outline-3">
+<h3 id="orge973ba1">Q146: What is multi-tenant runner isolation issue?</h3>
+<div class="outline-text-3" id="text-orge973ba1">
 <p>
 Jobs from different repos/teams may impact each other if isolation weak.
 </p>
 </div>
 </div>
-<div id="outline-container-org6da854a" class="outline-3">
-<h3 id="org6da854a">Q147: How isolate multi-tenant workloads?</h3>
-<div class="outline-text-3" id="text-org6da854a">
+<div id="outline-container-org4ddc315" class="outline-3">
+<h3 id="org4ddc315">Q147: How isolate multi-tenant workloads?</h3>
+<div class="outline-text-3" id="text-org4ddc315">
 <p>
 Ephemeral runners per trust boundary and strict credential separation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcefacba" class="outline-3">
-<h3 id="orgcefacba">Q148: What is large monorepo scaling pattern?</h3>
-<div class="outline-text-3" id="text-orgcefacba">
+<div id="outline-container-org578e3c8" class="outline-3">
+<h3 id="org578e3c8">Q148: What is large monorepo scaling pattern?</h3>
+<div class="outline-text-3" id="text-org578e3c8">
 <p>
 Change detection graph -&gt; targeted builds/tests -&gt; aggregated required checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org924bfa4" class="outline-3">
-<h3 id="org924bfa4">Q149: What is dynamic matrix generation?</h3>
-<div class="outline-text-3" id="text-org924bfa4">
+<div id="outline-container-orgce6a583" class="outline-3">
+<h3 id="orgce6a583">Q149: What is dynamic matrix generation?</h3>
+<div class="outline-text-3" id="text-orgce6a583">
 <p>
 Compute matrix values at runtime from repo metadata/changed components.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb4ef477" class="outline-3">
-<h3 id="orgb4ef477">Q150: Dynamic matrix risk?</h3>
-<div class="outline-text-3" id="text-orgb4ef477">
+<div id="outline-container-org70d812b" class="outline-3">
+<h3 id="org70d812b">Q150: Dynamic matrix risk?</h3>
+<div class="outline-text-3" id="text-org70d812b">
 <p>
 Complexity and harder debugging if generation logic opaque.
 </p>
 </div>
 </div>
-<div id="outline-container-org825981e" class="outline-3">
-<h3 id="org825981e">Q151: What is pipeline critical path optimization?</h3>
-<div class="outline-text-3" id="text-org825981e">
+<div id="outline-container-org6d239cf" class="outline-3">
+<h3 id="org6d239cf">Q151: What is pipeline critical path optimization?</h3>
+<div class="outline-text-3" id="text-org6d239cf">
 <p>
 Shorten longest dependency chain to reduce total lead time.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd23e5f6" class="outline-3">
-<h3 id="orgd23e5f6">Q152: How reduce critical path?</h3>
-<div class="outline-text-3" id="text-orgd23e5f6">
+<div id="outline-container-org331a11b" class="outline-3">
+<h3 id="org331a11b">Q152: How reduce critical path?</h3>
+<div class="outline-text-3" id="text-org331a11b">
 <p>
 Parallelize independent jobs, prebuild caches, split heavy tests smartly.
 </p>
 </div>
 </div>
-<div id="outline-container-org8447bb3" class="outline-3">
-<h3 id="org8447bb3">Q153: What is remote cache/artifact proxy benefit?</h3>
-<div class="outline-text-3" id="text-org8447bb3">
+<div id="outline-container-org894e1eb" class="outline-3">
+<h3 id="org894e1eb">Q153: What is remote cache/artifact proxy benefit?</h3>
+<div class="outline-text-3" id="text-org894e1eb">
 <p>
 Faster dependency retrieval and reduced external outages impact.
 </p>
 </div>
 </div>
-<div id="outline-container-org50c1136" class="outline-3">
-<h3 id="org50c1136">Q154: What is deterministic pipeline principle?</h3>
-<div class="outline-text-3" id="text-org50c1136">
+<div id="outline-container-orgd9b0cf2" class="outline-3">
+<h3 id="orgd9b0cf2">Q154: What is deterministic pipeline principle?</h3>
+<div class="outline-text-3" id="text-orgd9b0cf2">
 <p>
 Same commit + inputs should produce same outputs/results.
 </p>
 </div>
 </div>
-<div id="outline-container-org37eeec5" class="outline-3">
-<h3 id="org37eeec5">Q155: Non-determinism sources in Actions?</h3>
-<div class="outline-text-3" id="text-org37eeec5">
+<div id="outline-container-org0689d6c" class="outline-3">
+<h3 id="org0689d6c">Q155: Non-determinism sources in Actions?</h3>
+<div class="outline-text-3" id="text-org0689d6c">
 <p>
 Floating versions, time-dependent tests, mutable external services.
 </p>
 </div>
 </div>
-<div id="outline-container-orge08a52b" class="outline-3">
-<h3 id="orge08a52b">Q156: What is deployment ring strategy?</h3>
-<div class="outline-text-3" id="text-orge08a52b">
+<div id="outline-container-orge163a08" class="outline-3">
+<h3 id="orge163a08">Q156: What is deployment ring strategy?</h3>
+<div class="outline-text-3" id="text-orge163a08">
 <p>
 Progressive rollout stages (internal, canary, region subsets, full prod).
 </p>
 </div>
 </div>
-<div id="outline-container-org6d6476f" class="outline-3">
-<h3 id="org6d6476f">Q157: What is automated canary analysis concept?</h3>
-<div class="outline-text-3" id="text-org6d6476f">
+<div id="outline-container-orgbb5578a" class="outline-3">
+<h3 id="orgbb5578a">Q157: What is automated canary analysis concept?</h3>
+<div class="outline-text-3" id="text-orgbb5578a">
 <p>
 Promotion/rollback based on error/latency/SLO metrics.
 </p>
 </div>
 </div>
-<div id="outline-container-orga4757ec" class="outline-3">
-<h3 id="orga4757ec">Q158: What is progressive delivery with Actions?</h3>
-<div class="outline-text-3" id="text-orga4757ec">
+<div id="outline-container-orga2b3b55" class="outline-3">
+<h3 id="orga2b3b55">Q158: What is progressive delivery with Actions?</h3>
+<div class="outline-text-3" id="text-orga2b3b55">
 <p>
 Workflows orchestrate staged rollouts with policy gates and observability checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org72c8852" class="outline-3">
-<h3 id="org72c8852">Q159: What is rollback automation maturity?</h3>
-<div class="outline-text-3" id="text-org72c8852">
+<div id="outline-container-orgdb64b4a" class="outline-3">
+<h3 id="orgdb64b4a">Q159: What is rollback automation maturity?</h3>
+<div class="outline-text-3" id="text-orgdb64b4a">
 <p>
 One-click or auto-triggered safe revert using immutable previous artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd791236" class="outline-3">
-<h3 id="orgd791236">Q160: What is incident mode pipeline behavior?</h3>
-<div class="outline-text-3" id="text-orgd791236">
+<div id="outline-container-orgefc84f4" class="outline-3">
+<h3 id="orgefc84f4">Q160: What is incident mode pipeline behavior?</h3>
+<div class="outline-text-3" id="text-orgefc84f4">
 <p>
 Freeze noncritical deploys, enable emergency fixes with tightened audit path.
 </p>
 </div>
 </div>
-<div id="outline-container-org01ba65c" class="outline-3">
-<h3 id="org01ba65c">Q161: What is break-glass workflow?</h3>
-<div class="outline-text-3" id="text-org01ba65c">
+<div id="outline-container-org3251cd3" class="outline-3">
+<h3 id="org3251cd3">Q161: What is break-glass workflow?</h3>
+<div class="outline-text-3" id="text-org3251cd3">
 <p>
 Controlled emergency deployment path with extra approvals/logging.
 </p>
 </div>
 </div>
-<div id="outline-container-org9c2f263" class="outline-3">
-<h3 id="org9c2f263">Q162: What is compliance evidence in Actions?</h3>
-<div class="outline-text-3" id="text-org9c2f263">
+<div id="outline-container-org5b2ebf0" class="outline-3">
+<h3 id="org5b2ebf0">Q162: What is compliance evidence in Actions?</h3>
+<div class="outline-text-3" id="text-org5b2ebf0">
 <p>
 Run logs, approvals, artifact signatures, policy check results, deployment history.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a2129c" class="outline-3">
-<h3 id="org6a2129c">Q163: What is retention strategy for CI evidence?</h3>
-<div class="outline-text-3" id="text-org6a2129c">
+<div id="outline-container-org1409d25" class="outline-3">
+<h3 id="org1409d25">Q163: What is retention strategy for CI evidence?</h3>
+<div class="outline-text-3" id="text-org1409d25">
 <p>
 Store logs/artifacts long enough for audit and incident investigations.
 </p>
 </div>
 </div>
-<div id="outline-container-org0217ede" class="outline-3">
-<h3 id="org0217ede">Q164: What is advanced observability stack for Actions?</h3>
-<div class="outline-text-3" id="text-org0217ede">
+<div id="outline-container-org37764ee" class="outline-3">
+<h3 id="org37764ee">Q164: What is advanced observability stack for Actions?</h3>
+<div class="outline-text-3" id="text-org37764ee">
 <p>
 Workflow metrics, queue times, runner utilization, failure taxonomy, cost dashboards.
 </p>
 </div>
 </div>
-<div id="outline-container-org912bbd0" class="outline-3">
-<h3 id="org912bbd0">Q165: What is DORA metric mapping in Actions?</h3>
-<div class="outline-text-3" id="text-org912bbd0">
+<div id="outline-container-org606ae9a" class="outline-3">
+<h3 id="org606ae9a">Q165: What is DORA metric mapping in Actions?</h3>
+<div class="outline-text-3" id="text-org606ae9a">
 <p>
 Use workflow/deployment events to compute lead time, freq, MTTR, CFR.
 </p>
 </div>
 </div>
-<div id="outline-container-org04901aa" class="outline-3">
-<h3 id="org04901aa">Q166: What is flaky-test governance model?</h3>
-<div class="outline-text-3" id="text-org04901aa">
+<div id="outline-container-orga88926e" class="outline-3">
+<h3 id="orga88926e">Q166: What is flaky-test governance model?</h3>
+<div class="outline-text-3" id="text-orga88926e">
 <p>
 Ownership, quarantine SLA, and merge policy impacts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd5ec7db" class="outline-3">
-<h3 id="orgd5ec7db">Q167: Why quarantined tests must expire?</h3>
-<div class="outline-text-3" id="text-orgd5ec7db">
+<div id="outline-container-org1e4cd20" class="outline-3">
+<h3 id="org1e4cd20">Q167: Why quarantined tests must expire?</h3>
+<div class="outline-text-3" id="text-org1e4cd20">
 <p>
 Permanent quarantine hides quality debt and risk.
 </p>
 </div>
 </div>
-<div id="outline-container-org72d7e6d" class="outline-3">
-<h3 id="org72d7e6d">Q168: What is cross-repo orchestration pattern?</h3>
-<div class="outline-text-3" id="text-org72d7e6d">
+<div id="outline-container-orged9e0b5" class="outline-3">
+<h3 id="orged9e0b5">Q168: What is cross-repo orchestration pattern?</h3>
+<div class="outline-text-3" id="text-orged9e0b5">
 <p>
 <code>Repository_dispatch/workflow_call/workflow_run</code> to coordinate dependent releases.
 </p>
 </div>
 </div>
-<div id="outline-container-orga6a353e" class="outline-3">
-<h3 id="orga6a353e">Q169: Cross-repo orchestration risk?</h3>
-<div class="outline-text-3" id="text-orga6a353e">
+<div id="outline-container-orga457ac0" class="outline-3">
+<h3 id="orga457ac0">Q169: Cross-repo orchestration risk?</h3>
+<div class="outline-text-3" id="text-orga457ac0">
 <p>
 Token scope sprawl and event-loop complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-org18a614b" class="outline-3">
-<h3 id="org18a614b">Q170: Mitigation for orchestration risk?</h3>
-<div class="outline-text-3" id="text-org18a614b">
+<div id="outline-container-orgbb38cb6" class="outline-3">
+<h3 id="orgbb38cb6">Q170: Mitigation for orchestration risk?</h3>
+<div class="outline-text-3" id="text-orgbb38cb6">
 <p>
 Minimal scoped tokens, explicit contracts, idempotent triggers.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c52e7a" class="outline-3">
-<h3 id="org8c52e7a">Q171: What is GitHub-hosted larger runners concept?</h3>
-<div class="outline-text-3" id="text-org8c52e7a">
+<div id="outline-container-orgb1f8c1f" class="outline-3">
+<h3 id="orgb1f8c1f">Q171: What is GitHub-hosted larger runners concept?</h3>
+<div class="outline-text-3" id="text-orgb1f8c1f">
 <p>
 Bigger managed runners for heavier workloads (availability by plan/region).
 </p>
 </div>
 </div>
-<div id="outline-container-org763c142" class="outline-3">
-<h3 id="org763c142">Q172: When use larger runners?</h3>
-<div class="outline-text-3" id="text-org763c142">
+<div id="outline-container-org8d055a5" class="outline-3">
+<h3 id="org8d055a5">Q172: When use larger runners?</h3>
+<div class="outline-text-3" id="text-org8d055a5">
 <p>
 Large builds/tests requiring higher CPU/RAM/disk throughput.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb9b1043" class="outline-3">
-<h3 id="orgb9b1043">Q173: Cost control for larger runners?</h3>
-<div class="outline-text-3" id="text-orgb9b1043">
+<div id="outline-container-org9bdec52" class="outline-3">
+<h3 id="org9bdec52">Q173: Cost control for larger runners?</h3>
+<div class="outline-text-3" id="text-org9bdec52">
 <p>
 Use only on bottleneck jobs with measured ROI.
 </p>
 </div>
 </div>
-<div id="outline-container-orge5ca3c0" class="outline-3">
-<h3 id="orge5ca3c0">Q174: What is advanced anti-pattern in Actions?</h3>
-<div class="outline-text-3" id="text-orge5ca3c0">
+<div id="outline-container-org6ed76d8" class="outline-3">
+<h3 id="org6ed76d8">Q174: What is advanced anti-pattern in Actions?</h3>
+<div class="outline-text-3" id="text-org6ed76d8">
 <p>
 Embedding business-critical deploy logic in ad-hoc scripts with no tests/versioning.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c47578" class="outline-3">
-<h3 id="org6c47578">Q175: Better architecture?</h3>
-<div class="outline-text-3" id="text-org6c47578">
+<div id="outline-container-orgf34b208" class="outline-3">
+<h3 id="orgf34b208">Q175: Better architecture?</h3>
+<div class="outline-text-3" id="text-orgf34b208">
 <p>
 Versioned deployment tooling/actions with tests and clear interfaces.
 </p>
 </div>
 </div>
-<div id="outline-container-org5bbcd7f" class="outline-3">
-<h3 id="org5bbcd7f">Q176: What is final reliability principle?</h3>
-<div class="outline-text-3" id="text-org5bbcd7f">
+<div id="outline-container-orgfeb9fd4" class="outline-3">
+<h3 id="orgfeb9fd4">Q176: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-orgfeb9fd4">
 <p>
 Pipelines must be deterministic, observable, and rollback-capable.
 </p>
 </div>
 </div>
-<div id="outline-container-org79be85f" class="outline-3">
-<h3 id="org79be85f">Q177: What is final security principle?</h3>
-<div class="outline-text-3" id="text-org79be85f">
+<div id="outline-container-org985277e" class="outline-3">
+<h3 id="org985277e">Q177: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org985277e">
 <p>
 Treat workflows as privileged code with strict trust boundaries.
 </p>
 </div>
 </div>
-<div id="outline-container-org5029437" class="outline-3">
-<h3 id="org5029437">Q178: What is final performance principle?</h3>
-<div class="outline-text-3" id="text-org5029437">
+<div id="outline-container-orgd8ac2db" class="outline-3">
+<h3 id="orgd8ac2db">Q178: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-orgd8ac2db">
 <p>
 Continuously optimize critical path and cache effectiveness.
 </p>
 </div>
 </div>
-<div id="outline-container-orge825c70" class="outline-3">
-<h3 id="orge825c70">Q179: What is final governance principle?</h3>
-<div class="outline-text-3" id="text-orge825c70">
+<div id="outline-container-org0ef9b94" class="outline-3">
+<h3 id="org0ef9b94">Q179: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-org0ef9b94">
 <p>
 Central guardrails + reusable standards + auditable exceptions.
 </p>
 </div>
 </div>
-<div id="outline-container-org6fa185c" class="outline-3">
-<h3 id="org6fa185c">Q180: What is final operations principle?</h3>
-<div class="outline-text-3" id="text-org6fa185c">
+<div id="outline-container-org73aac1d" class="outline-3">
+<h3 id="org73aac1d">Q180: What is final operations principle?</h3>
+<div class="outline-text-3" id="text-org73aac1d">
 <p>
 Measure pipeline health like production service health.
 </p>
 </div>
 </div>
-<div id="outline-container-org80a748d" class="outline-3">
-<h3 id="org80a748d">Q181: What is final developer-experience principle?</h3>
-<div class="outline-text-3" id="text-org80a748d">
+<div id="outline-container-orgd298bc8" class="outline-3">
+<h3 id="orgd298bc8">Q181: What is final developer-experience principle?</h3>
+<div class="outline-text-3" id="text-orgd298bc8">
 <p>
 Fast, actionable CI feedback with minimal noise.
 </p>
 </div>
 </div>
-<div id="outline-container-org98d39cf" class="outline-3">
-<h3 id="org98d39cf">Q182: What is final platform principle?</h3>
-<div class="outline-text-3" id="text-org98d39cf">
+<div id="outline-container-org61e0831" class="outline-3">
+<h3 id="org61e0831">Q182: What is final platform principle?</h3>
+<div class="outline-text-3" id="text-org61e0831">
 <p>
 Separate untrusted build from trusted deploy contexts.
 </p>
 </div>
 </div>
-<div id="outline-container-org68a624d" class="outline-3">
-<h3 id="org68a624d">Q183: What is final supply-chain principle?</h3>
-<div class="outline-text-3" id="text-org68a624d">
+<div id="outline-container-org7dad3df" class="outline-3">
+<h3 id="org7dad3df">Q183: What is final supply-chain principle?</h3>
+<div class="outline-text-3" id="text-org7dad3df">
 <p>
 Verify origin and integrity of every dependency and artifact.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b6d324" class="outline-3">
-<h3 id="org9b6d324">Q184: What is final scaling principle?</h3>
-<div class="outline-text-3" id="text-org9b6d324">
+<div id="outline-container-org0f4d322" class="outline-3">
+<h3 id="org0f4d322">Q184: What is final scaling principle?</h3>
+<div class="outline-text-3" id="text-org0f4d322">
 <p>
 Design workflows modularly for org-wide reuse and independent evolution.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaea5e58" class="outline-3">
-<h3 id="orgaea5e58">Q185: Final maturity principle?</h3>
-<div class="outline-text-3" id="text-orgaea5e58">
+<div id="outline-container-orgb3ccfa4" class="outline-3">
+<h3 id="orgb3ccfa4">Q185: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-orgb3ccfa4">
 <p>
 GitHub Actions excellence is secure, governed, high-velocity delivery automation.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org6e3e800" class="outline-2">
-<h2 id="org6e3e800">Example:</h2>
-<div class="outline-text-2" id="text-org6e3e800">
+<div id="outline-container-org01b9f92" class="outline-2">
+<h2 id="org01b9f92">Example:</h2>
+<div class="outline-text-2" id="text-org01b9f92">
 <div class="org-src-container">
-<pre class="src src-text"># Project structure
+<pre class="src src-text"><code># Project structure
 .
 &#9500;&#9472; .github/
 &#9474;  &#9500;&#9472; workflows/
@@ -1548,11 +3715,11 @@ GitHub Actions excellence is secure, governed, high-velocity delivery automation
       &#9500;&#9472; networkpolicy.yaml
       &#9492;&#9472; _helpers.tpl
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./.github/workflows/example-java-ci-cd.yml
 
 name: example-java-ci-cd
@@ -1670,11 +3837,11 @@ jobs:
       - name: Sign image (keyless)
         run: cosign sign --yes ${{ fromJSON(steps.meta.outputs.json).tags[0] }}@${{ steps.build.outputs.digest }}
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./.github/workflows/example-k8s-helm-cd.yml
 
 name: example-k8s-helm-cd
@@ -1751,11 +3918,11 @@ jobs:
             --wait \
             --timeout 10m
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./.github/dependabot.yml
 
 version: 2
@@ -1768,11 +3935,11 @@ updates:
       - "dependencies"
       - "security"
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-dockerfile">
+<pre class="src src-dockerfile"><code>
 # ././Dockerfile
 
 # build stage
@@ -1791,11 +3958,11 @@ USER app
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-xml">
+<pre class="src src-xml"><code>
 &lt;<span style="font-weight: bold;">project</span> <span style="font-weight: bold;">xmlns</span>=<span style="font-style: italic;">"http://maven.apache.org/POM/4.0.0"</span> <span style="font-weight: bold;">xmlns</span>:<span style="font-weight: bold; font-style: italic;">xsi</span>=<span style="font-style: italic;">"http://www.w3.org/2001/XMLSchema-instance"</span>
   <span style="font-weight: bold;">xsi</span>:<span style="font-weight: bold; font-style: italic;">schemaLocation</span>=<span style="font-style: italic;">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;
   &lt;<span style="font-weight: bold;">modelVersion</span>&gt;4.0.0&lt;/<span style="font-weight: bold;">modelVersion</span>&gt;
@@ -1829,11 +3996,11 @@ ENTRYPOINT ["java","-jar","/app/app.jar"]
   &lt;/<span style="font-weight: bold;">build</span>&gt;
 &lt;/<span style="font-weight: bold;">project</span>&gt;
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-java">
+<pre class="src src-java"><code>
 <span style="font-weight: bold; font-style: italic;">// </span><span style="font-weight: bold; font-style: italic;">./src/main/java/com/example/App.java
 </span>
 <span style="font-weight: bold;">package</span> com.<span style="font-weight: bold; text-decoration: underline;">example</span>;
@@ -1856,11 +4023,11 @@ ENTRYPOINT ["java","-jar","/app/app.jar"]
   }
 }
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./chart/Chart.yaml
 
 apiVersion: v2
@@ -1870,12 +4037,12 @@ type: application
 version: 0.1.0
 appVersion: "1.0.0"
 
-</pre>
+</code></pre>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./chart/values.yaml
 
 replicaCount: 2
@@ -1906,22 +4073,22 @@ securityContext:
   capabilities:
     drop: ["ALL"]
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-tpl">
+<pre class="src src-tpl"><code>
 # ./chart/templates/_helpers.tpl
 
 {{- define "myapp.name" -}}myapp{{- end -}}
 {{- define "myapp.fullname" -}}{{ include "myapp.name" . }}{{- end -}}
 
-</pre>
+</code></pre>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./chart/templates/serviceaccount.yaml
 
 apiVersion: v1
@@ -1929,11 +4096,11 @@ kind: ServiceAccount
 metadata:
   name: {{ include "myapp.fullname" . }}
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./chart/templates/deployment.yaml
 
 apiVersion: apps/v1
@@ -1971,11 +4138,11 @@ spec:
             httpGet: { path: /healthz, port: {{ .Values.service.targetPort }} }
           resources: {{- toYaml .Values.resources | nindent 12 }}
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./chart/templates/service.yaml
 
 apiVersion: v1
@@ -1989,11 +4156,11 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
 
-</pre>
+</code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-yaml">
+<pre class="src src-yaml"><code>
 # ./chart/templates/networkpolicy.yaml
 
 apiVersion: networking.k8s.io/v1
@@ -2015,7 +4182,7 @@ spec:
         - protocol: TCP
           port: 443
 
-</pre>
+</code></pre>
 </div>
 
 <hr>
