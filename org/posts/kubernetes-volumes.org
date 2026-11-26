@@ -8,6 +8,875 @@
 
 * Kubernetes Volumes
 
+[[https://kubernetes.io/docs/concepts/storage/volumes/][Kubernetes Volumes Documentation]]
+
+-----
+
+* Kubernetes Volumes Command Handbook
+
+* 1. Inspect Pod Volumes and Mounts
+
+#+BEGIN_SRC bash
+
+# List pods
+kubectl get pods
+
+# Inspect a pod's volume definitions and mounts
+kubectl describe pod <pod-name>
+
+# Print the complete pod specification
+kubectl get pod <pod-name> -o yaml
+
+# Inspect only volume definitions
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.volumes}'
+
+# Inspect container volume mounts
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.containers[*].volumeMounts}'
+
+# Inspect volumes in a specific namespace
+kubectl get pods -n <namespace> -o wide
+
+#+END_SRC
+
+*2. Create and Inspect an emptyDir Volume*
+
+An `emptyDir` volume is created when a Pod is assigned to a node. It survives container restarts but is deleted when the Pod is removed.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: emptydir-demo
+spec:
+  containers:
+    - name: writer
+      image: busybox
+      command: ["sh", "-c", "while true; do date >> /data/time.log; sleep 10; done"]
+      volumeMounts:
+        - name: shared-data
+          mountPath: /data
+
+  volumes:
+    - name: shared-data
+      emptyDir: {}
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Create the pod
+kubectl apply -f emptydir.yaml
+
+# Inspect the volume
+kubectl describe pod emptydir-demo
+
+# Read files from the mounted volume
+kubectl exec emptydir-demo -- cat /data/time.log
+
+# List mounted files
+kubectl exec emptydir-demo -- ls -lah /data
+
+# Delete the pod (the emptyDir data is removed)
+kubectl delete pod emptydir-demo
+
+#+END_SRC
+
+*3. Configure emptyDir Size and Memory*
+
+Use `sizeLimit` to limit the amount of storage an `emptyDir` can consume.
+
+#+BEGIN_SRC yaml
+
+volumes:
+  - name: cache
+    emptyDir:
+      sizeLimit: 1Gi
+
+#+END_SRC
+
+For memory-backed temporary storage:
+
+#+BEGIN_SRC yaml
+
+volumes:
+  - name: memory-cache
+    emptyDir:
+      medium: Memory
+      sizeLimit: 256Mi
+
+#+END_SRC
+
+Memory-backed `emptyDir` uses tmpfs. Its contents consume memory and count against the memory limits of the writing container.
+
+*4. Share a Volume Between Containers*
+
+Containers in the same Pod can mount the same volume at different paths.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-demo
+spec:
+  containers:
+    - name: writer
+      image: busybox
+      command: ["sh", "-c", "while true; do date >> /shared/log.txt; sleep 5; done"]
+      volumeMounts:
+        - name: shared
+          mountPath: /shared
+
+    - name: reader
+      image: busybox
+      command: ["sh", "-c", "while true; do cat /data/log.txt; sleep 10; done"]
+      volumeMounts:
+        - name: shared
+          mountPath: /data
+          readOnly: true
+
+  volumes:
+    - name: shared
+      emptyDir: {}
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect both containers
+kubectl describe pod shared-volume-demo
+
+# Read data from the reader container
+kubectl exec shared-volume-demo -c reader -- cat /data/log.txt
+
+# Inspect the writer container
+kubectl exec shared-volume-demo -c writer -- ls -lah /shared
+
+#+END_SRC
+
+*5. Mount a ConfigMap as Files*
+
+#+BEGIN_SRC bash
+
+# Create a ConfigMap
+kubectl create configmap app-config \
+  --from-literal=APP_MODE=production \
+  --from-literal=LOG_LEVEL=info
+
+# Inspect it
+kubectl describe configmap app-config
+
+# Display its YAML
+kubectl get configmap app-config -o yaml
+
+#+END_SRC
+
+Pod example:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-volume-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "cat /etc/app-config/APP_MODE; sleep 3600"]
+      volumeMounts:
+        - name: app-config
+          mountPath: /etc/app-config
+          readOnly: true
+
+  volumes:
+    - name: app-config
+      configMap:
+        name: app-config
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+kubectl apply -f config-volume.yaml
+
+# Read mounted configuration
+kubectl exec config-volume-demo -- cat /etc/app-config/APP_MODE
+
+# List all mounted keys
+kubectl exec config-volume-demo -- ls -lah /etc/app-config
+
+#+END_SRC
+
+ConfigMap volume updates are eventually propagated, but applications must be able to reload changed files. Mounts using `subPath` do not receive automated updates.
+
+*6. Mount a Secret as Files*
+
+#+BEGIN_SRC bash
+
+# Create a Secret
+kubectl create secret generic app-secret \
+  --from-literal=username=admin \
+  --from-literal=password='change-me'
+
+# Inspect Secret metadata
+kubectl describe secret app-secret
+
+#+END_SRC
+
+Pod example:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-volume-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "ls -lah /etc/secrets; sleep 3600"]
+      volumeMounts:
+        - name: secret-data
+          mountPath: /etc/secrets
+          readOnly: true
+
+  volumes:
+    - name: secret-data
+      secret:
+        secretName: app-secret
+        defaultMode: 0400
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+kubectl apply -f secret-volume.yaml
+
+# List mounted secret files
+kubectl exec secret-volume-demo -- ls -lah /etc/secrets
+
+# Read a secret file (avoid exposing it in shared terminals or logs)
+kubectl exec secret-volume-demo -- cat /etc/secrets/username
+
+#+END_SRC
+
+#+results:
+
+Use restrictive permissions and least-privilege RBAC. Kubernetes Secrets are not automatically encrypted at rest unless encryption at rest is configured for the cluster.
+
+*7. Mount Selected ConfigMap or Secret Keys*
+
+Use `items` to expose only selected keys and control their filenames.
+
+#+BEGIN_SRC yaml
+
+volumes:
+  - name: app-config
+    configMap:
+      name: app-config
+      items:
+        - key: APP_MODE
+          path: settings/mode
+        - key: LOG_LEVEL
+          path: settings/log-level
+
+#+END_SRC
+
+For a Secret:
+
+#+BEGIN_SRC yaml
+
+volumes:
+  - name: credentials
+    secret:
+      secretName: app-secret
+      items:
+        - key: username
+          path: auth/user
+        - key: password
+          path: auth/password
+
+#+END_SRC
+
+The files appear under the volume mount path using the specified relative paths.
+
+*8. Mount Multiple Sources with a Projected Volume*
+
+Projected volumes combine sources into one directory.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: projected-volume-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "find /etc/app -type f; sleep 3600"]
+      volumeMounts:
+        - name: app-files
+          mountPath: /etc/app
+          readOnly: true
+
+  volumes:
+    - name: app-files
+      projected:
+        sources:
+          - configMap:
+              name: app-config
+          - secret:
+              name: app-secret
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+kubectl apply -f projected-volume.yaml
+
+# Inspect projected files
+kubectl exec projected-volume-demo -- find /etc/app -type f
+
+#+END_SRC
+
+#+results:
+
+Projected sources can include ConfigMaps, Secrets, Downward API data, and service account tokens.
+
+*9. Mount a Specific File with subPath*
+
+Use `subPath` when a container needs one file or directory from a volume without mounting the entire volume over the target path.
+
+#+BEGIN_SRC yaml
+
+volumeMounts:
+  - name: app-config
+    mountPath: /etc/app/application.properties
+    subPath: application.properties
+
+#+END_SRC
+
+Example volume definition:
+
+#+BEGIN_SRC yaml
+
+volumes:
+  - name: app-config
+    configMap:
+      name: app-config
+
+#+END_SRC
+
+Important: `subPath` mounts do not receive automated updates when the source ConfigMap or Secret changes. Restart or reload the workload to consume updated content.
+
+*10. Mount a PersistentVolumeClaim*
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-volume-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "echo persistent-data >> /data/test.txt; sleep 3600"]
+      volumeMounts:
+        - name: app-storage
+          mountPath: /data
+
+  volumes:
+    - name: app-storage
+      persistentVolumeClaim:
+        claimName: app-pvc
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Check the claim
+kubectl get pvc app-pvc
+
+# Inspect the pod
+kubectl describe pod pvc-volume-demo
+
+# Verify mounted data
+kubectl exec pvc-volume-demo -- cat /data/test.txt
+
+#+END_SRC
+
+The PVC must exist in the same namespace as the Pod and be compatible with the workload's storage requirements.
+
+*11. Use Multiple Volumes in One Pod*
+
+A workload can mount separate volumes for application data, configuration, credentials, and temporary files.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-volume-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/app
+        - name: config
+          mountPath: /etc/app
+          readOnly: true
+        - name: cache
+          mountPath: /tmp/cache
+
+  volumes:
+    - name: data
+      emptyDir: {}
+    - name: config
+      configMap:
+        name: app-config
+    - name: cache
+      emptyDir:
+        sizeLimit: 500Mi
+
+#+END_SRC
+
+For production workloads, replace the application data `emptyDir` with a PVC if the data must survive Pod deletion.
+
+*12. Configure Volume Permissions with fsGroup*
+
+Use a Pod security context to provide a supplemental group for processes and supported mounted volumes.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-permissions-demo
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    fsGroupChangePolicy: OnRootMismatch
+
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "id; touch /data/test.txt; sleep 3600"]
+      volumeMounts:
+        - name: app-data
+          mountPath: /data
+
+  volumes:
+    - name: app-data
+      emptyDir: {}
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+kubectl apply -f volume-permissions.yaml
+
+# Check the process identity
+kubectl exec volume-permissions-demo -- id
+
+# Inspect file ownership
+kubectl exec volume-permissions-demo -- ls -ln /data
+
+#+END_SRC
+
+`fsGroupChangePolicy` controls when Kubernetes applies ownership and permission changes to supported volumes. CSI drivers may handle ownership differently, including through `VOLUME_MOUNT_GROUP`.
+
+*13. Mount a Volume as Read-Only*
+
+Prevent a container from writing to a mounted volume by setting `readOnly: true`.
+
+#+BEGIN_SRC yaml
+
+volumeMounts:
+  - name: shared-data
+    mountPath: /data
+    readOnly: true
+
+#+END_SRC
+
+This setting applies to that container's mount. It does not automatically make every other mount of the same volume read-only.
+
+*14. Use hostPath Volumes Carefully*
+
+A `hostPath` volume mounts a path from the node filesystem.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hostpath-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "ls -lah /host-data; sleep 3600"]
+      volumeMounts:
+        - name: host-data
+          mountPath: /host-data
+          readOnly: true
+
+  volumes:
+    - name: host-data
+      hostPath:
+        path: /var/log
+        type: Directory
+
+#+END_SRC
+
+Useful `hostPath.type` values include:
+
+- `Directory`: path must already exist and be a directory.
+- `DirectoryOrCreate`: create the directory if missing.
+- `File`: path must already exist and be a file.
+- `FileOrCreate`: create the file if missing.
+
+Avoid using `hostPath` for ordinary application persistence. It creates node dependencies and can expose sensitive host files. Restrict it through admission policies and workload security controls.
+
+*15. Use Downward API Data in a Volume*
+
+The Downward API can expose Pod metadata and resource information as files.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: downward-volume-demo
+  labels:
+    app: example
+    environment: staging
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "cat /etc/pod-info/labels; sleep 3600"]
+      volumeMounts:
+        - name: pod-info
+          mountPath: /etc/pod-info
+          readOnly: true
+
+  volumes:
+    - name: pod-info
+      downwardAPI:
+        items:
+          - path: labels
+            fieldRef:
+              fieldPath: metadata.labels
+          - path: name
+            fieldRef:
+              fieldPath: metadata.name
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+kubectl apply -f downward-volume.yaml
+
+# Inspect Pod metadata exposed as files
+kubectl exec downward-volume-demo -- cat /etc/pod-info/labels
+kubectl exec downward-volume-demo -- cat /etc/pod-info/name
+
+#+END_SRC
+
+*16. Mount a ServiceAccount Token with a Projected Volume*
+
+Projected service account tokens provide short-lived credentials for applications that need to authenticate to the Kubernetes API.
+
+#+BEGIN_SRC yaml
+
+volumes:
+  - name: api-credentials
+    projected:
+      sources:
+        - serviceAccountToken:
+            path: token
+            expirationSeconds: 3600
+            audience: https://kubernetes.default.svc
+
+#+END_SRC
+
+Mount it in a container:
+
+#+BEGIN_SRC yaml
+
+volumeMounts:
+  - name: api-credentials
+    mountPath: /var/run/secrets/tokens
+    readOnly: true
+
+#+END_SRC
+
+Use an appropriate audience and RBAC permissions. Applications should reload rotated tokens rather than assuming a token remains valid indefinitely.
+
+*17. Use CSI Ephemeral Volumes*
+
+Some CSI drivers support ephemeral inline volumes defined directly in a Pod.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: csi-ephemeral-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: scratch
+          mountPath: /scratch
+
+  volumes:
+    - name: scratch
+      csi:
+        driver: example.csi.driver
+        volumeAttributes:
+          exampleParameter: exampleValue
+
+#+END_SRC
+
+The driver name and attributes above are placeholders. Replace them with values supported by an installed CSI driver. Not every CSI driver supports inline ephemeral volumes.
+
+*18. Inspect Mounts from Inside a Container*
+
+#+BEGIN_SRC bash
+
+# List mounted files
+kubectl exec <pod-name> -- mount
+
+# Inspect filesystem capacity
+kubectl exec <pod-name> -- df -h
+
+# Inspect directory permissions
+kubectl exec <pod-name> -- ls -lah <mount-path>
+
+# Inspect ownership
+kubectl exec <pod-name> -- ls -ln <mount-path>
+
+# Check available disk space
+kubectl exec <pod-name> -- df -h <mount-path>
+
+# Inspect a specific file
+kubectl exec <pod-name> -- stat <mount-path>/<file>
+
+#+END_SRC
+
+If the container image does not include diagnostic utilities, use an approved ephemeral debug container or another suitable troubleshooting image.
+
+*19. Debug Volume Mount Failures*
+
+#+BEGIN_SRC bash
+
+# Inspect pod events and mount errors
+kubectl describe pod <pod-name>
+
+# Show recent namespace events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# Inspect pod status and conditions
+kubectl get pod <pod-name> -o yaml
+
+# Inspect PVC status
+kubectl get pvc
+
+# Inspect PV status
+kubectl get pv
+
+# Inspect storage classes
+kubectl get storageclass
+
+# Inspect node details
+kubectl describe node <node-name>
+
+#+END_SRC
+
+Common errors:
+
+| Error | Possible cause |
+|---|---|
+| `MountVolume.SetUp failed` | Invalid volume source or mount setup failure |
+| `persistentvolumeclaim not found` | Missing PVC or wrong namespace |
+| `permission denied` | UID/GID, filesystem permissions, or security context mismatch |
+| `read-only file system` | Read-only mount or backend filesystem state |
+| `no such file or directory` | Incorrect mount path, key, or source file |
+| `Multi-Attach error` | Volume attachment constraints or conflicting consumers |
+| Pod stuck in `ContainerCreating` | Volume provisioning, attachment, or mount failure |
+
+*20. Troubleshoot Permission Problems*
+
+#+BEGIN_SRC bash
+
+# Inspect the container user
+kubectl exec <pod-name> -- id
+
+# Inspect directory ownership
+kubectl exec <pod-name> -- ls -ldn <mount-path>
+
+# Inspect file permissions
+kubectl exec <pod-name> -- ls -ln <mount-path>
+
+# Test write access
+kubectl exec <pod-name> -- sh -c 'touch <mount-path>/.write-test'
+
+# Remove the test file
+kubectl exec <pod-name> -- rm -f <mount-path>/.write-test
+
+#+END_SRC
+
+Check these items when writes fail:
+
+1. Container `runAsUser` and `runAsGroup`.
+2. Pod-level `fsGroup`.
+3. Volume and filesystem ownership.
+4. Read-only mount settings.
+5. CSI driver mount and ownership behavior.
+6. Security policies and backend access controls.
+
+Do not solve permission problems by blindly running containers as root or applying world-writable permissions.
+
+*21. Inspect StatefulSet Volume Mounts*
+
+StatefulSets commonly use `volumeClaimTemplates` to provide one PVC per replica.
+
+#+BEGIN_SRC bash
+
+# Inspect StatefulSets
+kubectl get statefulsets
+
+# Inspect a StatefulSet
+kubectl describe statefulset <statefulset-name>
+
+# List PVCs
+kubectl get pvc
+
+# Inspect generated PVCs
+kubectl get pvc -l app=<app-label>
+
+# Inspect the StatefulSet specification
+kubectl get statefulset <statefulset-name> -o yaml
+
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC yaml
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+spec:
+  serviceName: database
+  replicas: 2
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+        - name: database
+          image: busybox
+          command: ["sh", "-c", "sleep 3600"]
+          volumeMounts:
+            - name: database-data
+              mountPath: /var/lib/database
+  volumeClaimTemplates:
+    - metadata:
+        name: database-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 10Gi
+
+#+END_SRC
+
+The StorageClass must exist and support the requested volume. Each StatefulSet replica receives its own claim.
+
+*22. Apply and Validate Volume Manifests*
+
+#+BEGIN_SRC bash
+
+# Validate a manifest locally against the API schema
+kubectl apply --dry-run=client -f volume.yaml
+
+# Validate against the API server
+kubectl apply --dry-run=server -f volume.yaml
+
+# Apply the manifest
+kubectl apply -f volume.yaml
+
+# Inspect the created Pod
+kubectl get pod <pod-name> -o wide
+
+# Inspect volume configuration
+kubectl describe pod <pod-name>
+
+# Watch Pod startup
+kubectl get pods -w
+
+#+END_SRC
+
+*23. Useful Volume Command Cheat Sheet*
+
+| Task | Command |
+|---|---|
+| List Pods | `kubectl get pods` |
+| Inspect Pod | `kubectl describe pod <pod>` |
+| Print Pod YAML | `kubectl get pod <pod> -o yaml` |
+| List PVCs | `kubectl get pvc` |
+| List PVs | `kubectl get pv` |
+| List StorageClasses | `kubectl get storageclass` |
+| Inspect ConfigMap | `kubectl describe configmap <name>` |
+| Inspect Secret metadata | `kubectl describe secret <name>` |
+| Read mounted file | `kubectl exec <pod> -- cat <file>` |
+| List mounted directory | `kubectl exec <pod> -- ls -lah <path>` |
+| Check filesystem | `kubectl exec <pod> -- df -h` |
+| Check mounts | `kubectl exec <pod> -- mount` |
+| Inspect events | `kubectl get events --sort-by=.metadata.creationTimestamp` |
+| Follow Pod logs | `kubectl logs -f <pod>` |
+| Inspect StatefulSet | `kubectl describe statefulset <name>` |
+
+*24. Practical Volume Design Rules*
+
+- Use `emptyDir` for temporary data shared within a Pod.
+- Use PVCs for data that must survive Pod deletion.
+- Use ConfigMaps for non-sensitive configuration files.
+- Use Secrets for credentials and sensitive configuration.
+- Use projected volumes when multiple sources should appear under one directory.
+- Use `readOnly: true` for mounts that do not need writes.
+- Use `subPath` deliberately, remembering that it does not receive automated ConfigMap or Secret updates.
+- Use `fsGroup` and appropriate ownership settings instead of running every container as root.
+- Avoid `hostPath` unless node-level access is genuinely required.
+- Set resource requests and limits for memory-backed `emptyDir` and account for ephemeral storage consumption.
+- Test volume behavior when Pods restart, move between nodes, or are recreated.
+- Keep backups independent of the lifecycle of the Pod and its volume.
+
+Core principle: A Kubernetes volume is defined at the Pod level and mounted into containers. Choosing the correct volume type, mount path, permissions, and lifecycle behavior is essential for reliable workloads.
+
 -----
 
 * Beginner
