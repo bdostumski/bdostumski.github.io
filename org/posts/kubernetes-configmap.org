@@ -8,7 +8,1151 @@
 
 * Kubernetes ConfigMaps & Secrets
 
+[[https://kubernetes.io/docs/concepts/configuration/configmap/][Kubernetes ConfigMaps Documentation]]
+
 -----
+
+* Kubernetes ConfigMaps & Secrets Command Handbook:
+
+*1. ConfigMap Creation & Management*
+
+#+BEGIN_SRC bash
+
+# Create ConfigMap from literal values
+kubectl create configmap app-config \
+  --from-literal=APP_ENV=development \
+  --from-literal=LOG_LEVEL=debug
+
+# Create ConfigMap from a file
+kubectl create configmap app-config \
+  --from-file=application.properties
+
+# Create ConfigMap from a directory
+kubectl create configmap app-config \
+  --from-file=./config/
+
+# Create ConfigMap from environment file
+kubectl create configmap app-config \
+  --from-env-file=.env
+
+# List ConfigMaps
+kubectl get configmaps
+kubectl get cm
+
+# List ConfigMaps across namespaces
+kubectl get cm -A
+
+# Describe ConfigMap
+kubectl describe configmap app-config
+
+# Display ConfigMap YAML
+kubectl get configmap app-config -o yaml
+
+# Display ConfigMap JSON
+kubectl get configmap app-config -o json
+
+# Delete ConfigMap
+kubectl delete configmap app-config
+
+#+END_SRC
+
+*2. ConfigMap Inspection & Updates*
+
+#+BEGIN_SRC bash
+
+# Display ConfigMap data
+kubectl get cm app-config -o yaml
+
+# Display a specific ConfigMap value
+kubectl get cm app-config \
+  -o jsonpath='{.data.APP_ENV}'
+
+# Display all ConfigMap keys
+kubectl get cm app-config \
+  -o jsonpath='{.data}'
+
+# Edit ConfigMap interactively
+kubectl edit configmap app-config
+
+# Update a ConfigMap value
+kubectl patch configmap app-config \
+  --type=merge \
+  -p '{"data":{"LOG_LEVEL":"info"}}'
+
+# Add a new ConfigMap key
+kubectl patch configmap app-config \
+  --type=merge \
+  -p '{"data":{"APP_VERSION":"1.0"}}'
+
+# Replace ConfigMap from YAML
+kubectl replace -f configmap.yaml
+
+# Apply updated ConfigMap
+kubectl apply -f configmap.yaml
+
+# Watch ConfigMap changes
+kubectl get configmap app-config -w
+
+# Display ConfigMap labels
+kubectl get cm app-config --show-labels
+
+# Add label to ConfigMap
+kubectl label configmap app-config environment=production
+
+#+END_SRC
+
+*3. Secret Creation & Management*
+
+#+BEGIN_SRC bash
+
+# Create generic Secret
+kubectl create secret generic db-secret \
+  --from-literal=username=admin \
+  --from-literal=password=change-me
+
+# Create Secret from file
+kubectl create secret generic db-secret \
+  --from-file=password=./password.txt
+
+# Create Secret from environment file
+kubectl create secret generic db-secret \
+  --from-env-file=.env
+
+# Create Secret from multiple files
+kubectl create secret generic app-secret \
+  --from-file=username=./username.txt \
+  --from-file=password=./password.txt
+
+# List Secrets
+kubectl get secrets
+
+# List Secrets across namespaces
+kubectl get secrets -A
+
+# Describe Secret
+kubectl describe secret db-secret
+
+# Display Secret metadata and encoded data
+kubectl get secret db-secret -o yaml
+
+# Delete Secret
+kubectl delete secret db-secret
+
+# Create Secret YAML without applying it
+kubectl create secret generic db-secret \
+  --from-literal=username=admin \
+  --dry-run=client -o yaml
+
+#+END_SRC
+
+*4. Secret Inspection & Decoding*
+
+#+BEGIN_SRC bash
+
+# Display Secret metadata
+kubectl get secret db-secret
+
+# Display Secret type
+kubectl get secret db-secret \
+  -o jsonpath='{.type}'
+
+# Display Secret keys
+kubectl get secret db-secret \
+  -o jsonpath='{.data}'
+
+# Display encoded username
+kubectl get secret db-secret \
+  -o jsonpath='{.data.username}'
+
+# Decode a specific Secret value
+kubectl get secret db-secret \
+  -o jsonpath='{.data.password}' | base64 --decode
+
+# Decode username
+kubectl get secret db-secret \
+  -o jsonpath='{.data.username}' | base64 --decode
+
+# Display Secret labels
+kubectl get secret db-secret --show-labels
+
+# Edit Secret interactively
+kubectl edit secret db-secret
+
+# Export Secret YAML
+kubectl get secret db-secret -o yaml
+
+#+END_SRC
+
+Security warning: Decoding a Secret exposes its plaintext value in terminal output. Avoid using these commands in shared terminals, CI logs, or recorded sessions. Base64 is encoding, not encryption.
+
+*5. ConfigMap Environment Variable Injection*
+
+#+BEGIN_SRC bash
+
+# Display deployment configuration
+kubectl get deployment nginx -o yaml
+
+# Create deployment
+kubectl create deployment nginx --image=nginx
+
+# Inject one ConfigMap key as environment variable
+kubectl set env deployment/nginx \
+  --from=configmap/app-config
+
+# Display environment variables
+kubectl exec deployment/nginx -- printenv
+
+# Display a specific environment variable
+kubectl exec deployment/nginx -- printenv APP_ENV
+
+# Display deployment environment configuration
+kubectl describe deployment nginx
+
+# Remove an environment variable
+kubectl set env deployment/nginx APP_ENV-
+
+# Restart deployment after ConfigMap changes
+kubectl rollout restart deployment/nginx
+
+#+END_SRC
+
+*6. Secret Environment Variable Injection*
+
+#+BEGIN_SRC bash
+
+# Inject all Secret keys as environment variables
+kubectl set env deployment/nginx \
+  --from=secret/db-secret
+
+# Inject a specific Secret key
+kubectl set env deployment/nginx \
+  --from=secret/db-secret \
+  --prefix=DB_
+
+# Display deployment environment configuration
+kubectl describe deployment nginx
+
+# Display environment variables inside container
+kubectl exec deployment/nginx -- printenv
+
+# Restart deployment after Secret changes
+kubectl rollout restart deployment/nginx
+
+# Check rollout status
+kubectl rollout status deployment/nginx
+
+#+END_SRC
+
+Note: Environment variables are populated when a container starts. Updating the referenced ConfigMap or Secret does not update existing process environment variables. Restart the workload to load new values.
+
+*7. ConfigMap Volume Mounts*
+
+#+BEGIN_SRC bash
+
+# Apply ConfigMap manifest
+kubectl apply -f configmap.yaml
+
+# Apply Pod manifest with ConfigMap volume
+kubectl apply -f pod-configmap.yaml
+
+# Display pod details
+kubectl describe pod configmap-pod
+
+# Display mounted ConfigMap files
+kubectl exec configmap-pod -- ls -l /etc/config
+
+# Read mounted configuration file
+kubectl exec configmap-pod -- cat /etc/config/application.properties
+
+# Display ConfigMap volume information
+kubectl get pod configmap-pod -o yaml
+
+# Display ConfigMap volume mounts
+kubectl get pod configmap-pod \
+  -o jsonpath='{.spec.containers[*].volumeMounts}'
+
+# Delete pod
+kubectl delete pod configmap-pod
+
+#+END_SRC
+
+Example ConfigMap volume configuration:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: app-config
+
+#+END_SRC
+
+*8. Secret Volume Mounts*
+
+#+BEGIN_SRC bash
+
+# Apply Secret manifest
+kubectl apply -f secret.yaml
+
+# Apply Pod manifest
+kubectl apply -f pod-secret.yaml
+
+# Describe pod
+kubectl describe pod secret-pod
+
+# List mounted Secret files
+kubectl exec secret-pod -- ls -l /etc/secrets
+
+# Read mounted Secret file
+kubectl exec secret-pod -- cat /etc/secrets/username
+
+# Check mounted file permissions
+kubectl exec secret-pod -- stat /etc/secrets/username
+
+# Display volume configuration
+kubectl get pod secret-pod -o yaml
+
+# Delete pod
+kubectl delete pod secret-pod
+
+#+END_SRC
+
+Example Secret volume configuration:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: db-secret
+        defaultMode: 0400
+
+#+END_SRC
+
+*9. Projected Volumes*
+
+#+BEGIN_SRC bash
+
+# Display projected volume configuration
+kubectl get pod app-pod -o yaml
+
+# Apply projected volume manifest
+kubectl apply -f projected-volume.yaml
+
+# Inspect pod
+kubectl describe pod app-pod
+
+# List projected files
+kubectl exec app-pod -- ls -la /etc/app-config
+
+# Read ConfigMap file
+kubectl exec app-pod -- cat /etc/app-config/application.properties
+
+# Read Secret file
+kubectl exec app-pod -- cat /etc/app-config/password
+
+# Delete pod
+kubectl delete pod app-pod
+
+#+END_SRC
+
+Example projected volume:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: projected-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: app-config
+          mountPath: /etc/app-config
+          readOnly: true
+  volumes:
+    - name: app-config
+      projected:
+        sources:
+          - configMap:
+              name: app-config
+          - secret:
+              name: db-secret
+
+#+END_SRC
+
+*10. ConfigMap & Secret Updates*
+
+#+BEGIN_SRC bash
+
+# Update ConfigMap
+kubectl patch configmap app-config \
+  --type=merge \
+  -p '{"data":{"LOG_LEVEL":"info"}}'
+
+# Update Secret
+kubectl patch secret db-secret \
+  --type=merge \
+  -p '{"stringData":{"password":"new-password"}}'
+
+# Display updated ConfigMap
+kubectl get cm app-config -o yaml
+
+# Display updated Secret metadata
+kubectl describe secret db-secret
+
+# Restart deployment
+kubectl rollout restart deployment/nginx
+
+# Monitor rollout
+kubectl rollout status deployment/nginx
+
+# Display deployment pods
+kubectl get pods -l app=nginx
+
+# Check rollout history
+kubectl rollout history deployment/nginx
+
+# Roll back deployment
+kubectl rollout undo deployment/nginx
+
+#+END_SRC
+
+Important update behavior:
+
+| Consumption method | Update behavior |
+|---|---|
+| ConfigMap environment variable | Requires container restart |
+| Secret environment variable | Requires container restart |
+| ConfigMap volume mount | Eventually updated |
+| Secret volume mount | Eventually updated |
+| ConfigMap / Secret using `subPath` | Does not receive automatic updates |
+| Projected volume | Eventually updated, subject to source update behavior |
+
+*11. ConfigMap & Secret with Deployment*
+
+#+BEGIN_SRC bash
+
+# Create application ConfigMap
+kubectl create configmap app-config \
+  --from-literal=APP_ENV=production
+
+# Create database Secret
+kubectl create secret generic db-secret \
+  --from-literal=username=admin \
+  --from-literal=password=change-me
+
+# Apply deployment manifest
+kubectl apply -f deployment.yaml
+
+# Display deployment
+kubectl get deployments
+
+# Display pods
+kubectl get pods
+
+# Describe deployment
+kubectl describe deployment app
+
+# Check rollout
+kubectl rollout status deployment/app
+
+# Restart application after configuration changes
+kubectl rollout restart deployment/app
+
+# Delete deployment
+kubectl delete deployment app
+
+#+END_SRC
+
+*12. TLS Secrets*
+
+#+BEGIN_SRC bash
+
+# Create TLS Secret from certificate and private key
+kubectl create secret tls app-tls \
+  --cert=./tls.crt \
+  --key=./tls.key
+
+# List TLS Secrets
+kubectl get secrets --field-selector=type=kubernetes.io/tls
+
+# Describe TLS Secret
+kubectl describe secret app-tls
+
+# Display TLS Secret type
+kubectl get secret app-tls \
+  -o jsonpath='{.type}'
+
+# Display TLS certificate key names
+kubectl get secret app-tls \
+  -o jsonpath='{.data}'
+
+# Export TLS Secret manifest
+kubectl get secret app-tls -o yaml
+
+# Delete TLS Secret
+kubectl delete secret app-tls
+
+#+END_SRC
+
+*13. Docker Registry Secrets*
+
+#+BEGIN_SRC bash
+
+# Create Docker registry Secret
+kubectl create secret docker-registry registry-secret \
+  --docker-server=https://index.docker.io/v1/ \
+  --docker-username=myuser \
+  --docker-password=REPLACE_WITH_TOKEN \
+  --docker-email=user@example.com
+
+# List registry Secrets
+kubectl get secrets
+
+# Describe registry Secret
+kubectl describe secret registry-secret
+
+# Display Secret type
+kubectl get secret registry-secret \
+  -o jsonpath='{.type}'
+
+# Apply imagePullSecrets to a ServiceAccount
+kubectl patch serviceaccount default \
+  -p '{"imagePullSecrets":[{"name":"registry-secret"}]}'
+
+# Display ServiceAccount configuration
+kubectl get serviceaccount default -o yaml
+
+# Remove imagePullSecrets configuration
+kubectl patch serviceaccount default \
+  -p '{"imagePullSecrets":null}'
+
+#+END_SRC
+
+Use a registry access token rather than a personal password where possible. Avoid placing real credentials directly in command history.
+
+*14. Immutable ConfigMaps & Secrets*
+
+#+BEGIN_SRC bash
+
+# Create immutable ConfigMap
+kubectl create configmap app-config-v1 \
+  --from-literal=APP_ENV=production \
+  --dry-run=client -o yaml
+
+# Apply immutable ConfigMap manifest
+kubectl apply -f immutable-configmap.yaml
+
+# Create immutable Secret
+kubectl apply -f immutable-secret.yaml
+
+# Display ConfigMap immutable property
+kubectl get cm app-config-v1 \
+  -o jsonpath='{.immutable}'
+
+# Display Secret immutable property
+kubectl get secret db-secret-v1 \
+  -o jsonpath='{.immutable}'
+
+# List immutable ConfigMaps
+kubectl get cm -o yaml
+
+# Delete old immutable ConfigMap
+kubectl delete configmap app-config-v1
+
+#+END_SRC
+
+Note: Immutable ConfigMaps and Secrets cannot have their data changed after creation. Create a new resource and update the workload reference when configuration changes.
+
+*15. ConfigMap & Secret with Kustomize*
+
+#+BEGIN_SRC bash
+
+# Build Kustomize manifests
+kubectl kustomize ./k8s/
+
+# Apply Kustomize configuration
+kubectl apply -k ./k8s/
+
+# Preview Kustomize differences
+kubectl diff -k ./k8s/
+
+# Delete Kustomize resources
+kubectl delete -k ./k8s/
+
+# Display generated ConfigMaps
+kubectl get configmaps
+
+# Display generated Secrets
+kubectl get secrets
+
+# Display ConfigMap YAML
+kubectl get cm -o yaml
+
+#+END_SRC
+
+Example `kustomization.yaml`:
+
+#+BEGIN_SRC yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - APP_ENV=production
+      - LOG_LEVEL=info
+
+secretGenerator:
+  - name: db-secret
+    literals:
+      - username=admin
+      - password=placeholder
+
+resources:
+  - deployment.yaml
+
+#+END_SRC
+
+The generated resource names normally include a content hash, which helps trigger workload updates when generated configuration changes.
+
+Do not commit real Secret values to Git. Use an appropriate encrypted or external secret-management workflow.
+
+*16. ConfigMaps & Secrets with Helm*
+
+#+BEGIN_SRC bash
+
+# Install Helm chart
+helm install my-app ./my-chart
+
+# Upgrade application
+helm upgrade my-app ./my-chart
+
+# Upgrade with custom values
+helm upgrade my-app ./my-chart \
+  -f values.yaml
+
+# Render templates without installation
+helm template my-app ./my-chart
+
+# Render templates with debug information
+helm template my-app ./my-chart --debug
+
+# Display release information
+helm get values my-app
+
+# Display all computed values
+helm get values my-app --all
+
+# Display deployed manifests
+helm get manifest my-app
+
+# Display release history
+helm history my-app
+
+# Roll back release
+helm rollback my-app 1
+
+# Uninstall release
+helm uninstall my-app
+
+#+END_SRC
+
+*17. RBAC & ConfigMap / Secret Permissions*
+
+#+BEGIN_SRC bash
+
+# List Roles
+kubectl get roles -A
+
+# List ClusterRoles
+kubectl get clusterroles
+
+# List RoleBindings
+kubectl get rolebindings -A
+
+# List ClusterRoleBindings
+kubectl get clusterrolebindings
+
+# Check permission to read ConfigMaps
+kubectl auth can-i get configmaps
+
+# Check permission to list Secrets
+kubectl auth can-i list secrets
+
+# Check permission to read Secrets in production
+kubectl auth can-i get secrets -n production
+
+# Check permission as another user
+kubectl auth can-i get secrets --as=developer
+
+# Check permissions for a ServiceAccount
+kubectl auth can-i get secrets \
+  --as=system:serviceaccount:production:app-user \
+  -n production
+
+# List current user's permissions
+kubectl auth can-i --list
+
+#+END_SRC
+
+Example namespace-scoped Role:
+
+#+BEGIN_SRC yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: config-reader
+  namespace: production
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+
+#+END_SRC
+
+Example RoleBinding:
+
+#+BEGIN_SRC yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: config-reader-binding
+  namespace: production
+subjects:
+  - kind: ServiceAccount
+    name: app-user
+    namespace: production
+roleRef:
+  kind: Role
+  name: config-reader
+  apiGroup: rbac.authorization.k8s.io
+
+#+END_SRC
+
+Avoid granting broad Secret permissions. In particular, `list` and `watch` can expose the values of Secrets, not just their names.
+
+*18. Secret Encryption & etcd Configuration*
+
+These commands are mainly relevant to self-managed Kubernetes control planes.
+
+#+BEGIN_SRC bash
+
+# Check API server configuration
+kubectl get pods -n kube-system
+
+# Inspect API server command arguments
+kubectl describe pod kube-apiserver-node-name \
+  -n kube-system
+
+# Check encryption configuration file on control-plane node
+sudo cat /etc/kubernetes/enc/encryption-config.yaml
+
+# Inspect API server encryption provider argument
+sudo grep -n "encryption-provider-config" \
+  /etc/kubernetes/manifests/kube-apiserver.yaml
+
+# Check etcd pods
+kubectl get pods -n kube-system -l component=etcd
+
+# Check etcd configuration
+kubectl describe pod etcd-node-name -n kube-system
+
+# Check API server readiness
+kubectl get --raw='/readyz?verbose'
+
+# Inspect Secret metadata
+kubectl get secrets -A
+
+#+END_SRC
+
+Example encryption configuration structure:
+
+#+BEGIN_SRC yaml
+
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: REPLACE_WITH_BASE64_ENCODED_KEY
+      - identity: {}
+
+#+END_SRC
+
+Note: This is an illustrative configuration, not a ready-to-deploy production file. Encryption provider configuration must be managed carefully, and existing Secrets must be rewritten after enabling encryption so that they are stored encrypted. Prefer a supported KMS integration for production environments where appropriate.
+
+*19. External Secrets Operator & Vault*
+
+#+BEGIN_SRC bash
+
+# Check External Secrets Operator namespace
+kubectl get namespaces
+
+# List External Secrets Operator pods
+kubectl get pods -n external-secrets
+
+# List ExternalSecret resources
+kubectl get externalsecrets -A
+
+# Describe ExternalSecret
+kubectl describe externalsecret my-secret -n production
+
+# List SecretStores
+kubectl get secretstores -A
+
+# List ClusterSecretStores
+kubectl get clustersecretstores
+
+# Display ExternalSecret YAML
+kubectl get externalsecret my-secret -n production -o yaml
+
+# List generated Kubernetes Secrets
+kubectl get secrets -n production
+
+# Check ExternalSecret synchronization status
+kubectl describe externalsecret my-secret -n production
+
+# Check operator logs
+kubectl logs -n external-secrets \
+  deployment/external-secrets
+
+# List Vault-related resources, if installed
+kubectl get pods -A | grep vault
+
+#+END_SRC
+
+*20. Secret Rotation & Configuration Reloading*
+
+#+BEGIN_SRC bash
+
+# Update Secret data
+kubectl patch secret db-secret \
+  --type=merge \
+  -p '{"stringData":{"password":"new-password"}}'
+
+# Display Secret update timestamp
+kubectl get secret db-secret \
+  -o jsonpath='{.metadata.resourceVersion}'
+
+# Restart deployment to reload environment variables
+kubectl rollout restart deployment/app
+
+# Monitor rollout
+kubectl rollout status deployment/app
+
+# Check running pods
+kubectl get pods -l app=app
+
+# Display deployment history
+kubectl rollout history deployment/app
+
+# Roll back deployment if necessary
+kubectl rollout undo deployment/app
+
+# Update ConfigMap
+kubectl patch configmap app-config \
+  --type=merge \
+  -p '{"data":{"APP_ENV":"production"}}'
+
+# Restart deployment after configuration update
+kubectl rollout restart deployment/app
+
+#+END_SRC
+
+For file-mounted ConfigMaps and Secrets, Kubernetes updates the projected volume eventually, but the application must support reloading the files. A restart is not always required. The `subPath` mount exception is important: those mounts do not receive automatic updates.
+
+*21. ConfigMap & Secret Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# List ConfigMaps
+kubectl get cm -A
+
+# List Secrets
+kubectl get secrets -A
+
+# Describe ConfigMap
+kubectl describe cm app-config
+
+# Describe Secret
+kubectl describe secret db-secret
+
+# Check pod status
+kubectl get pods -A
+
+# Describe failing pod
+kubectl describe pod pod-name
+
+# Check pod events
+kubectl get events \
+  --sort-by=.metadata.creationTimestamp
+
+# Check container logs
+kubectl logs pod-name
+
+# Check previous container logs
+kubectl logs pod-name --previous
+
+# Inspect pod volume configuration
+kubectl get pod pod-name -o yaml
+
+# Inspect ConfigMap references
+kubectl get pod pod-name \
+  -o jsonpath='{.spec.volumes[*].configMap}'
+
+# Inspect Secret references
+kubectl get pod pod-name \
+  -o jsonpath='{.spec.volumes[*].secret}'
+
+# Inspect environment variable references
+kubectl get pod pod-name \
+  -o jsonpath='{.spec.containers[*].env}'
+
+# Inspect environment variable sources
+kubectl get pod pod-name \
+  -o jsonpath='{.spec.containers[*].envFrom}'
+
+# Inspect pod volume mounts
+kubectl get pod pod-name \
+  -o jsonpath='{.spec.containers[*].volumeMounts}'
+
+#+END_SRC
+
+Common problems:
+
+| Error / Problem | Possible Cause |
+|---|---|
+| `CreateContainerConfigError` | Missing ConfigMap, Secret, or referenced key |
+| `FailedMount` | Volume source missing or mount failure |
+| `secret not found` | Secret does not exist in the Pod namespace |
+| `configmap not found` | ConfigMap does not exist in the Pod namespace |
+| Environment variable missing | Incorrect key or reference |
+| Old environment value | Container has not restarted |
+| Stale mounted file | Application caching or update propagation delay |
+| Permission denied | Incorrect file mode or container security context |
+| Invalid TLS certificate | Incorrect certificate or private key |
+| ImagePullBackOff | Invalid or unavailable registry credentials |
+
+*22. Real-World ConfigMap & Secret Workflows*
+
+**A. Create application configuration**
+
+#+BEGIN_SRC bash
+
+kubectl create configmap app-config \
+  --from-literal=APP_ENV=production \
+  --from-literal=LOG_LEVEL=info
+
+kubectl get cm app-config
+kubectl describe cm app-config
+
+#+END_SRC
+
+**B. Create database credentials**
+
+#+BEGIN_SRC bash
+
+kubectl create secret generic db-secret \
+  --from-literal=username=admin \
+  --from-file=password=./password.txt
+
+kubectl get secret db-secret
+kubectl describe secret db-secret
+
+#+END_SRC
+
+**C. Deploy an application with ConfigMap and Secret**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f configmap.yaml
+kubectl apply -f secret.yaml
+kubectl apply -f deployment.yaml
+
+kubectl rollout status deployment/app
+kubectl get pods
+
+#+END_SRC
+
+**D. Update application configuration**
+
+#+BEGIN_SRC bash
+
+kubectl patch configmap app-config \
+  --type=merge \
+  -p '{"data":{"LOG_LEVEL":"debug"}}'
+
+kubectl rollout restart deployment/app
+
+kubectl rollout status deployment/app
+
+#+END_SRC
+
+**E. Rotate database credentials**
+
+#+BEGIN_SRC bash
+
+kubectl patch secret db-secret \
+  --type=merge \
+  -p '{"stringData":{"password":"new-password"}}'
+
+kubectl rollout restart deployment/app
+
+kubectl rollout status deployment/app
+
+#+END_SRC
+
+Coordinate credential rotation with the database itself. Updating the Kubernetes Secret alone does not change the database password.
+
+**F. Debug missing configuration**
+
+#+BEGIN_SRC bash
+
+kubectl describe pod pod-name
+
+kubectl get cm -A
+
+kubectl get secrets -A
+
+kubectl get events \
+  --sort-by=.metadata.creationTimestamp
+
+kubectl logs pod-name
+
+#+END_SRC
+
+**G. Deploy environment-specific configuration**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f k8s/base/
+
+kubectl apply -k k8s/overlays/development/
+
+kubectl get cm -n development
+
+kubectl get secrets -n development
+
+#+END_SRC
+
+**H. Validate Secret permissions**
+
+#+BEGIN_SRC bash
+
+kubectl auth can-i get secrets -n production
+
+kubectl auth can-i list secrets -n production
+
+kubectl auth can-i get configmaps -n production
+
+kubectl auth can-i --list -n production
+
+#+END_SRC
+
+**I. Verify mounted configuration**
+
+#+BEGIN_SRC bash
+
+kubectl get pods
+
+kubectl exec -it app-pod -- ls -la /etc/config
+
+kubectl exec -it app-pod -- cat /etc/config/application.properties
+
+#+END_SRC
+
+**J. Verify secret synchronization**
+
+#+BEGIN_SRC bash
+
+kubectl get externalsecrets -A
+
+kubectl describe externalsecret my-secret -n production
+
+kubectl get secret my-secret -n production
+
+#+END_SRC
+
+*23. Commands Every Developer Should Memorize*
+
+| Command | Purpose |
+|---|---|
+| `kubectl get cm` | List ConfigMaps |
+| `kubectl get cm -A` | List ConfigMaps across namespaces |
+| `kubectl describe cm app-config` | Inspect ConfigMap |
+| `kubectl create configmap app-config --from-file=config.properties` | Create ConfigMap from file |
+| `kubectl get cm app-config -o yaml` | Display ConfigMap YAML |
+| `kubectl edit cm app-config` | Edit ConfigMap |
+| `kubectl get secrets` | List Secrets |
+| `kubectl describe secret db-secret` | Inspect Secret metadata |
+| `kubectl create secret generic db-secret --from-file=password=./password.txt` | Create Secret from file |
+| `kubectl get secret db-secret -o yaml` | Display Secret YAML |
+| `kubectl create secret tls app-tls --cert=tls.crt --key=tls.key` | Create TLS Secret |
+| `kubectl create secret docker-registry registry-secret` | Create registry Secret |
+| `kubectl set env deployment/app --from=configmap/app-config` | Inject ConfigMap values |
+| `kubectl set env deployment/app --from=secret/db-secret` | Inject Secret values |
+| `kubectl rollout restart deployment/app` | Restart application |
+| `kubectl rollout status deployment/app` | Check rollout status |
+| `kubectl exec -it app-pod -- printenv` | Inspect container environment |
+| `kubectl exec -it app-pod -- ls /etc/config` | Inspect mounted configuration |
+| `kubectl get pod app-pod -o yaml` | Inspect Pod configuration |
+| `kubectl apply -f configmap.yaml` | Apply ConfigMap manifest |
+| `kubectl apply -f secret.yaml` | Apply Secret manifest |
+| `kubectl apply -k ./k8s/` | Apply Kustomize configuration |
+| `kubectl auth can-i get secrets` | Check Secret read permission |
+| `kubectl get externalsecrets -A` | List ExternalSecrets |
+| `kubectl get secret db-secret -o jsonpath='{.type}'` | Display Secret type |
+| `kubectl get events -A` | Inspect Kubernetes events |
+| `helm get manifest my-app` | Inspect Helm-generated manifests |
+| `helm upgrade my-app ./my-chart` | Upgrade Helm release |
+
+**Important Security Rules:**
+
+1. Never commit plaintext credentials, private keys, or production passwords to Git.
+2. Base64 encoding does not encrypt Kubernetes Secrets.
+3. Enable encryption at rest for Secrets in etcd.
+4. Use RBAC and least-privilege permissions to control Secret access.
+5. Prefer external secret managers for centralized credential lifecycle management.
+6. Rotate credentials regularly and coordinate application reloads.
+7. Avoid exposing Secret values through terminal output, shell history, or CI/CD logs.
+8. Use immutable ConfigMaps and Secrets when configuration changes should be explicit and controlled.
+9. Remember that ConfigMaps and Secrets are namespace-scoped resources.
+10. Treat the Kubernetes control plane, etcd, kubelet, and container runtime as part of the security boundary.
+
+    -----
 
 * Beginner
 

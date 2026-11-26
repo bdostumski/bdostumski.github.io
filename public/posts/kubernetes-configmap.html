@@ -23,212 +23,1728 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-orgbd38e46" class="outline-2">
-<h2 id="orgbd38e46">Kubernetes ConfigMaps &amp; Secrets</h2>
-<div class="outline-text-2" id="text-orgbd38e46">
+<div id="outline-container-org4a3609c" class="outline-2">
+<h2 id="org4a3609c">Kubernetes ConfigMaps &amp; Secrets</h2>
+<div class="outline-text-2" id="text-org4a3609c">
+<p>
+<a href="https://kubernetes.io/docs/concepts/configuration/configmap/">Kubernetes ConfigMaps Documentation</a>
+</p>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-org076685b" class="outline-2">
-<h2 id="org076685b">Beginner</h2>
-<div class="outline-text-2" id="text-org076685b">
+<div id="outline-container-org5717f16" class="outline-2">
+<h2 id="org5717f16">Kubernetes ConfigMaps &amp; Secrets Command Handbook:</h2>
+<div class="outline-text-2" id="text-org5717f16">
+<p>
+<b>1. ConfigMap Creation &amp; Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ConfigMap from literal values
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">APP_ENV</span>=development <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">LOG_LEVEL</span>=debug
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ConfigMap from a file
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-file=application.properties
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ConfigMap from a directory
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-file=./config/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ConfigMap from environment file
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-env-file=.env
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ConfigMaps
+</span>kubectl get configmaps
+kubectl get cm
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ConfigMaps across namespaces
+</span>kubectl get cm -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe ConfigMap
+</span>kubectl describe configmap app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap YAML
+</span>kubectl get configmap app-config -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap JSON
+</span>kubectl get configmap app-config -o json
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete ConfigMap
+</span>kubectl delete configmap app-config
+
+</code></pre>
 </div>
-<div id="outline-container-orgbf05659" class="outline-3">
-<h3 id="orgbf05659">Q1: What is a Kubernetes ConfigMap?</h3>
-<div class="outline-text-3" id="text-orgbf05659">
+
+<p>
+<b>2. ConfigMap Inspection &amp; Updates</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap data
+</span>kubectl get cm app-config -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display a specific ConfigMap value
+</span>kubectl get cm app-config <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data.APP_ENV}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all ConfigMap keys
+</span>kubectl get cm app-config <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Edit ConfigMap interactively
+</span>kubectl edit configmap app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update a ConfigMap value
+</span>kubectl patch configmap app-config <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"data":{"LOG_LEVEL":"info"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add a new ConfigMap key
+</span>kubectl patch configmap app-config <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"data":{"APP_VERSION":"1.0"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Replace ConfigMap from YAML
+</span>kubectl replace -f configmap.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply updated ConfigMap
+</span>kubectl apply -f configmap.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch ConfigMap changes
+</span>kubectl get configmap app-config -w
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap labels
+</span>kubectl get cm app-config --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add label to ConfigMap
+</span>kubectl label configmap app-config <span style="font-weight: bold; font-style: italic;">environment</span>=production
+
+</code></pre>
+</div>
+
+<p>
+<b>3. Secret Creation &amp; Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create generic Secret
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">username</span>=admin <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">password</span>=change-me
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Secret from file
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-file=<span style="font-weight: bold; font-style: italic;">password</span>=./password.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Secret from environment file
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-env-file=.env
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Secret from multiple files
+</span>kubectl create secret generic app-secret <span style="font-style: italic;">\</span>
+  --from-file=<span style="font-weight: bold; font-style: italic;">username</span>=./username.txt <span style="font-style: italic;">\</span>
+  --from-file=<span style="font-weight: bold; font-style: italic;">password</span>=./password.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Secrets
+</span>kubectl get secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Secrets across namespaces
+</span>kubectl get secrets -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe Secret
+</span>kubectl describe secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret metadata and encoded data
+</span>kubectl get secret db-secret -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Secret
+</span>kubectl delete secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Secret YAML without applying it
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">username</span>=admin <span style="font-style: italic;">\</span>
+  --dry-run=client -o yaml
+
+</code></pre>
+</div>
+
+<p>
+<b>4. Secret Inspection &amp; Decoding</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret metadata
+</span>kubectl get secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret type
+</span>kubectl get secret db-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.type}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret keys
+</span>kubectl get secret db-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display encoded username
+</span>kubectl get secret db-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data.username}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Decode a specific Secret value
+</span>kubectl get secret db-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data.password}'</span> | base64 --decode
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Decode username
+</span>kubectl get secret db-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data.username}'</span> | base64 --decode
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret labels
+</span>kubectl get secret db-secret --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Edit Secret interactively
+</span>kubectl edit secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export Secret YAML
+</span>kubectl get secret db-secret -o yaml
+
+</code></pre>
+</div>
+
+<p>
+Security warning: Decoding a Secret exposes its plaintext value in terminal output. Avoid using these commands in shared terminals, CI logs, or recorded sessions. Base64 is encoding, not encryption.
+</p>
+
+<p>
+<b>5. ConfigMap Environment Variable Injection</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment configuration
+</span>kubectl get deployment nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create deployment
+</span>kubectl create deployment nginx --image=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inject one ConfigMap key as environment variable
+</span>kubectl set env deployment/nginx <span style="font-style: italic;">\</span>
+  --from=configmap/app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display environment variables
+</span>kubectl exec deployment/nginx -- printenv
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display a specific environment variable
+</span>kubectl exec deployment/nginx -- printenv APP_ENV
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment environment configuration
+</span>kubectl describe deployment nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove an environment variable
+</span>kubectl set env deployment/nginx APP_ENV-
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment after ConfigMap changes
+</span>kubectl rollout restart deployment/nginx
+
+</code></pre>
+</div>
+
+<p>
+<b>6. Secret Environment Variable Injection</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inject all Secret keys as environment variables
+</span>kubectl set env deployment/nginx <span style="font-style: italic;">\</span>
+  --from=secret/db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inject a specific Secret key
+</span>kubectl set env deployment/nginx <span style="font-style: italic;">\</span>
+  --from=secret/db-secret <span style="font-style: italic;">\</span>
+  --prefix=DB_
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment environment configuration
+</span>kubectl describe deployment nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display environment variables inside container
+</span>kubectl exec deployment/nginx -- printenv
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment after Secret changes
+</span>kubectl rollout restart deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check rollout status
+</span>kubectl rollout status deployment/nginx
+
+</code></pre>
+</div>
+
+<p>
+Note: Environment variables are populated when a container starts. Updating the referenced ConfigMap or Secret does not update existing process environment variables. Restart the workload to load new values.
+</p>
+
+<p>
+<b>7. ConfigMap Volume Mounts</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply ConfigMap manifest
+</span>kubectl apply -f configmap.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Pod manifest with ConfigMap volume
+</span>kubectl apply -f pod-configmap.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod details
+</span>kubectl describe pod configmap-pod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display mounted ConfigMap files
+</span>kubectl exec configmap-pod -- ls -l /etc/config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Read mounted configuration file
+</span>kubectl exec configmap-pod -- cat /etc/config/application.properties
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap volume information
+</span>kubectl get pod configmap-pod -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap volume mounts
+</span>kubectl get pod configmap-pod <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].volumeMounts}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete pod
+</span>kubectl delete pod configmap-pod
+
+</code></pre>
+</div>
+
+<p>
+Example ConfigMap volume configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: app-config
+
+</code></pre>
+</div>
+
+<p>
+<b>8. Secret Volume Mounts</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Secret manifest
+</span>kubectl apply -f secret.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Pod manifest
+</span>kubectl apply -f pod-secret.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe pod
+</span>kubectl describe pod secret-pod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List mounted Secret files
+</span>kubectl exec secret-pod -- ls -l /etc/secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Read mounted Secret file
+</span>kubectl exec secret-pod -- cat /etc/secrets/username
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check mounted file permissions
+</span>kubectl exec secret-pod -- stat /etc/secrets/username
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display volume configuration
+</span>kubectl get pod secret-pod -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete pod
+</span>kubectl delete pod secret-pod
+
+</code></pre>
+</div>
+
+<p>
+Example Secret volume configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: db-secret
+        defaultMode: 0400
+
+</code></pre>
+</div>
+
+<p>
+<b>9. Projected Volumes</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display projected volume configuration
+</span>kubectl get pod app-pod -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply projected volume manifest
+</span>kubectl apply -f projected-volume.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod
+</span>kubectl describe pod app-pod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List projected files
+</span>kubectl exec app-pod -- ls -la /etc/app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Read ConfigMap file
+</span>kubectl exec app-pod -- cat /etc/app-config/application.properties
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Read Secret file
+</span>kubectl exec app-pod -- cat /etc/app-config/password
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete pod
+</span>kubectl delete pod app-pod
+
+</code></pre>
+</div>
+
+<p>
+Example projected volume:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: projected-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: app-config
+          mountPath: /etc/app-config
+          readOnly: true
+  volumes:
+    - name: app-config
+      projected:
+        sources:
+          - configMap:
+              name: app-config
+          - secret:
+              name: db-secret
+
+</code></pre>
+</div>
+
+<p>
+<b>10. ConfigMap &amp; Secret Updates</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update ConfigMap
+</span>kubectl patch configmap app-config <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"data":{"LOG_LEVEL":"info"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update Secret
+</span>kubectl patch secret db-secret <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"stringData":{"password":"new-password"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display updated ConfigMap
+</span>kubectl get cm app-config -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display updated Secret metadata
+</span>kubectl describe secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment
+</span>kubectl rollout restart deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Monitor rollout
+</span>kubectl rollout status deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check rollout history
+</span>kubectl rollout history deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Roll back deployment
+</span>kubectl rollout undo deployment/nginx
+
+</code></pre>
+</div>
+
+<p>
+Important update behavior:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Consumption method</th>
+<th scope="col" class="org-left">Update behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">ConfigMap environment variable</td>
+<td class="org-left">Requires container restart</td>
+</tr>
+
+<tr>
+<td class="org-left">Secret environment variable</td>
+<td class="org-left">Requires container restart</td>
+</tr>
+
+<tr>
+<td class="org-left">ConfigMap volume mount</td>
+<td class="org-left">Eventually updated</td>
+</tr>
+
+<tr>
+<td class="org-left">Secret volume mount</td>
+<td class="org-left">Eventually updated</td>
+</tr>
+
+<tr>
+<td class="org-left">ConfigMap / Secret using `subPath`</td>
+<td class="org-left">Does not receive automatic updates</td>
+</tr>
+
+<tr>
+<td class="org-left">Projected volume</td>
+<td class="org-left">Eventually updated, subject to source update behavior</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. ConfigMap &amp; Secret with Deployment</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create application ConfigMap
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">APP_ENV</span>=production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create database Secret
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">username</span>=admin <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">password</span>=change-me
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply deployment manifest
+</span>kubectl apply -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment
+</span>kubectl get deployments
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pods
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe deployment
+</span>kubectl describe deployment app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check rollout
+</span>kubectl rollout status deployment/app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart application after configuration changes
+</span>kubectl rollout restart deployment/app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete deployment
+</span>kubectl delete deployment app
+
+</code></pre>
+</div>
+
+<p>
+<b>12. TLS Secrets</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create TLS Secret from certificate and private key
+</span>kubectl create secret tls app-tls <span style="font-style: italic;">\</span>
+  --cert=./tls.crt <span style="font-style: italic;">\</span>
+  --key=./tls.key
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List TLS Secrets
+</span>kubectl get secrets --field-selector=<span style="font-weight: bold; font-style: italic;">type</span>=kubernetes.io/tls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe TLS Secret
+</span>kubectl describe secret app-tls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display TLS Secret type
+</span>kubectl get secret app-tls <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.type}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display TLS certificate key names
+</span>kubectl get secret app-tls <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export TLS Secret manifest
+</span>kubectl get secret app-tls -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete TLS Secret
+</span>kubectl delete secret app-tls
+
+</code></pre>
+</div>
+
+<p>
+<b>13. Docker Registry Secrets</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Docker registry Secret
+</span>kubectl create secret docker-registry registry-secret <span style="font-style: italic;">\</span>
+  --docker-server=https://index.docker.io/v1/ <span style="font-style: italic;">\</span>
+  --docker-username=myuser <span style="font-style: italic;">\</span>
+  --docker-password=REPLACE_WITH_TOKEN <span style="font-style: italic;">\</span>
+  --docker-email=user@example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List registry Secrets
+</span>kubectl get secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe registry Secret
+</span>kubectl describe secret registry-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret type
+</span>kubectl get secret registry-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.type}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply imagePullSecrets to a ServiceAccount
+</span>kubectl patch serviceaccount default <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"imagePullSecrets":[{"name":"registry-secret"}]}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ServiceAccount configuration
+</span>kubectl get serviceaccount default -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove imagePullSecrets configuration
+</span>kubectl patch serviceaccount default <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"imagePullSecrets":null}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Use a registry access token rather than a personal password where possible. Avoid placing real credentials directly in command history.
+</p>
+
+<p>
+<b>14. Immutable ConfigMaps &amp; Secrets</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create immutable ConfigMap
+</span>kubectl create configmap app-config-v1 <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">APP_ENV</span>=production <span style="font-style: italic;">\</span>
+  --dry-run=client -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply immutable ConfigMap manifest
+</span>kubectl apply -f immutable-configmap.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create immutable Secret
+</span>kubectl apply -f immutable-secret.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap immutable property
+</span>kubectl get cm app-config-v1 <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.immutable}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret immutable property
+</span>kubectl get secret db-secret-v1 <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.immutable}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List immutable ConfigMaps
+</span>kubectl get cm -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete old immutable ConfigMap
+</span>kubectl delete configmap app-config-v1
+
+</code></pre>
+</div>
+
+<p>
+Note: Immutable ConfigMaps and Secrets cannot have their data changed after creation. Create a new resource and update the workload reference when configuration changes.
+</p>
+
+<p>
+<b>15. ConfigMap &amp; Secret with Kustomize</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build Kustomize manifests
+</span>kubectl kustomize ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Kustomize configuration
+</span>kubectl apply -k ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Preview Kustomize differences
+</span>kubectl diff -k ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Kustomize resources
+</span>kubectl delete -k ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display generated ConfigMaps
+</span>kubectl get configmaps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display generated Secrets
+</span>kubectl get secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap YAML
+</span>kubectl get cm -o yaml
+
+</code></pre>
+</div>
+
+<p>
+Example `kustomization.yaml`:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - APP_ENV=production
+      - LOG_LEVEL=info
+
+secretGenerator:
+  - name: db-secret
+    literals:
+      - username=admin
+      - password=placeholder
+
+resources:
+  - deployment.yaml
+
+</code></pre>
+</div>
+
+<p>
+The generated resource names normally include a content hash, which helps trigger workload updates when generated configuration changes.
+</p>
+
+<p>
+Do not commit real Secret values to Git. Use an appropriate encrypted or external secret-management workflow.
+</p>
+
+<p>
+<b>16. ConfigMaps &amp; Secrets with Helm</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install Helm chart
+</span>helm install my-app ./my-chart
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Upgrade application
+</span>helm upgrade my-app ./my-chart
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Upgrade with custom values
+</span>helm upgrade my-app ./my-chart <span style="font-style: italic;">\</span>
+  -f values.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Render templates without installation
+</span>helm template my-app ./my-chart
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Render templates with debug information
+</span>helm template my-app ./my-chart --debug
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display release information
+</span>helm get values my-app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all computed values
+</span>helm get values my-app --all
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployed manifests
+</span>helm get manifest my-app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display release history
+</span>helm history my-app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Roll back release
+</span>helm rollback my-app 1
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Uninstall release
+</span>helm uninstall my-app
+
+</code></pre>
+</div>
+
+<p>
+<b>17. RBAC &amp; ConfigMap / Secret Permissions</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Roles
+</span>kubectl get roles -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ClusterRoles
+</span>kubectl get clusterroles
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List RoleBindings
+</span>kubectl get rolebindings -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ClusterRoleBindings
+</span>kubectl get clusterrolebindings
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permission to read ConfigMaps
+</span>kubectl auth can-i get configmaps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permission to list Secrets
+</span>kubectl auth can-i list secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permission to read Secrets in production
+</span>kubectl auth can-i get secrets -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permission as another user
+</span>kubectl auth can-i get secrets --as=developer
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permissions for a ServiceAccount
+</span>kubectl auth can-i get secrets <span style="font-style: italic;">\</span>
+  --as=system:serviceaccount:production:app-user <span style="font-style: italic;">\</span>
+  -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List current user's permissions
+</span>kubectl auth can-i --list
+
+</code></pre>
+</div>
+
+<p>
+Example namespace-scoped Role:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: config-reader
+  namespace: production
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+
+</code></pre>
+</div>
+
+<p>
+Example RoleBinding:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: config-reader-binding
+  namespace: production
+subjects:
+  - kind: ServiceAccount
+    name: app-user
+    namespace: production
+roleRef:
+  kind: Role
+  name: config-reader
+  apiGroup: rbac.authorization.k8s.io
+
+</code></pre>
+</div>
+
+<p>
+Avoid granting broad Secret permissions. In particular, `list` and `watch` can expose the values of Secrets, not just their names.
+</p>
+
+<p>
+<b>18. Secret Encryption &amp; etcd Configuration</b>
+</p>
+
+<p>
+These commands are mainly relevant to self-managed Kubernetes control planes.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check API server configuration
+</span>kubectl get pods -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect API server command arguments
+</span>kubectl describe pod kube-apiserver-node-name <span style="font-style: italic;">\</span>
+  -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check encryption configuration file on control-plane node
+</span>sudo cat /etc/kubernetes/enc/encryption-config.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect API server encryption provider argument
+</span>sudo grep -n <span style="font-style: italic;">"encryption-provider-config"</span> <span style="font-style: italic;">\</span>
+  /etc/kubernetes/manifests/kube-apiserver.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check etcd pods
+</span>kubectl get pods -n kube-system -l <span style="font-weight: bold; font-style: italic;">component</span>=etcd
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check etcd configuration
+</span>kubectl describe pod etcd-node-name -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check API server readiness
+</span>kubectl get --raw=<span style="font-style: italic;">'/readyz?verbose'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Secret metadata
+</span>kubectl get secrets -A
+
+</code></pre>
+</div>
+
+<p>
+Example encryption configuration structure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: REPLACE_WITH_BASE64_ENCODED_KEY
+      - identity: {}
+
+</code></pre>
+</div>
+
+<p>
+Note: This is an illustrative configuration, not a ready-to-deploy production file. Encryption provider configuration must be managed carefully, and existing Secrets must be rewritten after enabling encryption so that they are stored encrypted. Prefer a supported KMS integration for production environments where appropriate.
+</p>
+
+<p>
+<b>19. External Secrets Operator &amp; Vault</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check External Secrets Operator namespace
+</span>kubectl get namespaces
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List External Secrets Operator pods
+</span>kubectl get pods -n external-secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ExternalSecret resources
+</span>kubectl get externalsecrets -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe ExternalSecret
+</span>kubectl describe externalsecret my-secret -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List SecretStores
+</span>kubectl get secretstores -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ClusterSecretStores
+</span>kubectl get clustersecretstores
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ExternalSecret YAML
+</span>kubectl get externalsecret my-secret -n production -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List generated Kubernetes Secrets
+</span>kubectl get secrets -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check ExternalSecret synchronization status
+</span>kubectl describe externalsecret my-secret -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check operator logs
+</span>kubectl logs -n external-secrets <span style="font-style: italic;">\</span>
+  deployment/external-secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Vault-related resources, if installed
+</span>kubectl get pods -A | grep vault
+
+</code></pre>
+</div>
+
+<p>
+<b>20. Secret Rotation &amp; Configuration Reloading</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update Secret data
+</span>kubectl patch secret db-secret <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"stringData":{"password":"new-password"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret update timestamp
+</span>kubectl get secret db-secret <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.metadata.resourceVersion}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment to reload environment variables
+</span>kubectl rollout restart deployment/app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Monitor rollout
+</span>kubectl rollout status deployment/app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check running pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment history
+</span>kubectl rollout history deployment/app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Roll back deployment if necessary
+</span>kubectl rollout undo deployment/app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update ConfigMap
+</span>kubectl patch configmap app-config <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"data":{"APP_ENV":"production"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment after configuration update
+</span>kubectl rollout restart deployment/app
+
+</code></pre>
+</div>
+
+<p>
+For file-mounted ConfigMaps and Secrets, Kubernetes updates the projected volume eventually, but the application must support reloading the files. A restart is not always required. The `subPath` mount exception is important: those mounts do not receive automatic updates.
+</p>
+
+<p>
+<b>21. ConfigMap &amp; Secret Troubleshooting</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ConfigMaps
+</span>kubectl get cm -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Secrets
+</span>kubectl get secrets -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe ConfigMap
+</span>kubectl describe cm app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe Secret
+</span>kubectl describe secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod status
+</span>kubectl get pods -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe failing pod
+</span>kubectl describe pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod events
+</span>kubectl get events <span style="font-style: italic;">\</span>
+  --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check container logs
+</span>kubectl logs pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check previous container logs
+</span>kubectl logs pod-name --previous
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod volume configuration
+</span>kubectl get pod pod-name -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect ConfigMap references
+</span>kubectl get pod pod-name <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.volumes[*].configMap}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Secret references
+</span>kubectl get pod pod-name <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.volumes[*].secret}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect environment variable references
+</span>kubectl get pod pod-name <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].env}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect environment variable sources
+</span>kubectl get pod pod-name <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].envFrom}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod volume mounts
+</span>kubectl get pod pod-name <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].volumeMounts}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Common problems:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Error / Problem</th>
+<th scope="col" class="org-left">Possible Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`CreateContainerConfigError`</td>
+<td class="org-left">Missing ConfigMap, Secret, or referenced key</td>
+</tr>
+
+<tr>
+<td class="org-left">`FailedMount`</td>
+<td class="org-left">Volume source missing or mount failure</td>
+</tr>
+
+<tr>
+<td class="org-left">`secret not found`</td>
+<td class="org-left">Secret does not exist in the Pod namespace</td>
+</tr>
+
+<tr>
+<td class="org-left">`configmap not found`</td>
+<td class="org-left">ConfigMap does not exist in the Pod namespace</td>
+</tr>
+
+<tr>
+<td class="org-left">Environment variable missing</td>
+<td class="org-left">Incorrect key or reference</td>
+</tr>
+
+<tr>
+<td class="org-left">Old environment value</td>
+<td class="org-left">Container has not restarted</td>
+</tr>
+
+<tr>
+<td class="org-left">Stale mounted file</td>
+<td class="org-left">Application caching or update propagation delay</td>
+</tr>
+
+<tr>
+<td class="org-left">Permission denied</td>
+<td class="org-left">Incorrect file mode or container security context</td>
+</tr>
+
+<tr>
+<td class="org-left">Invalid TLS certificate</td>
+<td class="org-left">Incorrect certificate or private key</td>
+</tr>
+
+<tr>
+<td class="org-left">ImagePullBackOff</td>
+<td class="org-left">Invalid or unavailable registry credentials</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>22. Real-World ConfigMap &amp; Secret Workflows</b>
+</p>
+
+<p>
+<b><b>A. Create application configuration</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">APP_ENV</span>=production <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">LOG_LEVEL</span>=info
+
+kubectl get cm app-config
+kubectl describe cm app-config
+
+</code></pre>
+</div>
+
+<p>
+<b><b>B. Create database credentials</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">username</span>=admin <span style="font-style: italic;">\</span>
+  --from-file=<span style="font-weight: bold; font-style: italic;">password</span>=./password.txt
+
+kubectl get secret db-secret
+kubectl describe secret db-secret
+
+</code></pre>
+</div>
+
+<p>
+<b><b>C. Deploy an application with ConfigMap and Secret</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl apply -f configmap.yaml
+kubectl apply -f secret.yaml
+kubectl apply -f deployment.yaml
+
+kubectl rollout status deployment/app
+kubectl get pods
+
+</code></pre>
+</div>
+
+<p>
+<b><b>D. Update application configuration</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl patch configmap app-config <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"data":{"LOG_LEVEL":"debug"}}'</span>
+
+kubectl rollout restart deployment/app
+
+kubectl rollout status deployment/app
+
+</code></pre>
+</div>
+
+<p>
+<b><b>E. Rotate database credentials</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl patch secret db-secret <span style="font-style: italic;">\</span>
+  --type=merge <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"stringData":{"password":"new-password"}}'</span>
+
+kubectl rollout restart deployment/app
+
+kubectl rollout status deployment/app
+
+</code></pre>
+</div>
+
+<p>
+Coordinate credential rotation with the database itself. Updating the Kubernetes Secret alone does not change the database password.
+</p>
+
+<p>
+<b><b>F. Debug missing configuration</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl describe pod pod-name
+
+kubectl get cm -A
+
+kubectl get secrets -A
+
+kubectl get events <span style="font-style: italic;">\</span>
+  --sort-by=.metadata.creationTimestamp
+
+kubectl logs pod-name
+
+</code></pre>
+</div>
+
+<p>
+<b><b>G. Deploy environment-specific configuration</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl apply -f k8s/base/
+
+kubectl apply -k k8s/overlays/development/
+
+kubectl get cm -n development
+
+kubectl get secrets -n development
+
+</code></pre>
+</div>
+
+<p>
+<b><b>H. Validate Secret permissions</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl auth can-i get secrets -n production
+
+kubectl auth can-i list secrets -n production
+
+kubectl auth can-i get configmaps -n production
+
+kubectl auth can-i --list -n production
+
+</code></pre>
+</div>
+
+<p>
+<b><b>I. Verify mounted configuration</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl get pods
+
+kubectl exec -it app-pod -- ls -la /etc/config
+
+kubectl exec -it app-pod -- cat /etc/config/application.properties
+
+</code></pre>
+</div>
+
+<p>
+<b><b>J. Verify secret synchronization</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl get externalsecrets -A
+
+kubectl describe externalsecret my-secret -n production
+
+kubectl get secret my-secret -n production
+
+</code></pre>
+</div>
+
+<p>
+<b>23. Commands Every Developer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`kubectl get cm`</td>
+<td class="org-left">List ConfigMaps</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get cm -A`</td>
+<td class="org-left">List ConfigMaps across namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl describe cm app-config`</td>
+<td class="org-left">Inspect ConfigMap</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl create configmap app-config &ndash;from-file=config.properties`</td>
+<td class="org-left">Create ConfigMap from file</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get cm app-config -o yaml`</td>
+<td class="org-left">Display ConfigMap YAML</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl edit cm app-config`</td>
+<td class="org-left">Edit ConfigMap</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get secrets`</td>
+<td class="org-left">List Secrets</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl describe secret db-secret`</td>
+<td class="org-left">Inspect Secret metadata</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl create secret generic db-secret &ndash;from-file=password=./password.txt`</td>
+<td class="org-left">Create Secret from file</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get secret db-secret -o yaml`</td>
+<td class="org-left">Display Secret YAML</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl create secret tls app-tls &ndash;cert=tls.crt &ndash;key=tls.key`</td>
+<td class="org-left">Create TLS Secret</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl create secret docker-registry registry-secret`</td>
+<td class="org-left">Create registry Secret</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl set env deployment/app &ndash;from=configmap/app-config`</td>
+<td class="org-left">Inject ConfigMap values</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl set env deployment/app &ndash;from=secret/db-secret`</td>
+<td class="org-left">Inject Secret values</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl rollout restart deployment/app`</td>
+<td class="org-left">Restart application</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl rollout status deployment/app`</td>
+<td class="org-left">Check rollout status</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl exec -it app-pod &ndash; printenv`</td>
+<td class="org-left">Inspect container environment</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl exec -it app-pod &ndash; ls /etc/config`</td>
+<td class="org-left">Inspect mounted configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get pod app-pod -o yaml`</td>
+<td class="org-left">Inspect Pod configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl apply -f configmap.yaml`</td>
+<td class="org-left">Apply ConfigMap manifest</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl apply -f secret.yaml`</td>
+<td class="org-left">Apply Secret manifest</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl apply -k ./k8s/`</td>
+<td class="org-left">Apply Kustomize configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl auth can-i get secrets`</td>
+<td class="org-left">Check Secret read permission</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get externalsecrets -A`</td>
+<td class="org-left">List ExternalSecrets</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get secret db-secret -o jsonpath='{.type}'`</td>
+<td class="org-left">Display Secret type</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get events -A`</td>
+<td class="org-left">Inspect Kubernetes events</td>
+</tr>
+
+<tr>
+<td class="org-left">`helm get manifest my-app`</td>
+<td class="org-left">Inspect Helm-generated manifests</td>
+</tr>
+
+<tr>
+<td class="org-left">`helm upgrade my-app ./my-chart`</td>
+<td class="org-left">Upgrade Helm release</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b><b>Important Security Rules:</b></b>
+</p>
+
+<ol class="org-ol">
+<li>Never commit plaintext credentials, private keys, or production passwords to Git.</li>
+<li>Base64 encoding does not encrypt Kubernetes Secrets.</li>
+<li>Enable encryption at rest for Secrets in etcd.</li>
+<li>Use RBAC and least-privilege permissions to control Secret access.</li>
+<li>Prefer external secret managers for centralized credential lifecycle management.</li>
+<li>Rotate credentials regularly and coordinate application reloads.</li>
+<li>Avoid exposing Secret values through terminal output, shell history, or CI/CD logs.</li>
+<li>Use immutable ConfigMaps and Secrets when configuration changes should be explicit and controlled.</li>
+<li>Remember that ConfigMaps and Secrets are namespace-scoped resources.</li>
+<li><p>
+Treat the Kubernetes control plane, etcd, kubelet, and container runtime as part of the security boundary.
+</p>
+
+<hr></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org4e48243" class="outline-2">
+<h2 id="org4e48243">Beginner</h2>
+<div class="outline-text-2" id="text-org4e48243">
+</div>
+<div id="outline-container-org8d75cac" class="outline-3">
+<h3 id="org8d75cac">Q1: What is a Kubernetes ConfigMap?</h3>
+<div class="outline-text-3" id="text-org8d75cac">
 <p>
 A ConfigMap is a Kubernetes API object used to store non-sensitive configuration data for pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c21dff" class="outline-3">
-<h3 id="org0c21dff">Q2: Why use ConfigMaps?</h3>
-<div class="outline-text-3" id="text-org0c21dff">
+<div id="outline-container-org6bad6e1" class="outline-3">
+<h3 id="org6bad6e1">Q2: Why use ConfigMaps?</h3>
+<div class="outline-text-3" id="text-org6bad6e1">
 <p>
 ConfigMaps allow you to decouple configuration from application code and images.
 </p>
 </div>
 </div>
-<div id="outline-container-org141fd3b" class="outline-3">
-<h3 id="org141fd3b">Q3: What is a Secret in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org141fd3b">
+<div id="outline-container-org1f87588" class="outline-3">
+<h3 id="org1f87588">Q3: What is a Secret in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org1f87588">
 <p>
 A Secret is a Kubernetes API object used to store sensitive information such as passwords, tokens, or TLS keys.
 </p>
 </div>
 </div>
-<div id="outline-container-org1be18a1" class="outline-3">
-<h3 id="org1be18a1">Q4: Why use Secrets?</h3>
-<div class="outline-text-3" id="text-org1be18a1">
+<div id="outline-container-org048ff56" class="outline-3">
+<h3 id="org048ff56">Q4: Why use Secrets?</h3>
+<div class="outline-text-3" id="text-org048ff56">
 <p>
 Secrets help keep sensitive data out of source code and container images.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e2f513" class="outline-3">
-<h3 id="org6e2f513">Q5: What is configuration in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org6e2f513">
+<div id="outline-container-org69d9a63" class="outline-3">
+<h3 id="org69d9a63">Q5: What is configuration in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org69d9a63">
 <p>
 Configuration is the environment-specific or runtime-specific settings an application needs to run properly.
 </p>
 </div>
 </div>
-<div id="outline-container-orged94c6a" class="outline-3">
-<h3 id="orged94c6a">Q6: What is runtime configuration?</h3>
-<div class="outline-text-3" id="text-orged94c6a">
+<div id="outline-container-org4abd063" class="outline-3">
+<h3 id="org4abd063">Q6: What is runtime configuration?</h3>
+<div class="outline-text-3" id="text-org4abd063">
 <p>
 Runtime configuration includes environment variables, settings files, and dynamic data used while the app runs.
 </p>
 </div>
 </div>
-<div id="outline-container-org10a6db8" class="outline-3">
-<h3 id="org10a6db8">Q7: What is a pod in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org10a6db8">
+<div id="outline-container-orge052d86" class="outline-3">
+<h3 id="orge052d86">Q7: What is a pod in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orge052d86">
 <p>
 A pod is the smallest deployable unit in Kubernetes and usually contains one or more tightly-coupled containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ed6508" class="outline-3">
-<h3 id="org2ed6508">Q8: How do pods consume ConfigMaps?</h3>
-<div class="outline-text-3" id="text-org2ed6508">
+<div id="outline-container-org3365a16" class="outline-3">
+<h3 id="org3365a16">Q8: How do pods consume ConfigMaps?</h3>
+<div class="outline-text-3" id="text-org3365a16">
 <p>
 Pods can consume ConfigMaps through environment variables, command-line arguments, or mounted files.
 </p>
 </div>
 </div>
-<div id="outline-container-org7f25a7d" class="outline-3">
-<h3 id="org7f25a7d">Q9: How do pods consume Secrets?</h3>
-<div class="outline-text-3" id="text-org7f25a7d">
+<div id="outline-container-org18a3f18" class="outline-3">
+<h3 id="org18a3f18">Q9: How do pods consume Secrets?</h3>
+<div class="outline-text-3" id="text-org18a3f18">
 <p>
 Pods consume Secrets similarly to ConfigMaps: as environment variables, mounted files, or projected volumes.
 </p>
 </div>
 </div>
-<div id="outline-container-org27ba1a9" class="outline-3">
-<h3 id="org27ba1a9">Q10: What is the difference between ConfigMap and Secret?</h3>
-<div class="outline-text-3" id="text-org27ba1a9">
+<div id="outline-container-org5716c72" class="outline-3">
+<h3 id="org5716c72">Q10: What is the difference between ConfigMap and Secret?</h3>
+<div class="outline-text-3" id="text-org5716c72">
 <p>
 A ConfigMap is for non-sensitive config.
 A Secret is for sensitive config and is stored in a way that is handled more securely.
 </p>
 </div>
 </div>
-<div id="outline-container-org4294125" class="outline-3">
-<h3 id="org4294125">Q11: Why are Secrets not plain text in the API?</h3>
-<div class="outline-text-3" id="text-org4294125">
+<div id="outline-container-org153f73b" class="outline-3">
+<h3 id="org153f73b">Q11: Why are Secrets not plain text in the API?</h3>
+<div class="outline-text-3" id="text-org153f73b">
 <p>
 Kubernetes stores Secret data base64-encoded in the API, and in many setups additional protections such as encryption are enabled at rest.
 </p>
 </div>
 </div>
-<div id="outline-container-org4834d0e" class="outline-3">
-<h3 id="org4834d0e">Q12: What is a Secret object?</h3>
-<div class="outline-text-3" id="text-org4834d0e">
+<div id="outline-container-orgc41daf5" class="outline-3">
+<h3 id="orgc41daf5">Q12: What is a Secret object?</h3>
+<div class="outline-text-3" id="text-orgc41daf5">
 <p>
 A Secret object is a Kubernetes resource containing sensitive data stored as key-value pairs.
 </p>
 </div>
 </div>
-<div id="outline-container-org088ea26" class="outline-3">
-<h3 id="org088ea26">Q13: What is a key-value pair?</h3>
-<div class="outline-text-3" id="text-org088ea26">
+<div id="outline-container-org64c1772" class="outline-3">
+<h3 id="org64c1772">Q13: What is a key-value pair?</h3>
+<div class="outline-text-3" id="text-org64c1772">
 <p>
 A key-value pair maps a name to a value, often used in ConfigMaps and Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b03ee5" class="outline-3">
-<h3 id="org3b03ee5">Q14: What is a ConfigMap key?</h3>
-<div class="outline-text-3" id="text-org3b03ee5">
+<div id="outline-container-orgc707263" class="outline-3">
+<h3 id="orgc707263">Q14: What is a ConfigMap key?</h3>
+<div class="outline-text-3" id="text-orgc707263">
 <p>
 A ConfigMap key is the name of a data item, similar to a property name.
 </p>
 </div>
 </div>
-<div id="outline-container-org785181d" class="outline-3">
-<h3 id="org785181d">Q15: What is a Secret key?</h3>
-<div class="outline-text-3" id="text-org785181d">
+<div id="outline-container-org2196d94" class="outline-3">
+<h3 id="org2196d94">Q15: What is a Secret key?</h3>
+<div class="outline-text-3" id="text-org2196d94">
 <p>
 A Secret key is the name of a sensitive data item stored inside a Secret object.
 </p>
 </div>
 </div>
-<div id="outline-container-org45087c6" class="outline-3">
-<h3 id="org45087c6">Q16: What is a ConfigMap file mount?</h3>
-<div class="outline-text-3" id="text-org45087c6">
+<div id="outline-container-org2003d6c" class="outline-3">
+<h3 id="org2003d6c">Q16: What is a ConfigMap file mount?</h3>
+<div class="outline-text-3" id="text-org2003d6c">
 <p>
 A ConfigMap file mount injects ConfigMap data as files in a container filesystem.
 </p>
 </div>
 </div>
-<div id="outline-container-org7993cc1" class="outline-3">
-<h3 id="org7993cc1">Q17: What is a Secret file mount?</h3>
-<div class="outline-text-3" id="text-org7993cc1">
+<div id="outline-container-orga0a00d4" class="outline-3">
+<h3 id="orga0a00d4">Q17: What is a Secret file mount?</h3>
+<div class="outline-text-3" id="text-orga0a00d4">
 <p>
 A Secret file mount injects Secret data into a mounted volume as files.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcd0c13a" class="outline-3">
-<h3 id="orgcd0c13a">Q18: What is environment variable injection?</h3>
-<div class="outline-text-3" id="text-orgcd0c13a">
+<div id="outline-container-org64d817c" class="outline-3">
+<h3 id="org64d817c">Q18: What is environment variable injection?</h3>
+<div class="outline-text-3" id="text-org64d817c">
 <p>
 Environment variable injection absorbs ConfigMap or Secret data and exposes it as environment variables inside a container.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf611d23" class="outline-3">
-<h3 id="orgf611d23">Q19: What is a volume projection?</h3>
-<div class="outline-text-3" id="text-orgf611d23">
+<div id="outline-container-org8befccd" class="outline-3">
+<h3 id="org8befccd">Q19: What is a volume projection?</h3>
+<div class="outline-text-3" id="text-org8befccd">
 <p>
 A projected volume takes data from multiple sources such as ConfigMaps and Secrets and mounts them as files.
 </p>
 </div>
 </div>
-<div id="outline-container-org66108ca" class="outline-3">
-<h3 id="org66108ca">Q20: What is the kubectl apply command?</h3>
-<div class="outline-text-3" id="text-org66108ca">
+<div id="outline-container-org05bbffd" class="outline-3">
+<h3 id="org05bbffd">Q20: What is the kubectl apply command?</h3>
+<div class="outline-text-3" id="text-org05bbffd">
 <p>
 The <code>kubectl apply</code> command creates or updates Kubernetes resources declaratively.
 </p>
 </div>
 </div>
-<div id="outline-container-org2dba362" class="outline-3">
-<h3 id="org2dba362">Q21: What is the kubectl create configmap command?</h3>
-<div class="outline-text-3" id="text-org2dba362">
+<div id="outline-container-org968af6c" class="outline-3">
+<h3 id="org968af6c">Q21: What is the kubectl create configmap command?</h3>
+<div class="outline-text-3" id="text-org968af6c">
 <p>
 It creates a ConfigMap from literal values, files, or directories.
 </p>
 </div>
 </div>
-<div id="outline-container-org029d714" class="outline-3">
-<h3 id="org029d714">Q22: What is the kubectl create secret command?</h3>
-<div class="outline-text-3" id="text-org029d714">
+<div id="outline-container-org0669e7d" class="outline-3">
+<h3 id="org0669e7d">Q22: What is the kubectl create secret command?</h3>
+<div class="outline-text-3" id="text-org0669e7d">
 <p>
 It creates a Secret from a literal, file, or generated data.
 </p>
 </div>
 </div>
-<div id="outline-container-org8f15e7b" class="outline-3">
-<h3 id="org8f15e7b">Q23: What is a ConfigMap YAML manifest?</h3>
-<div class="outline-text-3" id="text-org8f15e7b">
+<div id="outline-container-orge451f8d" class="outline-3">
+<h3 id="orge451f8d">Q23: What is a ConfigMap YAML manifest?</h3>
+<div class="outline-text-3" id="text-orge451f8d">
 <p>
 A ConfigMap YAML manifest declares the object and includes its data.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd216ec4" class="outline-3">
-<h3 id="orgd216ec4">Q24: What is a Secret YAML manifest?</h3>
-<div class="outline-text-3" id="text-orgd216ec4">
+<div id="outline-container-org6f63827" class="outline-3">
+<h3 id="org6f63827">Q24: What is a Secret YAML manifest?</h3>
+<div class="outline-text-3" id="text-org6f63827">
 <p>
 A Secret YAML manifest declares the secret and its data.
 </p>
 </div>
 </div>
-<div id="outline-container-org10b107d" class="outline-3">
-<h3 id="org10b107d">Q25: What is the structure of a ConfigMap?</h3>
-<div class="outline-text-3" id="text-org10b107d">
+<div id="outline-container-org7b5b6d2" class="outline-3">
+<h3 id="org7b5b6d2">Q25: What is the structure of a ConfigMap?</h3>
+<div class="outline-text-3" id="text-org7b5b6d2">
 <p>
 A ConfigMap usually has:
 </p>
@@ -240,9 +1756,9 @@ A ConfigMap usually has:
 </ul>
 </div>
 </div>
-<div id="outline-container-org8db1b6c" class="outline-3">
-<h3 id="org8db1b6c">Q26: What is the structure of a Secret?</h3>
-<div class="outline-text-3" id="text-org8db1b6c">
+<div id="outline-container-org63d8168" class="outline-3">
+<h3 id="org63d8168">Q26: What is the structure of a Secret?</h3>
+<div class="outline-text-3" id="text-org63d8168">
 <p>
 A Secret usually has:
 </p>
@@ -255,761 +1771,761 @@ A Secret usually has:
 </ul>
 </div>
 </div>
-<div id="outline-container-org4d92f87" class="outline-3">
-<h3 id="org4d92f87">Q27: Why are ConfigMaps used for app settings?</h3>
-<div class="outline-text-3" id="text-org4d92f87">
+<div id="outline-container-orga8214da" class="outline-3">
+<h3 id="orga8214da">Q27: Why are ConfigMaps used for app settings?</h3>
+<div class="outline-text-3" id="text-orga8214da">
 <p>
 Because they let configuration be changeable without rebuilding the container image.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd27ef39" class="outline-3">
-<h3 id="orgd27ef39">Q28: Why are Secrets used for credentials?</h3>
-<div class="outline-text-3" id="text-orgd27ef39">
+<div id="outline-container-org4b81a64" class="outline-3">
+<h3 id="org4b81a64">Q28: Why are Secrets used for credentials?</h3>
+<div class="outline-text-3" id="text-org4b81a64">
 <p>
 Because credentials should not be embedded in container images or source repositories.
 </p>
 </div>
 </div>
-<div id="outline-container-org77e9294" class="outline-3">
-<h3 id="org77e9294">Q29: What is a config file injected into a container?</h3>
-<div class="outline-text-3" id="text-org77e9294">
+<div id="outline-container-orge56ac51" class="outline-3">
+<h3 id="orge56ac51">Q29: What is a config file injected into a container?</h3>
+<div class="outline-text-3" id="text-orge56ac51">
 <p>
 A config file mount allows an application to read configuration from a filesystem path rather than environment variables.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbf62af6" class="outline-3">
-<h3 id="orgbf62af6">Q30: What is a secret file injected into a container?</h3>
-<div class="outline-text-3" id="text-orgbf62af6">
+<div id="outline-container-org72ea87a" class="outline-3">
+<h3 id="org72ea87a">Q30: What is a secret file injected into a container?</h3>
+<div class="outline-text-3" id="text-org72ea87a">
 <p>
 A secret file is mounted into a container’s filesystem as a protected file.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf35b1e" class="outline-3">
-<h3 id="orgcf35b1e">Q31: What is the default behavior of ConfigMap updates?</h3>
-<div class="outline-text-3" id="text-orgcf35b1e">
+<div id="outline-container-orgb6814fb" class="outline-3">
+<h3 id="orgb6814fb">Q31: What is the default behavior of ConfigMap updates?</h3>
+<div class="outline-text-3" id="text-orgb6814fb">
 <p>
 By default, updates to ConfigMap data are propagated to mounted files and env vars in a way that depends on mount and refresh behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org56cf546" class="outline-3">
-<h3 id="org56cf546">Q32: Why is ConfigMap key naming important?</h3>
-<div class="outline-text-3" id="text-org56cf546">
+<div id="outline-container-org9b1d0cf" class="outline-3">
+<h3 id="org9b1d0cf">Q32: Why is ConfigMap key naming important?</h3>
+<div class="outline-text-3" id="text-org9b1d0cf">
 <p>
 Because environment variable names or file names must be valid and stable for the application.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d1e4ba" class="outline-3">
-<h3 id="org3d1e4ba">Q33: What is a mounted config volume?</h3>
-<div class="outline-text-3" id="text-org3d1e4ba">
+<div id="outline-container-org7a3f901" class="outline-3">
+<h3 id="org7a3f901">Q33: What is a mounted config volume?</h3>
+<div class="outline-text-3" id="text-org7a3f901">
 <p>
 A mounted config volume places ConfigMap data in a directory inside the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org8a384a7" class="outline-3">
-<h3 id="org8a384a7">Q34: What is the difference between env var and file injection?</h3>
-<div class="outline-text-3" id="text-org8a384a7">
+<div id="outline-container-orgeac6769" class="outline-3">
+<h3 id="orgeac6769">Q34: What is the difference between env var and file injection?</h3>
+<div class="outline-text-3" id="text-orgeac6769">
 <p>
 Environment variables are exposed as process variables.
 File injection makes configuration available as files on disk.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb046b2" class="outline-3">
-<h3 id="orgcb046b2">Q35: Why might file-based config be preferable?</h3>
-<div class="outline-text-3" id="text-orgcb046b2">
+<div id="outline-container-org6627d6d" class="outline-3">
+<h3 id="org6627d6d">Q35: Why might file-based config be preferable?</h3>
+<div class="outline-text-3" id="text-org6627d6d">
 <p>
 Some applications read config files rather than environment variables.
 </p>
 </div>
 </div>
-<div id="outline-container-org577df5f" class="outline-3">
-<h3 id="org577df5f">Q36: Why might env vars be preferable?</h3>
-<div class="outline-text-3" id="text-org577df5f">
+<div id="outline-container-org00e5879" class="outline-3">
+<h3 id="org00e5879">Q36: Why might env vars be preferable?</h3>
+<div class="outline-text-3" id="text-org00e5879">
 <p>
 They are easy to consume in many traditional apps and containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a5df54" class="outline-3">
-<h3 id="org9a5df54">Q37: What is a secret volume?</h3>
-<div class="outline-text-3" id="text-org9a5df54">
+<div id="outline-container-org921882e" class="outline-3">
+<h3 id="org921882e">Q37: What is a secret volume?</h3>
+<div class="outline-text-3" id="text-org921882e">
 <p>
 A secret volume is a filesystem mount that contains secret data files.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d96da8" class="outline-3">
-<h3 id="org3d96da8">Q38: What is a projection volume?</h3>
-<div class="outline-text-3" id="text-org3d96da8">
+<div id="outline-container-orga9e098c" class="outline-3">
+<h3 id="orga9e098c">Q38: What is a projection volume?</h3>
+<div class="outline-text-3" id="text-orga9e098c">
 <p>
 A projection volume combines multiple data sources into a single mount path.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e9ea17" class="outline-3">
-<h3 id="org6e9ea17">Q39: What is a ConfigMap as command-line arguments?</h3>
-<div class="outline-text-3" id="text-org6e9ea17">
+<div id="outline-container-org5810296" class="outline-3">
+<h3 id="org5810296">Q39: What is a ConfigMap as command-line arguments?</h3>
+<div class="outline-text-3" id="text-org5810296">
 <p>
 A pod can pass ConfigMap values as command-line arguments to a container entrypoint.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6f882b" class="outline-3">
-<h3 id="orgf6f882b">Q40: What is a Secret as command-line arguments?</h3>
-<div class="outline-text-3" id="text-orgf6f882b">
+<div id="outline-container-org4218823" class="outline-3">
+<h3 id="org4218823">Q40: What is a Secret as command-line arguments?</h3>
+<div class="outline-text-3" id="text-org4218823">
 <p>
 A Secret can also be used as an argument if the application expects it, though file-based or env var approaches are more common.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf4c9b8" class="outline-3">
-<h3 id="orgcf4c9b8">Q41: What is a mount path?</h3>
-<div class="outline-text-3" id="text-orgcf4c9b8">
+<div id="outline-container-org101ec30" class="outline-3">
+<h3 id="org101ec30">Q41: What is a mount path?</h3>
+<div class="outline-text-3" id="text-org101ec30">
 <p>
 A mount path is the container filesystem location where a volume is mounted.
 </p>
 </div>
 </div>
-<div id="outline-container-org1a8c8e7" class="outline-3">
-<h3 id="org1a8c8e7">Q42: What is a volume mount in a pod spec?</h3>
-<div class="outline-text-3" id="text-org1a8c8e7">
+<div id="outline-container-org0ee836a" class="outline-3">
+<h3 id="org0ee836a">Q42: What is a volume mount in a pod spec?</h3>
+<div class="outline-text-3" id="text-org0ee836a">
 <p>
 A volume mount is a field inside a container definition that connects a volume to a path.
 </p>
 </div>
 </div>
-<div id="outline-container-org2f69e47" class="outline-3">
-<h3 id="org2f69e47">Q43: What is a Kubernetes volume?</h3>
-<div class="outline-text-3" id="text-org2f69e47">
+<div id="outline-container-orgcf551e5" class="outline-3">
+<h3 id="orgcf551e5">Q43: What is a Kubernetes volume?</h3>
+<div class="outline-text-3" id="text-orgcf551e5">
 <p>
 A volume is a directory or file mount provided to containers in a pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc4e7bfe" class="outline-3">
-<h3 id="orgc4e7bfe">Q44: What is a pod spec?</h3>
-<div class="outline-text-3" id="text-orgc4e7bfe">
+<div id="outline-container-org7cb4657" class="outline-3">
+<h3 id="org7cb4657">Q44: What is a pod spec?</h3>
+<div class="outline-text-3" id="text-org7cb4657">
 <p>
 A pod spec is the Kubernetes manifest describing the pod, containers, volumes, and other runtime properties.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfeb28a9" class="outline-3">
-<h3 id="orgfeb28a9">Q45: What is a config file from a Kubernetes ConfigMap?</h3>
-<div class="outline-text-3" id="text-orgfeb28a9">
+<div id="outline-container-org51b2701" class="outline-3">
+<h3 id="org51b2701">Q45: What is a config file from a Kubernetes ConfigMap?</h3>
+<div class="outline-text-3" id="text-org51b2701">
 <p>
 It is a file inside a mounted volume or environment variable whose contents come from the ConfigMap data.
 </p>
 </div>
 </div>
-<div id="outline-container-org910a95d" class="outline-3">
-<h3 id="org910a95d">Q46: What is a mirrored config?</h3>
-<div class="outline-text-3" id="text-org910a95d">
+<div id="outline-container-org1b164bd" class="outline-3">
+<h3 id="org1b164bd">Q46: What is a mirrored config?</h3>
+<div class="outline-text-3" id="text-org1b164bd">
 <p>
 A mirrored config is a common pattern where the application reads configuration files from a mounted volume.
 </p>
 </div>
 </div>
-<div id="outline-container-org1fea5d6" class="outline-3">
-<h3 id="org1fea5d6">Q47: How does a Secret differ from a ConfigMap in API semantics?</h3>
-<div class="outline-text-3" id="text-org1fea5d6">
+<div id="outline-container-orga24a1bc" class="outline-3">
+<h3 id="orga24a1bc">Q47: How does a Secret differ from a ConfigMap in API semantics?</h3>
+<div class="outline-text-3" id="text-orga24a1bc">
 <p>
 ConfigMap is intended for non-sensitive data.
 Secret uses special handling and often more restricted access semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-org180da8c" class="outline-3">
-<h3 id="org180da8c">Q48: What is the effect of a Secret data value being base64-encoded?</h3>
-<div class="outline-text-3" id="text-org180da8c">
+<div id="outline-container-orgdc15f8f" class="outline-3">
+<h3 id="orgdc15f8f">Q48: What is the effect of a Secret data value being base64-encoded?</h3>
+<div class="outline-text-3" id="text-orgdc15f8f">
 <p>
 The stored value is not a plain string in the object, although it is decoded by clients when they read it.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd9971c3" class="outline-3">
-<h3 id="orgd9971c3">Q49: What is <code>stringData</code> in a Secret?</h3>
-<div class="outline-text-3" id="text-orgd9971c3">
+<div id="outline-container-org2c80199" class="outline-3">
+<h3 id="org2c80199">Q49: What is <code>stringData</code> in a Secret?</h3>
+<div class="outline-text-3" id="text-org2c80199">
 <p>
 <code>stringData</code> is a convenient field for writing plaintext values in a Secret manifest, which Kubernetes then converts internally.
 </p>
 </div>
 </div>
-<div id="outline-container-org9fbe8c3" class="outline-3">
-<h3 id="org9fbe8c3">Q50: What is the risk of using <code>stringData</code> in manifests?</h3>
-<div class="outline-text-3" id="text-org9fbe8c3">
+<div id="outline-container-orgcad98c0" class="outline-3">
+<h3 id="orgcad98c0">Q50: What is the risk of using <code>stringData</code> in manifests?</h3>
+<div class="outline-text-3" id="text-orgcad98c0">
 <p>
 It can accidentally expose secrets in YAML files and shell history if not handled carefully.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf2adaac" class="outline-3">
-<h3 id="orgf2adaac">Q51: What is a Kubernetes secret type?</h3>
-<div class="outline-text-3" id="text-orgf2adaac">
+<div id="outline-container-org1d60ca9" class="outline-3">
+<h3 id="org1d60ca9">Q51: What is a Kubernetes secret type?</h3>
+<div class="outline-text-3" id="text-org1d60ca9">
 <p>
 A Secret type indicates the intended purpose of the secret, such as Opaque, kubernetes.io/tls, or Docker config.
 </p>
 </div>
 </div>
-<div id="outline-container-orgee15fc0" class="outline-3">
-<h3 id="orgee15fc0">Q52: What is an Opaque Secret?</h3>
-<div class="outline-text-3" id="text-orgee15fc0">
+<div id="outline-container-org2a507ae" class="outline-3">
+<h3 id="org2a507ae">Q52: What is an Opaque Secret?</h3>
+<div class="outline-text-3" id="text-org2a507ae">
 <p>
 An Opaque Secret is the default form, used for arbitrary key-value pairs.
 </p>
 </div>
 </div>
-<div id="outline-container-org03e7f93" class="outline-3">
-<h3 id="org03e7f93">Q53: What is a TLS Secret?</h3>
-<div class="outline-text-3" id="text-org03e7f93">
+<div id="outline-container-orgcd7b636" class="outline-3">
+<h3 id="orgcd7b636">Q53: What is a TLS Secret?</h3>
+<div class="outline-text-3" id="text-orgcd7b636">
 <p>
 A TLS Secret contains a TLS certificate and private key for ingress or internal TLS use.
 </p>
 </div>
 </div>
-<div id="outline-container-org3700720" class="outline-3">
-<h3 id="org3700720">Q54: Why are TLS secrets special?</h3>
-<div class="outline-text-3" id="text-org3700720">
+<div id="outline-container-org0f03fea" class="outline-3">
+<h3 id="org0f03fea">Q54: Why are TLS secrets special?</h3>
+<div class="outline-text-3" id="text-org0f03fea">
 <p>
 Because they often contain certificate and key files that applications or ingress controllers expect.
 </p>
 </div>
 </div>
-<div id="outline-container-org450e9df" class="outline-3">
-<h3 id="org450e9df">Q55: What is a Docker registry Secret?</h3>
-<div class="outline-text-3" id="text-org450e9df">
+<div id="outline-container-org4710b85" class="outline-3">
+<h3 id="org4710b85">Q55: What is a Docker registry Secret?</h3>
+<div class="outline-text-3" id="text-org4710b85">
 <p>
 A Docker registry Secret stores credentials for pulling private images from a registry.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa0b94f" class="outline-3">
-<h3 id="orgaa0b94f">Q56: What is the difference between ConfigMaps and environment variables?</h3>
-<div class="outline-text-3" id="text-orgaa0b94f">
+<div id="outline-container-orgede7683" class="outline-3">
+<h3 id="orgede7683">Q56: What is the difference between ConfigMaps and environment variables?</h3>
+<div class="outline-text-3" id="text-orgede7683">
 <p>
 ConfigMaps and Secrets are Kubernetes resources; environment variables are the process-level view of their data.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc83bfa" class="outline-3">
-<h3 id="orgbc83bfa">Q57: What is the role of ConfigMap in DevOps?</h3>
-<div class="outline-text-3" id="text-orgbc83bfa">
+<div id="outline-container-org599ac45" class="outline-3">
+<h3 id="org599ac45">Q57: What is the role of ConfigMap in DevOps?</h3>
+<div class="outline-text-3" id="text-org599ac45">
 <p>
 It allows environment-specific configuration without altering the base image or code.
 </p>
 </div>
 </div>
-<div id="outline-container-org930a520" class="outline-3">
-<h3 id="org930a520">Q58: What is the role of Secrets in DevOps?</h3>
-<div class="outline-text-3" id="text-org930a520">
+<div id="outline-container-org152efff" class="outline-3">
+<h3 id="org152efff">Q58: What is the role of Secrets in DevOps?</h3>
+<div class="outline-text-3" id="text-org152efff">
 <p>
 It keeps credentials and keys separate from source code and deployment manifests where possible.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f0c6f6" class="outline-3">
-<h3 id="org5f0c6f6">Q59: What is a Kubelet?</h3>
-<div class="outline-text-3" id="text-org5f0c6f6">
+<div id="outline-container-orgbff135a" class="outline-3">
+<h3 id="orgbff135a">Q59: What is a Kubelet?</h3>
+<div class="outline-text-3" id="text-orgbff135a">
 <p>
 The Kubelet is the node agent that ensures the pods and containers described in the API are running correctly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdb66988" class="outline-3">
-<h3 id="orgdb66988">Q60: Why is the Kubelet relevant to ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-orgdb66988">
+<div id="outline-container-org5e65153" class="outline-3">
+<h3 id="org5e65153">Q60: Why is the Kubelet relevant to ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-org5e65153">
 <p>
 It is responsible for mounting ConfigMaps and Secrets into pods as files or environment variables.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb832780" class="outline-3">
-<h3 id="orgb832780">Q61: What does Kubernetes do with a Secret at runtime?</h3>
-<div class="outline-text-3" id="text-orgb832780">
+<div id="outline-container-org16afa81" class="outline-3">
+<h3 id="org16afa81">Q61: What does Kubernetes do with a Secret at runtime?</h3>
+<div class="outline-text-3" id="text-org16afa81">
 <p>
 It mounts or injects the Secret data into the pod, while taking steps to restrict access.
 </p>
 </div>
 </div>
-<div id="outline-container-org42da738" class="outline-3">
-<h3 id="org42da738">Q62: Why can reading Secret data be security-sensitive?</h3>
-<div class="outline-text-3" id="text-org42da738">
+<div id="outline-container-org5ad605c" class="outline-3">
+<h3 id="org5ad605c">Q62: Why can reading Secret data be security-sensitive?</h3>
+<div class="outline-text-3" id="text-org5ad605c">
 <p>
 Because it may expose credentials or certificates to processes inside the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org0770445" class="outline-3">
-<h3 id="org0770445">Q63: What is a mounted Secret file permission model?</h3>
-<div class="outline-text-3" id="text-org0770445">
+<div id="outline-container-org7534951" class="outline-3">
+<h3 id="org7534951">Q63: What is a mounted Secret file permission model?</h3>
+<div class="outline-text-3" id="text-org7534951">
 <p>
 Secrets are often mounted with restricted permissions to reduce accidental exposure.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb5135c" class="outline-3">
-<h3 id="orgbb5135c">Q64: What is a ConfigMap update propagation?</h3>
-<div class="outline-text-3" id="text-orgbb5135c">
+<div id="outline-container-org84760f9" class="outline-3">
+<h3 id="org84760f9">Q64: What is a ConfigMap update propagation?</h3>
+<div class="outline-text-3" id="text-org84760f9">
 <p>
 It refers to how modified ConfigMap data is refreshed in running pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdd3d1ac" class="outline-3">
-<h3 id="orgdd3d1ac">Q65: What is a Secret update propagation?</h3>
-<div class="outline-text-3" id="text-orgdd3d1ac">
+<div id="outline-container-orge8e17ab" class="outline-3">
+<h3 id="orge8e17ab">Q65: What is a Secret update propagation?</h3>
+<div class="outline-text-3" id="text-orge8e17ab">
 <p>
 It refers to how Secret values are rotated and reflected in running pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org5126bf0" class="outline-3">
-<h3 id="org5126bf0">Q66: What is a volume update strategy?</h3>
-<div class="outline-text-3" id="text-org5126bf0">
+<div id="outline-container-org9a701b3" class="outline-3">
+<h3 id="org9a701b3">Q66: What is a volume update strategy?</h3>
+<div class="outline-text-3" id="text-org9a701b3">
 <p>
 It determines whether updated ConfigMap or Secret data is refreshed automatically or requires a pod restart.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d03973" class="outline-3">
-<h3 id="org1d03973">Q67: Why are ConfigMaps and Secrets often combined with Kubernetes deployment strategies?</h3>
-<div class="outline-text-3" id="text-org1d03973">
+<div id="outline-container-org13a38e5" class="outline-3">
+<h3 id="org13a38e5">Q67: Why are ConfigMaps and Secrets often combined with Kubernetes deployment strategies?</h3>
+<div class="outline-text-3" id="text-org13a38e5">
 <p>
 Because configuration and secret changes may need rollout or restart coordination.
 </p>
 </div>
 </div>
-<div id="outline-container-org5988d88" class="outline-3">
-<h3 id="org5988d88">Q68: What is a rolling update?</h3>
-<div class="outline-text-3" id="text-org5988d88">
+<div id="outline-container-orgb05808c" class="outline-3">
+<h3 id="orgb05808c">Q68: What is a rolling update?</h3>
+<div class="outline-text-3" id="text-orgb05808c">
 <p>
 A rolling update gradually replaces old pods with new ones, often used for config or secret changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org087e189" class="outline-3">
-<h3 id="org087e189">Q69: What is a pod restart?</h3>
-<div class="outline-text-3" id="text-org087e189">
+<div id="outline-container-org51f1905" class="outline-3">
+<h3 id="org51f1905">Q69: What is a pod restart?</h3>
+<div class="outline-text-3" id="text-org51f1905">
 <p>
 A pod restart recreates the container so it picks up updated config or secret values.
 </p>
 </div>
 </div>
-<div id="outline-container-org6be5822" class="outline-3">
-<h3 id="org6be5822">Q70: Why do some config changes require rolling restart?</h3>
-<div class="outline-text-3" id="text-org6be5822">
+<div id="outline-container-orge1e32d0" class="outline-3">
+<h3 id="orge1e32d0">Q70: Why do some config changes require rolling restart?</h3>
+<div class="outline-text-3" id="text-orge1e32d0">
 <p>
 Because certain mounts and env vars are set at pod startup and may not change live without restart.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb4315e5" class="outline-3">
-<h3 id="orgb4315e5">Q71: What is a subPath mount?</h3>
-<div class="outline-text-3" id="text-orgb4315e5">
+<div id="outline-container-orge852631" class="outline-3">
+<h3 id="orge852631">Q71: What is a subPath mount?</h3>
+<div class="outline-text-3" id="text-orge852631">
 <p>
 A subPath mount is a mount of only a specific file or directory from a volume into the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org4374b6a" class="outline-3">
-<h3 id="org4374b6a">Q72: How can ConfigMap and Secret data be used via subPath?</h3>
-<div class="outline-text-3" id="text-org4374b6a">
+<div id="outline-container-org6ce7633" class="outline-3">
+<h3 id="org6ce7633">Q72: How can ConfigMap and Secret data be used via subPath?</h3>
+<div class="outline-text-3" id="text-org6ce7633">
 <p>
 A file from a mounted ConfigMap or Secret may be placed into a specific destination inside the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org84ce373" class="outline-3">
-<h3 id="org84ce373">Q73: What is a projected volume?</h3>
-<div class="outline-text-3" id="text-org84ce373">
+<div id="outline-container-org6d0816b" class="outline-3">
+<h3 id="org6d0816b">Q73: What is a projected volume?</h3>
+<div class="outline-text-3" id="text-org6d0816b">
 <p>
 A projected volume creates a single directory containing files from multiple ConfigMaps and Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-orge84b31b" class="outline-3">
-<h3 id="orge84b31b">Q74: Why use projected volumes?</h3>
-<div class="outline-text-3" id="text-orge84b31b">
+<div id="outline-container-orgf25ef56" class="outline-3">
+<h3 id="orgf25ef56">Q74: Why use projected volumes?</h3>
+<div class="outline-text-3" id="text-orgf25ef56">
 <p>
 It simplifies the configuration of multiple data sources into one place.
 </p>
 </div>
 </div>
-<div id="outline-container-orge14b601" class="outline-3">
-<h3 id="orge14b601">Q75: What is a ConfigMap update in a pod?</h3>
-<div class="outline-text-3" id="text-orge14b601">
+<div id="outline-container-org21e0fe0" class="outline-3">
+<h3 id="org21e0fe0">Q75: What is a ConfigMap update in a pod?</h3>
+<div class="outline-text-3" id="text-org21e0fe0">
 <p>
 It means a running pod sees the updated data, either via file refresh or by restart depending on Kubernetes behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org6730e3a" class="outline-3">
-<h3 id="org6730e3a">Q76: Why is Kubernetes configuration decoupled from apps?</h3>
-<div class="outline-text-3" id="text-org6730e3a">
+<div id="outline-container-org1af45b1" class="outline-3">
+<h3 id="org1af45b1">Q76: Why is Kubernetes configuration decoupled from apps?</h3>
+<div class="outline-text-3" id="text-org1af45b1">
 <p>
 Because infrastructure and app behavior can vary across environments without recompiling the app.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f8e9b4" class="outline-3">
-<h3 id="org3f8e9b4">Q77: What is an environment-specific config?</h3>
-<div class="outline-text-3" id="text-org3f8e9b4">
+<div id="outline-container-org0582c1b" class="outline-3">
+<h3 id="org0582c1b">Q77: What is an environment-specific config?</h3>
+<div class="outline-text-3" id="text-org0582c1b">
 <p>
 A config that differs across dev, staging, and prod, such as database URLs or log levels.
 </p>
 </div>
 </div>
-<div id="outline-container-orga59d3d5" class="outline-3">
-<h3 id="orga59d3d5">Q78: What is a non-sensitive config example?</h3>
-<div class="outline-text-3" id="text-orga59d3d5">
+<div id="outline-container-orgf6f441e" class="outline-3">
+<h3 id="orgf6f441e">Q78: What is a non-sensitive config example?</h3>
+<div class="outline-text-3" id="text-orgf6f441e">
 <p>
 Hostnames, feature flags, service URLs, or log levels.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeedbe03" class="outline-3">
-<h3 id="orgeedbe03">Q79: What is a secret config example?</h3>
-<div class="outline-text-3" id="text-orgeedbe03">
+<div id="outline-container-org394c4d6" class="outline-3">
+<h3 id="org394c4d6">Q79: What is a secret config example?</h3>
+<div class="outline-text-3" id="text-org394c4d6">
 <p>
 Passwords, certificates, tokens, or private keys.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b270f9" class="outline-3">
-<h3 id="org4b270f9">Q80: What are common Kubernetes objects used with ConfigMaps?</h3>
-<div class="outline-text-3" id="text-org4b270f9">
+<div id="outline-container-orgc06dc40" class="outline-3">
+<h3 id="orgc06dc40">Q80: What are common Kubernetes objects used with ConfigMaps?</h3>
+<div class="outline-text-3" id="text-orgc06dc40">
 <p>
 Pods, Deployments, DaemonSets, Jobs, and CronJobs commonly consume ConfigMaps.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf4369e" class="outline-3">
-<h3 id="orgcf4369e">Q81: What are common Kubernetes objects used with Secrets?</h3>
-<div class="outline-text-3" id="text-orgcf4369e">
+<div id="outline-container-org2c2e460" class="outline-3">
+<h3 id="org2c2e460">Q81: What are common Kubernetes objects used with Secrets?</h3>
+<div class="outline-text-3" id="text-org2c2e460">
 <p>
 Pods, Deployments, StatefulSets, and Ingress often consume Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3e4bde" class="outline-3">
-<h3 id="orgc3e4bde">Q82: Why separate ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-orgc3e4bde">
+<div id="outline-container-orgb5da623" class="outline-3">
+<h3 id="orgb5da623">Q82: Why separate ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-orgb5da623">
 <p>
 This separation encourages a security-sensitive workflow and easier configuration management.
 </p>
 </div>
 </div>
-<div id="outline-container-org8bbf70a" class="outline-3">
-<h3 id="org8bbf70a">Q83: What is a kubelet-managed volume?</h3>
-<div class="outline-text-3" id="text-org8bbf70a">
+<div id="outline-container-org0bc6d84" class="outline-3">
+<h3 id="org0bc6d84">Q83: What is a kubelet-managed volume?</h3>
+<div class="outline-text-3" id="text-org0bc6d84">
 <p>
 A kubelet-managed volume is mounted by the Kubelet and exists as part of the pod runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdeab3ea" class="outline-3">
-<h3 id="orgdeab3ea">Q84: What is the annotation-based secret injection pattern?</h3>
-<div class="outline-text-3" id="text-orgdeab3ea">
+<div id="outline-container-orgd0c0934" class="outline-3">
+<h3 id="orgd0c0934">Q84: What is the annotation-based secret injection pattern?</h3>
+<div class="outline-text-3" id="text-orgd0c0934">
 <p>
 Annotations can trigger sidecars or controllers to populate secrets or config into pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org2e6deda" class="outline-3">
-<h3 id="org2e6deda">Q85: What is the API object lifecycle?</h3>
-<div class="outline-text-3" id="text-org2e6deda">
+<div id="outline-container-org8f07070" class="outline-3">
+<h3 id="org8f07070">Q85: What is the API object lifecycle?</h3>
+<div class="outline-text-3" id="text-org8f07070">
 <p>
 A ConfigMap or Secret can be created, updated, read, used by pods, and eventually deleted.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf66aa44" class="outline-3">
-<h3 id="orgf66aa44">Q86: Why are ConfigMaps often created before workloads?</h3>
-<div class="outline-text-3" id="text-orgf66aa44">
+<div id="outline-container-org5f59b00" class="outline-3">
+<h3 id="org5f59b00">Q86: Why are ConfigMaps often created before workloads?</h3>
+<div class="outline-text-3" id="text-org5f59b00">
 <p>
 Because workloads reference them and may fail if the config source does not exist.
 </p>
 </div>
 </div>
-<div id="outline-container-orga22bae0" class="outline-3">
-<h3 id="orga22bae0">Q87: Why are Secrets often created before app deployment?</h3>
-<div class="outline-text-3" id="text-orga22bae0">
+<div id="outline-container-orgd6bd616" class="outline-3">
+<h3 id="orgd6bd616">Q87: Why are Secrets often created before app deployment?</h3>
+<div class="outline-text-3" id="text-orgd6bd616">
 <p>
 Because the pod may fail to start if required secret files or env vars are missing.
 </p>
 </div>
 </div>
-<div id="outline-container-org7e38ee8" class="outline-3">
-<h3 id="org7e38ee8">Q88: What is a stale configuration?</h3>
-<div class="outline-text-3" id="text-org7e38ee8">
+<div id="outline-container-orgd3f905b" class="outline-3">
+<h3 id="orgd3f905b">Q88: What is a stale configuration?</h3>
+<div class="outline-text-3" id="text-orgd3f905b">
 <p>
 A stale configuration is an old or outdated config value still being used by the application.
 </p>
 </div>
 </div>
-<div id="outline-container-org436dc9a" class="outline-3">
-<h3 id="org436dc9a">Q89: What is a stale secret?</h3>
-<div class="outline-text-3" id="text-org436dc9a">
+<div id="outline-container-org9306596" class="outline-3">
+<h3 id="org9306596">Q89: What is a stale secret?</h3>
+<div class="outline-text-3" id="text-org9306596">
 <p>
 A stale secret is an old credential that remains active or still mounted when it should be rotated.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e48afd" class="outline-3">
-<h3 id="org6e48afd">Q90: What is secret rotation?</h3>
-<div class="outline-text-3" id="text-org6e48afd">
+<div id="outline-container-org6ee465e" class="outline-3">
+<h3 id="org6ee465e">Q90: What is secret rotation?</h3>
+<div class="outline-text-3" id="text-org6ee465e">
 <p>
 Secret rotation is replacing old credentials or tokens with new ones and updating workloads to use them.
 </p>
 </div>
 </div>
-<div id="outline-container-org67177ce" class="outline-3">
-<h3 id="org67177ce">Q91: Why is rotation important?</h3>
-<div class="outline-text-3" id="text-org67177ce">
+<div id="outline-container-org034d7b0" class="outline-3">
+<h3 id="org034d7b0">Q91: Why is rotation important?</h3>
+<div class="outline-text-3" id="text-org034d7b0">
 <p>
 Because old secrets may be exposed or expire and need regular replacement.
 </p>
 </div>
 </div>
-<div id="outline-container-org043e234" class="outline-3">
-<h3 id="org043e234">Q92: What is the difference between a mounted secret and a secret in env var?</h3>
-<div class="outline-text-3" id="text-org043e234">
+<div id="outline-container-org796aa56" class="outline-3">
+<h3 id="org796aa56">Q92: What is the difference between a mounted secret and a secret in env var?</h3>
+<div class="outline-text-3" id="text-org796aa56">
 <p>
 Mounted secret files are persisted on disk.
 Env vars are present in process environment and easier to read via process inspection.
 </p>
 </div>
 </div>
-<div id="outline-container-orgedf6720" class="outline-3">
-<h3 id="orgedf6720">Q93: Why prefer file mounts for secrets sometimes?</h3>
-<div class="outline-text-3" id="text-orgedf6720">
+<div id="outline-container-orgf3f6b16" class="outline-3">
+<h3 id="orgf3f6b16">Q93: Why prefer file mounts for secrets sometimes?</h3>
+<div class="outline-text-3" id="text-orgf3f6b16">
 <p>
 Because some tools and runtimes expect files, and file permissions can be restricted.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d34d52" class="outline-3">
-<h3 id="org0d34d52">Q94: Why prefer env vars for some secrets?</h3>
-<div class="outline-text-3" id="text-org0d34d52">
+<div id="outline-container-org15153de" class="outline-3">
+<h3 id="org15153de">Q94: Why prefer env vars for some secrets?</h3>
+<div class="outline-text-3" id="text-org15153de">
 <p>
 Because they are simple to pass into applications and CI/CD automation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf45f1b0" class="outline-3">
-<h3 id="orgf45f1b0">Q95: What is a Kubernetes secret manager?</h3>
-<div class="outline-text-3" id="text-orgf45f1b0">
+<div id="outline-container-orgfe292c6" class="outline-3">
+<h3 id="orgfe292c6">Q95: What is a Kubernetes secret manager?</h3>
+<div class="outline-text-3" id="text-orgfe292c6">
 <p>
 A secret manager is an external service or controller that manages secrets and integrates with Kubernetes.
 </p>
 </div>
 </div>
-<div id="outline-container-org34c2cf1" class="outline-3">
-<h3 id="org34c2cf1">Q96: What is External Secrets Operator?</h3>
-<div class="outline-text-3" id="text-org34c2cf1">
+<div id="outline-container-org4c230f8" class="outline-3">
+<h3 id="org4c230f8">Q96: What is External Secrets Operator?</h3>
+<div class="outline-text-3" id="text-org4c230f8">
 <p>
 External Secrets Operator syncs external secrets from systems such as AWS Secrets Manager or HashiCorp Vault into Kubernetes Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-orgadd3610" class="outline-3">
-<h3 id="orgadd3610">Q97: What is Vault?</h3>
-<div class="outline-text-3" id="text-orgadd3610">
+<div id="outline-container-org09de46d" class="outline-3">
+<h3 id="org09de46d">Q97: What is Vault?</h3>
+<div class="outline-text-3" id="text-org09de46d">
 <p>
 Vault is a secret manager used to securely store and manage secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org05d026b" class="outline-3">
-<h3 id="org05d026b">Q98: Why do teams use external secret management?</h3>
-<div class="outline-text-3" id="text-org05d026b">
+<div id="outline-container-org42bc2ab" class="outline-3">
+<h3 id="org42bc2ab">Q98: Why do teams use external secret management?</h3>
+<div class="outline-text-3" id="text-org42bc2ab">
 <p>
 Because K8s Secrets are helpful but may be complemented by centralized secret lifecycle management.
 </p>
 </div>
 </div>
-<div id="outline-container-orge082b9a" class="outline-3">
-<h3 id="orge082b9a">Q99: What is the purpose of encryption at rest for Secrets?</h3>
-<div class="outline-text-3" id="text-orge082b9a">
+<div id="outline-container-org0563480" class="outline-3">
+<h3 id="org0563480">Q99: What is the purpose of encryption at rest for Secrets?</h3>
+<div class="outline-text-3" id="text-org0563480">
 <p>
 To protect Secrets data even if the underlying storage or etcd is compromised.
 </p>
 </div>
 </div>
-<div id="outline-container-org8f192ed" class="outline-3">
-<h3 id="org8f192ed">Q100: What is etcd in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org8f192ed">
+<div id="outline-container-orgc739660" class="outline-3">
+<h3 id="orgc739660">Q100: What is etcd in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgc739660">
 <p>
 etcd is the key-value store used by Kubernetes to persist cluster state and object data.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgabde7c5" class="outline-2">
-<h2 id="orgabde7c5">Intermediate</h2>
-<div class="outline-text-2" id="text-orgabde7c5">
+<div id="outline-container-org8484d78" class="outline-2">
+<h2 id="org8484d78">Intermediate</h2>
+<div class="outline-text-2" id="text-org8484d78">
 </div>
-<div id="outline-container-org4b4ab61" class="outline-3">
-<h3 id="org4b4ab61">Q101: Why is etcd security important for ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-org4b4ab61">
+<div id="outline-container-orgcf9da91" class="outline-3">
+<h3 id="orgcf9da91">Q101: Why is etcd security important for ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-orgcf9da91">
 <p>
 Because it stores Kubernetes resources, including Secrets, and therefore must be protected.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeab808b" class="outline-3">
-<h3 id="orgeab808b">Q102: What is Kubernetes Secret encryption at rest?</h3>
-<div class="outline-text-3" id="text-orgeab808b">
+<div id="outline-container-org7b6d7d4" class="outline-3">
+<h3 id="org7b6d7d4">Q102: What is Kubernetes Secret encryption at rest?</h3>
+<div class="outline-text-3" id="text-org7b6d7d4">
 <p>
 It is a feature that encrypts Secret values before they are stored in etcd.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3eef0f" class="outline-3">
-<h3 id="orgc3eef0f">Q103: What is KMS?</h3>
-<div class="outline-text-3" id="text-orgc3eef0f">
+<div id="outline-container-org48ffe83" class="outline-3">
+<h3 id="org48ffe83">Q103: What is KMS?</h3>
+<div class="outline-text-3" id="text-org48ffe83">
 <p>
 KMS (Key Management Service) is often used to store the encryption key used for Kubernetes Secret encryption.
 </p>
 </div>
 </div>
-<div id="outline-container-org5ee744a" class="outline-3">
-<h3 id="org5ee744a">Q104: Why is Secret encryption necessary?</h3>
-<div class="outline-text-3" id="text-org5ee744a">
+<div id="outline-container-org6b2e177" class="outline-3">
+<h3 id="org6b2e177">Q104: Why is Secret encryption necessary?</h3>
+<div class="outline-text-3" id="text-org6b2e177">
 <p>
 Because etcd can be a high-value target and should not expose raw secret data if compromised.
 </p>
 </div>
 </div>
-<div id="outline-container-org40a8570" class="outline-3">
-<h3 id="org40a8570">Q105: What is a Secret permission model?</h3>
-<div class="outline-text-3" id="text-org40a8570">
+<div id="outline-container-orgd6f3af8" class="outline-3">
+<h3 id="orgd6f3af8">Q105: What is a Secret permission model?</h3>
+<div class="outline-text-3" id="text-orgd6f3af8">
 <p>
 It defines which users, controllers, or workloads can access or modify the Secret.
 </p>
 </div>
 </div>
-<div id="outline-container-org58d9809" class="outline-3">
-<h3 id="org58d9809">Q106: What is RBAC in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org58d9809">
+<div id="outline-container-org05bb4e9" class="outline-3">
+<h3 id="org05bb4e9">Q106: What is RBAC in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org05bb4e9">
 <p>
 RBAC (Role-Based Access Control) restricts who can create, read, update, or delete Kubernetes resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c39336" class="outline-3">
-<h3 id="org0c39336">Q107: What is a Role?</h3>
-<div class="outline-text-3" id="text-org0c39336">
+<div id="outline-container-orgdc02a5c" class="outline-3">
+<h3 id="orgdc02a5c">Q107: What is a Role?</h3>
+<div class="outline-text-3" id="text-orgdc02a5c">
 <p>
 A Role grants permissions within a namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org2d01825" class="outline-3">
-<h3 id="org2d01825">Q108: What is a ClusterRole?</h3>
-<div class="outline-text-3" id="text-org2d01825">
+<div id="outline-container-orgce2ff76" class="outline-3">
+<h3 id="orgce2ff76">Q108: What is a ClusterRole?</h3>
+<div class="outline-text-3" id="text-orgce2ff76">
 <p>
 A ClusterRole grants permissions across the whole cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org69ae47d" class="outline-3">
-<h3 id="org69ae47d">Q109: Why is RBAC relevant to ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-org69ae47d">
+<div id="outline-container-org5a5d699" class="outline-3">
+<h3 id="org5a5d699">Q109: Why is RBAC relevant to ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-org5a5d699">
 <p>
 Because not everyone should be able to read or modify sensitive configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-orga717a08" class="outline-3">
-<h3 id="orga717a08">Q110: What is a service account?</h3>
-<div class="outline-text-3" id="text-orga717a08">
+<div id="outline-container-orgb2ca3e1" class="outline-3">
+<h3 id="orgb2ca3e1">Q110: What is a service account?</h3>
+<div class="outline-text-3" id="text-orgb2ca3e1">
 <p>
 A service account is an identity used by pods to interact with the Kubernetes API or other services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcfafdad" class="outline-3">
-<h3 id="orgcfafdad">Q111: Why is service account access relevant to Secrets?</h3>
-<div class="outline-text-3" id="text-orgcfafdad">
+<div id="outline-container-orgfebde5b" class="outline-3">
+<h3 id="orgfebde5b">Q111: Why is service account access relevant to Secrets?</h3>
+<div class="outline-text-3" id="text-orgfebde5b">
 <p>
 A pod may need permissions to read secrets or config sources depending on the environment.
 </p>
 </div>
 </div>
-<div id="outline-container-org9f8957d" class="outline-3">
-<h3 id="org9f8957d">Q112: What is a Secret volume mount permission?</h3>
-<div class="outline-text-3" id="text-org9f8957d">
+<div id="outline-container-org76a9beb" class="outline-3">
+<h3 id="org76a9beb">Q112: What is a Secret volume mount permission?</h3>
+<div class="outline-text-3" id="text-org76a9beb">
 <p>
 Secret-mounted files often have mode 0444 or similar settings so they are readable but not writable.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf1fb25" class="outline-3">
-<h3 id="orgdf1fb25">Q113: What is a secret file mode?</h3>
-<div class="outline-text-3" id="text-orgdf1fb25">
+<div id="outline-container-orgf8e757f" class="outline-3">
+<h3 id="orgf8e757f">Q113: What is a secret file mode?</h3>
+<div class="outline-text-3" id="text-orgf8e757f">
 <p>
 The file mode determines read/write access permissions of the mounted secret files.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfaa590f" class="outline-3">
-<h3 id="orgfaa590f">Q114: What is a ConfigMap volume permission?</h3>
-<div class="outline-text-3" id="text-orgfaa590f">
+<div id="outline-container-org53a582e" class="outline-3">
+<h3 id="org53a582e">Q114: What is a ConfigMap volume permission?</h3>
+<div class="outline-text-3" id="text-org53a582e">
 <p>
 ConfigMap volumes are often mounted with read-only permissions as well.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf5ad49" class="outline-3">
-<h3 id="orgcf5ad49">Q115: What is a Secret refresh mechanism?</h3>
-<div class="outline-text-3" id="text-orgcf5ad49">
+<div id="outline-container-orgf57f07a" class="outline-3">
+<h3 id="orgf57f07a">Q115: What is a Secret refresh mechanism?</h3>
+<div class="outline-text-3" id="text-orgf57f07a">
 <p>
 It is how Kubernetes updates mounted or injected Secret values in a running pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf57e63b" class="outline-3">
-<h3 id="orgf57e63b">Q116: What is a ConfigMap refresh mechanism?</h3>
-<div class="outline-text-3" id="text-orgf57e63b">
+<div id="outline-container-org23cfc69" class="outline-3">
+<h3 id="org23cfc69">Q116: What is a ConfigMap refresh mechanism?</h3>
+<div class="outline-text-3" id="text-org23cfc69">
 <p>
 It is how Kubernetes updates config files or env vars from ConfigMaps in a running pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf957534" class="outline-3">
-<h3 id="orgf957534">Q117: Why do some config and secret values not refresh automatically?</h3>
-<div class="outline-text-3" id="text-orgf957534">
+<div id="outline-container-orga0a829f" class="outline-3">
+<h3 id="orga0a829f">Q117: Why do some config and secret values not refresh automatically?</h3>
+<div class="outline-text-3" id="text-orga0a829f">
 <p>
 Because Kubernetes may require a pod restart or rely on specific volume or env var behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org1154563" class="outline-3">
-<h3 id="org1154563">Q118: What is a projected volume combined with Secrets?</h3>
-<div class="outline-text-3" id="text-org1154563">
+<div id="outline-container-org8921553" class="outline-3">
+<h3 id="org8921553">Q118: What is a projected volume combined with Secrets?</h3>
+<div class="outline-text-3" id="text-org8921553">
 <p>
 A projected volume can include multiple source objects, like ConfigMaps and Secrets, in one mount.
 </p>
 </div>
 </div>
-<div id="outline-container-org669f54f" class="outline-3">
-<h3 id="org669f54f">Q119: What is a Symmetric Secret?</h3>
-<div class="outline-text-3" id="text-org669f54f">
+<div id="outline-container-orgc6ad4d6" class="outline-3">
+<h3 id="orgc6ad4d6">Q119: What is a Symmetric Secret?</h3>
+<div class="outline-text-3" id="text-orgc6ad4d6">
 <p>
 A Symmetric Secret is a secret used by a single app or workload and is often created as a generic Opaque secret.
 </p>
 </div>
 </div>
-<div id="outline-container-orgafadcc3" class="outline-3">
-<h3 id="orgafadcc3">Q120: What is a TLS Secret structure?</h3>
-<div class="outline-text-3" id="text-orgafadcc3">
+<div id="outline-container-orgdd317a7" class="outline-3">
+<h3 id="orgdd317a7">Q120: What is a TLS Secret structure?</h3>
+<div class="outline-text-3" id="text-orgdd317a7">
 <p>
 A TLS Secret commonly contains:
 </p>
@@ -1019,646 +2535,646 @@ A TLS Secret commonly contains:
 </ul>
 </div>
 </div>
-<div id="outline-container-orgcd1d1da" class="outline-3">
-<h3 id="orgcd1d1da">Q121: Why do TLS Secrets have names like tls.crt and tls.key?</h3>
-<div class="outline-text-3" id="text-orgcd1d1da">
+<div id="outline-container-orge8c0567" class="outline-3">
+<h3 id="orge8c0567">Q121: Why do TLS Secrets have names like tls.crt and tls.key?</h3>
+<div class="outline-text-3" id="text-orge8c0567">
 <p>
 Because ingress controllers and TLS clients expect those standard file names.
 </p>
 </div>
 </div>
-<div id="outline-container-org63904cc" class="outline-3">
-<h3 id="org63904cc">Q122: What is the role of a Secret in ingress?</h3>
-<div class="outline-text-3" id="text-org63904cc">
+<div id="outline-container-orgee3f4df" class="outline-3">
+<h3 id="orgee3f4df">Q122: What is the role of a Secret in ingress?</h3>
+<div class="outline-text-3" id="text-orgee3f4df">
 <p>
 Ingress controllers use TLS Secrets to terminate TLS and serve certificates.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b9073e" class="outline-3">
-<h3 id="org2b9073e">Q123: What is a Secret for image pull credentials?</h3>
-<div class="outline-text-3" id="text-org2b9073e">
+<div id="outline-container-orgf1b1605" class="outline-3">
+<h3 id="orgf1b1605">Q123: What is a Secret for image pull credentials?</h3>
+<div class="outline-text-3" id="text-orgf1b1605">
 <p>
 A Docker config Secret stores credentials for a private registry used by the Kubernetes runtime to pull images.
 </p>
 </div>
 </div>
-<div id="outline-container-org585bfda" class="outline-3">
-<h3 id="org585bfda">Q124: Why are image pull secrets important?</h3>
-<div class="outline-text-3" id="text-org585bfda">
+<div id="outline-container-org24d0ddc" class="outline-3">
+<h3 id="org24d0ddc">Q124: Why are image pull secrets important?</h3>
+<div class="outline-text-3" id="text-org24d0ddc">
 <p>
 Because private registries require authentication and should not expose credentials in publicly visible manifests.
 </p>
 </div>
 </div>
-<div id="outline-container-org0040c33" class="outline-3">
-<h3 id="org0040c33">Q125: What is a config map with binary data?</h3>
-<div class="outline-text-3" id="text-org0040c33">
+<div id="outline-container-org68b1eac" class="outline-3">
+<h3 id="org68b1eac">Q125: What is a config map with binary data?</h3>
+<div class="outline-text-3" id="text-org68b1eac">
 <p>
 ConfigMaps can also contain binary-like data, though the common pattern is textual key-value data.
 </p>
 </div>
 </div>
-<div id="outline-container-org171de2d" class="outline-3">
-<h3 id="org171de2d">Q126: What is a Secret with binary data?</h3>
-<div class="outline-text-3" id="text-org171de2d">
+<div id="outline-container-org1149cc3" class="outline-3">
+<h3 id="org1149cc3">Q126: What is a Secret with binary data?</h3>
+<div class="outline-text-3" id="text-org1149cc3">
 <p>
 A Secret can store binary data as base64-encoded values.
 </p>
 </div>
 </div>
-<div id="outline-container-org760f8b7" class="outline-3">
-<h3 id="org760f8b7">Q127: Why are ConfigMaps and Secrets often created separately from app manifests?</h3>
-<div class="outline-text-3" id="text-org760f8b7">
+<div id="outline-container-org5152e75" class="outline-3">
+<h3 id="org5152e75">Q127: Why are ConfigMaps and Secrets often created separately from app manifests?</h3>
+<div class="outline-text-3" id="text-org5152e75">
 <p>
 This modularity keeps config reusable and allows config changes without altering deployment logic.
 </p>
 </div>
 </div>
-<div id="outline-container-org84d9343" class="outline-3">
-<h3 id="org84d9343">Q128: What is a values file?</h3>
-<div class="outline-text-3" id="text-org84d9343">
+<div id="outline-container-orgd76d099" class="outline-3">
+<h3 id="orgd76d099">Q128: What is a values file?</h3>
+<div class="outline-text-3" id="text-orgd76d099">
 <p>
 A values file often contains environment-specific parameter values used by Helm or other templating tools.
 </p>
 </div>
 </div>
-<div id="outline-container-org76a8424" class="outline-3">
-<h3 id="org76a8424">Q129: What is Helm?</h3>
-<div class="outline-text-3" id="text-org76a8424">
+<div id="outline-container-org616c88c" class="outline-3">
+<h3 id="org616c88c">Q129: What is Helm?</h3>
+<div class="outline-text-3" id="text-org616c88c">
 <p>
 Helm is a package manager for Kubernetes that often manages ConfigMaps and Secrets via templates.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc701dfe" class="outline-3">
-<h3 id="orgc701dfe">Q130: Why is Helm related to ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-orgc701dfe">
+<div id="outline-container-org7cb0201" class="outline-3">
+<h3 id="org7cb0201">Q130: Why is Helm related to ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-org7cb0201">
 <p>
 Because Helm charts frequently generate ConfigMap and Secret manifests for application deployment.
 </p>
 </div>
 </div>
-<div id="outline-container-org6dfb7b6" class="outline-3">
-<h3 id="org6dfb7b6">Q131: What is a kustomization?</h3>
-<div class="outline-text-3" id="text-org6dfb7b6">
+<div id="outline-container-org5dca332" class="outline-3">
+<h3 id="org5dca332">Q131: What is a kustomization?</h3>
+<div class="outline-text-3" id="text-org5dca332">
 <p>
 Kustomize is a Kubernetes manifest customization tool used to merge config overlays and generate ConfigMaps/Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org1f547ac" class="outline-3">
-<h3 id="org1f547ac">Q132: What is the unmanaged value of config manifest data?</h3>
-<div class="outline-text-3" id="text-org1f547ac">
+<div id="outline-container-orgb3942e9" class="outline-3">
+<h3 id="orgb3942e9">Q132: What is the unmanaged value of config manifest data?</h3>
+<div class="outline-text-3" id="text-orgb3942e9">
 <p>
 Config and secret values are often version-controlled, but sensitive content should not be stored in plain text without safeguards.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e1c939" class="outline-3">
-<h3 id="org9e1c939">Q133: What is a GitOps workflow?</h3>
-<div class="outline-text-3" id="text-org9e1c939">
+<div id="outline-container-org9eaccfc" class="outline-3">
+<h3 id="org9eaccfc">Q133: What is a GitOps workflow?</h3>
+<div class="outline-text-3" id="text-org9eaccfc">
 <p>
 GitOps uses Git as the source of truth for declarative infrastructure and app configuration, which often includes ConfigMaps and Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a052dd" class="outline-3">
-<h3 id="org6a052dd">Q134: Why is GitOps sensitive for Secrets?</h3>
-<div class="outline-text-3" id="text-org6a052dd">
+<div id="outline-container-orge5846e6" class="outline-3">
+<h3 id="orge5846e6">Q134: Why is GitOps sensitive for Secrets?</h3>
+<div class="outline-text-3" id="text-orge5846e6">
 <p>
 Because plain text Secrets in Git repositories can leak credentials if not managed carefully.
 </p>
 </div>
 </div>
-<div id="outline-container-org4d05479" class="outline-3">
-<h3 id="org4d05479">Q135: What is external secret syncing?</h3>
-<div class="outline-text-3" id="text-org4d05479">
+<div id="outline-container-org3ae1b2d" class="outline-3">
+<h3 id="org3ae1b2d">Q135: What is external secret syncing?</h3>
+<div class="outline-text-3" id="text-org3ae1b2d">
 <p>
 It moves secret material from external systems into Kubernetes Secrets without storing it directly in Git.
 </p>
 </div>
 </div>
-<div id="outline-container-org16a10cd" class="outline-3">
-<h3 id="org16a10cd">Q136: What should be avoided in Git for Secrets?</h3>
-<div class="outline-text-3" id="text-org16a10cd">
+<div id="outline-container-orgca93d03" class="outline-3">
+<h3 id="orgca93d03">Q136: What should be avoided in Git for Secrets?</h3>
+<div class="outline-text-3" id="text-orgca93d03">
 <p>
 Avoid committing plaintext credentials, certificate private keys, or other sensitive values.
 </p>
 </div>
 </div>
-<div id="outline-container-org62842fa" class="outline-3">
-<h3 id="org62842fa">Q137: What is Secret templating?</h3>
-<div class="outline-text-3" id="text-org62842fa">
+<div id="outline-container-orgafe981a" class="outline-3">
+<h3 id="orgafe981a">Q137: What is Secret templating?</h3>
+<div class="outline-text-3" id="text-orgafe981a">
 <p>
 It is the rendering of Secret values from environment variables or templates before applying to Kubernetes.
 </p>
 </div>
 </div>
-<div id="outline-container-org59105e9" class="outline-3">
-<h3 id="org59105e9">Q138: Why is secret templating risky?</h3>
-<div class="outline-text-3" id="text-org59105e9">
+<div id="outline-container-org862e91c" class="outline-3">
+<h3 id="org862e91c">Q138: Why is secret templating risky?</h3>
+<div class="outline-text-3" id="text-org862e91c">
 <p>
 Because plaintext values may end up in logs, shell history, or source-control artifacts.
 </p>
 </div>
 </div>
-<div id="outline-container-org4980027" class="outline-3">
-<h3 id="org4980027">Q139: What is a Kubernetes secret generator?</h3>
-<div class="outline-text-3" id="text-org4980027">
+<div id="outline-container-org7cc1876" class="outline-3">
+<h3 id="org7cc1876">Q139: What is a Kubernetes secret generator?</h3>
+<div class="outline-text-3" id="text-org7cc1876">
 <p>
 A secret generator can create secret data dynamically during deployment, often via tools like Kustomize or external systems.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b52df9" class="outline-3">
-<h3 id="org9b52df9">Q140: What is a config generator?</h3>
-<div class="outline-text-3" id="text-org9b52df9">
+<div id="outline-container-orgf7977ba" class="outline-3">
+<h3 id="orgf7977ba">Q140: What is a config generator?</h3>
+<div class="outline-text-3" id="text-orgf7977ba">
 <p>
 A config generator creates ConfigMaps from files or environment values for application settings.
 </p>
 </div>
 </div>
-<div id="outline-container-org18bff05" class="outline-3">
-<h3 id="org18bff05">Q141: What is a mounted ConfigMap vs env var ConfigMap?</h3>
-<div class="outline-text-3" id="text-org18bff05">
+<div id="outline-container-org2279ebe" class="outline-3">
+<h3 id="org2279ebe">Q141: What is a mounted ConfigMap vs env var ConfigMap?</h3>
+<div class="outline-text-3" id="text-org2279ebe">
 <p>
 Mounted ConfigMap files are more suitable for file-based applications; env var injection is easier for simple config values.
 </p>
 </div>
 </div>
-<div id="outline-container-org1ce45ec" class="outline-3">
-<h3 id="org1ce45ec">Q142: What is a ConfigMap file suffix?</h3>
-<div class="outline-text-3" id="text-org1ce45ec">
+<div id="outline-container-org50dc711" class="outline-3">
+<h3 id="org50dc711">Q142: What is a ConfigMap file suffix?</h3>
+<div class="outline-text-3" id="text-org50dc711">
 <p>
 The filename is often derived from the key and can be used by applications directly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2e76dc" class="outline-3">
-<h3 id="orgc2e76dc">Q143: What is config file reloading?</h3>
-<div class="outline-text-3" id="text-orgc2e76dc">
+<div id="outline-container-org6be5e29" class="outline-3">
+<h3 id="org6be5e29">Q143: What is config file reloading?</h3>
+<div class="outline-text-3" id="text-org6be5e29">
 <p>
 Some applications can reload config when the files or directories are updated.
 </p>
 </div>
 </div>
-<div id="outline-container-orgabbfdcc" class="outline-3">
-<h3 id="orgabbfdcc">Q144: What is the difference between ephemeral and persistent configuration?</h3>
-<div class="outline-text-3" id="text-orgabbfdcc">
+<div id="outline-container-org6d549ad" class="outline-3">
+<h3 id="org6d549ad">Q144: What is the difference between ephemeral and persistent configuration?</h3>
+<div class="outline-text-3" id="text-org6d549ad">
 <p>
 Ephemeral config may be built into images or generated at runtime; persistent config is typically managed through ConfigMaps or external stores.
 </p>
 </div>
 </div>
-<div id="outline-container-org9dd217a" class="outline-3">
-<h3 id="org9dd217a">Q145: What is dynamic secret injection?</h3>
-<div class="outline-text-3" id="text-org9dd217a">
+<div id="outline-container-orgfe8de0f" class="outline-3">
+<h3 id="orgfe8de0f">Q145: What is dynamic secret injection?</h3>
+<div class="outline-text-3" id="text-orgfe8de0f">
 <p>
 Dynamic secret injection uses controllers or sidecars to make secrets available without static manifests.
 </p>
 </div>
 </div>
-<div id="outline-container-orga65b945" class="outline-3">
-<h3 id="orga65b945">Q146: What is a projected Secret volume with multiple keys?</h3>
-<div class="outline-text-3" id="text-orga65b945">
+<div id="outline-container-org189f2ca" class="outline-3">
+<h3 id="org189f2ca">Q146: What is a projected Secret volume with multiple keys?</h3>
+<div class="outline-text-3" id="text-org189f2ca">
 <p>
 It can expose several Secret keys to a single mount directory in a structured way.
 </p>
 </div>
 </div>
-<div id="outline-container-org8d683b1" class="outline-3">
-<h3 id="org8d683b1">Q147: What is an app configuration file like application.properties?</h3>
-<div class="outline-text-3" id="text-org8d683b1">
+<div id="outline-container-org3f29b47" class="outline-3">
+<h3 id="org3f29b47">Q147: What is an app configuration file like application.properties?</h3>
+<div class="outline-text-3" id="text-org3f29b47">
 <p>
 This is common in Java and other frameworks and maps naturally to ConfigMap file mounts.
 </p>
 </div>
 </div>
-<div id="outline-container-org6379b37" class="outline-3">
-<h3 id="org6379b37">Q148: What is a YAML config map example?</h3>
-<div class="outline-text-3" id="text-org6379b37">
+<div id="outline-container-org9283e26" class="outline-3">
+<h3 id="org9283e26">Q148: What is a YAML config map example?</h3>
+<div class="outline-text-3" id="text-org9283e26">
 <p>
 A ConfigMap may hold keys representing config settings, such as <code>database.url</code>, <code>log.level</code>, or <code>feature.x.enabled</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgac5f2c4" class="outline-3">
-<h3 id="orgac5f2c4">Q149: What is a Secret remount?</h3>
-<div class="outline-text-3" id="text-orgac5f2c4">
+<div id="outline-container-org96adeaa" class="outline-3">
+<h3 id="org96adeaa">Q149: What is a Secret remount?</h3>
+<div class="outline-text-3" id="text-org96adeaa">
 <p>
 A Secret remount is when Kubernetes updates the mounted Secret and the pod’s filesystem reflects the new values.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcaa22f4" class="outline-3">
-<h3 id="orgcaa22f4">Q150: What is a kubelet token?</h3>
-<div class="outline-text-3" id="text-orgcaa22f4">
+<div id="outline-container-org33e9fd7" class="outline-3">
+<h3 id="org33e9fd7">Q150: What is a kubelet token?</h3>
+<div class="outline-text-3" id="text-org33e9fd7">
 <p>
 A kubelet token is used by the node to authenticate to the API server.
 </p>
 </div>
 </div>
-<div id="outline-container-orgac7ca1e" class="outline-3">
-<h3 id="orgac7ca1e">Q151: Why is app configuration often externalized?</h3>
-<div class="outline-text-3" id="text-orgac7ca1e">
+<div id="outline-container-orgb49b84d" class="outline-3">
+<h3 id="orgb49b84d">Q151: Why is app configuration often externalized?</h3>
+<div class="outline-text-3" id="text-orgb49b84d">
 <p>
 Because the app should not be tightly coupled to environment-specific values or private keys.
 </p>
 </div>
 </div>
-<div id="outline-container-org9132921" class="outline-3">
-<h3 id="org9132921">Q152: What is a network policy impact on ConfigMap/Secret access?</h3>
-<div class="outline-text-3" id="text-org9132921">
+<div id="outline-container-orge5abd96" class="outline-3">
+<h3 id="orge5abd96">Q152: What is a network policy impact on ConfigMap/Secret access?</h3>
+<div class="outline-text-3" id="text-orge5abd96">
 <p>
 Network policy can restrict which pods can talk to which services, but it does not replace RBAC for API access.
 </p>
 </div>
 </div>
-<div id="outline-container-org842c106" class="outline-3">
-<h3 id="org842c106">Q153: What is a namespace boundary?</h3>
-<div class="outline-text-3" id="text-org842c106">
+<div id="outline-container-org2d50e1e" class="outline-3">
+<h3 id="org2d50e1e">Q153: What is a namespace boundary?</h3>
+<div class="outline-text-3" id="text-org2d50e1e">
 <p>
 A namespace defines a logical boundary for resources, including ConfigMaps and Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc534da7" class="outline-3">
-<h3 id="orgc534da7">Q154: Why separate namespaces?</h3>
-<div class="outline-text-3" id="text-orgc534da7">
+<div id="outline-container-org04f624e" class="outline-3">
+<h3 id="org04f624e">Q154: Why separate namespaces?</h3>
+<div class="outline-text-3" id="text-org04f624e">
 <p>
 To isolate teams, workloads, and environments and control access to config and secret resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org692d869" class="outline-3">
-<h3 id="org692d869">Q155: What is a pod-level secret access?</h3>
-<div class="outline-text-3" id="text-org692d869">
+<div id="outline-container-org548d0cb" class="outline-3">
+<h3 id="org548d0cb">Q155: What is a pod-level secret access?</h3>
+<div class="outline-text-3" id="text-org548d0cb">
 <p>
 A pod can access secret volumes or env vars only if configured in the pod spec and permitted by policy.
 </p>
 </div>
 </div>
-<div id="outline-container-org14ddccb" class="outline-3">
-<h3 id="org14ddccb">Q156: What is a cluster-wide secret?</h3>
-<div class="outline-text-3" id="text-org14ddccb">
+<div id="outline-container-org1fa3f1b" class="outline-3">
+<h3 id="org1fa3f1b">Q156: What is a cluster-wide secret?</h3>
+<div class="outline-text-3" id="text-org1fa3f1b">
 <p>
 A cluster-wide secret is available across namespaces or at a cluster scope when defined accordingly.
 </p>
 </div>
 </div>
-<div id="outline-container-org16fefd1" class="outline-3">
-<h3 id="org16fefd1">Q157: What is a namespaced Secret?</h3>
-<div class="outline-text-3" id="text-org16fefd1">
+<div id="outline-container-orgd364e61" class="outline-3">
+<h3 id="orgd364e61">Q157: What is a namespaced Secret?</h3>
+<div class="outline-text-3" id="text-orgd364e61">
 <p>
 A namespaced Secret is created in a specific namespace and visible only within it unless further exposed.
 </p>
 </div>
 </div>
-<div id="outline-container-org4219f9a" class="outline-3">
-<h3 id="org4219f9a">Q158: What is a default service account token?</h3>
-<div class="outline-text-3" id="text-org4219f9a">
+<div id="outline-container-org685c0bb" class="outline-3">
+<h3 id="org685c0bb">Q158: What is a default service account token?</h3>
+<div class="outline-text-3" id="text-org685c0bb">
 <p>
 A service account token is automatically mounted into pods and can be used to access the Kubernetes API, making it sensitive.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf3bf453" class="outline-3">
-<h3 id="orgf3bf453">Q159: Why is the default service account token a security risk?</h3>
-<div class="outline-text-3" id="text-orgf3bf453">
+<div id="outline-container-org7d40292" class="outline-3">
+<h3 id="org7d40292">Q159: Why is the default service account token a security risk?</h3>
+<div class="outline-text-3" id="text-org7d40292">
 <p>
 Because if abused, it can be used by a compromised pod to interact with the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org4658775" class="outline-3">
-<h3 id="org4658775">Q160: What is a service account token secret?</h3>
-<div class="outline-text-3" id="text-org4658775">
+<div id="outline-container-org4ddd6a2" class="outline-3">
+<h3 id="org4ddd6a2">Q160: What is a service account token secret?</h3>
+<div class="outline-text-3" id="text-org4ddd6a2">
 <p>
 It is a Secret containing the token used by the pod to authenticate with the cluster API.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd2741f1" class="outline-3">
-<h3 id="orgd2741f1">Q161: Why should service account tokens be scoped and limited?</h3>
-<div class="outline-text-3" id="text-orgd2741f1">
+<div id="outline-container-org0a4fdde" class="outline-3">
+<h3 id="org0a4fdde">Q161: Why should service account tokens be scoped and limited?</h3>
+<div class="outline-text-3" id="text-org0a4fdde">
 <p>
 Because broad token access can allow unauthorized cluster actions.
 </p>
 </div>
 </div>
-<div id="outline-container-orga604ed0" class="outline-3">
-<h3 id="orga604ed0">Q162: What is a pod security context?</h3>
-<div class="outline-text-3" id="text-orga604ed0">
+<div id="outline-container-org1ba4056" class="outline-3">
+<h3 id="org1ba4056">Q162: What is a pod security context?</h3>
+<div class="outline-text-3" id="text-org1ba4056">
 <p>
 A security context can restrict privileges and filesystem access inside the pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org138680a" class="outline-3">
-<h3 id="org138680a">Q163: What is a readiness probe and config reload?</h3>
-<div class="outline-text-3" id="text-org138680a">
+<div id="outline-container-orgcbc6fdd" class="outline-3">
+<h3 id="orgcbc6fdd">Q163: What is a readiness probe and config reload?</h3>
+<div class="outline-text-3" id="text-orgcbc6fdd">
 <p>
 A readiness probe can help ensure the app is starting with the latest ConfigMap values before traffic is routed to it.
 </p>
 </div>
 </div>
-<div id="outline-container-org1f10be7" class="outline-3">
-<h3 id="org1f10be7">Q164: What is a rolling restart due to config change?</h3>
-<div class="outline-text-3" id="text-org1f10be7">
+<div id="outline-container-org93d9e34" class="outline-3">
+<h3 id="org93d9e34">Q164: What is a rolling restart due to config change?</h3>
+<div class="outline-text-3" id="text-org93d9e34">
 <p>
 A deployment may restart pods to refresh config when mounted ConfigMaps or Secrets are updated.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e30269" class="outline-3">
-<h3 id="org8e30269">Q165: What is config hot reload?</h3>
-<div class="outline-text-3" id="text-org8e30269">
+<div id="outline-container-orgbc19ae8" class="outline-3">
+<h3 id="orgbc19ae8">Q165: What is config hot reload?</h3>
+<div class="outline-text-3" id="text-orgbc19ae8">
 <p>
 Some apps can reload configuration files without restarting, but this is application-specific.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb42efa6" class="outline-3">
-<h3 id="orgb42efa6">Q166: Why are Secret rotations often coupled with deployments?</h3>
-<div class="outline-text-3" id="text-orgb42efa6">
+<div id="outline-container-orgf42ce5a" class="outline-3">
+<h3 id="orgf42ce5a">Q166: Why are Secret rotations often coupled with deployments?</h3>
+<div class="outline-text-3" id="text-orgf42ce5a">
 <p>
 Because applications may need to re-read or use new credentials after rotation.
 </p>
 </div>
 </div>
-<div id="outline-container-org99bdc82" class="outline-3">
-<h3 id="org99bdc82">Q167: What is secret rotation automation?</h3>
-<div class="outline-text-3" id="text-org99bdc82">
+<div id="outline-container-org308dfb4" class="outline-3">
+<h3 id="org308dfb4">Q167: What is secret rotation automation?</h3>
+<div class="outline-text-3" id="text-org308dfb4">
 <p>
 It automates the creation of new secrets and updates workloads or applications to use them.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc82d02d" class="outline-3">
-<h3 id="orgc82d02d">Q168: What is secret versioning?</h3>
-<div class="outline-text-3" id="text-orgc82d02d">
+<div id="outline-container-org61d0e6b" class="outline-3">
+<h3 id="org61d0e6b">Q168: What is secret versioning?</h3>
+<div class="outline-text-3" id="text-org61d0e6b">
 <p>
 Secret versioning tracks multiple versions of a secret so workloads can transition smoothly between old and new values.
 </p>
 </div>
 </div>
-<div id="outline-container-orge7f1df0" class="outline-3">
-<h3 id="orge7f1df0">Q169: Why is immutable config useful?</h3>
-<div class="outline-text-3" id="text-orge7f1df0">
+<div id="outline-container-org9db7c30" class="outline-3">
+<h3 id="org9db7c30">Q169: Why is immutable config useful?</h3>
+<div class="outline-text-3" id="text-org9db7c30">
 <p>
 Immutable config avoids surprise drift and makes changes explicit and reviewable.
 </p>
 </div>
 </div>
-<div id="outline-container-org592caa1" class="outline-3">
-<h3 id="org592caa1">Q170: What is a config change strategy?</h3>
-<div class="outline-text-3" id="text-org592caa1">
+<div id="outline-container-org6e22711" class="outline-3">
+<h3 id="org6e22711">Q170: What is a config change strategy?</h3>
+<div class="outline-text-3" id="text-org6e22711">
 <p>
 It defines how config is updated, what triggers rollout, and how to validate the new values.
 </p>
 </div>
 </div>
-<div id="outline-container-orgef43d7e" class="outline-3">
-<h3 id="orgef43d7e">Q171: What is a Secret create flow?</h3>
-<div class="outline-text-3" id="text-orgef43d7e">
+<div id="outline-container-org1bff847" class="outline-3">
+<h3 id="org1bff847">Q171: What is a Secret create flow?</h3>
+<div class="outline-text-3" id="text-org1bff847">
 <p>
 It usually includes generating the value, storing it securely, creating the Secret object, and updating the workload to consume it.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc9d88d" class="outline-3">
-<h3 id="orgdc9d88d">Q172: Why should secret generation be secure?</h3>
-<div class="outline-text-3" id="text-orgdc9d88d">
+<div id="outline-container-org7c530d4" class="outline-3">
+<h3 id="org7c530d4">Q172: Why should secret generation be secure?</h3>
+<div class="outline-text-3" id="text-org7c530d4">
 <p>
 Because generating secrets with low entropy or in unsafe contexts can produce weak credentials.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd9e945c" class="outline-3">
-<h3 id="orgd9e945c">Q173: What is a generated Secret?</h3>
-<div class="outline-text-3" id="text-orgd9e945c">
+<div id="outline-container-org2768814" class="outline-3">
+<h3 id="org2768814">Q173: What is a generated Secret?</h3>
+<div class="outline-text-3" id="text-org2768814">
 <p>
 A generated Secret is created automatically by tools or controllers, often with strong randomness.
 </p>
 </div>
 </div>
-<div id="outline-container-org0a455c1" class="outline-3">
-<h3 id="org0a455c1">Q174: What is a config checksum?</h3>
-<div class="outline-text-3" id="text-org0a455c1">
+<div id="outline-container-org6ef022e" class="outline-3">
+<h3 id="org6ef022e">Q174: What is a config checksum?</h3>
+<div class="outline-text-3" id="text-org6ef022e">
 <p>
 A checksum can be used to trigger a pod restart when ConfigMap or Secret content changes.
 </p>
 </div>
 </div>
-<div id="outline-container-orge75d0ed" class="outline-3">
-<h3 id="orge75d0ed">Q175: What is config hash annotation?</h3>
-<div class="outline-text-3" id="text-orge75d0ed">
+<div id="outline-container-orge12c85e" class="outline-3">
+<h3 id="orge12c85e">Q175: What is config hash annotation?</h3>
+<div class="outline-text-3" id="text-orge12c85e">
 <p>
 It is a common pattern where a deployment annotation includes the hash of config to trigger rollout.
 </p>
 </div>
 </div>
-<div id="outline-container-org704cb8a" class="outline-3">
-<h3 id="org704cb8a">Q176: Why is config hashing useful?</h3>
-<div class="outline-text-3" id="text-org704cb8a">
+<div id="outline-container-org21fe951" class="outline-3">
+<h3 id="org21fe951">Q176: Why is config hashing useful?</h3>
+<div class="outline-text-3" id="text-org21fe951">
 <p>
 Because it ensures workloads restart after config changes that require reloading.
 </p>
 </div>
 </div>
-<div id="outline-container-org78ba037" class="outline-3">
-<h3 id="org78ba037">Q177: What is the value of declarative config management?</h3>
-<div class="outline-text-3" id="text-org78ba037">
+<div id="outline-container-orgd5eabaa" class="outline-3">
+<h3 id="orgd5eabaa">Q177: What is the value of declarative config management?</h3>
+<div class="outline-text-3" id="text-orgd5eabaa">
 <p>
 It provides reproducibility, reviewability, and operational consistency for K8s objects.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9cb2e6" class="outline-3">
-<h3 id="orgc9cb2e6">Q178: What is the value of declarative Secrets management?</h3>
-<div class="outline-text-3" id="text-orgc9cb2e6">
+<div id="outline-container-org4684614" class="outline-3">
+<h3 id="org4684614">Q178: What is the value of declarative Secrets management?</h3>
+<div class="outline-text-3" id="text-org4684614">
 <p>
 It improves consistency and integration with GitOps while still requiring secure handling of the actual secret data.
 </p>
 </div>
 </div>
-<div id="outline-container-org0edc21b" class="outline-3">
-<h3 id="org0edc21b">Q179: Why are ConfigMaps and Secrets fundamental in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org0edc21b">
+<div id="outline-container-org3d7a7b7" class="outline-3">
+<h3 id="org3d7a7b7">Q179: Why are ConfigMaps and Secrets fundamental in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org3d7a7b7">
 <p>
 Because they decouple environment-specific behavior from the image and provide the data plane needed for reliable, configurable, and secure workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf392714" class="outline-3">
-<h3 id="orgf392714">Q180: What is the most important rule for Secrets in Kubernetes?</h3>
-<div class="outline-text-3" id="text-orgf392714">
+<div id="outline-container-orgd78026f" class="outline-3">
+<h3 id="orgd78026f">Q180: What is the most important rule for Secrets in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgd78026f">
 <p>
 Do not store private data in plain text in Git, build pipelines, or image history when a more secure secret workflow is available.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgde8358a" class="outline-2">
-<h2 id="orgde8358a">Advanced / Expert</h2>
-<div class="outline-text-2" id="text-orgde8358a">
+<div id="outline-container-org17c141c" class="outline-2">
+<h2 id="org17c141c">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-org17c141c">
 </div>
-<div id="outline-container-org9ef9456" class="outline-3">
-<h3 id="org9ef9456">Q181: What is Kubernetes Secret encryption at rest in detail?</h3>
-<div class="outline-text-3" id="text-org9ef9456">
+<div id="outline-container-org6aa38cd" class="outline-3">
+<h3 id="org6aa38cd">Q181: What is Kubernetes Secret encryption at rest in detail?</h3>
+<div class="outline-text-3" id="text-org6aa38cd">
 <p>
 It encrypts Secret data before persisting it in etcd, using a configured KMS or encryption provider.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c87961" class="outline-3">
-<h3 id="org3c87961">Q182: What is etcd encryption provider?</h3>
-<div class="outline-text-3" id="text-org3c87961">
+<div id="outline-container-org39b348f" class="outline-3">
+<h3 id="org39b348f">Q182: What is etcd encryption provider?</h3>
+<div class="outline-text-3" id="text-org39b348f">
 <p>
 It is the plugin or service that provides the actual encryption and decryption for API object data.
 </p>
 </div>
 </div>
-<div id="outline-container-org064ec79" class="outline-3">
-<h3 id="org064ec79">Q183: Why is etcd security crucial for Secret integrity?</h3>
-<div class="outline-text-3" id="text-org064ec79">
+<div id="outline-container-org4bb724d" class="outline-3">
+<h3 id="org4bb724d">Q183: Why is etcd security crucial for Secret integrity?</h3>
+<div class="outline-text-3" id="text-org4bb724d">
 <p>
 Because if etcd is compromised, Secrets may be accessible unless encryption at rest is enabled.
 </p>
 </div>
 </div>
-<div id="outline-container-org215b39b" class="outline-3">
-<h3 id="org215b39b">Q184: What is a Secret access path?</h3>
-<div class="outline-text-3" id="text-org215b39b">
+<div id="outline-container-orgae6e654" class="outline-3">
+<h3 id="orgae6e654">Q184: What is a Secret access path?</h3>
+<div class="outline-text-3" id="text-orgae6e654">
 <p>
 It is the chain from Secret object storage to the kubelet to the mounted file or env var seen by the container.
 </p>
 </div>
 </div>
-<div id="outline-container-org845da2a" class="outline-3">
-<h3 id="org845da2a">Q185: Why is the Kubelet a trust boundary?</h3>
-<div class="outline-text-3" id="text-org845da2a">
+<div id="outline-container-org1cd4ff3" class="outline-3">
+<h3 id="org1cd4ff3">Q185: Why is the Kubelet a trust boundary?</h3>
+<div class="outline-text-3" id="text-org1cd4ff3">
 <p>
 Because it handles mounted data and thus must be trusted to preserve secret confidentiality and correctness.
 </p>
 </div>
 </div>
-<div id="outline-container-org9c50333" class="outline-3">
-<h3 id="org9c50333">Q186: What is Secret projection validation?</h3>
-<div class="outline-text-3" id="text-org9c50333">
+<div id="outline-container-org8fcef47" class="outline-3">
+<h3 id="org8fcef47">Q186: What is Secret projection validation?</h3>
+<div class="outline-text-3" id="text-org8fcef47">
 <p>
 It validates that a projected Secret or ConfigMap is mounted and any referenced data keys exist.
 </p>
 </div>
 </div>
-<div id="outline-container-org8378cb6" class="outline-3">
-<h3 id="org8378cb6">Q187: What is a Secret key mismatch?</h3>
-<div class="outline-text-3" id="text-org8378cb6">
+<div id="outline-container-org2a0ab8d" class="outline-3">
+<h3 id="org2a0ab8d">Q187: What is a Secret key mismatch?</h3>
+<div class="outline-text-3" id="text-org2a0ab8d">
 <p>
 It occurs when an application expects a file or env var that does not exist in the mounted Secret.
 </p>
 </div>
 </div>
-<div id="outline-container-org57382de" class="outline-3">
-<h3 id="org57382de">Q188: What is a Secret file permission vulnerability?</h3>
-<div class="outline-text-3" id="text-org57382de">
+<div id="outline-container-orga43a4c2" class="outline-3">
+<h3 id="orga43a4c2">Q188: What is a Secret file permission vulnerability?</h3>
+<div class="outline-text-3" id="text-orga43a4c2">
 <p>
 It occurs when mounted Secret files are readable by unintended processes or users.
 </p>
 </div>
 </div>
-<div id="outline-container-org5cac2db" class="outline-3">
-<h3 id="org5cac2db">Q189: What is a secret injection attack?</h3>
-<div class="outline-text-3" id="text-org5cac2db">
+<div id="outline-container-orgbc69c61" class="outline-3">
+<h3 id="orgbc69c61">Q189: What is a secret injection attack?</h3>
+<div class="outline-text-3" id="text-orgbc69c61">
 <p>
 It is a malicious process or actor attempting to manipulate config or secret values in a pod or cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org54dfc1d" class="outline-3">
-<h3 id="org54dfc1d">Q190: What is a ConfigMap injection attack?</h3>
-<div class="outline-text-3" id="text-org54dfc1d">
+<div id="outline-container-orgb18d66d" class="outline-3">
+<h3 id="orgb18d66d">Q190: What is a ConfigMap injection attack?</h3>
+<div class="outline-text-3" id="text-orgb18d66d">
 <p>
 It is an attempt to alter config content in ways that change runtime behavior or exploit assumptions in the app.
 </p>
 </div>
 </div>
-<div id="outline-container-org41e233a" class="outline-3">
-<h3 id="org41e233a">Q191: Why do security policies matter for ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-org41e233a">
+<div id="outline-container-orgedae1f2" class="outline-3">
+<h3 id="orgedae1f2">Q191: Why do security policies matter for ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-orgedae1f2">
 <p>
 Because they constrain who can read, create, or update configuration and sensitive values.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd771166" class="outline-3">
-<h3 id="orgd771166">Q192: What is pod security admission?</h3>
-<div class="outline-text-3" id="text-orgd771166">
+<div id="outline-container-org593ea71" class="outline-3">
+<h3 id="org593ea71">Q192: What is pod security admission?</h3>
+<div class="outline-text-3" id="text-org593ea71">
 <p>
 Pod security admission enforces baseline security restrictions on pod creation based on policy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb51d4d9" class="outline-3">
-<h3 id="orgb51d4d9">Q193: What is a restricted pod security level?</h3>
-<div class="outline-text-3" id="text-orgb51d4d9">
+<div id="outline-container-orga58eee3" class="outline-3">
+<h3 id="orga58eee3">Q193: What is a restricted pod security level?</h3>
+<div class="outline-text-3" id="text-orga58eee3">
 <p>
 It enforces more stringent controls such as no privilege escalation, no root, and restricted capability usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d380fe" class="outline-3">
-<h3 id="org5d380fe">Q194: Why is no-root important for secret handling?</h3>
-<div class="outline-text-3" id="text-org5d380fe">
+<div id="outline-container-org6bdff72" class="outline-3">
+<h3 id="org6bdff72">Q194: Why is no-root important for secret handling?</h3>
+<div class="outline-text-3" id="text-org6bdff72">
 <p>
 Because apps running as root can access more sensitive files and may have broader privilege over mounted Secrets.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc85f6da" class="outline-3">
-<h3 id="orgc85f6da">Q195: Why do config values and secrets often need different lifecycle policies?</h3>
-<div class="outline-text-3" id="text-orgc85f6da">
+<div id="outline-container-org69cdf92" class="outline-3">
+<h3 id="org69cdf92">Q195: Why do config values and secrets often need different lifecycle policies?</h3>
+<div class="outline-text-3" id="text-org69cdf92">
 <p>
 Because configuration changes may be routine and low-risk, while secret changes require rotation and stricter governance.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c7a49d" class="outline-3">
-<h3 id="org2c7a49d">Q196: What is secret rotation without app restart?</h3>
-<div class="outline-text-3" id="text-org2c7a49d">
+<div id="outline-container-org35aa7a8" class="outline-3">
+<h3 id="org35aa7a8">Q196: What is secret rotation without app restart?</h3>
+<div class="outline-text-3" id="text-org35aa7a8">
 <p>
 Some patterns use reloading and hot updates, but many applications still require a restart or reload hook.
 </p>
 </div>
 </div>
-<div id="outline-container-org9308ba5" class="outline-3">
-<h3 id="org9308ba5">Q197: What is the challenge of secret rotation in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org9308ba5">
+<div id="outline-container-org6e5c5bd" class="outline-3">
+<h3 id="org6e5c5bd">Q197: What is the challenge of secret rotation in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org6e5c5bd">
 <p>
 Because running pods may hold stale in-memory copies of secret data and need coordinated reloading.
 </p>
 </div>
 </div>
-<div id="outline-container-org3dd03e6" class="outline-3">
-<h3 id="org3dd03e6">Q198: What is the risk of stale secrets?</h3>
-<div class="outline-text-3" id="text-org3dd03e6">
+<div id="outline-container-orgdeb5ba2" class="outline-3">
+<h3 id="orgdeb5ba2">Q198: What is the risk of stale secrets?</h3>
+<div class="outline-text-3" id="text-orgdeb5ba2">
 <p>
 Stale or forgotten secrets can remain valid longer than intended, increasing exposure.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc02c86b" class="outline-3">
-<h3 id="orgc02c86b">Q199: What is a centralized secret management integration?</h3>
-<div class="outline-text-3" id="text-orgc02c86b">
+<div id="outline-container-orgdb759b7" class="outline-3">
+<h3 id="orgdb759b7">Q199: What is a centralized secret management integration?</h3>
+<div class="outline-text-3" id="text-orgdb759b7">
 <p>
 It integrates Kubernetes Secrets with platforms like Vault, AWS Secrets Manager, or GCP Secret Manager.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd5a675a" class="outline-3">
-<h3 id="orgd5a675a">Q200: What is the ultimate principle of Kubernetes ConfigMaps and Secrets?</h3>
-<div class="outline-text-3" id="text-orgd5a675a">
+<div id="outline-container-org7bd1d36" class="outline-3">
+<h3 id="org7bd1d36">Q200: What is the ultimate principle of Kubernetes ConfigMaps and Secrets?</h3>
+<div class="outline-text-3" id="text-org7bd1d36">
 <p>
 Configuration should be externalized and Governed; secrets should be isolated, protected, rotated, and tightly controlled, while ConfigMaps stay flexible and environment-driven.
 </p>
