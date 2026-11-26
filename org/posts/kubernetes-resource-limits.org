@@ -8,7 +8,779 @@
 
 * Kubernetes Resource Limits
 
+- [[https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/][Kubernetes Resource Limits Documentation]]
+- [[https://kubernetes.io/docs/concepts/resource-management/][Kubernetes Resource Management Documentation]]
+
 -----
+
+* Kubernetes Resource Limits Handbook:
+
+*1. Inspect Kubernetes Cluster & Resources*
+
+#+BEGIN_SRC bash
+
+# Check Kubernetes client version
+kubectl version --client
+
+# Check cluster version
+kubectl version
+
+# Display cluster information
+kubectl cluster-info
+
+# List cluster nodes
+kubectl get nodes
+
+# Display detailed node information
+kubectl get nodes -o wide
+
+# Inspect node resources
+kubectl describe nodes
+
+# Display node resource capacity and allocatable resources
+kubectl get nodes \
+  -o custom-columns=NAME:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory,ALLOCATABLE_CPU:.status.allocatable.cpu,ALLOCATABLE_MEMORY:.status.allocatable.memory
+
+#+END_SRC
+
+*2. Pod Resource Requests & Limits*
+
+Requests define the resources used for scheduling. Limits define the maximum resources a container can consume.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-demo
+spec:
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "256Mi"
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply resource configuration
+kubectl apply -f pod.yaml
+
+# List pods
+kubectl get pods
+
+# Inspect pod configuration
+kubectl describe pod resource-demo
+
+# Display pod YAML
+kubectl get pod resource-demo -o yaml
+
+# Display resource configuration
+kubectl get pod resource-demo \
+  -o jsonpath='{.spec.containers[*].resources}'
+
+#+END_SRC
+
+*3. Understand CPU & Memory Units*
+
+| Resource | Value | Meaning |
+|---|---|---|
+| CPU | `100m` | 0.1 CPU core |
+| CPU | `250m` | 0.25 CPU core |
+| CPU | `500m` | 0.5 CPU core |
+| CPU | `1000m` | 1 CPU core |
+| Memory | `128Mi` | 128 mebibytes |
+| Memory | `512Mi` | 512 mebibytes |
+| Memory | `1Gi` | 1 gibibyte |
+| Memory | `2Gi` | 2 gibibytes |
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+
+#+END_SRC
+
+Note:
+
+- `1000m` CPU equals 1 CPU core.
+- CPU can be throttled when the container reaches its CPU limit.
+- Memory exceeding its enforced limit can trigger an OOM kill.
+- `Mi` and `Gi` are binary units, while `M` and `G` are decimal units.
+
+*4. Requests vs Limits*
+
+| Configuration | Purpose |
+|---|---|
+| CPU request | Scheduling reservation |
+| Memory request | Scheduling reservation |
+| CPU limit | Maximum CPU usage enforced through throttling |
+| Memory limit | Maximum memory usage enforced by the runtime/kernel |
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "512Mi"
+
+#+END_SRC
+
+Common configurations:
+
+#+BEGIN_SRC yaml
+
+# Requests equal limits – predictable resource allocation
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# Requests lower than limits – allows bursting
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+# Requests without limits
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+#+END_SRC
+
+Note: CPU and memory requests are used by the scheduler to evaluate node placement. Limits are enforced at runtime.
+
+*5. Configure Resources for Deployments*
+
+#+BEGIN_SRC yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Create deployment
+kubectl apply -f deployment.yaml
+
+# List deployments
+kubectl get deployments
+
+# List deployment pods
+kubectl get pods -l app=nginx
+
+# Display deployment details
+kubectl describe deployment nginx-deployment
+
+# Update deployment resources
+kubectl edit deployment nginx-deployment
+
+# Restart deployment
+kubectl rollout restart deployment nginx-deployment
+
+# Check rollout status
+kubectl rollout status deployment nginx-deployment
+
+#+END_SRC
+
+*6. Monitor CPU & Memory Usage*
+
+#+BEGIN_SRC bash
+
+# Display pod resource usage
+kubectl top pods
+
+# Display pod usage in a namespace
+kubectl top pods -n production
+
+# Display pod usage including containers
+kubectl top pods --containers
+
+# Display node resource usage
+kubectl top nodes
+
+# Sort pods by CPU usage
+kubectl top pods --sort-by=cpu
+
+# Sort pods by memory usage
+kubectl top pods --sort-by=memory
+
+# Display usage for a specific pod
+kubectl top pod resource-demo
+
+# Display usage for a specific container
+kubectl top pod resource-demo --containers
+
+#+END_SRC
+
+#+results:
+
+Note: `kubectl top` requires the Metrics Server or another supported metrics provider.
+
+*7. Resource Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Check pod status
+kubectl get pods
+
+# Check detailed pod events
+kubectl describe pod resource-demo
+
+# Display recent events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# Check pod logs
+kubectl logs resource-demo
+
+# Check logs from previous container instance
+kubectl logs resource-demo --previous
+
+# Check container restart count
+kubectl get pod resource-demo \
+  -o jsonpath='{.status.containerStatuses[*].restartCount}'
+
+# Check container termination reason
+kubectl get pod resource-demo \
+  -o jsonpath='{.status.containerStatuses[*].lastState.terminated.reason}'
+
+#+END_SRC
+
+Common problems:
+
+| Problem | Possible cause |
+|---|---|
+| `OOMKilled` | Container exceeded memory limit |
+| `Pending` | Insufficient requested resources |
+| `CPU throttling` | CPU limit is too restrictive |
+| `CrashLoopBackOff` | Application repeatedly crashes, potentially due to OOM |
+| `Evicted` | Node experienced resource pressure |
+| Slow application | CPU throttling or insufficient resources |
+
+*8. Debug OOMKilled Containers*
+
+#+BEGIN_SRC bash
+
+# Find OOMKilled pods
+kubectl get pods
+
+# Inspect pod events
+kubectl describe pod resource-demo
+
+# Check previous container logs
+kubectl logs resource-demo --previous
+
+# Inspect termination reason
+kubectl get pod resource-demo \
+  -o jsonpath='{.status.containerStatuses[*].lastState.terminated.reason}'
+
+# Inspect configured memory limit
+kubectl get pod resource-demo \
+  -o jsonpath='{.spec.containers[*].resources.limits.memory}'
+
+#+END_SRC
+
+Example memory configuration:
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    memory: "512Mi"
+  limits:
+    memory: "1Gi"
+
+#+END_SRC
+
+Note: Increasing the memory limit may resolve an OOM issue, but investigate application memory leaks, heap configuration, traffic patterns, and native memory usage before increasing limits blindly.
+
+*9. Debug CPU Throttling*
+
+#+BEGIN_SRC bash
+
+# Check current pod CPU usage
+kubectl top pods
+
+# Check container CPU requests and limits
+kubectl describe pod resource-demo
+
+# Inspect configured CPU limits
+kubectl get pod resource-demo \
+  -o jsonpath='{.spec.containers[*].resources.limits.cpu}'
+
+# Inspect configured CPU requests
+kubectl get pod resource-demo \
+  -o jsonpath='{.spec.containers[*].resources.requests.cpu}'
+
+#+END_SRC
+
+Example CPU configuration:
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    cpu: "500m"
+  limits:
+    cpu: "2"
+
+#+END_SRC
+
+Note: CPU throttling may result in increased latency and reduced throughput without restarting the container.
+
+*10. Kubernetes QoS Classes*
+
+Kubernetes assigns a Quality of Service (QoS) class to Pods.
+
+| QoS Class | Configuration | Eviction Priority |
+|---|---|---|
+| Guaranteed | Requests equal limits for CPU and memory on all containers | Highest protection |
+| Burstable | Requests and/or limits configured, but not Guaranteed | Intermediate |
+| BestEffort | No requests or limits configured | Lowest protection |
+
+#+BEGIN_SRC bash
+
+# Check Pod QoS class
+kubectl get pod resource-demo \
+  -o jsonpath='{.status.qosClass}'
+
+# Display QoS class for all pods
+kubectl get pods \
+  -o custom-columns=NAME:.metadata.name,QOS:.status.qosClass
+
+#+END_SRC
+
+Guaranteed QoS example:
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+#+END_SRC
+
+Burstable QoS example:
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+
+#+END_SRC
+
+BestEffort example:
+
+#+BEGIN_SRC yaml
+
+resources: {}
+
+#+END_SRC
+
+Note: QoS affects eviction behavior during node pressure. QoS alone does not guarantee that a Pod will never be evicted.
+
+*11. Namespace ResourceQuota*
+
+ResourceQuota limits aggregate resource consumption within a namespace.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "20"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Create resource quota
+kubectl apply -f resource-quota.yaml
+
+# List quotas
+kubectl get resourcequota
+
+# List quotas in a namespace
+kubectl get resourcequota -n production
+
+# Inspect quota details
+kubectl describe resourcequota production-quota -n production
+
+# Display quota usage
+kubectl get resourcequota production-quota -n production -o yaml
+
+# Delete quota
+kubectl delete resourcequota production-quota -n production
+
+#+END_SRC
+
+*12. LimitRange – Default Requests & Limits*
+
+LimitRange defines default resource values and minimum/maximum constraints within a namespace.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: container-resource-limits
+  namespace: production
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "256Mi"
+      min:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "2"
+        memory: "2Gi"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Create LimitRange
+kubectl apply -f limit-range.yaml
+
+# List LimitRanges
+kubectl get limitrange -n production
+
+# Inspect LimitRange
+kubectl describe limitrange container-resource-limits -n production
+
+# Display LimitRange YAML
+kubectl get limitrange container-resource-limits -n production -o yaml
+
+# Delete LimitRange
+kubectl delete limitrange container-resource-limits -n production
+
+#+END_SRC
+
+Note: Defaults may be applied to containers that omit resource requests or limits. Minimum and maximum constraints can reject Pod configurations that violate them.
+
+*13. Resource Management for Multi-Container Pods*
+
+Each container in a Pod can have its own resource requests and limits.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "512Mi"
+        limits:
+          cpu: "1"
+          memory: "1Gi"
+
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "64Mi"
+        limits:
+          cpu: "200m"
+          memory: "128Mi"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Display containers in a pod
+kubectl get pod multi-container-pod \
+  -o jsonpath='{.spec.containers[*].name}'
+
+# Display resource usage per container
+kubectl top pod multi-container-pod --containers
+
+# Inspect container resource configuration
+kubectl describe pod multi-container-pod
+
+#+END_SRC
+
+Note: Pod resource requirements are influenced by all containers, including sidecars and init containers.
+
+*14. Autoscaling & Resource Requests*
+
+Horizontal Pod Autoscaler (HPA) can use CPU utilization relative to CPU requests to scale workloads.
+
+#+BEGIN_SRC yaml
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply HPA
+kubectl apply -f hpa.yaml
+
+# List HPAs
+kubectl get hpa
+
+# Inspect HPA
+kubectl describe hpa nginx-hpa
+
+# Watch HPA metrics
+kubectl get hpa --watch
+
+# Check deployment replicas
+kubectl get deployment nginx-deployment
+
+# Check pod resource usage
+kubectl top pods
+
+#+END_SRC
+
+Note: CPU utilization percentage is calculated relative to the configured CPU request. Missing or unrealistic CPU requests can affect HPA behavior.
+
+*15. Node Resource Capacity & Scheduling*
+
+#+BEGIN_SRC bash
+
+# List nodes
+kubectl get nodes
+
+# Inspect node resource capacity
+kubectl describe node worker-1
+
+# Display allocatable resources
+kubectl get node worker-1 \
+  -o jsonpath='{.status.allocatable}'
+
+# Display allocated resources
+kubectl describe node worker-1
+
+# Display node CPU and memory usage
+kubectl top nodes
+
+# Check pending pods
+kubectl get pods --field-selector=status.phase=Pending
+
+# Inspect scheduling failures
+kubectl describe pod resource-demo
+
+#+END_SRC
+
+Common scheduling errors:
+
+#+BEGIN_SRC text
+
+Insufficient cpu
+Insufficient memory
+
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC yaml
+
+resources:
+  requests:
+    cpu: "2"
+    memory: "4Gi"
+
+#+END_SRC
+
+Note: A Pod may remain Pending if no eligible node has enough allocatable resources to satisfy its requests.
+
+*16. Resource Optimization & Best Practices*
+
+#+BEGIN_SRC bash
+
+# Monitor pod usage
+kubectl top pods --all-namespaces
+
+# Monitor node usage
+kubectl top nodes
+
+# Inspect workload resource configuration
+kubectl get deployments --all-namespaces -o yaml
+
+# Identify pods with resource configuration
+kubectl get pods -A \
+  -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CPU_REQUEST:.spec.containers[*].resources.requests.cpu,MEM_REQUEST:.spec.containers[*].resources.requests.memory,CPU_LIMIT:.spec.containers[*].resources.limits.cpu,MEM_LIMIT:.spec.containers[*].resources.limits.memory
+
+#+END_SRC
+
+Best practices:
+
+- Set CPU and memory requests for production workloads.
+- Set memory limits carefully to avoid OOM kills.
+- Measure actual usage before setting requests and limits.
+- Avoid excessively low CPU limits for latency-sensitive applications.
+- Reserve sufficient resources for system components.
+- Configure namespace ResourceQuota and LimitRange.
+- Monitor CPU throttling, memory usage, restarts, and evictions.
+- Include sidecars in resource calculations.
+- Revisit resource sizing after load testing and production changes.
+- Use autoscaling together with sensible resource requests.
+
+*17. Quick Troubleshooting Cheat Sheet*
+
+| Problem | Command / Action |
+|---|---|
+| Pod stuck Pending | `kubectl describe pod <pod>` |
+| OOMKilled | `kubectl describe pod <pod>` |
+| High CPU usage | `kubectl top pods` |
+| High memory usage | `kubectl top pods --containers` |
+| Node pressure | `kubectl describe node <node>` |
+| Pod restart count | `kubectl get pods` |
+| Previous crash logs | `kubectl logs <pod> --previous` |
+| ResourceQuota exceeded | `kubectl describe resourcequota -n <namespace>` |
+| LimitRange violation | `kubectl describe limitrange -n <namespace>` |
+| HPA not scaling | `kubectl describe hpa <hpa>` |
+| CPU throttling | Review CPU limit and metrics |
+| Scheduling failure | Check requests and node allocatable resources |
+
+*18. Useful Resource Commands*
+
+#+BEGIN_SRC bash
+
+# List pods across namespaces
+kubectl get pods -A
+
+# List deployments across namespaces
+kubectl get deployments -A
+
+# Display resource usage
+kubectl top pods -A
+
+# Display node resource usage
+kubectl top nodes
+
+# Describe a pod
+kubectl describe pod <pod-name> -n <namespace>
+
+# Describe a node
+kubectl describe node <node-name>
+
+# Get resource configuration in YAML
+kubectl get pod <pod-name> -o yaml
+
+# Watch pod status
+kubectl get pods --watch
+
+# Watch resource usage
+kubectl top pods --watch
+
+# Check pod events
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+
+# Delete a pod
+kubectl delete pod <pod-name> -n <namespace>
+
+# Restart a deployment
+kubectl rollout restart deployment <deployment-name> -n <namespace>
+
+# Check deployment rollout
+kubectl rollout status deployment <deployment-name> -n <namespace>
+
+#+END_SRC
+
+------
 
 * Beginner
 

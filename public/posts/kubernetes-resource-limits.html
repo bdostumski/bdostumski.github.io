@@ -23,155 +23,1273 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org22af738" class="outline-2">
-<h2 id="org22af738">Kubernetes Resource Limits</h2>
-<div class="outline-text-2" id="text-org22af738">
+<div id="outline-container-org999fe31" class="outline-2">
+<h2 id="org999fe31">Kubernetes Resource Limits</h2>
+<div class="outline-text-2" id="text-org999fe31">
+<ul class="org-ul">
+<li><a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/">Kubernetes Resource Limits Documentation</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/resource-management/">Kubernetes Resource Management Documentation</a></li>
+</ul>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-orge1fa8d9" class="outline-2">
-<h2 id="orge1fa8d9">Beginner</h2>
-<div class="outline-text-2" id="text-orge1fa8d9">
+<div id="outline-container-orga9924b8" class="outline-2">
+<h2 id="orga9924b8">Kubernetes Resource Limits Handbook:</h2>
+<div class="outline-text-2" id="text-orga9924b8">
+<p>
+<b>1. Inspect Kubernetes Cluster &amp; Resources</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Kubernetes client version
+</span>kubectl version --client
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check cluster version
+</span>kubectl version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display cluster information
+</span>kubectl cluster-info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List cluster nodes
+</span>kubectl get nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed node information
+</span>kubectl get nodes -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect node resources
+</span>kubectl describe nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node resource capacity and allocatable resources
+</span>kubectl get nodes <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory,ALLOCATABLE_CPU:.status.allocatable.cpu,ALLOCATABLE_MEMORY:.status.allocatable.memory
+
+</code></pre>
 </div>
-<div id="outline-container-org01730c5" class="outline-3">
-<h3 id="org01730c5">Q1: What are Kubernetes resource limits?</h3>
-<div class="outline-text-3" id="text-org01730c5">
+
+<p>
+<b>2. Pod Resource Requests &amp; Limits</b>
+</p>
+
+<p>
+Requests define the resources used for scheduling. Limits define the maximum resources a container can consume.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-demo
+spec:
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "256Mi"
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply resource configuration
+</span>kubectl apply -f pod.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List pods
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod configuration
+</span>kubectl describe pod resource-demo
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod YAML
+</span>kubectl get pod resource-demo -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource configuration
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].resources}'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b>3. Understand CPU &amp; Memory Units</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Resource</th>
+<th scope="col" class="org-left">Value</th>
+<th scope="col" class="org-left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">CPU</td>
+<td class="org-left">`100m`</td>
+<td class="org-left">0.1 CPU core</td>
+</tr>
+
+<tr>
+<td class="org-left">CPU</td>
+<td class="org-left">`250m`</td>
+<td class="org-left">0.25 CPU core</td>
+</tr>
+
+<tr>
+<td class="org-left">CPU</td>
+<td class="org-left">`500m`</td>
+<td class="org-left">0.5 CPU core</td>
+</tr>
+
+<tr>
+<td class="org-left">CPU</td>
+<td class="org-left">`1000m`</td>
+<td class="org-left">1 CPU core</td>
+</tr>
+
+<tr>
+<td class="org-left">Memory</td>
+<td class="org-left">`128Mi`</td>
+<td class="org-left">128 mebibytes</td>
+</tr>
+
+<tr>
+<td class="org-left">Memory</td>
+<td class="org-left">`512Mi`</td>
+<td class="org-left">512 mebibytes</td>
+</tr>
+
+<tr>
+<td class="org-left">Memory</td>
+<td class="org-left">`1Gi`</td>
+<td class="org-left">1 gibibyte</td>
+</tr>
+
+<tr>
+<td class="org-left">Memory</td>
+<td class="org-left">`2Gi`</td>
+<td class="org-left">2 gibibytes</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+
+</code></pre>
+</div>
+
+<p>
+Note:
+</p>
+
+<ul class="org-ul">
+<li>`1000m` CPU equals 1 CPU core.</li>
+<li>CPU can be throttled when the container reaches its CPU limit.</li>
+<li>Memory exceeding its enforced limit can trigger an OOM kill.</li>
+<li>`Mi` and `Gi` are binary units, while `M` and `G` are decimal units.</li>
+</ul>
+
+<p>
+<b>4. Requests vs Limits</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Configuration</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">CPU request</td>
+<td class="org-left">Scheduling reservation</td>
+</tr>
+
+<tr>
+<td class="org-left">Memory request</td>
+<td class="org-left">Scheduling reservation</td>
+</tr>
+
+<tr>
+<td class="org-left">CPU limit</td>
+<td class="org-left">Maximum CPU usage enforced through throttling</td>
+</tr>
+
+<tr>
+<td class="org-left">Memory limit</td>
+<td class="org-left">Maximum memory usage enforced by the runtime/kernel</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "512Mi"
+
+</code></pre>
+</div>
+
+<p>
+Common configurations:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+# Requests equal limits – predictable resource allocation
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+# Requests lower than limits – allows bursting
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+# Requests without limits
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+</code></pre>
+</div>
+
+<p>
+Note: CPU and memory requests are used by the scheduler to evaluate node placement. Limits are enforced at runtime.
+</p>
+
+<p>
+<b>5. Configure Resources for Deployments</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create deployment
+</span>kubectl apply -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List deployments
+</span>kubectl get deployments
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List deployment pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment details
+</span>kubectl describe deployment nginx-deployment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update deployment resources
+</span>kubectl edit deployment nginx-deployment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment
+</span>kubectl rollout restart deployment nginx-deployment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check rollout status
+</span>kubectl rollout status deployment nginx-deployment
+
+</code></pre>
+</div>
+
+<p>
+<b>6. Monitor CPU &amp; Memory Usage</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod resource usage
+</span>kubectl top pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod usage in a namespace
+</span>kubectl top pods -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod usage including containers
+</span>kubectl top pods --containers
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node resource usage
+</span>kubectl top nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sort pods by CPU usage
+</span>kubectl top pods --sort-by=cpu
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sort pods by memory usage
+</span>kubectl top pods --sort-by=memory
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display usage for a specific pod
+</span>kubectl top pod resource-demo
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display usage for a specific container
+</span>kubectl top pod resource-demo --containers
+
+</code></pre>
+</div>
+
+<p>
+Note: `kubectl top` requires the Metrics Server or another supported metrics provider.
+</p>
+
+<p>
+<b>7. Resource Troubleshooting</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod status
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check detailed pod events
+</span>kubectl describe pod resource-demo
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display recent events
+</span>kubectl get events --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod logs
+</span>kubectl logs resource-demo
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check logs from previous container instance
+</span>kubectl logs resource-demo --previous
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check container restart count
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.status.containerStatuses[*].restartCount}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check container termination reason
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.status.containerStatuses[*].lastState.terminated.reason}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Common problems:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Problem</th>
+<th scope="col" class="org-left">Possible cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`OOMKilled`</td>
+<td class="org-left">Container exceeded memory limit</td>
+</tr>
+
+<tr>
+<td class="org-left">`Pending`</td>
+<td class="org-left">Insufficient requested resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`CPU throttling`</td>
+<td class="org-left">CPU limit is too restrictive</td>
+</tr>
+
+<tr>
+<td class="org-left">`CrashLoopBackOff`</td>
+<td class="org-left">Application repeatedly crashes, potentially due to OOM</td>
+</tr>
+
+<tr>
+<td class="org-left">`Evicted`</td>
+<td class="org-left">Node experienced resource pressure</td>
+</tr>
+
+<tr>
+<td class="org-left">Slow application</td>
+<td class="org-left">CPU throttling or insufficient resources</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>8. Debug OOMKilled Containers</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find OOMKilled pods
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod events
+</span>kubectl describe pod resource-demo
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check previous container logs
+</span>kubectl logs resource-demo --previous
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect termination reason
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.status.containerStatuses[*].lastState.terminated.reason}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect configured memory limit
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].resources.limits.memory}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Example memory configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    memory: "512Mi"
+  limits:
+    memory: "1Gi"
+
+</code></pre>
+</div>
+
+<p>
+Note: Increasing the memory limit may resolve an OOM issue, but investigate application memory leaks, heap configuration, traffic patterns, and native memory usage before increasing limits blindly.
+</p>
+
+<p>
+<b>9. Debug CPU Throttling</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check current pod CPU usage
+</span>kubectl top pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check container CPU requests and limits
+</span>kubectl describe pod resource-demo
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect configured CPU limits
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].resources.limits.cpu}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect configured CPU requests
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].resources.requests.cpu}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Example CPU configuration:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    cpu: "500m"
+  limits:
+    cpu: "2"
+
+</code></pre>
+</div>
+
+<p>
+Note: CPU throttling may result in increased latency and reduced throughput without restarting the container.
+</p>
+
+<p>
+<b>10. Kubernetes QoS Classes</b>
+</p>
+
+<p>
+Kubernetes assigns a Quality of Service (QoS) class to Pods.
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">QoS Class</th>
+<th scope="col" class="org-left">Configuration</th>
+<th scope="col" class="org-left">Eviction Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Guaranteed</td>
+<td class="org-left">Requests equal limits for CPU and memory on all containers</td>
+<td class="org-left">Highest protection</td>
+</tr>
+
+<tr>
+<td class="org-left">Burstable</td>
+<td class="org-left">Requests and/or limits configured, but not Guaranteed</td>
+<td class="org-left">Intermediate</td>
+</tr>
+
+<tr>
+<td class="org-left">BestEffort</td>
+<td class="org-left">No requests or limits configured</td>
+<td class="org-left">Lowest protection</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Pod QoS class
+</span>kubectl get pod resource-demo <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.status.qosClass}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display QoS class for all pods
+</span>kubectl get pods <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,QOS:.status.qosClass
+
+</code></pre>
+</div>
+
+<p>
+Guaranteed QoS example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+</code></pre>
+</div>
+
+<p>
+Burstable QoS example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+
+</code></pre>
+</div>
+
+<p>
+BestEffort example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources: {}
+
+</code></pre>
+</div>
+
+<p>
+Note: QoS affects eviction behavior during node pressure. QoS alone does not guarantee that a Pod will never be evicted.
+</p>
+
+<p>
+<b>11. Namespace ResourceQuota</b>
+</p>
+
+<p>
+ResourceQuota limits aggregate resource consumption within a namespace.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "20"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create resource quota
+</span>kubectl apply -f resource-quota.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List quotas
+</span>kubectl get resourcequota
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List quotas in a namespace
+</span>kubectl get resourcequota -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect quota details
+</span>kubectl describe resourcequota production-quota -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display quota usage
+</span>kubectl get resourcequota production-quota -n production -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete quota
+</span>kubectl delete resourcequota production-quota -n production
+
+</code></pre>
+</div>
+
+<p>
+<b>12. LimitRange – Default Requests &amp; Limits</b>
+</p>
+
+<p>
+LimitRange defines default resource values and minimum/maximum constraints within a namespace.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: container-resource-limits
+  namespace: production
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "256Mi"
+      min:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "2"
+        memory: "2Gi"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create LimitRange
+</span>kubectl apply -f limit-range.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List LimitRanges
+</span>kubectl get limitrange -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect LimitRange
+</span>kubectl describe limitrange container-resource-limits -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display LimitRange YAML
+</span>kubectl get limitrange container-resource-limits -n production -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete LimitRange
+</span>kubectl delete limitrange container-resource-limits -n production
+
+</code></pre>
+</div>
+
+<p>
+Note: Defaults may be applied to containers that omit resource requests or limits. Minimum and maximum constraints can reject Pod configurations that violate them.
+</p>
+
+<p>
+<b>13. Resource Management for Multi-Container Pods</b>
+</p>
+
+<p>
+Each container in a Pod can have its own resource requests and limits.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "512Mi"
+        limits:
+          cpu: "1"
+          memory: "1Gi"
+
+    - name: sidecar
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "64Mi"
+        limits:
+          cpu: "200m"
+          memory: "128Mi"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display containers in a pod
+</span>kubectl get pod multi-container-pod <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.containers[*].name}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource usage per container
+</span>kubectl top pod multi-container-pod --containers
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect container resource configuration
+</span>kubectl describe pod multi-container-pod
+
+</code></pre>
+</div>
+
+<p>
+Note: Pod resource requirements are influenced by all containers, including sidecars and init containers.
+</p>
+
+<p>
+<b>14. Autoscaling &amp; Resource Requests</b>
+</p>
+
+<p>
+Horizontal Pod Autoscaler (HPA) can use CPU utilization relative to CPU requests to scale workloads.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply HPA
+</span>kubectl apply -f hpa.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List HPAs
+</span>kubectl get hpa
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect HPA
+</span>kubectl describe hpa nginx-hpa
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch HPA metrics
+</span>kubectl get hpa --watch
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check deployment replicas
+</span>kubectl get deployment nginx-deployment
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod resource usage
+</span>kubectl top pods
+
+</code></pre>
+</div>
+
+<p>
+Note: CPU utilization percentage is calculated relative to the configured CPU request. Missing or unrealistic CPU requests can affect HPA behavior.
+</p>
+
+<p>
+<b>15. Node Resource Capacity &amp; Scheduling</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List nodes
+</span>kubectl get nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect node resource capacity
+</span>kubectl describe node worker-1
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display allocatable resources
+</span>kubectl get node worker-1 <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.status.allocatable}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display allocated resources
+</span>kubectl describe node worker-1
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node CPU and memory usage
+</span>kubectl top nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pending pods
+</span>kubectl get pods --field-selector=status.phase=Pending
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect scheduling failures
+</span>kubectl describe pod resource-demo
+
+</code></pre>
+</div>
+
+<p>
+Common scheduling errors:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text"><code>
+Insufficient cpu
+Insufficient memory
+
+</code></pre>
+</div>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+resources:
+  requests:
+    cpu: "2"
+    memory: "4Gi"
+
+</code></pre>
+</div>
+
+<p>
+Note: A Pod may remain Pending if no eligible node has enough allocatable resources to satisfy its requests.
+</p>
+
+<p>
+<b>16. Resource Optimization &amp; Best Practices</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Monitor pod usage
+</span>kubectl top pods --all-namespaces
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Monitor node usage
+</span>kubectl top nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect workload resource configuration
+</span>kubectl get deployments --all-namespaces -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Identify pods with resource configuration
+</span>kubectl get pods -A <span style="font-style: italic;">\</span>
+  -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CPU_REQUEST:.spec.containers[*].resources.requests.cpu,MEM_REQUEST:.spec.containers[*].resources.requests.memory,CPU_LIMIT:.spec.containers[*].resources.limits.cpu,MEM_LIMIT:.spec.containers[*].resources.limits.memory
+
+</code></pre>
+</div>
+
+<p>
+Best practices:
+</p>
+
+<ul class="org-ul">
+<li>Set CPU and memory requests for production workloads.</li>
+<li>Set memory limits carefully to avoid OOM kills.</li>
+<li>Measure actual usage before setting requests and limits.</li>
+<li>Avoid excessively low CPU limits for latency-sensitive applications.</li>
+<li>Reserve sufficient resources for system components.</li>
+<li>Configure namespace ResourceQuota and LimitRange.</li>
+<li>Monitor CPU throttling, memory usage, restarts, and evictions.</li>
+<li>Include sidecars in resource calculations.</li>
+<li>Revisit resource sizing after load testing and production changes.</li>
+<li>Use autoscaling together with sensible resource requests.</li>
+</ul>
+
+<p>
+<b>17. Quick Troubleshooting Cheat Sheet</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Problem</th>
+<th scope="col" class="org-left">Command / Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Pod stuck Pending</td>
+<td class="org-left">`kubectl describe pod &lt;pod&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">OOMKilled</td>
+<td class="org-left">`kubectl describe pod &lt;pod&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">High CPU usage</td>
+<td class="org-left">`kubectl top pods`</td>
+</tr>
+
+<tr>
+<td class="org-left">High memory usage</td>
+<td class="org-left">`kubectl top pods &ndash;containers`</td>
+</tr>
+
+<tr>
+<td class="org-left">Node pressure</td>
+<td class="org-left">`kubectl describe node &lt;node&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">Pod restart count</td>
+<td class="org-left">`kubectl get pods`</td>
+</tr>
+
+<tr>
+<td class="org-left">Previous crash logs</td>
+<td class="org-left">`kubectl logs &lt;pod&gt; &ndash;previous`</td>
+</tr>
+
+<tr>
+<td class="org-left">ResourceQuota exceeded</td>
+<td class="org-left">`kubectl describe resourcequota -n &lt;namespace&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">LimitRange violation</td>
+<td class="org-left">`kubectl describe limitrange -n &lt;namespace&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">HPA not scaling</td>
+<td class="org-left">`kubectl describe hpa &lt;hpa&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">CPU throttling</td>
+<td class="org-left">Review CPU limit and metrics</td>
+</tr>
+
+<tr>
+<td class="org-left">Scheduling failure</td>
+<td class="org-left">Check requests and node allocatable resources</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>18. Useful Resource Commands</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List pods across namespaces
+</span>kubectl get pods -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List deployments across namespaces
+</span>kubectl get deployments -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource usage
+</span>kubectl top pods -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node resource usage
+</span>kubectl top nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a pod
+</span>kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a node
+</span>kubectl describe node &lt;node-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Get resource configuration in YAML
+</span>kubectl get pod &lt;pod-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch pod status
+</span>kubectl get pods --watch
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch resource usage
+</span>kubectl top pods --watch
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod events
+</span>kubectl get events -A --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a pod
+</span>kubectl delete pod &lt;pod-name&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart a deployment
+</span>kubectl rollout restart deployment &lt;deployment-name&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check deployment rollout
+</span>kubectl rollout status deployment &lt;deployment-name&gt; -n &lt;namespace&gt;
+
+</code></pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org0d19b6e" class="outline-2">
+<h2 id="org0d19b6e">Beginner</h2>
+<div class="outline-text-2" id="text-org0d19b6e">
+</div>
+<div id="outline-container-org345c407" class="outline-3">
+<h3 id="org345c407">Q1: What are Kubernetes resource limits?</h3>
+<div class="outline-text-3" id="text-org345c407">
 <p>
 Resource limits are constraints placed on CPU and memory usage for containers or Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orge50d7ce" class="outline-3">
-<h3 id="orge50d7ce">Q2: Why do we need resource limits?</h3>
-<div class="outline-text-3" id="text-orge50d7ce">
+<div id="outline-container-org0728518" class="outline-3">
+<h3 id="org0728518">Q2: Why do we need resource limits?</h3>
+<div class="outline-text-3" id="text-org0728518">
 <p>
 To avoid a single pod consuming too much cluster or node resources and degrading other workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a3b34d" class="outline-3">
-<h3 id="org5a3b34d">Q3: What is CPU in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org5a3b34d">
+<div id="outline-container-org440eb96" class="outline-3">
+<h3 id="org440eb96">Q3: What is CPU in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org440eb96">
 <p>
 CPU is the compute processing capacity available to a container or Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9f0757" class="outline-3">
-<h3 id="orgc9f0757">Q4: What is memory in Kubernetes?</h3>
-<div class="outline-text-3" id="text-orgc9f0757">
+<div id="outline-container-org8b28c3b" class="outline-3">
+<h3 id="org8b28c3b">Q4: What is memory in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org8b28c3b">
 <p>
 Memory is the RAM available to a container or Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org6dda334" class="outline-3">
-<h3 id="org6dda334">Q5: What is a request in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org6dda334">
+<div id="outline-container-org48a0272" class="outline-3">
+<h3 id="org48a0272">Q5: What is a request in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org48a0272">
 <p>
 A request is the minimum amount of CPU or memory reserved for a container.
 </p>
 </div>
 </div>
-<div id="outline-container-org52e694d" class="outline-3">
-<h3 id="org52e694d">Q6: What is a limit in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org52e694d">
+<div id="outline-container-orgab4463c" class="outline-3">
+<h3 id="orgab4463c">Q6: What is a limit in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgab4463c">
 <p>
 A limit is the maximum amount of CPU or memory a container can use.
 </p>
 </div>
 </div>
-<div id="outline-container-org929f597" class="outline-3">
-<h3 id="org929f597">Q7: What is the difference between request and limit?</h3>
-<div class="outline-text-3" id="text-org929f597">
+<div id="outline-container-org3dbf538" class="outline-3">
+<h3 id="org3dbf538">Q7: What is the difference between request and limit?</h3>
+<div class="outline-text-3" id="text-org3dbf538">
 <p>
 Request is guaranteed allocation; limit is the maximum cap.
 </p>
 </div>
 </div>
-<div id="outline-container-org1fb2a7f" class="outline-3">
-<h3 id="org1fb2a7f">Q8: Why do requests matter for scheduling?</h3>
-<div class="outline-text-3" id="text-org1fb2a7f">
+<div id="outline-container-orgd342f66" class="outline-3">
+<h3 id="orgd342f66">Q8: Why do requests matter for scheduling?</h3>
+<div class="outline-text-3" id="text-orgd342f66">
 <p>
 The scheduler uses requests to decide which node can run the Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org6227237" class="outline-3">
-<h3 id="org6227237">Q9: Why do limits matter for protection?</h3>
-<div class="outline-text-3" id="text-org6227237">
+<div id="outline-container-org6d058a1" class="outline-3">
+<h3 id="org6d058a1">Q9: Why do limits matter for protection?</h3>
+<div class="outline-text-3" id="text-org6d058a1">
 <p>
 Limits prevent runaway processes from exhausting node resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org40fbd4c" class="outline-3">
-<h3 id="org40fbd4c">Q10: What is the `resources` block in a Pod spec?</h3>
-<div class="outline-text-3" id="text-org40fbd4c">
+<div id="outline-container-orga375b89" class="outline-3">
+<h3 id="orga375b89">Q10: What is the `resources` block in a Pod spec?</h3>
+<div class="outline-text-3" id="text-orga375b89">
 <p>
 The `resources` block contains `requests` and `limits` for CPU and memory.
 </p>
 </div>
 </div>
-<div id="outline-container-orga906219" class="outline-3">
-<h3 id="orga906219">Q11: What is CPU request?</h3>
-<div class="outline-text-3" id="text-orga906219">
+<div id="outline-container-orgcac1495" class="outline-3">
+<h3 id="orgcac1495">Q11: What is CPU request?</h3>
+<div class="outline-text-3" id="text-orgcac1495">
 <p>
 CPU request is the amount of CPU the scheduler tries to reserve for the Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org5feae64" class="outline-3">
-<h3 id="org5feae64">Q12: What is CPU limit?</h3>
-<div class="outline-text-3" id="text-org5feae64">
+<div id="outline-container-orgfc0bc9b" class="outline-3">
+<h3 id="orgfc0bc9b">Q12: What is CPU limit?</h3>
+<div class="outline-text-3" id="text-orgfc0bc9b">
 <p>
 CPU limit is the upper bound on CPU the container can consume.
 </p>
 </div>
 </div>
-<div id="outline-container-org9571650" class="outline-3">
-<h3 id="org9571650">Q13: What is memory request?</h3>
-<div class="outline-text-3" id="text-org9571650">
+<div id="outline-container-orgdd831bd" class="outline-3">
+<h3 id="orgdd831bd">Q13: What is memory request?</h3>
+<div class="outline-text-3" id="text-orgdd831bd">
 <p>
 Memory request is the amount of memory guaranteed to the Pod by the scheduler.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd3c80b1" class="outline-3">
-<h3 id="orgd3c80b1">Q14: What is memory limit?</h3>
-<div class="outline-text-3" id="text-orgd3c80b1">
+<div id="outline-container-orgebd70bb" class="outline-3">
+<h3 id="orgebd70bb">Q14: What is memory limit?</h3>
+<div class="outline-text-3" id="text-orgebd70bb">
 <p>
 Memory limit is the maximum memory the container can use before it is killed or throttled.
 </p>
 </div>
 </div>
-<div id="outline-container-org00fe0ae" class="outline-3">
-<h3 id="org00fe0ae">Q15: What happens when a container exceeds memory limit?</h3>
-<div class="outline-text-3" id="text-org00fe0ae">
+<div id="outline-container-orgdffe0d5" class="outline-3">
+<h3 id="orgdffe0d5">Q15: What happens when a container exceeds memory limit?</h3>
+<div class="outline-text-3" id="text-orgdffe0d5">
 <p>
 Usually the container is killed by the kernel OOM killer or the runtime enforces the limit.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc7ca79" class="outline-3">
-<h3 id="orgbc7ca79">Q16: What happens when a container exceeds CPU limit?</h3>
-<div class="outline-text-3" id="text-orgbc7ca79">
+<div id="outline-container-org297b12a" class="outline-3">
+<h3 id="org297b12a">Q16: What happens when a container exceeds CPU limit?</h3>
+<div class="outline-text-3" id="text-org297b12a">
 <p>
 The container may be throttled or slowed, but it is not usually killed immediately.
 </p>
 </div>
 </div>
-<div id="outline-container-org7cdc707" class="outline-3">
-<h3 id="org7cdc707">Q17: What is QoS in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org7cdc707">
+<div id="outline-container-orge131a9c" class="outline-3">
+<h3 id="orge131a9c">Q17: What is QoS in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orge131a9c">
 <p>
 QoS (Quality of Service) classifies Pods based on request and limit values to determine eviction priority.
 </p>
 </div>
 </div>
-<div id="outline-container-orgace362f" class="outline-3">
-<h3 id="orgace362f">Q18: What are the Kubernetes QoS classes?</h3>
-<div class="outline-text-3" id="text-orgace362f">
+<div id="outline-container-org634922d" class="outline-3">
+<h3 id="org634922d">Q18: What are the Kubernetes QoS classes?</h3>
+<div class="outline-text-3" id="text-org634922d">
 <ul class="org-ul">
 <li>Guaranteed</li>
 <li>Burstable</li>
@@ -179,657 +1297,657 @@ QoS (Quality of Service) classifies Pods based on request and limit values to de
 </ul>
 </div>
 </div>
-<div id="outline-container-orga09a000" class="outline-3">
-<h3 id="orga09a000">Q19: What is Guaranteed QoS?</h3>
-<div class="outline-text-3" id="text-orga09a000">
+<div id="outline-container-orgff5e91b" class="outline-3">
+<h3 id="orgff5e91b">Q19: What is Guaranteed QoS?</h3>
+<div class="outline-text-3" id="text-orgff5e91b">
 <p>
 Guaranteed QoS means requests and limits are equal for all containers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc35f0af" class="outline-3">
-<h3 id="orgc35f0af">Q20: What is Burstable QoS?</h3>
-<div class="outline-text-3" id="text-orgc35f0af">
+<div id="outline-container-org784f948" class="outline-3">
+<h3 id="org784f948">Q20: What is Burstable QoS?</h3>
+<div class="outline-text-3" id="text-org784f948">
 <p>
 Burstable QoS means requests and limits are set, but not equal.
 </p>
 </div>
 </div>
-<div id="outline-container-org44f172e" class="outline-3">
-<h3 id="org44f172e">Q21: What is BestEffort QoS?</h3>
-<div class="outline-text-3" id="text-org44f172e">
+<div id="outline-container-orgcd892d2" class="outline-3">
+<h3 id="orgcd892d2">Q21: What is BestEffort QoS?</h3>
+<div class="outline-text-3" id="text-orgcd892d2">
 <p>
 BestEffort means no requests or limits are set.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb77c83b" class="outline-3">
-<h3 id="orgb77c83b">Q22: Why are QoS classes important?</h3>
-<div class="outline-text-3" id="text-orgb77c83b">
+<div id="outline-container-org5e683b2" class="outline-3">
+<h3 id="org5e683b2">Q22: Why are QoS classes important?</h3>
+<div class="outline-text-3" id="text-org5e683b2">
 <p>
 They affect eviction priority and cluster behavior during resource pressure.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb166aec" class="outline-3">
-<h3 id="orgb166aec">Q23: What is node pressure?</h3>
-<div class="outline-text-3" id="text-orgb166aec">
+<div id="outline-container-org78f08cb" class="outline-3">
+<h3 id="org78f08cb">Q23: What is node pressure?</h3>
+<div class="outline-text-3" id="text-org78f08cb">
 <p>
 Node pressure means the node is short on compute, memory, or disk and Kubernetes starts evicting workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org9dc1292" class="outline-3">
-<h3 id="org9dc1292">Q24: Why are limits important for cluster stability?</h3>
-<div class="outline-text-3" id="text-org9dc1292">
+<div id="outline-container-orgee26bdb" class="outline-3">
+<h3 id="orgee26bdb">Q24: Why are limits important for cluster stability?</h3>
+<div class="outline-text-3" id="text-orgee26bdb">
 <p>
 Because without limits, one workload can starve others or trigger node instability.
 </p>
 </div>
 </div>
-<div id="outline-container-org624cfe4" class="outline-3">
-<h3 id="org624cfe4">Q25: What is CPU throttling?</h3>
-<div class="outline-text-3" id="text-org624cfe4">
+<div id="outline-container-org2863293" class="outline-3">
+<h3 id="org2863293">Q25: What is CPU throttling?</h3>
+<div class="outline-text-3" id="text-org2863293">
 <p>
 CPU throttling slows a process when it exceeds the assigned CPU quota.
 </p>
 </div>
 </div>
-<div id="outline-container-org9823100" class="outline-3">
-<h3 id="org9823100">Q26: What is OOM kill?</h3>
-<div class="outline-text-3" id="text-org9823100">
+<div id="outline-container-org8b04438" class="outline-3">
+<h3 id="org8b04438">Q26: What is OOM kill?</h3>
+<div class="outline-text-3" id="text-org8b04438">
 <p>
 OOM kill means the kernel kills a process because it exceeded memory limits or system memory pressure.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd7a576c" class="outline-3">
-<h3 id="orgd7a576c">Q27: Why do memory limits often need careful tuning?</h3>
-<div class="outline-text-3" id="text-orgd7a576c">
+<div id="outline-container-org613cd11" class="outline-3">
+<h3 id="org613cd11">Q27: Why do memory limits often need careful tuning?</h3>
+<div class="outline-text-3" id="text-org613cd11">
 <p>
 Because memory limit too low causes crashes; too high can starve other pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org39310ab" class="outline-3">
-<h3 id="org39310ab">Q28: What is a request-to-limit ratio?</h3>
-<div class="outline-text-3" id="text-org39310ab">
+<div id="outline-container-org205eb6d" class="outline-3">
+<h3 id="org205eb6d">Q28: What is a request-to-limit ratio?</h3>
+<div class="outline-text-3" id="text-org205eb6d">
 <p>
 It is the relationship between reserved and allowed resources, affecting burst capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-org0f340a1" class="outline-3">
-<h3 id="org0f340a1">Q29: What is the scheduler?</h3>
-<div class="outline-text-3" id="text-org0f340a1">
+<div id="outline-container-org3e7fe02" class="outline-3">
+<h3 id="org3e7fe02">Q29: What is the scheduler?</h3>
+<div class="outline-text-3" id="text-org3e7fe02">
 <p>
 The scheduler decides which node can run a Pod based on resource requests and the cluster state.
 </p>
 </div>
 </div>
-<div id="outline-container-orge3a82d5" class="outline-3">
-<h3 id="orge3a82d5">Q30: What is node allocatable capacity?</h3>
-<div class="outline-text-3" id="text-orge3a82d5">
+<div id="outline-container-org1b97d21" class="outline-3">
+<h3 id="org1b97d21">Q30: What is node allocatable capacity?</h3>
+<div class="outline-text-3" id="text-org1b97d21">
 <p>
 It is the CPU and memory available for scheduling after system overhead and reservation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5b6a00" class="outline-3">
-<h3 id="orgb5b6a00">Q31: Why does the scheduler care about requests?</h3>
-<div class="outline-text-3" id="text-orgb5b6a00">
+<div id="outline-container-org59fe122" class="outline-3">
+<h3 id="org59fe122">Q31: Why does the scheduler care about requests?</h3>
+<div class="outline-text-3" id="text-org59fe122">
 <p>
 Because the Pod can only schedule if the node has enough resource requests for the workload.
 </p>
 </div>
 </div>
-<div id="outline-container-org033f667" class="outline-3">
-<h3 id="org033f667">Q32: Why might a pod stay Pending?</h3>
-<div class="outline-text-3" id="text-org033f667">
+<div id="outline-container-orgb31f760" class="outline-3">
+<h3 id="orgb31f760">Q32: Why might a pod stay Pending?</h3>
+<div class="outline-text-3" id="text-orgb31f760">
 <p>
 A pod can stay pending if no node has enough available resources matching its requests.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c3e9e9" class="outline-3">
-<h3 id="org6c3e9e9">Q33: What is a Pending pod?</h3>
-<div class="outline-text-3" id="text-org6c3e9e9">
+<div id="outline-container-org5845e05" class="outline-3">
+<h3 id="org5845e05">Q33: What is a Pending pod?</h3>
+<div class="outline-text-3" id="text-org5845e05">
 <p>
 A Pending pod is waiting to be scheduled or bound to a node.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e38f7f" class="outline-3">
-<h3 id="org9e38f7f">Q34: What is `cpu: "500m"`?</h3>
-<div class="outline-text-3" id="text-org9e38f7f">
+<div id="outline-container-orgf1797bd" class="outline-3">
+<h3 id="orgf1797bd">Q34: What is `cpu: "500m"`?</h3>
+<div class="outline-text-3" id="text-orgf1797bd">
 <p>
 500m means 0.5 CPU (half a CPU core).
 </p>
 </div>
 </div>
-<div id="outline-container-org33f888f" class="outline-3">
-<h3 id="org33f888f">Q35: What is `memory: "512Mi"`?</h3>
-<div class="outline-text-3" id="text-org33f888f">
+<div id="outline-container-org98a9280" class="outline-3">
+<h3 id="org98a9280">Q35: What is `memory: "512Mi"`?</h3>
+<div class="outline-text-3" id="text-org98a9280">
 <p>
 512Mi means 512 mebibytes of memory.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b8fab4" class="outline-3">
-<h3 id="org9b8fab4">Q36: What is the difference between Ki, Mi, Gi, and m values in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org9b8fab4">
+<div id="outline-container-org0d38ee1" class="outline-3">
+<h3 id="org0d38ee1">Q36: What is the difference between Ki, Mi, Gi, and m values in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org0d38ee1">
 <p>
 They are units for memory and CPU, where m means millicpu and Ki/Mi/Gi are binary memory units.
 </p>
 </div>
 </div>
-<div id="outline-container-org56dc042" class="outline-3">
-<h3 id="org56dc042">Q37: Why is CPU usually measured in millicores?</h3>
-<div class="outline-text-3" id="text-org56dc042">
+<div id="outline-container-org3d3cf58" class="outline-3">
+<h3 id="org3d3cf58">Q37: Why is CPU usually measured in millicores?</h3>
+<div class="outline-text-3" id="text-org3d3cf58">
 <p>
 Because CPU is often fractional and expressed as thousandths of a core.
 </p>
 </div>
 </div>
-<div id="outline-container-org16e0d19" class="outline-3">
-<h3 id="org16e0d19">Q38: What is a resource unit for memory?</h3>
-<div class="outline-text-3" id="text-org16e0d19">
+<div id="outline-container-org3e0821f" class="outline-3">
+<h3 id="org3e0821f">Q38: What is a resource unit for memory?</h3>
+<div class="outline-text-3" id="text-org3e0821f">
 <p>
 Common memory units include bytes, Ki, Mi, Gi, and similar binary units.
 </p>
 </div>
 </div>
-<div id="outline-container-org8a921cd" class="outline-3">
-<h3 id="org8a921cd">Q39: Why should workloads set requests?</h3>
-<div class="outline-text-3" id="text-org8a921cd">
+<div id="outline-container-org57aa4ba" class="outline-3">
+<h3 id="org57aa4ba">Q39: Why should workloads set requests?</h3>
+<div class="outline-text-3" id="text-org57aa4ba">
 <p>
 Because without requests, the scheduler may place workloads unpredictably and overload nodes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd2b67f3" class="outline-3">
-<h3 id="orgd2b67f3">Q40: Why should workloads set limits?</h3>
-<div class="outline-text-3" id="text-orgd2b67f3">
+<div id="outline-container-orgd9284b3" class="outline-3">
+<h3 id="orgd9284b3">Q40: Why should workloads set limits?</h3>
+<div class="outline-text-3" id="text-orgd9284b3">
 <p>
 Because it enforces a ceiling and reduces the chance of noisy neighbor behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org5bcaf8f" class="outline-3">
-<h3 id="org5bcaf8f">Q41: What is a noisy neighbor?</h3>
-<div class="outline-text-3" id="text-org5bcaf8f">
+<div id="outline-container-orgf90a121" class="outline-3">
+<h3 id="orgf90a121">Q41: What is a noisy neighbor?</h3>
+<div class="outline-text-3" id="text-orgf90a121">
 <p>
 A noisy neighbor is a workload using excessive resources and impacting other workloads on the same node.
 </p>
 </div>
 </div>
-<div id="outline-container-org561f7ee" class="outline-3">
-<h3 id="org561f7ee">Q42: What is a node-level resource pressure event?</h3>
-<div class="outline-text-3" id="text-org561f7ee">
+<div id="outline-container-org39a75f8" class="outline-3">
+<h3 id="org39a75f8">Q42: What is a node-level resource pressure event?</h3>
+<div class="outline-text-3" id="text-org39a75f8">
 <p>
 It is when the node is running out of CPU, memory, or disk and Kubernetes starts corrective actions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdcb275f" class="outline-3">
-<h3 id="orgdcb275f">Q43: What is eviction?</h3>
-<div class="outline-text-3" id="text-orgdcb275f">
+<div id="outline-container-org65e682b" class="outline-3">
+<h3 id="org65e682b">Q43: What is eviction?</h3>
+<div class="outline-text-3" id="text-org65e682b">
 <p>
 Eviction is the process Kubernetes uses to terminate pods when the node can no longer support them.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6b0565" class="outline-3">
-<h3 id="orgd6b0565">Q44: Why do evictions matter?</h3>
-<div class="outline-text-3" id="text-orgd6b0565">
+<div id="outline-container-org509c9d3" class="outline-3">
+<h3 id="org509c9d3">Q44: Why do evictions matter?</h3>
+<div class="outline-text-3" id="text-org509c9d3">
 <p>
 Evictions can disrupt workloads if their resource requests and limits are poorly configured.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfee15cb" class="outline-3">
-<h3 id="orgfee15cb">Q45: What is a resource quota?</h3>
-<div class="outline-text-3" id="text-orgfee15cb">
+<div id="outline-container-org92cd997" class="outline-3">
+<h3 id="org92cd997">Q45: What is a resource quota?</h3>
+<div class="outline-text-3" id="text-org92cd997">
 <p>
 A ResourceQuota limits the total amount of resources a namespace can consume.
 </p>
 </div>
 </div>
-<div id="outline-container-org4125c09" class="outline-3">
-<h3 id="org4125c09">Q46: Why is a ResourceQuota useful?</h3>
-<div class="outline-text-3" id="text-org4125c09">
+<div id="outline-container-org16e65fa" class="outline-3">
+<h3 id="org16e65fa">Q46: Why is a ResourceQuota useful?</h3>
+<div class="outline-text-3" id="text-org16e65fa">
 <p>
 It prevents a single namespace from consuming too much cluster capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf9e408a" class="outline-3">
-<h3 id="orgf9e408a">Q47: What is a LimitRange?</h3>
-<div class="outline-text-3" id="text-orgf9e408a">
+<div id="outline-container-orgb80d391" class="outline-3">
+<h3 id="orgb80d391">Q47: What is a LimitRange?</h3>
+<div class="outline-text-3" id="text-orgb80d391">
 <p>
 A LimitRange defines default or maximum resource values for pods in a namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-orge9a18c4" class="outline-3">
-<h3 id="orge9a18c4">Q48: Why use a LimitRange?</h3>
-<div class="outline-text-3" id="text-orge9a18c4">
+<div id="outline-container-org274b4c5" class="outline-3">
+<h3 id="org274b4c5">Q48: Why use a LimitRange?</h3>
+<div class="outline-text-3" id="text-org274b4c5">
 <p>
 To enforce a baseline and default resources for workloads in a namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-orga13ceae" class="outline-3">
-<h3 id="orga13ceae">Q49: What is a default request or default limit?</h3>
-<div class="outline-text-3" id="text-orga13ceae">
+<div id="outline-container-orgf385df4" class="outline-3">
+<h3 id="orgf385df4">Q49: What is a default request or default limit?</h3>
+<div class="outline-text-3" id="text-orgf385df4">
 <p>
 Kubernetes can apply defaults to pods that omit resource values based on the LimitRange.
 </p>
 </div>
 </div>
-<div id="outline-container-orga75f2ef" class="outline-3">
-<h3 id="orga75f2ef">Q50: What is a resource request for a Deployment?</h3>
-<div class="outline-text-3" id="text-orga75f2ef">
+<div id="outline-container-orgf661b94" class="outline-3">
+<h3 id="orgf661b94">Q50: What is a resource request for a Deployment?</h3>
+<div class="outline-text-3" id="text-orgf661b94">
 <p>
 A Deployment’s pod template can include resource requests and limits for all pod replicas.
 </p>
 </div>
 </div>
-<div id="outline-container-orge38f774" class="outline-3">
-<h3 id="orge38f774">Q51: How do limits affect autoscaling?</h3>
-<div class="outline-text-3" id="text-orge38f774">
+<div id="outline-container-org94179f3" class="outline-3">
+<h3 id="org94179f3">Q51: How do limits affect autoscaling?</h3>
+<div class="outline-text-3" id="text-org94179f3">
 <p>
 Autoscaling decisions may depend on observed pod resource utilization and requests.
 </p>
 </div>
 </div>
-<div id="outline-container-org07272a0" class="outline-3">
-<h3 id="org07272a0">Q52: What is HPA?</h3>
-<div class="outline-text-3" id="text-org07272a0">
+<div id="outline-container-org8925920" class="outline-3">
+<h3 id="org8925920">Q52: What is HPA?</h3>
+<div class="outline-text-3" id="text-org8925920">
 <p>
 HPA (Horizontal Pod Autoscaler) scales pods based on metrics such as CPU utilization.
 </p>
 </div>
 </div>
-<div id="outline-container-org08bcab6" class="outline-3">
-<h3 id="org08bcab6">Q53: Why are correct limits important for HPA?</h3>
-<div class="outline-text-3" id="text-org08bcab6">
+<div id="outline-container-org7d98468" class="outline-3">
+<h3 id="org7d98468">Q53: Why are correct limits important for HPA?</h3>
+<div class="outline-text-3" id="text-org7d98468">
 <p>
 Because HPA uses resource utilization to decide when to scale, and bad limits can distort the metrics.
 </p>
 </div>
 </div>
-<div id="outline-container-org9bcf13c" class="outline-3">
-<h3 id="org9bcf13c">Q54: What is a CPU utilization metric?</h3>
-<div class="outline-text-3" id="text-org9bcf13c">
+<div id="outline-container-org969ab8e" class="outline-3">
+<h3 id="org969ab8e">Q54: What is a CPU utilization metric?</h3>
+<div class="outline-text-3" id="text-org969ab8e">
 <p>
 It is the average CPU percentage used by the pod relative to its request or limit.
 </p>
 </div>
 </div>
-<div id="outline-container-orga3aa9a7" class="outline-3">
-<h3 id="orga3aa9a7">Q55: Why is utilization not the same as absolute usage?</h3>
-<div class="outline-text-3" id="text-orga3aa9a7">
+<div id="outline-container-org1111973" class="outline-3">
+<h3 id="org1111973">Q55: Why is utilization not the same as absolute usage?</h3>
+<div class="outline-text-3" id="text-org1111973">
 <p>
 Because the same percentage may correspond to different load depending on the pod’s request size.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf25167" class="outline-3">
-<h3 id="orgcf25167">Q56: What is a memory usage metric?</h3>
-<div class="outline-text-3" id="text-orgcf25167">
+<div id="outline-container-orga01ce0f" class="outline-3">
+<h3 id="orga01ce0f">Q56: What is a memory usage metric?</h3>
+<div class="outline-text-3" id="text-orga01ce0f">
 <p>
 It is the actual memory measured by the pod or node.
 </p>
 </div>
 </div>
-<div id="outline-container-orga1ee8b5" class="outline-3">
-<h3 id="orga1ee8b5">Q57: What is a container crash due to OOM?</h3>
-<div class="outline-text-3" id="text-orga1ee8b5">
+<div id="outline-container-org9eae0d1" class="outline-3">
+<h3 id="org9eae0d1">Q57: What is a container crash due to OOM?</h3>
+<div class="outline-text-3" id="text-org9eae0d1">
 <p>
 It happens when the process attempts to use more memory than allowed and is killed.
 </p>
 </div>
 </div>
-<div id="outline-container-org0385d1c" class="outline-3">
-<h3 id="org0385d1c">Q58: What is `resources: {}` in a pod spec?</h3>
-<div class="outline-text-3" id="text-org0385d1c">
+<div id="outline-container-org6630da5" class="outline-3">
+<h3 id="org6630da5">Q58: What is `resources: {}` in a pod spec?</h3>
+<div class="outline-text-3" id="text-org6630da5">
 <p>
 It means no explicit requests or limits are set for the container.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc202961" class="outline-3">
-<h3 id="orgc202961">Q59: Why is setting nothing risky?</h3>
-<div class="outline-text-3" id="text-orgc202961">
+<div id="outline-container-orgf2ec252" class="outline-3">
+<h3 id="orgf2ec252">Q59: Why is setting nothing risky?</h3>
+<div class="outline-text-3" id="text-orgf2ec252">
 <p>
 Because the pod may be scheduled without guarantees and may starve or be starved by others.
 </p>
 </div>
 </div>
-<div id="outline-container-orge7bd797" class="outline-3">
-<h3 id="orge7bd797">Q60: Why should limits be realistic?</h3>
-<div class="outline-text-3" id="text-orge7bd797">
+<div id="outline-container-org53e4283" class="outline-3">
+<h3 id="org53e4283">Q60: Why should limits be realistic?</h3>
+<div class="outline-text-3" id="text-org53e4283">
 <p>
 Because unrealistic limits create throttling, crashes, or overprovisioning.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d7d3a9" class="outline-3">
-<h3 id="org0d7d3a9">Q61: What is a memory leak?</h3>
-<div class="outline-text-3" id="text-org0d7d3a9">
+<div id="outline-container-orgda5df25" class="outline-3">
+<h3 id="orgda5df25">Q61: What is a memory leak?</h3>
+<div class="outline-text-3" id="text-orgda5df25">
 <p>
 A memory leak is a bug causing a program to consume memory continuously without releasing it.
 </p>
 </div>
 </div>
-<div id="outline-container-org779ee36" class="outline-3">
-<h3 id="org779ee36">Q62: Why do memory limits help with memory leaks?</h3>
-<div class="outline-text-3" id="text-org779ee36">
+<div id="outline-container-org4229205" class="outline-3">
+<h3 id="org4229205">Q62: Why do memory limits help with memory leaks?</h3>
+<div class="outline-text-3" id="text-org4229205">
 <p>
 They cap damage and can trigger restarts when a workload becomes unhealthy.
 </p>
 </div>
 </div>
-<div id="outline-container-orga78a84d" class="outline-3">
-<h3 id="orga78a84d">Q63: What is a CPU hog?</h3>
-<div class="outline-text-3" id="text-orga78a84d">
+<div id="outline-container-orga70690d" class="outline-3">
+<h3 id="orga70690d">Q63: What is a CPU hog?</h3>
+<div class="outline-text-3" id="text-orga70690d">
 <p>
 A CPU hog is a process or workload consuming excessive CPU time.
 </p>
 </div>
 </div>
-<div id="outline-container-org804bb54" class="outline-3">
-<h3 id="org804bb54">Q64: Why do CPU limits matter for CPU hogs?</h3>
-<div class="outline-text-3" id="text-org804bb54">
+<div id="outline-container-orgf208607" class="outline-3">
+<h3 id="orgf208607">Q64: Why do CPU limits matter for CPU hogs?</h3>
+<div class="outline-text-3" id="text-orgf208607">
 <p>
 They prevent a single workload from monopolizing all compute on a node.
 </p>
 </div>
 </div>
-<div id="outline-container-org60e8d3a" class="outline-3">
-<h3 id="org60e8d3a">Q65: What is resource pressure in a cluster?</h3>
-<div class="outline-text-3" id="text-org60e8d3a">
+<div id="outline-container-orgf83391a" class="outline-3">
+<h3 id="orgf83391a">Q65: What is resource pressure in a cluster?</h3>
+<div class="outline-text-3" id="text-orgf83391a">
 <p>
 It is when the cluster experiences shortage relative to requests and usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org16a843b" class="outline-3">
-<h3 id="org16a843b">Q66: What is scheduler placement?</h3>
-<div class="outline-text-3" id="text-org16a843b">
+<div id="outline-container-orga6997a4" class="outline-3">
+<h3 id="orga6997a4">Q66: What is scheduler placement?</h3>
+<div class="outline-text-3" id="text-orga6997a4">
 <p>
 It is the decision of which node should run a pod based on resources, labels, and constraints.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f527ff" class="outline-3">
-<h3 id="org5f527ff">Q67: What is a node selector?</h3>
-<div class="outline-text-3" id="text-org5f527ff">
+<div id="outline-container-orgf8f2138" class="outline-3">
+<h3 id="orgf8f2138">Q67: What is a node selector?</h3>
+<div class="outline-text-3" id="text-orgf8f2138">
 <p>
 A node selector constrains which nodes a pod may be scheduled onto.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb487e9d" class="outline-3">
-<h3 id="orgb487e9d">Q68: Why are node selectors relevant to resource limits?</h3>
-<div class="outline-text-3" id="text-orgb487e9d">
+<div id="outline-container-org8d1cb74" class="outline-3">
+<h3 id="org8d1cb74">Q68: Why are node selectors relevant to resource limits?</h3>
+<div class="outline-text-3" id="text-org8d1cb74">
 <p>
 Because workloads may need to be placed onto nodes with the right capacity or hardware.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e03ed4" class="outline-3">
-<h3 id="org6e03ed4">Q69: What is a taint and toleration?</h3>
-<div class="outline-text-3" id="text-org6e03ed4">
+<div id="outline-container-orgeaec6b1" class="outline-3">
+<h3 id="orgeaec6b1">Q69: What is a taint and toleration?</h3>
+<div class="outline-text-3" id="text-orgeaec6b1">
 <p>
 Taints and tolerations allow pods to schedule onto specific nodes or avoid others.
 </p>
 </div>
 </div>
-<div id="outline-container-org45ed35c" class="outline-3">
-<h3 id="org45ed35c">Q70: Why do taints and tolerations affect resources?</h3>
-<div class="outline-text-3" id="text-org45ed35c">
+<div id="outline-container-orga498d0e" class="outline-3">
+<h3 id="orga498d0e">Q70: Why do taints and tolerations affect resources?</h3>
+<div class="outline-text-3" id="text-orga498d0e">
 <p>
 Because they influence where workloads run and how resources are shared.
 </p>
 </div>
 </div>
-<div id="outline-container-org91af8d7" class="outline-3">
-<h3 id="org91af8d7">Q71: What is a pod disruption budget?</h3>
-<div class="outline-text-3" id="text-org91af8d7">
+<div id="outline-container-org79300c5" class="outline-3">
+<h3 id="org79300c5">Q71: What is a pod disruption budget?</h3>
+<div class="outline-text-3" id="text-org79300c5">
 <p>
 It limits how many pods can be disrupted during voluntary or involuntary disruptions.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a9b986" class="outline-3">
-<h3 id="org5a9b986">Q72: Why are resource limits tied to resilience?</h3>
-<div class="outline-text-3" id="text-org5a9b986">
+<div id="outline-container-orga5dcdd2" class="outline-3">
+<h3 id="orga5dcdd2">Q72: Why are resource limits tied to resilience?</h3>
+<div class="outline-text-3" id="text-orga5dcdd2">
 <p>
 Because if a node is overloaded, more pods may be evicted and disruption increases.
 </p>
 </div>
 </div>
-<div id="outline-container-orga3b87db" class="outline-3">
-<h3 id="orga3b87db">Q73: What is a resource threshold?</h3>
-<div class="outline-text-3" id="text-orga3b87db">
+<div id="outline-container-orgd43bfd5" class="outline-3">
+<h3 id="orgd43bfd5">Q73: What is a resource threshold?</h3>
+<div class="outline-text-3" id="text-orgd43bfd5">
 <p>
 A threshold is a limit or alerting point that flags unusual resource consumption.
 </p>
 </div>
 </div>
-<div id="outline-container-org728a5a2" class="outline-3">
-<h3 id="org728a5a2">Q74: What is a request vs limit best practice?</h3>
-<div class="outline-text-3" id="text-org728a5a2">
+<div id="outline-container-org2177b1f" class="outline-3">
+<h3 id="org2177b1f">Q74: What is a request vs limit best practice?</h3>
+<div class="outline-text-3" id="text-org2177b1f">
 <p>
 Use requests for scheduling and guarantees, and limits for safe caps based on real workload needs.
 </p>
 </div>
 </div>
-<div id="outline-container-org28f7b57" class="outline-3">
-<h3 id="org28f7b57">Q75: What is a memory request for a Java app?</h3>
-<div class="outline-text-3" id="text-org28f7b57">
+<div id="outline-container-orgd338746" class="outline-3">
+<h3 id="orgd338746">Q75: What is a memory request for a Java app?</h3>
+<div class="outline-text-3" id="text-orgd338746">
 <p>
 It often includes heap and runtime overhead plus some buffer for GC and OS memory.
 </p>
 </div>
 </div>
-<div id="outline-container-org29e7ad2" class="outline-3">
-<h3 id="org29e7ad2">Q76: Why is Java memory tuning tricky?</h3>
-<div class="outline-text-3" id="text-org29e7ad2">
+<div id="outline-container-org9b8b297" class="outline-3">
+<h3 id="org9b8b297">Q76: Why is Java memory tuning tricky?</h3>
+<div class="outline-text-3" id="text-org9b8b297">
 <p>
 Java uses heap, object overhead, native memory, and GC behavior that affect actual memory consumption.
 </p>
 </div>
 </div>
-<div id="outline-container-orgffd45c3" class="outline-3">
-<h3 id="orgffd45c3">Q77: Why are CPU limits sometimes not suitable for all workloads?</h3>
-<div class="outline-text-3" id="text-orgffd45c3">
+<div id="outline-container-orgf571aa8" class="outline-3">
+<h3 id="orgf571aa8">Q77: Why are CPU limits sometimes not suitable for all workloads?</h3>
+<div class="outline-text-3" id="text-orgf571aa8">
 <p>
 Some workloads benefit from bursting or using idle CPU when available.
 </p>
 </div>
 </div>
-<div id="outline-container-org6be927e" class="outline-3">
-<h3 id="org6be927e">Q78: What is a CPU burst?</h3>
-<div class="outline-text-3" id="text-org6be927e">
+<div id="outline-container-org448f4f0" class="outline-3">
+<h3 id="org448f4f0">Q78: What is a CPU burst?</h3>
+<div class="outline-text-3" id="text-org448f4f0">
 <p>
 A CPU burst is temporary additional CPU usage above the requested amount, if allowed by the node.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf778993" class="outline-3">
-<h3 id="orgf778993">Q79: Why do strict limits lower burst capacity?</h3>
-<div class="outline-text-3" id="text-orgf778993">
+<div id="outline-container-org7a12943" class="outline-3">
+<h3 id="org7a12943">Q79: Why do strict limits lower burst capacity?</h3>
+<div class="outline-text-3" id="text-org7a12943">
 <p>
 Because limits cap the maximum average throughput a process can use.
 </p>
 </div>
 </div>
-<div id="outline-container-org8682699" class="outline-3">
-<h3 id="org8682699">Q80: What is a kill due to OOM in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org8682699">
+<div id="outline-container-orga83947e" class="outline-3">
+<h3 id="orga83947e">Q80: What is a kill due to OOM in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orga83947e">
 <p>
 A pod can be restarted when the container exceeds its memory limit and is terminated.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9356df" class="outline-3">
-<h3 id="orgc9356df">Q81: What is a memory limit plus cgroup behavior?</h3>
-<div class="outline-text-3" id="text-orgc9356df">
+<div id="outline-container-org5a17d06" class="outline-3">
+<h3 id="org5a17d06">Q81: What is a memory limit plus cgroup behavior?</h3>
+<div class="outline-text-3" id="text-org5a17d06">
 <p>
 Kubernetes uses Linux cgroups to enforce memory limits.
 </p>
 </div>
 </div>
-<div id="outline-container-org9611d58" class="outline-3">
-<h3 id="org9611d58">Q82: Why do Linux cgroups matter?</h3>
-<div class="outline-text-3" id="text-org9611d58">
+<div id="outline-container-org2662282" class="outline-3">
+<h3 id="org2662282">Q82: Why do Linux cgroups matter?</h3>
+<div class="outline-text-3" id="text-org2662282">
 <p>
 They are the underlying mechanism used by Kubernetes to enforce limits.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeef543f" class="outline-3">
-<h3 id="orgeef543f">Q83: What is `cgroup` memory enforcement?</h3>
-<div class="outline-text-3" id="text-orgeef543f">
+<div id="outline-container-orga63a802" class="outline-3">
+<h3 id="orga63a802">Q83: What is `cgroup` memory enforcement?</h3>
+<div class="outline-text-3" id="text-orga63a802">
 <p>
 It restricts memory usage to the configured limit and may kill the process when exceeded.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb6c5dc7" class="outline-3">
-<h3 id="orgb6c5dc7">Q84: Why should you monitor node usage?</h3>
-<div class="outline-text-3" id="text-orgb6c5dc7">
+<div id="outline-container-org1c6bf5d" class="outline-3">
+<h3 id="org1c6bf5d">Q84: Why should you monitor node usage?</h3>
+<div class="outline-text-3" id="text-org1c6bf5d">
 <p>
 Because a cluster can look healthy until one node saturates and causes evictions.
 </p>
 </div>
 </div>
-<div id="outline-container-org536470c" class="outline-3">
-<h3 id="org536470c">Q85: What is a node starvation condition?</h3>
-<div class="outline-text-3" id="text-org536470c">
+<div id="outline-container-org6330e6d" class="outline-3">
+<h3 id="org6330e6d">Q85: What is a node starvation condition?</h3>
+<div class="outline-text-3" id="text-org6330e6d">
 <p>
 It is when a node does not have enough resources left to satisfy workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e02a19" class="outline-3">
-<h3 id="org9e02a19">Q86: What is a resource leak?</h3>
-<div class="outline-text-3" id="text-org9e02a19">
+<div id="outline-container-orgc3436be" class="outline-3">
+<h3 id="orgc3436be">Q86: What is a resource leak?</h3>
+<div class="outline-text-3" id="text-orgc3436be">
 <p>
 A resource leak is an application bug that gradually consumes resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org2bc4f14" class="outline-3">
-<h3 id="org2bc4f14">Q87: Why do resource limits not fix all app bugs?</h3>
-<div class="outline-text-3" id="text-org2bc4f14">
+<div id="outline-container-org2cc06cf" class="outline-3">
+<h3 id="org2cc06cf">Q87: Why do resource limits not fix all app bugs?</h3>
+<div class="outline-text-3" id="text-org2cc06cf">
 <p>
 They can mask failures by causing restarts rather than correcting the root cause.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbd07967" class="outline-3">
-<h3 id="orgbd07967">Q88: What is a request or limit mismatch?</h3>
-<div class="outline-text-3" id="text-orgbd07967">
+<div id="outline-container-orgafd7a71" class="outline-3">
+<h3 id="orgafd7a71">Q88: What is a request or limit mismatch?</h3>
+<div class="outline-text-3" id="text-orgafd7a71">
 <p>
 It happens when the numbers do not reflect actual runtime behavior, causing poor scheduling or failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org158c208" class="outline-3">
-<h3 id="org158c208">Q89: What is a noisy neighbor in a Kubernetes cluster?</h3>
-<div class="outline-text-3" id="text-org158c208">
+<div id="outline-container-orgee3aa74" class="outline-3">
+<h3 id="orgee3aa74">Q89: What is a noisy neighbor in a Kubernetes cluster?</h3>
+<div class="outline-text-3" id="text-orgee3aa74">
 <p>
 A workload with misconfigured or greedy limits can starve others on the same node.
 </p>
 </div>
 </div>
-<div id="outline-container-org37def03" class="outline-3">
-<h3 id="org37def03">Q90: What is capacity planning?</h3>
-<div class="outline-text-3" id="text-org37def03">
+<div id="outline-container-org9cd75d6" class="outline-3">
+<h3 id="org9cd75d6">Q90: What is capacity planning?</h3>
+<div class="outline-text-3" id="text-org9cd75d6">
 <p>
 Capacity planning estimates how much CPU and memory the cluster must provide for current and future workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf5d622a" class="outline-3">
-<h3 id="orgf5d622a">Q91: What is a resource reservation?</h3>
-<div class="outline-text-3" id="text-orgf5d622a">
+<div id="outline-container-org6e93f3c" class="outline-3">
+<h3 id="org6e93f3c">Q91: What is a resource reservation?</h3>
+<div class="outline-text-3" id="text-org6e93f3c">
 <p>
 A reservation is a guarantee that some resources are left for system daemons or critical workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc925f17" class="outline-3">
-<h3 id="orgc925f17">Q92: Why reserve resources for the system?</h3>
-<div class="outline-text-3" id="text-orgc925f17">
+<div id="outline-container-orgcf97704" class="outline-3">
+<h3 id="orgcf97704">Q92: Why reserve resources for the system?</h3>
+<div class="outline-text-3" id="text-orgcf97704">
 <p>
 Because system services also need CPU and memory, and they should not be starved.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb32a89" class="outline-3">
-<h3 id="orgfb32a89">Q93: What is a resource request for the kubelet or system daemons?</h3>
-<div class="outline-text-3" id="text-orgfb32a89">
+<div id="outline-container-org5cefba0" class="outline-3">
+<h3 id="org5cefba0">Q93: What is a resource request for the kubelet or system daemons?</h3>
+<div class="outline-text-3" id="text-org5cefba0">
 <p>
 These system-level resources are important for node health and should not be fully consumed by user workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb9fb72f" class="outline-3">
-<h3 id="orgb9fb72f">Q94: What is cluster overcommit?</h3>
-<div class="outline-text-3" id="text-orgb9fb72f">
+<div id="outline-container-orgeb2937a" class="outline-3">
+<h3 id="orgeb2937a">Q94: What is cluster overcommit?</h3>
+<div class="outline-text-3" id="text-orgeb2937a">
 <p>
 Overcommit happens when total requested resources exceed total cluster capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-org086b688" class="outline-3">
-<h3 id="org086b688">Q95: Why is cluster overcommit risky?</h3>
-<div class="outline-text-3" id="text-org086b688">
+<div id="outline-container-org148346c" class="outline-3">
+<h3 id="org148346c">Q95: Why is cluster overcommit risky?</h3>
+<div class="outline-text-3" id="text-org148346c">
 <p>
 It can lead to node pressure and pod eviction under load.
 </p>
 </div>
 </div>
-<div id="outline-container-org7758893" class="outline-3">
-<h3 id="org7758893">Q96: Why is pod sizing important?</h3>
-<div class="outline-text-3" id="text-org7758893">
+<div id="outline-container-org608a1fd" class="outline-3">
+<h3 id="org608a1fd">Q96: Why is pod sizing important?</h3>
+<div class="outline-text-3" id="text-org608a1fd">
 <p>
 Poor pod sizing causes poor utilization, unexpected throttling, or crash loops.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7050ba" class="outline-3">
-<h3 id="orgf7050ba">Q97: What is a resource utilization baseline?</h3>
-<div class="outline-text-3" id="text-orgf7050ba">
+<div id="outline-container-orgf6a26d3" class="outline-3">
+<h3 id="orgf6a26d3">Q97: What is a resource utilization baseline?</h3>
+<div class="outline-text-3" id="text-orgf6a26d3">
 <p>
 It is the typical amount of CPU and memory a workload uses in production.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca84f0b" class="outline-3">
-<h3 id="orgca84f0b">Q98: What is performance tuning for resources?</h3>
-<div class="outline-text-3" id="text-orgca84f0b">
+<div id="outline-container-org4954ff2" class="outline-3">
+<h3 id="org4954ff2">Q98: What is performance tuning for resources?</h3>
+<div class="outline-text-3" id="text-org4954ff2">
 <p>
 It means tuning requests and limits based on real load and throughput observations.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf78b9ec" class="outline-3">
-<h3 id="orgf78b9ec">Q99: What is autoscaling vs manual resource tuning?</h3>
-<div class="outline-text-3" id="text-orgf78b9ec">
+<div id="outline-container-org20cbbdf" class="outline-3">
+<h3 id="org20cbbdf">Q99: What is autoscaling vs manual resource tuning?</h3>
+<div class="outline-text-3" id="text-org20cbbdf">
 <p>
 Autoscaling responds to traffic dynamics; tuning sets a baseline for pod sizing and resource allocation.
 </p>
 </div>
 </div>
-<div id="outline-container-org326a66d" class="outline-3">
-<h3 id="org326a66d">Q100: What are common resource misconfigurations?</h3>
-<div class="outline-text-3" id="text-org326a66d">
+<div id="outline-container-orga09b1c5" class="outline-3">
+<h3 id="orga09b1c5">Q100: What are common resource misconfigurations?</h3>
+<div class="outline-text-3" id="text-orga09b1c5">
 <ul class="org-ul">
 <li>no requests</li>
 <li>no limits</li>
@@ -841,810 +1959,810 @@ Autoscaling responds to traffic dynamics; tuning sets a baseline for pod sizing 
 </div>
 </div>
 </div>
-<div id="outline-container-org9e9e17d" class="outline-2">
-<h2 id="org9e9e17d">Intermediate</h2>
-<div class="outline-text-2" id="text-org9e9e17d">
+<div id="outline-container-orgf076f76" class="outline-2">
+<h2 id="orgf076f76">Intermediate</h2>
+<div class="outline-text-2" id="text-orgf076f76">
 </div>
-<div id="outline-container-orgf6a630f" class="outline-3">
-<h3 id="orgf6a630f">Q101: What is a `requests` value used by scheduler?</h3>
-<div class="outline-text-3" id="text-orgf6a630f">
+<div id="outline-container-orge554fd2" class="outline-3">
+<h3 id="orge554fd2">Q101: What is a `requests` value used by scheduler?</h3>
+<div class="outline-text-3" id="text-orge554fd2">
 <p>
 The scheduler uses requests to find a suitable node and reserve space.
 </p>
 </div>
 </div>
-<div id="outline-container-org2cdd455" class="outline-3">
-<h3 id="org2cdd455">Q102: What is a `limits` value used by runtime?</h3>
-<div class="outline-text-3" id="text-org2cdd455">
+<div id="outline-container-org814fe89" class="outline-3">
+<h3 id="org814fe89">Q102: What is a `limits` value used by runtime?</h3>
+<div class="outline-text-3" id="text-org814fe89">
 <p>
 The runtime uses limits to enforce maximum cgroup usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org1068cc8" class="outline-3">
-<h3 id="org1068cc8">Q103: Why do requests and limits differ in practice?</h3>
-<div class="outline-text-3" id="text-org1068cc8">
+<div id="outline-container-org8662d96" class="outline-3">
+<h3 id="org8662d96">Q103: Why do requests and limits differ in practice?</h3>
+<div class="outline-text-3" id="text-org8662d96">
 <p>
 Because the runtime and scheduler use them differently: one is soft reserved capacity, the other is enforcement.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc5ef87d" class="outline-3">
-<h3 id="orgc5ef87d">Q104: Why do requests matter more than limits for scheduling?</h3>
-<div class="outline-text-3" id="text-orgc5ef87d">
+<div id="outline-container-org7bde91a" class="outline-3">
+<h3 id="org7bde91a">Q104: Why do requests matter more than limits for scheduling?</h3>
+<div class="outline-text-3" id="text-org7bde91a">
 <p>
 Because the scheduler can only place pods on nodes with enough available requests.
 </p>
 </div>
 </div>
-<div id="outline-container-org22acadc" class="outline-3">
-<h3 id="org22acadc">Q105: Why are requests sometimes set equal to limits?</h3>
-<div class="outline-text-3" id="text-org22acadc">
+<div id="outline-container-orgbc6b50d" class="outline-3">
+<h3 id="orgbc6b50d">Q105: Why are requests sometimes set equal to limits?</h3>
+<div class="outline-text-3" id="text-orgbc6b50d">
 <p>
 When you want predictable behavior and consistent capacity planning.
 </p>
 </div>
 </div>
-<div id="outline-container-org0beeb07" class="outline-3">
-<h3 id="org0beeb07">Q106: Why are requests sometimes lower than limits?</h3>
-<div class="outline-text-3" id="text-org0beeb07">
+<div id="outline-container-org18bd4ac" class="outline-3">
+<h3 id="org18bd4ac">Q106: Why are requests sometimes lower than limits?</h3>
+<div class="outline-text-3" id="text-org18bd4ac">
 <p>
 To allow burst capacity without starving the node.
 </p>
 </div>
 </div>
-<div id="outline-container-org05cf0f0" class="outline-3">
-<h3 id="org05cf0f0">Q107: What is the CPU burst model?</h3>
-<div class="outline-text-3" id="text-org05cf0f0">
+<div id="outline-container-orgab8d04a" class="outline-3">
+<h3 id="orgab8d04a">Q107: What is the CPU burst model?</h3>
+<div class="outline-text-3" id="text-orgab8d04a">
 <p>
 It allows short spikes above the request when there is available node capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-org4855b2c" class="outline-3">
-<h3 id="org4855b2c">Q108: What is a CPU throttle threshold?</h3>
-<div class="outline-text-3" id="text-org4855b2c">
+<div id="outline-container-orgbcf27ec" class="outline-3">
+<h3 id="orgbcf27ec">Q108: What is a CPU throttle threshold?</h3>
+<div class="outline-text-3" id="text-orgbcf27ec">
 <p>
 It is the point at which the runtime limits or throttles CPU usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org3d28b86" class="outline-3">
-<h3 id="org3d28b86">Q109: Why is memory overcommit dangerous?</h3>
-<div class="outline-text-3" id="text-org3d28b86">
+<div id="outline-container-org6f3f2af" class="outline-3">
+<h3 id="org6f3f2af">Q109: Why is memory overcommit dangerous?</h3>
+<div class="outline-text-3" id="text-org6f3f2af">
 <p>
 Because it can cause OOM kills and disruption when multiple pods compete for memory.
 </p>
 </div>
 </div>
-<div id="outline-container-org5b093c7" class="outline-3">
-<h3 id="org5b093c7">Q110: Why can high memory limits cause poor utilization?</h3>
-<div class="outline-text-3" id="text-org5b093c7">
+<div id="outline-container-org299e293" class="outline-3">
+<h3 id="org299e293">Q110: Why can high memory limits cause poor utilization?</h3>
+<div class="outline-text-3" id="text-org299e293">
 <p>
 Because the cluster may reserve memory that is not actually needed, reducing scheduling density.
 </p>
 </div>
 </div>
-<div id="outline-container-org9012687" class="outline-3">
-<h3 id="org9012687">Q111: What is `EmptyDir` and resource use?</h3>
-<div class="outline-text-3" id="text-org9012687">
+<div id="outline-container-org8b9ad71" class="outline-3">
+<h3 id="org8b9ad71">Q111: What is `EmptyDir` and resource use?</h3>
+<div class="outline-text-3" id="text-org8b9ad71">
 <p>
 It is local ephemeral storage, not CPU or memory, but may still affect disk usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org46ea987" class="outline-3">
-<h3 id="org46ea987">Q112: What is the resource use of system daemons?</h3>
-<div class="outline-text-3" id="text-org46ea987">
+<div id="outline-container-org7e373d4" class="outline-3">
+<h3 id="org7e373d4">Q112: What is the resource use of system daemons?</h3>
+<div class="outline-text-3" id="text-org7e373d4">
 <p>
 The kubelet, kernel, and control plane components also consume CPU and memory.
 </p>
 </div>
 </div>
-<div id="outline-container-org71f4c0b" class="outline-3">
-<h3 id="org71f4c0b">Q113: What is node allocatable memory?</h3>
-<div class="outline-text-3" id="text-org71f4c0b">
+<div id="outline-container-orgbabec1e" class="outline-3">
+<h3 id="orgbabec1e">Q113: What is node allocatable memory?</h3>
+<div class="outline-text-3" id="text-orgbabec1e">
 <p>
 The actual memory left for application workloads after system reservations.
 </p>
 </div>
 </div>
-<div id="outline-container-org59ee7d6" class="outline-3">
-<h3 id="org59ee7d6">Q114: What is a pressure condition on a node?</h3>
-<div class="outline-text-3" id="text-org59ee7d6">
+<div id="outline-container-org3818c93" class="outline-3">
+<h3 id="org3818c93">Q114: What is a pressure condition on a node?</h3>
+<div class="outline-text-3" id="text-org3818c93">
 <p>
 It occurs when memory or disk is under heavy strain and Kubernetes starts eviction or scheduling restrictions.
 </p>
 </div>
 </div>
-<div id="outline-container-org6315e7f" class="outline-3">
-<h3 id="org6315e7f">Q115: What is a `PriorityClass`?</h3>
-<div class="outline-text-3" id="text-org6315e7f">
+<div id="outline-container-org7691402" class="outline-3">
+<h3 id="org7691402">Q115: What is a `PriorityClass`?</h3>
+<div class="outline-text-3" id="text-org7691402">
 <p>
 A PriorityClass gives a pod higher or lower scheduling and eviction priority.
 </p>
 </div>
 </div>
-<div id="outline-container-org3e62a67" class="outline-3">
-<h3 id="org3e62a67">Q116: Why do priorities matter with resource limits?</h3>
-<div class="outline-text-3" id="text-org3e62a67">
+<div id="outline-container-org6fcb928" class="outline-3">
+<h3 id="org6fcb928">Q116: Why do priorities matter with resource limits?</h3>
+<div class="outline-text-3" id="text-org6fcb928">
 <p>
 Because under pressure, Kubernetes may evict lower-priority pods first.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf599507" class="outline-3">
-<h3 id="orgf599507">Q117: Why are cluster-level quotas useful?</h3>
-<div class="outline-text-3" id="text-orgf599507">
+<div id="outline-container-org7a8d15c" class="outline-3">
+<h3 id="org7a8d15c">Q117: Why are cluster-level quotas useful?</h3>
+<div class="outline-text-3" id="text-org7a8d15c">
 <p>
 They help control the total resources users or namespaces can consume.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b35bd4" class="outline-3">
-<h3 id="org9b35bd4">Q118: What is a quota object?</h3>
-<div class="outline-text-3" id="text-org9b35bd4">
+<div id="outline-container-orgfdbb11d" class="outline-3">
+<h3 id="orgfdbb11d">Q118: What is a quota object?</h3>
+<div class="outline-text-3" id="text-orgfdbb11d">
 <p>
 A quota object defines total requests and limits for a namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org3a40c02" class="outline-3">
-<h3 id="org3a40c02">Q119: Why use `LimitRange` plus quotas together?</h3>
-<div class="outline-text-3" id="text-org3a40c02">
+<div id="outline-container-org1e0de84" class="outline-3">
+<h3 id="org1e0de84">Q119: Why use `LimitRange` plus quotas together?</h3>
+<div class="outline-text-3" id="text-org1e0de84">
 <p>
 Because LimitRange sets defaults and bounds, while quota limits total usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org868ff95" class="outline-3">
-<h3 id="org868ff95">Q120: What is a resource-level namespace boundary?</h3>
-<div class="outline-text-3" id="text-org868ff95">
+<div id="outline-container-org8a9fe13" class="outline-3">
+<h3 id="org8a9fe13">Q120: What is a resource-level namespace boundary?</h3>
+<div class="outline-text-3" id="text-org8a9fe13">
 <p>
 It is the namespace-level total for CPU, memory, and storage.
 </p>
 </div>
 </div>
-<div id="outline-container-org66fbb0c" class="outline-3">
-<h3 id="org66fbb0c">Q121: What is a cluster autoscaler?</h3>
-<div class="outline-text-3" id="text-org66fbb0c">
+<div id="outline-container-org6ae9ad4" class="outline-3">
+<h3 id="org6ae9ad4">Q121: What is a cluster autoscaler?</h3>
+<div class="outline-text-3" id="text-org6ae9ad4">
 <p>
 The cluster autoscaler adds or removes nodes based on pending pods and cluster load.
 </p>
 </div>
 </div>
-<div id="outline-container-org80ff6aa" class="outline-3">
-<h3 id="org80ff6aa">Q122: Why is autoscaler relevant to resource limits?</h3>
-<div class="outline-text-3" id="text-org80ff6aa">
+<div id="outline-container-orgabccfa2" class="outline-3">
+<h3 id="orgabccfa2">Q122: Why is autoscaler relevant to resource limits?</h3>
+<div class="outline-text-3" id="text-orgabccfa2">
 <p>
 Because I/O and CPU pressure dictate whether more nodes are needed.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdd30301" class="outline-3">
-<h3 id="orgdd30301">Q123: What is a node pool?</h3>
-<div class="outline-text-3" id="text-orgdd30301">
+<div id="outline-container-org84aaceb" class="outline-3">
+<h3 id="org84aaceb">Q123: What is a node pool?</h3>
+<div class="outline-text-3" id="text-org84aaceb">
 <p>
 A node pool is a group of nodes with similar size or characteristics, often for scheduling CPU/memory workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e62919" class="outline-3">
-<h3 id="org8e62919">Q124: Why do some clusters create node pools for different workload types?</h3>
-<div class="outline-text-3" id="text-org8e62919">
+<div id="outline-container-org19d67bb" class="outline-3">
+<h3 id="org19d67bb">Q124: Why do some clusters create node pools for different workload types?</h3>
+<div class="outline-text-3" id="text-org19d67bb">
 <p>
 Because different apps have different CPU, memory, and capacity needs.
 </p>
 </div>
 </div>
-<div id="outline-container-org3894b6a" class="outline-3">
-<h3 id="org3894b6a">Q125: What is a memory request vs memory usage metric?</h3>
-<div class="outline-text-3" id="text-org3894b6a">
+<div id="outline-container-org359b417" class="outline-3">
+<h3 id="org359b417">Q125: What is a memory request vs memory usage metric?</h3>
+<div class="outline-text-3" id="text-org359b417">
 <p>
 Request is the reserved baseline; usage is actual observed allocation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgedfb7f4" class="outline-3">
-<h3 id="orgedfb7f4">Q126: Why is usage monitoring important?</h3>
-<div class="outline-text-3" id="text-orgedfb7f4">
+<div id="outline-container-org7646f6e" class="outline-3">
+<h3 id="org7646f6e">Q126: Why is usage monitoring important?</h3>
+<div class="outline-text-3" id="text-org7646f6e">
 <p>
 Because pods can exceed requests or limits without the platform realizing it.
 </p>
 </div>
 </div>
-<div id="outline-container-org6f748f6" class="outline-3">
-<h3 id="org6f748f6">Q127: What is a dashboard or metrics server?</h3>
-<div class="outline-text-3" id="text-org6f748f6">
+<div id="outline-container-org28e5526" class="outline-3">
+<h3 id="org28e5526">Q127: What is a dashboard or metrics server?</h3>
+<div class="outline-text-3" id="text-org28e5526">
 <p>
 It shows pod resource usage over time and helps tune requests and limits.
 </p>
 </div>
 </div>
-<div id="outline-container-orge2555b1" class="outline-3">
-<h3 id="orge2555b1">Q128: What is a CPU saturation event?</h3>
-<div class="outline-text-3" id="text-orge2555b1">
+<div id="outline-container-org3072b7d" class="outline-3">
+<h3 id="org3072b7d">Q128: What is a CPU saturation event?</h3>
+<div class="outline-text-3" id="text-org3072b7d">
 <p>
 A saturation event happens when the node or pod is at or near its CPU capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-org4465ce0" class="outline-3">
-<h3 id="org4465ce0">Q129: What is memory saturation?</h3>
-<div class="outline-text-3" id="text-org4465ce0">
+<div id="outline-container-orgafda3fc" class="outline-3">
+<h3 id="orgafda3fc">Q129: What is memory saturation?</h3>
+<div class="outline-text-3" id="text-orgafda3fc">
 <p>
 It is when memory usage is close to limit or near the node’s total capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-org8807634" class="outline-3">
-<h3 id="org8807634">Q130: Why are resource requests important for cluster capacity?</h3>
-<div class="outline-text-3" id="text-org8807634">
+<div id="outline-container-orge6b7cc2" class="outline-3">
+<h3 id="orge6b7cc2">Q130: Why are resource requests important for cluster capacity?</h3>
+<div class="outline-text-3" id="text-orge6b7cc2">
 <p>
 They are the basis for scheduling and future node scaling.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c6b0fd" class="outline-3">
-<h3 id="org7c6b0fd">Q131: Why are limits sometimes omitted for sidecars?</h3>
-<div class="outline-text-3" id="text-org7c6b0fd">
+<div id="outline-container-orgcb0f523" class="outline-3">
+<h3 id="orgcb0f523">Q131: Why are limits sometimes omitted for sidecars?</h3>
+<div class="outline-text-3" id="text-orgcb0f523">
 <p>
 Because sidecars may not need a strict cap or may be designed to burst.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb0e3ce5" class="outline-3">
-<h3 id="orgb0e3ce5">Q132: What is a sidecar container?</h3>
-<div class="outline-text-3" id="text-orgb0e3ce5">
+<div id="outline-container-orga20fb87" class="outline-3">
+<h3 id="orga20fb87">Q132: What is a sidecar container?</h3>
+<div class="outline-text-3" id="text-orga20fb87">
 <p>
 A sidecar is a helper container in the same pod that shares resources with the main app.
 </p>
 </div>
 </div>
-<div id="outline-container-org71e52b3" class="outline-3">
-<h3 id="org71e52b3">Q133: Why are sidecars relevant to resource budgeting?</h3>
-<div class="outline-text-3" id="text-org71e52b3">
+<div id="outline-container-org752ec8e" class="outline-3">
+<h3 id="org752ec8e">Q133: Why are sidecars relevant to resource budgeting?</h3>
+<div class="outline-text-3" id="text-org752ec8e">
 <p>
 Because sidecars compete for the same pod-level resource pool.
 </p>
 </div>
 </div>
-<div id="outline-container-org4ceb7a5" class="outline-3">
-<h3 id="org4ceb7a5">Q134: What is a pod-level resource sum?</h3>
-<div class="outline-text-3" id="text-org4ceb7a5">
+<div id="outline-container-org9ca69cc" class="outline-3">
+<h3 id="org9ca69cc">Q134: What is a pod-level resource sum?</h3>
+<div class="outline-text-3" id="text-org9ca69cc">
 <p>
 The sum of all containers’ requests and limits in a pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org89a0726" class="outline-3">
-<h3 id="org89a0726">Q135: Why is pod-level sum relevant?</h3>
-<div class="outline-text-3" id="text-org89a0726">
+<div id="outline-container-orgd2f4b7c" class="outline-3">
+<h3 id="orgd2f4b7c">Q135: Why is pod-level sum relevant?</h3>
+<div class="outline-text-3" id="text-orgd2f4b7c">
 <p>
 Because pod scheduling and resource enforcement happen at the pod/container aggregate level.
 </p>
 </div>
 </div>
-<div id="outline-container-org2389526" class="outline-3">
-<h3 id="org2389526">Q136: What is a memory request for a sidecar?</h3>
-<div class="outline-text-3" id="text-org2389526">
+<div id="outline-container-org4d282af" class="outline-3">
+<h3 id="org4d282af">Q136: What is a memory request for a sidecar?</h3>
+<div class="outline-text-3" id="text-org4d282af">
 <p>
 It may be lower than the main app, but the total still matters.
 </p>
 </div>
 </div>
-<div id="outline-container-org30c1d4b" class="outline-3">
-<h3 id="org30c1d4b">Q137: Why should service and sidecar resources be considered together?</h3>
-<div class="outline-text-3" id="text-org30c1d4b">
+<div id="outline-container-orga221113" class="outline-3">
+<h3 id="orga221113">Q137: Why should service and sidecar resources be considered together?</h3>
+<div class="outline-text-3" id="text-orga221113">
 <p>
 Because they share the pod’s total and can affect each other.
 </p>
 </div>
 </div>
-<div id="outline-container-org5874f83" class="outline-3">
-<h3 id="org5874f83">Q138: What is a “too low limit” problem?</h3>
-<div class="outline-text-3" id="text-org5874f83">
+<div id="outline-container-orga2ef91d" class="outline-3">
+<h3 id="orga2ef91d">Q138: What is a “too low limit” problem?</h3>
+<div class="outline-text-3" id="text-orga2ef91d">
 <p>
 It can cause the app to be throttled or killed even though the node has enough overall capacity.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b4a54d" class="outline-3">
-<h3 id="org2b4a54d">Q139: What is a “too high limit” problem?</h3>
-<div class="outline-text-3" id="text-org2b4a54d">
+<div id="outline-container-orgf1f2586" class="outline-3">
+<h3 id="orgf1f2586">Q139: What is a “too high limit” problem?</h3>
+<div class="outline-text-3" id="text-orgf1f2586">
 <p>
 It can starve other pods or reduce cluster density, leading to poor scheduling.
 </p>
 </div>
 </div>
-<div id="outline-container-org801b75f" class="outline-3">
-<h3 id="org801b75f">Q140: Why does resource tuning require experimentation?</h3>
-<div class="outline-text-3" id="text-org801b75f">
+<div id="outline-container-org402dc6a" class="outline-3">
+<h3 id="org402dc6a">Q140: Why does resource tuning require experimentation?</h3>
+<div class="outline-text-3" id="text-org402dc6a">
 <p>
 Because real workloads differ by runtime, concurrency, and traffic patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-org1efa6da" class="outline-3">
-<h3 id="org1efa6da">Q141: What is a container OOM with restart policy?</h3>
-<div class="outline-text-3" id="text-org1efa6da">
+<div id="outline-container-org6a7e2f8" class="outline-3">
+<h3 id="org6a7e2f8">Q141: What is a container OOM with restart policy?</h3>
+<div class="outline-text-3" id="text-org6a7e2f8">
 <p>
 A container can restart after OOM, which can cause a crash loop if limits are set too low.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa934fe" class="outline-3">
-<h3 id="orgaa934fe">Q142: Why do well-sized limits reduce restarts?</h3>
-<div class="outline-text-3" id="text-orgaa934fe">
+<div id="outline-container-org1293a85" class="outline-3">
+<h3 id="org1293a85">Q142: Why do well-sized limits reduce restarts?</h3>
+<div class="outline-text-3" id="text-org1293a85">
 <p>
 Because memory and CPU constraints remain aligned with actual workload behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org966ecf7" class="outline-3">
-<h3 id="org966ecf7">Q143: What is a memory headroom?</h3>
-<div class="outline-text-3" id="text-org966ecf7">
+<div id="outline-container-org1be3a23" class="outline-3">
+<h3 id="org1be3a23">Q143: What is a memory headroom?</h3>
+<div class="outline-text-3" id="text-org1be3a23">
 <p>
 Headroom is the extra memory left after requests and limits to absorb bursts and system activity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbbe51b6" class="outline-3">
-<h3 id="orgbbe51b6">Q144: Why is headroom important?</h3>
-<div class="outline-text-3" id="text-orgbbe51b6">
+<div id="outline-container-org330b09a" class="outline-3">
+<h3 id="org330b09a">Q144: Why is headroom important?</h3>
+<div class="outline-text-3" id="text-org330b09a">
 <p>
 It helps avoid unnecessary evictions and OOM kills.
 </p>
 </div>
 </div>
-<div id="outline-container-org6555ec3" class="outline-3">
-<h3 id="org6555ec3">Q145: What is a CPU headroom?</h3>
-<div class="outline-text-3" id="text-org6555ec3">
+<div id="outline-container-orge93d048" class="outline-3">
+<h3 id="orge93d048">Q145: What is a CPU headroom?</h3>
+<div class="outline-text-3" id="text-orge93d048">
 <p>
 The extra CPU capacity in the node that allows bursts without system starvation.
 </p>
 </div>
 </div>
-<div id="outline-container-org5ab984b" class="outline-3">
-<h3 id="org5ab984b">Q146: Why are node-level limits smaller than total node capacity?</h3>
-<div class="outline-text-3" id="text-org5ab984b">
+<div id="outline-container-orgb8c589c" class="outline-3">
+<h3 id="orgb8c589c">Q146: Why are node-level limits smaller than total node capacity?</h3>
+<div class="outline-text-3" id="text-orgb8c589c">
 <p>
 Because operating system daemons and Kubernetes components also need resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org43394bb" class="outline-3">
-<h3 id="org43394bb">Q147: What is a scheduling score?</h3>
-<div class="outline-text-3" id="text-org43394bb">
+<div id="outline-container-org52966ee" class="outline-3">
+<h3 id="org52966ee">Q147: What is a scheduling score?</h3>
+<div class="outline-text-3" id="text-org52966ee">
 <p>
 Kubernetes uses scoring to pick the best node based on many factors, including resource fit.
 </p>
 </div>
 </div>
-<div id="outline-container-org630c78e" class="outline-3">
-<h3 id="org630c78e">Q148: What are generic resource names?</h3>
-<div class="outline-text-3" id="text-org630c78e">
+<div id="outline-container-org488eb4f" class="outline-3">
+<h3 id="org488eb4f">Q148: What are generic resource names?</h3>
+<div class="outline-text-3" id="text-org488eb4f">
 <p>
 CPU and memory are the standard ones, but custom resources can also be used in some clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org82b2954" class="outline-3">
-<h3 id="org82b2954">Q149: What is a custom resource for GPU?</h3>
-<div class="outline-text-3" id="text-org82b2954">
+<div id="outline-container-org0b7d7f5" class="outline-3">
+<h3 id="org0b7d7f5">Q149: What is a custom resource for GPU?</h3>
+<div class="outline-text-3" id="text-org0b7d7f5">
 <p>
 GPUs can be requested and limited as custom resources in some clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b824ac" class="outline-3">
-<h3 id="org3b824ac">Q150: What is a GPU resource limit?</h3>
-<div class="outline-text-3" id="text-org3b824ac">
+<div id="outline-container-org927b6b7" class="outline-3">
+<h3 id="org927b6b7">Q150: What is a GPU resource limit?</h3>
+<div class="outline-text-3" id="text-org927b6b7">
 <p>
 It caps how much accelerator capacity a pod can use and is often modeled separately from CPU and memory.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d454b4" class="outline-3">
-<h3 id="org1d454b4">Q151: What are node resource reservations?</h3>
-<div class="outline-text-3" id="text-org1d454b4">
+<div id="outline-container-orgbf440d7" class="outline-3">
+<h3 id="orgbf440d7">Q151: What are node resource reservations?</h3>
+<div class="outline-text-3" id="text-orgbf440d7">
 <p>
 They keep some CPU and memory available for system-critical tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd0f9805" class="outline-3">
-<h3 id="orgd0f9805">Q152: Why is node reservation important?</h3>
-<div class="outline-text-3" id="text-orgd0f9805">
+<div id="outline-container-org3b7c5df" class="outline-3">
+<h3 id="org3b7c5df">Q152: Why is node reservation important?</h3>
+<div class="outline-text-3" id="text-org3b7c5df">
 <p>
 Because the node still needs to run kubelet, container runtime, and OS tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb6cf909" class="outline-3">
-<h3 id="orgb6cf909">Q153: What is a service-level resource plan?</h3>
-<div class="outline-text-3" id="text-orgb6cf909">
+<div id="outline-container-org8f41bcb" class="outline-3">
+<h3 id="org8f41bcb">Q153: What is a service-level resource plan?</h3>
+<div class="outline-text-3" id="text-org8f41bcb">
 <p>
 It is the policy and sizing model for each production service based on expected traffic and workload characteristics.
 </p>
 </div>
 </div>
-<div id="outline-container-org22fa75b" class="outline-3">
-<h3 id="org22fa75b">Q154: Why is baseline usage important?</h3>
-<div class="outline-text-3" id="text-org22fa75b">
+<div id="outline-container-org367ceeb" class="outline-3">
+<h3 id="org367ceeb">Q154: Why is baseline usage important?</h3>
+<div class="outline-text-3" id="text-org367ceeb">
 <p>
 Because it informs safe requests and limits, which impact scheduling and reliability.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc672a0c" class="outline-3">
-<h3 id="orgc672a0c">Q155: What is cluster capacity planning?</h3>
-<div class="outline-text-3" id="text-orgc672a0c">
+<div id="outline-container-org7c25019" class="outline-3">
+<h3 id="org7c25019">Q155: What is cluster capacity planning?</h3>
+<div class="outline-text-3" id="text-org7c25019">
 <p>
 It is the process of understanding total available CPU and memory and how much is consumed by workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orga6dcec4" class="outline-3">
-<h3 id="orga6dcec4">Q156: What is load testing and resource measurement?</h3>
-<div class="outline-text-3" id="text-orga6dcec4">
+<div id="outline-container-org9315173" class="outline-3">
+<h3 id="org9315173">Q156: What is load testing and resource measurement?</h3>
+<div class="outline-text-3" id="text-org9315173">
 <p>
 It is the process of measuring a workload under realistic conditions to determine good limits.
 </p>
 </div>
 </div>
-<div id="outline-container-org8a2706b" class="outline-3">
-<h3 id="org8a2706b">Q157: What is a canary resource test?</h3>
-<div class="outline-text-3" id="text-org8a2706b">
+<div id="outline-container-orgc1cfc5a" class="outline-3">
+<h3 id="orgc1cfc5a">Q157: What is a canary resource test?</h3>
+<div class="outline-text-3" id="text-orgc1cfc5a">
 <p>
 It measures whether a new workload version fits its resource budget before full rollout.
 </p>
 </div>
 </div>
-<div id="outline-container-org39ee5cd" class="outline-3">
-<h3 id="org39ee5cd">Q158: What is resource observability?</h3>
-<div class="outline-text-3" id="text-org39ee5cd">
+<div id="outline-container-orgdb220aa" class="outline-3">
+<h3 id="orgdb220aa">Q158: What is resource observability?</h3>
+<div class="outline-text-3" id="text-orgdb220aa">
 <p>
 It is the visibility into actual CPU, memory, and process behavior of workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb4adb68" class="outline-3">
-<h3 id="orgb4adb68">Q159: What is a resource alert?</h3>
-<div class="outline-text-3" id="text-orgb4adb68">
+<div id="outline-container-orga021c92" class="outline-3">
+<h3 id="orga021c92">Q159: What is a resource alert?</h3>
+<div class="outline-text-3" id="text-orga021c92">
 <p>
 An alert signals abnormal usage above expected thresholds.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaa3a591" class="outline-3">
-<h3 id="orgaa3a591">Q160: What is a resource usage trend?</h3>
-<div class="outline-text-3" id="text-orgaa3a591">
+<div id="outline-container-org81d395f" class="outline-3">
+<h3 id="org81d395f">Q160: What is a resource usage trend?</h3>
+<div class="outline-text-3" id="text-org81d395f">
 <p>
 A trend shows whether a workload grows over time and may require tuning or scaling.
 </p>
 </div>
 </div>
-<div id="outline-container-org41ade35" class="outline-3">
-<h3 id="org41ade35">Q161: Why is resource tuning an iterative process?</h3>
-<div class="outline-text-3" id="text-org41ade35">
+<div id="outline-container-org5b82dd0" class="outline-3">
+<h3 id="org5b82dd0">Q161: Why is resource tuning an iterative process?</h3>
+<div class="outline-text-3" id="text-org5b82dd0">
 <p>
 Because workloads evolve and traffic changes over time.
 </p>
 </div>
 </div>
-<div id="outline-container-org51314d8" class="outline-3">
-<h3 id="org51314d8">Q162: What is a pod left with no requests and limits?</h3>
-<div class="outline-text-3" id="text-org51314d8">
+<div id="outline-container-orgbf3492f" class="outline-3">
+<h3 id="orgbf3492f">Q162: What is a pod left with no requests and limits?</h3>
+<div class="outline-text-3" id="text-orgbf3492f">
 <p>
 It receives no scheduling guarantee and can be noisy or starved on a node.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc529878" class="outline-3">
-<h3 id="orgc529878">Q163: Why is overprovisioning dangerous?</h3>
-<div class="outline-text-3" id="text-orgc529878">
+<div id="outline-container-org5754f40" class="outline-3">
+<h3 id="org5754f40">Q163: Why is overprovisioning dangerous?</h3>
+<div class="outline-text-3" id="text-org5754f40">
 <p>
 It reduces scheduling efficiency and can create unanticipated contention.
 </p>
 </div>
 </div>
-<div id="outline-container-org37c44ea" class="outline-3">
-<h3 id="org37c44ea">Q164: What is garbage collection and resources?</h3>
-<div class="outline-text-3" id="text-org37c44ea">
+<div id="outline-container-org4870b29" class="outline-3">
+<h3 id="org4870b29">Q164: What is garbage collection and resources?</h3>
+<div class="outline-text-3" id="text-org4870b29">
 <p>
 Garbage collection may generate temporary CPU and memory use that is not always visible in baseline app metrics.
 </p>
 </div>
 </div>
-<div id="outline-container-orge876ee2" class="outline-3">
-<h3 id="orge876ee2">Q165: What is the relation between resource requests and evictions?</h3>
-<div class="outline-text-3" id="text-orge876ee2">
+<div id="outline-container-orgf28ee1c" class="outline-3">
+<h3 id="orgf28ee1c">Q165: What is the relation between resource requests and evictions?</h3>
+<div class="outline-text-3" id="text-orgf28ee1c">
 <p>
 Under resource pressure, pods with lower QoS or lower priority are more likely to be evicted.
 </p>
 </div>
 </div>
-<div id="outline-container-org51efcae" class="outline-3">
-<h3 id="org51efcae">Q166: What is a resource pressure event in a cluster?</h3>
-<div class="outline-text-3" id="text-org51efcae">
+<div id="outline-container-org1eb6d29" class="outline-3">
+<h3 id="org1eb6d29">Q166: What is a resource pressure event in a cluster?</h3>
+<div class="outline-text-3" id="text-org1eb6d29">
 <p>
 It is when the cluster experiences insufficient CPU or memory relative to current demand.
 </p>
 </div>
 </div>
-<div id="outline-container-orge2f39d4" class="outline-3">
-<h3 id="orge2f39d4">Q167: Why is QoS a key concept?</h3>
-<div class="outline-text-3" id="text-orge2f39d4">
+<div id="outline-container-orgd0052e7" class="outline-3">
+<h3 id="orgd0052e7">Q167: Why is QoS a key concept?</h3>
+<div class="outline-text-3" id="text-orgd0052e7">
 <p>
 Because it affects eviction order and resilience under stress.
 </p>
 </div>
 </div>
-<div id="outline-container-org20bbdc0" class="outline-3">
-<h3 id="org20bbdc0">Q168: What is the bounded usage model?</h3>
-<div class="outline-text-3" id="text-org20bbdc0">
+<div id="outline-container-org226fe9c" class="outline-3">
+<h3 id="org226fe9c">Q168: What is the bounded usage model?</h3>
+<div class="outline-text-3" id="text-org226fe9c">
 <p>
 It is the idea that workloads use only the resources they are allowed to use based on limits and requests.
 </p>
 </div>
 </div>
-<div id="outline-container-org0815178" class="outline-3">
-<h3 id="org0815178">Q169: What is a slow or starved pod?</h3>
-<div class="outline-text-3" id="text-org0815178">
+<div id="outline-container-orga4bbfb6" class="outline-3">
+<h3 id="orga4bbfb6">Q169: What is a slow or starved pod?</h3>
+<div class="outline-text-3" id="text-orga4bbfb6">
 <p>
 A pod starved of CPU or memory can behave erratically or fail under load.
 </p>
 </div>
 </div>
-<div id="outline-container-org78708e6" class="outline-3">
-<h3 id="org78708e6">Q170: What is memory pressure?</h3>
-<div class="outline-text-3" id="text-org78708e6">
+<div id="outline-container-org6ddceb7" class="outline-3">
+<h3 id="org6ddceb7">Q170: What is memory pressure?</h3>
+<div class="outline-text-3" id="text-org6ddceb7">
 <p>
 Memory pressure increases the risk of OOM kills and performance degradation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaf2da8c" class="outline-3">
-<h3 id="orgaf2da8c">Q171: What is CPU pressure?</h3>
-<div class="outline-text-3" id="text-orgaf2da8c">
+<div id="outline-container-orgde07d0a" class="outline-3">
+<h3 id="orgde07d0a">Q171: What is CPU pressure?</h3>
+<div class="outline-text-3" id="text-orgde07d0a">
 <p>
 CPU pressure makes the process slow or queued behind resource limits.
 </p>
 </div>
 </div>
-<div id="outline-container-org927cef8" class="outline-3">
-<h3 id="org927cef8">Q172: Why do both CPU and memory matter?</h3>
-<div class="outline-text-3" id="text-org927cef8">
+<div id="outline-container-orgf52d7e5" class="outline-3">
+<h3 id="orgf52d7e5">Q172: Why do both CPU and memory matter?</h3>
+<div class="outline-text-3" id="text-orgf52d7e5">
 <p>
 Because one can cause slowness while the other can cause failures or restarts.
 </p>
 </div>
 </div>
-<div id="outline-container-org290a178" class="outline-3">
-<h3 id="org290a178">Q173: What is a pod quality-of-service policy?</h3>
-<div class="outline-text-3" id="text-org290a178">
+<div id="outline-container-org28d9bb1" class="outline-3">
+<h3 id="org28d9bb1">Q173: What is a pod quality-of-service policy?</h3>
+<div class="outline-text-3" id="text-org28d9bb1">
 <p>
 It determines which pods are sacrificed first during node pressure events.
 </p>
 </div>
 </div>
-<div id="outline-container-org038a592" class="outline-3">
-<h3 id="org038a592">Q174: Why is resource-aware scheduling crucial?</h3>
-<div class="outline-text-3" id="text-org038a592">
+<div id="outline-container-orgd10c96d" class="outline-3">
+<h3 id="orgd10c96d">Q174: Why is resource-aware scheduling crucial?</h3>
+<div class="outline-text-3" id="text-orgd10c96d">
 <p>
 Because it ensures workloads land on suitable nodes and avoids chaotic contention.
 </p>
 </div>
 </div>
-<div id="outline-container-orge8432ac" class="outline-3">
-<h3 id="orge8432ac">Q175: Why should operators prefer explicit requests and limits?</h3>
-<div class="outline-text-3" id="text-orge8432ac">
+<div id="outline-container-org927a347" class="outline-3">
+<h3 id="org927a347">Q175: Why should operators prefer explicit requests and limits?</h3>
+<div class="outline-text-3" id="text-org927a347">
 <p>
 It improves reliability, predictability, and cluster health.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb0236b" class="outline-3">
-<h3 id="orgeb0236b">Q176: What is a baseline setting for app resources?</h3>
-<div class="outline-text-3" id="text-orgeb0236b">
+<div id="outline-container-org80272c4" class="outline-3">
+<h3 id="org80272c4">Q176: What is a baseline setting for app resources?</h3>
+<div class="outline-text-3" id="text-org80272c4">
 <p>
 It is the initial request and limit values set based on profiling and expected load.
 </p>
 </div>
 </div>
-<div id="outline-container-org000703b" class="outline-3">
-<h3 id="org000703b">Q177: What is cluster-level resource fairness?</h3>
-<div class="outline-text-3" id="text-org000703b">
+<div id="outline-container-orgd9ac1e2" class="outline-3">
+<h3 id="orgd9ac1e2">Q177: What is cluster-level resource fairness?</h3>
+<div class="outline-text-3" id="text-orgd9ac1e2">
 <p>
 It ensures users or namespaces do not overwhelm the shared cluster resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orga9903f6" class="outline-3">
-<h3 id="orga9903f6">Q178: What is request aggregation?</h3>
-<div class="outline-text-3" id="text-orga9903f6">
+<div id="outline-container-org11ecf92" class="outline-3">
+<h3 id="org11ecf92">Q178: What is request aggregation?</h3>
+<div class="outline-text-3" id="text-org11ecf92">
 <p>
 It is the total requests across all pods in a namespace or cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-orge22797b" class="outline-3">
-<h3 id="orge22797b">Q179: What is a resource utilization ratio?</h3>
-<div class="outline-text-3" id="text-orge22797b">
+<div id="outline-container-org76884cb" class="outline-3">
+<h3 id="org76884cb">Q179: What is a resource utilization ratio?</h3>
+<div class="outline-text-3" id="text-org76884cb">
 <p>
 It is the actual usage relative to request or limit values.
 </p>
 </div>
 </div>
-<div id="outline-container-org085f8f3" class="outline-3">
-<h3 id="org085f8f3">Q180: Why is measuring real usage crucial for resource tuning?</h3>
-<div class="outline-text-3" id="text-org085f8f3">
+<div id="outline-container-orgc019c90" class="outline-3">
+<h3 id="orgc019c90">Q180: Why is measuring real usage crucial for resource tuning?</h3>
+<div class="outline-text-3" id="text-orgc019c90">
 <p>
 Because good resource limits are derived from actual workload behavior, not guesses.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgd379ef1" class="outline-2">
-<h2 id="orgd379ef1">Advanced / Expert</h2>
-<div class="outline-text-2" id="text-orgd379ef1">
+<div id="outline-container-orgbc84e99" class="outline-2">
+<h2 id="orgbc84e99">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-orgbc84e99">
 </div>
-<div id="outline-container-org56cbe68" class="outline-3">
-<h3 id="org56cbe68">Q181: What is cgroup v1 vs cgroup v2?</h3>
-<div class="outline-text-3" id="text-org56cbe68">
+<div id="outline-container-org51f829f" class="outline-3">
+<h3 id="org51f829f">Q181: What is cgroup v1 vs cgroup v2?</h3>
+<div class="outline-text-3" id="text-org51f829f">
 <p>
 They are different Linux cgroup versions used by the runtime to enforce resource limits.
 </p>
 </div>
 </div>
-<div id="outline-container-orgda3df05" class="outline-3">
-<h3 id="orgda3df05">Q182: Why is cgroup version relevant?</h3>
-<div class="outline-text-3" id="text-orgda3df05">
+<div id="outline-container-orgbece018" class="outline-3">
+<h3 id="orgbece018">Q182: Why is cgroup version relevant?</h3>
+<div class="outline-text-3" id="text-orgbece018">
 <p>
 Because some tools and kernels behave differently depending on the cgroup version.
 </p>
 </div>
 </div>
-<div id="outline-container-org21e4474" class="outline-3">
-<h3 id="org21e4474">Q183: What is resource accounting?</h3>
-<div class="outline-text-3" id="text-org21e4474">
+<div id="outline-container-org73725c8" class="outline-3">
+<h3 id="org73725c8">Q183: What is resource accounting?</h3>
+<div class="outline-text-3" id="text-org73725c8">
 <p>
 It is the tracking of CPU and memory consumed by containers and processes.
 </p>
 </div>
 </div>
-<div id="outline-container-org3764b91" class="outline-3">
-<h3 id="org3764b91">Q184: Why is accounting needed?</h3>
-<div class="outline-text-3" id="text-org3764b91">
+<div id="outline-container-orgbd15144" class="outline-3">
+<h3 id="orgbd15144">Q184: Why is accounting needed?</h3>
+<div class="outline-text-3" id="text-orgbd15144">
 <p>
 Because it provides the raw input for scheduling, alerting, autoscaling, and tuning.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c04d53" class="outline-3">
-<h3 id="org0c04d53">Q185: What is `top` or `kubectl top`?</h3>
-<div class="outline-text-3" id="text-org0c04d53">
+<div id="outline-container-org759f9fb" class="outline-3">
+<h3 id="org759f9fb">Q185: What is `top` or `kubectl top`?</h3>
+<div class="outline-text-3" id="text-org759f9fb">
 <p>
 They show current resource usage of nodes or pods for operational observability.
 </p>
 </div>
 </div>
-<div id="outline-container-org2fd9a25" class="outline-3">
-<h3 id="org2fd9a25">Q186: Why is `kubectl top` valuable?</h3>
-<div class="outline-text-3" id="text-org2fd9a25">
+<div id="outline-container-org52d5827" class="outline-3">
+<h3 id="org52d5827">Q186: Why is `kubectl top` valuable?</h3>
+<div class="outline-text-3" id="text-org52d5827">
 <p>
 It helps estimate whether requests and limits are realistic and whether workloads are saturating the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d30f52" class="outline-3">
-<h3 id="org5d30f52">Q187: What is kernel OOM killer behavior?</h3>
-<div class="outline-text-3" id="text-org5d30f52">
+<div id="outline-container-org91c0581" class="outline-3">
+<h3 id="org91c0581">Q187: What is kernel OOM killer behavior?</h3>
+<div class="outline-text-3" id="text-org91c0581">
 <p>
 The OOM killer may kill the highest-memory container or process when memory is exhausted.
 </p>
 </div>
 </div>
-<div id="outline-container-org2e46944" class="outline-3">
-<h3 id="org2e46944">Q188: Why does OOM kill matter in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org2e46944">
+<div id="outline-container-orgc1d4aa3" class="outline-3">
+<h3 id="orgc1d4aa3">Q188: Why does OOM kill matter in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgc1d4aa3">
 <p>
 Because it can restart a pod abruptly and cause service disruption.
 </p>
 </div>
 </div>
-<div id="outline-container-orga5592af" class="outline-3">
-<h3 id="orga5592af">Q189: What is a memory burst beyond request?</h3>
-<div class="outline-text-3" id="text-orga5592af">
+<div id="outline-container-org60438b8" class="outline-3">
+<h3 id="org60438b8">Q189: What is a memory burst beyond request?</h3>
+<div class="outline-text-3" id="text-org60438b8">
 <p>
 Pods may temporarily use more memory than their request if there is free node memory.
 </p>
 </div>
 </div>
-<div id="outline-container-orgac71b8c" class="outline-3">
-<h3 id="orgac71b8c">Q190: Why is burst possible but limited?</h3>
-<div class="outline-text-3" id="text-orgac71b8c">
+<div id="outline-container-orgd23c731" class="outline-3">
+<h3 id="orgd23c731">Q190: Why is burst possible but limited?</h3>
+<div class="outline-text-3" id="text-orgd23c731">
 <p>
 Because the node can allow short spikes if capacity remains available.
 </p>
 </div>
 </div>
-<div id="outline-container-org397a238" class="outline-3">
-<h3 id="org397a238">Q191: What is a scheduler fit problem?</h3>
-<div class="outline-text-3" id="text-org397a238">
+<div id="outline-container-org5f4a846" class="outline-3">
+<h3 id="org5f4a846">Q191: What is a scheduler fit problem?</h3>
+<div class="outline-text-3" id="text-org5f4a846">
 <p>
 It happens when a pod cannot be scheduled because no node has enough requested resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcedecaa" class="outline-3">
-<h3 id="orgcedecaa">Q192: Why is careful CPU request budgeting important?</h3>
-<div class="outline-text-3" id="text-orgcedecaa">
+<div id="outline-container-org5ef0d5c" class="outline-3">
+<h3 id="org5ef0d5c">Q192: Why is careful CPU request budgeting important?</h3>
+<div class="outline-text-3" id="text-org5ef0d5c">
 <p>
 Because mis-sized CPU requests can cause under-scheduling or overutilization.
 </p>
 </div>
 </div>
-<div id="outline-container-org6336e39" class="outline-3">
-<h3 id="org6336e39">Q193: What is a high-concurrency app?</h3>
-<div class="outline-text-3" id="text-org6336e39">
+<div id="outline-container-org504831b" class="outline-3">
+<h3 id="org504831b">Q193: What is a high-concurrency app?</h3>
+<div class="outline-text-3" id="text-org504831b">
 <p>
 An app with many parallel workers or requests that may use bursts of CPU and memory.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a9e063" class="outline-3">
-<h3 id="org2a9e063">Q194: Why do bursty apps need careful limits?</h3>
-<div class="outline-text-3" id="text-org2a9e063">
+<div id="outline-container-org48e00b0" class="outline-3">
+<h3 id="org48e00b0">Q194: Why do bursty apps need careful limits?</h3>
+<div class="outline-text-3" id="text-org48e00b0">
 <p>
 Because they can be starved or killed if limits are too low and not aligned with traffic spikes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd23683e" class="outline-3">
-<h3 id="orgd23683e">Q195: What is a latency-sensitive workload?</h3>
-<div class="outline-text-3" id="text-orgd23683e">
+<div id="outline-container-orga47b1eb" class="outline-3">
+<h3 id="orga47b1eb">Q195: What is a latency-sensitive workload?</h3>
+<div class="outline-text-3" id="text-orga47b1eb">
 <p>
 It depends on low response time and stable resource availability.
 </p>
 </div>
 </div>
-<div id="outline-container-org4e96f0c" class="outline-3">
-<h3 id="org4e96f0c">Q196: Why do latency-sensitive apps need better resource reservations?</h3>
-<div class="outline-text-3" id="text-org4e96f0c">
+<div id="outline-container-orgae74f2f" class="outline-3">
+<h3 id="orgae74f2f">Q196: Why do latency-sensitive apps need better resource reservations?</h3>
+<div class="outline-text-3" id="text-orgae74f2f">
 <p>
 Because if they do not have enough resources, they may queue or throttle and increase latency.
 </p>
 </div>
 </div>
-<div id="outline-container-org6557735" class="outline-3">
-<h3 id="org6557735">Q197: What is a low-latency memory profile?</h3>
-<div class="outline-text-3" id="text-org6557735">
+<div id="outline-container-orgc8082d2" class="outline-3">
+<h3 id="orgc8082d2">Q197: What is a low-latency memory profile?</h3>
+<div class="outline-text-3" id="text-orgc8082d2">
 <p>
 It often requires more predictability and less aggressive overcommit.
 </p>
 </div>
 </div>
-<div id="outline-container-org151d106" class="outline-3">
-<h3 id="org151d106">Q198: Why is CPU limit too low a common production issue?</h3>
-<div class="outline-text-3" id="text-org151d106">
+<div id="outline-container-org25e4a06" class="outline-3">
+<h3 id="org25e4a06">Q198: Why is CPU limit too low a common production issue?</h3>
+<div class="outline-text-3" id="text-org25e4a06">
 <p>
 Because apps can degrade under load and appear “slow” even though they are still running.
 </p>
 </div>
 </div>
-<div id="outline-container-orga281e7c" class="outline-3">
-<h3 id="orga281e7c">Q199: What is the relationship between resource limits and autoscaling?</h3>
-<div class="outline-text-3" id="text-orga281e7c">
+<div id="outline-container-orgd688fa5" class="outline-3">
+<h3 id="orgd688fa5">Q199: What is the relationship between resource limits and autoscaling?</h3>
+<div class="outline-text-3" id="text-orgd688fa5">
 <p>
 Autoscaling decides scale-out based on load, while limits decide how much each pod can consume before throttling or OOM.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b0bc23" class="outline-3">
-<h3 id="org4b0bc23">Q200: What is the main lesson of Kubernetes resource limits?</h3>
-<div class="outline-text-3" id="text-org4b0bc23">
+<div id="outline-container-orgb7d3833" class="outline-3">
+<h3 id="orgb7d3833">Q200: What is the main lesson of Kubernetes resource limits?</h3>
+<div class="outline-text-3" id="text-orgb7d3833">
 <p>
 Resource limits are about safety, scheduling correctness, and cluster health; requests reserve capacity, limits cap usage, and both must be based on real workload behavior to keep the cluster stable and the app reliable.
 </p>
