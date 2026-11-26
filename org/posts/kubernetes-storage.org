@@ -8,7 +8,1074 @@
 
 * Kubernetes Storage
 
+[[https://kubernetes.io/docs/concepts/storage/][Kubernetes Storage Documentation]]
+
 -----
+
+* Kubernetes Storage Command Handbook:
+
+*1. PersistentVolumes (PV) Management*
+
+#+BEGIN_SRC bash
+
+# List PersistentVolumes
+kubectl get pv
+
+# List PersistentVolumes with additional details
+kubectl get pv -o wide
+
+# Describe a PersistentVolume
+kubectl describe pv pv-name
+
+# Display PV YAML
+kubectl get pv pv-name -o yaml
+
+# Display PV capacity
+kubectl get pv pv-name -o jsonpath='{.spec.capacity.storage}'
+
+# Display PV access modes
+kubectl get pv pv-name -o jsonpath='{.spec.accessModes}'
+
+# Display PV reclaim policy
+kubectl get pv pv-name -o jsonpath='{.spec.persistentVolumeReclaimPolicy}'
+
+# Display PV status
+kubectl get pv pv-name -o jsonpath='{.status.phase}'
+
+# Display PV storage class
+kubectl get pv pv-name -o jsonpath='{.spec.storageClassName}'
+
+# Display PV claim reference
+kubectl get pv pv-name -o jsonpath='{.spec.claimRef}'
+
+# Display PV labels
+kubectl get pv --show-labels
+
+# Delete a PersistentVolume
+kubectl delete pv pv-name
+
+# Watch PersistentVolumes
+kubectl get pv -w
+#+END_SRC
+
+*2. PersistentVolumeClaims (PVC) Management*
+
+#+BEGIN_SRC bash
+
+# List PVCs in current namespace
+kubectl get pvc
+
+# List PVCs across namespaces
+kubectl get pvc -A
+
+# Display PVC details
+kubectl get pvc -o wide
+
+# Describe PVC
+kubectl describe pvc pvc-name
+
+# Display PVC YAML
+kubectl get pvc pvc-name -o yaml
+
+# Display PVC status
+kubectl get pvc pvc-name -o jsonpath='{.status.phase}'
+
+# Display requested storage capacity
+kubectl get pvc pvc-name -o jsonpath='{.spec.resources.requests.storage}'
+
+# Display bound PV
+kubectl get pvc pvc-name -o jsonpath='{.spec.volumeName}'
+
+# Display PVC access modes
+kubectl get pvc pvc-name -o jsonpath='{.spec.accessModes}'
+
+# Display PVC storage class
+kubectl get pvc pvc-name -o jsonpath='{.spec.storageClassName}'
+
+# Watch PVC changes
+kubectl get pvc -w
+
+# Delete PVC
+kubectl delete pvc pvc-name
+
+# Delete all PVCs in current namespace
+kubectl delete pvc --all
+#+END_SRC
+
+*3. StorageClass Management*
+
+#+BEGIN_SRC bash
+
+# List StorageClasses
+kubectl get storageclass
+kubectl get sc
+
+# Display StorageClasses with additional details
+kubectl get sc -o wide
+
+# Describe StorageClass
+kubectl describe storageclass storage-class-name
+
+# Display StorageClass YAML
+kubectl get sc storage-class-name -o yaml
+
+# Display StorageClass provisioner
+kubectl get sc storage-class-name -o jsonpath='{.provisioner}'
+
+# Display reclaim policy
+kubectl get sc storage-class-name -o jsonpath='{.reclaimPolicy}'
+
+# Display volume binding mode
+kubectl get sc storage-class-name -o jsonpath='{.volumeBindingMode}'
+
+# Display allowVolumeExpansion setting
+kubectl get sc storage-class-name -o jsonpath='{.allowVolumeExpansion}'
+
+# Display default StorageClass
+kubectl get sc -o custom-columns=NAME:.metadata.name,DEFAULT:.metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class
+
+# Set default StorageClass
+kubectl patch storageclass standard \
+  -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+# Remove default StorageClass annotation
+kubectl patch storageclass standard \
+  -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+
+# Delete StorageClass
+kubectl delete storageclass storage-class-name
+
+#+END_SRC
+
+*4. Creating PersistentVolumes & PVCs*
+
+#+BEGIN_SRC bash
+
+# Apply PV manifest
+kubectl apply -f pv.yaml
+
+# Apply PVC manifest
+kubectl apply -f pvc.yaml
+
+# Apply both manifests
+kubectl apply -f storage.yaml
+
+# Create PVC from YAML
+kubectl create -f pvc.yaml
+
+# Generate PVC YAML without creating it
+kubectl create -f pvc.yaml --dry-run=client -o yaml
+
+# Check PV and PVC binding
+kubectl get pv,pvc
+
+# Describe PVC
+kubectl describe pvc my-pvc
+
+# Check PVC events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# Delete PVC
+kubectl delete pvc my-pvc
+
+# Delete PV
+kubectl delete pv my-pv
+
+#+END_SRC
+
+*5. Dynamic & Static Provisioning*
+
+#+BEGIN_SRC bash
+
+# List available StorageClasses
+kubectl get sc
+
+# List existing PVs
+kubectl get pv
+
+# List PVCs
+kubectl get pvc
+
+# Create PVC using dynamic provisioning
+kubectl apply -f dynamic-pvc.yaml
+
+# Monitor dynamic provisioning
+kubectl get pvc -w
+
+# Describe dynamically provisioned PVC
+kubectl describe pvc dynamic-pvc
+
+# Check automatically created PV
+kubectl get pv
+
+# Apply statically provisioned PV
+kubectl apply -f static-pv.yaml
+
+# Apply PVC for static PV
+kubectl apply -f static-pvc.yaml
+
+# Check PV and PVC binding
+kubectl get pv,pvc
+
+# Inspect provisioner events
+kubectl describe pvc my-pvc
+
+#+END_SRC
+
+*6. Storage Access Modes & Volume Modes*
+
+#+BEGIN_SRC bash
+
+# Display PVC access modes
+kubectl get pvc my-pvc -o jsonpath='{.spec.accessModes}'
+
+# Display PV access modes
+kubectl get pv my-pv -o jsonpath='{.spec.accessModes}'
+
+# Display PVC volume mode
+kubectl get pvc my-pvc -o jsonpath='{.spec.volumeMode}'
+
+# Display PV volume mode
+kubectl get pv my-pv -o jsonpath='{.spec.volumeMode}'
+
+# Display PVC YAML
+kubectl get pvc my-pvc -o yaml
+
+# Display PV YAML
+kubectl get pv my-pv -o yaml
+
+# Inspect volume attachment objects
+kubectl get volumeattachments
+
+# Describe VolumeAttachment
+kubectl describe volumeattachment attachment-name
+
+#+END_SRC
+
+Common access modes:
+
+| Access Mode | Meaning |
+|---|---|
+| RWO | ReadWriteOnce – read/write mounting from one node |
+| ROX | ReadOnlyMany – read-only mounting from multiple nodes |
+| RWX | ReadWriteMany – read/write mounting from multiple nodes |
+| RWOP | ReadWriteOncePod – read/write mounting by a single Pod |
+
+Note: Access modes describe supported mounting capabilities, not application-level locking or data consistency. Actual support depends on the storage driver.
+
+*7. Mounting PVCs into Pods*
+
+#+BEGIN_SRC bash
+
+# Apply Pod manifest with PVC
+kubectl apply -f pod-pvc.yaml
+
+# List Pods
+kubectl get pods
+
+# Describe Pod
+kubectl describe pod storage-pod
+
+# Display Pod volumes
+kubectl get pod storage-pod -o jsonpath='{.spec.volumes}'
+
+# Display container volume mounts
+kubectl get pod storage-pod -o jsonpath='{.spec.containers[*].volumeMounts}'
+
+# Display mounted files
+kubectl exec storage-pod -- ls -la /data
+
+# Create a test file
+kubectl exec storage-pod -- touch /data/test.txt
+
+# Verify file
+kubectl exec storage-pod -- ls -l /data
+
+# Display filesystem usage
+kubectl exec storage-pod -- df -h /data
+
+# Delete Pod
+kubectl delete pod storage-pod
+
+#+END_SRC
+
+*8. StatefulSets & VolumeClaimTemplates*
+
+#+BEGIN_SRC bash
+
+# List StatefulSets
+kubectl get statefulsets
+kubectl get sts
+
+# Apply StatefulSet manifest
+kubectl apply -f statefulset.yaml
+
+# Describe StatefulSet
+kubectl describe statefulset database
+
+# Display StatefulSet YAML
+kubectl get sts database -o yaml
+
+# Display StatefulSet Pods
+kubectl get pods -l app=database
+
+# List PVCs created by StatefulSet
+kubectl get pvc
+
+# Scale StatefulSet
+kubectl scale statefulset database --replicas=3
+
+# Check StatefulSet rollout
+kubectl rollout status statefulset/database
+
+# Display StatefulSet volume claim templates
+kubectl get sts database -o jsonpath='{.spec.volumeClaimTemplates[*].metadata.name}'
+
+# Delete StatefulSet
+kubectl delete statefulset database
+
+#+END_SRC
+
+Note: Deleting a StatefulSet does not automatically delete its associated PVCs. Check the PVC retention policy and underlying storage before removing them.
+
+*9. Storage Expansion & PVC Resizing*
+
+#+BEGIN_SRC bash
+
+# Check StorageClass expansion support
+kubectl get sc storage-class-name \
+  -o jsonpath='{.allowVolumeExpansion}'
+
+# Display current PVC capacity
+kubectl get pvc my-pvc
+
+# Display requested storage
+kubectl get pvc my-pvc \
+  -o jsonpath='{.spec.resources.requests.storage}'
+
+# Expand PVC to 20Gi
+kubectl patch pvc my-pvc \
+  -p '{"spec":{"resources":{"requests":{"storage":"20Gi"}}}}'
+
+# Display PVC status
+kubectl describe pvc my-pvc
+
+# Watch PVC resizing
+kubectl get pvc my-pvc -w
+
+# Display PV capacity
+kubectl get pv
+
+# Check filesystem capacity inside Pod
+kubectl exec storage-pod -- df -h /data
+
+# Check resize-related events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+#+END_SRC
+
+Note: PVC expansion requires StorageClass support and a compatible CSI driver. Filesystem expansion may happen online or require a Pod restart, depending on the driver and filesystem.
+
+*10. PersistentVolume Reclaim Policies*
+
+#+BEGIN_SRC bash
+
+# Display PV reclaim policy
+kubectl get pv my-pv \
+  -o jsonpath='{.spec.persistentVolumeReclaimPolicy}'
+
+# Display StorageClass reclaim policy
+kubectl get sc storage-class-name \
+  -o jsonpath='{.reclaimPolicy}'
+
+# Change PV reclaim policy to Retain
+kubectl patch pv my-pv \
+  -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+
+# Change PV reclaim policy to Delete
+kubectl patch pv my-pv \
+  -p '{"spec":{"persistentVolumeReclaimPolicy":"Delete"}}'
+
+# Check PV status
+kubectl get pv
+
+# Inspect released PV
+kubectl describe pv my-pv
+
+# List PVCs
+kubectl get pvc -A
+
+#+END_SRC
+
+Reclaim policies:
+
+| Policy | Behavior |
+|---|---|
+| Retain | Keeps underlying storage for manual recovery |
+| Delete | Deletes the underlying storage resource when supported |
+| Recycle | Deprecated legacy behavior; do not use for new workloads |
+
+Important: Changing a reclaim policy does not restore deleted data. Verify storage-backend behavior and backups before deleting PVCs or PVs.
+
+*11. Volume Snapshots*
+
+#+BEGIN_SRC bash
+
+# List VolumeSnapshot resources
+kubectl get volumesnapshots
+
+# List snapshots across namespaces
+kubectl get volumesnapshots -A
+
+# Describe VolumeSnapshot
+kubectl describe volumesnapshot snapshot-name
+
+# Display snapshot YAML
+kubectl get volumesnapshot snapshot-name -o yaml
+
+# List VolumeSnapshotClasses
+kubectl get volumesnapshotclass
+
+# Describe VolumeSnapshotClass
+kubectl describe volumesnapshotclass snapshot-class-name
+
+# List VolumeSnapshotContents
+kubectl get volumesnapshotcontents
+
+# Describe VolumeSnapshotContent
+kubectl describe volumesnapshotcontent content-name
+
+# Check snapshot status
+kubectl get volumesnapshot snapshot-name \
+  -o jsonpath='{.status.readyToUse}'
+
+# Check snapshot size
+kubectl get volumesnapshot snapshot-name \
+  -o jsonpath='{.status.restoreSize}'
+
+#+END_SRC
+
+*12. Creating & Restoring Volume Snapshots*
+
+#+BEGIN_SRC bash
+
+# Apply snapshot manifest
+kubectl apply -f volumesnapshot.yaml
+
+# Monitor snapshot creation
+kubectl get volumesnapshots -w
+
+# Describe snapshot
+kubectl describe volumesnapshot db-snapshot
+
+# Check snapshot readiness
+kubectl get volumesnapshot db-snapshot
+
+# Restore PVC from snapshot
+kubectl apply -f restore-pvc.yaml
+
+# Monitor restore operation
+kubectl get pvc -w
+
+# Verify restored PVC
+kubectl describe pvc restored-pvc
+
+# Mount restored PVC into a test Pod
+kubectl apply -f restore-test-pod.yaml
+
+# Verify restored data
+kubectl exec restore-test-pod -- ls -la /data
+
+#+END_SRC
+
+Example VolumeSnapshot:
+
+#+BEGIN_SRC yaml
+
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: db-snapshot
+spec:
+  volumeSnapshotClassName: csi-snapshot-class
+  source:
+    persistentVolumeClaimName: db-pvc
+
+#+END_SRC
+
+Example PVC restored from a snapshot:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: restored-pvc
+spec:
+  storageClassName: standard
+  dataSource:
+    name: db-snapshot
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+#+END_SRC
+
+Note: The CSI snapshot controller, snapshot CRDs, and a compatible CSI driver must be installed. The requested restore capacity must be compatible with the snapshot's source volume and driver.
+
+*13. CSI Drivers & Volume Attachments*
+
+#+BEGIN_SRC bash
+
+# List CSI drivers
+kubectl get csidrivers
+
+# Describe CSI driver
+kubectl describe csidriver driver-name
+
+# Display CSI driver YAML
+kubectl get csidriver driver-name -o yaml
+
+# List CSI nodes
+kubectl get csinodes
+
+# Describe CSI node
+kubectl describe csinode node-name
+
+# Display CSI node drivers
+kubectl get csinode node-name -o yaml
+
+# List volume attachments
+kubectl get volumeattachments
+
+# Describe volume attachment
+kubectl describe volumeattachment attachment-name
+
+# List storage-related Pods
+kubectl get pods -A | grep -i csi
+
+# List CSI-related events
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+
+#+END_SRC
+
+*14. Ephemeral Volumes & emptyDir*
+
+#+BEGIN_SRC bash
+
+# Apply Pod with emptyDir volume
+kubectl apply -f emptydir-pod.yaml
+
+# Describe Pod
+kubectl describe pod emptydir-pod
+
+# Display volume information
+kubectl get pod emptydir-pod -o yaml
+
+# Create temporary file
+kubectl exec emptydir-pod -- touch /cache/test.txt
+
+# List temporary files
+kubectl exec emptydir-pod -- ls -la /cache
+
+# Check emptyDir filesystem usage
+kubectl exec emptydir-pod -- df -h /cache
+
+# Delete Pod
+kubectl delete pod emptydir-pod
+
+#+END_SRC
+
+Example emptyDir volume:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: emptydir-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: cache
+          mountPath: /cache
+  volumes:
+    - name: cache
+      emptyDir:
+        sizeLimit: 1Gi
+
+#+END_SRC
+
+*15. Local Persistent Volumes*
+
+#+BEGIN_SRC bash
+
+# List local PVs
+kubectl get pv
+
+# Describe local PV
+kubectl describe pv local-pv
+
+# Display local PV node affinity
+kubectl get pv local-pv \
+  -o jsonpath='{.spec.nodeAffinity}'
+
+# Display local PV path
+kubectl get pv local-pv \
+  -o jsonpath='{.spec.local.path}'
+
+# Display nodes
+kubectl get nodes -o wide
+
+# Describe node
+kubectl describe node node-name
+
+# Display PV topology
+kubectl get pv local-pv -o yaml
+
+# List PVCs bound to local PVs
+kubectl get pvc -A
+
+#+END_SRC
+
+Example local PersistentVolume:
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/disks/vol1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - worker-node-1
+
+#+END_SRC
+
+*16. Storage Scheduling & Topology*
+
+#+BEGIN_SRC bash
+
+# Display PV node affinity
+kubectl get pv pv-name -o yaml
+
+# Display node labels
+kubectl get nodes --show-labels
+
+# Display node zones
+kubectl get nodes \
+  -L topology.kubernetes.io/zone
+
+# Display node regions
+kubectl get nodes \
+  -L topology.kubernetes.io/region
+
+# Display PVC binding mode
+kubectl get sc storage-class-name \
+  -o jsonpath='{.volumeBindingMode}'
+
+# List pending PVCs
+kubectl get pvc -A --field-selector=status.phase=Pending
+
+# Describe pending PVC
+kubectl describe pvc pvc-name
+
+# Display Pod scheduling events
+kubectl describe pod pod-name
+
+# Display PV topology
+kubectl get pv pv-name -o yaml
+
+# Display StorageClass topology parameters
+kubectl get sc storage-class-name -o yaml
+
+#+END_SRC
+
+*17. Storage Performance & Monitoring*
+
+#+BEGIN_SRC bash
+
+# Display node resource usage
+kubectl top nodes
+
+# Display Pod resource usage
+kubectl top pods -A
+
+# Display Pod details
+kubectl describe pod pod-name
+
+# Check filesystem capacity inside Pod
+kubectl exec pod-name -- df -h
+
+# Display mounted filesystems
+kubectl exec pod-name -- mount
+
+# Display disk usage
+kubectl exec pod-name -- du -sh /data
+
+# Display directory usage
+kubectl exec pod-name -- du -h --max-depth=1 /data
+
+# Display disk information, if tools are available
+kubectl exec pod-name -- lsblk
+
+# List PVCs and their capacities
+kubectl get pvc -A
+
+# List PV capacities
+kubectl get pv
+
+# Inspect storage events
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+
+#+END_SRC
+
+Note: `kubectl top` reports CPU and memory, not disk IOPS or storage latency. For detailed storage performance monitoring, use CSI driver metrics, node exporter, Prometheus, or the storage provider's monitoring tools.
+
+*18. Storage Backup & Restore*
+
+#+BEGIN_SRC bash
+
+# List PVCs
+kubectl get pvc -A
+
+# List PVs
+kubectl get pv
+
+# List VolumeSnapshots
+kubectl get volumesnapshots -A
+
+# Describe PVC
+kubectl describe pvc my-pvc
+
+# Describe snapshot
+kubectl describe volumesnapshot my-snapshot
+
+# Check snapshot readiness
+kubectl get volumesnapshot my-snapshot
+
+# Restore PVC from snapshot
+kubectl apply -f restore-pvc.yaml
+
+# Monitor restored PVC
+kubectl get pvc -w
+
+# Verify restored volume
+kubectl describe pvc restored-pvc
+
+# Mount restored volume
+kubectl apply -f restore-test-pod.yaml
+
+# Verify restored files
+kubectl exec restore-test-pod -- ls -la /data
+
+#+END_SRC
+
+For application-consistent database backups, coordinate storage snapshots with database-native backup procedures or supported quiescing mechanisms. A volume snapshot alone is not necessarily a consistent database backup.
+
+*19. Storage Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# List PVCs across namespaces
+kubectl get pvc -A
+
+# List PVs
+kubectl get pv
+
+# List StorageClasses
+kubectl get sc
+
+# Inspect pending PVC
+kubectl describe pvc pvc-name
+
+# Inspect PV
+kubectl describe pv pv-name
+
+# Inspect StorageClass
+kubectl describe sc storage-class-name
+
+# Check storage-related events
+kubectl get events -A --sort-by=.metadata.creationTimestamp
+
+# Check Pod status
+kubectl get pods -A
+
+# Describe failing Pod
+kubectl describe pod pod-name
+
+# Inspect Pod logs
+kubectl logs pod-name
+
+# Check volume attachment status
+kubectl get volumeattachments
+
+# Inspect CSI drivers
+kubectl get csidrivers
+
+# Inspect CSI nodes
+kubectl get csinodes
+
+# Inspect CSI controller Pods
+kubectl get pods -A | grep -i csi
+
+# Inspect snapshot resources
+kubectl get volumesnapshots -A
+
+# Check filesystem capacity
+kubectl exec pod-name -- df -h
+
+#+END_SRC
+
+Common storage problems:
+
+| Error / Status | Possible Cause |
+|---|---|
+| `Pending` PVC | No compatible PV or provisioning failure |
+| `Lost` PVC | Bound PV is no longer available |
+| `FailedMount` | Volume mount or backend failure |
+| `FailedAttachVolume` | Volume attachment failure |
+| `Multi-Attach error` | Volume already attached to another node |
+| `MountVolume.SetUp failed` | Mount configuration or storage failure |
+| `WaitForFirstConsumer` | Waiting for a Pod scheduling decision |
+| `FileSystemResizePending` | Filesystem expansion still required |
+| `OutOfDisk` / disk pressure | Node storage capacity exhausted |
+| Snapshot not ready | CSI snapshot operation failed or is pending |
+
+*20. Real-World Kubernetes Storage Workflows*
+
+**A. Create persistent storage for an application**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f storage-class.yaml
+
+kubectl apply -f pvc.yaml
+
+kubectl get pvc
+
+kubectl get pv
+
+kubectl describe pvc app-pvc
+
+#+END_SRC
+
+**B. Mount persistent storage into a Pod**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f pod-pvc.yaml
+
+kubectl get pods
+
+kubectl describe pod storage-pod
+
+kubectl exec storage-pod -- ls -la /data
+
+kubectl exec storage-pod -- df -h /data
+
+#+END_SRC
+
+**C. Configure storage for a database**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f database-pvc.yaml
+
+kubectl apply -f database-statefulset.yaml
+
+kubectl get sts
+
+kubectl get pods
+
+kubectl get pvc
+
+kubectl rollout status statefulset/database
+
+#+END_SRC
+
+**D. Expand database storage**
+
+#+BEGIN_SRC bash
+
+kubectl get sc
+
+kubectl get pvc database-pvc
+
+kubectl patch pvc database-pvc \
+  -p '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'
+
+kubectl get pvc database-pvc -w
+
+kubectl describe pvc database-pvc
+
+#+END_SRC
+
+**E. Create a storage snapshot**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f volumesnapshot.yaml
+
+kubectl get volumesnapshots -w
+
+kubectl describe volumesnapshot db-snapshot
+
+kubectl get volumesnapshotcontents
+
+#+END_SRC
+
+**F. Restore data from a snapshot**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f restore-pvc.yaml
+
+kubectl get pvc -w
+
+kubectl describe pvc restored-pvc
+
+kubectl apply -f restore-test-pod.yaml
+
+kubectl exec restore-test-pod -- ls -la /data
+
+#+END_SRC
+
+**G. Troubleshoot a Pending PVC**
+
+#+BEGIN_SRC bash
+
+kubectl get pvc
+
+kubectl describe pvc pvc-name
+
+kubectl get pv
+
+kubectl get sc
+
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+#+END_SRC
+
+**H. Troubleshoot volume attachment**
+
+#+BEGIN_SRC bash
+
+kubectl get pods -o wide
+
+kubectl get pv
+
+kubectl get pvc
+
+kubectl get volumeattachments
+
+kubectl describe volumeattachment attachment-name
+
+#+END_SRC
+
+**I. Verify storage capacity**
+
+#+BEGIN_SRC bash
+
+kubectl get pvc -A
+
+kubectl get pv
+
+kubectl exec storage-pod -- df -h
+
+kubectl exec storage-pod -- du -sh /data
+
+#+END_SRC
+
+**J. Protect persistent data before maintenance**
+
+#+BEGIN_SRC bash
+
+kubectl get pvc -A
+
+kubectl get pv
+
+kubectl get volumesnapshots -A
+
+kubectl describe pvc database-pvc
+
+kubectl describe pv pv-name
+
+#+END_SRC
+
+*21. Commands Every Developer Should Memorize*
+
+| Command | Purpose |
+|---|---|
+| `kubectl get pv` | List PersistentVolumes |
+| `kubectl get pvc` | List PersistentVolumeClaims |
+| `kubectl get pvc -A` | List PVCs across namespaces |
+| `kubectl describe pv pv-name` | Inspect PersistentVolume |
+| `kubectl describe pvc pvc-name` | Inspect PersistentVolumeClaim |
+| `kubectl get sc` | List StorageClasses |
+| `kubectl describe sc storage-class-name` | Inspect StorageClass |
+| `kubectl get pv,pvc` | Display PV and PVC resources |
+| `kubectl get pv -o wide` | Display PV details |
+| `kubectl get pvc -o wide` | Display PVC details |
+| `kubectl apply -f pvc.yaml` | Create or update PVC |
+| `kubectl get pods -o wide` | Inspect Pod placement |
+| `kubectl exec pod-name -- df -h` | Check filesystem capacity |
+| `kubectl exec pod-name -- ls -la /data` | Inspect mounted storage |
+| `kubectl get sts` | List StatefulSets |
+| `kubectl scale statefulset database --replicas=3` | Scale StatefulSet |
+| `kubectl get csidrivers` | List CSI drivers |
+| `kubectl get csinodes` | List CSI nodes |
+| `kubectl get volumeattachments` | List volume attachments |
+| `kubectl get volumesnapshots -A` | List volume snapshots |
+| `kubectl get volumesnapshotclass` | List snapshot classes |
+| `kubectl get volumesnapshotcontents` | List snapshot contents |
+| `kubectl describe volumesnapshot snapshot-name` | Inspect snapshot |
+| `kubectl get pvc pvc-name -o yaml` | Display PVC configuration |
+| `kubectl get pv pv-name -o yaml` | Display PV configuration |
+| `kubectl get events -A` | Inspect storage-related events |
+| `kubectl get nodes -o wide` | Inspect storage node placement |
+| `kubectl top nodes` | Check node CPU and memory |
+| `kubectl top pods -A` | Check Pod CPU and memory |
+| `kubectl patch pvc pvc-name -p '{"spec":{"resources":{"requests":{"storage":"20Gi"}}}}'` | Expand PVC |
+| `kubectl patch pv pv-name -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'` | Change PV reclaim policy |
+
+**Important Storage Best Practices:**
+
+1. Use PVCs and StorageClasses instead of coupling applications directly to storage backends.
+2. Use dynamic provisioning where appropriate.
+3. Choose access modes according to the capabilities of the storage driver.
+4. Use `WaitForFirstConsumer` when topology-aware provisioning is required.
+5. Configure reclaim policies carefully to avoid accidental data deletion.
+6. Take regular backups and test restoration procedures.
+7. Use volume snapshots as one part of a complete backup strategy.
+8. Monitor PVC capacity, disk usage, IOPS, and storage latency.
+9. Encrypt sensitive data at rest and protect access to storage resources.
+10. Use StatefulSets and dedicated PVCs for workloads requiring stable storage identity.
+11. Validate storage expansion and recovery procedures before production use.
+12. Never assume that deleting a Pod, PVC, or StatefulSet has the same effect on the underlying data.
+
+    ---------
 
 * Beginner
 
