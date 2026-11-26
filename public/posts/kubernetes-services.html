@@ -23,275 +23,1443 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org60ee701" class="outline-2">
-<h2 id="org60ee701">Kubernetes Services</h2>
-<div class="outline-text-2" id="text-org60ee701">
+<div id="outline-container-org86be137" class="outline-2">
+<h2 id="org86be137">Kubernetes Services</h2>
+<div class="outline-text-2" id="text-org86be137">
+<p>
+<a href="https://kubernetes.io/docs/concepts/services-networking/service/">Kubernetes Services</a>
+</p>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-org2e15fb8" class="outline-2">
-<h2 id="org2e15fb8">Beginner</h2>
-<div class="outline-text-2" id="text-org2e15fb8">
+<div id="outline-container-org206c84a" class="outline-2">
+<h2 id="org206c84a">Kubernetes Services Command Handbook:</h2>
+<div class="outline-text-2" id="text-org206c84a">
+<p>
+<b>1. Service Discovery &amp; Inspection</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services in current namespace
+</span>kubectl get services
+kubectl get svc
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services across all namespaces
+</span>kubectl get svc -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display services with additional information
+</span>kubectl get svc -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a service
+</span>kubectl describe service nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service YAML
+</span>kubectl get service nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service as JSON
+</span>kubectl get service nginx -o json
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Get services with labels
+</span>kubectl get svc --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Filter services by label
+</span>kubectl get svc -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch service changes
+</span>kubectl get svc -w
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services in a specific namespace
+</span>kubectl get svc -n production
+
+</code></pre>
 </div>
-<div id="outline-container-orgcd1268c" class="outline-3">
-<h3 id="orgcd1268c">Q1: What is a Kubernetes Service?</h3>
-<div class="outline-text-3" id="text-orgcd1268c">
+
+<p>
+<b>2. Creating Kubernetes Services</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a ClusterIP service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-service <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a service with a target port
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-service <span style="font-style: italic;">\</span>
+  --port=80 <span style="font-style: italic;">\</span>
+  --target-port=8080
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a NodePort service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-nodeport <span style="font-style: italic;">\</span>
+  --type=NodePort <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a LoadBalancer service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-lb <span style="font-style: italic;">\</span>
+  --type=LoadBalancer <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a service with a specific namespace
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-service <span style="font-style: italic;">\</span>
+  --port=80 <span style="font-style: italic;">\</span>
+  -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate Service YAML without creating it
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --port=80 <span style="font-style: italic;">\</span>
+  --dry-run=client <span style="font-style: italic;">\</span>
+  -o yaml
+
+</code></pre>
+</div>
+
+<p>
+<b>3. Service Types</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ClusterIP service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --type=ClusterIP <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create NodePort service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --type=NodePort <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create LoadBalancer service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --type=LoadBalancer <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Change Service type to NodePort
+</span>kubectl patch service nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"type":"NodePort"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Change Service type to LoadBalancer
+</span>kubectl patch service nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"type":"LoadBalancer"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Change Service type to ClusterIP
+</span>kubectl patch service nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"type":"ClusterIP"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Service type
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.type}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Service types:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">ClusterIP</td>
+<td class="org-left">Internal cluster communication</td>
+</tr>
+
+<tr>
+<td class="org-left">NodePort</td>
+<td class="org-left">Exposes service through node ports</td>
+</tr>
+
+<tr>
+<td class="org-left">LoadBalancer</td>
+<td class="org-left">Exposes service through an external load balancer</td>
+</tr>
+
+<tr>
+<td class="org-left">ExternalName</td>
+<td class="org-left">Maps service to an external DNS hostname</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>4. Service Ports &amp; Target Ports</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service ports
+</span>kubectl get svc nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display port configuration
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service port
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports[*].port}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display target port
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports[*].targetPort}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display NodePort
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports[*].nodePort}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service protocol
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports[*].protocol}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Patch service target port
+</span>kubectl patch svc nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"ports":[{"port":80,"targetPort":8080}]}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe service port mappings
+</span>kubectl describe svc nginx
+
+</code></pre>
+</div>
+
+<p>
+<b>5. Service Selectors &amp; Labels</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod labels
+</span>kubectl get pods --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service selectors
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.selector}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List pods matching a label
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add label to a pod
+</span>kubectl label pod nginx-pod <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update existing pod label
+</span>kubectl label pod nginx-pod <span style="font-weight: bold; font-style: italic;">app</span>=frontend --overwrite
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a pod label
+</span>kubectl label pod nginx-pod app-
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service selector and matching pods
+</span>kubectl describe svc nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find pods selected by a service
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service and pod labels
+</span>kubectl get svc,pods --show-labels
+
+</code></pre>
+</div>
+
+<p>
+<b>6. Endpoints &amp; EndpointSlices</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List endpoints
+</span>kubectl get endpoints
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List endpoints in all namespaces
+</span>kubectl get endpoints -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe service endpoints
+</span>kubectl describe endpoints nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display endpoint details
+</span>kubectl get endpoints nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List EndpointSlices
+</span>kubectl get endpointslices
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List EndpointSlices in all namespaces
+</span>kubectl get endpointslices -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe EndpointSlice
+</span>kubectl describe endpointslice endpointslice-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display EndpointSlice YAML
+</span>kubectl get endpointslice endpointslice-name -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find EndpointSlices associated with a service
+</span>kubectl get endpointslices <span style="font-style: italic;">\</span>
+  -l kubernetes.io/service-name=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display endpoint addresses
+</span>kubectl get endpoints nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.subsets[*].addresses[*].ip}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display endpoint ports
+</span>kubectl get endpoints nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.subsets[*].ports[*].port}'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b>7. Service DNS &amp; Service Discovery</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service DNS configuration
+</span>kubectl get svc nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run temporary DNS debugging container
+</span>kubectl run dns-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- nslookup nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resolve service in the same namespace
+</span>kubectl run dns-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- nslookup nginx.default.svc.cluster.local
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resolve service in another namespace
+</span>kubectl run dns-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- nslookup nginx.production.svc.cluster.local
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display DNS configuration inside a pod
+</span>kubectl exec -it pod-name -- cat /etc/resolv.conf
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display CoreDNS pods
+</span>kubectl get pods -n kube-system -l k8s-app=kube-dns
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display CoreDNS service
+</span>kubectl get svc -n kube-system kube-dns
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display CoreDNS logs
+</span>kubectl logs -n kube-system <span style="font-style: italic;">\</span>
+  -l k8s-app=kube-dns
+
+</code></pre>
+</div>
+
+<p>
+<b>8. Headless Services</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List headless services
+</span>kubectl get svc -A <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,CLUSTER-IP:.spec.clusterIP
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a specific headless service
+</span>kubectl describe svc my-headless-service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display headless service YAML
+</span>kubectl get svc my-headless-service -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create headless service from YAML
+</span>kubectl apply -f headless-service.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resolve headless service DNS
+</span>kubectl run dns-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- nslookup my-headless-service.default.svc.cluster.local
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete headless service
+</span>kubectl delete svc my-headless-service
+
+</code></pre>
+</div>
+
+<p>
+A headless Service uses `clusterIP: None` and provides DNS records for individual backend Pods instead of a virtual ClusterIP.
+</p>
+
+<p>
+<b>9. ExternalName &amp; Selectorless Services</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ExternalName service
+</span>kubectl create service externalname external-api <span style="font-style: italic;">\</span>
+  --external-name=api.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ExternalName service
+</span>kubectl get svc external-api -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe ExternalName service
+</span>kubectl describe svc external-api
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create selectorless service from YAML
+</span>kubectl apply -f selectorless-service.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services without selectors
+</span>kubectl get svc -o json
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service selectors
+</span>kubectl get svc <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,SELECTOR:.spec.selector
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List manually managed endpoints
+</span>kubectl get endpoints
+
+</code></pre>
+</div>
+
+<p>
+Note: Selectorless Services can use manually managed EndpointSlices to connect to external backends. Kubernetes does not automatically create EndpointSlices for selectorless Services.
+</p>
+
+<p>
+<b>10. Session Affinity &amp; Traffic Policies</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display session affinity
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.sessionAffinity}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Enable ClientIP session affinity
+</span>kubectl patch svc nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"sessionAffinity":"ClientIP"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Disable session affinity
+</span>kubectl patch svc nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"sessionAffinity":"None"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display session affinity timeout
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.sessionAffinityConfig}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display external traffic policy
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.externalTrafficPolicy}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set external traffic policy to Local
+</span>kubectl patch svc nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"externalTrafficPolicy":"Local"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set external traffic policy to Cluster
+</span>kubectl patch svc nginx <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"externalTrafficPolicy":"Cluster"}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display internal traffic policy
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.internalTrafficPolicy}'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b>11. Ingress &amp; Service Integration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress resources
+</span>kubectl get ingress
+kubectl get ing
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress resources across namespaces
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe Ingress
+</span>kubectl describe ingress my-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Ingress YAML
+</span>kubectl get ingress my-ingress -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe IngressClass
+</span>kubectl describe ingressclass nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Ingress manifest
+</span>kubectl apply -f ingress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display backend service information
+</span>kubectl describe ingress my-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Ingress
+</span>kubectl delete ingress my-ingress
+
+</code></pre>
+</div>
+
+<p>
+Example Ingress manifest:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<p>
+Note: An Ingress resource requires a compatible Ingress controller to implement its routing rules.
+</p>
+
+<p>
+<b>12. Service Networking &amp; Port Forwarding</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward local port to a service
+</span>kubectl port-forward svc/nginx 8080:80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward local port to a pod
+</span>kubectl port-forward pod/nginx-pod 8080:80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward local port to a deployment
+</span>kubectl port-forward deployment/nginx 8080:80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward on a specific local address
+</span>kubectl port-forward --address 127.0.0.1 svc/nginx 8080:80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward multiple ports
+</span>kubectl port-forward svc/nginx 8080:80 8443:443
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service ClusterIP
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.clusterIP}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node IP addresses
+</span>kubectl get nodes -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display NodePort
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports[*].nodePort}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test service connectivity from a temporary container
+</span>kubectl run curl-test <span style="font-style: italic;">\</span>
+  --image=curlimages/curl <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- curl -v http://nginx
+
+</code></pre>
+</div>
+
+<p>
+<b>13. NetworkPolicy &amp; Service Security</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List NetworkPolicies
+</span>kubectl get networkpolicies
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List NetworkPolicies across namespaces
+</span>kubectl get networkpolicies -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe NetworkPolicy
+</span>kubectl describe networkpolicy policy-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display NetworkPolicy YAML
+</span>kubectl get networkpolicy policy-name -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply NetworkPolicy
+</span>kubectl apply -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete NetworkPolicy
+</span>kubectl delete networkpolicy policy-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pods with labels
+</span>kubectl get pods --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service connectivity from a test pod
+</span>kubectl exec -it test-pod -- <span style="font-style: italic;">\</span>
+  curl -v http://nginx-service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service namespace
+</span>kubectl get svc nginx -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.metadata.namespace}'</span>
+
+</code></pre>
+</div>
+
+<p>
+Note: NetworkPolicies select Pods, not Service objects directly. Their enforcement depends on whether the cluster networking implementation supports NetworkPolicy.
+</p>
+
+<p>
+<b>14. Service Troubleshooting</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service status
+</span>kubectl get svc
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe service
+</span>kubectl describe svc nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service endpoints
+</span>kubectl get endpoints nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check EndpointSlices
+</span>kubectl get endpointslices <span style="font-style: italic;">\</span>
+  -l kubernetes.io/service-name=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check selected pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pod readiness
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod details
+</span>kubectl describe pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect pod logs
+</span>kubectl logs pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check recent events
+</span>kubectl get events <span style="font-style: italic;">\</span>
+  --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service selectors
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.selector}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service ports
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ports}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test DNS resolution
+</span>kubectl run dns-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- nslookup nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTP connectivity
+</span>kubectl run curl-test <span style="font-style: italic;">\</span>
+  --image=curlimages/curl <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- curl -v http://nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check CoreDNS logs
+</span>kubectl logs -n kube-system <span style="font-style: italic;">\</span>
+  -l k8s-app=kube-dns
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check kube-proxy pods, if deployed
+</span>kubectl get pods -n kube-system <span style="font-style: italic;">\</span>
+  -l k8s-app=kube-proxy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service configuration
+</span>kubectl get svc nginx -o yaml
+
+</code></pre>
+</div>
+
+<p>
+Common Service problems:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Problem</th>
+<th scope="col" class="org-left">Possible Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">No endpoints</td>
+<td class="org-left">Selector does not match Pods</td>
+</tr>
+
+<tr>
+<td class="org-left">Connection refused</td>
+<td class="org-left">Application not listening on target port</td>
+</tr>
+
+<tr>
+<td class="org-left">Connection timeout</td>
+<td class="org-left">NetworkPolicy or networking issue</td>
+</tr>
+
+<tr>
+<td class="org-left">DNS resolution failure</td>
+<td class="org-left">CoreDNS or DNS configuration issue</td>
+</tr>
+
+<tr>
+<td class="org-left">NodePort unavailable</td>
+<td class="org-left">Incorrect port, firewall, or node networking</td>
+</tr>
+
+<tr>
+<td class="org-left">LoadBalancer pending</td>
+<td class="org-left">Cloud provider or load balancer integration issue</td>
+</tr>
+
+<tr>
+<td class="org-left">503 from Ingress</td>
+<td class="org-left">Missing or unhealthy backend endpoints</td>
+</tr>
+
+<tr>
+<td class="org-left">Intermittent failures</td>
+<td class="org-left">Unready Pods or application instability</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>15. Service Scaling &amp; High Availability</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale deployment behind a service
+</span>kubectl scale deployment nginx --replicas=3
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service backends
+</span>kubectl get endpoints nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display backend pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check deployment rollout
+</span>kubectl rollout status deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment
+</span>kubectl rollout restart deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check readiness status
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display PodDisruptionBudgets
+</span>kubectl get pdb
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe PodDisruptionBudget
+</span>kubectl describe pdb
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service topology configuration
+</span>kubectl get svc nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service traffic distribution
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.trafficDistribution}'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b>16. Advanced Service Operations</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Service API schema
+</span>kubectl explain service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Service specification
+</span>kubectl explain service.spec
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Service ports schema
+</span>kubectl explain service.spec.ports
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Service selectors schema
+</span>kubectl explain service.spec.selector
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List service-related API resources
+</span>kubectl api-resources | grep -i service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all Services in YAML
+</span>kubectl get svc -A -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all EndpointSlices
+</span>kubectl get endpointslices -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service IP families
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ipFamilies}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display IP family policy
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.ipFamilyPolicy}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display allocated ClusterIP
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.clusterIP}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display allocated ClusterIPs
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.clusterIPs}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service annotations
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.metadata.annotations}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service labels
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service creation timestamp
+</span>kubectl get svc nginx <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.metadata.creationTimestamp}'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b>17. Real-World Kubernetes Services Workflows</b>
+</p>
+
+<p>
+<b><b>A. Create an application and expose it internally</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl create deployment nginx --image=nginx
+
+kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-service <span style="font-style: italic;">\</span>
+  --type=ClusterIP <span style="font-style: italic;">\</span>
+  --port=80
+
+kubectl get svc
+kubectl get endpoints nginx-service
+
+</code></pre>
+</div>
+
+<p>
+<b><b>B. Expose an application externally</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --name=nginx-service <span style="font-style: italic;">\</span>
+  --type=LoadBalancer <span style="font-style: italic;">\</span>
+  --port=80 <span style="font-style: italic;">\</span>
+  --target-port=80
+
+kubectl get svc nginx-service -w
+
+</code></pre>
+</div>
+
+<p>
+<b><b>C. Troubleshoot a Service without endpoints</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl get svc nginx-service
+
+kubectl describe svc nginx-service
+
+kubectl get endpoints nginx-service
+
+kubectl get pods --show-labels
+
+kubectl get svc nginx-service <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.spec.selector}'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b><b>D. Test Service DNS between namespaces</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl run dns-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- nslookup nginx-service.production.svc.cluster.local
+
+</code></pre>
+</div>
+
+<p>
+<b><b>E. Configure session affinity</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl patch svc nginx-service <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"sessionAffinity":"ClientIP"}}'</span>
+
+kubectl describe svc nginx-service
+
+</code></pre>
+</div>
+
+<p>
+<b><b>F. Debug Service connectivity</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl get svc nginx-service
+
+kubectl get endpoints nginx-service
+
+kubectl get pods -o wide
+
+kubectl run curl-test <span style="font-style: italic;">\</span>
+  --image=curlimages/curl <span style="font-style: italic;">\</span>
+  -it --rm <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- curl -v http://nginx-service
+
+</code></pre>
+</div>
+
+<p>
+<b><b>G. Configure an Ingress backend</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl apply -f service.yaml
+
+kubectl apply -f ingress.yaml
+
+kubectl get svc
+
+kubectl get ingress
+
+kubectl describe ingress app-ingress
+
+</code></pre>
+</div>
+
+<p>
+<b><b>H. Create a headless Service for StatefulSet</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl apply -f headless-service.yaml
+
+kubectl apply -f statefulset.yaml
+
+kubectl get svc
+
+kubectl get pods
+
+kubectl get endpoints
+
+</code></pre>
+</div>
+
+<p>
+<b><b>I. Switch Service from ClusterIP to LoadBalancer</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl patch svc nginx-service <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"type":"LoadBalancer"}}'</span>
+
+kubectl get svc nginx-service -w
+
+</code></pre>
+</div>
+
+<p>
+<b><b>J. Verify Service health</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl get svc -A
+
+kubectl get endpoints -A
+
+kubectl get endpointslices -A
+
+kubectl get pods -A
+
+kubectl get events -A <span style="font-style: italic;">\</span>
+  --sort-by=.metadata.creationTimestamp
+
+</code></pre>
+</div>
+
+<p>
+<b>18. Kubernetes Services Commands Every Developer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`kubectl get svc`</td>
+<td class="org-left">List Services</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc -A`</td>
+<td class="org-left">List Services across namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl describe svc nginx`</td>
+<td class="org-left">Inspect Service</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o yaml`</td>
+<td class="org-left">Display Service YAML</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl expose deployment nginx &ndash;port=80`</td>
+<td class="org-left">Create ClusterIP Service</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get endpoints`</td>
+<td class="org-left">List Service endpoints</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get endpointslices`</td>
+<td class="org-left">List EndpointSlices</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get pods &ndash;show-labels`</td>
+<td class="org-left">Display Pod labels</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc &ndash;show-labels`</td>
+<td class="org-left">Display Service labels</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get pods -l app=nginx`</td>
+<td class="org-left">Filter Pods by label</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o json`</td>
+<td class="org-left">Display Service JSON</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get ingress`</td>
+<td class="org-left">List Ingress resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl describe ingress my-ingress`</td>
+<td class="org-left">Inspect Ingress</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get networkpolicies`</td>
+<td class="org-left">List NetworkPolicies</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o wide`</td>
+<td class="org-left">Display additional Service information</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl port-forward svc/nginx 8080:80`</td>
+<td class="org-left">Forward local traffic to Service</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o jsonpath='{.spec.clusterIP}'`</td>
+<td class="org-left">Display ClusterIP</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o jsonpath='{.spec.ports[*].nodePort}'`</td>
+<td class="org-left">Display NodePort</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o jsonpath='{.spec.selector}'`</td>
+<td class="org-left">Display Service selector</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc nginx -o jsonpath='{.spec.type}'`</td>
+<td class="org-left">Display Service type</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get svc -w`</td>
+<td class="org-left">Watch Service changes</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get endpoints nginx`</td>
+<td class="org-left">Check Service backends</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get endpointslices -l kubernetes.io/service-name=nginx`</td>
+<td class="org-left">Find Service EndpointSlices</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get events -A`</td>
+<td class="org-left">Inspect cluster events</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl explain service`</td>
+<td class="org-left">Explore Service API schema</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Important: Always verify Service selectors, Pod readiness, target ports, endpoints, and network policies when troubleshooting connectivity. Before changing Service types or traffic policies in production, check the impact on external load balancers and application clients.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org971cfa3" class="outline-2">
+<h2 id="org971cfa3">Beginner</h2>
+<div class="outline-text-2" id="text-org971cfa3">
+</div>
+<div id="outline-container-org6567b17" class="outline-3">
+<h3 id="org6567b17">Q1: What is a Kubernetes Service?</h3>
+<div class="outline-text-3" id="text-org6567b17">
 <p>
 A Kubernetes Service is an abstraction that defines a stable network identity and routing policy for a set of Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe4cd64" class="outline-3">
-<h3 id="orgbe4cd64">Q2: Why do we need Services in Kubernetes?</h3>
-<div class="outline-text-3" id="text-orgbe4cd64">
+<div id="outline-container-org6b68129" class="outline-3">
+<h3 id="org6b68129">Q2: Why do we need Services in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org6b68129">
 <p>
 Pods are ephemeral and often have dynamic IPs. Services provide a stable endpoint for clients to connect to.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c80d9f" class="outline-3">
-<h3 id="org0c80d9f">Q3: What is a Pod IP?</h3>
-<div class="outline-text-3" id="text-org0c80d9f">
+<div id="outline-container-org44b1775" class="outline-3">
+<h3 id="org44b1775">Q3: What is a Pod IP?</h3>
+<div class="outline-text-3" id="text-org44b1775">
 <p>
 A Pod IP is the IP address assigned to a pod, which can change when the pod is recreated.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc4601b6" class="outline-3">
-<h3 id="orgc4601b6">Q4: Why are Pod IPs not stable?</h3>
-<div class="outline-text-3" id="text-orgc4601b6">
+<div id="outline-container-org8cd93c5" class="outline-3">
+<h3 id="org8cd93c5">Q4: Why are Pod IPs not stable?</h3>
+<div class="outline-text-3" id="text-org8cd93c5">
 <p>
 Pods may be rescheduled, restarted, scaled, or replaced, which can change their IP addresses.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d78833" class="outline-3">
-<h3 id="org1d78833">Q5: What is service discovery?</h3>
-<div class="outline-text-3" id="text-org1d78833">
+<div id="outline-container-org7b9b4d5" class="outline-3">
+<h3 id="org7b9b4d5">Q5: What is service discovery?</h3>
+<div class="outline-text-3" id="text-org7b9b4d5">
 <p>
 Service discovery is the process of finding the network endpoint for a service without hardcoding pod IPs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc6ebe34" class="outline-3">
-<h3 id="orgc6ebe34">Q6: What is a Service selector?</h3>
-<div class="outline-text-3" id="text-orgc6ebe34">
+<div id="outline-container-org9afeffe" class="outline-3">
+<h3 id="org9afeffe">Q6: What is a Service selector?</h3>
+<div class="outline-text-3" id="text-org9afeffe">
 <p>
 A Service selector matches Pods by labels, selecting which pods receive traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org2e2e326" class="outline-3">
-<h3 id="org2e2e326">Q7: What is a label in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org2e2e326">
+<div id="outline-container-orgbdf060e" class="outline-3">
+<h3 id="orgbdf060e">Q7: What is a label in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgbdf060e">
 <p>
 A label is a key-value pair used to organize and select objects like Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb1a99a4" class="outline-3">
-<h3 id="orgb1a99a4">Q8: What is a selector match?</h3>
-<div class="outline-text-3" id="text-orgb1a99a4">
+<div id="outline-container-orga3ab3b9" class="outline-3">
+<h3 id="orga3ab3b9">Q8: What is a selector match?</h3>
+<div class="outline-text-3" id="text-orga3ab3b9">
 <p>
 A selector match identifies Pods whose labels satisfy the Service’s label query.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a8f145" class="outline-3">
-<h3 id="org2a8f145">Q9: What is the default Service type?</h3>
-<div class="outline-text-3" id="text-org2a8f145">
+<div id="outline-container-org93fcfc0" class="outline-3">
+<h3 id="org93fcfc0">Q9: What is the default Service type?</h3>
+<div class="outline-text-3" id="text-org93fcfc0">
 <p>
 The default Service type is <code>ClusterIP</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org6cb26ee" class="outline-3">
-<h3 id="org6cb26ee">Q10: What is a ClusterIP Service?</h3>
-<div class="outline-text-3" id="text-org6cb26ee">
+<div id="outline-container-org02c5793" class="outline-3">
+<h3 id="org02c5793">Q10: What is a ClusterIP Service?</h3>
+<div class="outline-text-3" id="text-org02c5793">
 <p>
 A ClusterIP Service exposes the service internally within the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org4ced695" class="outline-3">
-<h3 id="org4ced695">Q11: What is a NodePort Service?</h3>
-<div class="outline-text-3" id="text-org4ced695">
+<div id="outline-container-org9aa7579" class="outline-3">
+<h3 id="org9aa7579">Q11: What is a NodePort Service?</h3>
+<div class="outline-text-3" id="text-org9aa7579">
 <p>
 A NodePort Service exposes the service on a static port on each node.
 </p>
 </div>
 </div>
-<div id="outline-container-orge404aa3" class="outline-3">
-<h3 id="orge404aa3">Q12: What is a LoadBalancer Service?</h3>
-<div class="outline-text-3" id="text-orge404aa3">
+<div id="outline-container-org6724bcb" class="outline-3">
+<h3 id="org6724bcb">Q12: What is a LoadBalancer Service?</h3>
+<div class="outline-text-3" id="text-org6724bcb">
 <p>
 A LoadBalancer Service provisions an external load balancer to expose the service outside the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org2555282" class="outline-3">
-<h3 id="org2555282">Q13: What is an ExternalName Service?</h3>
-<div class="outline-text-3" id="text-org2555282">
+<div id="outline-container-org8c6edf7" class="outline-3">
+<h3 id="org8c6edf7">Q13: What is an ExternalName Service?</h3>
+<div class="outline-text-3" id="text-org8c6edf7">
 <p>
 An ExternalName Service maps a service name to an external hostname, such as an external DNS name.
 </p>
 </div>
 </div>
-<div id="outline-container-orga80f2d7" class="outline-3">
-<h3 id="orga80f2d7">Q14: What is an Ingress?</h3>
-<div class="outline-text-3" id="text-orga80f2d7">
+<div id="outline-container-org31e5e81" class="outline-3">
+<h3 id="org31e5e81">Q14: What is an Ingress?</h3>
+<div class="outline-text-3" id="text-org31e5e81">
 <p>
 An Ingress is an HTTP or HTTPS entry point that routes traffic to Services based on rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org62860a4" class="outline-3">
-<h3 id="org62860a4">Q15: Why use an Ingress instead of NodePort?</h3>
-<div class="outline-text-3" id="text-org62860a4">
+<div id="outline-container-orgd1427af" class="outline-3">
+<h3 id="orgd1427af">Q15: Why use an Ingress instead of NodePort?</h3>
+<div class="outline-text-3" id="text-orgd1427af">
 <p>
 Ingress provides HTTP routing, TLS termination, path routing, and a cleaner external entry point.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c957d9" class="outline-3">
-<h3 id="org3c957d9">Q16: What does a Service do at a high level?</h3>
-<div class="outline-text-3" id="text-org3c957d9">
+<div id="outline-container-org291c6c4" class="outline-3">
+<h3 id="org291c6c4">Q16: What does a Service do at a high level?</h3>
+<div class="outline-text-3" id="text-org291c6c4">
 <p>
 A Service provides a stable IP and port, and load balances traffic to matching Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc77bd8d" class="outline-3">
-<h3 id="orgc77bd8d">Q17: What is a Service endpoint?</h3>
-<div class="outline-text-3" id="text-orgc77bd8d">
+<div id="outline-container-orga1e598f" class="outline-3">
+<h3 id="orga1e598f">Q17: What is a Service endpoint?</h3>
+<div class="outline-text-3" id="text-orga1e598f">
 <p>
 A Service endpoint is the Pod address and port selected by the Service.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b77f1d" class="outline-3">
-<h3 id="org2b77f1d">Q18: What are endpoints in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org2b77f1d">
+<div id="outline-container-orgdfd7be9" class="outline-3">
+<h3 id="orgdfd7be9">Q18: What are endpoints in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgdfd7be9">
 <p>
 Endpoints are the actual IPs and ports of the Pods behind a Service.
 </p>
 </div>
 </div>
-<div id="outline-container-org555f36d" class="outline-3">
-<h3 id="org555f36d">Q19: What is endpoint slicing?</h3>
-<div class="outline-text-3" id="text-org555f36d">
+<div id="outline-container-org0f42230" class="outline-3">
+<h3 id="org0f42230">Q19: What is endpoint slicing?</h3>
+<div class="outline-text-3" id="text-org0f42230">
 <p>
 Endpoint slicing is the newer API for tracking sets of Pod endpoints behind a Service efficiently.
 </p>
 </div>
 </div>
-<div id="outline-container-orgabd3d6c" class="outline-3">
-<h3 id="orgabd3d6c">Q20: Why are Services needed in a cluster?</h3>
-<div class="outline-text-3" id="text-orgabd3d6c">
+<div id="outline-container-orgba88796" class="outline-3">
+<h3 id="orgba88796">Q20: Why are Services needed in a cluster?</h3>
+<div class="outline-text-3" id="text-orgba88796">
 <p>
 Because clients should not need to know all Pod IPs or handle churn.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf91c377" class="outline-3">
-<h3 id="orgf91c377">Q21: What is a stable DNS name for a Service?</h3>
-<div class="outline-text-3" id="text-orgf91c377">
+<div id="outline-container-orgd7730b8" class="outline-3">
+<h3 id="orgd7730b8">Q21: What is a stable DNS name for a Service?</h3>
+<div class="outline-text-3" id="text-orgd7730b8">
 <p>
 A Service gets a DNS name in the cluster namespace, such as <code>my-service.my-namespace.svc.cluster.local</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org11e9cd4" class="outline-3">
-<h3 id="org11e9cd4">Q22: What is a Service in a Namespace?</h3>
-<div class="outline-text-3" id="text-org11e9cd4">
+<div id="outline-container-orga35db6e" class="outline-3">
+<h3 id="orga35db6e">Q22: What is a Service in a Namespace?</h3>
+<div class="outline-text-3" id="text-orga35db6e">
 <p>
 A Service is scoped to a namespace and typically discovered via that namespace’s DNS.
 </p>
 </div>
 </div>
-<div id="outline-container-orga474a54" class="outline-3">
-<h3 id="orga474a54">Q23: What is cluster DNS?</h3>
-<div class="outline-text-3" id="text-orga474a54">
+<div id="outline-container-org780a9c9" class="outline-3">
+<h3 id="org780a9c9">Q23: What is cluster DNS?</h3>
+<div class="outline-text-3" id="text-org780a9c9">
 <p>
 Cluster DNS provides name resolution for Services and Pods within the Kubernetes cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfa3f90d" class="outline-3">
-<h3 id="orgfa3f90d">Q24: What is a selectorless Service?</h3>
-<div class="outline-text-3" id="text-orgfa3f90d">
+<div id="outline-container-org839992f" class="outline-3">
+<h3 id="org839992f">Q24: What is a selectorless Service?</h3>
+<div class="outline-text-3" id="text-org839992f">
 <p>
 A selectorless Service does not match Pods by labels and is often used to point to an external service or manually managed endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org2034f2f" class="outline-3">
-<h3 id="org2034f2f">Q25: What is a headless Service?</h3>
-<div class="outline-text-3" id="text-org2034f2f">
+<div id="outline-container-orgbc29815" class="outline-3">
+<h3 id="orgbc29815">Q25: What is a headless Service?</h3>
+<div class="outline-text-3" id="text-orgbc29815">
 <p>
 A headless Service has no ClusterIP and exposes each Pod directly through DNS entries.
 </p>
 </div>
 </div>
-<div id="outline-container-org4c9fdc7" class="outline-3">
-<h3 id="org4c9fdc7">Q26: Why use a headless Service?</h3>
-<div class="outline-text-3" id="text-org4c9fdc7">
+<div id="outline-container-org9420d77" class="outline-3">
+<h3 id="org9420d77">Q26: Why use a headless Service?</h3>
+<div class="outline-text-3" id="text-org9420d77">
 <p>
 It is useful for stateful applications and direct Pod access, like a database cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbd3ec77" class="outline-3">
-<h3 id="orgbd3ec77">Q27: What is a session affinity?</h3>
-<div class="outline-text-3" id="text-orgbd3ec77">
+<div id="outline-container-org0d72499" class="outline-3">
+<h3 id="org0d72499">Q27: What is a session affinity?</h3>
+<div class="outline-text-3" id="text-org0d72499">
 <p>
 Session affinity keeps requests from the same client bound to the same backend Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org163fd2c" class="outline-3">
-<h3 id="org163fd2c">Q28: Why would you use session affinity?</h3>
-<div class="outline-text-3" id="text-org163fd2c">
+<div id="outline-container-org4288465" class="outline-3">
+<h3 id="org4288465">Q28: Why would you use session affinity?</h3>
+<div class="outline-text-3" id="text-org4288465">
 <p>
 Some applications are stateful and require stickiness to a specific Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgebf979e" class="outline-3">
-<h3 id="orgebf979e">Q29: What is a Service port?</h3>
-<div class="outline-text-3" id="text-orgebf979e">
+<div id="outline-container-org2f894eb" class="outline-3">
+<h3 id="org2f894eb">Q29: What is a Service port?</h3>
+<div class="outline-text-3" id="text-org2f894eb">
 <p>
 A Service port is the port exposed by the Service to clients.
 </p>
 </div>
 </div>
-<div id="outline-container-org84ce95d" class="outline-3">
-<h3 id="org84ce95d">Q30: What is a target port?</h3>
-<div class="outline-text-3" id="text-org84ce95d">
+<div id="outline-container-org3b834db" class="outline-3">
+<h3 id="org3b834db">Q30: What is a target port?</h3>
+<div class="outline-text-3" id="text-org3b834db">
 <p>
 A target port is the port on the Pod that receives the traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orge23097f" class="outline-3">
-<h3 id="orge23097f">Q31: Why use a target port value different from a service port?</h3>
-<div class="outline-text-3" id="text-orge23097f">
+<div id="outline-container-org0413ae0" class="outline-3">
+<h3 id="org0413ae0">Q31: Why use a target port value different from a service port?</h3>
+<div class="outline-text-3" id="text-org0413ae0">
 <p>
 Because the Service may expose a stable public port while the app listens on another internal port.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6c17e9" class="outline-3">
-<h3 id="orgd6c17e9">Q32: What is a Service manifest?</h3>
-<div class="outline-text-3" id="text-orgd6c17e9">
+<div id="outline-container-org68a7e9a" class="outline-3">
+<h3 id="org68a7e9a">Q32: What is a Service manifest?</h3>
+<div class="outline-text-3" id="text-org68a7e9a">
 <p>
 A Service manifest is a Kubernetes YAML resource that defines the Service’s selector, ports, and type.
 </p>
 </div>
 </div>
-<div id="outline-container-org4920b77" class="outline-3">
-<h3 id="org4920b77">Q33: What is a selector label example?</h3>
-<div class="outline-text-3" id="text-org4920b77">
+<div id="outline-container-org9be0879" class="outline-3">
+<h3 id="org9be0879">Q33: What is a selector label example?</h3>
+<div class="outline-text-3" id="text-org9be0879">
 <p>
 For example:
 <code>app: api</code>
@@ -300,1349 +1468,1349 @@ or
 </p>
 </div>
 </div>
-<div id="outline-container-org3080471" class="outline-3">
-<h3 id="org3080471">Q34: What does a Service select by default?</h3>
-<div class="outline-text-3" id="text-org3080471">
+<div id="outline-container-org060590a" class="outline-3">
+<h3 id="org060590a">Q34: What does a Service select by default?</h3>
+<div class="outline-text-3" id="text-org060590a">
 <p>
 A Service selects Pods by labels based on the selector field.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d0dad9" class="outline-3">
-<h3 id="org5d0dad9">Q35: How does traffic reach Pods behind a Service?</h3>
-<div class="outline-text-3" id="text-org5d0dad9">
+<div id="outline-container-org3f90d1d" class="outline-3">
+<h3 id="org3f90d1d">Q35: How does traffic reach Pods behind a Service?</h3>
+<div class="outline-text-3" id="text-org3f90d1d">
 <p>
 The kube-proxy or network plugin routes packets to one of the selected Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc0eecf" class="outline-3">
-<h3 id="orgdc0eecf">Q36: What is kube-proxy?</h3>
-<div class="outline-text-3" id="text-orgdc0eecf">
+<div id="outline-container-org3efd1bb" class="outline-3">
+<h3 id="org3efd1bb">Q36: What is kube-proxy?</h3>
+<div class="outline-text-3" id="text-org3efd1bb">
 <p>
 kube-proxy is the Kubernetes component that implements Service routing rules in the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org6206156" class="outline-3">
-<h3 id="org6206156">Q37: What is iptables mode?</h3>
-<div class="outline-text-3" id="text-org6206156">
+<div id="outline-container-org85e6087" class="outline-3">
+<h3 id="org85e6087">Q37: What is iptables mode?</h3>
+<div class="outline-text-3" id="text-org85e6087">
 <p>
 iptables mode is a kube-proxy mode that uses iptables rules for routing and load balancing.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d71cd7" class="outline-3">
-<h3 id="org6d71cd7">Q38: What is IPVS mode?</h3>
-<div class="outline-text-3" id="text-org6d71cd7">
+<div id="outline-container-org50c6602" class="outline-3">
+<h3 id="org50c6602">Q38: What is IPVS mode?</h3>
+<div class="outline-text-3" id="text-org50c6602">
 <p>
 IPVS mode uses IPVS load balancing for service traffic and can be more performant in some large clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org31df015" class="outline-3">
-<h3 id="org31df015">Q39: What is load balancing in a Service?</h3>
-<div class="outline-text-3" id="text-org31df015">
+<div id="outline-container-org2b42d90" class="outline-3">
+<h3 id="org2b42d90">Q39: What is load balancing in a Service?</h3>
+<div class="outline-text-3" id="text-org2b42d90">
 <p>
 Load balancing means distributing requests across multiple matching Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org0fb4d92" class="outline-3">
-<h3 id="org0fb4d92">Q40: What is round-robin load balancing?</h3>
-<div class="outline-text-3" id="text-org0fb4d92">
+<div id="outline-container-org26030d3" class="outline-3">
+<h3 id="org26030d3">Q40: What is round-robin load balancing?</h3>
+<div class="outline-text-3" id="text-org26030d3">
 <p>
 Round-robin is a common load-balancing strategy where traffic is sent to Pods in turn.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf729792" class="outline-3">
-<h3 id="orgf729792">Q41: What is service health?</h3>
-<div class="outline-text-3" id="text-orgf729792">
+<div id="outline-container-org5472a47" class="outline-3">
+<h3 id="org5472a47">Q41: What is service health?</h3>
+<div class="outline-text-3" id="text-org5472a47">
 <p>
 A healthy Service endpoint is a Pod that is ready and able to accept traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org7480974" class="outline-3">
-<h3 id="org7480974">Q42: What is a readiness probe?</h3>
-<div class="outline-text-3" id="text-org7480974">
+<div id="outline-container-org4f899f0" class="outline-3">
+<h3 id="org4f899f0">Q42: What is a readiness probe?</h3>
+<div class="outline-text-3" id="text-org4f899f0">
 <p>
 A readiness probe indicates when a container is ready to receive traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org28fe3ce" class="outline-3">
-<h3 id="org28fe3ce">Q43: Why are readiness probes important to Services?</h3>
-<div class="outline-text-3" id="text-org28fe3ce">
+<div id="outline-container-orgef2c3ce" class="outline-3">
+<h3 id="orgef2c3ce">Q43: Why are readiness probes important to Services?</h3>
+<div class="outline-text-3" id="text-orgef2c3ce">
 <p>
 Because Services route only to ready Pods unless explicitly configured otherwise.
 </p>
 </div>
 </div>
-<div id="outline-container-org97f97c9" class="outline-3">
-<h3 id="org97f97c9">Q44: What is a liveness probe?</h3>
-<div class="outline-text-3" id="text-org97f97c9">
+<div id="outline-container-orgbff8ccd" class="outline-3">
+<h3 id="orgbff8ccd">Q44: What is a liveness probe?</h3>
+<div class="outline-text-3" id="text-orgbff8ccd">
 <p>
 A liveness probe indicates whether the container is alive and should be restarted if not.
 </p>
 </div>
 </div>
-<div id="outline-container-orga0904ef" class="outline-3">
-<h3 id="orga0904ef">Q45: What is a Pod readiness gate?</h3>
-<div class="outline-text-3" id="text-orga0904ef">
+<div id="outline-container-orgf8b6d58" class="outline-3">
+<h3 id="orgf8b6d58">Q45: What is a Pod readiness gate?</h3>
+<div class="outline-text-3" id="text-orgf8b6d58">
 <p>
 It is a more advanced readiness mechanism used by workloads to gate traffic acceptance.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb82270b" class="outline-3">
-<h3 id="orgb82270b">Q46: What is service backlog?</h3>
-<div class="outline-text-3" id="text-orgb82270b">
+<div id="outline-container-orgbd98a16" class="outline-3">
+<h3 id="orgbd98a16">Q46: What is service backlog?</h3>
+<div class="outline-text-3" id="text-orgbd98a16">
 <p>
 A backlog is the queue of connections or requests waiting to be handled by backend Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb6892a9" class="outline-3">
-<h3 id="orgb6892a9">Q47: What is a network policy?</h3>
-<div class="outline-text-3" id="text-orgb6892a9">
+<div id="outline-container-org99f63ef" class="outline-3">
+<h3 id="org99f63ef">Q47: What is a network policy?</h3>
+<div class="outline-text-3" id="text-org99f63ef">
 <p>
 A network policy allows or denies traffic to and from pods and services based on labels and ports.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ac8643" class="outline-3">
-<h3 id="org7ac8643">Q48: Why do Services and network policies matter together?</h3>
-<div class="outline-text-3" id="text-org7ac8643">
+<div id="outline-container-org47f5dad" class="outline-3">
+<h3 id="org47f5dad">Q48: Why do Services and network policies matter together?</h3>
+<div class="outline-text-3" id="text-org47f5dad">
 <p>
 Because Services route traffic while network policies enforce who may talk to whom.
 </p>
 </div>
 </div>
-<div id="outline-container-org3dcd772" class="outline-3">
-<h3 id="org3dcd772">Q49: What is a ClusterIP assignment?</h3>
-<div class="outline-text-3" id="text-org3dcd772">
+<div id="outline-container-org033fcb6" class="outline-3">
+<h3 id="org033fcb6">Q49: What is a ClusterIP assignment?</h3>
+<div class="outline-text-3" id="text-org033fcb6">
 <p>
 Kubernetes assigns a virtual IP address to the Service for intra-cluster access.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b83dc9" class="outline-3">
-<h3 id="org2b83dc9">Q50: What is a Service type change?</h3>
-<div class="outline-text-3" id="text-org2b83dc9">
+<div id="outline-container-orgc4797e1" class="outline-3">
+<h3 id="orgc4797e1">Q50: What is a Service type change?</h3>
+<div class="outline-text-3" id="text-orgc4797e1">
 <p>
 A Service can be changed from ClusterIP to NodePort or LoadBalancer depending on exposure requirements.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ef9ed9" class="outline-3">
-<h3 id="org2ef9ed9">Q51: What is a Kubernetes Deployment?</h3>
-<div class="outline-text-3" id="text-org2ef9ed9">
+<div id="outline-container-org347370c" class="outline-3">
+<h3 id="org347370c">Q51: What is a Kubernetes Deployment?</h3>
+<div class="outline-text-3" id="text-org347370c">
 <p>
 A Deployment manages ReplicaSets and maintains a desired number of Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf962133" class="outline-3">
-<h3 id="orgf962133">Q52: How does a Service relate to a Deployment?</h3>
-<div class="outline-text-3" id="text-orgf962133">
+<div id="outline-container-orgab68634" class="outline-3">
+<h3 id="orgab68634">Q52: How does a Service relate to a Deployment?</h3>
+<div class="outline-text-3" id="text-orgab68634">
 <p>
 A Service selects Pods created by a Deployment by labels.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd19fc91" class="outline-3">
-<h3 id="orgd19fc91">Q53: What is a ReplicaSet?</h3>
-<div class="outline-text-3" id="text-orgd19fc91">
+<div id="outline-container-org1c1c795" class="outline-3">
+<h3 id="org1c1c795">Q53: What is a ReplicaSet?</h3>
+<div class="outline-text-3" id="text-org1c1c795">
 <p>
 A ReplicaSet ensures a defined number of Pod replicas are running.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e88288" class="outline-3">
-<h3 id="org8e88288">Q54: What is a DaemonSet?</h3>
-<div class="outline-text-3" id="text-org8e88288">
+<div id="outline-container-org17fd3f9" class="outline-3">
+<h3 id="org17fd3f9">Q54: What is a DaemonSet?</h3>
+<div class="outline-text-3" id="text-org17fd3f9">
 <p>
 A DaemonSet ensures a Pod runs on every or selected nodes, often relevant for node-level networking services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6bd5b9" class="outline-3">
-<h3 id="orgd6bd5b9">Q55: What is a StatefulSet?</h3>
-<div class="outline-text-3" id="text-orgd6bd5b9">
+<div id="outline-container-org82f6dec" class="outline-3">
+<h3 id="org82f6dec">Q55: What is a StatefulSet?</h3>
+<div class="outline-text-3" id="text-org82f6dec">
 <p>
 A StatefulSet manages stateful Pods that often need stable identities and stable network identities.
 </p>
 </div>
 </div>
-<div id="outline-container-org7e47ac1" class="outline-3">
-<h3 id="org7e47ac1">Q56: Why do StatefulSets often use headless Services?</h3>
-<div class="outline-text-3" id="text-org7e47ac1">
+<div id="outline-container-orgcbd9749" class="outline-3">
+<h3 id="orgcbd9749">Q56: Why do StatefulSets often use headless Services?</h3>
+<div class="outline-text-3" id="text-orgcbd9749">
 <p>
 Because they need direct Pod-level identities and stable DNS names.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ebee68" class="outline-3">
-<h3 id="org7ebee68">Q57: What is a Service name?</h3>
-<div class="outline-text-3" id="text-org7ebee68">
+<div id="outline-container-org6fc448a" class="outline-3">
+<h3 id="org6fc448a">Q57: What is a Service name?</h3>
+<div class="outline-text-3" id="text-org6fc448a">
 <p>
 A Service name is the DNS name used by clients to connect to it.
 </p>
 </div>
 </div>
-<div id="outline-container-org039c177" class="outline-3">
-<h3 id="org039c177">Q58: What is DNS A record resolution for Services?</h3>
-<div class="outline-text-3" id="text-org039c177">
+<div id="outline-container-org2241d23" class="outline-3">
+<h3 id="org2241d23">Q58: What is DNS A record resolution for Services?</h3>
+<div class="outline-text-3" id="text-org2241d23">
 <p>
 Kubernetes DNS resolves Service names to cluster IP addresses.
 </p>
 </div>
 </div>
-<div id="outline-container-org55d6504" class="outline-3">
-<h3 id="org55d6504">Q59: What is a Service port mapping?</h3>
-<div class="outline-text-3" id="text-org55d6504">
+<div id="outline-container-org05fe2c6" class="outline-3">
+<h3 id="org05fe2c6">Q59: What is a Service port mapping?</h3>
+<div class="outline-text-3" id="text-org05fe2c6">
 <p>
 A Service port maps external name and port to target port(s) on the Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeb3bcc5" class="outline-3">
-<h3 id="orgeb3bcc5">Q60: What is a Kubernetes namespace?</h3>
-<div class="outline-text-3" id="text-orgeb3bcc5">
+<div id="outline-container-org1e8d9fd" class="outline-3">
+<h3 id="org1e8d9fd">Q60: What is a Kubernetes namespace?</h3>
+<div class="outline-text-3" id="text-org1e8d9fd">
 <p>
 A namespace isolates Kubernetes objects, including Services, within a logical boundary.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf80f7ef" class="outline-3">
-<h3 id="orgf80f7ef">Q61: Why is namespace isolation important?</h3>
-<div class="outline-text-3" id="text-orgf80f7ef">
+<div id="outline-container-org6c10ad3" class="outline-3">
+<h3 id="org6c10ad3">Q61: Why is namespace isolation important?</h3>
+<div class="outline-text-3" id="text-org6c10ad3">
 <p>
 It separates teams, apps, and environments while reducing accidental cross-communication.
 </p>
 </div>
 </div>
-<div id="outline-container-org50465a6" class="outline-3">
-<h3 id="org50465a6">Q62: What is an internal service?</h3>
-<div class="outline-text-3" id="text-org50465a6">
+<div id="outline-container-org5a1a63e" class="outline-3">
+<h3 id="org5a1a63e">Q62: What is an internal service?</h3>
+<div class="outline-text-3" id="text-org5a1a63e">
 <p>
 An internal service is only reachable within the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org9b6a792" class="outline-3">
-<h3 id="org9b6a792">Q63: What is an external service?</h3>
-<div class="outline-text-3" id="text-org9b6a792">
+<div id="outline-container-orgceb6e2e" class="outline-3">
+<h3 id="orgceb6e2e">Q63: What is an external service?</h3>
+<div class="outline-text-3" id="text-orgceb6e2e">
 <p>
 An external service is reachable from outside the cluster, usually via NodePort, LoadBalancer, or Ingress.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c17081" class="outline-3">
-<h3 id="org3c17081">Q64: What is service exposure?</h3>
-<div class="outline-text-3" id="text-org3c17081">
+<div id="outline-container-org814fab4" class="outline-3">
+<h3 id="org814fab4">Q64: What is service exposure?</h3>
+<div class="outline-text-3" id="text-org814fab4">
 <p>
 Service exposure is the act of making a Service reachable from outside or within the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfe7a545" class="outline-3">
-<h3 id="orgfe7a545">Q65: What is port forwarding?</h3>
-<div class="outline-text-3" id="text-orgfe7a545">
+<div id="outline-container-orgcb2d0c2" class="outline-3">
+<h3 id="orgcb2d0c2">Q65: What is port forwarding?</h3>
+<div class="outline-text-3" id="text-orgcb2d0c2">
 <p>
 Port forwarding is a debugging technique where local traffic is forwarded into a pod or service.
 </p>
 </div>
 </div>
-<div id="outline-container-org7526c77" class="outline-3">
-<h3 id="org7526c77">Q66: What is kubectl port-forward?</h3>
-<div class="outline-text-3" id="text-org7526c77">
+<div id="outline-container-org6657441" class="outline-3">
+<h3 id="org6657441">Q66: What is kubectl port-forward?</h3>
+<div class="outline-text-3" id="text-org6657441">
 <p>
 It allows local clients to access a Service or pod as if it were local.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb70fb6a" class="outline-3">
-<h3 id="orgb70fb6a">Q67: What is a network endpoint?</h3>
-<div class="outline-text-3" id="text-orgb70fb6a">
+<div id="outline-container-org748f089" class="outline-3">
+<h3 id="org748f089">Q67: What is a network endpoint?</h3>
+<div class="outline-text-3" id="text-org748f089">
 <p>
 An endpoint is the destination that a Service forwards traffic to, nominally a Pod IP and port.
 </p>
 </div>
 </div>
-<div id="outline-container-org298d18d" class="outline-3">
-<h3 id="org298d18d">Q68: What is a Service mesh?</h3>
-<div class="outline-text-3" id="text-org298d18d">
+<div id="outline-container-org64a065e" class="outline-3">
+<h3 id="org64a065e">Q68: What is a Service mesh?</h3>
+<div class="outline-text-3" id="text-org64a065e">
 <p>
 A Service mesh adds advanced routing, policy, and observability on top of Service networking.
 </p>
 </div>
 </div>
-<div id="outline-container-org2639386" class="outline-3">
-<h3 id="org2639386">Q69: Why is a Service mesh complementary to Kubernetes Services?</h3>
-<div class="outline-text-3" id="text-org2639386">
+<div id="outline-container-orgd869aaf" class="outline-3">
+<h3 id="orgd869aaf">Q69: Why is a Service mesh complementary to Kubernetes Services?</h3>
+<div class="outline-text-3" id="text-orgd869aaf">
 <p>
 Because Services handle basic routing, while a mesh adds policy, observability, and advanced traffic control.
 </p>
 </div>
 </div>
-<div id="outline-container-org58ef58d" class="outline-3">
-<h3 id="org58ef58d">Q70: What is a Service to Pod mapping?</h3>
-<div class="outline-text-3" id="text-org58ef58d">
+<div id="outline-container-org1290226" class="outline-3">
+<h3 id="org1290226">Q70: What is a Service to Pod mapping?</h3>
+<div class="outline-text-3" id="text-org1290226">
 <p>
 A Service maps a stable identity to one or more backend Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf24990e" class="outline-3">
-<h3 id="orgf24990e">Q71: Why are labels important for Services?</h3>
-<div class="outline-text-3" id="text-orgf24990e">
+<div id="outline-container-org7bef8bf" class="outline-3">
+<h3 id="org7bef8bf">Q71: Why are labels important for Services?</h3>
+<div class="outline-text-3" id="text-org7bef8bf">
 <p>
 Because Services target Pods by labels, which makes selection dynamic and resilient.
 </p>
 </div>
 </div>
-<div id="outline-container-org106d60e" class="outline-3">
-<h3 id="org106d60e">Q72: What is a label selector mismatch?</h3>
-<div class="outline-text-3" id="text-org106d60e">
+<div id="outline-container-org9916a81" class="outline-3">
+<h3 id="org9916a81">Q72: What is a label selector mismatch?</h3>
+<div class="outline-text-3" id="text-org9916a81">
 <p>
 It happens when the Service selector does not match any Pods or when labels change unexpectedly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc73eed2" class="outline-3">
-<h3 id="orgc73eed2">Q73: What is a Service not selecting Pods?</h3>
-<div class="outline-text-3" id="text-orgc73eed2">
+<div id="outline-container-orgdad653e" class="outline-3">
+<h3 id="orgdad653e">Q73: What is a Service not selecting Pods?</h3>
+<div class="outline-text-3" id="text-orgdad653e">
 <p>
 This often causes connection failures because no backends exist for the Service.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b0a6a8" class="outline-3">
-<h3 id="org2b0a6a8">Q74: Why should Services be placed in the same namespace as Pods?</h3>
-<div class="outline-text-3" id="text-org2b0a6a8">
+<div id="outline-container-orgabad068" class="outline-3">
+<h3 id="orgabad068">Q74: Why should Services be placed in the same namespace as Pods?</h3>
+<div class="outline-text-3" id="text-orgabad068">
 <p>
 Usually yes, because DNS names and service discovery are namespaced.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaf2ebad" class="outline-3">
-<h3 id="orgaf2ebad">Q75: What is DNS name resolution across namespaces?</h3>
-<div class="outline-text-3" id="text-orgaf2ebad">
+<div id="outline-container-org65e7d86" class="outline-3">
+<h3 id="org65e7d86">Q75: What is DNS name resolution across namespaces?</h3>
+<div class="outline-text-3" id="text-org65e7d86">
 <p>
 Pods in different namespaces can resolve a Service with the namespace-qualified DNS name.
 </p>
 </div>
 </div>
-<div id="outline-container-org447a3f2" class="outline-3">
-<h3 id="org447a3f2">Q76: What is a service account and how is it related?</h3>
-<div class="outline-text-3" id="text-org447a3f2">
+<div id="outline-container-orgcb0478a" class="outline-3">
+<h3 id="orgcb0478a">Q76: What is a service account and how is it related?</h3>
+<div class="outline-text-3" id="text-orgcb0478a">
 <p>
 A service account is separate from a Service object, though both are K8s objects.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9baf2a" class="outline-3">
-<h3 id="orgc9baf2a">Q77: What is a service port number?</h3>
-<div class="outline-text-3" id="text-orgc9baf2a">
+<div id="outline-container-org3056b07" class="outline-3">
+<h3 id="org3056b07">Q77: What is a service port number?</h3>
+<div class="outline-text-3" id="text-org3056b07">
 <p>
 A port number identifies where a Service listens, such as 80 or 443.
 </p>
 </div>
 </div>
-<div id="outline-container-org8963ed9" class="outline-3">
-<h3 id="org8963ed9">Q78: What is a target port number?</h3>
-<div class="outline-text-3" id="text-org8963ed9">
+<div id="outline-container-orga4fcf8f" class="outline-3">
+<h3 id="orga4fcf8f">Q78: What is a target port number?</h3>
+<div class="outline-text-3" id="text-orga4fcf8f">
 <p>
 A target port may be different from the service port, often 8080 inside a container.
 </p>
 </div>
 </div>
-<div id="outline-container-org8a0a841" class="outline-3">
-<h3 id="org8a0a841">Q79: What is a named port?</h3>
-<div class="outline-text-3" id="text-org8a0a841">
+<div id="outline-container-org17f4a57" class="outline-3">
+<h3 id="org17f4a57">Q79: What is a named port?</h3>
+<div class="outline-text-3" id="text-org17f4a57">
 <p>
 A named port lets you reference a service or container port by a name instead of a number in some APIs.
 </p>
 </div>
 </div>
-<div id="outline-container-orga8b8771" class="outline-3">
-<h3 id="orga8b8771">Q80: What is a Service IP family?</h3>
-<div class="outline-text-3" id="text-orga8b8771">
+<div id="outline-container-orgae0af4d" class="outline-3">
+<h3 id="orgae0af4d">Q80: What is a Service IP family?</h3>
+<div class="outline-text-3" id="text-orgae0af4d">
 <p>
 The IP family indicates IPv4 and/or IPv6 support for the Service.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbd1deb2" class="outline-3">
-<h3 id="orgbd1deb2">Q81: Why is IPv6 support relevant?</h3>
-<div class="outline-text-3" id="text-orgbd1deb2">
+<div id="outline-container-org2a5ed05" class="outline-3">
+<h3 id="org2a5ed05">Q81: Why is IPv6 support relevant?</h3>
+<div class="outline-text-3" id="text-org2a5ed05">
 <p>
 Some clusters support dual-stack networking, and Services may be assigned IPv4, IPv6, or both.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff55416" class="outline-3">
-<h3 id="orgff55416">Q82: What is a dual-stack Service?</h3>
-<div class="outline-text-3" id="text-orgff55416">
+<div id="outline-container-orgf8d867e" class="outline-3">
+<h3 id="orgf8d867e">Q82: What is a dual-stack Service?</h3>
+<div class="outline-text-3" id="text-orgf8d867e">
 <p>
 A dual-stack Service has both IPv4 and IPv6 addresses in a dual-stack cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org4d97fbd" class="outline-3">
-<h3 id="org4d97fbd">Q83: What is a NodePort range?</h3>
-<div class="outline-text-3" id="text-org4d97fbd">
+<div id="outline-container-org0cc32cc" class="outline-3">
+<h3 id="org0cc32cc">Q83: What is a NodePort range?</h3>
+<div class="outline-text-3" id="text-org0cc32cc">
 <p>
 NodePort ports are allocated from a configurable range, usually 30000-32767.
 </p>
 </div>
 </div>
-<div id="outline-container-org7a9d4f1" class="outline-3">
-<h3 id="org7a9d4f1">Q84: Why does NodePort expose to all nodes?</h3>
-<div class="outline-text-3" id="text-org7a9d4f1">
+<div id="outline-container-org16df89c" class="outline-3">
+<h3 id="org16df89c">Q84: Why does NodePort expose to all nodes?</h3>
+<div class="outline-text-3" id="text-org16df89c">
 <p>
 A NodePort Service opens the port on each cluster node, allowing access through any node IP.
 </p>
 </div>
 </div>
-<div id="outline-container-org96f6cb2" class="outline-3">
-<h3 id="org96f6cb2">Q85: What is a LoadBalancer external IP?</h3>
-<div class="outline-text-3" id="text-org96f6cb2">
+<div id="outline-container-org1056608" class="outline-3">
+<h3 id="org1056608">Q85: What is a LoadBalancer external IP?</h3>
+<div class="outline-text-3" id="text-org1056608">
 <p>
 A LoadBalancer Service obtains an external IP assigned by a cloud or external load balancer.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeba7c57" class="outline-3">
-<h3 id="orgeba7c57">Q86: What is a cloud provider integration?</h3>
-<div class="outline-text-3" id="text-orgeba7c57">
+<div id="outline-container-org1699545" class="outline-3">
+<h3 id="org1699545">Q86: What is a cloud provider integration?</h3>
+<div class="outline-text-3" id="text-org1699545">
 <p>
 CDNs or cloud load balancers integrate with Kubernetes Services to expose workloads externally.
 </p>
 </div>
 </div>
-<div id="outline-container-org0904498" class="outline-3">
-<h3 id="org0904498">Q87: Why do cluster internal Services not need external IPs?</h3>
-<div class="outline-text-3" id="text-org0904498">
+<div id="outline-container-org582439e" class="outline-3">
+<h3 id="org582439e">Q87: Why do cluster internal Services not need external IPs?</h3>
+<div class="outline-text-3" id="text-org582439e">
 <p>
 Because traffic stays inside the cluster and uses the Service’s ClusterIP.
 </p>
 </div>
 </div>
-<div id="outline-container-org5cae8f6" class="outline-3">
-<h3 id="org5cae8f6">Q88: What is an internal load balancer?</h3>
-<div class="outline-text-3" id="text-org5cae8f6">
+<div id="outline-container-org9dfd6f3" class="outline-3">
+<h3 id="org9dfd6f3">Q88: What is an internal load balancer?</h3>
+<div class="outline-text-3" id="text-org9dfd6f3">
 <p>
 An internal load balancer exposes a Service only inside the private network or VPC.
 </p>
 </div>
 </div>
-<div id="outline-container-org9f6388b" class="outline-3">
-<h3 id="org9f6388b">Q89: What is a Service health check?</h3>
-<div class="outline-text-3" id="text-org9f6388b">
+<div id="outline-container-org6235dbb" class="outline-3">
+<h3 id="org6235dbb">Q89: What is a Service health check?</h3>
+<div class="outline-text-3" id="text-org6235dbb">
 <p>
 A health check ensures a Service is reachable and backend Pods are ready.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc9b6e10" class="outline-3">
-<h3 id="orgc9b6e10">Q90: Why is readiness critical to SLOs?</h3>
-<div class="outline-text-3" id="text-orgc9b6e10">
+<div id="outline-container-org87eed87" class="outline-3">
+<h3 id="org87eed87">Q90: Why is readiness critical to SLOs?</h3>
+<div class="outline-text-3" id="text-org87eed87">
 <p>
 Because a Service should not send traffic to unhealthy endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdb5703a" class="outline-3">
-<h3 id="orgdb5703a">Q91: What is a Service event?</h3>
-<div class="outline-text-3" id="text-orgdb5703a">
+<div id="outline-container-orgdb34d24" class="outline-3">
+<h3 id="orgdb34d24">Q91: What is a Service event?</h3>
+<div class="outline-text-3" id="text-orgdb34d24">
 <p>
 A Service event can indicate changes to endpoints, type, or load balancer configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org7d31400" class="outline-3">
-<h3 id="org7d31400">Q92: What is a Kubernetes endpoint controller?</h3>
-<div class="outline-text-3" id="text-org7d31400">
+<div id="outline-container-orgc816864" class="outline-3">
+<h3 id="orgc816864">Q92: What is a Kubernetes endpoint controller?</h3>
+<div class="outline-text-3" id="text-orgc816864">
 <p>
 The endpoint controller maintains the list of backend Pods for Services.
 </p>
 </div>
 </div>
-<div id="outline-container-org32e043f" class="outline-3">
-<h3 id="org32e043f">Q93: Why do Services need endpoints?</h3>
-<div class="outline-text-3" id="text-org32e043f">
+<div id="outline-container-orgc69c489" class="outline-3">
+<h3 id="orgc69c489">Q93: Why do Services need endpoints?</h3>
+<div class="outline-text-3" id="text-orgc69c489">
 <p>
 Because otherwise no backend addresses exist and traffic cannot reach the app.
 </p>
 </div>
 </div>
-<div id="outline-container-org9c63df3" class="outline-3">
-<h3 id="org9c63df3">Q94: What is the difference between a Service and a Deployment?</h3>
-<div class="outline-text-3" id="text-org9c63df3">
+<div id="outline-container-orge23453a" class="outline-3">
+<h3 id="orge23453a">Q94: What is the difference between a Service and a Deployment?</h3>
+<div class="outline-text-3" id="text-orge23453a">
 <p>
 A Deployment defines what Pods should run.
 A Service defines how to reach them.
 </p>
 </div>
 </div>
-<div id="outline-container-org621f813" class="outline-3">
-<h3 id="org621f813">Q95: What is a Pod label selector?</h3>
-<div class="outline-text-3" id="text-org621f813">
+<div id="outline-container-org9603333" class="outline-3">
+<h3 id="org9603333">Q95: What is a Pod label selector?</h3>
+<div class="outline-text-3" id="text-org9603333">
 <p>
 It is a query used to identify Pods based on labels.
 </p>
 </div>
 </div>
-<div id="outline-container-org50db999" class="outline-3">
-<h3 id="org50db999">Q96: What is a multi-port Service?</h3>
-<div class="outline-text-3" id="text-org50db999">
+<div id="outline-container-orge280868" class="outline-3">
+<h3 id="orge280868">Q96: What is a multi-port Service?</h3>
+<div class="outline-text-3" id="text-orge280868">
 <p>
 A Service can expose multiple ports, such as HTTP on 80 and metrics on 9090.
 </p>
 </div>
 </div>
-<div id="outline-container-orga3f8467" class="outline-3">
-<h3 id="orga3f8467">Q97: What is a named port in a Pod?</h3>
-<div class="outline-text-3" id="text-orga3f8467">
+<div id="outline-container-org8c724dd" class="outline-3">
+<h3 id="org8c724dd">Q97: What is a named port in a Pod?</h3>
+<div class="outline-text-3" id="text-org8c724dd">
 <p>
 A Pod port may be assigned a name so a Service or app can reference it by name.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf13b85" class="outline-3">
-<h3 id="orgdf13b85">Q98: What is a service port protocol?</h3>
-<div class="outline-text-3" id="text-orgdf13b85">
+<div id="outline-container-orgb67cf85" class="outline-3">
+<h3 id="orgb67cf85">Q98: What is a service port protocol?</h3>
+<div class="outline-text-3" id="text-orgb67cf85">
 <p>
 The protocol is often TCP or UDP, and for some services it may be SCTP as well.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c9f638" class="outline-3">
-<h3 id="org2c9f638">Q99: What is a Service protocol mismatch?</h3>
-<div class="outline-text-3" id="text-org2c9f638">
+<div id="outline-container-org51529b3" class="outline-3">
+<h3 id="org51529b3">Q99: What is a Service protocol mismatch?</h3>
+<div class="outline-text-3" id="text-org51529b3">
 <p>
 It occurs when the Service or Pod is configured for one protocol but the application expects another.
 </p>
 </div>
 </div>
-<div id="outline-container-org15eb6b0" class="outline-3">
-<h3 id="org15eb6b0">Q100: What is a service routing policy?</h3>
-<div class="outline-text-3" id="text-org15eb6b0">
+<div id="outline-container-org4cddbeb" class="outline-3">
+<h3 id="org4cddbeb">Q100: What is a service routing policy?</h3>
+<div class="outline-text-3" id="text-org4cddbeb">
 <p>
 A service routing policy governs traffic rules such as load balancing, affinity, and session behavior.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org4c706f3" class="outline-2">
-<h2 id="org4c706f3">Intermediate</h2>
-<div class="outline-text-2" id="text-org4c706f3">
+<div id="outline-container-orgeb9d19e" class="outline-2">
+<h2 id="orgeb9d19e">Intermediate</h2>
+<div class="outline-text-2" id="text-orgeb9d19e">
 </div>
-<div id="outline-container-org5b9b6ea" class="outline-3">
-<h3 id="org5b9b6ea">Q101: What is kube-proxy in userspace mode?</h3>
-<div class="outline-text-3" id="text-org5b9b6ea">
+<div id="outline-container-org0609718" class="outline-3">
+<h3 id="org0609718">Q101: What is kube-proxy in userspace mode?</h3>
+<div class="outline-text-3" id="text-org0609718">
 <p>
 It is an older kube-proxy mode where traffic is proxied by user-space processes.
 </p>
 </div>
 </div>
-<div id="outline-container-org31ccd37" class="outline-3">
-<h3 id="org31ccd37">Q102: What is IPVS mode?</h3>
-<div class="outline-text-3" id="text-org31ccd37">
+<div id="outline-container-org7bca3a3" class="outline-3">
+<h3 id="org7bca3a3">Q102: What is IPVS mode?</h3>
+<div class="outline-text-3" id="text-org7bca3a3">
 <p>
 IPVS is a kernel-space load balancer used by kube-proxy for high-performance L4 service routing.
 </p>
 </div>
 </div>
-<div id="outline-container-org775df8b" class="outline-3">
-<h3 id="org775df8b">Q103: Why use IPVS?</h3>
-<div class="outline-text-3" id="text-org775df8b">
+<div id="outline-container-org930e1d9" class="outline-3">
+<h3 id="org930e1d9">Q103: Why use IPVS?</h3>
+<div class="outline-text-3" id="text-org930e1d9">
 <p>
 It can scale better and provide more efficient load balancing for large clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org89b8da2" class="outline-3">
-<h3 id="org89b8da2">Q104: What is a ClusterIP service in practice?</h3>
-<div class="outline-text-3" id="text-org89b8da2">
+<div id="outline-container-orgf9ba083" class="outline-3">
+<h3 id="orgf9ba083">Q104: What is a ClusterIP service in practice?</h3>
+<div class="outline-text-3" id="text-orgf9ba083">
 <p>
 It is virtual IP and port that routes to one or more selected Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orga167f72" class="outline-3">
-<h3 id="orga167f72">Q105: What is a kube-proxy iptables rule?</h3>
-<div class="outline-text-3" id="text-orga167f72">
+<div id="outline-container-org19862fa" class="outline-3">
+<h3 id="org19862fa">Q105: What is a kube-proxy iptables rule?</h3>
+<div class="outline-text-3" id="text-org19862fa">
 <p>
 It is a low-level rule that sends packets from the Service IP to Pod endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org65aaffc" class="outline-3">
-<h3 id="org65aaffc">Q106: Why is Service routing more complex than simple DNS?</h3>
-<div class="outline-text-3" id="text-org65aaffc">
+<div id="outline-container-org7ecb144" class="outline-3">
+<h3 id="org7ecb144">Q106: Why is Service routing more complex than simple DNS?</h3>
+<div class="outline-text-3" id="text-org7ecb144">
 <p>
 Because the Service needs to balance traffic among multiple Pods and track readiness.
 </p>
 </div>
 </div>
-<div id="outline-container-org9cd4855" class="outline-3">
-<h3 id="org9cd4855">Q107: What is an endpoint slice?</h3>
-<div class="outline-text-3" id="text-org9cd4855">
+<div id="outline-container-org19d6cd9" class="outline-3">
+<h3 id="org19d6cd9">Q107: What is an endpoint slice?</h3>
+<div class="outline-text-3" id="text-org19d6cd9">
 <p>
 EndpointSlice is the API object that stores addresses and metadata for Service backends.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf1ae49d" class="outline-3">
-<h3 id="orgf1ae49d">Q108: Why was EndpointSlice introduced?</h3>
-<div class="outline-text-3" id="text-orgf1ae49d">
+<div id="outline-container-org6545d96" class="outline-3">
+<h3 id="org6545d96">Q108: Why was EndpointSlice introduced?</h3>
+<div class="outline-text-3" id="text-org6545d96">
 <p>
 To scale better for large numbers of endpoints and Services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd7a3cc0" class="outline-3">
-<h3 id="orgd7a3cc0">Q109: What is endpoint controller behavior?</h3>
-<div class="outline-text-3" id="text-orgd7a3cc0">
+<div id="outline-container-org59e7087" class="outline-3">
+<h3 id="org59e7087">Q109: What is endpoint controller behavior?</h3>
+<div class="outline-text-3" id="text-org59e7087">
 <p>
 It watches Pods and updates the appropriate Service endpoints as Pods appear, disappear, or become ready.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd288bf" class="outline-3">
-<h3 id="orgfd288bf">Q110: What is a Pod ready condition?</h3>
-<div class="outline-text-3" id="text-orgfd288bf">
+<div id="outline-container-orgb3a0b37" class="outline-3">
+<h3 id="orgb3a0b37">Q110: What is a Pod ready condition?</h3>
+<div class="outline-text-3" id="text-orgb3a0b37">
 <p>
 The Pod ready condition indicates whether Pod containers are ready for service traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf08cb43" class="outline-3">
-<h3 id="orgf08cb43">Q111: Why is readiness important for zero-downtime deployments?</h3>
-<div class="outline-text-3" id="text-orgf08cb43">
+<div id="outline-container-org67acb97" class="outline-3">
+<h3 id="org67acb97">Q111: Why is readiness important for zero-downtime deployments?</h3>
+<div class="outline-text-3" id="text-org67acb97">
 <p>
 Because traffic should not go to Pods still starting up or failing readiness checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org880f5a3" class="outline-3">
-<h3 id="org880f5a3">Q112: What is a startup probe?</h3>
-<div class="outline-text-3" id="text-org880f5a3">
+<div id="outline-container-org238df86" class="outline-3">
+<h3 id="org238df86">Q112: What is a startup probe?</h3>
+<div class="outline-text-3" id="text-org238df86">
 <p>
 A startup probe detects whether an app has finished starting up and can delay liveness checks during initialization.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6c3cac" class="outline-3">
-<h3 id="orgd6c3cac">Q113: Why use a startup probe with Services?</h3>
-<div class="outline-text-3" id="text-orgd6c3cac">
+<div id="outline-container-orgdf4a4b7" class="outline-3">
+<h3 id="orgdf4a4b7">Q113: Why use a startup probe with Services?</h3>
+<div class="outline-text-3" id="text-orgdf4a4b7">
 <p>
 It helps avoid premature restarts when the app starts slowly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc11da34" class="outline-3">
-<h3 id="orgc11da34">Q114: What is an externalTrafficPolicy?</h3>
-<div class="outline-text-3" id="text-orgc11da34">
+<div id="outline-container-org1d88570" class="outline-3">
+<h3 id="org1d88570">Q114: What is an externalTrafficPolicy?</h3>
+<div class="outline-text-3" id="text-org1d88570">
 <p>
 ExternalTrafficPolicy controls whether traffic from outside the cluster is routed through the node or directly to Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfac6e45" class="outline-3">
-<h3 id="orgfac6e45">Q115: What is local traffic policy?</h3>
-<div class="outline-text-3" id="text-orgfac6e45">
+<div id="outline-container-orgf0ced36" class="outline-3">
+<h3 id="orgf0ced36">Q115: What is local traffic policy?</h3>
+<div class="outline-text-3" id="text-orgf0ced36">
 <p>
 Local traffic policy sends external traffic only to local Pods on the same node when possible.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc612d67" class="outline-3">
-<h3 id="orgc612d67">Q116: What is Cluster external traffic policy?</h3>
-<div class="outline-text-3" id="text-orgc612d67">
+<div id="outline-container-org5a5462b" class="outline-3">
+<h3 id="org5a5462b">Q116: What is Cluster external traffic policy?</h3>
+<div class="outline-text-3" id="text-org5a5462b">
 <p>
 Cluster external traffic policy may route traffic to Pods on other nodes.
 </p>
 </div>
 </div>
-<div id="outline-container-org0671b07" class="outline-3">
-<h3 id="org0671b07">Q117: What is a LoadBalancer health check?</h3>
-<div class="outline-text-3" id="text-org0671b07">
+<div id="outline-container-org1867f46" class="outline-3">
+<h3 id="org1867f46">Q117: What is a LoadBalancer health check?</h3>
+<div class="outline-text-3" id="text-org1867f46">
 <p>
 A cloud or external LB often performs health checks against the Service’s backend to decide routing.
 </p>
 </div>
 </div>
-<div id="outline-container-org664363f" class="outline-3">
-<h3 id="org664363f">Q118: What is a NodePort health check?</h3>
-<div class="outline-text-3" id="text-org664363f">
+<div id="outline-container-org570f50d" class="outline-3">
+<h3 id="org570f50d">Q118: What is a NodePort health check?</h3>
+<div class="outline-text-3" id="text-org570f50d">
 <p>
 A NodePort may need health checks at the node or LB layer to know when the endpoints are healthy.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a24a5a" class="outline-3">
-<h3 id="org6a24a5a">Q119: Why do external load balancers need readiness?</h3>
-<div class="outline-text-3" id="text-org6a24a5a">
+<div id="outline-container-orgcf87fb6" class="outline-3">
+<h3 id="orgcf87fb6">Q119: Why do external load balancers need readiness?</h3>
+<div class="outline-text-3" id="text-orgcf87fb6">
 <p>
 Because they should not route to unhealthy Pods or nodes.
 </p>
 </div>
 </div>
-<div id="outline-container-org9106e3b" class="outline-3">
-<h3 id="org9106e3b">Q120: What is an ingress controller?</h3>
-<div class="outline-text-3" id="text-org9106e3b">
+<div id="outline-container-org940ab4d" class="outline-3">
+<h3 id="org940ab4d">Q120: What is an ingress controller?</h3>
+<div class="outline-text-3" id="text-org940ab4d">
 <p>
 An ingress controller watches Ingress resources and configures an HTTP routing layer.
 </p>
 </div>
 </div>
-<div id="outline-container-org1e657b4" class="outline-3">
-<h3 id="org1e657b4">Q121: How does an Ingress relate to Services?</h3>
-<div class="outline-text-3" id="text-org1e657b4">
+<div id="outline-container-org8749b6b" class="outline-3">
+<h3 id="org8749b6b">Q121: How does an Ingress relate to Services?</h3>
+<div class="outline-text-3" id="text-org8749b6b">
 <p>
 Ingress routes HTTP traffic to one or more Services, which then route to Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b59c97" class="outline-3">
-<h3 id="org2b59c97">Q122: What is a Service multi-port scenario?</h3>
-<div class="outline-text-3" id="text-org2b59c97">
+<div id="outline-container-org3b9d821" class="outline-3">
+<h3 id="org3b9d821">Q122: What is a Service multi-port scenario?</h3>
+<div class="outline-text-3" id="text-org3b9d821">
 <p>
 A Service may expose multiple ports, each mapping to a different target port or protocol.
 </p>
 </div>
 </div>
-<div id="outline-container-org68b2b85" class="outline-3">
-<h3 id="org68b2b85">Q123: What is a host-based Ingress rule?</h3>
-<div class="outline-text-3" id="text-org68b2b85">
+<div id="outline-container-org2c7c54d" class="outline-3">
+<h3 id="org2c7c54d">Q123: What is a host-based Ingress rule?</h3>
+<div class="outline-text-3" id="text-org2c7c54d">
 <p>
 Host-based routing sends traffic for different domains to different Services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2e564c" class="outline-3">
-<h3 id="orgc2e564c">Q124: What is a path-based Ingress rule?</h3>
-<div class="outline-text-3" id="text-orgc2e564c">
+<div id="outline-container-org34013e2" class="outline-3">
+<h3 id="org34013e2">Q124: What is a path-based Ingress rule?</h3>
+<div class="outline-text-3" id="text-org34013e2">
 <p>
 Path-based routing sends /api to one Service and /web to another.
 </p>
 </div>
 </div>
-<div id="outline-container-orge214dd8" class="outline-3">
-<h3 id="orge214dd8">Q125: What is a TLS Ingress?</h3>
-<div class="outline-text-3" id="text-orge214dd8">
+<div id="outline-container-orga132275" class="outline-3">
+<h3 id="orga132275">Q125: What is a TLS Ingress?</h3>
+<div class="outline-text-3" id="text-orga132275">
 <p>
 An Ingress can terminate TLS and route incoming HTTPS traffic to a backend Service.
 </p>
 </div>
 </div>
-<div id="outline-container-org7208fb4" class="outline-3">
-<h3 id="org7208fb4">Q126: What is a Service in a multi-tenant cluster?</h3>
-<div class="outline-text-3" id="text-org7208fb4">
+<div id="outline-container-org7fb3ee6" class="outline-3">
+<h3 id="org7fb3ee6">Q126: What is a Service in a multi-tenant cluster?</h3>
+<div class="outline-text-3" id="text-org7fb3ee6">
 <p>
 It may be namespaced and connected to a particular team or app.
 </p>
 </div>
 </div>
-<div id="outline-container-org9666357" class="outline-3">
-<h3 id="org9666357">Q127: What is stable service identity?</h3>
-<div class="outline-text-3" id="text-org9666357">
+<div id="outline-container-org0df4179" class="outline-3">
+<h3 id="org0df4179">Q127: What is stable service identity?</h3>
+<div class="outline-text-3" id="text-org0df4179">
 <p>
 A stable Service identity means clients can rely on a consistent name and IP without managing Pod churn.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c1baea" class="outline-3">
-<h3 id="org2c1baea">Q128: What is a DNS A record for a Service?</h3>
-<div class="outline-text-3" id="text-org2c1baea">
+<div id="outline-container-orgd65a57f" class="outline-3">
+<h3 id="orgd65a57f">Q128: What is a DNS A record for a Service?</h3>
+<div class="outline-text-3" id="text-orgd65a57f">
 <p>
 Cluster DNS resolves Service names to an A record or cluster IP.
 </p>
 </div>
 </div>
-<div id="outline-container-org42a03d3" class="outline-3">
-<h3 id="org42a03d3">Q129: What is a DNS SRV record for a Service?</h3>
-<div class="outline-text-3" id="text-org42a03d3">
+<div id="outline-container-orgd995458" class="outline-3">
+<h3 id="orgd995458">Q129: What is a DNS SRV record for a Service?</h3>
+<div class="outline-text-3" id="text-orgd995458">
 <p>
 SRV records can identify named ports for a Service, useful for some protocols.
 </p>
 </div>
 </div>
-<div id="outline-container-org298c755" class="outline-3">
-<h3 id="org298c755">Q130: What is a headless Service DNS behavior?</h3>
-<div class="outline-text-3" id="text-org298c755">
+<div id="outline-container-org41263d2" class="outline-3">
+<h3 id="org41263d2">Q130: What is a headless Service DNS behavior?</h3>
+<div class="outline-text-3" id="text-org41263d2">
 <p>
 A headless Service returns individual Pod IPs instead of the ClusterIP.
 </p>
 </div>
 </div>
-<div id="outline-container-org703538d" class="outline-3">
-<h3 id="org703538d">Q131: Why do StatefulSets need headless Services?</h3>
-<div class="outline-text-3" id="text-org703538d">
+<div id="outline-container-orgfa5bfb2" class="outline-3">
+<h3 id="orgfa5bfb2">Q131: Why do StatefulSets need headless Services?</h3>
+<div class="outline-text-3" id="text-orgfa5bfb2">
 <p>
 To give each Pod a stable identity and DNS name independent of the Service IP.
 </p>
 </div>
 </div>
-<div id="outline-container-org809e975" class="outline-3">
-<h3 id="org809e975">Q132: What is a StatefulSet network identity?</h3>
-<div class="outline-text-3" id="text-org809e975">
+<div id="outline-container-orgf13188a" class="outline-3">
+<h3 id="orgf13188a">Q132: What is a StatefulSet network identity?</h3>
+<div class="outline-text-3" id="text-orgf13188a">
 <p>
 Each StatefulSet Pod gets a stable ordinal-based name and DNS record.
 </p>
 </div>
 </div>
-<div id="outline-container-orgad37f2d" class="outline-3">
-<h3 id="orgad37f2d">Q133: What is a Service mesh for advanced traffic control?</h3>
-<div class="outline-text-3" id="text-orgad37f2d">
+<div id="outline-container-org6544d85" class="outline-3">
+<h3 id="org6544d85">Q133: What is a Service mesh for advanced traffic control?</h3>
+<div class="outline-text-3" id="text-org6544d85">
 <p>
 A service mesh adds retries, mTLS, canary releases, and traffic shifting on top of standard Services.
 </p>
 </div>
 </div>
-<div id="outline-container-orga347c70" class="outline-3">
-<h3 id="orga347c70">Q134: What is a Service topology?</h3>
-<div class="outline-text-3" id="text-orga347c70">
+<div id="outline-container-orga99a3cd" class="outline-3">
+<h3 id="orga99a3cd">Q134: What is a Service topology?</h3>
+<div class="outline-text-3" id="text-orga99a3cd">
 <p>
 Service topology defines how a Service routes traffic, such as local-only or zone-aware routing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc6c31ab" class="outline-3">
-<h3 id="orgc6c31ab">Q135: What is topology-aware routing?</h3>
-<div class="outline-text-3" id="text-orgc6c31ab">
+<div id="outline-container-orga66867c" class="outline-3">
+<h3 id="orga66867c">Q135: What is topology-aware routing?</h3>
+<div class="outline-text-3" id="text-orga66867c">
 <p>
 It routes traffic to nearby backends based on topology, such as the same zone or node.
 </p>
 </div>
 </div>
-<div id="outline-container-org898167c" class="outline-3">
-<h3 id="org898167c">Q136: What is a cluster IP leak?</h3>
-<div class="outline-text-3" id="text-org898167c">
+<div id="outline-container-org80c80ad" class="outline-3">
+<h3 id="org80c80ad">Q136: What is a cluster IP leak?</h3>
+<div class="outline-text-3" id="text-org80c80ad">
 <p>
 A cluster IP leak happens when internal Service addresses are exposed unintentionally.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a4ed16" class="outline-3">
-<h3 id="org6a4ed16">Q137: What is a Service exposure risk?</h3>
-<div class="outline-text-3" id="text-org6a4ed16">
+<div id="outline-container-org0544eaf" class="outline-3">
+<h3 id="org0544eaf">Q137: What is a Service exposure risk?</h3>
+<div class="outline-text-3" id="text-org0544eaf">
 <p>
 External exposure can create attack surfaces if the Service is not controlled by firewall or ingress policy.
 </p>
 </div>
 </div>
-<div id="outline-container-org953706b" class="outline-3">
-<h3 id="org953706b">Q138: What is the role of firewalling with Services?</h3>
-<div class="outline-text-3" id="text-org953706b">
+<div id="outline-container-org98a7c60" class="outline-3">
+<h3 id="org98a7c60">Q138: What is the role of firewalling with Services?</h3>
+<div class="outline-text-3" id="text-org98a7c60">
 <p>
 Firewall rules help restrict access to cluster or external entry points.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcefbfec" class="outline-3">
-<h3 id="orgcefbfec">Q139: What is a Kubernetes NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-orgcefbfec">
+<div id="outline-container-org7b2ee77" class="outline-3">
+<h3 id="org7b2ee77">Q139: What is a Kubernetes NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org7b2ee77">
 <p>
 A NetworkPolicy restricts traffic to and from Pods, which helps control Service accessibility.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc0d80ec" class="outline-3">
-<h3 id="orgc0d80ec">Q140: What is a default deny policy?</h3>
-<div class="outline-text-3" id="text-orgc0d80ec">
+<div id="outline-container-orgac59cbc" class="outline-3">
+<h3 id="orgac59cbc">Q140: What is a default deny policy?</h3>
+<div class="outline-text-3" id="text-orgac59cbc">
 <p>
 A default deny policy blocks most traffic until specific allowed paths are defined.
 </p>
 </div>
 </div>
-<div id="outline-container-org6de9cb3" class="outline-3">
-<h3 id="org6de9cb3">Q141: Why do Services rely on NetworkPolicies?</h3>
-<div class="outline-text-3" id="text-org6de9cb3">
+<div id="outline-container-orge505a8d" class="outline-3">
+<h3 id="orge505a8d">Q141: Why do Services rely on NetworkPolicies?</h3>
+<div class="outline-text-3" id="text-orge505a8d">
 <p>
 Because a Service should not be reachable by every pod by default in secure environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf99ef19" class="outline-3">
-<h3 id="orgf99ef19">Q142: What is a zero-trust service model?</h3>
-<div class="outline-text-3" id="text-orgf99ef19">
+<div id="outline-container-orgb9675fb" class="outline-3">
+<h3 id="orgb9675fb">Q142: What is a zero-trust service model?</h3>
+<div class="outline-text-3" id="text-orgb9675fb">
 <p>
 It assumes workloads are isolated unless explicitly allowed to talk to each other.
 </p>
 </div>
 </div>
-<div id="outline-container-org74bfdd7" class="outline-3">
-<h3 id="org74bfdd7">Q143: What is a private cluster service?</h3>
-<div class="outline-text-3" id="text-org74bfdd7">
+<div id="outline-container-org2d00196" class="outline-3">
+<h3 id="org2d00196">Q143: What is a private cluster service?</h3>
+<div class="outline-text-3" id="text-org2d00196">
 <p>
 It is a Service only reachable within the cluster or VPC.
 </p>
 </div>
 </div>
-<div id="outline-container-org37d06d0" class="outline-3">
-<h3 id="org37d06d0">Q144: What is a public service?</h3>
-<div class="outline-text-3" id="text-org37d06d0">
+<div id="outline-container-orgf42d71a" class="outline-3">
+<h3 id="orgf42d71a">Q144: What is a public service?</h3>
+<div class="outline-text-3" id="text-orgf42d71a">
 <p>
 A public service is reachable by external clients via LoadBalancer, NodePort, or Ingress.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd0e6bc9" class="outline-3">
-<h3 id="orgd0e6bc9">Q145: What is a gateway service?</h3>
-<div class="outline-text-3" id="text-orgd0e6bc9">
+<div id="outline-container-org4341142" class="outline-3">
+<h3 id="org4341142">Q145: What is a gateway service?</h3>
+<div class="outline-text-3" id="text-org4341142">
 <p>
 A gateway service handles external traffic and routes it to the correct internal Service.
 </p>
 </div>
 </div>
-<div id="outline-container-orge769b35" class="outline-3">
-<h3 id="orge769b35">Q146: What is a cluster ingress?</h3>
-<div class="outline-text-3" id="text-orge769b35">
+<div id="outline-container-org07f3e0e" class="outline-3">
+<h3 id="org07f3e0e">Q146: What is a cluster ingress?</h3>
+<div class="outline-text-3" id="text-org07f3e0e">
 <p>
 An ingress sits at the edge and routes HTTP/HTTPS traffic into the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org02cfc93" class="outline-3">
-<h3 id="org02cfc93">Q147: Why is Ingress often preferred for HTTP services?</h3>
-<div class="outline-text-3" id="text-org02cfc93">
+<div id="outline-container-orge4b55e3" class="outline-3">
+<h3 id="orge4b55e3">Q147: Why is Ingress often preferred for HTTP services?</h3>
+<div class="outline-text-3" id="text-orge4b55e3">
 <p>
 Because it supports URL routing and TLS termination without exposing many node ports.
 </p>
 </div>
 </div>
-<div id="outline-container-org1ed6c5f" class="outline-3">
-<h3 id="org1ed6c5f">Q148: What is an Ingress rule path?</h3>
-<div class="outline-text-3" id="text-org1ed6c5f">
+<div id="outline-container-org735972d" class="outline-3">
+<h3 id="org735972d">Q148: What is an Ingress rule path?</h3>
+<div class="outline-text-3" id="text-org735972d">
 <p>
 A path routes particular URL requests to specific backend Services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc6c3e87" class="outline-3">
-<h3 id="orgc6c3e87">Q149: What is an Ingress host rule?</h3>
-<div class="outline-text-3" id="text-orgc6c3e87">
+<div id="outline-container-org3478c25" class="outline-3">
+<h3 id="org3478c25">Q149: What is an Ingress host rule?</h3>
+<div class="outline-text-3" id="text-org3478c25">
 <p>
 It routes based on hostname, such as api.example.com vs app.example.com.
 </p>
 </div>
 </div>
-<div id="outline-container-org63c4c4b" class="outline-3">
-<h3 id="org63c4c4b">Q150: What is a host and path combination?</h3>
-<div class="outline-text-3" id="text-org63c4c4b">
+<div id="outline-container-orgb2dee05" class="outline-3">
+<h3 id="orgb2dee05">Q150: What is a host and path combination?</h3>
+<div class="outline-text-3" id="text-orgb2dee05">
 <p>
 Ingress can match on both, allowing multiple apps and routes behind one external entry point.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0c1e01" class="outline-3">
-<h3 id="orge0c1e01">Q151: What is a service admission control?</h3>
-<div class="outline-text-3" id="text-orge0c1e01">
+<div id="outline-container-orgfe37d12" class="outline-3">
+<h3 id="orgfe37d12">Q151: What is a service admission control?</h3>
+<div class="outline-text-3" id="text-orgfe37d12">
 <p>
 Policies can restrict which Services can be exposed or which types are allowed.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3ac9a6" class="outline-3">
-<h3 id="orgc3ac9a6">Q152: Why is Services naming important?</h3>
-<div class="outline-text-3" id="text-orgc3ac9a6">
+<div id="outline-container-orgcff1f81" class="outline-3">
+<h3 id="orgcff1f81">Q152: Why is Services naming important?</h3>
+<div class="outline-text-3" id="text-orgcff1f81">
 <p>
 Because names become DNS names and are used by apps and operators to discover them.
 </p>
 </div>
 </div>
-<div id="outline-container-org8429d93" class="outline-3">
-<h3 id="org8429d93">Q153: What is a Service selector bug?</h3>
-<div class="outline-text-3" id="text-org8429d93">
+<div id="outline-container-orge8d6b7e" class="outline-3">
+<h3 id="orge8d6b7e">Q153: What is a Service selector bug?</h3>
+<div class="outline-text-3" id="text-orge8d6b7e">
 <p>
 It happens when the selector labels do not match Pods, leaving the Service with no endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org9c223a0" class="outline-3">
-<h3 id="org9c223a0">Q154: What is a stale endpoint?</h3>
-<div class="outline-text-3" id="text-org9c223a0">
+<div id="outline-container-orgdd894e1" class="outline-3">
+<h3 id="orgdd894e1">Q154: What is a stale endpoint?</h3>
+<div class="outline-text-3" id="text-orgdd894e1">
 <p>
 A stale endpoint refers to a Pod that was removed but still appears in the endpoint list temporarily.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b3e23c" class="outline-3">
-<h3 id="org2b3e23c">Q155: What is a Pod termination lifecycle?</h3>
-<div class="outline-text-3" id="text-org2b3e23c">
+<div id="outline-container-org67ff0e5" class="outline-3">
+<h3 id="org67ff0e5">Q155: What is a Pod termination lifecycle?</h3>
+<div class="outline-text-3" id="text-org67ff0e5">
 <p>
 When a Pod is terminating, it may remain temporarily ready or not, affecting Service routing.
 </p>
 </div>
 </div>
-<div id="outline-container-org1a4aff6" class="outline-3">
-<h3 id="org1a4aff6">Q156: What is a readiness grace period?</h3>
-<div class="outline-text-3" id="text-org1a4aff6">
+<div id="outline-container-orga4b4de5" class="outline-3">
+<h3 id="orga4b4de5">Q156: What is a readiness grace period?</h3>
+<div class="outline-text-3" id="text-orga4b4de5">
 <p>
 A readiness grace period allows a Pod to start receiving traffic only after it is fully ready.
 </p>
 </div>
 </div>
-<div id="outline-container-org039fa7c" class="outline-3">
-<h3 id="org039fa7c">Q157: What is a Service timeout?</h3>
-<div class="outline-text-3" id="text-org039fa7c">
+<div id="outline-container-orgfa88d57" class="outline-3">
+<h3 id="orgfa88d57">Q157: What is a Service timeout?</h3>
+<div class="outline-text-3" id="text-orgfa88d57">
 <p>
 A timeout occurs when a client waits too long for a response from a backend.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc62b8fe" class="outline-3">
-<h3 id="orgc62b8fe">Q158: What is a circuit breaker?</h3>
-<div class="outline-text-3" id="text-orgc62b8fe">
+<div id="outline-container-orga5567aa" class="outline-3">
+<h3 id="orga5567aa">Q158: What is a circuit breaker?</h3>
+<div class="outline-text-3" id="text-orga5567aa">
 <p>
 A circuit breaker prevents repeated calls to an unhealthy or overloaded Service.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd16e2ce" class="outline-3">
-<h3 id="orgd16e2ce">Q159: What is a retry policy?</h3>
-<div class="outline-text-3" id="text-orgd16e2ce">
+<div id="outline-container-org0db9b9c" class="outline-3">
+<h3 id="org0db9b9c">Q159: What is a retry policy?</h3>
+<div class="outline-text-3" id="text-org0db9b9c">
 <p>
 A retry policy determines whether failed requests are retried and with what backoff.
 </p>
 </div>
 </div>
-<div id="outline-container-org3554d04" class="outline-3">
-<h3 id="org3554d04">Q160: What is service-level observability?</h3>
-<div class="outline-text-3" id="text-org3554d04">
+<div id="outline-container-orgb80b48f" class="outline-3">
+<h3 id="orgb80b48f">Q160: What is service-level observability?</h3>
+<div class="outline-text-3" id="text-orgb80b48f">
 <p>
 It includes metrics, logs, traces, and health signals for Service traffic patterns and latency.
 </p>
 </div>
 </div>
-<div id="outline-container-org83c27c9" class="outline-3">
-<h3 id="org83c27c9">Q161: Why is tracing important for Services?</h3>
-<div class="outline-text-3" id="text-org83c27c9">
+<div id="outline-container-org046a07c" class="outline-3">
+<h3 id="org046a07c">Q161: Why is tracing important for Services?</h3>
+<div class="outline-text-3" id="text-org046a07c">
 <p>
 Because each request may traverse multiple Services, and tracing helps identify bottlenecks and failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org42086d1" class="outline-3">
-<h3 id="org42086d1">Q162: What is a Service topology spread?</h3>
-<div class="outline-text-3" id="text-org42086d1">
+<div id="outline-container-orgc2070e6" class="outline-3">
+<h3 id="orgc2070e6">Q162: What is a Service topology spread?</h3>
+<div class="outline-text-3" id="text-orgc2070e6">
 <p>
 It distributes backend Pods across zones or nodes to improve resilience.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf116658" class="outline-3">
-<h3 id="orgf116658">Q163: What is high availability for Services?</h3>
-<div class="outline-text-3" id="text-orgf116658">
+<div id="outline-container-orge0f501e" class="outline-3">
+<h3 id="orge0f501e">Q163: What is high availability for Services?</h3>
+<div class="outline-text-3" id="text-orge0f501e">
 <p>
 High availability means the Service remains reachable even when some Pods or nodes fail.
 </p>
 </div>
 </div>
-<div id="outline-container-org25051ce" class="outline-3">
-<h3 id="org25051ce">Q164: What is the relationship between Deployment replicas and Services?</h3>
-<div class="outline-text-3" id="text-org25051ce">
+<div id="outline-container-org383836f" class="outline-3">
+<h3 id="org383836f">Q164: What is the relationship between Deployment replicas and Services?</h3>
+<div class="outline-text-3" id="text-org383836f">
 <p>
 A Service routes to all ready Pods behind its selector, regardless of deployment scale.
 </p>
 </div>
 </div>
-<div id="outline-container-org8ae2aa8" class="outline-3">
-<h3 id="org8ae2aa8">Q165: Why do Services abstract pod churn?</h3>
-<div class="outline-text-3" id="text-org8ae2aa8">
+<div id="outline-container-org8729b73" class="outline-3">
+<h3 id="org8729b73">Q165: Why do Services abstract pod churn?</h3>
+<div class="outline-text-3" id="text-org8729b73">
 <p>
 Because clients see a stable per-service endpoint rather than unstable pod IPs.
 </p>
 </div>
 </div>
-<div id="outline-container-org60ca854" class="outline-3">
-<h3 id="org60ca854">Q166: What is a Service port conflict?</h3>
-<div class="outline-text-3" id="text-org60ca854">
+<div id="outline-container-org2e6af94" class="outline-3">
+<h3 id="org2e6af94">Q166: What is a Service port conflict?</h3>
+<div class="outline-text-3" id="text-org2e6af94">
 <p>
 It happens when multiple Services on the same cluster or nodes try to bind the same port unexpectedly.
 </p>
 </div>
 </div>
-<div id="outline-container-orga70ddf5" class="outline-3">
-<h3 id="orga70ddf5">Q167: What is an external IP assignment race?</h3>
-<div class="outline-text-3" id="text-orga70ddf5">
+<div id="outline-container-org1dd4338" class="outline-3">
+<h3 id="org1dd4338">Q167: What is an external IP assignment race?</h3>
+<div class="outline-text-3" id="text-org1dd4338">
 <p>
 It happens when multiple Services try to claim or update the same cloud external IP.
 </p>
 </div>
 </div>
-<div id="outline-container-org21eabb8" class="outline-3">
-<h3 id="org21eabb8">Q168: What is a NodePort conflict?</h3>
-<div class="outline-text-3" id="text-org21eabb8">
+<div id="outline-container-org1c8738a" class="outline-3">
+<h3 id="org1c8738a">Q168: What is a NodePort conflict?</h3>
+<div class="outline-text-3" id="text-org1c8738a">
 <p>
 A NodePort conflict occurs when two Services try to use the same node port.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb8abac5" class="outline-3">
-<h3 id="orgb8abac5">Q169: What is Service object metadata?</h3>
-<div class="outline-text-3" id="text-orgb8abac5">
+<div id="outline-container-org01dceae" class="outline-3">
+<h3 id="org01dceae">Q169: What is Service object metadata?</h3>
+<div class="outline-text-3" id="text-org01dceae">
 <p>
 Metadata includes labels, annotations, name, namespace, and other identifying fields.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd119dec" class="outline-3">
-<h3 id="orgd119dec">Q170: What is a Service annotation?</h3>
-<div class="outline-text-3" id="text-orgd119dec">
+<div id="outline-container-orgf70652f" class="outline-3">
+<h3 id="orgf70652f">Q170: What is a Service annotation?</h3>
+<div class="outline-text-3" id="text-orgf70652f">
 <p>
 Annotations are arbitrary metadata used by controllers, ingress, or cloud vendors.
 </p>
 </div>
 </div>
-<div id="outline-container-org4f53fc4" class="outline-3">
-<h3 id="org4f53fc4">Q171: What is an annotation-based cloud LB integration?</h3>
-<div class="outline-text-3" id="text-org4f53fc4">
+<div id="outline-container-org0a7ed2d" class="outline-3">
+<h3 id="org0a7ed2d">Q171: What is an annotation-based cloud LB integration?</h3>
+<div class="outline-text-3" id="text-org0a7ed2d">
 <p>
 Cloud controllers may use annotations to create or modify load balancers for a Service.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd611f0e" class="outline-3">
-<h3 id="orgd611f0e">Q172: What is a Service type conversion?</h3>
-<div class="outline-text-3" id="text-orgd611f0e">
+<div id="outline-container-org6a61331" class="outline-3">
+<h3 id="org6a61331">Q172: What is a Service type conversion?</h3>
+<div class="outline-text-3" id="text-org6a61331">
 <p>
 You can convert a Service between ClusterIP, NodePort, and LoadBalancer when you need to change exposure.
 </p>
 </div>
 </div>
-<div id="outline-container-orgec18ce7" class="outline-3">
-<h3 id="orgec18ce7">Q173: What is a service account token and network policy interaction?</h3>
-<div class="outline-text-3" id="text-orgec18ce7">
+<div id="outline-container-org3b5a007" class="outline-3">
+<h3 id="org3b5a007">Q173: What is a service account token and network policy interaction?</h3>
+<div class="outline-text-3" id="text-org3b5a007">
 <p>
 Service account token exposure may be affected by policies, but Services themselves are network objects not identity objects.
 </p>
 </div>
 </div>
-<div id="outline-container-org2e83693" class="outline-3">
-<h3 id="org2e83693">Q174: Why do Service types matter?</h3>
-<div class="outline-text-3" id="text-org2e83693">
+<div id="outline-container-org28c2e0a" class="outline-3">
+<h3 id="org28c2e0a">Q174: Why do Service types matter?</h3>
+<div class="outline-text-3" id="text-org28c2e0a">
 <p>
 Because they define the external exposure model and how the Service is accessed by clients.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5acb20" class="outline-3">
-<h3 id="orgb5acb20">Q175: What is a stable service endpoint model?</h3>
-<div class="outline-text-3" id="text-orgb5acb20">
+<div id="outline-container-org3c8eb7d" class="outline-3">
+<h3 id="org3c8eb7d">Q175: What is a stable service endpoint model?</h3>
+<div class="outline-text-3" id="text-org3c8eb7d">
 <p>
 It is the idea that clients can reach a service without tracking individual pods or their movements.
 </p>
 </div>
 </div>
-<div id="outline-container-orgce3d846" class="outline-3">
-<h3 id="orgce3d846">Q176: What is a service-level DNS entry?</h3>
-<div class="outline-text-3" id="text-orgce3d846">
+<div id="outline-container-org636a21a" class="outline-3">
+<h3 id="org636a21a">Q176: What is a service-level DNS entry?</h3>
+<div class="outline-text-3" id="text-org636a21a">
 <p>
 It is the DNS name that resolves to the Service’s stable cluster IP or other address.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ef06dd" class="outline-3">
-<h3 id="org2ef06dd">Q177: Why use a Service without a selector?</h3>
-<div class="outline-text-3" id="text-org2ef06dd">
+<div id="outline-container-org9f79d06" class="outline-3">
+<h3 id="org9f79d06">Q177: Why use a Service without a selector?</h3>
+<div class="outline-text-3" id="text-org9f79d06">
 <p>
 To manually define endpoints that are not Kubernetes Pods, or to integrate with external resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdcbdce1" class="outline-3">
-<h3 id="orgdcbdce1">Q178: What is a Service generated by an external controller?</h3>
-<div class="outline-text-3" id="text-orgdcbdce1">
+<div id="outline-container-org592d666" class="outline-3">
+<h3 id="org592d666">Q178: What is a Service generated by an external controller?</h3>
+<div class="outline-text-3" id="text-org592d666">
 <p>
 Some controllers create Services automatically for external or internal integrations.
 </p>
 </div>
 </div>
-<div id="outline-container-org3483b39" class="outline-3">
-<h3 id="org3483b39">Q179: What is k8s service traffic flow?</h3>
-<div class="outline-text-3" id="text-org3483b39">
+<div id="outline-container-org9ea1646" class="outline-3">
+<h3 id="org9ea1646">Q179: What is k8s service traffic flow?</h3>
+<div class="outline-text-3" id="text-org9ea1646">
 <p>
 Client -&gt; Service IP -&gt; kube-proxy -&gt; selected backend Pod -&gt; app response.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a7a95a" class="outline-3">
-<h3 id="org5a7a95a">Q180: Why is kube-proxy central to service routing?</h3>
-<div class="outline-text-3" id="text-org5a7a95a">
+<div id="outline-container-orgc20e9dd" class="outline-3">
+<h3 id="orgc20e9dd">Q180: Why is kube-proxy central to service routing?</h3>
+<div class="outline-text-3" id="text-orgc20e9dd">
 <p>
 Because it turns the Service abstraction into actual iptables or IPVS rules on the node.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc08edb7" class="outline-2">
-<h2 id="orgc08edb7">Advanced / Expert</h2>
-<div class="outline-text-2" id="text-orgc08edb7">
+<div id="outline-container-org1c8fb4d" class="outline-2">
+<h2 id="org1c8fb4d">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-org1c8fb4d">
 </div>
-<div id="outline-container-org4002ccb" class="outline-3">
-<h3 id="org4002ccb">Q181: What is Service topology in large clusters?</h3>
-<div class="outline-text-3" id="text-org4002ccb">
+<div id="outline-container-org52a5b72" class="outline-3">
+<h3 id="org52a5b72">Q181: What is Service topology in large clusters?</h3>
+<div class="outline-text-3" id="text-org52a5b72">
 <p>
 It includes topology-aware routing, zone balancing, and node locality to optimize performance and resilience.
 </p>
 </div>
 </div>
-<div id="outline-container-org5b9d2e8" class="outline-3">
-<h3 id="org5b9d2e8">Q182: What is kube-proxy iptables performance under load?</h3>
-<div class="outline-text-3" id="text-org5b9d2e8">
+<div id="outline-container-org7ae81d2" class="outline-3">
+<h3 id="org7ae81d2">Q182: What is kube-proxy iptables performance under load?</h3>
+<div class="outline-text-3" id="text-org7ae81d2">
 <p>
 iptables rules are efficient but can scale poorly under extreme endpoint churn or large clusters compared with IPVS.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e22aed" class="outline-3">
-<h3 id="org9e22aed">Q183: What is IPVS load balancing semantics?</h3>
-<div class="outline-text-3" id="text-org9e22aed">
+<div id="outline-container-org3bd5aad" class="outline-3">
+<h3 id="org3bd5aad">Q183: What is IPVS load balancing semantics?</h3>
+<div class="outline-text-3" id="text-org3bd5aad">
 <p>
 IPVS supports weighted scheduling and more advanced L4 balancing than simple iptables rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org9af5236" class="outline-3">
-<h3 id="org9af5236">Q184: What is kube-proxy per-node behavior?</h3>
-<div class="outline-text-3" id="text-org9af5236">
+<div id="outline-container-org0c6ba4b" class="outline-3">
+<h3 id="org0c6ba4b">Q184: What is kube-proxy per-node behavior?</h3>
+<div class="outline-text-3" id="text-org0c6ba4b">
 <p>
 kube-proxy runs on each node and maintains the local Service routing rules.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfe7669c" class="outline-3">
-<h3 id="orgfe7669c">Q185: What is Service headless mode in StatefulSets?</h3>
-<div class="outline-text-3" id="text-orgfe7669c">
+<div id="outline-container-orga929a43" class="outline-3">
+<h3 id="orga929a43">Q185: What is Service headless mode in StatefulSets?</h3>
+<div class="outline-text-3" id="text-orga929a43">
 <p>
 It eliminates the ClusterIP and exposes each pod as a unique DNS endpoint.
 </p>
 </div>
 </div>
-<div id="outline-container-orge2288eb" class="outline-3">
-<h3 id="orge2288eb">Q186: Why is headless Service important in StatefulSets?</h3>
-<div class="outline-text-3" id="text-orge2288eb">
+<div id="outline-container-org846f767" class="outline-3">
+<h3 id="org846f767">Q186: Why is headless Service important in StatefulSets?</h3>
+<div class="outline-text-3" id="text-org846f767">
 <p>
 Because stateful workloads often need stable Pod DNS names and direct peer discovery.
 </p>
 </div>
 </div>
-<div id="outline-container-org373d7ba" class="outline-3">
-<h3 id="org373d7ba">Q187: What is DNS A record for a headless Service?</h3>
-<div class="outline-text-3" id="text-org373d7ba">
+<div id="outline-container-orgb9594a7" class="outline-3">
+<h3 id="orgb9594a7">Q187: What is DNS A record for a headless Service?</h3>
+<div class="outline-text-3" id="text-orgb9594a7">
 <p>
 It resolves to one or more Pod IPs rather than a single Service ClusterIP.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c2857f" class="outline-3">
-<h3 id="org7c2857f">Q188: What is a Service with multiple ports and protocols?</h3>
-<div class="outline-text-3" id="text-org7c2857f">
+<div id="outline-container-org80bdd49" class="outline-3">
+<h3 id="org80bdd49">Q188: What is a Service with multiple ports and protocols?</h3>
+<div class="outline-text-3" id="text-org80bdd49">
 <p>
 It can expose e.g. TCP and UDP port combinations to match different application protocols.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeeaf3d2" class="outline-3">
-<h3 id="orgeeaf3d2">Q189: What is a Service for gRPC?</h3>
-<div class="outline-text-3" id="text-orgeeaf3d2">
+<div id="outline-container-orgec79bc7" class="outline-3">
+<h3 id="orgec79bc7">Q189: What is a Service for gRPC?</h3>
+<div class="outline-text-3" id="text-orgec79bc7">
 <p>
 It is commonly a ClusterIP or LoadBalancer Service exposing the gRPC port to clients.
 </p>
 </div>
 </div>
-<div id="outline-container-orge536750" class="outline-3">
-<h3 id="orge536750">Q190: What is a Service for WebSocket?</h3>
-<div class="outline-text-3" id="text-orge536750">
+<div id="outline-container-org81c7c6c" class="outline-3">
+<h3 id="org81c7c6c">Q190: What is a Service for WebSocket?</h3>
+<div class="outline-text-3" id="text-org81c7c6c">
 <p>
 A Service can route WebSocket traffic just like HTTP traffic, as long as backend Pods are ready and the protocol is supported.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c731c6" class="outline-3">
-<h3 id="org0c731c6">Q191: What is a Service mesh traffic policy?</h3>
-<div class="outline-text-3" id="text-org0c731c6">
+<div id="outline-container-org9bb40f4" class="outline-3">
+<h3 id="org9bb40f4">Q191: What is a Service mesh traffic policy?</h3>
+<div class="outline-text-3" id="text-org9bb40f4">
 <p>
 It may enforce mTLS, retries, circuit breakers, and routing rules independent of raw K8s Services.
 </p>
 </div>
 </div>
-<div id="outline-container-org9810a83" class="outline-3">
-<h3 id="org9810a83">Q192: What is a Service endpoint anti-affinity?</h3>
-<div class="outline-text-3" id="text-org9810a83">
+<div id="outline-container-org20fd4d3" class="outline-3">
+<h3 id="org20fd4d3">Q192: What is a Service endpoint anti-affinity?</h3>
+<div class="outline-text-3" id="text-org20fd4d3">
 <p>
 It means preferring backends in different failure domains to reduce correlated failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org49cf201" class="outline-3">
-<h3 id="org49cf201">Q193: What is a multi-zone Service deployment?</h3>
-<div class="outline-text-3" id="text-org49cf201">
+<div id="outline-container-org8b872fe" class="outline-3">
+<h3 id="org8b872fe">Q193: What is a multi-zone Service deployment?</h3>
+<div class="outline-text-3" id="text-org8b872fe">
 <p>
 It spreads Pods across availability zones and uses routing patterns to improve resilience and latency.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6019c1" class="outline-3">
-<h3 id="orgf6019c1">Q194: What is ingress sharding?</h3>
-<div class="outline-text-3" id="text-orgf6019c1">
+<div id="outline-container-org11e6386" class="outline-3">
+<h3 id="org11e6386">Q194: What is ingress sharding?</h3>
+<div class="outline-text-3" id="text-org11e6386">
 <p>
 It is the partitioning of inbound traffic across ingress controllers or ingress nodes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfbf5668" class="outline-3">
-<h3 id="orgfbf5668">Q195: What is L4 vs L7 routing?</h3>
-<div class="outline-text-3" id="text-orgfbf5668">
+<div id="outline-container-org8e6334a" class="outline-3">
+<h3 id="org8e6334a">Q195: What is L4 vs L7 routing?</h3>
+<div class="outline-text-3" id="text-org8e6334a">
 <p>
 L4 routing operates at the transport layer, such as TCP/UDP.
 L7 routing operates at the application layer, such as HTTP path and host.
 </p>
 </div>
 </div>
-<div id="outline-container-org35afc63" class="outline-3">
-<h3 id="org35afc63">Q196: What is Kubernetes Service at L4?</h3>
-<div class="outline-text-3" id="text-org35afc63">
+<div id="outline-container-org6144951" class="outline-3">
+<h3 id="org6144951">Q196: What is Kubernetes Service at L4?</h3>
+<div class="outline-text-3" id="text-org6144951">
 <p>
 The Service mostly functions at the transport layer, balancing connections to backend Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb129a08" class="outline-3">
-<h3 id="orgb129a08">Q197: What is Ingress at L7?</h3>
-<div class="outline-text-3" id="text-orgb129a08">
+<div id="outline-container-orgacc02e2" class="outline-3">
+<h3 id="orgacc02e2">Q197: What is Ingress at L7?</h3>
+<div class="outline-text-3" id="text-orgacc02e2">
 <p>
 Ingress goes above Service routing and inspects HTTP headers, hosts, and paths.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a0e14c" class="outline-3">
-<h3 id="org5a0e14c">Q198: What is external DNS integration?</h3>
-<div class="outline-text-3" id="text-org5a0e14c">
+<div id="outline-container-org3577cbc" class="outline-3">
+<h3 id="org3577cbc">Q198: What is external DNS integration?</h3>
+<div class="outline-text-3" id="text-org3577cbc">
 <p>
 ExternalDNS syncs DNS records to cloud or external DNS providers based on Kubernetes Services and Ingresses.
 </p>
 </div>
 </div>
-<div id="outline-container-org3f1695f" class="outline-3">
-<h3 id="org3f1695f">Q199: What is a Service object as the primitive of service discovery?</h3>
-<div class="outline-text-3" id="text-org3f1695f">
+<div id="outline-container-orgbd594e4" class="outline-3">
+<h3 id="orgbd594e4">Q199: What is a Service object as the primitive of service discovery?</h3>
+<div class="outline-text-3" id="text-orgbd594e4">
 <p>
 It is one of the core building blocks of K8s networking and inter-service communication.
 </p>
 </div>
 </div>
-<div id="outline-container-org3e331e2" class="outline-3">
-<h3 id="org3e331e2">Q200: What is the main lesson of Kubernetes Services?</h3>
-<div class="outline-text-3" id="text-org3e331e2">
+<div id="outline-container-org2fbf137" class="outline-3">
+<h3 id="org2fbf137">Q200: What is the main lesson of Kubernetes Services?</h3>
+<div class="outline-text-3" id="text-org2fbf137">
 <p>
 Kubernetes Services turn a dynamic set of Pods into a stable, discoverable, load-balanced endpoint, which is the foundation of resilient and scalable application traffic management.
 </p>

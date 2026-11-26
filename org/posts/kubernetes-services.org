@@ -8,7 +8,882 @@
 
 * Kubernetes Services
 
+[[https://kubernetes.io/docs/concepts/services-networking/service/][Kubernetes Services]]
+
 -----
+
+* Kubernetes Services Command Handbook:
+
+*1. Service Discovery & Inspection*
+
+#+BEGIN_SRC bash
+
+# List services in current namespace
+kubectl get services
+kubectl get svc
+
+# List services across all namespaces
+kubectl get svc -A
+
+# Display services with additional information
+kubectl get svc -o wide
+
+# Describe a service
+kubectl describe service nginx
+
+# Display service YAML
+kubectl get service nginx -o yaml
+
+# Display service as JSON
+kubectl get service nginx -o json
+
+# Get services with labels
+kubectl get svc --show-labels
+
+# Filter services by label
+kubectl get svc -l app=nginx
+
+# Watch service changes
+kubectl get svc -w
+
+# List services in a specific namespace
+kubectl get svc -n production
+
+#+END_SRC
+
+*2. Creating Kubernetes Services*
+
+#+BEGIN_SRC bash
+
+# Create a ClusterIP service
+kubectl expose deployment nginx \
+  --name=nginx-service \
+  --port=80
+
+# Create a service with a target port
+kubectl expose deployment nginx \
+  --name=nginx-service \
+  --port=80 \
+  --target-port=8080
+
+# Create a NodePort service
+kubectl expose deployment nginx \
+  --name=nginx-nodeport \
+  --type=NodePort \
+  --port=80
+
+# Create a LoadBalancer service
+kubectl expose deployment nginx \
+  --name=nginx-lb \
+  --type=LoadBalancer \
+  --port=80
+
+# Create a service with a specific namespace
+kubectl expose deployment nginx \
+  --name=nginx-service \
+  --port=80 \
+  -n production
+
+# Generate Service YAML without creating it
+kubectl expose deployment nginx \
+  --port=80 \
+  --dry-run=client \
+  -o yaml
+
+#+END_SRC
+
+*3. Service Types*
+
+#+BEGIN_SRC bash
+
+# Create ClusterIP service
+kubectl expose deployment nginx \
+  --type=ClusterIP \
+  --port=80
+
+# Create NodePort service
+kubectl expose deployment nginx \
+  --type=NodePort \
+  --port=80
+
+# Create LoadBalancer service
+kubectl expose deployment nginx \
+  --type=LoadBalancer \
+  --port=80
+
+# Change Service type to NodePort
+kubectl patch service nginx \
+  -p '{"spec":{"type":"NodePort"}}'
+
+# Change Service type to LoadBalancer
+kubectl patch service nginx \
+  -p '{"spec":{"type":"LoadBalancer"}}'
+
+# Change Service type to ClusterIP
+kubectl patch service nginx \
+  -p '{"spec":{"type":"ClusterIP"}}'
+
+# Display Service type
+kubectl get svc nginx \
+  -o jsonpath='{.spec.type}'
+
+#+END_SRC
+
+Service types:
+
+| Type | Purpose |
+|---|---|
+| ClusterIP | Internal cluster communication |
+| NodePort | Exposes service through node ports |
+| LoadBalancer | Exposes service through an external load balancer |
+| ExternalName | Maps service to an external DNS hostname |
+
+*4. Service Ports & Target Ports*
+
+#+BEGIN_SRC bash
+
+# Display service ports
+kubectl get svc nginx
+
+# Display port configuration
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports}'
+
+# Display service port
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports[*].port}'
+
+# Display target port
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports[*].targetPort}'
+
+# Display NodePort
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports[*].nodePort}'
+
+# Display service protocol
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports[*].protocol}'
+
+# Patch service target port
+kubectl patch svc nginx \
+  -p '{"spec":{"ports":[{"port":80,"targetPort":8080}]}}'
+
+# Describe service port mappings
+kubectl describe svc nginx
+
+#+END_SRC
+
+*5. Service Selectors & Labels*
+
+#+BEGIN_SRC bash
+
+# Display pod labels
+kubectl get pods --show-labels
+
+# Display service selectors
+kubectl get svc nginx \
+  -o jsonpath='{.spec.selector}'
+
+# List pods matching a label
+kubectl get pods -l app=nginx
+
+# Add label to a pod
+kubectl label pod nginx-pod app=nginx
+
+# Update existing pod label
+kubectl label pod nginx-pod app=frontend --overwrite
+
+# Remove a pod label
+kubectl label pod nginx-pod app-
+
+# Display service selector and matching pods
+kubectl describe svc nginx
+
+# Find pods selected by a service
+kubectl get pods -l app=nginx -o wide
+
+# Display service and pod labels
+kubectl get svc,pods --show-labels
+
+#+END_SRC
+
+*6. Endpoints & EndpointSlices*
+
+#+BEGIN_SRC bash
+
+# List endpoints
+kubectl get endpoints
+
+# List endpoints in all namespaces
+kubectl get endpoints -A
+
+# Describe service endpoints
+kubectl describe endpoints nginx
+
+# Display endpoint details
+kubectl get endpoints nginx -o yaml
+
+# List EndpointSlices
+kubectl get endpointslices
+
+# List EndpointSlices in all namespaces
+kubectl get endpointslices -A
+
+# Describe EndpointSlice
+kubectl describe endpointslice endpointslice-name
+
+# Display EndpointSlice YAML
+kubectl get endpointslice endpointslice-name -o yaml
+
+# Find EndpointSlices associated with a service
+kubectl get endpointslices \
+  -l kubernetes.io/service-name=nginx
+
+# Display endpoint addresses
+kubectl get endpoints nginx \
+  -o jsonpath='{.subsets[*].addresses[*].ip}'
+
+# Display endpoint ports
+kubectl get endpoints nginx \
+  -o jsonpath='{.subsets[*].ports[*].port}'
+
+#+END_SRC
+
+*7. Service DNS & Service Discovery*
+
+#+BEGIN_SRC bash
+
+# Display service DNS configuration
+kubectl get svc nginx -o yaml
+
+# Run temporary DNS debugging container
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  -it --rm \
+  --restart=Never \
+  -- nslookup nginx
+
+# Resolve service in the same namespace
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  -it --rm \
+  --restart=Never \
+  -- nslookup nginx.default.svc.cluster.local
+
+# Resolve service in another namespace
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  -it --rm \
+  --restart=Never \
+  -- nslookup nginx.production.svc.cluster.local
+
+# Display DNS configuration inside a pod
+kubectl exec -it pod-name -- cat /etc/resolv.conf
+
+# Display CoreDNS pods
+kubectl get pods -n kube-system -l k8s-app=kube-dns
+
+# Display CoreDNS service
+kubectl get svc -n kube-system kube-dns
+
+# Display CoreDNS logs
+kubectl logs -n kube-system \
+  -l k8s-app=kube-dns
+
+#+END_SRC
+
+*8. Headless Services*
+
+#+BEGIN_SRC bash
+
+# List headless services
+kubectl get svc -A \
+  -o custom-columns=NAME:.metadata.name,CLUSTER-IP:.spec.clusterIP
+
+# Inspect a specific headless service
+kubectl describe svc my-headless-service
+
+# Display headless service YAML
+kubectl get svc my-headless-service -o yaml
+
+# Create headless service from YAML
+kubectl apply -f headless-service.yaml
+
+# Resolve headless service DNS
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  -it --rm \
+  --restart=Never \
+  -- nslookup my-headless-service.default.svc.cluster.local
+
+# Delete headless service
+kubectl delete svc my-headless-service
+
+#+END_SRC
+
+A headless Service uses `clusterIP: None` and provides DNS records for individual backend Pods instead of a virtual ClusterIP.
+
+*9. ExternalName & Selectorless Services*
+
+#+BEGIN_SRC bash
+
+# Create ExternalName service
+kubectl create service externalname external-api \
+  --external-name=api.example.com
+
+# Display ExternalName service
+kubectl get svc external-api -o yaml
+
+# Describe ExternalName service
+kubectl describe svc external-api
+
+# Create selectorless service from YAML
+kubectl apply -f selectorless-service.yaml
+
+# List services without selectors
+kubectl get svc -o json
+
+# Display service selectors
+kubectl get svc \
+  -o custom-columns=NAME:.metadata.name,SELECTOR:.spec.selector
+
+# List manually managed endpoints
+kubectl get endpoints
+
+#+END_SRC
+
+Note: Selectorless Services can use manually managed EndpointSlices to connect to external backends. Kubernetes does not automatically create EndpointSlices for selectorless Services.
+
+*10. Session Affinity & Traffic Policies*
+
+#+BEGIN_SRC bash
+
+# Display session affinity
+kubectl get svc nginx \
+  -o jsonpath='{.spec.sessionAffinity}'
+
+# Enable ClientIP session affinity
+kubectl patch svc nginx \
+  -p '{"spec":{"sessionAffinity":"ClientIP"}}'
+
+# Disable session affinity
+kubectl patch svc nginx \
+  -p '{"spec":{"sessionAffinity":"None"}}'
+
+# Display session affinity timeout
+kubectl get svc nginx \
+  -o jsonpath='{.spec.sessionAffinityConfig}'
+
+# Display external traffic policy
+kubectl get svc nginx \
+  -o jsonpath='{.spec.externalTrafficPolicy}'
+
+# Set external traffic policy to Local
+kubectl patch svc nginx \
+  -p '{"spec":{"externalTrafficPolicy":"Local"}}'
+
+# Set external traffic policy to Cluster
+kubectl patch svc nginx \
+  -p '{"spec":{"externalTrafficPolicy":"Cluster"}}'
+
+# Display internal traffic policy
+kubectl get svc nginx \
+  -o jsonpath='{.spec.internalTrafficPolicy}'
+
+#+END_SRC
+
+*11. Ingress & Service Integration*
+
+#+BEGIN_SRC bash
+
+# List Ingress resources
+kubectl get ingress
+kubectl get ing
+
+# List Ingress resources across namespaces
+kubectl get ingress -A
+
+# Describe Ingress
+kubectl describe ingress my-ingress
+
+# Display Ingress YAML
+kubectl get ingress my-ingress -o yaml
+
+# List Ingress classes
+kubectl get ingressclass
+
+# Describe IngressClass
+kubectl describe ingressclass nginx
+
+# Apply Ingress manifest
+kubectl apply -f ingress.yaml
+
+# Display backend service information
+kubectl describe ingress my-ingress
+
+# Delete Ingress
+kubectl delete ingress my-ingress
+
+#+END_SRC
+
+Example Ingress manifest:
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+Note: An Ingress resource requires a compatible Ingress controller to implement its routing rules.
+
+*12. Service Networking & Port Forwarding*
+
+#+BEGIN_SRC bash
+
+# Forward local port to a service
+kubectl port-forward svc/nginx 8080:80
+
+# Forward local port to a pod
+kubectl port-forward pod/nginx-pod 8080:80
+
+# Forward local port to a deployment
+kubectl port-forward deployment/nginx 8080:80
+
+# Forward on a specific local address
+kubectl port-forward --address 127.0.0.1 svc/nginx 8080:80
+
+# Forward multiple ports
+kubectl port-forward svc/nginx 8080:80 8443:443
+
+# Display service ClusterIP
+kubectl get svc nginx \
+  -o jsonpath='{.spec.clusterIP}'
+
+# Display node IP addresses
+kubectl get nodes -o wide
+
+# Display NodePort
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports[*].nodePort}'
+
+# Test service connectivity from a temporary container
+kubectl run curl-test \
+  --image=curlimages/curl \
+  -it --rm \
+  --restart=Never \
+  -- curl -v http://nginx
+
+#+END_SRC
+
+*13. NetworkPolicy & Service Security*
+
+#+BEGIN_SRC bash
+
+# List NetworkPolicies
+kubectl get networkpolicies
+
+# List NetworkPolicies across namespaces
+kubectl get networkpolicies -A
+
+# Describe NetworkPolicy
+kubectl describe networkpolicy policy-name
+
+# Display NetworkPolicy YAML
+kubectl get networkpolicy policy-name -o yaml
+
+# Apply NetworkPolicy
+kubectl apply -f network-policy.yaml
+
+# Delete NetworkPolicy
+kubectl delete networkpolicy policy-name
+
+# Display pods with labels
+kubectl get pods --show-labels
+
+# Check service connectivity from a test pod
+kubectl exec -it test-pod -- \
+  curl -v http://nginx-service
+
+# Display service namespace
+kubectl get svc nginx -o jsonpath='{.metadata.namespace}'
+
+#+END_SRC
+
+Note: NetworkPolicies select Pods, not Service objects directly. Their enforcement depends on whether the cluster networking implementation supports NetworkPolicy.
+
+*14. Service Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Check service status
+kubectl get svc
+
+# Describe service
+kubectl describe svc nginx
+
+# Check service endpoints
+kubectl get endpoints nginx
+
+# Check EndpointSlices
+kubectl get endpointslices \
+  -l kubernetes.io/service-name=nginx
+
+# Check selected pods
+kubectl get pods -l app=nginx -o wide
+
+# Check pod readiness
+kubectl get pods
+
+# Inspect pod details
+kubectl describe pod pod-name
+
+# Inspect pod logs
+kubectl logs pod-name
+
+# Check recent events
+kubectl get events \
+  --sort-by=.metadata.creationTimestamp
+
+# Check service selectors
+kubectl get svc nginx \
+  -o jsonpath='{.spec.selector}'
+
+# Check service ports
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ports}'
+
+# Test DNS resolution
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  -it --rm \
+  --restart=Never \
+  -- nslookup nginx
+
+# Test HTTP connectivity
+kubectl run curl-test \
+  --image=curlimages/curl \
+  -it --rm \
+  --restart=Never \
+  -- curl -v http://nginx
+
+# Check CoreDNS logs
+kubectl logs -n kube-system \
+  -l k8s-app=kube-dns
+
+# Check kube-proxy pods, if deployed
+kubectl get pods -n kube-system \
+  -l k8s-app=kube-proxy
+
+# Check service configuration
+kubectl get svc nginx -o yaml
+
+#+END_SRC
+
+Common Service problems:
+
+| Problem | Possible Cause |
+|---|---|
+| No endpoints | Selector does not match Pods |
+| Connection refused | Application not listening on target port |
+| Connection timeout | NetworkPolicy or networking issue |
+| DNS resolution failure | CoreDNS or DNS configuration issue |
+| NodePort unavailable | Incorrect port, firewall, or node networking |
+| LoadBalancer pending | Cloud provider or load balancer integration issue |
+| 503 from Ingress | Missing or unhealthy backend endpoints |
+| Intermittent failures | Unready Pods or application instability |
+
+*15. Service Scaling & High Availability*
+
+#+BEGIN_SRC bash
+
+# Scale deployment behind a service
+kubectl scale deployment nginx --replicas=3
+
+# Display service backends
+kubectl get endpoints nginx
+
+# Display backend pods
+kubectl get pods -l app=nginx -o wide
+
+# Check deployment rollout
+kubectl rollout status deployment/nginx
+
+# Restart deployment
+kubectl rollout restart deployment/nginx
+
+# Check readiness status
+kubectl get pods
+
+# Display PodDisruptionBudgets
+kubectl get pdb
+
+# Describe PodDisruptionBudget
+kubectl describe pdb
+
+# Display service topology configuration
+kubectl get svc nginx -o yaml
+
+# Display service traffic distribution
+kubectl get svc nginx \
+  -o jsonpath='{.spec.trafficDistribution}'
+
+#+END_SRC
+
+*16. Advanced Service Operations*
+
+#+BEGIN_SRC bash
+
+# Display Service API schema
+kubectl explain service
+
+# Display Service specification
+kubectl explain service.spec
+
+# Display Service ports schema
+kubectl explain service.spec.ports
+
+# Display Service selectors schema
+kubectl explain service.spec.selector
+
+# List service-related API resources
+kubectl api-resources | grep -i service
+
+# Display all Services in YAML
+kubectl get svc -A -o yaml
+
+# Display all EndpointSlices
+kubectl get endpointslices -A
+
+# Display service IP families
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ipFamilies}'
+
+# Display IP family policy
+kubectl get svc nginx \
+  -o jsonpath='{.spec.ipFamilyPolicy}'
+
+# Display allocated ClusterIP
+kubectl get svc nginx \
+  -o jsonpath='{.spec.clusterIP}'
+
+# Display allocated ClusterIPs
+kubectl get svc nginx \
+  -o jsonpath='{.spec.clusterIPs}'
+
+# Display service annotations
+kubectl get svc nginx \
+  -o jsonpath='{.metadata.annotations}'
+
+# Display service labels
+kubectl get svc nginx \
+  --show-labels
+
+# Display service creation timestamp
+kubectl get svc nginx \
+  -o jsonpath='{.metadata.creationTimestamp}'
+
+#+END_SRC
+
+*17. Real-World Kubernetes Services Workflows*
+
+**A. Create an application and expose it internally**
+
+#+BEGIN_SRC bash
+
+kubectl create deployment nginx --image=nginx
+
+kubectl expose deployment nginx \
+  --name=nginx-service \
+  --type=ClusterIP \
+  --port=80
+
+kubectl get svc
+kubectl get endpoints nginx-service
+
+#+END_SRC
+
+**B. Expose an application externally**
+
+#+BEGIN_SRC bash
+
+kubectl expose deployment nginx \
+  --name=nginx-service \
+  --type=LoadBalancer \
+  --port=80 \
+  --target-port=80
+
+kubectl get svc nginx-service -w
+
+#+END_SRC
+
+**C. Troubleshoot a Service without endpoints**
+
+#+BEGIN_SRC bash
+
+kubectl get svc nginx-service
+
+kubectl describe svc nginx-service
+
+kubectl get endpoints nginx-service
+
+kubectl get pods --show-labels
+
+kubectl get svc nginx-service \
+  -o jsonpath='{.spec.selector}'
+
+#+END_SRC
+
+**D. Test Service DNS between namespaces**
+
+#+BEGIN_SRC bash
+
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  -it --rm \
+  --restart=Never \
+  -- nslookup nginx-service.production.svc.cluster.local
+
+#+END_SRC
+
+**E. Configure session affinity**
+
+#+BEGIN_SRC bash
+
+kubectl patch svc nginx-service \
+  -p '{"spec":{"sessionAffinity":"ClientIP"}}'
+
+kubectl describe svc nginx-service
+
+#+END_SRC
+
+**F. Debug Service connectivity**
+
+#+BEGIN_SRC bash
+
+kubectl get svc nginx-service
+
+kubectl get endpoints nginx-service
+
+kubectl get pods -o wide
+
+kubectl run curl-test \
+  --image=curlimages/curl \
+  -it --rm \
+  --restart=Never \
+  -- curl -v http://nginx-service
+
+#+END_SRC
+
+**G. Configure an Ingress backend**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f service.yaml
+
+kubectl apply -f ingress.yaml
+
+kubectl get svc
+
+kubectl get ingress
+
+kubectl describe ingress app-ingress
+
+#+END_SRC
+
+**H. Create a headless Service for StatefulSet**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f headless-service.yaml
+
+kubectl apply -f statefulset.yaml
+
+kubectl get svc
+
+kubectl get pods
+
+kubectl get endpoints
+
+#+END_SRC
+
+**I. Switch Service from ClusterIP to LoadBalancer**
+
+#+BEGIN_SRC bash
+
+kubectl patch svc nginx-service \
+  -p '{"spec":{"type":"LoadBalancer"}}'
+
+kubectl get svc nginx-service -w
+
+#+END_SRC
+
+**J. Verify Service health**
+
+#+BEGIN_SRC bash
+
+kubectl get svc -A
+
+kubectl get endpoints -A
+
+kubectl get endpointslices -A
+
+kubectl get pods -A
+
+kubectl get events -A \
+  --sort-by=.metadata.creationTimestamp
+
+#+END_SRC
+
+*18. Kubernetes Services Commands Every Developer Should Memorize*
+
+| Command | Purpose |
+|---|---|
+| `kubectl get svc` | List Services |
+| `kubectl get svc -A` | List Services across namespaces |
+| `kubectl describe svc nginx` | Inspect Service |
+| `kubectl get svc nginx -o yaml` | Display Service YAML |
+| `kubectl expose deployment nginx --port=80` | Create ClusterIP Service |
+| `kubectl get endpoints` | List Service endpoints |
+| `kubectl get endpointslices` | List EndpointSlices |
+| `kubectl get pods --show-labels` | Display Pod labels |
+| `kubectl get svc --show-labels` | Display Service labels |
+| `kubectl get pods -l app=nginx` | Filter Pods by label |
+| `kubectl get svc nginx -o json` | Display Service JSON |
+| `kubectl get ingress` | List Ingress resources |
+| `kubectl describe ingress my-ingress` | Inspect Ingress |
+| `kubectl get networkpolicies` | List NetworkPolicies |
+| `kubectl get svc nginx -o wide` | Display additional Service information |
+| `kubectl port-forward svc/nginx 8080:80` | Forward local traffic to Service |
+| `kubectl get svc nginx -o jsonpath='{.spec.clusterIP}'` | Display ClusterIP |
+| `kubectl get svc nginx -o jsonpath='{.spec.ports[*].nodePort}'` | Display NodePort |
+| `kubectl get svc nginx -o jsonpath='{.spec.selector}'` | Display Service selector |
+| `kubectl get svc nginx -o jsonpath='{.spec.type}'` | Display Service type |
+| `kubectl get svc -w` | Watch Service changes |
+| `kubectl get endpoints nginx` | Check Service backends |
+| `kubectl get endpointslices -l kubernetes.io/service-name=nginx` | Find Service EndpointSlices |
+| `kubectl get events -A` | Inspect cluster events |
+| `kubectl explain service` | Explore Service API schema |
+
+Important: Always verify Service selectors, Pod readiness, target ports, endpoints, and network policies when troubleshooting connectivity. Before changing Service types or traffic policies in production, check the impact on external load balancers and application clients.
+
+------
 
 * Beginner
 
