@@ -8,6 +8,1167 @@
 
 * Kubernetes
 
+[[https://kubernetes.io/docs/home/][Kubernetes Documentation]]
+-----
+
+* Kubernetes Command Handbook:
+
+*1. Kubernetes Installation & Configuration*
+
+#+BEGIN_SRC bash
+
+# Check kubectl version
+kubectl version --client
+kubectl version --client --output=yaml
+
+# Check Kubernetes cluster version
+kubectl version
+
+# Check kubectl installation path
+which kubectl                 # Linux / macOS
+where kubectl                 # Windows
+
+# Display cluster information
+kubectl cluster-info
+
+# Display Kubernetes configuration
+kubectl config view
+
+# Display current context
+kubectl config current-context
+
+# Display available contexts
+kubectl config get-contexts
+
+# Set a default namespace
+kubectl config set-context --current --namespace=default
+
+#+END_SRC
+
+*2. Cluster & Node Management*
+
+#+BEGIN_SRC bash
+
+# Display cluster information
+kubectl cluster-info
+
+# List all nodes
+kubectl get nodes
+
+# Display detailed node information
+kubectl get nodes -o wide
+
+# Describe a specific node
+kubectl describe node node-name
+
+# Display node labels
+kubectl get nodes --show-labels
+
+# Display node resource capacity and allocation
+kubectl describe nodes
+
+# Check node resource usage (requires Metrics Server)
+kubectl top nodes
+
+# List all cluster resources
+kubectl get all -A
+
+# Check API resources
+kubectl api-resources
+
+# Display Kubernetes API versions
+kubectl api-versions
+
+#+END_SRC
+
+*3. Contexts & Namespace Management*
+
+Contexts allow you to switch between different Kubernetes clusters, users, and namespaces.
+
+#+BEGIN_SRC bash
+
+# List available contexts
+kubectl config get-contexts
+
+# Display current context
+kubectl config current-context
+
+# Switch to another context
+kubectl config use-context development
+
+# Create a new context
+kubectl config set-context dev-context \
+  --cluster=dev-cluster \
+  --user=dev-user \
+  --namespace=development
+
+# Delete a context
+kubectl config delete-context dev-context
+
+# List namespaces
+kubectl get namespaces
+kubectl get ns
+
+# Create a namespace
+kubectl create namespace development
+
+# Describe a namespace
+kubectl describe namespace development
+
+# Delete a namespace
+kubectl delete namespace development
+
+# List resources in a namespace
+kubectl get all -n development
+
+# Set namespace for current context
+kubectl config set-context --current --namespace=development
+
+#+END_SRC
+
+*4. Pods Management*
+
+Pods are the smallest deployable units in Kubernetes and contain one or more containers.
+
+#+BEGIN_SRC bash
+
+# List pods in current namespace
+kubectl get pods
+
+# List pods in all namespaces
+kubectl get pods -A
+
+# Display additional pod information
+kubectl get pods -o wide
+
+# Watch pods in real time
+kubectl get pods -w
+
+# Describe a pod
+kubectl describe pod pod-name
+
+# Display pod YAML
+kubectl get pod pod-name -o yaml
+
+# Create a pod imperatively
+kubectl run nginx --image=nginx
+
+# Create a pod with a specific port
+kubectl run nginx --image=nginx --port=80
+
+# Delete a pod
+kubectl delete pod pod-name
+
+# Delete all pods in a namespace
+kubectl delete pods --all
+
+# Get pods using labels
+kubectl get pods -l app=nginx
+
+# Display pod IP addresses
+kubectl get pods -o wide
+
+#+END_SRC
+
+*5. Deployments & ReplicaSets*
+
+Deployments manage ReplicaSets and provide declarative updates, scaling, and rollbacks.
+
+#+BEGIN_SRC bash
+
+# Create a deployment
+kubectl create deployment nginx --image=nginx
+
+# Create a deployment with replicas
+kubectl create deployment nginx \
+  --image=nginx \
+  --replicas=3
+
+# List deployments
+kubectl get deployments
+
+# Describe a deployment
+kubectl describe deployment nginx
+
+# Display deployment YAML
+kubectl get deployment nginx -o yaml
+
+# Scale deployment
+kubectl scale deployment nginx --replicas=5
+
+# Update container image
+kubectl set image deployment/nginx nginx=nginx:1.27
+
+# Check rollout status
+kubectl rollout status deployment/nginx
+
+# Display rollout history
+kubectl rollout history deployment/nginx
+
+# Display a specific revision
+kubectl rollout history deployment/nginx --revision=2
+
+# Undo the latest deployment
+kubectl rollout undo deployment/nginx
+
+# Roll back to a specific revision
+kubectl rollout undo deployment/nginx --to-revision=2
+
+# Restart deployment
+kubectl rollout restart deployment/nginx
+
+# Pause deployment rollout
+kubectl rollout pause deployment/nginx
+
+# Resume deployment rollout
+kubectl rollout resume deployment/nginx
+
+# Delete deployment
+kubectl delete deployment nginx
+
+#+END_SRC
+
+*6. Services & Networking*
+
+Services provide stable network endpoints for accessing a group of pods.
+
+#+BEGIN_SRC bash
+
+# List services
+kubectl get services
+kubectl get svc
+
+# List services in all namespaces
+kubectl get svc -A
+
+# Describe a service
+kubectl describe service nginx
+
+# Create a ClusterIP service
+kubectl expose deployment nginx \
+  --port=80 \
+  --target-port=80
+
+# Create a NodePort service
+kubectl expose deployment nginx \
+  --type=NodePort \
+  --port=80
+
+# Create a LoadBalancer service
+kubectl expose deployment nginx \
+  --type=LoadBalancer \
+  --port=80
+
+# Display service endpoints
+kubectl get endpoints
+
+# Display EndpointSlices
+kubectl get endpointslices
+
+# Display service YAML
+kubectl get service nginx -o yaml
+
+# Delete a service
+kubectl delete service nginx
+
+# List network policies
+kubectl get networkpolicies
+
+#+END_SRC
+
+Service types:
+
+| Service Type | Purpose |
+|---|---|
+| `ClusterIP` | Internal cluster communication |
+| `NodePort` | Exposes service on node ports |
+| `LoadBalancer` | Requests an external load balancer |
+| `ExternalName` | Maps service to an external DNS name |
+
+*7. ConfigMaps & Secrets*
+
+ConfigMaps store non-sensitive configuration, while Secrets are intended for sensitive information.
+
+#+BEGIN_SRC bash
+
+# Create ConfigMap from literal values
+kubectl create configmap app-config \
+  --from-literal=APP_ENV=development
+
+# Create ConfigMap from file
+kubectl create configmap app-config \
+  --from-file=application.properties
+
+# List ConfigMaps
+kubectl get configmaps
+
+# Describe ConfigMap
+kubectl describe configmap app-config
+
+# Display ConfigMap YAML
+kubectl get configmap app-config -o yaml
+
+# Create Secret from literal values
+kubectl create secret generic db-secret \
+  --from-literal=username=admin \
+  --from-literal=password=change-me
+
+# Create Secret from file
+kubectl create secret generic db-secret \
+  --from-file=password=./password.txt
+
+# List Secrets
+kubectl get secrets
+
+# Describe Secret
+kubectl describe secret db-secret
+
+# Display Secret YAML
+kubectl get secret db-secret -o yaml
+
+# Delete ConfigMap
+kubectl delete configmap app-config
+
+# Delete Secret
+kubectl delete secret db-secret
+
+#+END_SRC
+
+Note: Kubernetes Secret values are base64-encoded by default, not encrypted. Configure encryption at rest, RBAC, and appropriate secret-management controls. Avoid putting real credentials directly in shell history or source control.
+
+*8. YAML Manifests & Declarative Management*
+
+Kubernetes declarative management uses YAML manifests to describe the desired state of resources.
+
+#+BEGIN_SRC bash
+
+# Apply a YAML manifest
+kubectl apply -f deployment.yaml
+
+# Apply all YAML files in a directory
+kubectl apply -f ./k8s/
+
+# Apply multiple manifests
+kubectl apply -f deployment.yaml -f service.yaml
+
+# Validate manifest without applying changes
+kubectl apply --dry-run=server -f deployment.yaml
+
+# Validate manifest locally
+kubectl apply --dry-run=client -f deployment.yaml
+
+# Preview differences
+kubectl diff -f deployment.yaml
+
+# Delete resources defined in a manifest
+kubectl delete -f deployment.yaml
+
+# Replace resource using manifest
+kubectl replace -f deployment.yaml
+
+# Generate YAML without creating a resource
+kubectl create deployment nginx \
+  --image=nginx \
+  --dry-run=client -o yaml
+
+# Export an existing deployment
+kubectl get deployment nginx -o yaml
+
+# Generate YAML for a service
+kubectl expose deployment nginx \
+  --port=80 \
+  --dry-run=client -o yaml
+
+#+END_SRC
+
+Useful manifest-management commands:
+
+| Command | Purpose |
+|---|---|
+| `kubectl apply` | Create or update resources |
+| `kubectl diff` | Preview manifest changes |
+| `kubectl delete -f` | Delete manifest resources |
+| `kubectl replace` | Replace an existing resource |
+| `kubectl get -o yaml` | Display resource YAML |
+| `kubectl explain` | Explore resource schema |
+
+*9. Logs, Exec & Container Debugging*
+
+#+BEGIN_SRC bash
+
+# Display pod logs
+kubectl logs pod-name
+
+# Display logs from a specific container
+kubectl logs pod-name -c container-name
+
+# Follow logs in real time
+kubectl logs -f pod-name
+
+# Display the last 100 lines
+kubectl logs pod-name --tail=100
+
+# Display logs from the previous container instance
+kubectl logs pod-name --previous
+
+# Display logs with timestamps
+kubectl logs pod-name --timestamps
+
+# Display logs from all containers in a pod
+kubectl logs pod-name --all-containers=true
+
+# Execute command inside a container
+kubectl exec pod-name -- ls
+
+# Open an interactive shell
+kubectl exec -it pod-name -- /bin/sh
+
+# Open Bash shell
+kubectl exec -it pod-name -- /bin/bash
+
+# Execute command in a specific container
+kubectl exec -it pod-name -c container-name -- /bin/sh
+
+# Copy file from local machine to pod
+kubectl cp ./file.txt pod-name:/tmp/file.txt
+
+# Copy file from pod to local machine
+kubectl cp pod-name:/tmp/file.txt ./file.txt
+
+# Forward local port to pod
+kubectl port-forward pod-name 8080:80
+
+# Forward local port to service
+kubectl port-forward service/nginx 8080:80
+
+# Run a temporary debugging pod
+kubectl run debug --image=busybox:1.36 -it --rm --restart=Never -- sh
+
+#+END_SRC
+
+*10. Events & Troubleshooting*
+
+Kubernetes events and resource descriptions are essential for diagnosing scheduling, networking, image-pull, and container failures.
+
+#+BEGiN_SRC bash
+
+# Display all events
+kubectl get events
+
+# Display events across all namespaces
+kubectl get events -A
+
+# Sort events by creation timestamp
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# Describe a pod
+kubectl describe pod pod-name
+
+# Describe a node
+kubectl describe node node-name
+
+# Check pods that are not running
+kubectl get pods -A --field-selector=status.phase!=Running
+
+# Check pods with wide output
+kubectl get pods -o wide
+
+# Check resource usage (requires Metrics Server)
+kubectl top pods
+kubectl top pods -A
+
+# Check resource usage for a specific node
+kubectl top node node-name
+
+# Check deployment status
+kubectl rollout status deployment/nginx
+
+# Check persistent volume claims
+kubectl get pvc
+
+# Check persistent volumes
+kubectl get pv
+
+# Check service endpoints
+kubectl get endpoints
+
+# Check cluster components and control plane health
+kubectl get --raw='/readyz?verbose'
+kubectl get --raw='/livez?verbose'
+
+#+END_SRC
+
+Common Kubernetes errors:
+
+| Status / Error | Common Cause |
+|---|---|
+| `CrashLoopBackOff` | Container repeatedly crashes |
+| `ImagePullBackOff` | Image cannot be pulled |
+| `ErrImagePull` | Image pull failure |
+| `Pending` | Pod cannot be scheduled or storage is unavailable |
+| `OOMKilled` | Container exceeded memory limit |
+| `CreateContainerConfigError` | Invalid or missing configuration |
+| `ContainerCreating` | Container setup is still in progress |
+
+*11. Resource Management & Autoscaling*
+
+#+BEGIN_SRC bash
+
+# Display resource usage
+kubectl top nodes
+kubectl top pods
+
+# Display resource requests and limits
+kubectl describe pod pod-name
+
+# Scale deployment manually
+kubectl scale deployment nginx --replicas=5
+
+# Create Horizontal Pod Autoscaler
+kubectl autoscale deployment nginx \
+  --cpu-percent=70 \
+  --min=2 \
+  --max=10
+
+# List Horizontal Pod Autoscalers
+kubectl get hpa
+
+# Describe HPA
+kubectl describe hpa nginx
+
+# Display HPA YAML
+kubectl get hpa nginx -o yaml
+
+# Delete HPA
+kubectl delete hpa nginx
+
+# List resource quotas
+kubectl get resourcequota
+
+# Describe resource quota
+kubectl describe resourcequota
+
+# List limit ranges
+kubectl get limitrange
+
+#+END_SRC
+
+Note: HPA CPU utilization requires appropriate resource requests and an available metrics API. VPA and Cluster Autoscaler generally require additional components or platform integration.
+
+*12. Persistent Storage & Volumes*
+
+#+BEGIN_SRC bash
+
+# List PersistentVolumes
+kubectl get pv
+
+# List PersistentVolumeClaims
+kubectl get pvc
+
+# List StorageClasses
+kubectl get storageclass
+kubectl get sc
+
+# Describe a PersistentVolume
+kubectl describe pv pv-name
+
+# Describe a PersistentVolumeClaim
+kubectl describe pvc pvc-name
+
+# Display PVC YAML
+kubectl get pvc pvc-name -o yaml
+
+# List volume snapshots (if supported)
+kubectl get volumesnapshots
+
+# Describe a StorageClass
+kubectl describe storageclass storage-class-name
+
+# Delete PVC
+kubectl delete pvc pvc-name
+
+# Delete PV
+kubectl delete pv pv-name
+
+#+END_SRC
+
+Important storage resources:
+
+| Resource | Purpose |
+|---|---|
+| `PersistentVolume (PV)` | Cluster storage resource |
+| `PersistentVolumeClaim (PVC)` | Request for persistent storage |
+| `StorageClass` | Defines dynamic provisioning |
+| `VolumeSnapshot` | Point-in-time storage snapshot |
+
+Note: Deleting a PVC can result in data loss depending on the PV reclaim policy and storage provider. Always verify the retention policy before deleting storage resources.
+
+*13. StatefulSets, DaemonSets & Jobs*
+
+#+BEGIN_SRC bash
+
+# List StatefulSets
+kubectl get statefulsets
+kubectl get sts
+
+# Create StatefulSet from YAML
+kubectl apply -f statefulset.yaml
+
+# Describe StatefulSet
+kubectl describe statefulset app
+
+# Scale StatefulSet
+kubectl scale statefulset app --replicas=3
+
+# Delete StatefulSet
+kubectl delete statefulset app
+
+# List DaemonSets
+kubectl get daemonsets
+kubectl get ds
+
+# Describe DaemonSet
+kubectl describe daemonset monitoring-agent
+
+# List Jobs
+kubectl get jobs
+
+# Create a Job
+kubectl create job hello --image=busybox:1.36 \
+  -- echo "Hello Kubernetes"
+
+# Describe Job
+kubectl describe job hello
+
+# List CronJobs
+kubectl get cronjobs
+
+# Create CronJob from YAML
+kubectl apply -f cronjob.yaml
+
+# Suspend a CronJob
+kubectl patch cronjob backup \
+  -p '{"spec":{"suspend":true}}'
+
+# Resume a CronJob
+kubectl patch cronjob backup \
+  -p '{"spec":{"suspend":false}}'
+
+# Delete Job
+kubectl delete job hello
+
+#+END_SRC
+
+*14. Scheduling, Taints & Node Maintenance*
+
+#+BEGIN_SRC bash
+
+# Display node labels
+kubectl get nodes --show-labels
+
+# Add a label to a node
+kubectl label nodes node-name environment=production
+
+# Remove a node label
+kubectl label nodes node-name environment-
+
+# Add a taint to a node
+kubectl taint nodes node-name dedicated=production:NoSchedule
+
+# Remove a taint
+kubectl taint nodes node-name dedicated=production:NoSchedule-
+
+# Mark node as unschedulable
+kubectl cordon node-name
+
+# Drain a node for maintenance
+kubectl drain node-name --ignore-daemonsets
+
+# Allow scheduling on a node again
+kubectl uncordon node-name
+
+# Display node conditions
+kubectl describe node node-name
+
+# Display pods scheduled on a specific node
+kubectl get pods -A -o wide --field-selector spec.nodeName=node-name
+
+#+END_SRC
+
+Important scheduling options:
+
+| Option | Purpose |
+|---|---|
+| `nodeSelector` | Simple node selection |
+| `nodeAffinity` | Advanced node selection rules |
+| `podAffinity` | Co-locate related pods |
+| `podAntiAffinity` | Separate related pods |
+| `tolerations` | Allow scheduling onto tainted nodes |
+| `topologySpreadConstraints` | Distribute pods across topology domains |
+
+Note: `kubectl drain` may be blocked by PodDisruptionBudgets. Review workloads and disruption budgets before performing node maintenance.
+
+*15. Security, RBAC & Service Accounts*
+
+#+BEGIN_SRC bash
+
+# List ServiceAccounts
+kubectl get serviceaccounts
+
+# Create a ServiceAccount
+kubectl create serviceaccount app-user
+
+# Describe ServiceAccount
+kubectl describe serviceaccount app-user
+
+# List Roles
+kubectl get roles
+
+# List ClusterRoles
+kubectl get clusterroles
+
+# List RoleBindings
+kubectl get rolebindings
+
+# List ClusterRoleBindings
+kubectl get clusterrolebindings
+
+# Create a Role
+kubectl create role pod-reader \
+  --verb=get,list,watch \
+  --resource=pods
+
+# Create a RoleBinding
+kubectl create rolebinding read-pods \
+  --role=pod-reader \
+  --user=developer
+
+# Check permissions for current identity
+kubectl auth can-i get pods
+
+# Check permissions in a namespace
+kubectl auth can-i get pods -n production
+
+# Check permissions for another user
+kubectl auth can-i get pods --as=developer
+
+# Check all permissions
+kubectl auth can-i --list
+
+# Display Pod Security Admission labels
+kubectl get namespaces --show-labels
+
+#+END_SRC
+
+Useful RBAC resource differences:
+
+| Resource | Scope |
+|---|---|
+| `Role` | Namespace |
+| `ClusterRole` | Cluster |
+| `RoleBinding` | Namespace |
+| `ClusterRoleBinding` | Cluster |
+
+Security note: Use least-privilege permissions, avoid unnecessary cluster-admin access, and prefer dedicated ServiceAccounts for workloads.
+
+*16. Helm & Kustomize*
+
+Helm and Kustomize are commonly used to package and customize Kubernetes applications.
+
+**Helm commands**
+
+#+BEGIN_SRC bash
+
+# Check Helm version
+helm version
+
+# Add a Helm repository
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+# Update repositories
+helm repo update
+
+# List repositories
+helm repo list
+
+# Search charts
+helm search repo nginx
+
+# Search Artifact Hub
+helm search hub nginx
+
+# Install a chart
+helm install my-nginx bitnami/nginx
+
+# Install with custom values
+helm install my-nginx bitnami/nginx \
+  -f values.yaml
+
+# Preview installation
+helm install my-nginx bitnami/nginx --dry-run
+
+# List releases
+helm list
+
+# List releases across namespaces
+helm list -A
+
+# Display release information
+helm status my-nginx
+
+# Upgrade release
+helm upgrade my-nginx bitnami/nginx
+
+# Upgrade with custom values
+helm upgrade my-nginx bitnami/nginx \
+  -f values.yaml
+
+# Display release history
+helm history my-nginx
+
+# Roll back release
+helm rollback my-nginx 1
+
+# Uninstall release
+helm uninstall my-nginx
+
+#+END_SRC
+
+**Kustomize commands**
+
+#+BEGIN_SRC bash
+
+# Build Kubernetes manifests
+kubectl kustomize ./k8s/
+
+# Apply Kustomize configuration
+kubectl apply -k ./k8s/
+
+# Delete Kustomize resources
+kubectl delete -k ./k8s/
+
+# Preview Kustomize differences
+kubectl diff -k ./k8s/
+
+#+END_SRC
+
+Helm vs Kustomize:
+
+| Tool | Purpose |
+|---|---|
+| `Helm` | Package manager using charts and templates |
+| `Kustomize` | Manifest customization using overlays and patches |
+| `helm install` | Install a chart |
+| `helm upgrade` | Upgrade a release |
+| `kubectl apply -k` | Apply customized manifests |
+
+*17. Advanced Kubernetes Operations*
+
+#+BEGIN_SRC bash
+
+# Display API resources
+kubectl api-resources
+
+# Explain Kubernetes resource structure
+kubectl explain deployment
+kubectl explain deployment.spec
+kubectl explain pod.spec.containers
+
+# Display API versions
+kubectl api-versions
+
+# List Custom Resource Definitions
+kubectl get crds
+
+# Describe a CRD
+kubectl describe crd crd-name
+
+# List custom resources
+kubectl get custom-resource-name
+
+# Display admission webhooks
+kubectl get validatingwebhookconfigurations
+kubectl get mutatingwebhookconfigurations
+
+# Display PriorityClasses
+kubectl get priorityclasses
+
+# Display PodDisruptionBudgets
+kubectl get pdb
+
+# Describe PodDisruptionBudget
+kubectl describe pdb pdb-name
+
+# Display NetworkPolicies
+kubectl get networkpolicies -A
+
+# Display resource quotas across namespaces
+kubectl get resourcequota -A
+
+# Display API server readiness
+kubectl get --raw='/readyz?verbose'
+
+# Display API server liveness
+kubectl get --raw='/livez?verbose'
+
+#+END_SRC
+
+*18. Logging, Output Formatting & Command-Line Options*
+
+#+BEGIN_SRC bash
+
+# Output resources as YAML
+kubectl get pods -o yaml
+
+# Output resources as JSON
+kubectl get pods -o json
+
+# Display additional columns
+kubectl get pods -o wide
+
+# Display only resource names
+kubectl get pods -o name
+
+# Display custom columns
+kubectl get pods \
+  -o custom-columns=NAME:.metadata.name,STATUS:.status.phase
+
+# Filter resources using labels
+kubectl get pods -l app=nginx
+
+# Filter resources using field selectors
+kubectl get pods --field-selector=status.phase=Running
+
+# Sort pods by creation timestamp
+kubectl get pods --sort-by=.metadata.creationTimestamp
+
+# Watch resource changes
+kubectl get pods --watch
+
+# Display resource details
+kubectl describe pod pod-name
+
+# Explain resource configuration
+kubectl explain pod
+
+# Display command help
+kubectl help
+
+# Display help for a specific command
+kubectl get --help
+kubectl apply --help
+
+#+END_SRC
+
+Useful command-line options:
+
+| Option | Purpose |
+|---|---|
+| `-n` | Specify namespace |
+| `-A` | All namespaces |
+| `-o yaml` | YAML output |
+| `-o json` | JSON output |
+| `-o wide` | Additional resource details |
+| `-l` | Label selector |
+| `-f` | Manifest file or directory |
+| `-w` | Watch resources |
+| `-c` | Specify container |
+| `--dry-run=client` | Client-side dry run |
+| `--dry-run=server` | Server-side dry run |
+| `--context` | Select Kubernetes context |
+| `--kubeconfig` | Specify kubeconfig file |
+
+*19. Real-World Development & DevOps Workflows*
+
+**A. Deploy an application**
+
+#+BEGIN_SRC bash
+
+kubectl create deployment nginx --image=nginx:1.27
+kubectl rollout status deployment/nginx
+kubectl get pods -o wide
+kubectl get services
+
+#+END_SRC
+
+**B. Expose an application**
+
+#+BEGIN_SRC bash
+
+kubectl expose deployment nginx \
+  --type=NodePort \
+  --port=80
+
+kubectl get services
+kubectl describe service nginx
+
+#+END_SRC
+
+**C. Deploy using YAML manifests**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f namespace.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+kubectl get all -n production
+
+#+END_SRC
+
+**D. Scale an application**
+
+#+BEGIN_SRC bash
+
+kubectl scale deployment nginx --replicas=5
+kubectl get deployment nginx
+kubectl get pods -o wide
+
+#+END_SRC
+
+**E. Update application version**
+
+#+BEGIN_SRC bash
+
+kubectl set image deployment/nginx nginx=nginx:1.28
+
+kubectl rollout status deployment/nginx
+kubectl rollout history deployment/nginx
+
+#+END_SRC
+
+**F. Roll back an application**
+
+#+BEGIN_SRC bash
+
+kubectl rollout history deployment/nginx
+
+kubectl rollout undo deployment/nginx
+
+kubectl rollout status deployment/nginx
+
+#+END_SRC
+
+**G. Troubleshoot a failing application**
+
+#+BEGIN_SRC bash
+
+kubectl get pods -A
+kubectl describe pod pod-name
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl logs pod-name
+kubectl logs pod-name --previous
+
+#+END_SRC
+
+**H. Debug an application interactively**
+
+#+BEGIN_SRC bash
+
+kubectl exec -it pod-name -- /bin/sh
+
+kubectl port-forward service/nginx 8080:80
+
+#+END_SRC
+
+**I. Configure autoscaling**
+
+#+BEGIN_SRC bash
+
+kubectl autoscale deployment nginx \
+  --cpu-percent=70 \
+  --min=2 \
+  --max=10
+
+kubectl get hpa
+kubectl describe hpa nginx
+
+#+END_SRC
+
+**J. Perform node maintenance**
+
+#+BEGIN_SRC bash
+
+kubectl cordon node-name
+
+kubectl drain node-name --ignore-daemonsets
+
+# Perform maintenance
+
+kubectl uncordon node-name
+
+#+END_SRC
+
+**K. Deploy using Helm**
+
+#+BEGIN_SRC bash
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+helm install my-nginx bitnami/nginx
+
+helm list
+helm status my-nginx
+
+#+END_SRC
+
+**L. Apply production configuration**
+
+#+BEGIN_SRC bash
+
+kubectl apply -f namespace.yaml
+kubectl apply -f configmap.yaml
+kubectl apply -f secret.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl apply -f ingress.yaml
+
+kubectl rollout status deployment/my-app -n production
+
+#+END_SRC
+
+*20. Commands Every Developer Should Memorize*
+
+| Command | Purpose |
+|---|---|
+| `kubectl version` | Check Kubernetes version |
+| `kubectl cluster-info` | Display cluster information |
+| `kubectl get nodes` | List cluster nodes |
+| `kubectl get pods` | List pods |
+| `kubectl get pods -A` | List pods across namespaces |
+| `kubectl get deployments` | List deployments |
+| `kubectl get services` | List services |
+| `kubectl get all -A` | List common resources across namespaces |
+| `kubectl describe pod pod-name` | Inspect pod details |
+| `kubectl logs pod-name` | Display container logs |
+| `kubectl logs pod-name --previous` | Display previous container logs |
+| `kubectl exec -it pod-name -- /bin/sh` | Enter container shell |
+| `kubectl apply -f deployment.yaml` | Apply Kubernetes manifest |
+| `kubectl delete -f deployment.yaml` | Delete manifest resources |
+| `kubectl scale deployment nginx --replicas=3` | Scale deployment |
+| `kubectl rollout status deployment/nginx` | Check deployment rollout |
+| `kubectl rollout undo deployment/nginx` | Roll back deployment |
+| `kubectl rollout restart deployment/nginx` | Restart deployment |
+| `kubectl get events -A` | Display cluster events |
+| `kubectl top nodes` | Check node resource usage |
+| `kubectl top pods` | Check pod resource usage |
+| `kubectl get namespaces` | List namespaces |
+| `kubectl config get-contexts` | List Kubernetes contexts |
+| `kubectl config use-context dev` | Switch cluster context |
+| `kubectl get pvc` | List persistent volume claims |
+| `kubectl get hpa` | List autoscalers |
+| `kubectl auth can-i --list` | Check current permissions |
+| `kubectl port-forward service/nginx 8080:80` | Forward local traffic to service |
+| `kubectl cordon node-name` | Disable node scheduling |
+| `kubectl drain node-name --ignore-daemonsets` | Drain node for maintenance |
+| `kubectl uncordon node-name` | Enable node scheduling |
+| `helm list -A` | List Helm releases |
+| `helm upgrade my-app chart-name` | Upgrade Helm release |
+| `kubectl apply -k ./k8s/` | Apply Kustomize configuration |
+
+Important: Kubernetes commands can affect an entire cluster. Always verify the current context and namespace before executing destructive operations, especially when working with production environments.
+
 -----
 
 * Beginner

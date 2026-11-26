@@ -23,1510 +23,3276 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-org2748100" class="outline-2">
-<h2 id="org2748100">Kubernetes</h2>
-<div class="outline-text-2" id="text-org2748100">
+<div id="outline-container-org301fc93" class="outline-2">
+<h2 id="org301fc93">Kubernetes</h2>
+<div class="outline-text-2" id="text-org301fc93">
+<p>
+<a href="https://kubernetes.io/docs/home/">Kubernetes Documentation</a>
+</p>
 <hr>
 </div>
 </div>
-<div id="outline-container-org15c1bbf" class="outline-2">
-<h2 id="org15c1bbf">Beginner</h2>
-<div class="outline-text-2" id="text-org15c1bbf">
+<div id="outline-container-org8edfd09" class="outline-2">
+<h2 id="org8edfd09">Kubernetes Command Handbook:</h2>
+<div class="outline-text-2" id="text-org8edfd09">
+<p>
+<b>1. Kubernetes Installation &amp; Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check kubectl version
+</span>kubectl version --client
+kubectl version --client --output=yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Kubernetes cluster version
+</span>kubectl version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check kubectl installation path
+</span><span style="font-weight: bold;">which</span> kubectl                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Linux / macOS
+</span>where kubectl                 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Windows
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display cluster information
+</span>kubectl cluster-info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Kubernetes configuration
+</span>kubectl config view
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display current context
+</span>kubectl config current-context
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display available contexts
+</span>kubectl config get-contexts
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set a default namespace
+</span>kubectl config set-context --current --namespace=default
+
+</code></pre>
 </div>
-<div id="outline-container-org6ce6f97" class="outline-3">
-<h3 id="org6ce6f97">Q1. What is Kubernetes?</h3>
-<div class="outline-text-3" id="text-org6ce6f97">
+
+<p>
+<b>2. Cluster &amp; Node Management</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display cluster information
+</span>kubectl cluster-info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all nodes
+</span>kubectl get nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed node information
+</span>kubectl get nodes -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a specific node
+</span>kubectl describe node node-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node labels
+</span>kubectl get nodes --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node resource capacity and allocation
+</span>kubectl describe nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check node resource usage (requires Metrics Server)
+</span>kubectl top nodes
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all cluster resources
+</span>kubectl get all -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check API resources
+</span>kubectl api-resources
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Kubernetes API versions
+</span>kubectl api-versions
+
+</code></pre>
+</div>
+
+<p>
+<b>3. Contexts &amp; Namespace Management</b>
+</p>
+
+<p>
+Contexts allow you to switch between different Kubernetes clusters, users, and namespaces.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List available contexts
+</span>kubectl config get-contexts
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display current context
+</span>kubectl config current-context
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Switch to another context
+</span>kubectl config use-context development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a new context
+</span>kubectl config set-context dev-context <span style="font-style: italic;">\</span>
+  --cluster=dev-cluster <span style="font-style: italic;">\</span>
+  --user=dev-user <span style="font-style: italic;">\</span>
+  --namespace=development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a context
+</span>kubectl config delete-context dev-context
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List namespaces
+</span>kubectl get namespaces
+kubectl get ns
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a namespace
+</span>kubectl create namespace development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a namespace
+</span>kubectl describe namespace development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a namespace
+</span>kubectl delete namespace development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List resources in a namespace
+</span>kubectl get all -n development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set namespace for current context
+</span>kubectl config set-context --current --namespace=development
+
+</code></pre>
+</div>
+
+<p>
+<b>4. Pods Management</b>
+</p>
+
+<p>
+Pods are the smallest deployable units in Kubernetes and contain one or more containers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List pods in current namespace
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List pods in all namespaces
+</span>kubectl get pods -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display additional pod information
+</span>kubectl get pods -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch pods in real time
+</span>kubectl get pods -w
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a pod
+</span>kubectl describe pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod YAML
+</span>kubectl get pod pod-name -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a pod imperatively
+</span>kubectl run nginx --image=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a pod with a specific port
+</span>kubectl run nginx --image=nginx --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a pod
+</span>kubectl delete pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete all pods in a namespace
+</span>kubectl delete pods --all
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Get pods using labels
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod IP addresses
+</span>kubectl get pods -o wide
+
+</code></pre>
+</div>
+
+<p>
+<b>5. Deployments &amp; ReplicaSets</b>
+</p>
+
+<p>
+Deployments manage ReplicaSets and provide declarative updates, scaling, and rollbacks.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a deployment
+</span>kubectl create deployment nginx --image=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a deployment with replicas
+</span>kubectl create deployment nginx <span style="font-style: italic;">\</span>
+  --image=nginx <span style="font-style: italic;">\</span>
+  --replicas=3
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List deployments
+</span>kubectl get deployments
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a deployment
+</span>kubectl describe deployment nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display deployment YAML
+</span>kubectl get deployment nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale deployment
+</span>kubectl scale deployment nginx --replicas=5
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update container image
+</span>kubectl set image deployment/nginx <span style="font-weight: bold; font-style: italic;">nginx</span>=nginx:1.27
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check rollout status
+</span>kubectl rollout status deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display rollout history
+</span>kubectl rollout history deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display a specific revision
+</span>kubectl rollout history deployment/nginx --revision=2
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Undo the latest deployment
+</span>kubectl rollout undo deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Roll back to a specific revision
+</span>kubectl rollout undo deployment/nginx --to-revision=2
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Restart deployment
+</span>kubectl rollout restart deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Pause deployment rollout
+</span>kubectl rollout pause deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resume deployment rollout
+</span>kubectl rollout resume deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete deployment
+</span>kubectl delete deployment nginx
+
+</code></pre>
+</div>
+
+<p>
+<b>6. Services &amp; Networking</b>
+</p>
+
+<p>
+Services provide stable network endpoints for accessing a group of pods.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services
+</span>kubectl get services
+kubectl get svc
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List services in all namespaces
+</span>kubectl get svc -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a service
+</span>kubectl describe service nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a ClusterIP service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --port=80 <span style="font-style: italic;">\</span>
+  --target-port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a NodePort service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --type=NodePort <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a LoadBalancer service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --type=LoadBalancer <span style="font-style: italic;">\</span>
+  --port=80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service endpoints
+</span>kubectl get endpoints
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display EndpointSlices
+</span>kubectl get endpointslices
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display service YAML
+</span>kubectl get service nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a service
+</span>kubectl delete service nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List network policies
+</span>kubectl get networkpolicies
+
+</code></pre>
+</div>
+
+<p>
+Service types:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Service Type</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`ClusterIP`</td>
+<td class="org-left">Internal cluster communication</td>
+</tr>
+
+<tr>
+<td class="org-left">`NodePort`</td>
+<td class="org-left">Exposes service on node ports</td>
+</tr>
+
+<tr>
+<td class="org-left">`LoadBalancer`</td>
+<td class="org-left">Requests an external load balancer</td>
+</tr>
+
+<tr>
+<td class="org-left">`ExternalName`</td>
+<td class="org-left">Maps service to an external DNS name</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>7. ConfigMaps &amp; Secrets</b>
+</p>
+
+<p>
+ConfigMaps store non-sensitive configuration, while Secrets are intended for sensitive information.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ConfigMap from literal values
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">APP_ENV</span>=development
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create ConfigMap from file
+</span>kubectl create configmap app-config <span style="font-style: italic;">\</span>
+  --from-file=application.properties
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ConfigMaps
+</span>kubectl get configmaps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe ConfigMap
+</span>kubectl describe configmap app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display ConfigMap YAML
+</span>kubectl get configmap app-config -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Secret from literal values
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">username</span>=admin <span style="font-style: italic;">\</span>
+  --from-literal=<span style="font-weight: bold; font-style: italic;">password</span>=change-me
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Secret from file
+</span>kubectl create secret generic db-secret <span style="font-style: italic;">\</span>
+  --from-file=<span style="font-weight: bold; font-style: italic;">password</span>=./password.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Secrets
+</span>kubectl get secrets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe Secret
+</span>kubectl describe secret db-secret
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Secret YAML
+</span>kubectl get secret db-secret -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete ConfigMap
+</span>kubectl delete configmap app-config
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Secret
+</span>kubectl delete secret db-secret
+
+</code></pre>
+</div>
+
+<p>
+Note: Kubernetes Secret values are base64-encoded by default, not encrypted. Configure encryption at rest, RBAC, and appropriate secret-management controls. Avoid putting real credentials directly in shell history or source control.
+</p>
+
+<p>
+<b>8. YAML Manifests &amp; Declarative Management</b>
+</p>
+
+<p>
+Kubernetes declarative management uses YAML manifests to describe the desired state of resources.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply a YAML manifest
+</span>kubectl apply -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply all YAML files in a directory
+</span>kubectl apply -f ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply multiple manifests
+</span>kubectl apply -f deployment.yaml -f service.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate manifest without applying changes
+</span>kubectl apply --dry-run=server -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate manifest locally
+</span>kubectl apply --dry-run=client -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Preview differences
+</span>kubectl diff -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete resources defined in a manifest
+</span>kubectl delete -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Replace resource using manifest
+</span>kubectl replace -f deployment.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate YAML without creating a resource
+</span>kubectl create deployment nginx <span style="font-style: italic;">\</span>
+  --image=nginx <span style="font-style: italic;">\</span>
+  --dry-run=client -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export an existing deployment
+</span>kubectl get deployment nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generate YAML for a service
+</span>kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --port=80 <span style="font-style: italic;">\</span>
+  --dry-run=client -o yaml
+
+</code></pre>
+</div>
+
+<p>
+Useful manifest-management commands:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`kubectl apply`</td>
+<td class="org-left">Create or update resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl diff`</td>
+<td class="org-left">Preview manifest changes</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl delete -f`</td>
+<td class="org-left">Delete manifest resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl replace`</td>
+<td class="org-left">Replace an existing resource</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get -o yaml`</td>
+<td class="org-left">Display resource YAML</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl explain`</td>
+<td class="org-left">Explore resource schema</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>9. Logs, Exec &amp; Container Debugging</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pod logs
+</span>kubectl logs pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs from a specific container
+</span>kubectl logs pod-name -c container-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow logs in real time
+</span>kubectl logs -f pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display the last 100 lines
+</span>kubectl logs pod-name --tail=100
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs from the previous container instance
+</span>kubectl logs pod-name --previous
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs with timestamps
+</span>kubectl logs pod-name --timestamps
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display logs from all containers in a pod
+</span>kubectl logs pod-name --all-containers=true
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute command inside a container
+</span>kubectl exec pod-name -- ls
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Open an interactive shell
+</span>kubectl exec -it pod-name -- /bin/sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Open Bash shell
+</span>kubectl exec -it pod-name -- /bin/bash
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Execute command in a specific container
+</span>kubectl exec -it pod-name -c container-name -- /bin/sh
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy file from local machine to pod
+</span>kubectl cp ./file.txt pod-name:/tmp/file.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Copy file from pod to local machine
+</span>kubectl cp pod-name:/tmp/file.txt ./file.txt
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward local port to pod
+</span>kubectl port-forward pod-name 8080:80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Forward local port to service
+</span>kubectl port-forward service/nginx 8080:80
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Run a temporary debugging pod
+</span>kubectl run debug --image=busybox:1.36 -it --rm --restart=Never -- sh
+
+</code></pre>
+</div>
+
+<p>
+<b>10. Events &amp; Troubleshooting</b>
+</p>
+
+<p>
+Kubernetes events and resource descriptions are essential for diagnosing scheduling, networking, image-pull, and container failures.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display all events
+</span>kubectl get events
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display events across all namespaces
+</span>kubectl get events -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sort events by creation timestamp
+</span>kubectl get events --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a pod
+</span>kubectl describe pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a node
+</span>kubectl describe node node-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pods that are not running
+</span>kubectl get pods -A --field-selector=status.phase!=Running
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check pods with wide output
+</span>kubectl get pods -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check resource usage (requires Metrics Server)
+</span>kubectl top pods
+kubectl top pods -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check resource usage for a specific node
+</span>kubectl top node node-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check deployment status
+</span>kubectl rollout status deployment/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check persistent volume claims
+</span>kubectl get pvc
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check persistent volumes
+</span>kubectl get pv
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check service endpoints
+</span>kubectl get endpoints
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check cluster components and control plane health
+</span>kubectl get --raw=<span style="font-style: italic;">'/readyz?verbose'</span>
+kubectl get --raw=<span style="font-style: italic;">'/livez?verbose'</span>
+
+</code></pre>
+</div>
+
+<p>
+Common Kubernetes errors:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Status / Error</th>
+<th scope="col" class="org-left">Common Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`CrashLoopBackOff`</td>
+<td class="org-left">Container repeatedly crashes</td>
+</tr>
+
+<tr>
+<td class="org-left">`ImagePullBackOff`</td>
+<td class="org-left">Image cannot be pulled</td>
+</tr>
+
+<tr>
+<td class="org-left">`ErrImagePull`</td>
+<td class="org-left">Image pull failure</td>
+</tr>
+
+<tr>
+<td class="org-left">`Pending`</td>
+<td class="org-left">Pod cannot be scheduled or storage is unavailable</td>
+</tr>
+
+<tr>
+<td class="org-left">`OOMKilled`</td>
+<td class="org-left">Container exceeded memory limit</td>
+</tr>
+
+<tr>
+<td class="org-left">`CreateContainerConfigError`</td>
+<td class="org-left">Invalid or missing configuration</td>
+</tr>
+
+<tr>
+<td class="org-left">`ContainerCreating`</td>
+<td class="org-left">Container setup is still in progress</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>11. Resource Management &amp; Autoscaling</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource usage
+</span>kubectl top nodes
+kubectl top pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource requests and limits
+</span>kubectl describe pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale deployment manually
+</span>kubectl scale deployment nginx --replicas=5
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Horizontal Pod Autoscaler
+</span>kubectl autoscale deployment nginx <span style="font-style: italic;">\</span>
+  --cpu-percent=70 <span style="font-style: italic;">\</span>
+  --min=2 <span style="font-style: italic;">\</span>
+  --max=10
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Horizontal Pod Autoscalers
+</span>kubectl get hpa
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe HPA
+</span>kubectl describe hpa nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display HPA YAML
+</span>kubectl get hpa nginx -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete HPA
+</span>kubectl delete hpa nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List resource quotas
+</span>kubectl get resourcequota
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe resource quota
+</span>kubectl describe resourcequota
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List limit ranges
+</span>kubectl get limitrange
+
+</code></pre>
+</div>
+
+<p>
+Note: HPA CPU utilization requires appropriate resource requests and an available metrics API. VPA and Cluster Autoscaler generally require additional components or platform integration.
+</p>
+
+<p>
+<b>12. Persistent Storage &amp; Volumes</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List PersistentVolumes
+</span>kubectl get pv
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List PersistentVolumeClaims
+</span>kubectl get pvc
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List StorageClasses
+</span>kubectl get storageclass
+kubectl get sc
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a PersistentVolume
+</span>kubectl describe pv pv-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a PersistentVolumeClaim
+</span>kubectl describe pvc pvc-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display PVC YAML
+</span>kubectl get pvc pvc-name -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List volume snapshots (if supported)
+</span>kubectl get volumesnapshots
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a StorageClass
+</span>kubectl describe storageclass storage-class-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete PVC
+</span>kubectl delete pvc pvc-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete PV
+</span>kubectl delete pv pv-name
+
+</code></pre>
+</div>
+
+<p>
+Important storage resources:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Resource</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`PersistentVolume (PV)`</td>
+<td class="org-left">Cluster storage resource</td>
+</tr>
+
+<tr>
+<td class="org-left">`PersistentVolumeClaim (PVC)`</td>
+<td class="org-left">Request for persistent storage</td>
+</tr>
+
+<tr>
+<td class="org-left">`StorageClass`</td>
+<td class="org-left">Defines dynamic provisioning</td>
+</tr>
+
+<tr>
+<td class="org-left">`VolumeSnapshot`</td>
+<td class="org-left">Point-in-time storage snapshot</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Deleting a PVC can result in data loss depending on the PV reclaim policy and storage provider. Always verify the retention policy before deleting storage resources.
+</p>
+
+<p>
+<b>13. StatefulSets, DaemonSets &amp; Jobs</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List StatefulSets
+</span>kubectl get statefulsets
+kubectl get sts
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create StatefulSet from YAML
+</span>kubectl apply -f statefulset.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe StatefulSet
+</span>kubectl describe statefulset app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale StatefulSet
+</span>kubectl scale statefulset app --replicas=3
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete StatefulSet
+</span>kubectl delete statefulset app
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List DaemonSets
+</span>kubectl get daemonsets
+kubectl get ds
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe DaemonSet
+</span>kubectl describe daemonset monitoring-agent
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Jobs
+</span>kubectl get jobs
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a Job
+</span>kubectl create job hello --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  -- echo <span style="font-style: italic;">"Hello Kubernetes"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe Job
+</span>kubectl describe job hello
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List CronJobs
+</span>kubectl get cronjobs
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create CronJob from YAML
+</span>kubectl apply -f cronjob.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Suspend a CronJob
+</span>kubectl patch cronjob backup <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"suspend":true}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resume a CronJob
+</span>kubectl patch cronjob backup <span style="font-style: italic;">\</span>
+  -p <span style="font-style: italic;">'{"spec":{"suspend":false}}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Job
+</span>kubectl delete job hello
+
+</code></pre>
+</div>
+
+<p>
+<b>14. Scheduling, Taints &amp; Node Maintenance</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node labels
+</span>kubectl get nodes --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add a label to a node
+</span>kubectl label nodes node-name <span style="font-weight: bold; font-style: italic;">environment</span>=production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a node label
+</span>kubectl label nodes node-name environment-
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add a taint to a node
+</span>kubectl taint nodes node-name <span style="font-weight: bold; font-style: italic;">dedicated</span>=production:NoSchedule
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove a taint
+</span>kubectl taint nodes node-name <span style="font-weight: bold; font-style: italic;">dedicated</span>=production:NoSchedule-
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Mark node as unschedulable
+</span>kubectl cordon node-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Drain a node for maintenance
+</span>kubectl drain node-name --ignore-daemonsets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Allow scheduling on a node again
+</span>kubectl uncordon node-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display node conditions
+</span>kubectl describe node node-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display pods scheduled on a specific node
+</span>kubectl get pods -A -o wide --field-selector spec.nodeName=node-name
+
+</code></pre>
+</div>
+
+<p>
+Important scheduling options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Option</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`nodeSelector`</td>
+<td class="org-left">Simple node selection</td>
+</tr>
+
+<tr>
+<td class="org-left">`nodeAffinity`</td>
+<td class="org-left">Advanced node selection rules</td>
+</tr>
+
+<tr>
+<td class="org-left">`podAffinity`</td>
+<td class="org-left">Co-locate related pods</td>
+</tr>
+
+<tr>
+<td class="org-left">`podAntiAffinity`</td>
+<td class="org-left">Separate related pods</td>
+</tr>
+
+<tr>
+<td class="org-left">`tolerations`</td>
+<td class="org-left">Allow scheduling onto tainted nodes</td>
+</tr>
+
+<tr>
+<td class="org-left">`topologySpreadConstraints`</td>
+<td class="org-left">Distribute pods across topology domains</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: `kubectl drain` may be blocked by PodDisruptionBudgets. Review workloads and disruption budgets before performing node maintenance.
+</p>
+
+<p>
+<b>15. Security, RBAC &amp; Service Accounts</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ServiceAccounts
+</span>kubectl get serviceaccounts
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a ServiceAccount
+</span>kubectl create serviceaccount app-user
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe ServiceAccount
+</span>kubectl describe serviceaccount app-user
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Roles
+</span>kubectl get roles
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ClusterRoles
+</span>kubectl get clusterroles
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List RoleBindings
+</span>kubectl get rolebindings
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ClusterRoleBindings
+</span>kubectl get clusterrolebindings
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a Role
+</span>kubectl create role pod-reader <span style="font-style: italic;">\</span>
+  --verb=get,list,watch <span style="font-style: italic;">\</span>
+  --resource=pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a RoleBinding
+</span>kubectl create rolebinding read-pods <span style="font-style: italic;">\</span>
+  --role=pod-reader <span style="font-style: italic;">\</span>
+  --user=developer
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permissions for current identity
+</span>kubectl auth can-i get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permissions in a namespace
+</span>kubectl auth can-i get pods -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check permissions for another user
+</span>kubectl auth can-i get pods --as=developer
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check all permissions
+</span>kubectl auth can-i --list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Pod Security Admission labels
+</span>kubectl get namespaces --show-labels
+
+</code></pre>
+</div>
+
+<p>
+Useful RBAC resource differences:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Resource</th>
+<th scope="col" class="org-left">Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`Role`</td>
+<td class="org-left">Namespace</td>
+</tr>
+
+<tr>
+<td class="org-left">`ClusterRole`</td>
+<td class="org-left">Cluster</td>
+</tr>
+
+<tr>
+<td class="org-left">`RoleBinding`</td>
+<td class="org-left">Namespace</td>
+</tr>
+
+<tr>
+<td class="org-left">`ClusterRoleBinding`</td>
+<td class="org-left">Cluster</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Security note: Use least-privilege permissions, avoid unnecessary cluster-admin access, and prefer dedicated ServiceAccounts for workloads.
+</p>
+
+<p>
+<b>16. Helm &amp; Kustomize</b>
+</p>
+
+<p>
+Helm and Kustomize are commonly used to package and customize Kubernetes applications.
+</p>
+
+<p>
+<b><b>Helm commands</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Helm version
+</span>helm version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add a Helm repository
+</span>helm repo add bitnami https://charts.bitnami.com/bitnami
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update repositories
+</span>helm repo update
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List repositories
+</span>helm repo list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Search charts
+</span>helm search repo nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Search Artifact Hub
+</span>helm search hub nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install a chart
+</span>helm install my-nginx bitnami/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Install with custom values
+</span>helm install my-nginx bitnami/nginx <span style="font-style: italic;">\</span>
+  -f values.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Preview installation
+</span>helm install my-nginx bitnami/nginx --dry-run
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List releases
+</span>helm list
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List releases across namespaces
+</span>helm list -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display release information
+</span>helm status my-nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Upgrade release
+</span>helm upgrade my-nginx bitnami/nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Upgrade with custom values
+</span>helm upgrade my-nginx bitnami/nginx <span style="font-style: italic;">\</span>
+  -f values.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display release history
+</span>helm history my-nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Roll back release
+</span>helm rollback my-nginx 1
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Uninstall release
+</span>helm uninstall my-nginx
+
+</code></pre>
+</div>
+
+<p>
+<b><b>Kustomize commands</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Build Kubernetes manifests
+</span>kubectl kustomize ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Kustomize configuration
+</span>kubectl apply -k ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Kustomize resources
+</span>kubectl delete -k ./k8s/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Preview Kustomize differences
+</span>kubectl diff -k ./k8s/
+
+</code></pre>
+</div>
+
+<p>
+Helm vs Kustomize:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Tool</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`Helm`</td>
+<td class="org-left">Package manager using charts and templates</td>
+</tr>
+
+<tr>
+<td class="org-left">`Kustomize`</td>
+<td class="org-left">Manifest customization using overlays and patches</td>
+</tr>
+
+<tr>
+<td class="org-left">`helm install`</td>
+<td class="org-left">Install a chart</td>
+</tr>
+
+<tr>
+<td class="org-left">`helm upgrade`</td>
+<td class="org-left">Upgrade a release</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl apply -k`</td>
+<td class="org-left">Apply customized manifests</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>17. Advanced Kubernetes Operations</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display API resources
+</span>kubectl api-resources
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Explain Kubernetes resource structure
+</span>kubectl explain deployment
+kubectl explain deployment.spec
+kubectl explain pod.spec.containers
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display API versions
+</span>kubectl api-versions
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Custom Resource Definitions
+</span>kubectl get crds
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe a CRD
+</span>kubectl describe crd crd-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List custom resources
+</span>kubectl get custom-resource-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display admission webhooks
+</span>kubectl get validatingwebhookconfigurations
+kubectl get mutatingwebhookconfigurations
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display PriorityClasses
+</span>kubectl get priorityclasses
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display PodDisruptionBudgets
+</span>kubectl get pdb
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe PodDisruptionBudget
+</span>kubectl describe pdb pdb-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display NetworkPolicies
+</span>kubectl get networkpolicies -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource quotas across namespaces
+</span>kubectl get resourcequota -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display API server readiness
+</span>kubectl get --raw=<span style="font-style: italic;">'/readyz?verbose'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display API server liveness
+</span>kubectl get --raw=<span style="font-style: italic;">'/livez?verbose'</span>
+
+</code></pre>
+</div>
+
+<p>
+<b>18. Logging, Output Formatting &amp; Command-Line Options</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Output resources as YAML
+</span>kubectl get pods -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Output resources as JSON
+</span>kubectl get pods -o json
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display additional columns
+</span>kubectl get pods -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display only resource names
+</span>kubectl get pods -o name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display custom columns
+</span>kubectl get pods <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,STATUS:.status.phase
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Filter resources using labels
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Filter resources using field selectors
+</span>kubectl get pods --field-selector=status.phase=Running
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sort pods by creation timestamp
+</span>kubectl get pods --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch resource changes
+</span>kubectl get pods --watch
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display resource details
+</span>kubectl describe pod pod-name
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Explain resource configuration
+</span>kubectl explain pod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display command help
+</span>kubectl help
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display help for a specific command
+</span>kubectl get --help
+kubectl apply --help
+
+</code></pre>
+</div>
+
+<p>
+Useful command-line options:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Option</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`-n`</td>
+<td class="org-left">Specify namespace</td>
+</tr>
+
+<tr>
+<td class="org-left">`-A`</td>
+<td class="org-left">All namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">`-o yaml`</td>
+<td class="org-left">YAML output</td>
+</tr>
+
+<tr>
+<td class="org-left">`-o json`</td>
+<td class="org-left">JSON output</td>
+</tr>
+
+<tr>
+<td class="org-left">`-o wide`</td>
+<td class="org-left">Additional resource details</td>
+</tr>
+
+<tr>
+<td class="org-left">`-l`</td>
+<td class="org-left">Label selector</td>
+</tr>
+
+<tr>
+<td class="org-left">`-f`</td>
+<td class="org-left">Manifest file or directory</td>
+</tr>
+
+<tr>
+<td class="org-left">`-w`</td>
+<td class="org-left">Watch resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`-c`</td>
+<td class="org-left">Specify container</td>
+</tr>
+
+<tr>
+<td class="org-left">`&ndash;dry-run=client`</td>
+<td class="org-left">Client-side dry run</td>
+</tr>
+
+<tr>
+<td class="org-left">`&ndash;dry-run=server`</td>
+<td class="org-left">Server-side dry run</td>
+</tr>
+
+<tr>
+<td class="org-left">`&ndash;context`</td>
+<td class="org-left">Select Kubernetes context</td>
+</tr>
+
+<tr>
+<td class="org-left">`&ndash;kubeconfig`</td>
+<td class="org-left">Specify kubeconfig file</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>19. Real-World Development &amp; DevOps Workflows</b>
+</p>
+
+<p>
+<b><b>A. Deploy an application</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl create deployment nginx --image=nginx:1.27
+kubectl rollout status deployment/nginx
+kubectl get pods -o wide
+kubectl get services
+
+</code></pre>
+</div>
+
+<p>
+<b><b>B. Expose an application</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl expose deployment nginx <span style="font-style: italic;">\</span>
+  --type=NodePort <span style="font-style: italic;">\</span>
+  --port=80
+
+kubectl get services
+kubectl describe service nginx
+
+</code></pre>
+</div>
+
+<p>
+<b><b>C. Deploy using YAML manifests</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl apply -f namespace.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+kubectl get all -n production
+
+</code></pre>
+</div>
+
+<p>
+<b><b>D. Scale an application</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl scale deployment nginx --replicas=5
+kubectl get deployment nginx
+kubectl get pods -o wide
+
+</code></pre>
+</div>
+
+<p>
+<b><b>E. Update application version</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl set image deployment/nginx <span style="font-weight: bold; font-style: italic;">nginx</span>=nginx:1.28
+
+kubectl rollout status deployment/nginx
+kubectl rollout history deployment/nginx
+
+</code></pre>
+</div>
+
+<p>
+<b><b>F. Roll back an application</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl rollout history deployment/nginx
+
+kubectl rollout undo deployment/nginx
+
+kubectl rollout status deployment/nginx
+
+</code></pre>
+</div>
+
+<p>
+<b><b>G. Troubleshoot a failing application</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl get pods -A
+kubectl describe pod pod-name
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl logs pod-name
+kubectl logs pod-name --previous
+
+</code></pre>
+</div>
+
+<p>
+<b><b>H. Debug an application interactively</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl exec -it pod-name -- /bin/sh
+
+kubectl port-forward service/nginx 8080:80
+
+</code></pre>
+</div>
+
+<p>
+<b><b>I. Configure autoscaling</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl autoscale deployment nginx <span style="font-style: italic;">\</span>
+  --cpu-percent=70 <span style="font-style: italic;">\</span>
+  --min=2 <span style="font-style: italic;">\</span>
+  --max=10
+
+kubectl get hpa
+kubectl describe hpa nginx
+
+</code></pre>
+</div>
+
+<p>
+<b><b>J. Perform node maintenance</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl cordon node-name
+
+kubectl drain node-name --ignore-daemonsets
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Perform maintenance
+</span>
+kubectl uncordon node-name
+
+</code></pre>
+</div>
+
+<p>
+<b><b>K. Deploy using Helm</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+helm install my-nginx bitnami/nginx
+
+helm list
+helm status my-nginx
+
+</code></pre>
+</div>
+
+<p>
+<b><b>L. Apply production configuration</b></b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+kubectl apply -f namespace.yaml
+kubectl apply -f configmap.yaml
+kubectl apply -f secret.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl apply -f ingress.yaml
+
+kubectl rollout status deployment/my-app -n production
+
+</code></pre>
+</div>
+
+<p>
+<b>20. Commands Every Developer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Command</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`kubectl version`</td>
+<td class="org-left">Check Kubernetes version</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl cluster-info`</td>
+<td class="org-left">Display cluster information</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get nodes`</td>
+<td class="org-left">List cluster nodes</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get pods`</td>
+<td class="org-left">List pods</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get pods -A`</td>
+<td class="org-left">List pods across namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get deployments`</td>
+<td class="org-left">List deployments</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get services`</td>
+<td class="org-left">List services</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get all -A`</td>
+<td class="org-left">List common resources across namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl describe pod pod-name`</td>
+<td class="org-left">Inspect pod details</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl logs pod-name`</td>
+<td class="org-left">Display container logs</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl logs pod-name &ndash;previous`</td>
+<td class="org-left">Display previous container logs</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl exec -it pod-name &ndash; /bin/sh`</td>
+<td class="org-left">Enter container shell</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl apply -f deployment.yaml`</td>
+<td class="org-left">Apply Kubernetes manifest</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl delete -f deployment.yaml`</td>
+<td class="org-left">Delete manifest resources</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl scale deployment nginx &ndash;replicas=3`</td>
+<td class="org-left">Scale deployment</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl rollout status deployment/nginx`</td>
+<td class="org-left">Check deployment rollout</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl rollout undo deployment/nginx`</td>
+<td class="org-left">Roll back deployment</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl rollout restart deployment/nginx`</td>
+<td class="org-left">Restart deployment</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get events -A`</td>
+<td class="org-left">Display cluster events</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl top nodes`</td>
+<td class="org-left">Check node resource usage</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl top pods`</td>
+<td class="org-left">Check pod resource usage</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get namespaces`</td>
+<td class="org-left">List namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl config get-contexts`</td>
+<td class="org-left">List Kubernetes contexts</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl config use-context dev`</td>
+<td class="org-left">Switch cluster context</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get pvc`</td>
+<td class="org-left">List persistent volume claims</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl get hpa`</td>
+<td class="org-left">List autoscalers</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl auth can-i &ndash;list`</td>
+<td class="org-left">Check current permissions</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl port-forward service/nginx 8080:80`</td>
+<td class="org-left">Forward local traffic to service</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl cordon node-name`</td>
+<td class="org-left">Disable node scheduling</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl drain node-name &ndash;ignore-daemonsets`</td>
+<td class="org-left">Drain node for maintenance</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl uncordon node-name`</td>
+<td class="org-left">Enable node scheduling</td>
+</tr>
+
+<tr>
+<td class="org-left">`helm list -A`</td>
+<td class="org-left">List Helm releases</td>
+</tr>
+
+<tr>
+<td class="org-left">`helm upgrade my-app chart-name`</td>
+<td class="org-left">Upgrade Helm release</td>
+</tr>
+
+<tr>
+<td class="org-left">`kubectl apply -k ./k8s/`</td>
+<td class="org-left">Apply Kustomize configuration</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Important: Kubernetes commands can affect an entire cluster. Always verify the current context and namespace before executing destructive operations, especially when working with production environments.
+</p>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-orgbb535d6" class="outline-2">
+<h2 id="orgbb535d6">Beginner</h2>
+<div class="outline-text-2" id="text-orgbb535d6">
+</div>
+<div id="outline-container-org34c8a7b" class="outline-3">
+<h3 id="org34c8a7b">Q1. What is Kubernetes?</h3>
+<div class="outline-text-3" id="text-org34c8a7b">
 <p>
 Kubernetes is an open-source container orchestration platform for deploying and managing containerized applications.
 </p>
 </div>
 </div>
-<div id="outline-container-org6988666" class="outline-3">
-<h3 id="org6988666">Q2. Why use Kubernetes?</h3>
-<div class="outline-text-3" id="text-org6988666">
+<div id="outline-container-org682186b" class="outline-3">
+<h3 id="org682186b">Q2. Why use Kubernetes?</h3>
+<div class="outline-text-3" id="text-org682186b">
 <p>
 It automates scheduling, scaling, self-healing, and service discovery for containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org4678c98" class="outline-3">
-<h3 id="org4678c98">Q3. What is a cluster?</h3>
-<div class="outline-text-3" id="text-org4678c98">
+<div id="outline-container-org1685aab" class="outline-3">
+<h3 id="org1685aab">Q3. What is a cluster?</h3>
+<div class="outline-text-3" id="text-org1685aab">
 <p>
 A set of machines (nodes) running Kubernetes control plane and workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d0388e" class="outline-3">
-<h3 id="org1d0388e">Q4. What is a node?</h3>
-<div class="outline-text-3" id="text-org1d0388e">
+<div id="outline-container-org847e748" class="outline-3">
+<h3 id="org847e748">Q4. What is a node?</h3>
+<div class="outline-text-3" id="text-org847e748">
 <p>
 A worker machine (VM or physical) where pods run.
 </p>
 </div>
 </div>
-<div id="outline-container-org67faf3e" class="outline-3">
-<h3 id="org67faf3e">Q5. What is a pod?</h3>
-<div class="outline-text-3" id="text-org67faf3e">
+<div id="outline-container-org5445d5c" class="outline-3">
+<h3 id="org5445d5c">Q5. What is a pod?</h3>
+<div class="outline-text-3" id="text-org5445d5c">
 <p>
 Smallest deployable Kubernetes unit; one or more containers sharing network and storage namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcce6081" class="outline-3">
-<h3 id="orgcce6081">Q6. Why are pods ephemeral?</h3>
-<div class="outline-text-3" id="text-orgcce6081">
+<div id="outline-container-org072d0ce" class="outline-3">
+<h3 id="org072d0ce">Q6. Why are pods ephemeral?</h3>
+<div class="outline-text-3" id="text-org072d0ce">
 <p>
 They are designed to be replaceable; higher-level controllers maintain desired state.
 </p>
 </div>
 </div>
-<div id="outline-container-org0608f2b" class="outline-3">
-<h3 id="org0608f2b">Q7. What is a Deployment?</h3>
-<div class="outline-text-3" id="text-org0608f2b">
+<div id="outline-container-org7664bce" class="outline-3">
+<h3 id="org7664bce">Q7. What is a Deployment?</h3>
+<div class="outline-text-3" id="text-org7664bce">
 <p>
 Controller managing stateless replicated pods with rolling updates/rollbacks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca4d89b" class="outline-3">
-<h3 id="orgca4d89b">Q8. What is a ReplicaSet?</h3>
-<div class="outline-text-3" id="text-orgca4d89b">
+<div id="outline-container-org4948e32" class="outline-3">
+<h3 id="org4948e32">Q8. What is a ReplicaSet?</h3>
+<div class="outline-text-3" id="text-org4948e32">
 <p>
 Controller ensuring specified number of pod replicas are running.
 </p>
 </div>
 </div>
-<div id="outline-container-org39e3bbe" class="outline-3">
-<h3 id="org39e3bbe">Q9. Deployment vs ReplicaSet?</h3>
-<div class="outline-text-3" id="text-org39e3bbe">
+<div id="outline-container-org507361e" class="outline-3">
+<h3 id="org507361e">Q9. Deployment vs ReplicaSet?</h3>
+<div class="outline-text-3" id="text-org507361e">
 <p>
 Deployment manages ReplicaSets and rollout strategy; ReplicaSet only maintains replica count.
 </p>
 </div>
 </div>
-<div id="outline-container-org3c12ff5" class="outline-3">
-<h3 id="org3c12ff5">Q10. What is StatefulSet?</h3>
-<div class="outline-text-3" id="text-org3c12ff5">
+<div id="outline-container-org00ebcb7" class="outline-3">
+<h3 id="org00ebcb7">Q10. What is StatefulSet?</h3>
+<div class="outline-text-3" id="text-org00ebcb7">
 <p>
 Controller for stateful apps needing stable identities and ordered deployment/scaling.
 </p>
 </div>
 </div>
-<div id="outline-container-org70dbeaf" class="outline-3">
-<h3 id="org70dbeaf">Q11. What is DaemonSet?</h3>
-<div class="outline-text-3" id="text-org70dbeaf">
+<div id="outline-container-orgecfebbc" class="outline-3">
+<h3 id="orgecfebbc">Q11. What is DaemonSet?</h3>
+<div class="outline-text-3" id="text-orgecfebbc">
 <p>
 Ensures one (or selected) pod runs on each node.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb3b22e" class="outline-3">
-<h3 id="orgbb3b22e">Q12. What is Job?</h3>
-<div class="outline-text-3" id="text-orgbb3b22e">
+<div id="outline-container-org3e047aa" class="outline-3">
+<h3 id="org3e047aa">Q12. What is Job?</h3>
+<div class="outline-text-3" id="text-org3e047aa">
 <p>
 Runs pods to completion for finite tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-orga8f554b" class="outline-3">
-<h3 id="orga8f554b">Q13. What is CronJob?</h3>
-<div class="outline-text-3" id="text-orga8f554b">
+<div id="outline-container-orgadd16e2" class="outline-3">
+<h3 id="orgadd16e2">Q13. What is CronJob?</h3>
+<div class="outline-text-3" id="text-orgadd16e2">
 <p>
 Schedules Jobs at specified times (cron syntax).
 </p>
 </div>
 </div>
-<div id="outline-container-org8cdf62e" class="outline-3">
-<h3 id="org8cdf62e">Q14. What is a Service in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org8cdf62e">
+<div id="outline-container-org9432821" class="outline-3">
+<h3 id="org9432821">Q14. What is a Service in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org9432821">
 <p>
 Stable network abstraction exposing a set of pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orge7b4030" class="outline-3">
-<h3 id="orge7b4030">Q15. Why Service is needed?</h3>
-<div class="outline-text-3" id="text-orge7b4030">
+<div id="outline-container-org37905cc" class="outline-3">
+<h3 id="org37905cc">Q15. Why Service is needed?</h3>
+<div class="outline-text-3" id="text-org37905cc">
 <p>
 Pods are ephemeral; Service provides stable endpoint and load balancing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb649532" class="outline-3">
-<h3 id="orgb649532">Q16. Service types?</h3>
-<div class="outline-text-3" id="text-orgb649532">
+<div id="outline-container-org84da677" class="outline-3">
+<h3 id="org84da677">Q16. Service types?</h3>
+<div class="outline-text-3" id="text-org84da677">
 <p>
 ClusterIP, NodePort, LoadBalancer, ExternalName.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c065b7" class="outline-3">
-<h3 id="org0c065b7">Q17. What is ClusterIP?</h3>
-<div class="outline-text-3" id="text-org0c065b7">
+<div id="outline-container-orge65a417" class="outline-3">
+<h3 id="orge65a417">Q17. What is ClusterIP?</h3>
+<div class="outline-text-3" id="text-orge65a417">
 <p>
 Internal-only service reachable within cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org64054f6" class="outline-3">
-<h3 id="org64054f6">Q18. What is NodePort?</h3>
-<div class="outline-text-3" id="text-org64054f6">
+<div id="outline-container-orgb18aad8" class="outline-3">
+<h3 id="orgb18aad8">Q18. What is NodePort?</h3>
+<div class="outline-text-3" id="text-orgb18aad8">
 <p>
 Exposes service on static port on each node.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd95bca7" class="outline-3">
-<h3 id="orgd95bca7">Q19. What is LoadBalancer service?</h3>
-<div class="outline-text-3" id="text-orgd95bca7">
+<div id="outline-container-orgdb434a2" class="outline-3">
+<h3 id="orgdb434a2">Q19. What is LoadBalancer service?</h3>
+<div class="outline-text-3" id="text-orgdb434a2">
 <p>
 Requests external load balancer from cloud/provider integration.
 </p>
 </div>
 </div>
-<div id="outline-container-org7dc4418" class="outline-3">
-<h3 id="org7dc4418">Q20. What is ExternalName service?</h3>
-<div class="outline-text-3" id="text-org7dc4418">
+<div id="outline-container-org498053f" class="outline-3">
+<h3 id="org498053f">Q20. What is ExternalName service?</h3>
+<div class="outline-text-3" id="text-org498053f">
 <p>
 Maps service to external DNS name.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd2722b" class="outline-3">
-<h3 id="orgfd2722b">Q21. What is Ingress?</h3>
-<div class="outline-text-3" id="text-orgfd2722b">
+<div id="outline-container-orga8fbe21" class="outline-3">
+<h3 id="orga8fbe21">Q21. What is Ingress?</h3>
+<div class="outline-text-3" id="text-orga8fbe21">
 <p>
 API object for HTTP(S) routing into cluster, typically via Ingress Controller.
 </p>
 </div>
 </div>
-<div id="outline-container-orge451837" class="outline-3">
-<h3 id="orge451837">Q22. Is Ingress itself a load balancer?</h3>
-<div class="outline-text-3" id="text-orge451837">
+<div id="outline-container-org180fe41" class="outline-3">
+<h3 id="org180fe41">Q22. Is Ingress itself a load balancer?</h3>
+<div class="outline-text-3" id="text-org180fe41">
 <p>
 No, it defines rules; controller implements behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-org5187e7f" class="outline-3">
-<h3 id="org5187e7f">Q23. What is Ingress Controller?</h3>
-<div class="outline-text-3" id="text-org5187e7f">
+<div id="outline-container-orgbc40ec9" class="outline-3">
+<h3 id="orgbc40ec9">Q23. What is Ingress Controller?</h3>
+<div class="outline-text-3" id="text-orgbc40ec9">
 <p>
 Component that watches Ingress resources and configures actual proxy/load balancer.
 </p>
 </div>
 </div>
-<div id="outline-container-org005fab1" class="outline-3">
-<h3 id="org005fab1">Q24. What is namespace?</h3>
-<div class="outline-text-3" id="text-org005fab1">
+<div id="outline-container-org412f080" class="outline-3">
+<h3 id="org412f080">Q24. What is namespace?</h3>
+<div class="outline-text-3" id="text-org412f080">
 <p>
 Logical cluster partition for resource organization and policy scope.
 </p>
 </div>
 </div>
-<div id="outline-container-org362e302" class="outline-3">
-<h3 id="org362e302">Q25. Why use namespaces?</h3>
-<div class="outline-text-3" id="text-org362e302">
+<div id="outline-container-org7ee71fb" class="outline-3">
+<h3 id="org7ee71fb">Q25. Why use namespaces?</h3>
+<div class="outline-text-3" id="text-org7ee71fb">
 <p>
 Multi-team isolation, naming boundaries, and policy/quota management.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc458faf" class="outline-3">
-<h3 id="orgc458faf">Q26. What is ConfigMap?</h3>
-<div class="outline-text-3" id="text-orgc458faf">
+<div id="outline-container-org3170fd4" class="outline-3">
+<h3 id="org3170fd4">Q26. What is ConfigMap?</h3>
+<div class="outline-text-3" id="text-org3170fd4">
 <p>
 Stores non-sensitive configuration as key-value data.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfff76a6" class="outline-3">
-<h3 id="orgfff76a6">Q27. What is Secret?</h3>
-<div class="outline-text-3" id="text-orgfff76a6">
+<div id="outline-container-org2c908e5" class="outline-3">
+<h3 id="org2c908e5">Q27. What is Secret?</h3>
+<div class="outline-text-3" id="text-org2c908e5">
 <p>
 Stores sensitive data (base64-encoded; secure handling still required).
 </p>
 </div>
 </div>
-<div id="outline-container-org938e28b" class="outline-3">
-<h3 id="org938e28b">Q28. ConfigMap vs Secret?</h3>
-<div class="outline-text-3" id="text-org938e28b">
+<div id="outline-container-orge2d4bdb" class="outline-3">
+<h3 id="orge2d4bdb">Q28. ConfigMap vs Secret?</h3>
+<div class="outline-text-3" id="text-orge2d4bdb">
 <p>
 Purpose and handling: Secret intended for sensitive values with stricter controls.
 </p>
 </div>
 </div>
-<div id="outline-container-orgab813bc" class="outline-3">
-<h3 id="orgab813bc">Q29. What is kube-apiserver?</h3>
-<div class="outline-text-3" id="text-orgab813bc">
+<div id="outline-container-org59ab8da" class="outline-3">
+<h3 id="org59ab8da">Q29. What is kube-apiserver?</h3>
+<div class="outline-text-3" id="text-org59ab8da">
 <p>
 Control plane API front door for all cluster operations.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d3768e" class="outline-3">
-<h3 id="org6d3768e">Q30. What is etcd?</h3>
-<div class="outline-text-3" id="text-org6d3768e">
+<div id="outline-container-orge7c508a" class="outline-3">
+<h3 id="orge7c508a">Q30. What is etcd?</h3>
+<div class="outline-text-3" id="text-orge7c508a">
 <p>
 Distributed key-value store holding cluster state/configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ac8f46" class="outline-3">
-<h3 id="org7ac8f46">Q31. What is kube-scheduler?</h3>
-<div class="outline-text-3" id="text-org7ac8f46">
+<div id="outline-container-org811312c" class="outline-3">
+<h3 id="org811312c">Q31. What is kube-scheduler?</h3>
+<div class="outline-text-3" id="text-org811312c">
 <p>
 Assigns unscheduled pods to nodes based on constraints/resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org9505ed1" class="outline-3">
-<h3 id="org9505ed1">Q32. What is kube-controller-manager?</h3>
-<div class="outline-text-3" id="text-org9505ed1">
+<div id="outline-container-org2abeb4d" class="outline-3">
+<h3 id="org2abeb4d">Q32. What is kube-controller-manager?</h3>
+<div class="outline-text-3" id="text-org2abeb4d">
 <p>
 Runs controllers reconciling desired vs actual cluster state.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb71360b" class="outline-3">
-<h3 id="orgb71360b">Q33. What is kubelet?</h3>
-<div class="outline-text-3" id="text-orgb71360b">
+<div id="outline-container-org8c784f7" class="outline-3">
+<h3 id="org8c784f7">Q33. What is kubelet?</h3>
+<div class="outline-text-3" id="text-org8c784f7">
 <p>
 Node agent managing pods/containers on each node.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c3c8b0" class="outline-3">
-<h3 id="org8c3c8b0">Q34. What is kube-proxy?</h3>
-<div class="outline-text-3" id="text-org8c3c8b0">
+<div id="outline-container-orgb0401a8" class="outline-3">
+<h3 id="orgb0401a8">Q34. What is kube-proxy?</h3>
+<div class="outline-text-3" id="text-orgb0401a8">
 <p>
 Implements service networking rules on nodes.
 </p>
 </div>
 </div>
-<div id="outline-container-org4008a54" class="outline-3">
-<h3 id="org4008a54">Q35. What is desired state?</h3>
-<div class="outline-text-3" id="text-org4008a54">
+<div id="outline-container-orgc0ab5ec" class="outline-3">
+<h3 id="orgc0ab5ec">Q35. What is desired state?</h3>
+<div class="outline-text-3" id="text-orgc0ab5ec">
 <p>
 Declarative target configuration submitted to Kubernetes.
 </p>
 </div>
 </div>
-<div id="outline-container-org63147e5" class="outline-3">
-<h3 id="org63147e5">Q36. What is reconciliation loop?</h3>
-<div class="outline-text-3" id="text-org63147e5">
+<div id="outline-container-orgf5007cf" class="outline-3">
+<h3 id="orgf5007cf">Q36. What is reconciliation loop?</h3>
+<div class="outline-text-3" id="text-orgf5007cf">
 <p>
 Controllers continuously adjust actual state toward desired state.
 </p>
 </div>
 </div>
-<div id="outline-container-org057f002" class="outline-3">
-<h3 id="org057f002">Q37. What is declarative management?</h3>
-<div class="outline-text-3" id="text-org057f002">
+<div id="outline-container-org246cfc2" class="outline-3">
+<h3 id="org246cfc2">Q37. What is declarative management?</h3>
+<div class="outline-text-3" id="text-org246cfc2">
 <p>
 Define desired YAML state, let controllers enforce it.
 </p>
 </div>
 </div>
-<div id="outline-container-org0c4ff81" class="outline-3">
-<h3 id="org0c4ff81">Q38. Imperative vs declarative kubectl usage?</h3>
-<div class="outline-text-3" id="text-org0c4ff81">
+<div id="outline-container-org1ebbff9" class="outline-3">
+<h3 id="org1ebbff9">Q38. Imperative vs declarative kubectl usage?</h3>
+<div class="outline-text-3" id="text-org1ebbff9">
 <p>
 Imperative runs commands directly; declarative applies manifests.
 </p>
 </div>
 </div>
-<div id="outline-container-org615fe50" class="outline-3">
-<h3 id="org615fe50">Q39. What does kubectl apply do?</h3>
-<div class="outline-text-3" id="text-org615fe50">
+<div id="outline-container-org3a561a7" class="outline-3">
+<h3 id="org3a561a7">Q39. What does kubectl apply do?</h3>
+<div class="outline-text-3" id="text-org3a561a7">
 <p>
 Creates/updates resources to match manifest desired state.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb00f45" class="outline-3">
-<h3 id="orgfb00f45">Q40. What does kubectl get do?</h3>
-<div class="outline-text-3" id="text-orgfb00f45">
+<div id="outline-container-orgdd28b42" class="outline-3">
+<h3 id="orgdd28b42">Q40. What does kubectl get do?</h3>
+<div class="outline-text-3" id="text-orgdd28b42">
 <p>
 Lists resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org19a253a" class="outline-3">
-<h3 id="org19a253a">Q41. What does kubectl describe do?</h3>
-<div class="outline-text-3" id="text-org19a253a">
+<div id="outline-container-org8fb5e22" class="outline-3">
+<h3 id="org8fb5e22">Q41. What does kubectl describe do?</h3>
+<div class="outline-text-3" id="text-org8fb5e22">
 <p>
 Shows detailed resource state/events.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c10597" class="outline-3">
-<h3 id="org6c10597">Q42. What does kubectl logs do?</h3>
-<div class="outline-text-3" id="text-org6c10597">
+<div id="outline-container-orgae67dce" class="outline-3">
+<h3 id="orgae67dce">Q42. What does kubectl logs do?</h3>
+<div class="outline-text-3" id="text-orgae67dce">
 <p>
 Fetches container logs from pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf5ca9e8" class="outline-3">
-<h3 id="orgf5ca9e8">Q43. What does kubectl exec do?</h3>
-<div class="outline-text-3" id="text-orgf5ca9e8">
+<div id="outline-container-org6abb23f" class="outline-3">
+<h3 id="org6abb23f">Q43. What does kubectl exec do?</h3>
+<div class="outline-text-3" id="text-org6abb23f">
 <p>
 Runs command inside container.
 </p>
 </div>
 </div>
-<div id="outline-container-orgee9ed09" class="outline-3">
-<h3 id="orgee9ed09">Q44. What does kubectl port-forward do?</h3>
-<div class="outline-text-3" id="text-orgee9ed09">
+<div id="outline-container-org1085c0a" class="outline-3">
+<h3 id="org1085c0a">Q44. What does kubectl port-forward do?</h3>
+<div class="outline-text-3" id="text-org1085c0a">
 <p>
 Forwards local port to pod/service port temporarily.
 </p>
 </div>
 </div>
-<div id="outline-container-org135d0dd" class="outline-3">
-<h3 id="org135d0dd">Q45. What is label?</h3>
-<div class="outline-text-3" id="text-org135d0dd">
+<div id="outline-container-orge124258" class="outline-3">
+<h3 id="orge124258">Q45. What is label?</h3>
+<div class="outline-text-3" id="text-orge124258">
 <p>
 Key-value metadata for organizing/selecting resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org88e4fd1" class="outline-3">
-<h3 id="org88e4fd1">Q46. What is selector?</h3>
-<div class="outline-text-3" id="text-org88e4fd1">
+<div id="outline-container-orgfdca35f" class="outline-3">
+<h3 id="orgfdca35f">Q46. What is selector?</h3>
+<div class="outline-text-3" id="text-orgfdca35f">
 <p>
 Query mechanism matching labels to target objects.
 </p>
 </div>
 </div>
-<div id="outline-container-org731efda" class="outline-3">
-<h3 id="org731efda">Q47. Why labels are critical?</h3>
-<div class="outline-text-3" id="text-org731efda">
+<div id="outline-container-org5bdfb68" class="outline-3">
+<h3 id="org5bdfb68">Q47. Why labels are critical?</h3>
+<div class="outline-text-3" id="text-org5bdfb68">
 <p>
 Services/controllers use them to select pods/resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orgafc801a" class="outline-3">
-<h3 id="orgafc801a">Q48. What is annotation?</h3>
-<div class="outline-text-3" id="text-orgafc801a">
+<div id="outline-container-org8374416" class="outline-3">
+<h3 id="org8374416">Q48. What is annotation?</h3>
+<div class="outline-text-3" id="text-org8374416">
 <p>
 Non-identifying metadata for tools/humans/controllers.
 </p>
 </div>
 </div>
-<div id="outline-container-org86e9687" class="outline-3">
-<h3 id="org86e9687">Q49. What is container image pull policy?</h3>
-<div class="outline-text-3" id="text-org86e9687">
+<div id="outline-container-org20eb512" class="outline-3">
+<h3 id="org20eb512">Q49. What is container image pull policy?</h3>
+<div class="outline-text-3" id="text-org20eb512">
 <p>
 Rules controlling when kubelet pulls image (Always/IfNotPresent/Never).
 </p>
 </div>
 </div>
-<div id="outline-container-orgee7dcd3" class="outline-3">
-<h3 id="orgee7dcd3">Q50. What is readiness probe?</h3>
-<div class="outline-text-3" id="text-orgee7dcd3">
+<div id="outline-container-org198b9ab" class="outline-3">
+<h3 id="org198b9ab">Q50. What is readiness probe?</h3>
+<div class="outline-text-3" id="text-org198b9ab">
 <p>
 Indicates pod ready to receive traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb0a3502" class="outline-3">
-<h3 id="orgb0a3502">Q51. What is liveness probe?</h3>
-<div class="outline-text-3" id="text-orgb0a3502">
+<div id="outline-container-org1a7582e" class="outline-3">
+<h3 id="org1a7582e">Q51. What is liveness probe?</h3>
+<div class="outline-text-3" id="text-org1a7582e">
 <p>
 Detects unhealthy container needing restart.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6a7d04" class="outline-3">
-<h3 id="orgf6a7d04">Q52. What is startup probe?</h3>
-<div class="outline-text-3" id="text-orgf6a7d04">
+<div id="outline-container-org083f5e6" class="outline-3">
+<h3 id="org083f5e6">Q52. What is startup probe?</h3>
+<div class="outline-text-3" id="text-org083f5e6">
 <p>
 Gives slow-start apps time before liveness checks begin.
 </p>
 </div>
 </div>
-<div id="outline-container-org0853746" class="outline-3">
-<h3 id="org0853746">Q53. Why probes matter?</h3>
-<div class="outline-text-3" id="text-org0853746">
+<div id="outline-container-orgebb8b9c" class="outline-3">
+<h3 id="orgebb8b9c">Q53. Why probes matter?</h3>
+<div class="outline-text-3" id="text-orgebb8b9c">
 <p>
 Enable self-healing and prevent routing traffic to broken pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b2ab7b" class="outline-3">
-<h3 id="org6b2ab7b">Q54. What is resource request?</h3>
-<div class="outline-text-3" id="text-org6b2ab7b">
+<div id="outline-container-orgdf05223" class="outline-3">
+<h3 id="orgdf05223">Q54. What is resource request?</h3>
+<div class="outline-text-3" id="text-orgdf05223">
 <p>
 Guaranteed minimum CPU/memory used for scheduling.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbf067d6" class="outline-3">
-<h3 id="orgbf067d6">Q55. What is resource limit?</h3>
-<div class="outline-text-3" id="text-orgbf067d6">
+<div id="outline-container-org4e4851f" class="outline-3">
+<h3 id="org4e4851f">Q55. What is resource limit?</h3>
+<div class="outline-text-3" id="text-org4e4851f">
 <p>
 Maximum CPU/memory container may use.
 </p>
 </div>
 </div>
-<div id="outline-container-orge8c82fd" class="outline-3">
-<h3 id="orge8c82fd">Q56. Why set requests/limits?</h3>
-<div class="outline-text-3" id="text-orge8c82fd">
+<div id="outline-container-orgec008ca" class="outline-3">
+<h3 id="orgec008ca">Q56. Why set requests/limits?</h3>
+<div class="outline-text-3" id="text-orgec008ca">
 <p>
 Predictable scheduling, fairness, and node stability.
 </p>
 </div>
 </div>
-<div id="outline-container-org99224a0" class="outline-3">
-<h3 id="org99224a0">Q57. What is OOMKilled?</h3>
-<div class="outline-text-3" id="text-org99224a0">
+<div id="outline-container-org202c5d2" class="outline-3">
+<h3 id="org202c5d2">Q57. What is OOMKilled?</h3>
+<div class="outline-text-3" id="text-org202c5d2">
 <p>
 Container killed for exceeding memory limit.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf3172e7" class="outline-3">
-<h3 id="orgf3172e7">Q58. What is CrashLoopBackOff?</h3>
-<div class="outline-text-3" id="text-orgf3172e7">
+<div id="outline-container-orgfde090b" class="outline-3">
+<h3 id="orgfde090b">Q58. What is CrashLoopBackOff?</h3>
+<div class="outline-text-3" id="text-orgfde090b">
 <p>
 Repeated container failures with backoff restarts.
 </p>
 </div>
 </div>
-<div id="outline-container-org92b6741" class="outline-3">
-<h3 id="org92b6741">Q59. Common beginner Kubernetes anti-pattern?</h3>
-<div class="outline-text-3" id="text-org92b6741">
+<div id="outline-container-org4f8830c" class="outline-3">
+<h3 id="org4f8830c">Q59. Common beginner Kubernetes anti-pattern?</h3>
+<div class="outline-text-3" id="text-org4f8830c">
 <p>
 No resource limits/probes on production workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org3eec3cd" class="outline-3">
-<h3 id="org3eec3cd">Q60. Another beginner anti-pattern?</h3>
-<div class="outline-text-3" id="text-org3eec3cd">
+<div id="outline-container-orgc4fb365" class="outline-3">
+<h3 id="orgc4fb365">Q60. Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgc4fb365">
 <p>
 Using latest image tags in deployments.
 </p>
 </div>
 </div>
-<div id="outline-container-orga37090b" class="outline-3">
-<h3 id="orga37090b">Q61. Beginner security baseline?</h3>
-<div class="outline-text-3" id="text-orga37090b">
+<div id="outline-container-org12da181" class="outline-3">
+<h3 id="org12da181">Q61. Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-org12da181">
 <p>
 Namespaces, least-privilege RBAC, non-root containers, trusted images.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a79c9a" class="outline-3">
-<h3 id="org5a79c9a">Q62. Beginner reliability baseline?</h3>
-<div class="outline-text-3" id="text-org5a79c9a">
+<div id="outline-container-orgbb47048" class="outline-3">
+<h3 id="orgbb47048">Q62. Beginner reliability baseline?</h3>
+<div class="outline-text-3" id="text-orgbb47048">
 <p>
 Replicas, probes, rolling updates, and PodDisruptionBudgets.
 </p>
 </div>
 </div>
-<div id="outline-container-org47fbda4" class="outline-3">
-<h3 id="org47fbda4">Q63. Beginner observability baseline?</h3>
-<div class="outline-text-3" id="text-org47fbda4">
+<div id="outline-container-org3dd156d" class="outline-3">
+<h3 id="org3dd156d">Q63. Beginner observability baseline?</h3>
+<div class="outline-text-3" id="text-org3dd156d">
 <p>
 Metrics, logs, events, and health dashboards.
 </p>
 </div>
 </div>
-<div id="outline-container-org902e7f2" class="outline-3">
-<h3 id="org902e7f2">Q64. Beginner deployment baseline?</h3>
-<div class="outline-text-3" id="text-org902e7f2">
+<div id="outline-container-org5118901" class="outline-3">
+<h3 id="org5118901">Q64. Beginner deployment baseline?</h3>
+<div class="outline-text-3" id="text-org5118901">
 <p>
 Use Deployments with versioned immutable image tags.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c8c5ea" class="outline-3">
-<h3 id="org8c8c5ea">Q65. Beginner best practice?</h3>
-<div class="outline-text-3" id="text-org8c8c5ea">
+<div id="outline-container-org25e984d" class="outline-3">
+<h3 id="org25e984d">Q65. Beginner best practice?</h3>
+<div class="outline-text-3" id="text-org25e984d">
 <p>
 Treat manifests as code and keep everything declarative/versioned.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org7eff618" class="outline-2">
-<h2 id="org7eff618">Intermediate</h2>
-<div class="outline-text-2" id="text-org7eff618">
+<div id="outline-container-orgb24ba04" class="outline-2">
+<h2 id="orgb24ba04">Intermediate</h2>
+<div class="outline-text-2" id="text-orgb24ba04">
 </div>
-<div id="outline-container-org0734d9d" class="outline-3">
-<h3 id="org0734d9d">Q66. What is rolling update strategy?</h3>
-<div class="outline-text-3" id="text-org0734d9d">
+<div id="outline-container-org1f75a8f" class="outline-3">
+<h3 id="org1f75a8f">Q66. What is rolling update strategy?</h3>
+<div class="outline-text-3" id="text-org1f75a8f">
 <p>
 Gradual replacement of old pods with new pods minimizing downtime.
 </p>
 </div>
 </div>
-<div id="outline-container-org2866be7" class="outline-3">
-<h3 id="org2866be7">Q67. What are maxUnavailable/maxSurge?</h3>
-<div class="outline-text-3" id="text-org2866be7">
+<div id="outline-container-orgbe642ee" class="outline-3">
+<h3 id="orgbe642ee">Q67. What are maxUnavailable/maxSurge?</h3>
+<div class="outline-text-3" id="text-orgbe642ee">
 <p>
 Controls rollout pace and temporary extra pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org26c1207" class="outline-3">
-<h3 id="org26c1207">Q68. What is rollout undo?</h3>
-<div class="outline-text-3" id="text-org26c1207">
+<div id="outline-container-orgf7161fc" class="outline-3">
+<h3 id="orgf7161fc">Q68. What is rollout undo?</h3>
+<div class="outline-text-3" id="text-orgf7161fc">
 <p>
 Revert Deployment to previous ReplicaSet revision.
 </p>
 </div>
 </div>
-<div id="outline-container-org4c9c22e" class="outline-3">
-<h3 id="org4c9c22e">Q69. What is revision history limit?</h3>
-<div class="outline-text-3" id="text-org4c9c22e">
+<div id="outline-container-orgf83e617" class="outline-3">
+<h3 id="orgf83e617">Q69. What is revision history limit?</h3>
+<div class="outline-text-3" id="text-orgf83e617">
 <p>
 How many old ReplicaSets retained for rollback.
 </p>
 </div>
 </div>
-<div id="outline-container-org0a963b4" class="outline-3">
-<h3 id="org0a963b4">Q70. What is HPA?</h3>
-<div class="outline-text-3" id="text-org0a963b4">
+<div id="outline-container-org918bb5a" class="outline-3">
+<h3 id="org918bb5a">Q70. What is HPA?</h3>
+<div class="outline-text-3" id="text-org918bb5a">
 <p>
 Horizontal Pod Autoscaler scales pod replicas based on metrics.
 </p>
 </div>
 </div>
-<div id="outline-container-org446d3fa" class="outline-3">
-<h3 id="org446d3fa">Q71. What metrics can HPA use?</h3>
-<div class="outline-text-3" id="text-org446d3fa">
+<div id="outline-container-org933f35c" class="outline-3">
+<h3 id="org933f35c">Q71. What metrics can HPA use?</h3>
+<div class="outline-text-3" id="text-org933f35c">
 <p>
 CPU/memory and custom/external metrics (with adapters).
 </p>
 </div>
 </div>
-<div id="outline-container-orgca1c269" class="outline-3">
-<h3 id="orgca1c269">Q72. What is VPA?</h3>
-<div class="outline-text-3" id="text-orgca1c269">
+<div id="outline-container-org8a30dec" class="outline-3">
+<h3 id="org8a30dec">Q72. What is VPA?</h3>
+<div class="outline-text-3" id="text-org8a30dec">
 <p>
 Vertical Pod Autoscaler adjusts pod resource requests (with operational caveats).
 </p>
 </div>
 </div>
-<div id="outline-container-org4d0c2cb" class="outline-3">
-<h3 id="org4d0c2cb">Q73. HPA vs VPA?</h3>
-<div class="outline-text-3" id="text-org4d0c2cb">
+<div id="outline-container-orgbbc8382" class="outline-3">
+<h3 id="orgbbc8382">Q73. HPA vs VPA?</h3>
+<div class="outline-text-3" id="text-orgbbc8382">
 <p>
 HPA scales replica count; VPA scales per-pod resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb061a54" class="outline-3">
-<h3 id="orgb061a54">Q74. What is Cluster Autoscaler?</h3>
-<div class="outline-text-3" id="text-orgb061a54">
+<div id="outline-container-orgfd2c3f9" class="outline-3">
+<h3 id="orgfd2c3f9">Q74. What is Cluster Autoscaler?</h3>
+<div class="outline-text-3" id="text-orgfd2c3f9">
 <p>
 Scales node pool size based on unschedulable pods/utilization.
 </p>
 </div>
 </div>
-<div id="outline-container-org798c837" class="outline-3">
-<h3 id="org798c837">Q75. What is taint?</h3>
-<div class="outline-text-3" id="text-org798c837">
+<div id="outline-container-org3204984" class="outline-3">
+<h3 id="org3204984">Q75. What is taint?</h3>
+<div class="outline-text-3" id="text-org3204984">
 <p>
 Node marker repelling pods unless tolerated.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb218b60" class="outline-3">
-<h3 id="orgb218b60">Q76. What is toleration?</h3>
-<div class="outline-text-3" id="text-orgb218b60">
+<div id="outline-container-orge644524" class="outline-3">
+<h3 id="orge644524">Q76. What is toleration?</h3>
+<div class="outline-text-3" id="text-orge644524">
 <p>
 Pod rule allowing scheduling onto tainted nodes.
 </p>
 </div>
 </div>
-<div id="outline-container-orga29e1b1" class="outline-3">
-<h3 id="orga29e1b1">Q77. What is nodeSelector?</h3>
-<div class="outline-text-3" id="text-orga29e1b1">
+<div id="outline-container-org5f45be0" class="outline-3">
+<h3 id="org5f45be0">Q77. What is nodeSelector?</h3>
+<div class="outline-text-3" id="text-org5f45be0">
 <p>
 Simple pod constraint selecting nodes by label.
 </p>
 </div>
 </div>
-<div id="outline-container-org016f728" class="outline-3">
-<h3 id="org016f728">Q78. What is node affinity?</h3>
-<div class="outline-text-3" id="text-org016f728">
+<div id="outline-container-orgcdb6b29" class="outline-3">
+<h3 id="orgcdb6b29">Q78. What is node affinity?</h3>
+<div class="outline-text-3" id="text-orgcdb6b29">
 <p>
 Advanced scheduling rules/preferences based on node labels.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfae7025" class="outline-3">
-<h3 id="orgfae7025">Q79. What is pod affinity/anti-affinity?</h3>
-<div class="outline-text-3" id="text-orgfae7025">
+<div id="outline-container-org5d0b9e8" class="outline-3">
+<h3 id="org5d0b9e8">Q79. What is pod affinity/anti-affinity?</h3>
+<div class="outline-text-3" id="text-org5d0b9e8">
 <p>
 Rules to co-locate or separate pods relative to other pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org6cbda4a" class="outline-3">
-<h3 id="org6cbda4a">Q80. Why use pod anti-affinity?</h3>
-<div class="outline-text-3" id="text-org6cbda4a">
+<div id="outline-container-org99be6dc" class="outline-3">
+<h3 id="org99be6dc">Q80. Why use pod anti-affinity?</h3>
+<div class="outline-text-3" id="text-org99be6dc">
 <p>
 Improve high availability by spreading replicas across nodes/zones.
 </p>
 </div>
 </div>
-<div id="outline-container-orgca499e4" class="outline-3">
-<h3 id="orgca499e4">Q81. What is topology spread constraint?</h3>
-<div class="outline-text-3" id="text-orgca499e4">
+<div id="outline-container-org991b4f9" class="outline-3">
+<h3 id="org991b4f9">Q81. What is topology spread constraint?</h3>
+<div class="outline-text-3" id="text-org991b4f9">
 <p>
 Evenly distributes pods across topology domains.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a8aa48" class="outline-3">
-<h3 id="org2a8aa48">Q82. What is PDB (PodDisruptionBudget)?</h3>
-<div class="outline-text-3" id="text-org2a8aa48">
+<div id="outline-container-org15863d7" class="outline-3">
+<h3 id="org15863d7">Q82. What is PDB (PodDisruptionBudget)?</h3>
+<div class="outline-text-3" id="text-org15863d7">
 <p>
 Limits voluntary disruptions to maintain availability.
 </p>
 </div>
 </div>
-<div id="outline-container-org4eb4653" class="outline-3">
-<h3 id="org4eb4653">Q83. Voluntary vs involuntary disruption?</h3>
-<div class="outline-text-3" id="text-org4eb4653">
+<div id="outline-container-orge61b6e3" class="outline-3">
+<h3 id="orge61b6e3">Q83. Voluntary vs involuntary disruption?</h3>
+<div class="outline-text-3" id="text-orge61b6e3">
 <p>
 Voluntary: drains/upgrades; involuntary: node crash/outage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf00a1ac" class="outline-3">
-<h3 id="orgf00a1ac">Q84. What is eviction in Kubernetes?</h3>
-<div class="outline-text-3" id="text-orgf00a1ac">
+<div id="outline-container-orgfd5c3b3" class="outline-3">
+<h3 id="orgfd5c3b3">Q84. What is eviction in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgfd5c3b3">
 <p>
 Controlled pod termination due to resource pressure/policies.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd91f797" class="outline-3">
-<h3 id="orgd91f797">Q85. What is QoS class?</h3>
-<div class="outline-text-3" id="text-orgd91f797">
+<div id="outline-container-org6bde534" class="outline-3">
+<h3 id="org6bde534">Q85. What is QoS class?</h3>
+<div class="outline-text-3" id="text-org6bde534">
 <p>
 Pod quality-of-service tier (Guaranteed/Burstable/BestEffort) based on requests/limits.
 </p>
 </div>
 </div>
-<div id="outline-container-org83b41b5" class="outline-3">
-<h3 id="org83b41b5">Q86. What is init container?</h3>
-<div class="outline-text-3" id="text-org83b41b5">
+<div id="outline-container-org0a1ee40" class="outline-3">
+<h3 id="org0a1ee40">Q86. What is init container?</h3>
+<div class="outline-text-3" id="text-org0a1ee40">
 <p>
 Container run before app containers for setup tasks.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a1c5dc" class="outline-3">
-<h3 id="org2a1c5dc">Q87. What is sidecar container?</h3>
-<div class="outline-text-3" id="text-org2a1c5dc">
+<div id="outline-container-org95e58ad" class="outline-3">
+<h3 id="org95e58ad">Q87. What is sidecar container?</h3>
+<div class="outline-text-3" id="text-org95e58ad">
 <p>
 Helper container running alongside main app container in same pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org105826a" class="outline-3">
-<h3 id="org105826a">Q88. Sidecar use cases?</h3>
-<div class="outline-text-3" id="text-org105826a">
+<div id="outline-container-org4040da3" class="outline-3">
+<h3 id="org4040da3">Q88. Sidecar use cases?</h3>
+<div class="outline-text-3" id="text-org4040da3">
 <p>
 Log shipping, proxying, cert refresh, metrics export.
 </p>
 </div>
 </div>
-<div id="outline-container-org87d6784" class="outline-3">
-<h3 id="org87d6784">Q89. What is ephemeral container?</h3>
-<div class="outline-text-3" id="text-org87d6784">
+<div id="outline-container-orgcf9d6f3" class="outline-3">
+<h3 id="orgcf9d6f3">Q89. What is ephemeral container?</h3>
+<div class="outline-text-3" id="text-orgcf9d6f3">
 <p>
 Debug container injected into running pod for troubleshooting.
 </p>
 </div>
 </div>
-<div id="outline-container-org7a103f5" class="outline-3">
-<h3 id="org7a103f5">Q90. What is CNI?</h3>
-<div class="outline-text-3" id="text-org7a103f5">
+<div id="outline-container-orga68f98c" class="outline-3">
+<h3 id="orga68f98c">Q90. What is CNI?</h3>
+<div class="outline-text-3" id="text-orga68f98c">
 <p>
 Container Network Interface plugin model for Kubernetes networking.
 </p>
 </div>
 </div>
-<div id="outline-container-org12ae309" class="outline-3">
-<h3 id="org12ae309">Q91. What is CSI?</h3>
-<div class="outline-text-3" id="text-org12ae309">
+<div id="outline-container-org5ce23bb" class="outline-3">
+<h3 id="org5ce23bb">Q91. What is CSI?</h3>
+<div class="outline-text-3" id="text-org5ce23bb">
 <p>
 Container Storage Interface for pluggable storage drivers.
 </p>
 </div>
 </div>
-<div id="outline-container-org477ff64" class="outline-3">
-<h3 id="org477ff64">Q92. What is PV?</h3>
-<div class="outline-text-3" id="text-org477ff64">
+<div id="outline-container-orgb63d9b3" class="outline-3">
+<h3 id="orgb63d9b3">Q92. What is PV?</h3>
+<div class="outline-text-3" id="text-orgb63d9b3">
 <p>
 PersistentVolume: cluster storage resource.
 </p>
 </div>
 </div>
-<div id="outline-container-org9cdaf7a" class="outline-3">
-<h3 id="org9cdaf7a">Q93. What is PVC?</h3>
-<div class="outline-text-3" id="text-org9cdaf7a">
+<div id="outline-container-orgebd5b0f" class="outline-3">
+<h3 id="orgebd5b0f">Q93. What is PVC?</h3>
+<div class="outline-text-3" id="text-orgebd5b0f">
 <p>
 PersistentVolumeClaim: user request for storage.
 </p>
 </div>
 </div>
-<div id="outline-container-orgada0099" class="outline-3">
-<h3 id="orgada0099">Q94. PV vs PVC relation?</h3>
-<div class="outline-text-3" id="text-orgada0099">
+<div id="outline-container-orgc9f35db" class="outline-3">
+<h3 id="orgc9f35db">Q94. PV vs PVC relation?</h3>
+<div class="outline-text-3" id="text-orgc9f35db">
 <p>
 PVC binds to matching PV dynamically or statically.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd72f247" class="outline-3">
-<h3 id="orgd72f247">Q95. What is StorageClass?</h3>
-<div class="outline-text-3" id="text-orgd72f247">
+<div id="outline-container-org70be96f" class="outline-3">
+<h3 id="org70be96f">Q95. What is StorageClass?</h3>
+<div class="outline-text-3" id="text-org70be96f">
 <p>
 Defines storage provisioner and parameters for dynamic provisioning.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff4e2b8" class="outline-3">
-<h3 id="orgff4e2b8">Q96. What is access mode?</h3>
-<div class="outline-text-3" id="text-orgff4e2b8">
+<div id="outline-container-orge6b310b" class="outline-3">
+<h3 id="orge6b310b">Q96. What is access mode?</h3>
+<div class="outline-text-3" id="text-orge6b310b">
 <p>
 How volume can be mounted (RWO, ROX, RWX, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org40ef9ab" class="outline-3">
-<h3 id="org40ef9ab">Q97. What is volume snapshot?</h3>
-<div class="outline-text-3" id="text-org40ef9ab">
+<div id="outline-container-org1908d6c" class="outline-3">
+<h3 id="org1908d6c">Q97. What is volume snapshot?</h3>
+<div class="outline-text-3" id="text-org1908d6c">
 <p>
 Point-in-time storage copy (driver support required).
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7d5a58" class="outline-3">
-<h3 id="orgc7d5a58">Q98. What is headless service?</h3>
-<div class="outline-text-3" id="text-orgc7d5a58">
+<div id="outline-container-org901c558" class="outline-3">
+<h3 id="org901c558">Q98. What is headless service?</h3>
+<div class="outline-text-3" id="text-org901c558">
 <p>
 Service with no cluster IP, often used by StatefulSets for stable DNS.
 </p>
 </div>
 </div>
-<div id="outline-container-org2b84404" class="outline-3">
-<h3 id="org2b84404">Q99. What is StatefulSet stable identity?</h3>
-<div class="outline-text-3" id="text-org2b84404">
+<div id="outline-container-orgdd89eb3" class="outline-3">
+<h3 id="orgdd89eb3">Q99. What is StatefulSet stable identity?</h3>
+<div class="outline-text-3" id="text-orgdd89eb3">
 <p>
 Persistent pod names and stable network/storage identities.
 </p>
 </div>
 </div>
-<div id="outline-container-org9073577" class="outline-3">
-<h3 id="org9073577">Q100. What is service discovery in cluster?</h3>
-<div class="outline-text-3" id="text-org9073577">
+<div id="outline-container-org5505122" class="outline-3">
+<h3 id="org5505122">Q100. What is service discovery in cluster?</h3>
+<div class="outline-text-3" id="text-org5505122">
 <p>
 DNS-based resolution via CoreDNS for services/pods (as configured).
 </p>
 </div>
 </div>
-<div id="outline-container-orgbcd544b" class="outline-3">
-<h3 id="orgbcd544b">Q101. What is CoreDNS?</h3>
-<div class="outline-text-3" id="text-orgbcd544b">
+<div id="outline-container-orgb907731" class="outline-3">
+<h3 id="orgb907731">Q101. What is CoreDNS?</h3>
+<div class="outline-text-3" id="text-orgb907731">
 <p>
 Cluster DNS service resolving Kubernetes service names.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd8f5db0" class="outline-3">
-<h3 id="orgd8f5db0">Q102. What is NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-orgd8f5db0">
+<div id="outline-container-org9ab2727" class="outline-3">
+<h3 id="org9ab2727">Q102. What is NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org9ab2727">
 <p>
 Rules controlling pod-to-pod/network traffic at L3/L4.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb0b275" class="outline-3">
-<h3 id="orgbb0b275">Q103. Default NetworkPolicy behavior if none applied?</h3>
-<div class="outline-text-3" id="text-orgbb0b275">
+<div id="outline-container-orgcb79b0b" class="outline-3">
+<h3 id="orgcb79b0b">Q103. Default NetworkPolicy behavior if none applied?</h3>
+<div class="outline-text-3" id="text-orgcb79b0b">
 <p>
 Typically allow-all (depends on CNI and policies).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6a1239" class="outline-3">
-<h3 id="orgd6a1239">Q104. Why implement default-deny policies?</h3>
-<div class="outline-text-3" id="text-orgd6a1239">
+<div id="outline-container-org2617dc6" class="outline-3">
+<h3 id="org2617dc6">Q104. Why implement default-deny policies?</h3>
+<div class="outline-text-3" id="text-org2617dc6">
 <p>
 Reduce lateral movement and enforce least-privilege connectivity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc8ed332" class="outline-3">
-<h3 id="orgc8ed332">Q105. What is RBAC?</h3>
-<div class="outline-text-3" id="text-orgc8ed332">
+<div id="outline-container-orgd4daff2" class="outline-3">
+<h3 id="orgd4daff2">Q105. What is RBAC?</h3>
+<div class="outline-text-3" id="text-orgd4daff2">
 <p>
 Role-Based Access Control for Kubernetes API authorization.
 </p>
 </div>
 </div>
-<div id="outline-container-org0ef55ec" class="outline-3">
-<h3 id="org0ef55ec">Q106. What is Role vs ClusterRole?</h3>
-<div class="outline-text-3" id="text-org0ef55ec">
+<div id="outline-container-org9e1c477" class="outline-3">
+<h3 id="org9e1c477">Q106. What is Role vs ClusterRole?</h3>
+<div class="outline-text-3" id="text-org9e1c477">
 <p>
 Role is namespace-scoped; ClusterRole is cluster-scoped.
 </p>
 </div>
 </div>
-<div id="outline-container-org4de905f" class="outline-3">
-<h3 id="org4de905f">Q107. What is RoleBinding vs ClusterRoleBinding?</h3>
-<div class="outline-text-3" id="text-org4de905f">
+<div id="outline-container-org94eeb5e" class="outline-3">
+<h3 id="org94eeb5e">Q107. What is RoleBinding vs ClusterRoleBinding?</h3>
+<div class="outline-text-3" id="text-org94eeb5e">
 <p>
 Binds roles to subjects at namespace vs cluster scope.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c031d0" class="outline-3">
-<h3 id="org7c031d0">Q108. What is ServiceAccount?</h3>
-<div class="outline-text-3" id="text-org7c031d0">
+<div id="outline-container-org707188b" class="outline-3">
+<h3 id="org707188b">Q108. What is ServiceAccount?</h3>
+<div class="outline-text-3" id="text-org707188b">
 <p>
 Identity for pods/processes to access Kubernetes API/resources.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc7afcc" class="outline-3">
-<h3 id="orgbc7afcc">Q109. Why avoid default ServiceAccount permissions?</h3>
-<div class="outline-text-3" id="text-orgbc7afcc">
+<div id="outline-container-org9f5b344" class="outline-3">
+<h3 id="org9f5b344">Q109. Why avoid default ServiceAccount permissions?</h3>
+<div class="outline-text-3" id="text-org9f5b344">
 <p>
 May be overly broad for sensitive workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org0ea76dc" class="outline-3">
-<h3 id="org0ea76dc">Q110. What is admission controller?</h3>
-<div class="outline-text-3" id="text-org0ea76dc">
+<div id="outline-container-orgf5c484e" class="outline-3">
+<h3 id="orgf5c484e">Q110. What is admission controller?</h3>
+<div class="outline-text-3" id="text-orgf5c484e">
 <p>
 Plugin intercepting API requests for validation/mutation/policy enforcement.
 </p>
 </div>
 </div>
-<div id="outline-container-org4155e88" class="outline-3">
-<h3 id="org4155e88">Q111. What is mutating vs validating admission?</h3>
-<div class="outline-text-3" id="text-org4155e88">
+<div id="outline-container-org1c3fdef" class="outline-3">
+<h3 id="org1c3fdef">Q111. What is mutating vs validating admission?</h3>
+<div class="outline-text-3" id="text-org1c3fdef">
 <p>
 Mutating can change objects; validating accepts/rejects requests.
 </p>
 </div>
 </div>
-<div id="outline-container-org7860991" class="outline-3">
-<h3 id="org7860991">Q112. What is OPA/Gatekeeper/Kyverno concept?</h3>
-<div class="outline-text-3" id="text-org7860991">
+<div id="outline-container-org13bd4d3" class="outline-3">
+<h3 id="org13bd4d3">Q112. What is OPA/Gatekeeper/Kyverno concept?</h3>
+<div class="outline-text-3" id="text-org13bd4d3">
 <p>
 Policy-as-code tools enforcing governance/security constraints.
 </p>
 </div>
 </div>
-<div id="outline-container-org7abbd05" class="outline-3">
-<h3 id="org7abbd05">Q113. What is Helm?</h3>
-<div class="outline-text-3" id="text-org7abbd05">
+<div id="outline-container-orgcd2487d" class="outline-3">
+<h3 id="orgcd2487d">Q113. What is Helm?</h3>
+<div class="outline-text-3" id="text-orgcd2487d">
 <p>
 Package manager templating/deploying Kubernetes applications via charts.
 </p>
 </div>
 </div>
-<div id="outline-container-org01e9f30" class="outline-3">
-<h3 id="org01e9f30">Q114. What is a Helm chart?</h3>
-<div class="outline-text-3" id="text-org01e9f30">
+<div id="outline-container-org840ab25" class="outline-3">
+<h3 id="org840ab25">Q114. What is a Helm chart?</h3>
+<div class="outline-text-3" id="text-org840ab25">
 <p>
 Parameterized package of Kubernetes manifests.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d94cdd" class="outline-3">
-<h3 id="org5d94cdd">Q115. What is Kustomize?</h3>
-<div class="outline-text-3" id="text-org5d94cdd">
+<div id="outline-container-orgdc19391" class="outline-3">
+<h3 id="orgdc19391">Q115. What is Kustomize?</h3>
+<div class="outline-text-3" id="text-orgdc19391">
 <p>
 Native manifest customization tool using overlays/patches.
 </p>
 </div>
 </div>
-<div id="outline-container-orge8ab996" class="outline-3">
-<h3 id="orge8ab996">Q116. Helm vs Kustomize?</h3>
-<div class="outline-text-3" id="text-orge8ab996">
+<div id="outline-container-orgc185a32" class="outline-3">
+<h3 id="orgc185a32">Q116. Helm vs Kustomize?</h3>
+<div class="outline-text-3" id="text-orgc185a32">
 <p>
 Helm is templating/package ecosystem; Kustomize is overlay-based customization.
 </p>
 </div>
 </div>
-<div id="outline-container-org60a8afc" class="outline-3">
-<h3 id="org60a8afc">Q117. What is GitOps?</h3>
-<div class="outline-text-3" id="text-org60a8afc">
+<div id="outline-container-org101e7e1" class="outline-3">
+<h3 id="org101e7e1">Q117. What is GitOps?</h3>
+<div class="outline-text-3" id="text-org101e7e1">
 <p>
 Managing cluster state from Git as single source of truth with reconciliation.
 </p>
 </div>
 </div>
-<div id="outline-container-org0cef99c" class="outline-3">
-<h3 id="org0cef99c">Q118. GitOps benefits?</h3>
-<div class="outline-text-3" id="text-org0cef99c">
+<div id="outline-container-org5a72338" class="outline-3">
+<h3 id="org5a72338">Q118. GitOps benefits?</h3>
+<div class="outline-text-3" id="text-org5a72338">
 <p>
 Auditability, reproducibility, safer rollbacks, drift detection.
 </p>
 </div>
 </div>
-<div id="outline-container-orga90a7c6" class="outline-3">
-<h3 id="orga90a7c6">Q119. What is Argo CD / Flux conceptually?</h3>
-<div class="outline-text-3" id="text-orga90a7c6">
+<div id="outline-container-orgb7a8316" class="outline-3">
+<h3 id="orgb7a8316">Q119. What is Argo CD / Flux conceptually?</h3>
+<div class="outline-text-3" id="text-orgb7a8316">
 <p>
 GitOps controllers syncing cluster state from Git repos.
 </p>
 </div>
 </div>
-<div id="outline-container-orgffc01ba" class="outline-3">
-<h3 id="orgffc01ba">Q120. What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgffc01ba">
+<div id="outline-container-orge6775c1" class="outline-3">
+<h3 id="orge6775c1">Q120. What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orge6775c1">
 <p>
 Manual kubectl edits in production bypassing Git history.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf3c1aa" class="outline-3">
-<h3 id="orgdf3c1aa">Q121. Better change management pattern?</h3>
-<div class="outline-text-3" id="text-orgdf3c1aa">
+<div id="outline-container-org483dee0" class="outline-3">
+<h3 id="org483dee0">Q121. Better change management pattern?</h3>
+<div class="outline-text-3" id="text-org483dee0">
 <p>
 Pull requests + automated policy checks + GitOps sync.
 </p>
 </div>
 </div>
-<div id="outline-container-org5bb3afb" class="outline-3">
-<h3 id="org5bb3afb">Q122. What is canary deployment in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org5bb3afb">
+<div id="outline-container-org82ffec4" class="outline-3">
+<h3 id="org82ffec4">Q122. What is canary deployment in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org82ffec4">
 <p>
 Gradual traffic shift to new version with monitoring gates.
 </p>
 </div>
 </div>
-<div id="outline-container-orga6aa92f" class="outline-3">
-<h3 id="orga6aa92f">Q123. What is blue/green deployment?</h3>
-<div class="outline-text-3" id="text-orga6aa92f">
+<div id="outline-container-org6c6c490" class="outline-3">
+<h3 id="org6c6c490">Q123. What is blue/green deployment?</h3>
+<div class="outline-text-3" id="text-org6c6c490">
 <p>
 Parallel environments with controlled traffic cutover.
 </p>
 </div>
 </div>
-<div id="outline-container-orga54d996" class="outline-3">
-<h3 id="orga54d996">Q124. What is intermediate observability must-have?</h3>
-<div class="outline-text-3" id="text-orga54d996">
+<div id="outline-container-orgb4ae551" class="outline-3">
+<h3 id="orgb4ae551">Q124. What is intermediate observability must-have?</h3>
+<div class="outline-text-3" id="text-orgb4ae551">
 <p>
 Cluster/pod metrics, logs, traces, events, and alerting.
 </p>
 </div>
 </div>
-<div id="outline-container-org540cf86" class="outline-3">
-<h3 id="org540cf86">Q125. What is intermediate reliability baseline?</h3>
-<div class="outline-text-3" id="text-org540cf86">
+<div id="outline-container-org6de1173" class="outline-3">
+<h3 id="org6de1173">Q125. What is intermediate reliability baseline?</h3>
+<div class="outline-text-3" id="text-org6de1173">
 <p>
 Multi-zone spread, PDBs, autoscaling, and tested rollback playbooks.
 </p>
 </div>
 </div>
-<div id="outline-container-org1db01dd" class="outline-3">
-<h3 id="org1db01dd">Q126. What is intermediate security baseline?</h3>
-<div class="outline-text-3" id="text-org1db01dd">
+<div id="outline-container-org5a70247" class="outline-3">
+<h3 id="org5a70247">Q126. What is intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-org5a70247">
 <p>
 Pod security standards, network policies, RBAC least privilege, image scanning.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb4d697" class="outline-3">
-<h3 id="orgfb4d697">Q127. What is cost optimization baseline?</h3>
-<div class="outline-text-3" id="text-orgfb4d697">
+<div id="outline-container-orgba7bcd2" class="outline-3">
+<h3 id="orgba7bcd2">Q127. What is cost optimization baseline?</h3>
+<div class="outline-text-3" id="text-orgba7bcd2">
 <p>
 Right-size resources, autoscale, and monitor idle overprovisioning.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a50d5c" class="outline-3">
-<h3 id="org9a50d5c">Q128. Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-org9a50d5c">
+<div id="outline-container-orgb573fe0" class="outline-3">
+<h3 id="orgb573fe0">Q128. Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-orgb573fe0">
 <p>
 Team can explain scheduling, rollout, and failure behavior end-to-end.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb4efa0e" class="outline-3">
-<h3 id="orgb4efa0e">Q129. What is intermediate troubleshooting flow?</h3>
-<div class="outline-text-3" id="text-orgb4efa0e">
+<div id="outline-container-orgbd0e2bb" class="outline-3">
+<h3 id="orgbd0e2bb">Q129. What is intermediate troubleshooting flow?</h3>
+<div class="outline-text-3" id="text-orgbd0e2bb">
 <p>
 Events → describe → logs → metrics → network/storage/auth checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org99b91b8" class="outline-3">
-<h3 id="org99b91b8">Q130. Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-org99b91b8">
+<div id="outline-container-org272821f" class="outline-3">
+<h3 id="org272821f">Q130. Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-org272821f">
 <p>
 Engineer for failure: assume pods/nodes/networks will break regularly.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org6f9ae88" class="outline-2">
-<h2 id="org6f9ae88">Advanced</h2>
-<div class="outline-text-2" id="text-org6f9ae88">
+<div id="outline-container-org29e918a" class="outline-2">
+<h2 id="org29e918a">Advanced</h2>
+<div class="outline-text-2" id="text-org29e918a">
 </div>
-<div id="outline-container-org2308752" class="outline-3">
-<h3 id="org2308752">Q131. What is control plane high availability?</h3>
-<div class="outline-text-3" id="text-org2308752">
+<div id="outline-container-orgce52ca7" class="outline-3">
+<h3 id="orgce52ca7">Q131. What is control plane high availability?</h3>
+<div class="outline-text-3" id="text-orgce52ca7">
 <p>
 Running redundant control plane components to avoid single-point failure.
 </p>
 </div>
 </div>
-<div id="outline-container-org9077f5d" class="outline-3">
-<h3 id="org9077f5d">Q132. What is etcd quorum?</h3>
-<div class="outline-text-3" id="text-org9077f5d">
+<div id="outline-container-org549108f" class="outline-3">
+<h3 id="org549108f">Q132. What is etcd quorum?</h3>
+<div class="outline-text-3" id="text-org549108f">
 <p>
 Majority of etcd members required for consistent writes/cluster health.
 </p>
 </div>
 </div>
-<div id="outline-container-org7e0bcd5" class="outline-3">
-<h3 id="org7e0bcd5">Q133. Why odd etcd member count?</h3>
-<div class="outline-text-3" id="text-org7e0bcd5">
+<div id="outline-container-org688e94f" class="outline-3">
+<h3 id="org688e94f">Q133. Why odd etcd member count?</h3>
+<div class="outline-text-3" id="text-org688e94f">
 <p>
 Optimizes quorum fault tolerance.
 </p>
 </div>
 </div>
-<div id="outline-container-orge7c4e63" class="outline-3">
-<h3 id="orge7c4e63">Q134. What is split-brain risk in distributed control planes?</h3>
-<div class="outline-text-3" id="text-orge7c4e63">
+<div id="outline-container-org50843bb" class="outline-3">
+<h3 id="org50843bb">Q134. What is split-brain risk in distributed control planes?</h3>
+<div class="outline-text-3" id="text-org50843bb">
 <p>
 Network partitions causing inconsistent leadership/state views.
 </p>
 </div>
 </div>
-<div id="outline-container-org877a51f" class="outline-3">
-<h3 id="org877a51f">Q135. What is API server priority and fairness?</h3>
-<div class="outline-text-3" id="text-org877a51f">
+<div id="outline-container-orgef09550" class="outline-3">
+<h3 id="orgef09550">Q135. What is API server priority and fairness?</h3>
+<div class="outline-text-3" id="text-orgef09550">
 <p>
 Mechanism protecting API responsiveness under heavy request load.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ed404d" class="outline-3">
-<h3 id="org6ed404d">Q136. What is scheduler extender/framework concept?</h3>
-<div class="outline-text-3" id="text-org6ed404d">
+<div id="outline-container-org23fc690" class="outline-3">
+<h3 id="org23fc690">Q136. What is scheduler extender/framework concept?</h3>
+<div class="outline-text-3" id="text-org23fc690">
 <p>
 Customizing scheduling decisions with plugins/extenders.
 </p>
 </div>
 </div>
-<div id="outline-container-org54556da" class="outline-3">
-<h3 id="org54556da">Q137. What is descheduler?</h3>
-<div class="outline-text-3" id="text-org54556da">
+<div id="outline-container-org5cce4c4" class="outline-3">
+<h3 id="org5cce4c4">Q137. What is descheduler?</h3>
+<div class="outline-text-3" id="text-org5cce4c4">
 <p>
 Rebalances pods post-scheduling to improve placement over time.
 </p>
 </div>
 </div>
-<div id="outline-container-org404cafa" class="outline-3">
-<h3 id="org404cafa">Q138. What is topology-aware routing?</h3>
-<div class="outline-text-3" id="text-org404cafa">
+<div id="outline-container-org4513031" class="outline-3">
+<h3 id="org4513031">Q138. What is topology-aware routing?</h3>
+<div class="outline-text-3" id="text-org4513031">
 <p>
 Steering traffic to nearer endpoints for latency/cost improvements.
 </p>
 </div>
 </div>
-<div id="outline-container-org3ff647b" class="outline-3">
-<h3 id="org3ff647b">Q139. What is service mesh?</h3>
-<div class="outline-text-3" id="text-org3ff647b">
+<div id="outline-container-org4374494" class="outline-3">
+<h3 id="org4374494">Q139. What is service mesh?</h3>
+<div class="outline-text-3" id="text-org4374494">
 <p>
 Dedicated data plane/control plane for service-to-service traffic policies/telemetry/security.
 </p>
 </div>
 </div>
-<div id="outline-container-org04c7405" class="outline-3">
-<h3 id="org04c7405">Q140. Why use service mesh?</h3>
-<div class="outline-text-3" id="text-org04c7405">
+<div id="outline-container-org31c252b" class="outline-3">
+<h3 id="org31c252b">Q140. Why use service mesh?</h3>
+<div class="outline-text-3" id="text-org31c252b">
 <p>
 mTLS, retries, traffic shaping, detailed observability without app code changes.
 </p>
 </div>
 </div>
-<div id="outline-container-orga992342" class="outline-3">
-<h3 id="orga992342">Q141. Mesh tradeoff?</h3>
-<div class="outline-text-3" id="text-orga992342">
+<div id="outline-container-org2046ed0" class="outline-3">
+<h3 id="org2046ed0">Q141. Mesh tradeoff?</h3>
+<div class="outline-text-3" id="text-org2046ed0">
 <p>
 Operational complexity and resource overhead.
 </p>
 </div>
 </div>
-<div id="outline-container-org791a024" class="outline-3">
-<h3 id="org791a024">Q142. What is mTLS in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org791a024">
+<div id="outline-container-orge533467" class="outline-3">
+<h3 id="orge533467">Q142. What is mTLS in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orge533467">
 <p>
 Mutual TLS authenticating and encrypting pod/service communications.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ea7a2e" class="outline-3">
-<h3 id="org2ea7a2e">Q143. What is SPIFFE/SPIRE concept?</h3>
-<div class="outline-text-3" id="text-org2ea7a2e">
+<div id="outline-container-org38064e8" class="outline-3">
+<h3 id="org38064e8">Q143. What is SPIFFE/SPIRE concept?</h3>
+<div class="outline-text-3" id="text-org38064e8">
 <p>
 Standardized workload identity framework for zero-trust environments.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c8a63d" class="outline-3">
-<h3 id="org6c8a63d">Q144. What is zero-trust networking in cluster?</h3>
-<div class="outline-text-3" id="text-org6c8a63d">
+<div id="outline-container-orgd6662f4" class="outline-3">
+<h3 id="orgd6662f4">Q144. What is zero-trust networking in cluster?</h3>
+<div class="outline-text-3" id="text-orgd6662f4">
 <p>
 Authenticate/authorize every workload connection regardless of network location.
 </p>
 </div>
 </div>
-<div id="outline-container-org74298aa" class="outline-3">
-<h3 id="org74298aa">Q145. What is secret encryption at rest?</h3>
-<div class="outline-text-3" id="text-org74298aa">
+<div id="outline-container-org5d3a165" class="outline-3">
+<h3 id="org5d3a165">Q145. What is secret encryption at rest?</h3>
+<div class="outline-text-3" id="text-org5d3a165">
 <p>
 Encrypting Kubernetes secrets in etcd using KMS/providers.
 </p>
 </div>
 </div>
-<div id="outline-container-org07370a5" class="outline-3">
-<h3 id="org07370a5">Q146. Why base64 in Secret is not encryption?</h3>
-<div class="outline-text-3" id="text-org07370a5">
+<div id="outline-container-org0bb27e6" class="outline-3">
+<h3 id="org0bb27e6">Q146. Why base64 in Secret is not encryption?</h3>
+<div class="outline-text-3" id="text-org0bb27e6">
 <p>
 Base64 is encoding only; not cryptographic protection.
 </p>
 </div>
 </div>
-<div id="outline-container-org81dfcf7" class="outline-3">
-<h3 id="org81dfcf7">Q147. What is external secrets operator pattern?</h3>
-<div class="outline-text-3" id="text-org81dfcf7">
+<div id="outline-container-orgbb1bec7" class="outline-3">
+<h3 id="orgbb1bec7">Q147. What is external secrets operator pattern?</h3>
+<div class="outline-text-3" id="text-orgbb1bec7">
 <p>
 Sync secrets from vault/cloud secret manager into Kubernetes resources.
 </p>
 </div>
 </div>
-<div id="outline-container-org3e62f8a" class="outline-3">
-<h3 id="org3e62f8a">Q148. What is supply-chain security in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org3e62f8a">
+<div id="outline-container-orga1c9f84" class="outline-3">
+<h3 id="orga1c9f84">Q148. What is supply-chain security in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orga1c9f84">
 <p>
 Securing source, build, image, registry, deploy, and runtime.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7b267d" class="outline-3">
-<h3 id="orgc7b267d">Q149. What is image signature verification?</h3>
-<div class="outline-text-3" id="text-orgc7b267d">
+<div id="outline-container-org1509e8e" class="outline-3">
+<h3 id="org1509e8e">Q149. What is image signature verification?</h3>
+<div class="outline-text-3" id="text-org1509e8e">
 <p>
 Admission-time verification of signed images before allowing deployment.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd1e2b76" class="outline-3">
-<h3 id="orgd1e2b76">Q150. What is SBOM in Kubernetes operations?</h3>
-<div class="outline-text-3" id="text-orgd1e2b76">
+<div id="outline-container-org4c6d197" class="outline-3">
+<h3 id="org4c6d197">Q150. What is SBOM in Kubernetes operations?</h3>
+<div class="outline-text-3" id="text-org4c6d197">
 <p>
 Artifact metadata used for vulnerability/compliance tracking.
 </p>
 </div>
 </div>
-<div id="outline-container-org50bb0a6" class="outline-3">
-<h3 id="org50bb0a6">Q151. What is runtime security monitoring?</h3>
-<div class="outline-text-3" id="text-org50bb0a6">
+<div id="outline-container-org19d5712" class="outline-3">
+<h3 id="org19d5712">Q151. What is runtime security monitoring?</h3>
+<div class="outline-text-3" id="text-org19d5712">
 <p>
 Detect suspicious process/network/syscall behavior in running containers.
 </p>
 </div>
 </div>
-<div id="outline-container-org05537bb" class="outline-3">
-<h3 id="org05537bb">Q152. What is eBPF relevance to Kubernetes?</h3>
-<div class="outline-text-3" id="text-org05537bb">
+<div id="outline-container-orgc92b4b6" class="outline-3">
+<h3 id="orgc92b4b6">Q152. What is eBPF relevance to Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgc92b4b6">
 <p>
 Low-overhead kernel observability/network/security instrumentation.
 </p>
 </div>
 </div>
-<div id="outline-container-org0710734" class="outline-3">
-<h3 id="org0710734">Q153. What is multi-tenancy model in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org0710734">
+<div id="outline-container-org5912be7" class="outline-3">
+<h3 id="org5912be7">Q153. What is multi-tenancy model in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org5912be7">
 <p>
 Soft/hard isolation strategies for teams/apps/customers in shared clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org0d75ec4" class="outline-3">
-<h3 id="org0d75ec4">Q154. Namespace-only multi-tenancy risk?</h3>
-<div class="outline-text-3" id="text-org0d75ec4">
+<div id="outline-container-org04aa55b" class="outline-3">
+<h3 id="org04aa55b">Q154. Namespace-only multi-tenancy risk?</h3>
+<div class="outline-text-3" id="text-org04aa55b">
 <p>
 Insufficient isolation for strong security/compliance requirements.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd0479a4" class="outline-3">
-<h3 id="orgd0479a4">Q155. Hard multi-tenancy alternatives?</h3>
-<div class="outline-text-3" id="text-orgd0479a4">
+<div id="outline-container-org2c9c507" class="outline-3">
+<h3 id="org2c9c507">Q155. Hard multi-tenancy alternatives?</h3>
+<div class="outline-text-3" id="text-org2c9c507">
 <p>
 Separate clusters/node pools, strict policies, workload isolation.
 </p>
 </div>
 </div>
-<div id="outline-container-org771d64f" class="outline-3">
-<h3 id="org771d64f">Q156. What is cell-based architecture on Kubernetes?</h3>
-<div class="outline-text-3" id="text-org771d64f">
+<div id="outline-container-org808f053" class="outline-3">
+<h3 id="org808f053">Q156. What is cell-based architecture on Kubernetes?</h3>
+<div class="outline-text-3" id="text-org808f053">
 <p>
 Independent workload cells reducing blast radius.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a1503a" class="outline-3">
-<h3 id="org5a1503a">Q157. What is failure domain design?</h3>
-<div class="outline-text-3" id="text-org5a1503a">
+<div id="outline-container-org9e98bdd" class="outline-3">
+<h3 id="org9e98bdd">Q157. What is failure domain design?</h3>
+<div class="outline-text-3" id="text-org9e98bdd">
 <p>
 Aligning replicas across zones/nodes/racks to tolerate localized failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org38df02d" class="outline-3">
-<h3 id="org38df02d">Q158. What is disruption budget tuning challenge?</h3>
-<div class="outline-text-3" id="text-org38df02d">
+<div id="outline-container-orgbaa8481" class="outline-3">
+<h3 id="orgbaa8481">Q158. What is disruption budget tuning challenge?</h3>
+<div class="outline-text-3" id="text-orgbaa8481">
 <p>
 Too strict blocks maintenance; too loose harms availability.
 </p>
 </div>
 </div>
-<div id="outline-container-org2fc6c08" class="outline-3">
-<h3 id="org2fc6c08">Q159. What is graceful node shutdown support?</h3>
-<div class="outline-text-3" id="text-org2fc6c08">
+<div id="outline-container-org61bbbb6" class="outline-3">
+<h3 id="org61bbbb6">Q159. What is graceful node shutdown support?</h3>
+<div class="outline-text-3" id="text-org61bbbb6">
 <p>
 Coordinated pod termination during node shutdown events.
 </p>
 </div>
 </div>
-<div id="outline-container-org1fddf8d" class="outline-3">
-<h3 id="org1fddf8d">Q160. What is priority class?</h3>
-<div class="outline-text-3" id="text-org1fddf8d">
+<div id="outline-container-org978d2a7" class="outline-3">
+<h3 id="org978d2a7">Q160. What is priority class?</h3>
+<div class="outline-text-3" id="text-org978d2a7">
 <p>
 Defines pod scheduling/eviction priority under contention.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e74ae5" class="outline-3">
-<h3 id="org9e74ae5">Q161. What is preemption?</h3>
-<div class="outline-text-3" id="text-org9e74ae5">
+<div id="outline-container-orgaae775f" class="outline-3">
+<h3 id="orgaae775f">Q161. What is preemption?</h3>
+<div class="outline-text-3" id="text-orgaae775f">
 <p>
 Higher-priority pods evict lower-priority pods when resources scarce.
 </p>
 </div>
 </div>
-<div id="outline-container-org61b49fa" class="outline-3">
-<h3 id="org61b49fa">Q162. Preemption risk?</h3>
-<div class="outline-text-3" id="text-org61b49fa">
+<div id="outline-container-orgf7ecca8" class="outline-3">
+<h3 id="orgf7ecca8">Q162. Preemption risk?</h3>
+<div class="outline-text-3" id="text-orgf7ecca8">
 <p>
 Can destabilize lower-priority workloads if overused.
 </p>
 </div>
 </div>
-<div id="outline-container-org9fcbe96" class="outline-3">
-<h3 id="org9fcbe96">Q163. What is overcommit strategy?</h3>
-<div class="outline-text-3" id="text-org9fcbe96">
+<div id="outline-container-orgd742266" class="outline-3">
+<h3 id="orgd742266">Q163. What is overcommit strategy?</h3>
+<div class="outline-text-3" id="text-orgd742266">
 <p>
 Allocating requested resources below physical capacity assumptions.
 </p>
 </div>
 </div>
-<div id="outline-container-org35aadf2" class="outline-3">
-<h3 id="org35aadf2">Q164. Overcommit tradeoff?</h3>
-<div class="outline-text-3" id="text-org35aadf2">
+<div id="outline-container-org935e561" class="outline-3">
+<h3 id="org935e561">Q164. Overcommit tradeoff?</h3>
+<div class="outline-text-3" id="text-org935e561">
 <p>
 Better utilization vs higher contention/OOM risk.
 </p>
 </div>
 </div>
-<div id="outline-container-org919e3c7" class="outline-3">
-<h3 id="org919e3c7">Q165. What is bin packing vs spreading?</h3>
-<div class="outline-text-3" id="text-org919e3c7">
+<div id="outline-container-orgef6241b" class="outline-3">
+<h3 id="orgef6241b">Q165. What is bin packing vs spreading?</h3>
+<div class="outline-text-3" id="text-orgef6241b">
 <p>
 Packing improves utilization; spreading improves resilience/perf isolation.
 </p>
 </div>
 </div>
-<div id="outline-container-org8602afb" class="outline-3">
-<h3 id="org8602afb">Q166. What is advanced autoscaling challenge?</h3>
-<div class="outline-text-3" id="text-org8602afb">
+<div id="outline-container-orgee38a06" class="outline-3">
+<h3 id="orgee38a06">Q166. What is advanced autoscaling challenge?</h3>
+<div class="outline-text-3" id="text-orgee38a06">
 <p>
 Coordinating HPA, VPA, and Cluster Autoscaler without oscillations.
 </p>
 </div>
 </div>
-<div id="outline-container-org7cf0ebb" class="outline-3">
-<h3 id="org7cf0ebb">Q167. What causes autoscaling thrash?</h3>
-<div class="outline-text-3" id="text-org7cf0ebb">
+<div id="outline-container-org293c668" class="outline-3">
+<h3 id="org293c668">Q167. What causes autoscaling thrash?</h3>
+<div class="outline-text-3" id="text-org293c668">
 <p>
 Noisy metrics, aggressive thresholds, slow startup, conflicting policies.
 </p>
 </div>
 </div>
-<div id="outline-container-org24c93c6" class="outline-3">
-<h3 id="org24c93c6">Q168. What is workload startup probe tuning impact?</h3>
-<div class="outline-text-3" id="text-org24c93c6">
+<div id="outline-container-org8a09bef" class="outline-3">
+<h3 id="org8a09bef">Q168. What is workload startup probe tuning impact?</h3>
+<div class="outline-text-3" id="text-org8a09bef">
 <p>
 Prevents premature restarts of slow-boot applications.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdce058e" class="outline-3">
-<h3 id="orgdce058e">Q169. What is persistent storage performance pitfall?</h3>
-<div class="outline-text-3" id="text-orgdce058e">
+<div id="outline-container-org3ba8370" class="outline-3">
+<h3 id="org3ba8370">Q169. What is persistent storage performance pitfall?</h3>
+<div class="outline-text-3" id="text-org3ba8370">
 <p>
 Ignoring IOPS/throughput/latency characteristics per workload profile.
 </p>
 </div>
 </div>
-<div id="outline-container-org093d1a8" class="outline-3">
-<h3 id="org093d1a8">Q170. What is StatefulSet update strategy nuance?</h3>
-<div class="outline-text-3" id="text-org093d1a8">
+<div id="outline-container-org184f4ad" class="outline-3">
+<h3 id="org184f4ad">Q170. What is StatefulSet update strategy nuance?</h3>
+<div class="outline-text-3" id="text-org184f4ad">
 <p>
 Ordered rolling updates may require partitioned/canary updates for safety.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ad9dcb" class="outline-3">
-<h3 id="org7ad9dcb">Q171. What is operator pattern in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org7ad9dcb">
+<div id="outline-container-orgae84b5d" class="outline-3">
+<h3 id="orgae84b5d">Q171. What is operator pattern in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgae84b5d">
 <p>
 Custom controller managing domain-specific applications via CRDs.
 </p>
 </div>
 </div>
-<div id="outline-container-org8dd101d" class="outline-3">
-<h3 id="org8dd101d">Q172. What is CRD?</h3>
-<div class="outline-text-3" id="text-org8dd101d">
+<div id="outline-container-orgc2b3e06" class="outline-3">
+<h3 id="orgc2b3e06">Q172. What is CRD?</h3>
+<div class="outline-text-3" id="text-orgc2b3e06">
 <p>
 CustomResourceDefinition extending Kubernetes API with new resource types.
 </p>
 </div>
 </div>
-<div id="outline-container-org4412707" class="outline-3">
-<h3 id="org4412707">Q173. Why use operators?</h3>
-<div class="outline-text-3" id="text-org4412707">
+<div id="outline-container-org84ac9f4" class="outline-3">
+<h3 id="org84ac9f4">Q173. Why use operators?</h3>
+<div class="outline-text-3" id="text-org84ac9f4">
 <p>
 Automate complex lifecycle tasks (backup, failover, scaling, upgrades).
 </p>
 </div>
 </div>
-<div id="outline-container-org98a760e" class="outline-3">
-<h3 id="org98a760e">Q174. Operator risk?</h3>
-<div class="outline-text-3" id="text-org98a760e">
+<div id="outline-container-orgbbc8a8a" class="outline-3">
+<h3 id="orgbbc8a8a">Q174. Operator risk?</h3>
+<div class="outline-text-3" id="text-orgbbc8a8a">
 <p>
 Buggy reconciliation can cause large-scale unintended changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b93e7b" class="outline-3">
-<h3 id="org4b93e7b">Q175. What is progressive delivery on Kubernetes?</h3>
-<div class="outline-text-3" id="text-org4b93e7b">
+<div id="outline-container-org0d84358" class="outline-3">
+<h3 id="org0d84358">Q175. What is progressive delivery on Kubernetes?</h3>
+<div class="outline-text-3" id="text-org0d84358">
 <p>
 Canary/blue-green/analysis-driven rollout with automated promotion/rollback.
 </p>
 </div>
 </div>
-<div id="outline-container-org0db1cdb" class="outline-3">
-<h3 id="org0db1cdb">Q176. What is SLO-driven operations in Kubernetes?</h3>
-<div class="outline-text-3" id="text-org0db1cdb">
+<div id="outline-container-org9fe1ef2" class="outline-3">
+<h3 id="org9fe1ef2">Q176. What is SLO-driven operations in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org9fe1ef2">
 <p>
 Operate workloads based on availability/latency/error objectives.
 </p>
 </div>
 </div>
-<div id="outline-container-orgab4534e" class="outline-3">
-<h3 id="orgab4534e">Q177. What is error budget policy?</h3>
-<div class="outline-text-3" id="text-orgab4534e">
+<div id="outline-container-orgfe60d2e" class="outline-3">
+<h3 id="orgfe60d2e">Q177. What is error budget policy?</h3>
+<div class="outline-text-3" id="text-orgfe60d2e">
 <p>
 Defines acceptable unreliability and release pace tradeoffs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb54d741" class="outline-3">
-<h3 id="orgb54d741">Q178. What is advanced observability stack?</h3>
-<div class="outline-text-3" id="text-orgb54d741">
+<div id="outline-container-org83fbc1d" class="outline-3">
+<h3 id="org83fbc1d">Q178. What is advanced observability stack?</h3>
+<div class="outline-text-3" id="text-org83fbc1d">
 <p>
 Metrics (Prometheus), logs, traces, events, profiling, and topology views.
 </p>
 </div>
 </div>
-<div id="outline-container-org65d8708" class="outline-3">
-<h3 id="org65d8708">Q179. Why include Kubernetes events in alert triage?</h3>
-<div class="outline-text-3" id="text-org65d8708">
+<div id="outline-container-orgedf1ade" class="outline-3">
+<h3 id="orgedf1ade">Q179. Why include Kubernetes events in alert triage?</h3>
+<div class="outline-text-3" id="text-orgedf1ade">
 <p>
 Events reveal scheduling, probe, image pull, and policy failures quickly.
 </p>
 </div>
 </div>
-<div id="outline-container-org52ecad8" class="outline-3">
-<h3 id="org52ecad8">Q180. What is disaster recovery strategy for Kubernetes?</h3>
-<div class="outline-text-3" id="text-org52ecad8">
+<div id="outline-container-org39bd768" class="outline-3">
+<h3 id="org39bd768">Q180. What is disaster recovery strategy for Kubernetes?</h3>
+<div class="outline-text-3" id="text-org39bd768">
 <p>
 Backup/restore etcd, manifests, secrets, PV snapshots, and tested runbooks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc911ed0" class="outline-3">
-<h3 id="orgc911ed0">Q181. What is multi-cluster strategy?</h3>
-<div class="outline-text-3" id="text-orgc911ed0">
+<div id="outline-container-orge98b52e" class="outline-3">
+<h3 id="orge98b52e">Q181. What is multi-cluster strategy?</h3>
+<div class="outline-text-3" id="text-orge98b52e">
 <p>
 Use multiple clusters for isolation, scale, DR, or regional presence.
 </p>
 </div>
 </div>
-<div id="outline-container-org51d2e08" class="outline-3">
-<h3 id="org51d2e08">Q182. What is fleet management challenge?</h3>
-<div class="outline-text-3" id="text-org51d2e08">
+<div id="outline-container-org6f0114d" class="outline-3">
+<h3 id="org6f0114d">Q182. What is fleet management challenge?</h3>
+<div class="outline-text-3" id="text-org6f0114d">
 <p>
 Consistent policy, upgrades, and visibility across many clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf1b8201" class="outline-3">
-<h3 id="orgf1b8201">Q183. Biggest advanced Kubernetes anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgf1b8201">
+<div id="outline-container-org9f5d326" class="outline-3">
+<h3 id="org9f5d326">Q183. Biggest advanced Kubernetes anti-pattern?</h3>
+<div class="outline-text-3" id="text-org9f5d326">
 <p>
 Treating cluster as VM replacement without platform engineering discipline.
 </p>
 </div>
 </div>
-<div id="outline-container-org83e10ee" class="outline-3">
-<h3 id="org83e10ee">Q184. Final architecture principle?</h3>
-<div class="outline-text-3" id="text-org83e10ee">
+<div id="outline-container-orgf164e16" class="outline-3">
+<h3 id="orgf164e16">Q184. Final architecture principle?</h3>
+<div class="outline-text-3" id="text-orgf164e16">
 <p>
 Design workloads cloud-native: stateless where possible, resilient where stateful.
 </p>
 </div>
 </div>
-<div id="outline-container-org96fa77e" class="outline-3">
-<h3 id="org96fa77e">Q185. Final maturity principle?</h3>
-<div class="outline-text-3" id="text-org96fa77e">
+<div id="outline-container-orgcbb83ca" class="outline-3">
+<h3 id="orgcbb83ca">Q185. Final maturity principle?</h3>
+<div class="outline-text-3" id="text-orgcbb83ca">
 <p>
 Kubernetes excellence is secure, observable, automated operations at scale.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org6674de4" class="outline-2">
-<h2 id="org6674de4">Bonus: Minimal Production-Oriented Deployment + Service Template</h2>
-<div class="outline-text-2" id="text-org6674de4">
+<div id="outline-container-org63d3729" class="outline-2">
+<h2 id="org63d3729">Bonus: Minimal Production-Oriented Deployment + Service Template</h2>
+<div class="outline-text-2" id="text-org63d3729">
 <div class="org-src-container">
 <pre class="src src-yaml"><code>apiVersion: apps/v1
 kind: Deployment
