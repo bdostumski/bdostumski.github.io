@@ -8,6 +8,854 @@
 
 * Kubernetes Probes
 
+[[https://kubernetes.io/docs/concepts/workloads/pods/probes/][Kubernetes Probes Documentation]]
+-----
+
+* Kubernetes Probes Handbook:
+
+*1. Inspect Pods & Container Health*
+
+#+BEGIN_SRC bash
+
+# List pods
+kubectl get pods
+
+# List pods across all namespaces
+kubectl get pods -A
+
+# Display pod status and IP addresses
+kubectl get pods -o wide
+
+# Display pod details
+kubectl describe pod <pod-name>
+
+# Check pod readiness
+kubectl get pods \
+  -o custom-columns=NAME:.metadata.name,READY:.status.containerStatuses[*].ready,STATUS:.status.phase
+
+# Check pod conditions
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.conditions}'
+
+# Check container restart count
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].restartCount}'
+
+# Check container state
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].state}'
+
+#+END_SRC
+
+*2. Kubernetes Probe Types*
+
+Kubernetes supports three main types of probes:
+
+| Probe | Purpose | Failure action |
+|---|---|---|
+| Liveness | Determines whether the application is alive | Restarts the container |
+| Readiness | Determines whether the application can receive traffic | Marks the Pod as not ready |
+| Startup | Determines whether application startup has completed | Restarts the container if startup fails |
+
+#+BEGIN_SRC bash
+
+# Inspect liveness probe configuration
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.containers[*].livenessProbe}'
+
+# Inspect readiness probe configuration
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.containers[*].readinessProbe}'
+
+# Inspect startup probe configuration
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.containers[*].startupProbe}'
+
+#+END_SRC
+
+*3. Readiness Probe*
+
+A readiness probe determines whether a container is ready to receive traffic.
+
+If the readiness probe fails, Kubernetes marks the Pod as not ready and removes it from the ready endpoints of matching Services.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness-demo
+  labels:
+    app: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 2
+        failureThreshold: 3
+        successThreshold: 1
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply configuration
+kubectl apply -f readiness.yaml
+
+# Check pod readiness
+kubectl get pods
+
+# Inspect readiness probe
+kubectl describe pod readiness-demo
+
+# Check pod conditions
+kubectl get pod readiness-demo \
+  -o jsonpath='{.status.conditions}'
+
+# Check Service endpoints
+kubectl get endpoints <service-name>
+
+# Check EndpointSlices
+kubectl get endpointslices \
+  -l kubernetes.io/service-name=<service-name>
+
+#+END_SRC
+
+*4. Liveness Probe*
+
+A liveness probe determines whether an application is still functioning.
+
+If the probe fails repeatedly, Kubernetes terminates and restarts the container according to its restart policy.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-demo
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 2
+        failureThreshold: 3
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+# Apply configuration
+kubectl apply -f liveness.yaml
+
+# Inspect liveness probe
+kubectl describe pod liveness-demo
+
+# Check restart count
+kubectl get pod liveness-demo
+
+# Inspect container state
+kubectl get pod liveness-demo \
+  -o jsonpath='{.status.containerStatuses[*].lastState}'
+
+# Check container logs
+kubectl logs liveness-demo
+
+# Check previous container logs
+kubectl logs liveness-demo --previous
+
+#+END_SRC
+
+*5. Startup Probe*
+
+A startup probe protects applications that require a long initialization period.
+
+Liveness and readiness probes are not executed until the startup probe succeeds.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: startup-demo
+spec:
+  containers:
+    - name: app
+      image: nginx
+      ports:
+        - containerPort: 80
+      startupProbe:
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 10
+        timeoutSeconds: 3
+        failureThreshold: 30
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply configuration
+kubectl apply -f startup.yaml
+
+# Inspect startup probe
+kubectl describe pod startup-demo
+
+# Check pod status
+kubectl get pod startup-demo
+
+# Watch pod status
+kubectl get pod startup-demo --watch
+
+# Check container restart count
+kubectl get pod startup-demo \
+  -o jsonpath='{.status.containerStatuses[*].restartCount}'
+
+#+END_SRC
+
+**Startup time calculation:**
+
+#+BEGIN_SRC text
+
+Maximum startup probe failure window:
+
+failureThreshold * periodSeconds
+
+30 * 10 = 300 seconds
+
+Maximum configured startup failure window: 5 minutes
+
+#+END_SRC
+
+*6. HTTP Probe*
+
+HTTP probes send HTTP GET requests to an application endpoint.
+
+A successful response has an HTTP status code between 200 and 399.
+
+#+BEGIN_SRC yaml
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+    scheme: HTTP
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect HTTP probe configuration
+kubectl describe pod <pod-name>
+
+# Test health endpoint from inside the container
+kubectl exec <pod-name> -- \
+  curl -i http://localhost:8080/healthz
+
+# Test readiness endpoint
+kubectl exec <pod-name> -- \
+  curl -i http://localhost:8080/ready
+
+# Port-forward application
+kubectl port-forward pod/<pod-name> 8080:8080
+
+# Test endpoint locally
+curl -i http://localhost:8080/healthz
+
+#+END_SRC
+
+Note: The container image must include curl for the exec commands above. HTTP probes themselves are executed by the kubelet and do not require curl inside the image.
+
+*7. TCP Probe*
+
+TCP probes check whether a connection can be established to a specified container port.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tcp-probe-demo
+spec:
+  containers:
+    - name: app
+      image: nginx
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        tcpSocket:
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        tcpSocket:
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply TCP probe configuration
+kubectl apply -f tcp-probe.yaml
+
+# Inspect probe status
+kubectl describe pod tcp-probe-demo
+
+# Check container port
+kubectl get pod tcp-probe-demo -o yaml
+
+# Test connectivity through port forwarding
+kubectl port-forward pod/tcp-probe-demo 8080:80
+
+# Test TCP connection locally
+nc -zv localhost 8080
+
+#+END_SRC
+
+Note: TCP probes confirm that a port accepts connections. They do not verify that the application can process requests correctly.
+
+*8. Exec Probe*
+
+Exec probes execute a command inside the container.
+
+The probe succeeds when the command exits with status code `0`.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exec-probe-demo
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command:
+        - /bin/sh
+        - -c
+        - "touch /tmp/healthy; sleep 3600"
+      livenessProbe:
+        exec:
+          command:
+            - cat
+            - /tmp/healthy
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        failureThreshold: 3
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply configuration
+kubectl apply -f exec-probe.yaml
+
+# Inspect probe
+kubectl describe pod exec-probe-demo
+
+# Execute health check manually
+kubectl exec exec-probe-demo -- cat /tmp/healthy
+
+# Remove health file to simulate failure
+kubectl exec exec-probe-demo -- rm /tmp/healthy
+
+# Inspect container restarts
+kubectl get pod exec-probe-demo
+
+# Inspect previous logs
+kubectl logs exec-probe-demo --previous
+
+#+END_SRC
+
+#+results:
+
+Note: Exec probes should be lightweight. Kubernetes creates processes for each execution, which can introduce overhead when probes run frequently across many containers.
+
+*9. gRPC Probe*
+
+gRPC probes are useful for applications that implement the gRPC Health Checking Protocol.
+
+#+BEGIN_SRC yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: grpc-probe-demo
+spec:
+  containers:
+    - name: grpc-app
+      image: <your-grpc-application-image>
+      ports:
+        - containerPort: 50051
+      livenessProbe:
+        grpc:
+          port: 50051
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 2
+        failureThreshold: 3
+      readinessProbe:
+        grpc:
+          port: 50051
+        periodSeconds: 5
+        timeoutSeconds: 2
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply configuration
+kubectl apply -f grpc-probe.yaml
+
+# Inspect pod
+kubectl describe pod grpc-probe-demo
+
+# Check pod status
+kubectl get pod grpc-probe-demo
+
+# Check container logs
+kubectl logs grpc-probe-demo
+
+#+END_SRC
+
+Note:
+- The application must implement the gRPC Health Checking Protocol.
+- gRPC probes use a numeric port.
+- The default probe connection is plaintext.
+- gRPC probes are stable since Kubernetes v1.27.
+
+*10. Probe Configuration Parameters*
+
+| Parameter | Description | Default |
+|---|---|---|
+| `initialDelaySeconds` | Delay before the first probe | 0 |
+| `periodSeconds` | Frequency of probe execution | 10 |
+| `timeoutSeconds` | Maximum time to wait for a response | 1 |
+| `failureThreshold` | Consecutive failures before probe failure | 3 |
+| `successThreshold` | Consecutive successes required after failure | 1 |
+
+#+BEGIN_SRC yaml
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+#+END_SRC
+
+Important rules:
+
+- `successThreshold` must be `1` for liveness and startup probes.
+- `periodSeconds` must be at least `1`.
+- `timeoutSeconds` must be at least `1`.
+- `failureThreshold` must be at least `1`.
+- Readiness probes continue running throughout the container lifecycle.
+
+*11. Configure All Three Probes Together*
+
+A common production configuration separates startup, liveness and readiness responsibilities.
+
+#+BEGIN_SRC yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: application
+  template:
+    metadata:
+      labels:
+        app: application
+    spec:
+      containers:
+        - name: application
+          image: nginx
+          ports:
+            - name: http
+              containerPort: 80
+
+          startupProbe:
+            httpGet:
+              path: /startup
+              port: http
+            periodSeconds: 10
+            failureThreshold: 30
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+#+END_SRC
+
+Note: This is a configuration template. The application must actually implement the `/startup`, `/healthz` and `/ready` endpoints. The example uses Nginx as a placeholder image, not an application that provides these custom endpoints.
+
+#+BEGIN_SRC bash
+
+# Deploy application
+kubectl apply -f deployment.yaml
+
+# Check deployment
+kubectl get deployment application
+
+# Check pods
+kubectl get pods -l app=application
+
+# Inspect probe events
+kubectl describe pods -l app=application
+
+# Check rollout
+kubectl rollout status deployment/application
+
+#+END_SRC
+
+*12. Readiness, Liveness & Startup Differences*
+
+| Scenario | Recommended probe |
+|---|---|
+| Application is running but cannot accept traffic | Readiness |
+| Application is deadlocked | Liveness |
+| Application needs a long initialization period | Startup |
+| Database temporarily unavailable | Readiness, if database access is required |
+| Cache is still warming up | Readiness |
+| Application process is permanently stuck | Liveness |
+| Application is loading configuration | Startup |
+
+Remember:
+
+#+BEGIN_SRC text
+
+Startup   = Has the application finished initializing?
+
+Liveness  = Is the application still functioning?
+
+Readiness = Can the application receive traffic?
+
+#+END_SRC
+
+*13. Inspect Pod Readiness & Service Endpoints*
+
+#+BEGIN_SRC bash
+
+# Check pod readiness
+kubectl get pods
+
+# Display readiness conditions
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")]}'
+
+# Check container readiness
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].ready}'
+
+# List Services
+kubectl get services
+
+# Inspect Service
+kubectl describe service <service-name>
+
+# List Service endpoints
+kubectl get endpoints <service-name>
+
+# List EndpointSlices
+kubectl get endpointslices \
+  -l kubernetes.io/service-name=<service-name>
+
+# Watch endpoint changes
+kubectl get endpointslices --watch
+
+#+END_SRC
+
+Note: A Pod can be in `Running` phase while its `Ready` condition is `False`.
+
+*14. Probe Troubleshooting*
+
+#+BEGIN_SRC bash
+
+# Check pod status
+kubectl get pods
+
+# Inspect pod events
+kubectl describe pod <pod-name>
+
+# Display recent events
+kubectl get events \
+  --sort-by=.metadata.creationTimestamp
+
+# Check container logs
+kubectl logs <pod-name>
+
+# Check previous container logs
+kubectl logs <pod-name> --previous
+
+# Check restart count
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].restartCount}'
+
+# Inspect container termination reason
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].lastState.terminated.reason}'
+
+# Inspect probe configuration
+kubectl get pod <pod-name> -o yaml
+
+# Watch pod status
+kubectl get pod <pod-name> --watch
+
+#+END_SRC
+
+Common probe failures:
+
+| Problem | Possible cause |
+|---|---|
+| `Liveness probe failed` | Application is unhealthy or endpoint is failing |
+| `Readiness probe failed` | Application cannot accept traffic |
+| `Startup probe failed` | Application initialization takes too long |
+| `Connection refused` | Application is not listening on the configured port |
+| `HTTP probe failed with statuscode: 503` | Application reports itself unavailable |
+| `HTTP probe failed with statuscode: 404` | Incorrect health endpoint |
+| `context deadline exceeded` | Probe timeout is too short or application is slow |
+| `CrashLoopBackOff` | Container repeatedly terminates |
+| Pod Running but not Ready | Readiness probe is failing |
+| Excessive restarts | Liveness or startup probe may be too aggressive |
+
+*15. Debug Liveness Probe Failures*
+
+#+BEGIN_SRC bash
+
+# Inspect liveness failure events
+kubectl describe pod <pod-name>
+
+# Check container restart count
+kubectl get pod <pod-name>
+
+# Inspect previous container logs
+kubectl logs <pod-name> --previous
+
+# Test health endpoint
+kubectl exec <pod-name> -- \
+  curl -i http://localhost:8080/healthz
+
+# Check configured liveness probe
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.containers[*].livenessProbe}'
+
+#+END_SRC
+
+Possible solutions:
+
+- Verify the health endpoint.
+- Check application deadlocks and CPU starvation.
+- Increase `timeoutSeconds` if the application legitimately needs more time.
+- Increase `failureThreshold` to tolerate temporary failures.
+- Configure a startup probe for slow initialization.
+- Avoid using liveness to check temporary external dependency outages.
+
+*16. Debug Readiness Probe Failures*
+
+#+BEGIN_SRC bash
+
+# Inspect readiness events
+kubectl describe pod <pod-name>
+
+# Check readiness status
+kubectl get pods
+
+# Test readiness endpoint
+kubectl exec <pod-name> -- \
+  curl -i http://localhost:8080/ready
+
+# Inspect Service endpoints
+kubectl get endpoints <service-name>
+
+# Inspect EndpointSlices
+kubectl get endpointslices \
+  -l kubernetes.io/service-name=<service-name>
+
+# Check application logs
+kubectl logs <pod-name>
+
+#+END_SRC
+
+Possible solutions:
+
+- Verify the readiness endpoint.
+- Check database connectivity if required by the application.
+- Check cache and external service dependencies.
+- Allow enough time for application initialization.
+- Ensure the application returns an appropriate HTTP status.
+- Avoid overly aggressive readiness checks.
+
+*17. Debug Startup Probe Failures*
+
+#+BEGIN_SRC bash
+
+# Inspect startup probe events
+kubectl describe pod <pod-name>
+
+# Check container logs
+kubectl logs <pod-name>
+
+# Inspect previous container logs
+kubectl logs <pod-name> --previous
+
+# Inspect startup probe settings
+kubectl get pod <pod-name> \
+  -o jsonpath='{.spec.containers[*].startupProbe}'
+
+# Check restart count
+kubectl get pod <pod-name>
+
+#+END_SRC
+
+#+results:
+
+Possible solutions:
+
+- Increase `failureThreshold`.
+- Increase `periodSeconds` if appropriate.
+- Verify the startup endpoint.
+- Check database migrations and initialization.
+- Check cache warm-up and configuration loading.
+- Ensure startup probe settings accommodate the worst expected startup time.
+
+*18. Probe Anti-Patterns & Best Practices*
+
+Common anti-patterns:
+
+| Anti-pattern | Why it is problematic |
+|---|---|
+| Using liveness as readiness | A live application may not be ready for traffic |
+| No readiness probe | Unready applications may receive traffic |
+| Aggressive liveness thresholds | Healthy containers may restart unnecessarily |
+| Checking every dependency in liveness | Temporary outages can trigger cascading restarts |
+| Expensive health endpoints | Probes can consume unnecessary resources |
+| Incorrect probe ports | Connections fail even when the application is healthy |
+| No startup probe for slow applications | Liveness can restart the application prematurely |
+| TCP-only application health checks | An open port does not guarantee application functionality |
+
+Best practices:
+
+- Use separate endpoints for readiness and liveness when their meanings differ.
+- Use startup probes for slow-starting applications.
+- Keep probe handlers lightweight and fast.
+- Configure realistic timeouts and thresholds.
+- Use readiness to control traffic eligibility.
+- Use liveness to detect unrecoverable application failures.
+- Avoid dependency checks in liveness probes.
+- Test probes under load and during dependency outages.
+- Monitor probe failures and container restart counts.
+- Ensure health endpoints reflect actual application behavior.
+
+*19. Useful Probe Commands Cheat Sheet*
+
+#+BEGIN_SRC bash
+
+# List pods
+kubectl get pods -A
+
+# Inspect pod
+kubectl describe pod <pod-name>
+
+# Check pod readiness
+kubectl get pods -o wide
+
+# Inspect probe configuration
+kubectl get pod <pod-name> -o yaml
+
+# Check restart count
+kubectl get pod <pod-name>
+
+# Check application logs
+kubectl logs <pod-name>
+
+# Check previous container logs
+kubectl logs <pod-name> --previous
+
+# Check pod events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# Check Service endpoints
+kubectl get endpoints <service-name>
+
+# Check EndpointSlices
+kubectl get endpointslices
+
+# Watch pod changes
+kubectl get pods --watch
+
+# Restart deployment
+kubectl rollout restart deployment <deployment-name>
+
+# Check rollout status
+kubectl rollout status deployment <deployment-name>
+
+# Test application endpoint
+kubectl exec <pod-name> -- curl -i http://localhost:8080/healthz
+
+# Port-forward application
+kubectl port-forward pod/<pod-name> 8080:8080
+
+# Check container state
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].state}'
+
+# Check container readiness
+kubectl get pod <pod-name> \
+  -o jsonpath='{.status.containerStatuses[*].ready}'
+
+#+END_SRC
+
 -----
 
 * Beginner
