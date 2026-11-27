@@ -8,6 +8,1716 @@
 
 * Kubernetes Ingress
 
+- [[https://kubernetes.io/docs/concepts/services-networking/ingress/][Kubernetes Ingress Documentation]] -> Legacy Ingress API
+- [[https://kubernetes.io/docs/concepts/services-networking/gateway/][Gateway API]] -> Recommended for new deployments
+
+-----
+
+
+* Kubernetes Ingress Handbook:
+
+*1. Inspect Kubernetes Ingress Resources*
+
+#+BEGIN_SRC bash
+
+# List Ingress resources
+kubectl get ingress
+
+# List Ingress resources across namespaces
+kubectl get ingress -A
+
+# Display Ingress details
+kubectl get ingress -o wide
+
+# Inspect a specific Ingress
+kubectl describe ingress <ingress-name>
+
+# Display Ingress configuration in YAML
+kubectl get ingress <ingress-name> -o yaml
+
+# List Ingress classes
+kubectl get ingressclass
+
+# Inspect an IngressClass
+kubectl describe ingressclass <class-name>
+
+# Check Ingress events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+#+END_SRC
+
+*2. Understand Ingress Architecture*
+
+Ingress provides HTTP/HTTPS routing from outside the cluster to Kubernetes Services.
+
+#+BEGIN_SRC text
+
+                 Internet
+                    |
+                    |
+                DNS Record
+                    |
+                    |
+             Load Balancer
+                    |
+                    |
+             Ingress Controller
+                    |
+          +---------+---------+
+          |                   |
+       /api                 /web
+          |                   |
+     API Service         Web Service
+          |                   |
+       API Pods            Web Pods
+
+#+END_SRC
+
+Important components:
+
+| Component | Responsibility |
+|---|---|
+| Ingress | Defines HTTP/HTTPS routing rules |
+| Ingress Controller | Implements routing rules |
+| IngressClass | Identifies the controller |
+| Service | Provides access to backend Pods |
+| DNS | Resolves application hostnames |
+| TLS Secret | Stores certificate and private key |
+| LoadBalancer | Exposes the controller externally |
+
+Note: Creating an Ingress resource alone does not expose an application. An appropriate Ingress Controller must be installed and configured.
+
+*3. Inspect Ingress Controllers*
+
+#+BEGIN_SRC bash
+
+# List controller pods
+kubectl get pods -A | grep -i ingress
+
+# List controller deployments
+kubectl get deployments -A | grep -i ingress
+
+# List controller services
+kubectl get services -A | grep -i ingress
+
+# Inspect IngressClass resources
+kubectl get ingressclass -o yaml
+
+# Inspect controller pods
+kubectl get pods -n ingress-nginx -o wide
+
+# Inspect controller deployment
+kubectl describe deployment ingress-nginx-controller -n ingress-nginx
+
+# Inspect controller logs
+kubectl logs deployment/ingress-nginx-controller -n ingress-nginx
+
+# Follow controller logs
+kubectl logs deployment/ingress-nginx-controller -n ingress-nginx -f
+
+#+END_SRC
+
+Note: Namespace and resource names depend on the controller installation.
+
+*4. Create a Basic Ingress Resource*
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply Ingress configuration
+kubectl apply -f ingress.yaml
+
+# List Ingress resources
+kubectl get ingress
+
+# Inspect Ingress
+kubectl describe ingress web-ingress
+
+# Display Ingress YAML
+kubectl get ingress web-ingress -o yaml
+
+# Delete Ingress
+kubectl delete ingress web-ingress
+
+#+END_SRC
+
+Note: The example assumes an IngressClass named `nginx` already exists and is managed by a compatible controller.
+
+*5. Host-Based Routing*
+
+Host-based routing directs requests to different Services according to the HTTP hostname.
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: host-based-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 8080
+
+    - host: admin.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect host routing rules
+kubectl describe ingress host-based-ingress
+
+# Test frontend hostname
+curl -I http://app.example.com
+
+# Test API hostname
+curl -I http://api.example.com
+
+# Test admin hostname
+curl -I http://admin.example.com
+
+#+END_SRC
+
+*6. Path-Based Routing*
+
+Path-based routing sends requests to different Services depending on the requested URL path.
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-based-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 80
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Test API path
+curl -I http://example.com/api
+
+# Test admin path
+curl -I http://example.com/admin
+
+# Test frontend path
+curl -I http://example.com/
+
+# Inspect routing configuration
+kubectl describe ingress path-based-ingress
+
+#+END_SRC
+
+*7. Ingress Path Types*
+
+Kubernetes supports three path types.
+
+| Path Type | Behavior | Example |
+|---|---|---|
+| `Prefix` | Matches path elements and their subpaths | `/api` matches `/api/users` |
+| `Exact` | Matches the exact URL path | `/api` matches `/api` only |
+| `ImplementationSpecific` | Matching behavior depends on the controller | Controller-specific |
+
+#+BEGIN_SRC yaml
+
+rules:
+  - host: example.com
+    http:
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: api-service
+              port:
+                number: 8080
+
+        - path: /health
+          pathType: Exact
+          backend:
+            service:
+              name: health-service
+              port:
+                number: 80
+
+#+END_SRC
+
+Important:
+
+- `Prefix` is case-sensitive.
+- Prefix matching uses path elements, not arbitrary string prefixes.
+- `/api` matches `/api/users`.
+- `/api` does not match `/apiv2`.
+- `Exact` requires an exact path match.
+
+*8. Configure TLS / HTTPS*
+
+Ingress TLS configuration references a Kubernetes Secret containing a certificate and private key.
+
+#+BEGIN_SRC bash
+
+# Create TLS secret
+kubectl create secret tls app-tls \
+  --cert=tls.crt \
+  --key=tls.key \
+  -n production
+
+# List secrets
+kubectl get secrets -n production
+
+# Inspect TLS secret
+kubectl describe secret app-tls -n production
+
+# Display TLS secret type
+kubectl get secret app-tls \
+  -n production \
+  -o jsonpath='{.type}'
+
+# Inspect certificate expiration locally
+openssl x509 -in tls.crt -noout -dates
+
+#+END_SRC
+
+Example Ingress:
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: secure-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: app-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply TLS Ingress
+kubectl apply -f secure-ingress.yaml
+
+# Inspect TLS configuration
+kubectl describe ingress secure-ingress
+
+# Test HTTPS endpoint
+curl -I https://app.example.com
+
+# Inspect certificate served by endpoint
+openssl s_client \
+  -connect app.example.com:443 \
+  -servername app.example.com </dev/null
+
+# Inspect certificate details
+echo | openssl s_client \
+  -connect app.example.com:443 \
+  -servername app.example.com 2>/dev/null \
+  | openssl x509 -noout -dates -issuer -subject
+
+#+END_SRC
+
+Note: TLS secrets must exist in the same namespace as the Ingress resource. TLS termination and HTTP-to-HTTPS redirection behavior depend on the selected controller.
+
+*9. HTTP to HTTPS Redirect*
+
+HTTP-to-HTTPS redirection is commonly configured through controller-specific settings.
+
+For the community ingress-nginx controller, the legacy annotation was:
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redirect-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: app-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Test HTTP redirect
+curl -I http://app.example.com
+
+# Follow redirects
+curl -IL http://app.example.com
+
+# Test HTTPS
+curl -I https://app.example.com
+
+#+END_SRC
+
+Note: Annotations are controller-specific. Do not assume this annotation works with other controllers.
+
+*10. Wildcard Host Routing*
+
+Wildcard hostnames can be used to route multiple subdomains through one Ingress.
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wildcard-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "*.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wildcard-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Test application subdomain
+curl -I http://app.example.com
+
+# Test API subdomain
+curl -I http://api.example.com
+
+# Test wildcard hostname resolution
+nslookup app.example.com
+
+# Inspect Ingress
+kubectl describe ingress wildcard-ingress
+
+#+END_SRC
+
+Note: Kubernetes wildcard host matching covers one DNS label, not arbitrary nested subdomains. DNS records and controller support must also be configured.
+
+*11. Multiple Ingress Resources & Classes*
+
+Different Ingress resources can be managed by different Ingress Controllers.
+
+#+BEGIN_SRC bash
+
+# List Ingress classes
+kubectl get ingressclass
+
+# Inspect class configuration
+kubectl describe ingressclass public
+
+# Inspect another class
+kubectl describe ingressclass internal
+
+# List Ingress resources
+kubectl get ingress -A
+
+# Find Ingress resources by class
+kubectl get ingress -A \
+  -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CLASS:.spec.ingressClassName
+
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: public-ingress
+spec:
+  ingressClassName: public
+  rules:
+    - host: public.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: public-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: internal-ingress
+spec:
+  ingressClassName: internal
+  rules:
+    - host: internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: internal-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+Note: An IngressClass selects a controller implementation; it does not by itself make an endpoint private. Private exposure must also be enforced through controller Services, load balancers, networking and DNS.
+
+*12. Inspect Ingress Status & External IP*
+
+#+BEGIN_SRC bash
+
+# Display Ingress address
+kubectl get ingress
+
+# Display detailed Ingress status
+kubectl describe ingress <ingress-name>
+
+# Inspect Ingress status address
+kubectl get ingress <ingress-name> \
+  -o jsonpath='{.status.loadBalancer.ingress}'
+
+# Inspect controller Service
+kubectl get services -A
+
+# Get LoadBalancer external IP
+kubectl get svc <controller-service> \
+  -n <controller-namespace>
+
+# Watch external address assignment
+kubectl get ingress --watch
+
+#+END_SRC
+
+*13. DNS Configuration & Validation*
+
+Ingress hostnames must resolve to the externally reachable Ingress Controller endpoint.
+
+#+BEGIN_SRC bash
+
+# Resolve DNS
+nslookup app.example.com
+
+# Query DNS records
+dig app.example.com
+
+# Display DNS A record
+dig app.example.com A
+
+# Display DNS CNAME
+dig app.example.com CNAME
+
+# Check DNS propagation through a resolver
+dig @8.8.8.8 app.example.com
+
+# Test HTTP hostname routing
+curl -v http://app.example.com
+
+# Test HTTPS hostname routing
+curl -v https://app.example.com
+
+# Test a hostname against a specific IP
+curl -H "Host: app.example.com" http://<ingress-ip>
+
+#+END_SRC
+
+*14. Test Ingress Without DNS*
+
+You can test routing before public DNS records are configured by sending the appropriate Host header.
+
+#+BEGIN_SRC bash
+
+# Test HTTP using Host header
+curl -v \
+  -H "Host: app.example.com" \
+  http://<ingress-ip>
+
+# Test HTTPS with hostname and SNI
+curl -vk \
+  --resolve app.example.com:443:<ingress-ip> \
+  https://app.example.com
+
+# Test a specific URL path
+curl -v \
+  --resolve app.example.com:443:<ingress-ip> \
+  https://app.example.com/api
+
+#+END_SRC
+
+*15. Inspect Backend Services & Endpoints*
+
+Ingress routes requests to Services, not directly to ordinary Pod IPs.
+
+#+BEGIN_SRC bash
+
+# List Services
+kubectl get services -A
+
+# Inspect backend Service
+kubectl describe service <service-name>
+
+# Display Service YAML
+kubectl get service <service-name> -o yaml
+
+# List Service endpoints
+kubectl get endpoints <service-name>
+
+# List EndpointSlices
+kubectl get endpointslices
+
+# Inspect EndpointSlice
+kubectl describe endpointslice <endpointslice-name>
+
+# Check backend Pods
+kubectl get pods -l app=<application-label>
+
+# Check backend Pod readiness
+kubectl get pods -o wide
+
+#+END_SRC
+
+Common issues:
+
+- Service name does not exist.
+- Service port is incorrect.
+- Service selector does not match Pod labels.
+- Backend Pods are not ready.
+- Application is listening on a different container port.
+
+### 16. Configure Request Path Rewriting
+
+Path rewriting is controller-specific and is not part of the standard Ingress API.
+
+Example using the legacy community ingress-nginx annotation:
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rewrite-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+
+#+END_SRC
+
+Example:
+
+#+BEGIN_SRC text
+
+External request:
+https://app.example.com/api/users
+
+Backend request:
+/users
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect rewrite configuration
+kubectl describe ingress rewrite-ingress
+
+# Test rewritten path
+curl -v https://app.example.com/api/users
+
+# Inspect controller logs
+kubectl logs deployment/ingress-nginx-controller \
+  -n ingress-nginx
+
+#+END_SRC
+
+Note: Regex syntax and rewrite behavior depend on the controller. Validate the exact implementation before using this configuration.
+
+*17. Configure Timeouts & Request Body Size*
+
+Ingress proxies commonly provide settings for request size and connection timeouts.
+
+Legacy ingress-nginx annotations:
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect Ingress annotations
+kubectl get ingress <ingress-name> -o yaml
+
+# Inspect controller configuration
+kubectl get configmap -n ingress-nginx
+
+# Inspect controller ConfigMap
+kubectl describe configmap ingress-nginx-controller \
+  -n ingress-nginx
+
+# Inspect controller logs
+kubectl logs deployment/ingress-nginx-controller \
+  -n ingress-nginx
+
+#+END_SRC
+
+Note: Annotation names and supported values vary by controller. Large request bodies and long timeouts should be configured according to application requirements and resource capacity.
+
+*18. Configure Rate Limiting & IP Restrictions*
+
+Legacy ingress-nginx annotations include:
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.0.0/16"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect configured annotations
+kubectl get ingress <ingress-name> -o yaml
+
+# Test endpoint
+curl -I https://app.example.com
+
+# Inspect controller access logs
+kubectl logs deployment/ingress-nginx-controller \
+  -n ingress-nginx
+
+#+END_SRC
+
+Note: Rate limiting and source IP restrictions are implementation-specific. Correct client IP detection requires a trusted proxy/load balancer configuration. Do not trust arbitrary forwarded headers from untrusted clients.
+
+*19. Configure CORS*
+
+CORS can be handled by the application or by an Ingress Controller.
+
+Legacy ingress-nginx example:
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://frontend.example.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Test CORS preflight request
+curl -i -X OPTIONS \
+  https://api.example.com \
+  -H "Origin: https://frontend.example.com" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: Authorization,Content-Type"
+
+# Inspect response headers
+curl -I \
+  -H "Origin: https://frontend.example.com" \
+  https://api.example.com
+
+#+END_SRC
+
+Note: When credentials are enabled, wildcard origins should not be used. Configure an explicit trusted origin.
+
+*20. Configure Canary Deployments*
+
+Canary routing sends a subset of requests to a new application version.
+
+Legacy ingress-nginx example:
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "10"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-v2-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+The primary Ingress routes to `app-v1-service`, while the canary Ingress routes a configured portion of traffic to `app-v2-service`.
+
+#+BEGIN_SRC bash
+
+# List application Ingress resources
+kubectl get ingress
+
+# Inspect canary configuration
+kubectl describe ingress app-canary
+
+# Test application endpoint
+curl -I https://app.example.com
+
+# Check backend services
+kubectl get services
+
+# Monitor application Pods
+kubectl get pods -w
+
+#+END_SRC
+
+Note: Canary annotations and traffic distribution are controller-specific. A weight of 10 is a routing target, not a guarantee of an exact percentage over a small number of requests.
+
+*21. Configure Sticky Sessions*
+
+Session affinity can help keep a client connected to the same backend instance.
+
+Legacy ingress-nginx example:
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "INGRESSCOOKIE"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect session affinity configuration
+kubectl get ingress <ingress-name> -o yaml
+
+# Display response cookies
+curl -I https://app.example.com
+
+# Display cookies on subsequent requests
+curl -c cookies.txt -b cookies.txt \
+  -v https://app.example.com
+
+#+END_SRC
+
+Note: Sticky sessions can create uneven backend load. Prefer external session storage when applications need to scale horizontally without relying on a specific Pod.
+
+*22. Configure Authentication at Ingress*
+
+Authentication can be integrated at the edge using controller-specific mechanisms or an external authentication service.
+
+Legacy ingress-nginx basic authentication example:
+
+#+BEGIN_SRC bash
+
+# Create authentication credentials file
+htpasswd -c auth admin
+
+# Create Kubernetes Secret
+kubectl create secret generic basic-auth \
+  --from-file=auth \
+  -n production
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect authentication secret
+kubectl describe secret basic-auth -n production
+
+# Test without credentials
+curl -I https://app.example.com
+
+# Test with credentials
+curl -u admin:<password> \
+  -I https://app.example.com
+
+#+END_SRC
+
+Note: Use a secure credential-generation process and protect Kubernetes Secrets with appropriate RBAC and encryption at rest. For production identity management, consider an established OIDC or external authentication integration.
+
+*23. Configure cert-manager Integration*
+
+cert-manager automates TLS certificate issuance and renewal.
+
+#+BEGIN_SRC bash
+
+# Check cert-manager pods
+kubectl get pods -n cert-manager
+
+# List ClusterIssuers
+kubectl get clusterissuers
+
+# List Issuers
+kubectl get issuers -A
+
+# List certificates
+kubectl get certificates -A
+
+# Inspect certificate
+kubectl describe certificate <certificate-name> -n production
+
+# Check certificate requests
+kubectl get certificaterequests -A
+
+# Check ACME challenges
+kubectl get challenges -A
+
+# Check ACME orders
+kubectl get orders -A
+
+#+END_SRC
+
+Example ClusterIssuer:
+
+#+BEGIN_SRC yaml
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: admin@example.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-account
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+
+#+END_SRC
+
+Example Ingress:
+
+#+BEGIN_SRC yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cert-manager-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: app-example-com-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply ClusterIssuer
+kubectl apply -f cluster-issuer.yaml
+
+# Apply Ingress
+kubectl apply -f ingress.yaml
+
+# Watch certificate status
+kubectl get certificates -w
+
+# Inspect certificate
+kubectl describe certificate app-example-com -n production
+
+# Check certificate Secret
+kubectl get secret app-example-com-tls -n production
+
+# Inspect cert-manager logs
+kubectl logs deployment/cert-manager -n cert-manager
+
+#+END_SRC
+
+Note: HTTP-01 challenges require the domain to resolve correctly and the challenge endpoint to be reachable from the ACME server.
+
+*24. Configure Internal & External Ingress*
+
+A common architecture separates public and private traffic.
+
+#+BEGIN_SRC text
+
+                 Internet
+                    |
+             Public LoadBalancer
+                    |
+              Public Controller
+                    |
+              Public Services
+
+
+              Private Network
+                    |
+            Internal LoadBalancer
+                    |
+             Internal Controller
+                    |
+             Internal Services
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect all Ingress controllers
+kubectl get deployments -A
+
+# Inspect controller Services
+kubectl get services -A
+
+# Inspect Ingress classes
+kubectl get ingressclass
+
+# Inspect public Ingress resources
+kubectl get ingress -A
+
+# Inspect controller external IPs
+kubectl get services -A \
+  -o wide
+
+#+END_SRC
+
+Note: Private ingress requires network-level restrictions, private load balancer configuration and appropriate DNS. An IngressClass alone does not enforce network isolation.
+
+*25. Configure gRPC Routing*
+
+gRPC applications require HTTP/2-compatible proxying and appropriate backend protocol configuration.
+
+Legacy ingress-nginx example:
+
+#+BEGIN_SRC yaml
+
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+
+#+END_SRC
+
+#+BEGIN_SRC yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grpc-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: grpc.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grpc-service
+                port:
+                  number: 50051
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Inspect gRPC Ingress
+kubectl describe ingress grpc-ingress
+
+# Inspect backend Service
+kubectl describe service grpc-service
+
+# Inspect application logs
+kubectl logs deployment/grpc-service
+
+# Test using grpcurl (where available)
+grpcurl -plaintext grpc.example.com:80 list
+
+#+END_SRC
+
+Note: The example assumes a plaintext gRPC backend. TLS termination and HTTP/2 forwarding behavior depend on the selected controller and backend protocol configuration.
+
+*26. Inspect Ingress Logs & Metrics*
+
+#+BEGIN_SRC bash
+
+# Inspect controller logs
+kubectl logs deployment/<controller-deployment> \
+  -n <controller-namespace>
+
+# Follow logs
+kubectl logs deployment/<controller-deployment> \
+  -n <controller-namespace> -f
+
+# Display recent controller logs
+kubectl logs deployment/<controller-deployment> \
+  -n <controller-namespace> --since=10m
+
+# Inspect controller resource usage
+kubectl top pods -n <controller-namespace>
+
+# Inspect controller deployment
+kubectl describe deployment <controller-deployment> \
+  -n <controller-namespace>
+
+# Inspect controller Service
+kubectl get svc -n <controller-namespace>
+
+# Check controller endpoints
+kubectl get endpoints -n <controller-namespace>
+
+#+END_SRC
+
+Useful metrics:
+
+| Metric | Purpose |
+|---|---|
+| Request rate | Requests per second |
+| Request latency | Response time percentiles |
+| HTTP 4xx | Client-side errors |
+| HTTP 5xx | Proxy/backend failures |
+| Active connections | Concurrent connections |
+| Upstream errors | Backend communication failures |
+| Controller CPU | Processing capacity |
+| Controller memory | Resource consumption |
+
+Note: Metrics endpoints and Prometheus metric names depend on the controller implementation.
+
+*27. Troubleshoot 404, 502 & 503 Errors*
+
+#+BEGIN_SRC bash
+
+# Inspect Ingress rules
+kubectl describe ingress <ingress-name>
+
+# Inspect backend Service
+kubectl describe service <service-name>
+
+# Check backend endpoints
+kubectl get endpoints <service-name>
+
+# Check EndpointSlices
+kubectl get endpointslices
+
+# Check backend Pods
+kubectl get pods -o wide
+
+# Check backend logs
+kubectl logs deployment/<application-deployment>
+
+# Check controller logs
+kubectl logs deployment/<controller-deployment> \
+  -n <controller-namespace>
+
+# Test backend Service from inside cluster
+kubectl run curl-test \
+  --image=curlimages/curl \
+  --rm -it --restart=Never \
+  -- curl -v http://<service-name>.<namespace>.svc.cluster.local:<port>
+
+#+END_SRC
+
+| HTTP Status | Common causes |
+|---|---|
+| 404 | Host/path mismatch, default backend or controller routing configuration |
+| 502 | Backend connection failure, invalid upstream protocol or reset |
+| 503 | No available backend endpoints or controller-specific unavailable response |
+| 504 | Upstream timeout |
+| 301/308 | HTTP-to-HTTPS redirection |
+| 403 | Authentication, authorization or IP restriction |
+
+*28. Troubleshoot TLS & Certificate Issues*
+
+#+BEGIN_SRC bash
+
+# Inspect TLS secret
+kubectl describe secret <tls-secret> -n <namespace>
+
+# Check certificate resource
+kubectl get certificates -A
+
+# Inspect certificate status
+kubectl describe certificate <certificate-name> -n <namespace>
+
+# Inspect certificate expiration
+kubectl get secret <tls-secret> \
+  -n <namespace> \
+  -o jsonpath='{.data.tls\.crt}' \
+  | base64 -d \
+  | openssl x509 -noout -dates
+
+# Check certificate issuer
+kubectl get certificate <certificate-name> \
+  -n <namespace> -o yaml
+
+# Check TLS endpoint
+openssl s_client \
+  -connect app.example.com:443 \
+  -servername app.example.com
+
+# Test HTTPS certificate
+curl -Iv https://app.example.com
+
+#+END_SRC
+
+Common problems:
+
+- TLS Secret does not exist.
+- Secret is in the wrong namespace.
+- Certificate does not include the requested hostname.
+- Certificate has expired.
+- DNS does not resolve correctly.
+- ACME challenge cannot reach the controller.
+- Incorrect certificate is selected through SNI.
+
+*29. Troubleshoot Ingress Controller*
+
+#+BEGIN_SRC bash
+
+# Check controller Pods
+kubectl get pods -n <controller-namespace>
+
+# Inspect controller Pod
+kubectl describe pod <controller-pod> \
+  -n <controller-namespace>
+
+# Check controller logs
+kubectl logs <controller-pod> \
+  -n <controller-namespace>
+
+# Check controller Service
+kubectl describe service <controller-service> \
+  -n <controller-namespace>
+
+# Check controller deployment
+kubectl describe deployment <controller-deployment> \
+  -n <controller-namespace>
+
+# Inspect controller events
+kubectl get events \
+  -n <controller-namespace> \
+  --sort-by=.metadata.creationTimestamp
+
+# Check resource usage
+kubectl top pods -n <controller-namespace>
+
+# Inspect node resources
+kubectl top nodes
+
+#+END_SRC
+
+*30. Configure High Availability & Scaling*
+
+Ingress Controllers commonly run with multiple replicas to improve availability and throughput.
+
+#+BEGIN_SRC bash
+
+# Inspect controller replicas
+kubectl get deployment <controller-deployment> \
+  -n <controller-namespace>
+
+# Scale controller replicas
+kubectl scale deployment <controller-deployment> \
+  -n <controller-namespace> \
+  --replicas=3
+
+# Inspect Pods
+kubectl get pods -n <controller-namespace> -o wide
+
+# Check rollout status
+kubectl rollout status deployment/<controller-deployment> \
+  -n <controller-namespace>
+
+# Inspect resource usage
+kubectl top pods -n <controller-namespace>
+
+# Inspect disruption budgets
+kubectl get pdb -n <controller-namespace>
+
+#+END_SRC
+
+Example PodDisruptionBudget:
+
+#+BEGIN_SRC yaml
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ingress-controller-pdb
+  namespace: ingress-system
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: ingress-controller
+
+#+END_SRC
+
+Note: The selector must match the controller Pods' actual labels. Multiple replicas alone do not guarantee high availability; consider topology spread, node placement, disruption budgets and load balancer health checks.
+
+*31. Gateway API – Modern Alternative to Ingress*
+
+The Kubernetes Ingress API is stable but frozen. Gateway API provides a more expressive, role-oriented model for traffic management.
+
+Important resources:
+
+| Resource | Purpose |
+|---|---|
+| GatewayClass | Defines the Gateway controller implementation |
+| Gateway | Defines traffic entry points and listeners |
+| HTTPRoute | Defines HTTP routing rules |
+| GRPCRoute | Defines gRPC routing rules |
+| TLSRoute | Defines TLS routing |
+| TCPRoute | Defines TCP routing |
+| UDPRoute | Defines UDP routing |
+
+#+BEGIN_SRC bash
+
+# Check Gateway API CRDs
+kubectl get crds | grep gateway.networking.k8s.io
+
+# List GatewayClasses
+kubectl get gatewayclass
+
+# List Gateways
+kubectl get gateways -A
+
+# List HTTPRoutes
+kubectl get httproutes -A
+
+# Inspect a Gateway
+kubectl describe gateway <gateway-name> -n <namespace>
+
+# Inspect HTTPRoute
+kubectl describe httproute <route-name> -n <namespace>
+
+# Inspect Gateway API conditions
+kubectl get gateway <gateway-name> \
+  -n <namespace> -o yaml
+
+#+END_SRC
+
+Example Gateway:
+
+#+BEGIN_SRC yaml
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: application-gateway
+spec:
+  gatewayClassName: example-gateway-class
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+#+END_SRC
+
+Example HTTPRoute:
+
+#+BEGIN_SRC yaml
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: application-route
+spec:
+  parentRefs:
+    - name: application-gateway
+  hostnames:
+    - app.example.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: web-service
+          port: 80
+
+#+END_SRC
+
+#+BEGIN_SRC bash
+
+# Apply Gateway
+kubectl apply -f gateway.yaml
+
+# Apply HTTPRoute
+kubectl apply -f httproute.yaml
+
+# Inspect Gateway status
+kubectl get gateway application-gateway
+
+# Inspect route status
+kubectl get httproute application-route
+
+# Check Gateway conditions
+kubectl describe gateway application-gateway
+
+# Check route conditions
+kubectl describe httproute application-route
+
+#+END_SRC
+
+Note: A compatible Gateway API implementation and its CRDs must be installed before applying these resources. Replace the example GatewayClass with one supported by your controller.
+
+*32. Ingress vs Gateway API*
+
+| Feature | Ingress | Gateway API |
+|---|---|---|
+| HTTP routing | Yes | Yes |
+| HTTPS routing | Yes | Yes |
+| Host-based routing | Yes | Yes |
+| Path-based routing | Yes | Yes |
+| Role-oriented configuration | Limited | Yes |
+| Header-based matching | Controller-specific extensions | Standard route capabilities |
+| Traffic weighting | Controller-specific | Standard route capabilities |
+| TCP/UDP routing | Not supported by core Ingress API | Supported by appropriate route types and implementations |
+| Extensibility | Limited | More extensible |
+| API evolution | Frozen | Actively developed |
+
+*33. Security Best Practices*
+
+#+BEGIN_SRC bash
+
+# Inspect externally exposed Ingress resources
+kubectl get ingress -A
+
+# Inspect Ingress classes
+kubectl get ingressclass
+
+# Inspect TLS configuration
+kubectl get ingress -A -o yaml
+
+# Inspect controller permissions
+kubectl get clusterrole,clusterrolebinding
+
+# Inspect controller Service exposure
+kubectl get svc -A
+
+# Inspect TLS secrets
+kubectl get secrets -A
+
+# Inspect namespace access permissions
+kubectl auth can-i create ingress \
+  --as=<user> \
+  -n <namespace>
+
+#+END_SRC
+
+Best practices:
+
+- Enforce HTTPS for production applications.
+- Use managed certificate issuance and renewal.
+- Restrict public endpoints to required applications.
+- Protect TLS private keys.
+- Apply least-privilege RBAC.
+- Restrict dangerous controller-specific annotations.
+- Validate forwarded client IP headers.
+- Use rate limiting and WAF protections where appropriate.
+- Separate public and private ingress infrastructure.
+- Audit changes to external exposure.
+- Keep controllers and their dependencies patched.
+- Use network policies and application-level authorization.
+
+*34. Ingress Migration & Operational Best Practices*
+
+#+BEGIN_SRC bash
+
+# Inventory all Ingress resources
+kubectl get ingress -A
+
+# Inventory Ingress classes
+kubectl get ingressclass
+
+# Export Ingress configurations
+kubectl get ingress -A -o yaml > ingress-backup.yaml
+
+# Inventory controller deployments
+kubectl get deployments -A | grep -i ingress
+
+# Inventory controller Services
+kubectl get services -A
+
+# Inspect controller images
+kubectl get deployments -A \
+  -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,IMAGES:.spec.template.spec.containers[*].image
+
+# Find community ingress-nginx Pods
+kubectl get pods -A \
+  --selector app.kubernetes.io/name=ingress-nginx
+
+#+END_SRC
+
+Migration checklist:
+
+- Inventory existing Ingress resources.
+- Identify controller-specific annotations.
+- Document hostnames, paths and TLS certificates.
+- Identify authentication and authorization rules.
+- Review rate limits, rewrites and timeout configurations.
+- Select a supported Gateway API implementation or maintained Ingress controller.
+- Map existing features to the new implementation.
+- Test routing and TLS in a staging environment.
+- Validate observability and security policies.
+- Perform staged traffic migration.
+- Keep a tested rollback procedure.
+
+*35. Ingress Troubleshooting Cheat Sheet*
+
+| Problem | Command / Action |
+|---|---|
+| Ingress has no address | `kubectl get ingress -A` |
+| Wrong Ingress class | `kubectl describe ingressclass <class>` |
+| 404 Not Found | Check hostname and path rules |
+| 502 Bad Gateway | Check Service and backend connectivity |
+| 503 Service Unavailable | Check ready endpoints |
+| 504 Gateway Timeout | Check application latency and proxy timeouts |
+| TLS certificate error | `kubectl describe certificate <name>` |
+| TLS Secret missing | `kubectl get secrets -n <namespace>` |
+| DNS not resolving | `dig <hostname>` |
+| Controller unavailable | `kubectl get pods -n <controller-namespace>` |
+| Backend unreachable | `kubectl get endpoints <service>` |
+| Incorrect rewrite | Inspect controller-specific annotations |
+| Unexpected 403 | Check authentication and source IP restrictions |
+| High latency | Inspect controller and backend metrics |
+| Certificate renewal failure | Inspect cert-manager challenges and orders |
+
+*36. Useful Ingress Commands*
+
+#+BEGIN_SRC bash
+
+# List all Ingress resources
+kubectl get ingress -A
+
+# List Ingress classes
+kubectl get ingressclass
+
+# Describe Ingress
+kubectl describe ingress <ingress-name>
+
+# Display Ingress YAML
+kubectl get ingress <ingress-name> -o yaml
+
+# Inspect controller Pods
+kubectl get pods -A | grep -i ingress
+
+# Inspect controller Services
+kubectl get svc -A | grep -i ingress
+
+# Inspect controller logs
+kubectl logs deployment/<controller-deployment> \
+  -n <controller-namespace>
+
+# Inspect backend endpoints
+kubectl get endpoints <service-name>
+
+# Inspect EndpointSlices
+kubectl get endpointslices -A
+
+# Test DNS
+dig <hostname>
+
+# Test HTTP
+curl -I http://<hostname>
+
+# Test HTTPS
+curl -Iv https://<hostname>
+
+# Test routing with Host header
+curl -H "Host: <hostname>" http://<ingress-ip>
+
+# Test TLS certificate
+openssl s_client \
+  -connect <hostname>:443 \
+  -servername <hostname>
+
+# Export Ingress configuration
+kubectl get ingress -A -o yaml > ingress-backup.yaml
+
+# Watch Ingress resources
+kubectl get ingress -A --watch
+
+# List Gateway API resources
+kubectl get gateways,httproutes -A
+
+#+END_SRC
+
 -----
 
 * Beginner

@@ -23,1470 +23,3807 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-orgeea8978" class="outline-2">
-<h2 id="orgeea8978">Kubernetes Ingress</h2>
-<div class="outline-text-2" id="text-orgeea8978">
+<div id="outline-container-org5eab99f" class="outline-2">
+<h2 id="org5eab99f">Kubernetes Ingress</h2>
+<div class="outline-text-2" id="text-org5eab99f">
+<ul class="org-ul">
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Kubernetes Ingress Documentation</a> -&gt; Legacy Ingress API</li>
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/gateway/">Gateway API</a> -&gt; Recommended for new deployments</li>
+</ul>
+
 <hr>
 </div>
 </div>
-<div id="outline-container-org8bc99d4" class="outline-2">
-<h2 id="org8bc99d4">Beginner</h2>
-<div class="outline-text-2" id="text-org8bc99d4">
+<div id="outline-container-orgcec8c33" class="outline-2">
+<h2 id="orgcec8c33">Kubernetes Ingress Handbook:</h2>
+<div class="outline-text-2" id="text-orgcec8c33">
+<p>
+<b>1. Inspect Kubernetes Ingress Resources</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress resources
+</span>kubectl get ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress resources across namespaces
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Ingress details
+</span>kubectl get ingress -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a specific Ingress
+</span>kubectl describe ingress &lt;ingress-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Ingress configuration in YAML
+</span>kubectl get ingress &lt;ingress-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect an IngressClass
+</span>kubectl describe ingressclass &lt;class-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Ingress events
+</span>kubectl get events --sort-by=.metadata.creationTimestamp
+
+</code></pre>
 </div>
-<div id="outline-container-org6eca88d" class="outline-3">
-<h3 id="org6eca88d">Q1: What is Kubernetes Ingress?</h3>
-<div class="outline-text-3" id="text-org6eca88d">
+
+<p>
+<b>2. Understand Ingress Architecture</b>
+</p>
+
+<p>
+Ingress provides HTTP/HTTPS routing from outside the cluster to Kubernetes Services.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text"><code>
+            Internet
+               |
+               |
+           DNS Record
+               |
+               |
+        Load Balancer
+               |
+               |
+        Ingress Controller
+               |
+     +---------+---------+
+     |                   |
+  /api                 /web
+     |                   |
+API Service         Web Service
+     |                   |
+  API Pods            Web Pods
+
+</code></pre>
+</div>
+
+<p>
+Important components:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Component</th>
+<th scope="col" class="org-left">Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Ingress</td>
+<td class="org-left">Defines HTTP/HTTPS routing rules</td>
+</tr>
+
+<tr>
+<td class="org-left">Ingress Controller</td>
+<td class="org-left">Implements routing rules</td>
+</tr>
+
+<tr>
+<td class="org-left">IngressClass</td>
+<td class="org-left">Identifies the controller</td>
+</tr>
+
+<tr>
+<td class="org-left">Service</td>
+<td class="org-left">Provides access to backend Pods</td>
+</tr>
+
+<tr>
+<td class="org-left">DNS</td>
+<td class="org-left">Resolves application hostnames</td>
+</tr>
+
+<tr>
+<td class="org-left">TLS Secret</td>
+<td class="org-left">Stores certificate and private key</td>
+</tr>
+
+<tr>
+<td class="org-left">LoadBalancer</td>
+<td class="org-left">Exposes the controller externally</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Creating an Ingress resource alone does not expose an application. An appropriate Ingress Controller must be installed and configured.
+</p>
+
+<p>
+<b>3. Inspect Ingress Controllers</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List controller pods
+</span>kubectl get pods -A | grep -i ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List controller deployments
+</span>kubectl get deployments -A | grep -i ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List controller services
+</span>kubectl get services -A | grep -i ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect IngressClass resources
+</span>kubectl get ingressclass -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller pods
+</span>kubectl get pods -n ingress-nginx -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller deployment
+</span>kubectl describe deployment ingress-nginx-controller -n ingress-nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller logs
+</span>kubectl logs deployment/ingress-nginx-controller -n ingress-nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow controller logs
+</span>kubectl logs deployment/ingress-nginx-controller -n ingress-nginx -f
+
+</code></pre>
+</div>
+
+<p>
+Note: Namespace and resource names depend on the controller installation.
+</p>
+
+<p>
+<b>4. Create a Basic Ingress Resource</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Ingress configuration
+</span>kubectl apply -f ingress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress resources
+</span>kubectl get ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress
+</span>kubectl describe ingress web-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Ingress YAML
+</span>kubectl get ingress web-ingress -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete Ingress
+</span>kubectl delete ingress web-ingress
+
+</code></pre>
+</div>
+
+<p>
+Note: The example assumes an IngressClass named `nginx` already exists and is managed by a compatible controller.
+</p>
+
+<p>
+<b>5. Host-Based Routing</b>
+</p>
+
+<p>
+Host-based routing directs requests to different Services according to the HTTP hostname.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: host-based-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 8080
+
+    - host: admin.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect host routing rules
+</span>kubectl describe ingress host-based-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test frontend hostname
+</span>curl -I http://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test API hostname
+</span>curl -I http://api.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test admin hostname
+</span>curl -I http://admin.example.com
+
+</code></pre>
+</div>
+
+<p>
+<b>6. Path-Based Routing</b>
+</p>
+
+<p>
+Path-based routing sends requests to different Services depending on the requested URL path.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-based-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-service
+                port:
+                  number: 80
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test API path
+</span>curl -I http://example.com/api
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test admin path
+</span>curl -I http://example.com/admin
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test frontend path
+</span>curl -I http://example.com/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect routing configuration
+</span>kubectl describe ingress path-based-ingress
+
+</code></pre>
+</div>
+
+<p>
+<b>7. Ingress Path Types</b>
+</p>
+
+<p>
+Kubernetes supports three path types.
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Path Type</th>
+<th scope="col" class="org-left">Behavior</th>
+<th scope="col" class="org-left">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">`Prefix`</td>
+<td class="org-left">Matches path elements and their subpaths</td>
+<td class="org-left">`/api` matches `/api/users`</td>
+</tr>
+
+<tr>
+<td class="org-left">`Exact`</td>
+<td class="org-left">Matches the exact URL path</td>
+<td class="org-left">`/api` matches `/api` only</td>
+</tr>
+
+<tr>
+<td class="org-left">`ImplementationSpecific`</td>
+<td class="org-left">Matching behavior depends on the controller</td>
+<td class="org-left">Controller-specific</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+rules:
+  - host: example.com
+    http:
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: api-service
+              port:
+                number: 8080
+
+        - path: /health
+          pathType: Exact
+          backend:
+            service:
+              name: health-service
+              port:
+                number: 80
+
+</code></pre>
+</div>
+
+<p>
+Important:
+</p>
+
+<ul class="org-ul">
+<li>`Prefix` is case-sensitive.</li>
+<li>Prefix matching uses path elements, not arbitrary string prefixes.</li>
+<li>`/api` matches `/api/users`.</li>
+<li>`/api` does not match `/apiv2`.</li>
+<li>`Exact` requires an exact path match.</li>
+</ul>
+
+<p>
+<b>8. Configure TLS / HTTPS</b>
+</p>
+
+<p>
+Ingress TLS configuration references a Kubernetes Secret containing a certificate and private key.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create TLS secret
+</span>kubectl create secret tls app-tls <span style="font-style: italic;">\</span>
+  --cert=tls.crt <span style="font-style: italic;">\</span>
+  --key=tls.key <span style="font-style: italic;">\</span>
+  -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List secrets
+</span>kubectl get secrets -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect TLS secret
+</span>kubectl describe secret app-tls -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display TLS secret type
+</span>kubectl get secret app-tls <span style="font-style: italic;">\</span>
+  -n production <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.type}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate expiration locally
+</span>openssl x509 -in tls.crt -noout -dates
+
+</code></pre>
+</div>
+
+<p>
+Example Ingress:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: secure-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: app-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply TLS Ingress
+</span>kubectl apply -f secure-ingress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect TLS configuration
+</span>kubectl describe ingress secure-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTPS endpoint
+</span>curl -I https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate served by endpoint
+</span>openssl s_client <span style="font-style: italic;">\</span>
+  -connect app.example.com:443 <span style="font-style: italic;">\</span>
+  -servername app.example.com &lt;/dev/null
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate details
+</span><span style="font-weight: bold;">echo</span> | openssl s_client <span style="font-style: italic;">\</span>
+  -connect app.example.com:443 <span style="font-style: italic;">\</span>
+  -servername app.example.com 2&gt;/dev/null <span style="font-style: italic;">\</span>
+  | openssl x509 -noout -dates -issuer -subject
+
+</code></pre>
+</div>
+
+<p>
+Note: TLS secrets must exist in the same namespace as the Ingress resource. TLS termination and HTTP-to-HTTPS redirection behavior depend on the selected controller.
+</p>
+
+<p>
+<b>9. HTTP to HTTPS Redirect</b>
+</p>
+
+<p>
+HTTP-to-HTTPS redirection is commonly configured through controller-specific settings.
+</p>
+
+<p>
+For the community ingress-nginx controller, the legacy annotation was:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+</code></pre>
+</div>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redirect-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: app-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTP redirect
+</span>curl -I http://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow redirects
+</span>curl -IL http://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTPS
+</span>curl -I https://app.example.com
+
+</code></pre>
+</div>
+
+<p>
+Note: Annotations are controller-specific. Do not assume this annotation works with other controllers.
+</p>
+
+<p>
+<b>10. Wildcard Host Routing</b>
+</p>
+
+<p>
+Wildcard hostnames can be used to route multiple subdomains through one Ingress.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wildcard-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "*.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wildcard-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test application subdomain
+</span>curl -I http://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test API subdomain
+</span>curl -I http://api.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test wildcard hostname resolution
+</span>nslookup app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress
+</span>kubectl describe ingress wildcard-ingress
+
+</code></pre>
+</div>
+
+<p>
+Note: Kubernetes wildcard host matching covers one DNS label, not arbitrary nested subdomains. DNS records and controller support must also be configured.
+</p>
+
+<p>
+<b>11. Multiple Ingress Resources &amp; Classes</b>
+</p>
+
+<p>
+Different Ingress resources can be managed by different Ingress Controllers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect class configuration
+</span>kubectl describe ingressclass public
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect another class
+</span>kubectl describe ingressclass internal
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress resources
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find Ingress resources by class
+</span>kubectl get ingress -A <span style="font-style: italic;">\</span>
+  -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CLASS:.spec.ingressClassName
+
+</code></pre>
+</div>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: public-ingress
+spec:
+  ingressClassName: public
+  rules:
+    - host: public.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: public-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: internal-ingress
+spec:
+  ingressClassName: internal
+  rules:
+    - host: internal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: internal-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<p>
+Note: An IngressClass selects a controller implementation; it does not by itself make an endpoint private. Private exposure must also be enforced through controller Services, load balancers, networking and DNS.
+</p>
+
+<p>
+<b>12. Inspect Ingress Status &amp; External IP</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Ingress address
+</span>kubectl get ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed Ingress status
+</span>kubectl describe ingress &lt;ingress-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress status address
+</span>kubectl get ingress &lt;ingress-name&gt; <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.status.loadBalancer.ingress}'</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Service
+</span>kubectl get services -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Get LoadBalancer external IP
+</span>kubectl get svc &lt;controller-service&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch external address assignment
+</span>kubectl get ingress --watch
+
+</code></pre>
+</div>
+
+<p>
+<b>13. DNS Configuration &amp; Validation</b>
+</p>
+
+<p>
+Ingress hostnames must resolve to the externally reachable Ingress Controller endpoint.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Resolve DNS
+</span>nslookup app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Query DNS records
+</span>dig app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display DNS A record
+</span>dig app.example.com A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display DNS CNAME
+</span>dig app.example.com CNAME
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check DNS propagation through a resolver
+</span>dig @8.8.8.8 app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTP hostname routing
+</span>curl -v http://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTPS hostname routing
+</span>curl -v https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test a hostname against a specific IP
+</span>curl -H <span style="font-style: italic;">"Host: app.example.com"</span> http://&lt;ingress-ip&gt;
+
+</code></pre>
+</div>
+
+<p>
+<b>14. Test Ingress Without DNS</b>
+</p>
+
+<p>
+You can test routing before public DNS records are configured by sending the appropriate Host header.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTP using Host header
+</span>curl -v <span style="font-style: italic;">\</span>
+  -H <span style="font-style: italic;">"Host: app.example.com"</span> <span style="font-style: italic;">\</span>
+  http://&lt;ingress-ip&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTPS with hostname and SNI
+</span>curl -vk <span style="font-style: italic;">\</span>
+  --resolve app.example.com:443:&lt;ingress-ip&gt; <span style="font-style: italic;">\</span>
+  https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test a specific URL path
+</span>curl -v <span style="font-style: italic;">\</span>
+  --resolve app.example.com:443:&lt;ingress-ip&gt; <span style="font-style: italic;">\</span>
+  https://app.example.com/api
+
+</code></pre>
+</div>
+
+<p>
+<b>15. Inspect Backend Services &amp; Endpoints</b>
+</p>
+
+<p>
+Ingress routes requests to Services, not directly to ordinary Pod IPs.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Services
+</span>kubectl get services -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect backend Service
+</span>kubectl describe service &lt;service-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Service YAML
+</span>kubectl get service &lt;service-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Service endpoints
+</span>kubectl get endpoints &lt;service-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List EndpointSlices
+</span>kubectl get endpointslices
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect EndpointSlice
+</span>kubectl describe endpointslice &lt;endpointslice-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend Pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=&lt;application-label&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend Pod readiness
+</span>kubectl get pods -o wide
+
+</code></pre>
+</div>
+
+<p>
+Common issues:
+</p>
+
+<ul class="org-ul">
+<li>Service name does not exist.</li>
+<li>Service port is incorrect.</li>
+<li>Service selector does not match Pod labels.</li>
+<li>Backend Pods are not ready.</li>
+<li>Application is listening on a different container port.</li>
+</ul>
+
+<p>
+### 16. Configure Request Path Rewriting
+</p>
+
+<p>
+Path rewriting is controller-specific and is not part of the standard Ingress API.
+</p>
+
+<p>
+Example using the legacy community ingress-nginx annotation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rewrite-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+
+</code></pre>
+</div>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text"><code>
+External request:
+https://app.example.com/api/users
+
+Backend request:
+/users
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect rewrite configuration
+</span>kubectl describe ingress rewrite-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test rewritten path
+</span>curl -v https://app.example.com/api/users
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller logs
+</span>kubectl logs deployment/ingress-nginx-controller <span style="font-style: italic;">\</span>
+  -n ingress-nginx
+
+</code></pre>
+</div>
+
+<p>
+Note: Regex syntax and rewrite behavior depend on the controller. Validate the exact implementation before using this configuration.
+</p>
+
+<p>
+<b>17. Configure Timeouts &amp; Request Body Size</b>
+</p>
+
+<p>
+Ingress proxies commonly provide settings for request size and connection timeouts.
+</p>
+
+<p>
+Legacy ingress-nginx annotations:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress annotations
+</span>kubectl get ingress &lt;ingress-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller configuration
+</span>kubectl get configmap -n ingress-nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller ConfigMap
+</span>kubectl describe configmap ingress-nginx-controller <span style="font-style: italic;">\</span>
+  -n ingress-nginx
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller logs
+</span>kubectl logs deployment/ingress-nginx-controller <span style="font-style: italic;">\</span>
+  -n ingress-nginx
+
+</code></pre>
+</div>
+
+<p>
+Note: Annotation names and supported values vary by controller. Large request bodies and long timeouts should be configured according to application requirements and resource capacity.
+</p>
+
+<p>
+<b>18. Configure Rate Limiting &amp; IP Restrictions</b>
+</p>
+
+<p>
+Legacy ingress-nginx annotations include:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,192.168.0.0/16"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect configured annotations
+</span>kubectl get ingress &lt;ingress-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test endpoint
+</span>curl -I https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller access logs
+</span>kubectl logs deployment/ingress-nginx-controller <span style="font-style: italic;">\</span>
+  -n ingress-nginx
+
+</code></pre>
+</div>
+
+<p>
+Note: Rate limiting and source IP restrictions are implementation-specific. Correct client IP detection requires a trusted proxy/load balancer configuration. Do not trust arbitrary forwarded headers from untrusted clients.
+</p>
+
+<p>
+<b>19. Configure CORS</b>
+</p>
+
+<p>
+CORS can be handled by the application or by an Ingress Controller.
+</p>
+
+<p>
+Legacy ingress-nginx example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://frontend.example.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test CORS preflight request
+</span>curl -i -X OPTIONS <span style="font-style: italic;">\</span>
+  https://api.example.com <span style="font-style: italic;">\</span>
+  -H <span style="font-style: italic;">"Origin: https://frontend.example.com"</span> <span style="font-style: italic;">\</span>
+  -H <span style="font-style: italic;">"Access-Control-Request-Method: POST"</span> <span style="font-style: italic;">\</span>
+  -H <span style="font-style: italic;">"Access-Control-Request-Headers: Authorization,Content-Type"</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect response headers
+</span>curl -I <span style="font-style: italic;">\</span>
+  -H <span style="font-style: italic;">"Origin: https://frontend.example.com"</span> <span style="font-style: italic;">\</span>
+  https://api.example.com
+
+</code></pre>
+</div>
+
+<p>
+Note: When credentials are enabled, wildcard origins should not be used. Configure an explicit trusted origin.
+</p>
+
+<p>
+<b>20. Configure Canary Deployments</b>
+</p>
+
+<p>
+Canary routing sends a subset of requests to a new application version.
+</p>
+
+<p>
+Legacy ingress-nginx example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-canary
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "10"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-v2-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<p>
+The primary Ingress routes to `app-v1-service`, while the canary Ingress routes a configured portion of traffic to `app-v2-service`.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List application Ingress resources
+</span>kubectl get ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect canary configuration
+</span>kubectl describe ingress app-canary
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test application endpoint
+</span>curl -I https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend services
+</span>kubectl get services
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Monitor application Pods
+</span>kubectl get pods -w
+
+</code></pre>
+</div>
+
+<p>
+Note: Canary annotations and traffic distribution are controller-specific. A weight of 10 is a routing target, not a guarantee of an exact percentage over a small number of requests.
+</p>
+
+<p>
+<b>21. Configure Sticky Sessions</b>
+</p>
+
+<p>
+Session affinity can help keep a client connected to the same backend instance.
+</p>
+
+<p>
+Legacy ingress-nginx example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "INGRESSCOOKIE"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect session affinity configuration
+</span>kubectl get ingress &lt;ingress-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display response cookies
+</span>curl -I https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display cookies on subsequent requests
+</span>curl -c cookies.txt -b cookies.txt <span style="font-style: italic;">\</span>
+  -v https://app.example.com
+
+</code></pre>
+</div>
+
+<p>
+Note: Sticky sessions can create uneven backend load. Prefer external session storage when applications need to scale horizontally without relying on a specific Pod.
+</p>
+
+<p>
+<b>22. Configure Authentication at Ingress</b>
+</p>
+
+<p>
+Authentication can be integrated at the edge using controller-specific mechanisms or an external authentication service.
+</p>
+
+<p>
+Legacy ingress-nginx basic authentication example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create authentication credentials file
+</span>htpasswd -c auth admin
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create Kubernetes Secret
+</span>kubectl create secret generic basic-auth <span style="font-style: italic;">\</span>
+  --from-file=auth <span style="font-style: italic;">\</span>
+  -n production
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect authentication secret
+</span>kubectl describe secret basic-auth -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test without credentials
+</span>curl -I https://app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test with credentials
+</span>curl -u admin:&lt;password&gt; <span style="font-style: italic;">\</span>
+  -I https://app.example.com
+
+</code></pre>
+</div>
+
+<p>
+Note: Use a secure credential-generation process and protect Kubernetes Secrets with appropriate RBAC and encryption at rest. For production identity management, consider an established OIDC or external authentication integration.
+</p>
+
+<p>
+<b>23. Configure cert-manager Integration</b>
+</p>
+
+<p>
+cert-manager automates TLS certificate issuance and renewal.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check cert-manager pods
+</span>kubectl get pods -n cert-manager
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List ClusterIssuers
+</span>kubectl get clusterissuers
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Issuers
+</span>kubectl get issuers -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List certificates
+</span>kubectl get certificates -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate
+</span>kubectl describe certificate &lt;certificate-name&gt; -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check certificate requests
+</span>kubectl get certificaterequests -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check ACME challenges
+</span>kubectl get challenges -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check ACME orders
+</span>kubectl get orders -A
+
+</code></pre>
+</div>
+
+<p>
+Example ClusterIssuer:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: admin@example.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-account
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+
+</code></pre>
+</div>
+
+<p>
+Example Ingress:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cert-manager-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: app-example-com-tls
+  rules:
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply ClusterIssuer
+</span>kubectl apply -f cluster-issuer.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Ingress
+</span>kubectl apply -f ingress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch certificate status
+</span>kubectl get certificates -w
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate
+</span>kubectl describe certificate app-example-com -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check certificate Secret
+</span>kubectl get secret app-example-com-tls -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect cert-manager logs
+</span>kubectl logs deployment/cert-manager -n cert-manager
+
+</code></pre>
+</div>
+
+<p>
+Note: HTTP-01 challenges require the domain to resolve correctly and the challenge endpoint to be reachable from the ACME server.
+</p>
+
+<p>
+<b>24. Configure Internal &amp; External Ingress</b>
+</p>
+
+<p>
+A common architecture separates public and private traffic.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text"><code>
+     Internet
+        |
+ Public LoadBalancer
+        |
+  Public Controller
+        |
+  Public Services
+
+
+  Private Network
+        |
+Internal LoadBalancer
+        |
+ Internal Controller
+        |
+ Internal Services
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect all Ingress controllers
+</span>kubectl get deployments -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Services
+</span>kubectl get services -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect public Ingress resources
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller external IPs
+</span>kubectl get services -A <span style="font-style: italic;">\</span>
+  -o wide
+
+</code></pre>
+</div>
+
+<p>
+Note: Private ingress requires network-level restrictions, private load balancer configuration and appropriate DNS. An IngressClass alone does not enforce network isolation.
+</p>
+
+<p>
+<b>25. Configure gRPC Routing</b>
+</p>
+
+<p>
+gRPC applications require HTTP/2-compatible proxying and appropriate backend protocol configuration.
+</p>
+
+<p>
+Legacy ingress-nginx example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grpc-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: grpc.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grpc-service
+                port:
+                  number: 50051
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect gRPC Ingress
+</span>kubectl describe ingress grpc-ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect backend Service
+</span>kubectl describe service grpc-service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect application logs
+</span>kubectl logs deployment/grpc-service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test using grpcurl (where available)
+</span>grpcurl -plaintext grpc.example.com:80 list
+
+</code></pre>
+</div>
+
+<p>
+Note: The example assumes a plaintext gRPC backend. TLS termination and HTTP/2 forwarding behavior depend on the selected controller and backend protocol configuration.
+</p>
+
+<p>
+<b>26. Inspect Ingress Logs &amp; Metrics</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller logs
+</span>kubectl logs deployment/&lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Follow logs
+</span>kubectl logs deployment/&lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt; -f
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display recent controller logs
+</span>kubectl logs deployment/&lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt; --since=10m
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller resource usage
+</span>kubectl top pods -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller deployment
+</span>kubectl describe deployment &lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Service
+</span>kubectl get svc -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check controller endpoints
+</span>kubectl get endpoints -n &lt;controller-namespace&gt;
+
+</code></pre>
+</div>
+
+<p>
+Useful metrics:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Metric</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Request rate</td>
+<td class="org-left">Requests per second</td>
+</tr>
+
+<tr>
+<td class="org-left">Request latency</td>
+<td class="org-left">Response time percentiles</td>
+</tr>
+
+<tr>
+<td class="org-left">HTTP 4xx</td>
+<td class="org-left">Client-side errors</td>
+</tr>
+
+<tr>
+<td class="org-left">HTTP 5xx</td>
+<td class="org-left">Proxy/backend failures</td>
+</tr>
+
+<tr>
+<td class="org-left">Active connections</td>
+<td class="org-left">Concurrent connections</td>
+</tr>
+
+<tr>
+<td class="org-left">Upstream errors</td>
+<td class="org-left">Backend communication failures</td>
+</tr>
+
+<tr>
+<td class="org-left">Controller CPU</td>
+<td class="org-left">Processing capacity</td>
+</tr>
+
+<tr>
+<td class="org-left">Controller memory</td>
+<td class="org-left">Resource consumption</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note: Metrics endpoints and Prometheus metric names depend on the controller implementation.
+</p>
+
+<p>
+<b>27. Troubleshoot 404, 502 &amp; 503 Errors</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress rules
+</span>kubectl describe ingress &lt;ingress-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect backend Service
+</span>kubectl describe service &lt;service-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend endpoints
+</span>kubectl get endpoints &lt;service-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check EndpointSlices
+</span>kubectl get endpointslices
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend Pods
+</span>kubectl get pods -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend logs
+</span>kubectl logs deployment/&lt;application-deployment&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check controller logs
+</span>kubectl logs deployment/&lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test backend Service from inside cluster
+</span>kubectl run curl-test <span style="font-style: italic;">\</span>
+  --image=curlimages/curl <span style="font-style: italic;">\</span>
+  --rm -it --restart=Never <span style="font-style: italic;">\</span>
+  -- curl -v http://&lt;service-name&gt;.&lt;namespace&gt;.svc.cluster.local:&lt;port&gt;
+
+</code></pre>
+</div>
+
+<table>
+
+
+<colgroup>
+<col  class="org-right">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">HTTP Status</th>
+<th scope="col" class="org-left">Common causes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">404</td>
+<td class="org-left">Host/path mismatch, default backend or controller routing configuration</td>
+</tr>
+
+<tr>
+<td class="org-right">502</td>
+<td class="org-left">Backend connection failure, invalid upstream protocol or reset</td>
+</tr>
+
+<tr>
+<td class="org-right">503</td>
+<td class="org-left">No available backend endpoints or controller-specific unavailable response</td>
+</tr>
+
+<tr>
+<td class="org-right">504</td>
+<td class="org-left">Upstream timeout</td>
+</tr>
+
+<tr>
+<td class="org-right">301/308</td>
+<td class="org-left">HTTP-to-HTTPS redirection</td>
+</tr>
+
+<tr>
+<td class="org-right">403</td>
+<td class="org-left">Authentication, authorization or IP restriction</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>28. Troubleshoot TLS &amp; Certificate Issues</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect TLS secret
+</span>kubectl describe secret &lt;tls-secret&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check certificate resource
+</span>kubectl get certificates -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate status
+</span>kubectl describe certificate &lt;certificate-name&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect certificate expiration
+</span>kubectl get secret &lt;tls-secret&gt; <span style="font-style: italic;">\</span>
+  -n &lt;namespace&gt; <span style="font-style: italic;">\</span>
+  -o <span style="font-weight: bold; font-style: italic;">jsonpath</span>=<span style="font-style: italic;">'{.data.tls\.crt}'</span> <span style="font-style: italic;">\</span>
+  | base64 -d <span style="font-style: italic;">\</span>
+  | openssl x509 -noout -dates
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check certificate issuer
+</span>kubectl get certificate &lt;certificate-name&gt; <span style="font-style: italic;">\</span>
+  -n &lt;namespace&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check TLS endpoint
+</span>openssl s_client <span style="font-style: italic;">\</span>
+  -connect app.example.com:443 <span style="font-style: italic;">\</span>
+  -servername app.example.com
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTPS certificate
+</span>curl -Iv https://app.example.com
+
+</code></pre>
+</div>
+
+<p>
+Common problems:
+</p>
+
+<ul class="org-ul">
+<li>TLS Secret does not exist.</li>
+<li>Secret is in the wrong namespace.</li>
+<li>Certificate does not include the requested hostname.</li>
+<li>Certificate has expired.</li>
+<li>DNS does not resolve correctly.</li>
+<li>ACME challenge cannot reach the controller.</li>
+<li>Incorrect certificate is selected through SNI.</li>
+</ul>
+
+<p>
+<b>29. Troubleshoot Ingress Controller</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check controller Pods
+</span>kubectl get pods -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Pod
+</span>kubectl describe pod &lt;controller-pod&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check controller logs
+</span>kubectl logs &lt;controller-pod&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check controller Service
+</span>kubectl describe service &lt;controller-service&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check controller deployment
+</span>kubectl describe deployment &lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller events
+</span>kubectl get events <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt; <span style="font-style: italic;">\</span>
+  --sort-by=.metadata.creationTimestamp
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check resource usage
+</span>kubectl top pods -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect node resources
+</span>kubectl top nodes
+
+</code></pre>
+</div>
+
+<p>
+<b>30. Configure High Availability &amp; Scaling</b>
+</p>
+
+<p>
+Ingress Controllers commonly run with multiple replicas to improve availability and throughput.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller replicas
+</span>kubectl get deployment &lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Scale controller replicas
+</span>kubectl scale deployment &lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt; <span style="font-style: italic;">\</span>
+  --replicas=3
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Pods
+</span>kubectl get pods -n &lt;controller-namespace&gt; -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check rollout status
+</span>kubectl rollout status deployment/&lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect resource usage
+</span>kubectl top pods -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect disruption budgets
+</span>kubectl get pdb -n &lt;controller-namespace&gt;
+
+</code></pre>
+</div>
+
+<p>
+Example PodDisruptionBudget:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ingress-controller-pdb
+  namespace: ingress-system
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: ingress-controller
+
+</code></pre>
+</div>
+
+<p>
+Note: The selector must match the controller Pods' actual labels. Multiple replicas alone do not guarantee high availability; consider topology spread, node placement, disruption budgets and load balancer health checks.
+</p>
+
+<p>
+<b>31. Gateway API – Modern Alternative to Ingress</b>
+</p>
+
+<p>
+The Kubernetes Ingress API is stable but frozen. Gateway API provides a more expressive, role-oriented model for traffic management.
+</p>
+
+<p>
+Important resources:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Resource</th>
+<th scope="col" class="org-left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">GatewayClass</td>
+<td class="org-left">Defines the Gateway controller implementation</td>
+</tr>
+
+<tr>
+<td class="org-left">Gateway</td>
+<td class="org-left">Defines traffic entry points and listeners</td>
+</tr>
+
+<tr>
+<td class="org-left">HTTPRoute</td>
+<td class="org-left">Defines HTTP routing rules</td>
+</tr>
+
+<tr>
+<td class="org-left">GRPCRoute</td>
+<td class="org-left">Defines gRPC routing rules</td>
+</tr>
+
+<tr>
+<td class="org-left">TLSRoute</td>
+<td class="org-left">Defines TLS routing</td>
+</tr>
+
+<tr>
+<td class="org-left">TCPRoute</td>
+<td class="org-left">Defines TCP routing</td>
+</tr>
+
+<tr>
+<td class="org-left">UDPRoute</td>
+<td class="org-left">Defines UDP routing</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Gateway API CRDs
+</span>kubectl get crds | grep gateway.networking.k8s.io
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List GatewayClasses
+</span>kubectl get gatewayclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Gateways
+</span>kubectl get gateways -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List HTTPRoutes
+</span>kubectl get httproutes -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect a Gateway
+</span>kubectl describe gateway &lt;gateway-name&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect HTTPRoute
+</span>kubectl describe httproute &lt;route-name&gt; -n &lt;namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Gateway API conditions
+</span>kubectl get gateway &lt;gateway-name&gt; <span style="font-style: italic;">\</span>
+  -n &lt;namespace&gt; -o yaml
+
+</code></pre>
+</div>
+
+<p>
+Example Gateway:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: application-gateway
+spec:
+  gatewayClassName: example-gateway-class
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+</code></pre>
+</div>
+
+<p>
+Example HTTPRoute:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: application-route
+spec:
+  parentRefs:
+    - name: application-gateway
+  hostnames:
+    - app.example.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: web-service
+          port: 80
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply Gateway
+</span>kubectl apply -f gateway.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply HTTPRoute
+</span>kubectl apply -f httproute.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Gateway status
+</span>kubectl get gateway application-gateway
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect route status
+</span>kubectl get httproute application-route
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Gateway conditions
+</span>kubectl describe gateway application-gateway
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check route conditions
+</span>kubectl describe httproute application-route
+
+</code></pre>
+</div>
+
+<p>
+Note: A compatible Gateway API implementation and its CRDs must be installed before applying these resources. Replace the example GatewayClass with one supported by your controller.
+</p>
+
+<p>
+<b>32. Ingress vs Gateway API</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Feature</th>
+<th scope="col" class="org-left">Ingress</th>
+<th scope="col" class="org-left">Gateway API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">HTTP routing</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">HTTPS routing</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">Host-based routing</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">Path-based routing</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">Role-oriented configuration</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">Header-based matching</td>
+<td class="org-left">Controller-specific extensions</td>
+<td class="org-left">Standard route capabilities</td>
+</tr>
+
+<tr>
+<td class="org-left">Traffic weighting</td>
+<td class="org-left">Controller-specific</td>
+<td class="org-left">Standard route capabilities</td>
+</tr>
+
+<tr>
+<td class="org-left">TCP/UDP routing</td>
+<td class="org-left">Not supported by core Ingress API</td>
+<td class="org-left">Supported by appropriate route types and implementations</td>
+</tr>
+
+<tr>
+<td class="org-left">Extensibility</td>
+<td class="org-left">Limited</td>
+<td class="org-left">More extensible</td>
+</tr>
+
+<tr>
+<td class="org-left">API evolution</td>
+<td class="org-left">Frozen</td>
+<td class="org-left">Actively developed</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>33. Security Best Practices</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect externally exposed Ingress resources
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect TLS configuration
+</span>kubectl get ingress -A -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller permissions
+</span>kubectl get clusterrole,clusterrolebinding
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Service exposure
+</span>kubectl get svc -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect TLS secrets
+</span>kubectl get secrets -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect namespace access permissions
+</span>kubectl auth can-i create ingress <span style="font-style: italic;">\</span>
+  --as=&lt;user&gt; <span style="font-style: italic;">\</span>
+  -n &lt;namespace&gt;
+
+</code></pre>
+</div>
+
+<p>
+Best practices:
+</p>
+
+<ul class="org-ul">
+<li>Enforce HTTPS for production applications.</li>
+<li>Use managed certificate issuance and renewal.</li>
+<li>Restrict public endpoints to required applications.</li>
+<li>Protect TLS private keys.</li>
+<li>Apply least-privilege RBAC.</li>
+<li>Restrict dangerous controller-specific annotations.</li>
+<li>Validate forwarded client IP headers.</li>
+<li>Use rate limiting and WAF protections where appropriate.</li>
+<li>Separate public and private ingress infrastructure.</li>
+<li>Audit changes to external exposure.</li>
+<li>Keep controllers and their dependencies patched.</li>
+<li>Use network policies and application-level authorization.</li>
+</ul>
+
+<p>
+<b>34. Ingress Migration &amp; Operational Best Practices</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inventory all Ingress resources
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inventory Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export Ingress configurations
+</span>kubectl get ingress -A -o yaml &gt; ingress-backup.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inventory controller deployments
+</span>kubectl get deployments -A | grep -i ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inventory controller Services
+</span>kubectl get services -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller images
+</span>kubectl get deployments -A <span style="font-style: italic;">\</span>
+  -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,IMAGES:.spec.template.spec.containers[*].image
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find community ingress-nginx Pods
+</span>kubectl get pods -A <span style="font-style: italic;">\</span>
+  --selector app.kubernetes.io/name=ingress-nginx
+
+</code></pre>
+</div>
+
+<p>
+Migration checklist:
+</p>
+
+<ul class="org-ul">
+<li>Inventory existing Ingress resources.</li>
+<li>Identify controller-specific annotations.</li>
+<li>Document hostnames, paths and TLS certificates.</li>
+<li>Identify authentication and authorization rules.</li>
+<li>Review rate limits, rewrites and timeout configurations.</li>
+<li>Select a supported Gateway API implementation or maintained Ingress controller.</li>
+<li>Map existing features to the new implementation.</li>
+<li>Test routing and TLS in a staging environment.</li>
+<li>Validate observability and security policies.</li>
+<li>Perform staged traffic migration.</li>
+<li>Keep a tested rollback procedure.</li>
+</ul>
+
+<p>
+<b>35. Ingress Troubleshooting Cheat Sheet</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Problem</th>
+<th scope="col" class="org-left">Command / Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Ingress has no address</td>
+<td class="org-left">`kubectl get ingress -A`</td>
+</tr>
+
+<tr>
+<td class="org-left">Wrong Ingress class</td>
+<td class="org-left">`kubectl describe ingressclass &lt;class&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">404 Not Found</td>
+<td class="org-left">Check hostname and path rules</td>
+</tr>
+
+<tr>
+<td class="org-left">502 Bad Gateway</td>
+<td class="org-left">Check Service and backend connectivity</td>
+</tr>
+
+<tr>
+<td class="org-left">503 Service Unavailable</td>
+<td class="org-left">Check ready endpoints</td>
+</tr>
+
+<tr>
+<td class="org-left">504 Gateway Timeout</td>
+<td class="org-left">Check application latency and proxy timeouts</td>
+</tr>
+
+<tr>
+<td class="org-left">TLS certificate error</td>
+<td class="org-left">`kubectl describe certificate &lt;name&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">TLS Secret missing</td>
+<td class="org-left">`kubectl get secrets -n &lt;namespace&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">DNS not resolving</td>
+<td class="org-left">`dig &lt;hostname&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">Controller unavailable</td>
+<td class="org-left">`kubectl get pods -n &lt;controller-namespace&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">Backend unreachable</td>
+<td class="org-left">`kubectl get endpoints &lt;service&gt;`</td>
+</tr>
+
+<tr>
+<td class="org-left">Incorrect rewrite</td>
+<td class="org-left">Inspect controller-specific annotations</td>
+</tr>
+
+<tr>
+<td class="org-left">Unexpected 403</td>
+<td class="org-left">Check authentication and source IP restrictions</td>
+</tr>
+
+<tr>
+<td class="org-left">High latency</td>
+<td class="org-left">Inspect controller and backend metrics</td>
+</tr>
+
+<tr>
+<td class="org-left">Certificate renewal failure</td>
+<td class="org-left">Inspect cert-manager challenges and orders</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>36. Useful Ingress Commands</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all Ingress resources
+</span>kubectl get ingress -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Ingress classes
+</span>kubectl get ingressclass
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe Ingress
+</span>kubectl describe ingress &lt;ingress-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Ingress YAML
+</span>kubectl get ingress &lt;ingress-name&gt; -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Pods
+</span>kubectl get pods -A | grep -i ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller Services
+</span>kubectl get svc -A | grep -i ingress
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect controller logs
+</span>kubectl logs deployment/&lt;controller-deployment&gt; <span style="font-style: italic;">\</span>
+  -n &lt;controller-namespace&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect backend endpoints
+</span>kubectl get endpoints &lt;service-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect EndpointSlices
+</span>kubectl get endpointslices -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test DNS
+</span>dig &lt;hostname&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTP
+</span>curl -I http://&lt;hostname&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test HTTPS
+</span>curl -Iv https://&lt;hostname&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test routing with Host header
+</span>curl -H <span style="font-style: italic;">"Host: &lt;hostname&gt;"</span> http://&lt;ingress-ip&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test TLS certificate
+</span>openssl s_client <span style="font-style: italic;">\</span>
+  -connect &lt;hostname&gt;:443 <span style="font-style: italic;">\</span>
+  -servername &lt;hostname&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export Ingress configuration
+</span>kubectl get ingress -A -o yaml &gt; ingress-backup.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch Ingress resources
+</span>kubectl get ingress -A --watch
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Gateway API resources
+</span>kubectl get gateways,httproutes -A
+
+</code></pre>
+</div>
+
+<hr>
+</div>
+</div>
+<div id="outline-container-org95be87a" class="outline-2">
+<h2 id="org95be87a">Beginner</h2>
+<div class="outline-text-2" id="text-org95be87a">
+</div>
+<div id="outline-container-orgd278190" class="outline-3">
+<h3 id="orgd278190">Q1: What is Kubernetes Ingress?</h3>
+<div class="outline-text-3" id="text-orgd278190">
 <p>
 Ingress is a Kubernetes API resource that defines external HTTP/HTTPS routing to services.
 </p>
 </div>
 </div>
-<div id="outline-container-org837a1ba" class="outline-3">
-<h3 id="org837a1ba">Q2: What problem does Ingress solve?</h3>
-<div class="outline-text-3" id="text-org837a1ba">
+<div id="outline-container-org90e7250" class="outline-3">
+<h3 id="org90e7250">Q2: What problem does Ingress solve?</h3>
+<div class="outline-text-3" id="text-org90e7250">
 <p>
 Centralizes Layer 7 routing rules (host/path/TLS) instead of exposing many LoadBalancers.
 </p>
 </div>
 </div>
-<div id="outline-container-org03219be" class="outline-3">
-<h3 id="org03219be">Q3: Is Ingress a load balancer itself?</h3>
-<div class="outline-text-3" id="text-org03219be">
+<div id="outline-container-org6e21522" class="outline-3">
+<h3 id="org6e21522">Q3: Is Ingress a load balancer itself?</h3>
+<div class="outline-text-3" id="text-org6e21522">
 <p>
 No, Ingress is configuration; an Ingress Controller implements it.
 </p>
 </div>
 </div>
-<div id="outline-container-org183534d" class="outline-3">
-<h3 id="org183534d">Q4: What is an Ingress Controller?</h3>
-<div class="outline-text-3" id="text-org183534d">
+<div id="outline-container-orgbb68a26" class="outline-3">
+<h3 id="orgbb68a26">Q4: What is an Ingress Controller?</h3>
+<div class="outline-text-3" id="text-orgbb68a26">
 <p>
 Software that watches Ingress resources and configures a proxy/load balancer accordingly.
 </p>
 </div>
 </div>
-<div id="outline-container-orgead28a5" class="outline-3">
-<h3 id="orgead28a5">Q5: Common Ingress Controllers?</h3>
-<div class="outline-text-3" id="text-orgead28a5">
+<div id="outline-container-org5158e11" class="outline-3">
+<h3 id="org5158e11">Q5: Common Ingress Controllers?</h3>
+<div class="outline-text-3" id="text-org5158e11">
 <p>
 NGINX Ingress, Traefik, HAProxy, cloud-specific controllers, etc.
 </p>
 </div>
 </div>
-<div id="outline-container-org76735b9" class="outline-3">
-<h3 id="org76735b9">Q6: What is <code>ingressClassName</code>?</h3>
-<div class="outline-text-3" id="text-org76735b9">
+<div id="outline-container-org7dea57d" class="outline-3">
+<h3 id="org7dea57d">Q6: What is <code>ingressClassName</code>?</h3>
+<div class="outline-text-3" id="text-org7dea57d">
 <p>
 Field selecting which controller should process the Ingress resource.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf09f440" class="outline-3">
-<h3 id="orgf09f440">Q7: Why ingress class matters?</h3>
-<div class="outline-text-3" id="text-orgf09f440">
+<div id="outline-container-org814126b" class="outline-3">
+<h3 id="org814126b">Q7: Why ingress class matters?</h3>
+<div class="outline-text-3" id="text-org814126b">
 <p>
 Multiple controllers may exist; class avoids ambiguous ownership.
 </p>
 </div>
 </div>
-<div id="outline-container-org750537f" class="outline-3">
-<h3 id="org750537f">Q8: What does an Ingress rule contain?</h3>
-<div class="outline-text-3" id="text-org750537f">
+<div id="outline-container-org0ebf3c3" class="outline-3">
+<h3 id="org0ebf3c3">Q8: What does an Ingress rule contain?</h3>
+<div class="outline-text-3" id="text-org0ebf3c3">
 <p>
 Host, path, backend service name, and service port mapping.
 </p>
 </div>
 </div>
-<div id="outline-container-orgafa800a" class="outline-3">
-<h3 id="orgafa800a">Q9: Host-based routing?</h3>
-<div class="outline-text-3" id="text-orgafa800a">
+<div id="outline-container-orgf19de6c" class="outline-3">
+<h3 id="orgf19de6c">Q9: Host-based routing?</h3>
+<div class="outline-text-3" id="text-orgf19de6c">
 <p>
 Route by HTTP Host header (e.g., app.example.com).
 </p>
 </div>
 </div>
-<div id="outline-container-org493b21e" class="outline-3">
-<h3 id="org493b21e">Q10: Path-based routing?</h3>
-<div class="outline-text-3" id="text-org493b21e">
+<div id="outline-container-org2f8e0cc" class="outline-3">
+<h3 id="org2f8e0cc">Q10: Path-based routing?</h3>
+<div class="outline-text-3" id="text-org2f8e0cc">
 <p>
 Route by URL path prefix/exact match (e.g., /api, /admin).
 </p>
 </div>
 </div>
-<div id="outline-container-org82592fd" class="outline-3">
-<h3 id="org82592fd">Q11: What backend does Ingress point to?</h3>
-<div class="outline-text-3" id="text-org82592fd">
+<div id="outline-container-org7a7e9da" class="outline-3">
+<h3 id="org7a7e9da">Q11: What backend does Ingress point to?</h3>
+<div class="outline-text-3" id="text-org7a7e9da">
 <p>
 Kubernetes Service, which forwards traffic to Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0981c9" class="outline-3">
-<h3 id="orge0981c9">Q12: Service vs Ingress?</h3>
-<div class="outline-text-3" id="text-orge0981c9">
+<div id="outline-container-orgabe8f2d" class="outline-3">
+<h3 id="orgabe8f2d">Q12: Service vs Ingress?</h3>
+<div class="outline-text-3" id="text-orgabe8f2d">
 <p>
 Service exposes internal app endpoints; Ingress governs external HTTP(S) entry routing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb2c725c" class="outline-3">
-<h3 id="orgb2c725c">Q13: What is default backend?</h3>
-<div class="outline-text-3" id="text-orgb2c725c">
+<div id="outline-container-orgb68d4a6" class="outline-3">
+<h3 id="orgb68d4a6">Q13: What is default backend?</h3>
+<div class="outline-text-3" id="text-orgb68d4a6">
 <p>
 Fallback service for unmatched requests (controller-dependent behavior/config).
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5f5e36" class="outline-3">
-<h3 id="orgb5f5e36">Q14: What is TLS in Ingress?</h3>
-<div class="outline-text-3" id="text-orgb5f5e36">
+<div id="outline-container-orgcd49878" class="outline-3">
+<h3 id="orgcd49878">Q14: What is TLS in Ingress?</h3>
+<div class="outline-text-3" id="text-orgcd49878">
 <p>
 HTTPS termination configuration using certificate secret references.
 </p>
 </div>
 </div>
-<div id="outline-container-org9eeb003" class="outline-3">
-<h3 id="org9eeb003">Q15: What does TLS secret contain?</h3>
-<div class="outline-text-3" id="text-org9eeb003">
+<div id="outline-container-orgb3560f8" class="outline-3">
+<h3 id="orgb3560f8">Q15: What does TLS secret contain?</h3>
+<div class="outline-text-3" id="text-orgb3560f8">
 <p>
 Certificate and private key (typically type kubernetes.io/tls).
 </p>
 </div>
 </div>
-<div id="outline-container-org0ad9af6" class="outline-3">
-<h3 id="org0ad9af6">Q16: Can one Ingress handle multiple hosts?</h3>
-<div class="outline-text-3" id="text-org0ad9af6">
+<div id="outline-container-org94c2e83" class="outline-3">
+<h3 id="org94c2e83">Q16: Can one Ingress handle multiple hosts?</h3>
+<div class="outline-text-3" id="text-org94c2e83">
 <p>
 Yes, multiple rules/hosts can be defined.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf9ed0cb" class="outline-3">
-<h3 id="orgf9ed0cb">Q17: What is pathType?</h3>
-<div class="outline-text-3" id="text-orgf9ed0cb">
+<div id="outline-container-org587f825" class="outline-3">
+<h3 id="org587f825">Q17: What is pathType?</h3>
+<div class="outline-text-3" id="text-org587f825">
 <p>
 Defines path matching behavior (Exact, Prefix, ImplementationSpecific).
 </p>
 </div>
 </div>
-<div id="outline-container-org48e8c69" class="outline-3">
-<h3 id="org48e8c69">Q18: Prefix vs Exact pathType?</h3>
-<div class="outline-text-3" id="text-org48e8c69">
+<div id="outline-container-org17fad72" class="outline-3">
+<h3 id="org17fad72">Q18: Prefix vs Exact pathType?</h3>
+<div class="outline-text-3" id="text-org17fad72">
 <p>
 Prefix matches path prefix tree; Exact matches full path exactly.
 </p>
 </div>
 </div>
-<div id="outline-container-orged37f97" class="outline-3">
-<h3 id="orged37f97">Q19: What is wildcard host in Ingress?</h3>
-<div class="outline-text-3" id="text-orged37f97">
+<div id="outline-container-org42126f1" class="outline-3">
+<h3 id="org42126f1">Q19: What is wildcard host in Ingress?</h3>
+<div class="outline-text-3" id="text-org42126f1">
 <p>
 Host pattern matching subdomains (controller support/constraints apply).
 </p>
 </div>
 </div>
-<div id="outline-container-orgdeeea18" class="outline-3">
-<h3 id="orgdeeea18">Q20: What is rewrite target concept?</h3>
-<div class="outline-text-3" id="text-orgdeeea18">
+<div id="outline-container-orgd7246ce" class="outline-3">
+<h3 id="orgd7246ce">Q20: What is rewrite target concept?</h3>
+<div class="outline-text-3" id="text-orgd7246ce">
 <p>
 Modify request path before proxying to backend.
 </p>
 </div>
 </div>
-<div id="outline-container-org52ab2e3" class="outline-3">
-<h3 id="org52ab2e3">Q21: Why path rewrite is used?</h3>
-<div class="outline-text-3" id="text-org52ab2e3">
+<div id="outline-container-org3ddd20c" class="outline-3">
+<h3 id="org3ddd20c">Q21: Why path rewrite is used?</h3>
+<div class="outline-text-3" id="text-org3ddd20c">
 <p>
 Align external URL structure with backend app routes.
 </p>
 </div>
 </div>
-<div id="outline-container-org51394a0" class="outline-3">
-<h3 id="org51394a0">Q22: What are annotations in Ingress?</h3>
-<div class="outline-text-3" id="text-org51394a0">
+<div id="outline-container-orgc646f3c" class="outline-3">
+<h3 id="orgc646f3c">Q22: What are annotations in Ingress?</h3>
+<div class="outline-text-3" id="text-orgc646f3c">
 <p>
 Controller-specific configuration extensions on metadata.
 </p>
 </div>
 </div>
-<div id="outline-container-org89eebc7" class="outline-3">
-<h3 id="org89eebc7">Q23: Annotation risk?</h3>
-<div class="outline-text-3" id="text-org89eebc7">
+<div id="outline-container-org2ac6f31" class="outline-3">
+<h3 id="org2ac6f31">Q23: Annotation risk?</h3>
+<div class="outline-text-3" id="text-org2ac6f31">
 <p>
 Portability loss and misconfig due to controller-specific semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-orgeffe1e3" class="outline-3">
-<h3 id="orgeffe1e3">Q24: What is ingress status address?</h3>
-<div class="outline-text-3" id="text-orgeffe1e3">
+<div id="outline-container-orgb225421" class="outline-3">
+<h3 id="orgb225421">Q24: What is ingress status address?</h3>
+<div class="outline-text-3" id="text-orgb225421">
 <p>
 External IP/hostname exposed by controller for DNS mapping.
 </p>
 </div>
 </div>
-<div id="outline-container-orga89ee16" class="outline-3">
-<h3 id="orga89ee16">Q25: Why DNS is required with Ingress?</h3>
-<div class="outline-text-3" id="text-orga89ee16">
+<div id="outline-container-org0743616" class="outline-3">
+<h3 id="org0743616">Q25: Why DNS is required with Ingress?</h3>
+<div class="outline-text-3" id="text-org0743616">
 <p>
 Public hostnames must resolve to controller’s external endpoint.
 </p>
 </div>
 </div>
-<div id="outline-container-org30e7ce2" class="outline-3">
-<h3 id="org30e7ce2">Q26: What is HTTP vs HTTPS handling?</h3>
-<div class="outline-text-3" id="text-org30e7ce2">
+<div id="outline-container-org10aba16" class="outline-3">
+<h3 id="org10aba16">Q26: What is HTTP vs HTTPS handling?</h3>
+<div class="outline-text-3" id="text-org10aba16">
 <p>
 HTTP can redirect to HTTPS or serve directly depending config.
 </p>
 </div>
 </div>
-<div id="outline-container-org8ced9a1" class="outline-3">
-<h3 id="org8ced9a1">Q27: What is SSL redirect?</h3>
-<div class="outline-text-3" id="text-org8ced9a1">
+<div id="outline-container-org8bcd564" class="outline-3">
+<h3 id="org8bcd564">Q27: What is SSL redirect?</h3>
+<div class="outline-text-3" id="text-org8bcd564">
 <p>
 Automatic redirection of HTTP requests to HTTPS.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd683a82" class="outline-3">
-<h3 id="orgd683a82">Q28: What is SNI relevance?</h3>
-<div class="outline-text-3" id="text-orgd683a82">
+<div id="outline-container-orgc4c36b9" class="outline-3">
+<h3 id="orgc4c36b9">Q28: What is SNI relevance?</h3>
+<div class="outline-text-3" id="text-orgc4c36b9">
 <p>
 TLS host-based certificate selection for multi-domain ingress endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org29ed15b" class="outline-3">
-<h3 id="org29ed15b">Q29: What is 404 from Ingress usually mean?</h3>
-<div class="outline-text-3" id="text-org29ed15b">
+<div id="outline-container-org325d528" class="outline-3">
+<h3 id="org325d528">Q29: What is 404 from Ingress usually mean?</h3>
+<div class="outline-text-3" id="text-org325d528">
 <p>
 No matching host/path rule or backend unavailable/misconfigured.
 </p>
 </div>
 </div>
-<div id="outline-container-org08daa5e" class="outline-3">
-<h3 id="org08daa5e">Q30: What is 502/503 from Ingress often indicate?</h3>
-<div class="outline-text-3" id="text-org08daa5e">
+<div id="outline-container-org5884990" class="outline-3">
+<h3 id="org5884990">Q30: What is 502/503 from Ingress often indicate?</h3>
+<div class="outline-text-3" id="text-org5884990">
 <p>
 Backend service/pod not reachable or unhealthy.
 </p>
 </div>
 </div>
-<div id="outline-container-org6416677" class="outline-3">
-<h3 id="org6416677">Q31: What is readiness probe relation to Ingress?</h3>
-<div class="outline-text-3" id="text-org6416677">
+<div id="outline-container-org762da6f" class="outline-3">
+<h3 id="org762da6f">Q31: What is readiness probe relation to Ingress?</h3>
+<div class="outline-text-3" id="text-org762da6f">
 <p>
 Only ready pods should receive traffic via Service endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfeb19ed" class="outline-3">
-<h3 id="orgfeb19ed">Q32: What is externalTrafficPolicy relation (Service LB)?</h3>
-<div class="outline-text-3" id="text-orgfeb19ed">
+<div id="outline-container-orgfe2bd88" class="outline-3">
+<h3 id="orgfe2bd88">Q32: What is externalTrafficPolicy relation (Service LB)?</h3>
+<div class="outline-text-3" id="text-orgfe2bd88">
 <p>
 Affects source IP preservation and routing behavior at service edge.
 </p>
 </div>
 </div>
-<div id="outline-container-org8d2ab55" class="outline-3">
-<h3 id="org8d2ab55">Q33: Can Ingress route TCP/UDP by default spec?</h3>
-<div class="outline-text-3" id="text-org8d2ab55">
+<div id="outline-container-orgc0660fd" class="outline-3">
+<h3 id="orgc0660fd">Q33: Can Ingress route TCP/UDP by default spec?</h3>
+<div class="outline-text-3" id="text-orgc0660fd">
 <p>
 Ingress API is primarily HTTP/HTTPS; TCP/UDP often controller-specific extensions.
 </p>
 </div>
 </div>
-<div id="outline-container-org345fb20" class="outline-3">
-<h3 id="org345fb20">Q34: What is beginner anti-pattern with Ingress?</h3>
-<div class="outline-text-3" id="text-org345fb20">
+<div id="outline-container-orga41b490" class="outline-3">
+<h3 id="orga41b490">Q34: What is beginner anti-pattern with Ingress?</h3>
+<div class="outline-text-3" id="text-orga41b490">
 <p>
 One giant shared Ingress with unmanaged rule sprawl.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb1c5b2" class="outline-3">
-<h3 id="orgbb1c5b2">Q35: Another beginner anti-pattern?</h3>
-<div class="outline-text-3" id="text-orgbb1c5b2">
+<div id="outline-container-orgcd351c2" class="outline-3">
+<h3 id="orgcd351c2">Q35: Another beginner anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgcd351c2">
 <p>
 Exposing apps over HTTP without TLS in production.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb67801e" class="outline-3">
-<h3 id="orgb67801e">Q36: Beginner security baseline?</h3>
-<div class="outline-text-3" id="text-orgb67801e">
+<div id="outline-container-org0d32289" class="outline-3">
+<h3 id="org0d32289">Q36: Beginner security baseline?</h3>
+<div class="outline-text-3" id="text-org0d32289">
 <p>
 TLS everywhere, minimal exposed paths, and controlled DNS.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf9222a8" class="outline-3">
-<h3 id="orgf9222a8">Q37: Beginner reliability baseline?</h3>
-<div class="outline-text-3" id="text-orgf9222a8">
+<div id="outline-container-org25b9cea" class="outline-3">
+<h3 id="org25b9cea">Q37: Beginner reliability baseline?</h3>
+<div class="outline-text-3" id="text-org25b9cea">
 <p>
 Health probes and multiple backend replicas.
 </p>
 </div>
 </div>
-<div id="outline-container-org6955450" class="outline-3">
-<h3 id="org6955450">Q38: Beginner observability baseline?</h3>
-<div class="outline-text-3" id="text-org6955450">
+<div id="outline-container-org32ce720" class="outline-3">
+<h3 id="org32ce720">Q38: Beginner observability baseline?</h3>
+<div class="outline-text-3" id="text-org32ce720">
 <p>
 Access logs, error logs, request latency and status metrics.
 </p>
 </div>
 </div>
-<div id="outline-container-orgedffc8b" class="outline-3">
-<h3 id="orgedffc8b">Q39: Beginner governance baseline?</h3>
-<div class="outline-text-3" id="text-orgedffc8b">
+<div id="outline-container-org8c6ca2d" class="outline-3">
+<h3 id="org8c6ca2d">Q39: Beginner governance baseline?</h3>
+<div class="outline-text-3" id="text-org8c6ca2d">
 <p>
 Standard naming and ingress class usage conventions.
 </p>
 </div>
 </div>
-<div id="outline-container-org22c1f32" class="outline-3">
-<h3 id="org22c1f32">Q40: What is kubectl describe ingress useful for?</h3>
-<div class="outline-text-3" id="text-org22c1f32">
+<div id="outline-container-org9cf601c" class="outline-3">
+<h3 id="org9cf601c">Q40: What is kubectl describe ingress useful for?</h3>
+<div class="outline-text-3" id="text-org9cf601c">
 <p>
 Inspect rules, events, backend mappings, and controller feedback.
 </p>
 </div>
 </div>
-<div id="outline-container-org1765d2f" class="outline-3">
-<h3 id="org1765d2f">Q41: What is ingress event troubleshooting value?</h3>
-<div class="outline-text-3" id="text-org1765d2f">
+<div id="outline-container-org078dedc" class="outline-3">
+<h3 id="org078dedc">Q41: What is ingress event troubleshooting value?</h3>
+<div class="outline-text-3" id="text-org078dedc">
 <p>
 Surface config errors like missing service/secret/class mismatch.
 </p>
 </div>
 </div>
-<div id="outline-container-org3b84a05" class="outline-3">
-<h3 id="org3b84a05">Q42: What is canary concept (ingress-level)?</h3>
-<div class="outline-text-3" id="text-org3b84a05">
+<div id="outline-container-orga514d80" class="outline-3">
+<h3 id="orga514d80">Q42: What is canary concept (ingress-level)?</h3>
+<div class="outline-text-3" id="text-orga514d80">
 <p>
 Route subset of requests to alternate backend version.
 </p>
 </div>
 </div>
-<div id="outline-container-org610eca6" class="outline-3">
-<h3 id="org610eca6">Q43: Why canary routing helps?</h3>
-<div class="outline-text-3" id="text-org610eca6">
+<div id="outline-container-org4d145dc" class="outline-3">
+<h3 id="org4d145dc">Q43: Why canary routing helps?</h3>
+<div class="outline-text-3" id="text-org4d145dc">
 <p>
 Validate changes with limited user impact.
 </p>
 </div>
 </div>
-<div id="outline-container-orgda6c981" class="outline-3">
-<h3 id="orgda6c981">Q44: What is sticky session concept?</h3>
-<div class="outline-text-3" id="text-orgda6c981">
+<div id="outline-container-orgc58589a" class="outline-3">
+<h3 id="orgc58589a">Q44: What is sticky session concept?</h3>
+<div class="outline-text-3" id="text-orgc58589a">
 <p>
 Route same client repeatedly to same backend (cookie/IP strategies).
 </p>
 </div>
 </div>
-<div id="outline-container-org267a13d" class="outline-3">
-<h3 id="org267a13d">Q45: Sticky session tradeoff?</h3>
-<div class="outline-text-3" id="text-org267a13d">
+<div id="outline-container-org39c1e6d" class="outline-3">
+<h3 id="org39c1e6d">Q45: Sticky session tradeoff?</h3>
+<div class="outline-text-3" id="text-org39c1e6d">
 <p>
 Session affinity convenience vs uneven load distribution risk.
 </p>
 </div>
 </div>
-<div id="outline-container-org1c60ec6" class="outline-3">
-<h3 id="org1c60ec6">Q46: What is timeout setting in ingress proxy?</h3>
-<div class="outline-text-3" id="text-org1c60ec6">
+<div id="outline-container-orgcbd4f26" class="outline-3">
+<h3 id="orgcbd4f26">Q46: What is timeout setting in ingress proxy?</h3>
+<div class="outline-text-3" id="text-orgcbd4f26">
 <p>
 Controls connect/read/send request timeout behavior.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2b8e0e" class="outline-3">
-<h3 id="orgc2b8e0e">Q47: Why timeout tuning matters?</h3>
-<div class="outline-text-3" id="text-orgc2b8e0e">
+<div id="outline-container-org437e659" class="outline-3">
+<h3 id="org437e659">Q47: Why timeout tuning matters?</h3>
+<div class="outline-text-3" id="text-org437e659">
 <p>
 Prevents hanging connections and aligns with app response profiles.
 </p>
 </div>
 </div>
-<div id="outline-container-org8e3bc59" class="outline-3">
-<h3 id="org8e3bc59">Q48: What is body size limit setting?</h3>
-<div class="outline-text-3" id="text-org8e3bc59">
+<div id="outline-container-org8c62966" class="outline-3">
+<h3 id="org8c62966">Q48: What is body size limit setting?</h3>
+<div class="outline-text-3" id="text-org8c62966">
 <p>
 Max request payload allowed by ingress proxy.
 </p>
 </div>
 </div>
-<div id="outline-container-org8929aed" class="outline-3">
-<h3 id="org8929aed">Q49: Why body limit is important?</h3>
-<div class="outline-text-3" id="text-org8929aed">
+<div id="outline-container-org1d27e81" class="outline-3">
+<h3 id="org1d27e81">Q49: Why body limit is important?</h3>
+<div class="outline-text-3" id="text-org1d27e81">
 <p>
 Protects resources and prevents unexpected upload failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org218aa05" class="outline-3">
-<h3 id="org218aa05">Q50: What is CORS handling relation?</h3>
-<div class="outline-text-3" id="text-org218aa05">
+<div id="outline-container-org8b6d4b5" class="outline-3">
+<h3 id="org8b6d4b5">Q50: What is CORS handling relation?</h3>
+<div class="outline-text-3" id="text-org8b6d4b5">
 <p>
 Often configured at app or ingress layer for browser cross-origin control.
 </p>
 </div>
 </div>
-<div id="outline-container-org0468cb2" class="outline-3">
-<h3 id="org0468cb2">Q51: What is rate limiting at ingress?</h3>
-<div class="outline-text-3" id="text-org0468cb2">
+<div id="outline-container-orga69dbd5" class="outline-3">
+<h3 id="orga69dbd5">Q51: What is rate limiting at ingress?</h3>
+<div class="outline-text-3" id="text-orga69dbd5">
 <p>
 Throttle requests per client/key to reduce abuse.
 </p>
 </div>
 </div>
-<div id="outline-container-org533da58" class="outline-3">
-<h3 id="org533da58">Q52: Why rate limiting?</h3>
-<div class="outline-text-3" id="text-org533da58">
+<div id="outline-container-org8960e01" class="outline-3">
+<h3 id="org8960e01">Q52: Why rate limiting?</h3>
+<div class="outline-text-3" id="text-org8960e01">
 <p>
 Protect backend capacity and mitigate simple attack traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org0ff329f" class="outline-3">
-<h3 id="org0ff329f">Q53: What is IP allow/deny listing?</h3>
-<div class="outline-text-3" id="text-org0ff329f">
+<div id="outline-container-orgf6b48ef" class="outline-3">
+<h3 id="orgf6b48ef">Q53: What is IP allow/deny listing?</h3>
+<div class="outline-text-3" id="text-orgf6b48ef">
 <p>
 Restrict ingress access to specific client ranges.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb3161e5" class="outline-3">
-<h3 id="orgb3161e5">Q54: Beginner workflow principle?</h3>
-<div class="outline-text-3" id="text-orgb3161e5">
+<div id="outline-container-org46c8852" class="outline-3">
+<h3 id="org46c8852">Q54: Beginner workflow principle?</h3>
+<div class="outline-text-3" id="text-org46c8852">
 <p>
 Keep routing rules explicit and minimal.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbde6318" class="outline-3">
-<h3 id="orgbde6318">Q55: Beginner architecture principle?</h3>
-<div class="outline-text-3" id="text-orgbde6318">
+<div id="outline-container-orgd9581ee" class="outline-3">
+<h3 id="orgd9581ee">Q55: Beginner architecture principle?</h3>
+<div class="outline-text-3" id="text-orgd9581ee">
 <p>
 Separate public and internal traffic entry patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb31a48f" class="outline-3">
-<h3 id="orgb31a48f">Q56: Beginner collaboration principle?</h3>
-<div class="outline-text-3" id="text-orgb31a48f">
+<div id="outline-container-org3c255e8" class="outline-3">
+<h3 id="org3c255e8">Q56: Beginner collaboration principle?</h3>
+<div class="outline-text-3" id="text-org3c255e8">
 <p>
 Platform team defines ingress guardrails; app teams define routes.
 </p>
 </div>
 </div>
-<div id="outline-container-org06ab66c" class="outline-3">
-<h3 id="org06ab66c">Q57: Beginner incident principle?</h3>
-<div class="outline-text-3" id="text-org06ab66c">
+<div id="outline-container-org49676a3" class="outline-3">
+<h3 id="org49676a3">Q57: Beginner incident principle?</h3>
+<div class="outline-text-3" id="text-org49676a3">
 <p>
 Document common 4xx/5xx ingress triage playbook.
 </p>
 </div>
 </div>
-<div id="outline-container-org1fca025" class="outline-3">
-<h3 id="org1fca025">Q58: Beginner scaling principle?</h3>
-<div class="outline-text-3" id="text-org1fca025">
+<div id="outline-container-org792be66" class="outline-3">
+<h3 id="org792be66">Q58: Beginner scaling principle?</h3>
+<div class="outline-text-3" id="text-org792be66">
 <p>
 Start with one controller pattern per environment before diversification.
 </p>
 </div>
 </div>
-<div id="outline-container-org65ac93c" class="outline-3">
-<h3 id="org65ac93c">Q59: Beginner compliance principle?</h3>
-<div class="outline-text-3" id="text-org65ac93c">
+<div id="outline-container-org6b1e5af" class="outline-3">
+<h3 id="org6b1e5af">Q59: Beginner compliance principle?</h3>
+<div class="outline-text-3" id="text-org6b1e5af">
 <p>
 Track certificate ownership and renewal responsibilities.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf01fe7e" class="outline-3">
-<h3 id="orgf01fe7e">Q60: Beginner best practice?</h3>
-<div class="outline-text-3" id="text-orgf01fe7e">
+<div id="outline-container-orge4b2a05" class="outline-3">
+<h3 id="orge4b2a05">Q60: Beginner best practice?</h3>
+<div class="outline-text-3" id="text-orge4b2a05">
 <p>
 Treat ingress config as production-critical code.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orga25caca" class="outline-2">
-<h2 id="orga25caca">Intermediate</h2>
-<div class="outline-text-2" id="text-orga25caca">
+<div id="outline-container-org71fbcac" class="outline-2">
+<h2 id="org71fbcac">Intermediate</h2>
+<div class="outline-text-2" id="text-org71fbcac">
 </div>
-<div id="outline-container-org4b3ad3a" class="outline-3">
-<h3 id="org4b3ad3a">Q61: What is controller deployment topology?</h3>
-<div class="outline-text-3" id="text-org4b3ad3a">
+<div id="outline-container-org15ecea3" class="outline-3">
+<h3 id="org15ecea3">Q61: What is controller deployment topology?</h3>
+<div class="outline-text-3" id="text-org15ecea3">
 <p>
 Ingress controller runs as Deployment/DaemonSet with service exposure pattern.
 </p>
 </div>
 </div>
-<div id="outline-container-org463bffc" class="outline-3">
-<h3 id="org463bffc">Q62: Why multiple controller replicas?</h3>
-<div class="outline-text-3" id="text-org463bffc">
+<div id="outline-container-orgce53549" class="outline-3">
+<h3 id="orgce53549">Q62: Why multiple controller replicas?</h3>
+<div class="outline-text-3" id="text-orgce53549">
 <p>
 High availability and throughput scaling.
 </p>
 </div>
 </div>
-<div id="outline-container-org830f59d" class="outline-3">
-<h3 id="org830f59d">Q63: What is leader election in controllers?</h3>
-<div class="outline-text-3" id="text-org830f59d">
+<div id="outline-container-orgb3d442c" class="outline-3">
+<h3 id="orgb3d442c">Q63: What is leader election in controllers?</h3>
+<div class="outline-text-3" id="text-orgb3d442c">
 <p>
 Coordinates active reconciliation responsibilities among replicas.
 </p>
 </div>
 </div>
-<div id="outline-container-org6342e99" class="outline-3">
-<h3 id="org6342e99">Q64: What is config map role for ingress controller?</h3>
-<div class="outline-text-3" id="text-org6342e99">
+<div id="outline-container-org88ae179" class="outline-3">
+<h3 id="org88ae179">Q64: What is config map role for ingress controller?</h3>
+<div class="outline-text-3" id="text-org88ae179">
 <p>
 Global controller tuning (timeouts, buffers, headers, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-orgef22248" class="outline-3">
-<h3 id="orgef22248">Q65: Config sprawl risk?</h3>
-<div class="outline-text-3" id="text-orgef22248">
+<div id="outline-container-org915490d" class="outline-3">
+<h3 id="org915490d">Q65: Config sprawl risk?</h3>
+<div class="outline-text-3" id="text-org915490d">
 <p>
 Global settings can affect all tenants unexpectedly.
 </p>
 </div>
 </div>
-<div id="outline-container-org284228e" class="outline-3">
-<h3 id="org284228e">Q66: What is dedicated ingress controller per tenant/domain?</h3>
-<div class="outline-text-3" id="text-org284228e">
+<div id="outline-container-org760c288" class="outline-3">
+<h3 id="org760c288">Q66: What is dedicated ingress controller per tenant/domain?</h3>
+<div class="outline-text-3" id="text-org760c288">
 <p>
 Isolation pattern for security/performance/governance boundaries.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc530297" class="outline-3">
-<h3 id="orgc530297">Q67: Why isolate controllers?</h3>
-<div class="outline-text-3" id="text-orgc530297">
+<div id="outline-container-org7b3afef" class="outline-3">
+<h3 id="org7b3afef">Q67: Why isolate controllers?</h3>
+<div class="outline-text-3" id="text-org7b3afef">
 <p>
 Reduce blast radius and noisy-neighbor effects.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf86034a" class="outline-3">
-<h3 id="orgf86034a">Q68: What is internal ingress pattern?</h3>
-<div class="outline-text-3" id="text-orgf86034a">
+<div id="outline-container-orgb15b063" class="outline-3">
+<h3 id="orgb15b063">Q68: What is internal ingress pattern?</h3>
+<div class="outline-text-3" id="text-orgb15b063">
 <p>
 Controller exposed privately for internal-only traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org7a4a61d" class="outline-3">
-<h3 id="org7a4a61d">Q69: What is external ingress pattern?</h3>
-<div class="outline-text-3" id="text-org7a4a61d">
+<div id="outline-container-org3b49634" class="outline-3">
+<h3 id="org3b49634">Q69: What is external ingress pattern?</h3>
+<div class="outline-text-3" id="text-org3b49634">
 <p>
 Internet-facing endpoint for public applications.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc57134" class="outline-3">
-<h3 id="orgdc57134">Q70: Split-horizon DNS relation?</h3>
-<div class="outline-text-3" id="text-orgdc57134">
+<div id="outline-container-org19534a7" class="outline-3">
+<h3 id="org19534a7">Q70: Split-horizon DNS relation?</h3>
+<div class="outline-text-3" id="text-org19534a7">
 <p>
 Different DNS responses/endpoints for internal vs external clients.
 </p>
 </div>
 </div>
-<div id="outline-container-org1c08f8d" class="outline-3">
-<h3 id="org1c08f8d">Q71: What is cert-manager integration?</h3>
-<div class="outline-text-3" id="text-org1c08f8d">
+<div id="outline-container-org7db2c88" class="outline-3">
+<h3 id="org7db2c88">Q71: What is cert-manager integration?</h3>
+<div class="outline-text-3" id="text-org7db2c88">
 <p>
 Automates certificate issuance/renewal for ingress TLS.
 </p>
 </div>
 </div>
-<div id="outline-container-org1d8e967" class="outline-3">
-<h3 id="org1d8e967">Q72: Why automate cert lifecycle?</h3>
-<div class="outline-text-3" id="text-org1d8e967">
+<div id="outline-container-org5dbbe1e" class="outline-3">
+<h3 id="org5dbbe1e">Q72: Why automate cert lifecycle?</h3>
+<div class="outline-text-3" id="text-org5dbbe1e">
 <p>
 Avoid outages from expired certificates.
 </p>
 </div>
 </div>
-<div id="outline-container-org10ae0e6" class="outline-3">
-<h3 id="org10ae0e6">Q73: What is ACME HTTP-01 challenge relation?</h3>
-<div class="outline-text-3" id="text-org10ae0e6">
+<div id="outline-container-orgd333bee" class="outline-3">
+<h3 id="orgd333bee">Q73: What is ACME HTTP-01 challenge relation?</h3>
+<div class="outline-text-3" id="text-orgd333bee">
 <p>
 Ingress serves validation path for certificate issuance.
 </p>
 </div>
 </div>
-<div id="outline-container-org61307f1" class="outline-3">
-<h3 id="org61307f1">Q74: What is wildcard certificate tradeoff?</h3>
-<div class="outline-text-3" id="text-org61307f1">
+<div id="outline-container-org570005e" class="outline-3">
+<h3 id="org570005e">Q74: What is wildcard certificate tradeoff?</h3>
+<div class="outline-text-3" id="text-org570005e">
 <p>
 Operational simplicity vs broader blast radius if key compromised.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd944836" class="outline-3">
-<h3 id="orgd944836">Q75: What is mTLS at ingress?</h3>
-<div class="outline-text-3" id="text-orgd944836">
+<div id="outline-container-org7a45289" class="outline-3">
+<h3 id="org7a45289">Q75: What is mTLS at ingress?</h3>
+<div class="outline-text-3" id="text-org7a45289">
 <p>
 Require/validate client certificates at edge.
 </p>
 </div>
 </div>
-<div id="outline-container-org4445349" class="outline-3">
-<h3 id="org4445349">Q76: mTLS use case?</h3>
-<div class="outline-text-3" id="text-org4445349">
+<div id="outline-container-orgc5aa38a" class="outline-3">
+<h3 id="orgc5aa38a">Q76: mTLS use case?</h3>
+<div class="outline-text-3" id="text-orgc5aa38a">
 <p>
 B2B/private API access with strong client identity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb3fd05e" class="outline-3">
-<h3 id="orgb3fd05e">Q77: What is auth at ingress layer?</h3>
-<div class="outline-text-3" id="text-orgb3fd05e">
+<div id="outline-container-org7155a4f" class="outline-3">
+<h3 id="org7155a4f">Q77: What is auth at ingress layer?</h3>
+<div class="outline-text-3" id="text-org7155a4f">
 <p>
 External auth, basic auth, OIDC integration (controller-specific patterns).
 </p>
 </div>
 </div>
-<div id="outline-container-orge47921c" class="outline-3">
-<h3 id="orge47921c">Q78: Why edge auth can help?</h3>
-<div class="outline-text-3" id="text-orge47921c">
+<div id="outline-container-org12fb422" class="outline-3">
+<h3 id="org12fb422">Q78: Why edge auth can help?</h3>
+<div class="outline-text-3" id="text-org12fb422">
 <p>
 Centralized access policy for many services.
 </p>
 </div>
 </div>
-<div id="outline-container-org5fbb7bc" class="outline-3">
-<h3 id="org5fbb7bc">Q79: Edge auth pitfall?</h3>
-<div class="outline-text-3" id="text-org5fbb7bc">
+<div id="outline-container-orgdae5fb9" class="outline-3">
+<h3 id="orgdae5fb9">Q79: Edge auth pitfall?</h3>
+<div class="outline-text-3" id="text-orgdae5fb9">
 <p>
 Over-centralization may hide app-specific authorization needs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbd2bd0a" class="outline-3">
-<h3 id="orgbd2bd0a">Q80: What is WebSocket support concern?</h3>
-<div class="outline-text-3" id="text-orgbd2bd0a">
+<div id="outline-container-orgcb4b6a0" class="outline-3">
+<h3 id="orgcb4b6a0">Q80: What is WebSocket support concern?</h3>
+<div class="outline-text-3" id="text-orgcb4b6a0">
 <p>
 Requires proper upgrade headers/timeouts in ingress proxy.
 </p>
 </div>
 </div>
-<div id="outline-container-org26f2f31" class="outline-3">
-<h3 id="org26f2f31">Q81: What is gRPC ingress requirement?</h3>
-<div class="outline-text-3" id="text-org26f2f31">
+<div id="outline-container-orge0f7d69" class="outline-3">
+<h3 id="orge0f7d69">Q81: What is gRPC ingress requirement?</h3>
+<div class="outline-text-3" id="text-orge0f7d69">
 <p>
 HTTP/2-aware proxy configuration and backend compatibility.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc62a3b" class="outline-3">
-<h3 id="orgcc62a3b">Q82: What is canary routing methods?</h3>
-<div class="outline-text-3" id="text-orgcc62a3b">
+<div id="outline-container-org0ddf990" class="outline-3">
+<h3 id="org0ddf990">Q82: What is canary routing methods?</h3>
+<div class="outline-text-3" id="text-org0ddf990">
 <p>
 Header-based, cookie-based, weight-based (controller features vary).
 </p>
 </div>
 </div>
-<div id="outline-container-orga759af0" class="outline-3">
-<h3 id="orga759af0">Q83: What is blue/green via ingress?</h3>
-<div class="outline-text-3" id="text-orga759af0">
+<div id="outline-container-org14b603d" class="outline-3">
+<h3 id="org14b603d">Q83: What is blue/green via ingress?</h3>
+<div class="outline-text-3" id="text-org14b603d">
 <p>
 Switch routing from old to new service version quickly.
 </p>
 </div>
 </div>
-<div id="outline-container-org2865fee" class="outline-3">
-<h3 id="org2865fee">Q84: What is traffic shadowing/mirroring?</h3>
-<div class="outline-text-3" id="text-org2865fee">
+<div id="outline-container-org4c754ed" class="outline-3">
+<h3 id="org4c754ed">Q84: What is traffic shadowing/mirroring?</h3>
+<div class="outline-text-3" id="text-org4c754ed">
 <p>
 Duplicate real requests to shadow backend without impacting responses.
 </p>
 </div>
 </div>
-<div id="outline-container-org1bc46b3" class="outline-3">
-<h3 id="org1bc46b3">Q85: Why traffic mirroring useful?</h3>
-<div class="outline-text-3" id="text-org1bc46b3">
+<div id="outline-container-org9f65952" class="outline-3">
+<h3 id="org9f65952">Q85: Why traffic mirroring useful?</h3>
+<div class="outline-text-3" id="text-org9f65952">
 <p>
 Validate backend behavior under production-like load safely.
 </p>
 </div>
 </div>
-<div id="outline-container-org4ae7245" class="outline-3">
-<h3 id="org4ae7245">Q86: What is backend protocol setting?</h3>
-<div class="outline-text-3" id="text-org4ae7245">
+<div id="outline-container-org85002ba" class="outline-3">
+<h3 id="org85002ba">Q86: What is backend protocol setting?</h3>
+<div class="outline-text-3" id="text-org85002ba">
 <p>
 Tell ingress how to talk to service (HTTP/HTTPS/gRPC etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-org966b5e6" class="outline-3">
-<h3 id="org966b5e6">Q87: Misconfigured backend protocol symptom?</h3>
-<div class="outline-text-3" id="text-org966b5e6">
+<div id="outline-container-org51ab515" class="outline-3">
+<h3 id="org51ab515">Q87: Misconfigured backend protocol symptom?</h3>
+<div class="outline-text-3" id="text-org51ab515">
 <p>
 TLS handshake errors, 502/503, unexpected connection failures.
 </p>
 </div>
 </div>
-<div id="outline-container-org0b93aea" class="outline-3">
-<h3 id="org0b93aea">Q88: What is upstream keepalive tuning?</h3>
-<div class="outline-text-3" id="text-org0b93aea">
+<div id="outline-container-orge9a31a8" class="outline-3">
+<h3 id="orge9a31a8">Q88: What is upstream keepalive tuning?</h3>
+<div class="outline-text-3" id="text-orge9a31a8">
 <p>
 Reuse backend connections for lower latency/resource efficiency.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb9a368b" class="outline-3">
-<h3 id="orgb9a368b">Q89: What is proxy buffer tuning?</h3>
-<div class="outline-text-3" id="text-orgb9a368b">
+<div id="outline-container-orgf51282a" class="outline-3">
+<h3 id="orgf51282a">Q89: What is proxy buffer tuning?</h3>
+<div class="outline-text-3" id="text-orgf51282a">
 <p>
 Controls response buffering impacting memory/performance/latency tradeoffs.
 </p>
 </div>
 </div>
-<div id="outline-container-org8a8cbbb" class="outline-3">
-<h3 id="org8a8cbbb">Q90: What is intermediate anti-pattern?</h3>
-<div class="outline-text-3" id="text-org8a8cbbb">
+<div id="outline-container-orgd317e5d" class="outline-3">
+<h3 id="orgd317e5d">Q90: What is intermediate anti-pattern?</h3>
+<div class="outline-text-3" id="text-orgd317e5d">
 <p>
 Heavy business logic embedded in ingress annotations.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd2a8f06" class="outline-3">
-<h3 id="orgd2a8f06">Q91: Better pattern?</h3>
-<div class="outline-text-3" id="text-orgd2a8f06">
+<div id="outline-container-orgaf5c876" class="outline-3">
+<h3 id="orgaf5c876">Q91: Better pattern?</h3>
+<div class="outline-text-3" id="text-orgaf5c876">
 <p>
 Use ingress for routing/policy edge concerns, keep app logic in services.
 </p>
 </div>
 </div>
-<div id="outline-container-org7cce764" class="outline-3">
-<h3 id="org7cce764">Q92: What is WAF integration with ingress?</h3>
-<div class="outline-text-3" id="text-org7cce764">
+<div id="outline-container-org942d95b" class="outline-3">
+<h3 id="org942d95b">Q92: What is WAF integration with ingress?</h3>
+<div class="outline-text-3" id="text-org942d95b">
 <p>
 Web application firewall protections at edge/controller or upstream LB.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b7b993" class="outline-3">
-<h3 id="org4b7b993">Q93: Why WAF matters?</h3>
-<div class="outline-text-3" id="text-org4b7b993">
+<div id="outline-container-org7669f80" class="outline-3">
+<h3 id="org7669f80">Q93: Why WAF matters?</h3>
+<div class="outline-text-3" id="text-org7669f80">
 <p>
 Mitigates common web exploit traffic patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-org58e0d40" class="outline-3">
-<h3 id="org58e0d40">Q94: What is DDoS mitigation relation?</h3>
-<div class="outline-text-3" id="text-org58e0d40">
+<div id="outline-container-org371f8da" class="outline-3">
+<h3 id="org371f8da">Q94: What is DDoS mitigation relation?</h3>
+<div class="outline-text-3" id="text-org371f8da">
 <p>
 Ingress alone insufficient; combine with upstream network protections/CDN.
 </p>
 </div>
 </div>
-<div id="outline-container-org9175562" class="outline-3">
-<h3 id="org9175562">Q95: What is source IP preservation concern?</h3>
-<div class="outline-text-3" id="text-org9175562">
+<div id="outline-container-org68d8034" class="outline-3">
+<h3 id="org68d8034">Q95: What is source IP preservation concern?</h3>
+<div class="outline-text-3" id="text-org68d8034">
 <p>
 Needed for security policies/logging; depends on LB/service/controller setup.
 </p>
 </div>
 </div>
-<div id="outline-container-org832ce60" class="outline-3">
-<h3 id="org832ce60">Q96: What is X-Forwarded-* header importance?</h3>
-<div class="outline-text-3" id="text-org832ce60">
+<div id="outline-container-orgd36c1f6" class="outline-3">
+<h3 id="orgd36c1f6">Q96: What is X-Forwarded-* header importance?</h3>
+<div class="outline-text-3" id="text-orgd36c1f6">
 <p>
 Conveys original client/proto/host context to backends.
 </p>
 </div>
 </div>
-<div id="outline-container-org391f0d3" class="outline-3">
-<h3 id="org391f0d3">Q97: Header trust risk?</h3>
-<div class="outline-text-3" id="text-org391f0d3">
+<div id="outline-container-org6895690" class="outline-3">
+<h3 id="org6895690">Q97: Header trust risk?</h3>
+<div class="outline-text-3" id="text-org6895690">
 <p>
 Spoofed headers if trust boundaries not configured correctly.
 </p>
 </div>
 </div>
-<div id="outline-container-orga521d3b" class="outline-3">
-<h3 id="orga521d3b">Q98: What is ingress metrics baseline?</h3>
-<div class="outline-text-3" id="text-orga521d3b">
+<div id="outline-container-org020b308" class="outline-3">
+<h3 id="org020b308">Q98: What is ingress metrics baseline?</h3>
+<div class="outline-text-3" id="text-org020b308">
 <p>
 Request rate, latency percentiles, response codes, active connections, retries.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd40090b" class="outline-3">
-<h3 id="orgd40090b">Q99: What is log correlation strategy?</h3>
-<div class="outline-text-3" id="text-orgd40090b">
+<div id="outline-container-orgc9cc536" class="outline-3">
+<h3 id="orgc9cc536">Q99: What is log correlation strategy?</h3>
+<div class="outline-text-3" id="text-orgc9cc536">
 <p>
 Propagate request IDs from edge to backend for tracing.
 </p>
 </div>
 </div>
-<div id="outline-container-org31e788e" class="outline-3">
-<h3 id="org31e788e">Q100: What is OpenTelemetry relation?</h3>
-<div class="outline-text-3" id="text-org31e788e">
+<div id="outline-container-org26e00d2" class="outline-3">
+<h3 id="org26e00d2">Q100: What is OpenTelemetry relation?</h3>
+<div class="outline-text-3" id="text-org26e00d2">
 <p>
 Instrument ingress/controller and apps for trace/metric integration.
 </p>
 </div>
 </div>
-<div id="outline-container-org8fa5b6f" class="outline-3">
-<h3 id="org8fa5b6f">Q101: What is retry policy concern?</h3>
-<div class="outline-text-3" id="text-org8fa5b6f">
+<div id="outline-container-orgb5bebbf" class="outline-3">
+<h3 id="orgb5bebbf">Q101: What is retry policy concern?</h3>
+<div class="outline-text-3" id="text-orgb5bebbf">
 <p>
 Retries can amplify load during backend partial failure.
 </p>
 </div>
 </div>
-<div id="outline-container-org95b0360" class="outline-3">
-<h3 id="org95b0360">Q102: Retry mitigation?</h3>
-<div class="outline-text-3" id="text-org95b0360">
+<div id="outline-container-orgcf4d74b" class="outline-3">
+<h3 id="orgcf4d74b">Q102: Retry mitigation?</h3>
+<div class="outline-text-3" id="text-orgcf4d74b">
 <p>
 Bounded retries, circuit breaking, timeout harmonization.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd671d7e" class="outline-3">
-<h3 id="orgd671d7e">Q103: What is circuit breaker concept at edge/proxy?</h3>
-<div class="outline-text-3" id="text-orgd671d7e">
+<div id="outline-container-org0deefc7" class="outline-3">
+<h3 id="org0deefc7">Q103: What is circuit breaker concept at edge/proxy?</h3>
+<div class="outline-text-3" id="text-org0deefc7">
 <p>
 Stop forwarding to failing upstreams based on failure thresholds (implementation dependent).
 </p>
 </div>
 </div>
-<div id="outline-container-orgb3dc4ac" class="outline-3">
-<h3 id="orgb3dc4ac">Q104: What is outlier detection concept?</h3>
-<div class="outline-text-3" id="text-orgb3dc4ac">
+<div id="outline-container-orga0db922" class="outline-3">
+<h3 id="orga0db922">Q104: What is outlier detection concept?</h3>
+<div class="outline-text-3" id="text-orga0db922">
 <p>
 Eject unhealthy upstream instances from load balancing pool (proxy-specific).
 </p>
 </div>
 </div>
-<div id="outline-container-org888d11c" class="outline-3">
-<h3 id="org888d11c">Q105: What is intermediate reliability baseline?</h3>
-<div class="outline-text-3" id="text-org888d11c">
+<div id="outline-container-org4b0f04f" class="outline-3">
+<h3 id="org4b0f04f">Q105: What is intermediate reliability baseline?</h3>
+<div class="outline-text-3" id="text-org4b0f04f">
 <p>
 HA controllers + health checks + controlled rollout patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2e62d1" class="outline-3">
-<h3 id="orgc2e62d1">Q106: What is intermediate security baseline?</h3>
-<div class="outline-text-3" id="text-orgc2e62d1">
+<div id="outline-container-org7e8428b" class="outline-3">
+<h3 id="org7e8428b">Q106: What is intermediate security baseline?</h3>
+<div class="outline-text-3" id="text-org7e8428b">
 <p>
 Automated TLS, authN/Z integration, rate limits, WAF strategy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfc9ef8b" class="outline-3">
-<h3 id="orgfc9ef8b">Q107: What is intermediate governance baseline?</h3>
-<div class="outline-text-3" id="text-orgfc9ef8b">
+<div id="outline-container-org03fcc62" class="outline-3">
+<h3 id="org03fcc62">Q107: What is intermediate governance baseline?</h3>
+<div class="outline-text-3" id="text-org03fcc62">
 <p>
 Policy templates for allowed annotations/hostnames/TLS requirements.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf7d12f" class="outline-3">
-<h3 id="orgcf7d12f">Q108: What is intermediate observability baseline?</h3>
-<div class="outline-text-3" id="text-orgcf7d12f">
+<div id="outline-container-orgb053ba9" class="outline-3">
+<h3 id="orgb053ba9">Q108: What is intermediate observability baseline?</h3>
+<div class="outline-text-3" id="text-orgb053ba9">
 <p>
 SLO dashboards and alerting for ingress error/latency anomalies.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc668e3b" class="outline-3">
-<h3 id="orgc668e3b">Q109: Intermediate maturity signal?</h3>
-<div class="outline-text-3" id="text-orgc668e3b">
+<div id="outline-container-orgc42441f" class="outline-3">
+<h3 id="orgc42441f">Q109: Intermediate maturity signal?</h3>
+<div class="outline-text-3" id="text-orgc42441f">
 <p>
 Teams can safely rollout ingress changes with measurable impact control.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcb22b47" class="outline-3">
-<h3 id="orgcb22b47">Q110: What is intermediate ops principle?</h3>
-<div class="outline-text-3" id="text-orgcb22b47">
+<div id="outline-container-org83b8e6e" class="outline-3">
+<h3 id="org83b8e6e">Q110: What is intermediate ops principle?</h3>
+<div class="outline-text-3" id="text-org83b8e6e">
 <p>
 Treat ingress config changes as high-risk with staged deployment.
 </p>
 </div>
 </div>
-<div id="outline-container-orga1403e2" class="outline-3">
-<h3 id="orga1403e2">Q111: What is intermediate architecture principle?</h3>
-<div class="outline-text-3" id="text-orga1403e2">
+<div id="outline-container-org1f71796" class="outline-3">
+<h3 id="org1f71796">Q111: What is intermediate architecture principle?</h3>
+<div class="outline-text-3" id="text-org1f71796">
 <p>
 Standardize edge patterns across services/environments.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcf448bd" class="outline-3">
-<h3 id="orgcf448bd">Q112: What is intermediate collaboration principle?</h3>
-<div class="outline-text-3" id="text-orgcf448bd">
+<div id="outline-container-org15ae1c4" class="outline-3">
+<h3 id="org15ae1c4">Q112: What is intermediate collaboration principle?</h3>
+<div class="outline-text-3" id="text-org15ae1c4">
 <p>
 Clear ownership split: platform edge controls vs service route definitions.
 </p>
 </div>
 </div>
-<div id="outline-container-org01dca9a" class="outline-3">
-<h3 id="org01dca9a">Q113: What is intermediate compliance principle?</h3>
-<div class="outline-text-3" id="text-org01dca9a">
+<div id="outline-container-org22e54fd" class="outline-3">
+<h3 id="org22e54fd">Q113: What is intermediate compliance principle?</h3>
+<div class="outline-text-3" id="text-org22e54fd">
 <p>
 Audit who changed ingress exposure and certificate settings.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd45ed4c" class="outline-3">
-<h3 id="orgd45ed4c">Q114: What is intermediate cost principle?</h3>
-<div class="outline-text-3" id="text-orgd45ed4c">
+<div id="outline-container-orgb6f84bb" class="outline-3">
+<h3 id="orgb6f84bb">Q114: What is intermediate cost principle?</h3>
+<div class="outline-text-3" id="text-orgb6f84bb">
 <p>
 Optimize controller sizing and avoid redundant public load balancers.
 </p>
 </div>
 </div>
-<div id="outline-container-orgad68c35" class="outline-3">
-<h3 id="orgad68c35">Q115: What is intermediate scaling principle?</h3>
-<div class="outline-text-3" id="text-orgad68c35">
+<div id="outline-container-orgc66d2d3" class="outline-3">
+<h3 id="orgc66d2d3">Q115: What is intermediate scaling principle?</h3>
+<div class="outline-text-3" id="text-orgc66d2d3">
 <p>
 Use class-based segmentation for traffic domains.
 </p>
 </div>
 </div>
-<div id="outline-container-org74b9e34" class="outline-3">
-<h3 id="org74b9e34">Q116: What is intermediate resilience principle?</h3>
-<div class="outline-text-3" id="text-org74b9e34">
+<div id="outline-container-org21284c3" class="outline-3">
+<h3 id="org21284c3">Q116: What is intermediate resilience principle?</h3>
+<div class="outline-text-3" id="text-org21284c3">
 <p>
 Plan for DNS/LB/controller failure scenarios explicitly.
 </p>
 </div>
 </div>
-<div id="outline-container-org3039e15" class="outline-3">
-<h3 id="org3039e15">Q117: What is intermediate migration principle?</h3>
-<div class="outline-text-3" id="text-org3039e15">
+<div id="outline-container-orgaf683a2" class="outline-3">
+<h3 id="orgaf683a2">Q117: What is intermediate migration principle?</h3>
+<div class="outline-text-3" id="text-orgaf683a2">
 <p>
 Move legacy ingress rules to standardized policy-driven templates.
 </p>
 </div>
 </div>
-<div id="outline-container-org4888d82" class="outline-3">
-<h3 id="org4888d82">Q118: What is intermediate quality principle?</h3>
-<div class="outline-text-3" id="text-org4888d82">
+<div id="outline-container-orgdd5b66d" class="outline-3">
+<h3 id="orgdd5b66d">Q118: What is intermediate quality principle?</h3>
+<div class="outline-text-3" id="text-orgdd5b66d">
 <p>
 Validate manifests with policy/lint before apply.
 </p>
 </div>
 </div>
-<div id="outline-container-org924ffb1" class="outline-3">
-<h3 id="org924ffb1">Q119: What is intermediate delivery principle?</h3>
-<div class="outline-text-3" id="text-org924ffb1">
+<div id="outline-container-orgd32fe7d" class="outline-3">
+<h3 id="orgd32fe7d">Q119: What is intermediate delivery principle?</h3>
+<div class="outline-text-3" id="text-orgd32fe7d">
 <p>
 Use canary ingress changes before full traffic cutover.
 </p>
 </div>
 </div>
-<div id="outline-container-orgcc0624a" class="outline-3">
-<h3 id="orgcc0624a">Q120: What is intermediate trust principle?</h3>
-<div class="outline-text-3" id="text-orgcc0624a">
+<div id="outline-container-org2047318" class="outline-3">
+<h3 id="org2047318">Q120: What is intermediate trust principle?</h3>
+<div class="outline-text-3" id="text-org2047318">
 <p>
 Constrain privileged annotations and admin-only ingress features.
 </p>
 </div>
 </div>
-<div id="outline-container-org15bce05" class="outline-3">
-<h3 id="org15bce05">Q121: What is intermediate tenancy principle?</h3>
-<div class="outline-text-3" id="text-org15bce05">
+<div id="outline-container-orgd4bceb4" class="outline-3">
+<h3 id="orgd4bceb4">Q121: What is intermediate tenancy principle?</h3>
+<div class="outline-text-3" id="text-orgd4bceb4">
 <p>
 Per-team namespaces/projects with bounded ingress permissions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd29c081" class="outline-3">
-<h3 id="orgd29c081">Q122: What is intermediate incident principle?</h3>
-<div class="outline-text-3" id="text-orgd29c081">
+<div id="outline-container-orgbded619" class="outline-3">
+<h3 id="orgbded619">Q122: What is intermediate incident principle?</h3>
+<div class="outline-text-3" id="text-orgbded619">
 <p>
 Fast rollback path for edge config regressions.
 </p>
 </div>
 </div>
-<div id="outline-container-org8490ddf" class="outline-3">
-<h3 id="org8490ddf">Q123: What is intermediate performance principle?</h3>
-<div class="outline-text-3" id="text-org8490ddf">
+<div id="outline-container-org61687d6" class="outline-3">
+<h3 id="org61687d6">Q123: What is intermediate performance principle?</h3>
+<div class="outline-text-3" id="text-org61687d6">
 <p>
 Tune timeouts/keepalive/buffers with real traffic profiling.
 </p>
 </div>
 </div>
-<div id="outline-container-orga370881" class="outline-3">
-<h3 id="orga370881">Q124: What is intermediate platform principle?</h3>
-<div class="outline-text-3" id="text-orga370881">
+<div id="outline-container-orga1cc9b1" class="outline-3">
+<h3 id="orga1cc9b1">Q124: What is intermediate platform principle?</h3>
+<div class="outline-text-3" id="text-orga1cc9b1">
 <p>
 Document golden ingress patterns and anti-patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-orga00668a" class="outline-3">
-<h3 id="orga00668a">Q125: Intermediate best practice?</h3>
-<div class="outline-text-3" id="text-orga00668a">
+<div id="outline-container-orgea56812" class="outline-3">
+<h3 id="orgea56812">Q125: Intermediate best practice?</h3>
+<div class="outline-text-3" id="text-orgea56812">
 <p>
 Engineer ingress as shared edge platform, not per-app improvisation.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org9dbdfe4" class="outline-2">
-<h2 id="org9dbdfe4">Advanced</h2>
-<div class="outline-text-2" id="text-org9dbdfe4">
+<div id="outline-container-orgb85763c" class="outline-2">
+<h2 id="orgb85763c">Advanced</h2>
+<div class="outline-text-2" id="text-orgb85763c">
 </div>
-<div id="outline-container-orgbcf10a4" class="outline-3">
-<h3 id="orgbcf10a4">Q126: What is ingress at scale core challenge?</h3>
-<div class="outline-text-3" id="text-orgbcf10a4">
+<div id="outline-container-org7e3be6b" class="outline-3">
+<h3 id="org7e3be6b">Q126: What is ingress at scale core challenge?</h3>
+<div class="outline-text-3" id="text-org7e3be6b">
 <p>
 Balancing security, performance, and multi-tenant governance across many apps/clusters.
 </p>
 </div>
 </div>
-<div id="outline-container-org46b1239" class="outline-3">
-<h3 id="org46b1239">Q127: What is control-plane vs data-plane distinction?</h3>
-<div class="outline-text-3" id="text-org46b1239">
+<div id="outline-container-orgb99c0be" class="outline-3">
+<h3 id="orgb99c0be">Q127: What is control-plane vs data-plane distinction?</h3>
+<div class="outline-text-3" id="text-orgb99c0be">
 <p>
 Controller reconciles config; proxy instances handle live traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org55f440b" class="outline-3">
-<h3 id="org55f440b">Q128: Why data-plane scaling is critical?</h3>
-<div class="outline-text-3" id="text-org55f440b">
+<div id="outline-container-org55daff4" class="outline-3">
+<h3 id="org55daff4">Q128: Why data-plane scaling is critical?</h3>
+<div class="outline-text-3" id="text-org55daff4">
 <p>
 Traffic load growth directly impacts latency and availability.
 </p>
 </div>
 </div>
-<div id="outline-container-org5bea46f" class="outline-3">
-<h3 id="org5bea46f">Q129: What is multi-controller architecture?</h3>
-<div class="outline-text-3" id="text-org5bea46f">
+<div id="outline-container-orge97ae09" class="outline-3">
+<h3 id="orge97ae09">Q129: What is multi-controller architecture?</h3>
+<div class="outline-text-3" id="text-orge97ae09">
 <p>
 Different ingress classes/controllers for public, private, and regulated workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org955f16e" class="outline-3">
-<h3 id="org955f16e">Q130: Multi-controller tradeoff?</h3>
-<div class="outline-text-3" id="text-org955f16e">
+<div id="outline-container-org58d5f16" class="outline-3">
+<h3 id="org58d5f16">Q130: Multi-controller tradeoff?</h3>
+<div class="outline-text-3" id="text-org58d5f16">
 <p>
 Isolation and flexibility vs operational complexity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbec034e" class="outline-3">
-<h3 id="orgbec034e">Q131: What is global load balancing pattern?</h3>
-<div class="outline-text-3" id="text-orgbec034e">
+<div id="outline-container-org6d6787c" class="outline-3">
+<h3 id="org6d6787c">Q131: What is global load balancing pattern?</h3>
+<div class="outline-text-3" id="text-org6d6787c">
 <p>
 Geo/latency-based DNS or global LB distributing across regional ingress endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org6204b60" class="outline-3">
-<h3 id="org6204b60">Q132: What is active-active ingress strategy?</h3>
-<div class="outline-text-3" id="text-org6204b60">
+<div id="outline-container-org6c735f3" class="outline-3">
+<h3 id="org6c735f3">Q132: What is active-active ingress strategy?</h3>
+<div class="outline-text-3" id="text-org6c735f3">
 <p>
 Serve traffic from multiple regions simultaneously for resilience/performance.
 </p>
 </div>
 </div>
-<div id="outline-container-org25892bb" class="outline-3">
-<h3 id="org25892bb">Q133: What is active-passive strategy?</h3>
-<div class="outline-text-3" id="text-org25892bb">
+<div id="outline-container-org8feb1b3" class="outline-3">
+<h3 id="org8feb1b3">Q133: What is active-passive strategy?</h3>
+<div class="outline-text-3" id="text-org8feb1b3">
 <p>
 Primary region serves traffic, failover to secondary on outage.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c2485f" class="outline-3">
-<h3 id="org6c2485f">Q134: What is failover challenge with ingress?</h3>
-<div class="outline-text-3" id="text-org6c2485f">
+<div id="outline-container-orgc35d5b3" class="outline-3">
+<h3 id="orgc35d5b3">Q134: What is failover challenge with ingress?</h3>
+<div class="outline-text-3" id="text-orgc35d5b3">
 <p>
 DNS TTL, session state, and certificate/key consistency.
 </p>
 </div>
 </div>
-<div id="outline-container-org4b2dd1c" class="outline-3">
-<h3 id="org4b2dd1c">Q135: What is zero-downtime ingress migration?</h3>
-<div class="outline-text-3" id="text-org4b2dd1c">
+<div id="outline-container-orgbb14284" class="outline-3">
+<h3 id="orgbb14284">Q135: What is zero-downtime ingress migration?</h3>
+<div class="outline-text-3" id="text-orgbb14284">
 <p>
 Gradual DNS/traffic shift with parallel controller operation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc94b8fe" class="outline-3">
-<h3 id="orgc94b8fe">Q136: What is gateway API relation to ingress?</h3>
-<div class="outline-text-3" id="text-orgc94b8fe">
+<div id="outline-container-orgd9e1f0a" class="outline-3">
+<h3 id="orgd9e1f0a">Q136: What is gateway API relation to ingress?</h3>
+<div class="outline-text-3" id="text-orgd9e1f0a">
 <p>
 Newer Kubernetes API model offering richer, role-oriented traffic management.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d293de" class="outline-3">
-<h3 id="org5d293de">Q137: Ingress vs Gateway API future view?</h3>
-<div class="outline-text-3" id="text-org5d293de">
+<div id="outline-container-org69d8418" class="outline-3">
+<h3 id="org69d8418">Q137: Ingress vs Gateway API future view?</h3>
+<div class="outline-text-3" id="text-org69d8418">
 <p>
 Ingress is simple/common; Gateway API provides more expressive extensible control.
 </p>
 </div>
 </div>
-<div id="outline-container-org2111f2a" class="outline-3">
-<h3 id="org2111f2a">Q138: What is service mesh relation to ingress?</h3>
-<div class="outline-text-3" id="text-org2111f2a">
+<div id="outline-container-org046a0d8" class="outline-3">
+<h3 id="org046a0d8">Q138: What is service mesh relation to ingress?</h3>
+<div class="outline-text-3" id="text-org046a0d8">
 <p>
 Ingress handles north-south edge; mesh handles east-west and advanced traffic policy.
 </p>
 </div>
 </div>
-<div id="outline-container-org0cf2d78" class="outline-3">
-<h3 id="org0cf2d78">Q139: Edge + mesh integration benefit?</h3>
-<div class="outline-text-3" id="text-org0cf2d78">
+<div id="outline-container-org6fb4bd2" class="outline-3">
+<h3 id="org6fb4bd2">Q139: Edge + mesh integration benefit?</h3>
+<div class="outline-text-3" id="text-org6fb4bd2">
 <p>
 Consistent security/telemetry/policy across external and internal traffic paths.
 </p>
 </div>
 </div>
-<div id="outline-container-org67aa586" class="outline-3">
-<h3 id="org67aa586">Q140: What is advanced WAF strategy?</h3>
-<div class="outline-text-3" id="text-org67aa586">
+<div id="outline-container-orga9ca9b1" class="outline-3">
+<h3 id="orga9ca9b1">Q140: What is advanced WAF strategy?</h3>
+<div class="outline-text-3" id="text-orga9ca9b1">
 <p>
 Risk-based managed rules + custom signatures + false-positive tuning lifecycle.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc05eeb3" class="outline-3">
-<h3 id="orgc05eeb3">Q141: What is bot management at edge?</h3>
-<div class="outline-text-3" id="text-orgc05eeb3">
+<div id="outline-container-orgcf862b1" class="outline-3">
+<h3 id="orgcf862b1">Q141: What is bot management at edge?</h3>
+<div class="outline-text-3" id="text-orgcf862b1">
 <p>
 Detect/challenge/block abusive automated traffic patterns.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb8d6adb" class="outline-3">
-<h3 id="orgb8d6adb">Q142: What is API security gateway pattern?</h3>
-<div class="outline-text-3" id="text-orgb8d6adb">
+<div id="outline-container-org907d65d" class="outline-3">
+<h3 id="org907d65d">Q142: What is API security gateway pattern?</h3>
+<div class="outline-text-3" id="text-org907d65d">
 <p>
 JWT validation, schema enforcement, rate plans, and auth at ingress edge.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfbd4f4f" class="outline-3">
-<h3 id="orgfbd4f4f">Q143: What is TLS policy hardening?</h3>
-<div class="outline-text-3" id="text-orgfbd4f4f">
+<div id="outline-container-org7db816b" class="outline-3">
+<h3 id="org7db816b">Q143: What is TLS policy hardening?</h3>
+<div class="outline-text-3" id="text-org7db816b">
 <p>
 Modern cipher suites, protocol minimums, HSTS, perfect forward secrecy posture.
 </p>
 </div>
 </div>
-<div id="outline-container-org298c98e" class="outline-3">
-<h3 id="org298c98e">Q144: What is certificate key custody concern?</h3>
-<div class="outline-text-3" id="text-org298c98e">
+<div id="outline-container-orga82e109" class="outline-3">
+<h3 id="orga82e109">Q144: What is certificate key custody concern?</h3>
+<div class="outline-text-3" id="text-orga82e109">
 <p>
 Protect private keys with strict secret management and rotation controls.
 </p>
 </div>
 </div>
-<div id="outline-container-org42a53c2" class="outline-3">
-<h3 id="org42a53c2">Q145: What is secret distribution risk in ingress?</h3>
-<div class="outline-text-3" id="text-org42a53c2">
+<div id="outline-container-orgb644555" class="outline-3">
+<h3 id="orgb644555">Q145: What is secret distribution risk in ingress?</h3>
+<div class="outline-text-3" id="text-orgb644555">
 <p>
 Compromised TLS secrets can expose multiple domains/services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe96341" class="outline-3">
-<h3 id="orgbe96341">Q146: Mitigation for TLS secret risk?</h3>
-<div class="outline-text-3" id="text-orgbe96341">
+<div id="outline-container-org9a4f3e9" class="outline-3">
+<h3 id="org9a4f3e9">Q146: Mitigation for TLS secret risk?</h3>
+<div class="outline-text-3" id="text-org9a4f3e9">
 <p>
 Scoped secrets, short-lived certs, automated rotation, strong RBAC.
 </p>
 </div>
 </div>
-<div id="outline-container-orge134f24" class="outline-3">
-<h3 id="orge134f24">Q147: What is supply-chain risk for ingress controllers?</h3>
-<div class="outline-text-3" id="text-orge134f24">
+<div id="outline-container-org948b29e" class="outline-3">
+<h3 id="org948b29e">Q147: What is supply-chain risk for ingress controllers?</h3>
+<div class="outline-text-3" id="text-org948b29e">
 <p>
 Compromised controller images/charts affect entire traffic edge.
 </p>
 </div>
 </div>
-<div id="outline-container-org3764cc3" class="outline-3">
-<h3 id="org3764cc3">Q148: Supply-chain mitigation?</h3>
-<div class="outline-text-3" id="text-org3764cc3">
+<div id="outline-container-org80645b1" class="outline-3">
+<h3 id="org80645b1">Q148: Supply-chain mitigation?</h3>
+<div class="outline-text-3" id="text-org80645b1">
 <p>
 Signed images, trusted registries, SBOM scanning, rapid patch cadence.
 </p>
 </div>
 </div>
-<div id="outline-container-orge3dfb30" class="outline-3">
-<h3 id="orge3dfb30">Q149: What is noisy-neighbor issue in shared ingress?</h3>
-<div class="outline-text-3" id="text-orge3dfb30">
+<div id="outline-container-orgf644684" class="outline-3">
+<h3 id="orgf644684">Q149: What is noisy-neighbor issue in shared ingress?</h3>
+<div class="outline-text-3" id="text-orgf644684">
 <p>
 One tenant’s traffic spikes degrade others on same controller.
 </p>
 </div>
 </div>
-<div id="outline-container-org7eed770" class="outline-3">
-<h3 id="org7eed770">Q150: Mitigation for noisy neighbors?</h3>
-<div class="outline-text-3" id="text-org7eed770">
+<div id="outline-container-org7e102fc" class="outline-3">
+<h3 id="org7e102fc">Q150: Mitigation for noisy neighbors?</h3>
+<div class="outline-text-3" id="text-org7e102fc">
 <p>
 Resource isolation, rate limits, dedicated controllers, autoscaling.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba905ad" class="outline-3">
-<h3 id="orgba905ad">Q151: What is autoscaling signal for ingress controllers?</h3>
-<div class="outline-text-3" id="text-orgba905ad">
+<div id="outline-container-org7ea1298" class="outline-3">
+<h3 id="org7ea1298">Q151: What is autoscaling signal for ingress controllers?</h3>
+<div class="outline-text-3" id="text-org7ea1298">
 <p>
 CPU/memory plus request rate/latency/connection metrics.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf81a38b" class="outline-3">
-<h3 id="orgf81a38b">Q152: What is benchmarking requirement for edge changes?</h3>
-<div class="outline-text-3" id="text-orgf81a38b">
+<div id="outline-container-orgc880da6" class="outline-3">
+<h3 id="orgc880da6">Q152: What is benchmarking requirement for edge changes?</h3>
+<div class="outline-text-3" id="text-orgc880da6">
 <p>
 Load-test config/controller versions before production rollout.
 </p>
 </div>
 </div>
-<div id="outline-container-org38f1b1d" class="outline-3">
-<h3 id="org38f1b1d">Q153: What is config drift at edge?</h3>
-<div class="outline-text-3" id="text-org38f1b1d">
+<div id="outline-container-orgaf8634d" class="outline-3">
+<h3 id="orgaf8634d">Q153: What is config drift at edge?</h3>
+<div class="outline-text-3" id="text-orgaf8634d">
 <p>
 Live controller behavior diverges from declared manifests/policies.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a325b1" class="outline-3">
-<h3 id="org9a325b1">Q154: Drift mitigation?</h3>
-<div class="outline-text-3" id="text-org9a325b1">
+<div id="outline-container-orgefa411b" class="outline-3">
+<h3 id="orgefa411b">Q154: Drift mitigation?</h3>
+<div class="outline-text-3" id="text-orgefa411b">
 <p>
 GitOps reconciliation, policy enforcement, restricted manual changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org7a0fb55" class="outline-3">
-<h3 id="org7a0fb55">Q155: What is policy-as-code for ingress?</h3>
-<div class="outline-text-3" id="text-org7a0fb55">
+<div id="outline-container-orgaa03f20" class="outline-3">
+<h3 id="orgaa03f20">Q155: What is policy-as-code for ingress?</h3>
+<div class="outline-text-3" id="text-orgaa03f20">
 <p>
 Admission controls enforcing TLS, host naming, annotation allowlists.
 </p>
 </div>
 </div>
-<div id="outline-container-org8342b0d" class="outline-3">
-<h3 id="org8342b0d">Q156: Why annotation allowlists?</h3>
-<div class="outline-text-3" id="text-org8342b0d">
+<div id="outline-container-orgeade27d" class="outline-3">
+<h3 id="orgeade27d">Q156: Why annotation allowlists?</h3>
+<div class="outline-text-3" id="text-orgeade27d">
 <p>
 Prevent dangerous controller features from broad tenant usage.
 </p>
 </div>
 </div>
-<div id="outline-container-org54dde33" class="outline-3">
-<h3 id="org54dde33">Q157: What is SLO model for ingress platform?</h3>
-<div class="outline-text-3" id="text-org54dde33">
+<div id="outline-container-orgc241cb3" class="outline-3">
+<h3 id="orgc241cb3">Q157: What is SLO model for ingress platform?</h3>
+<div class="outline-text-3" id="text-orgc241cb3">
 <p>
 Availability, latency, and error-rate objectives for edge traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf066ef6" class="outline-3">
-<h3 id="orgf066ef6">Q158: What is error budget use at edge?</h3>
-<div class="outline-text-3" id="text-orgf066ef6">
+<div id="outline-container-org499b931" class="outline-3">
+<h3 id="org499b931">Q158: What is error budget use at edge?</h3>
+<div class="outline-text-3" id="text-org499b931">
 <p>
 Guide release pace and risk decisions for ingress/controller changes.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc33ab4" class="outline-3">
-<h3 id="orgbc33ab4">Q159: What is chaos testing for ingress?</h3>
-<div class="outline-text-3" id="text-orgbc33ab4">
+<div id="outline-container-orgc63e348" class="outline-3">
+<h3 id="orgc63e348">Q159: What is chaos testing for ingress?</h3>
+<div class="outline-text-3" id="text-orgc63e348">
 <p>
 Inject controller/node/LB faults to validate resilience and failover.
 </p>
 </div>
 </div>
-<div id="outline-container-org94a30c2" class="outline-3">
-<h3 id="org94a30c2">Q160: Why chaos tests matter?</h3>
-<div class="outline-text-3" id="text-org94a30c2">
+<div id="outline-container-org2b6a4d8" class="outline-3">
+<h3 id="org2b6a4d8">Q160: Why chaos tests matter?</h3>
+<div class="outline-text-3" id="text-org2b6a4d8">
 <p>
 Expose hidden dependencies before real incidents.
 </p>
 </div>
 </div>
-<div id="outline-container-org74a6755" class="outline-3">
-<h3 id="org74a6755">Q161: What is disaster recovery for ingress layer?</h3>
-<div class="outline-text-3" id="text-org74a6755">
+<div id="outline-container-orgf003613" class="outline-3">
+<h3 id="orgf003613">Q161: What is disaster recovery for ingress layer?</h3>
+<div class="outline-text-3" id="text-orgf003613">
 <p>
 Rebuild controllers, restore configs/secrets, and validate DNS/LB paths quickly.
 </p>
 </div>
 </div>
-<div id="outline-container-orga63f15b" class="outline-3">
-<h3 id="orga63f15b">Q162: Why rehearse ingress DR?</h3>
-<div class="outline-text-3" id="text-orga63f15b">
+<div id="outline-container-org53b3083" class="outline-3">
+<h3 id="org53b3083">Q162: Why rehearse ingress DR?</h3>
+<div class="outline-text-3" id="text-org53b3083">
 <p>
 Edge failures have immediate customer impact.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf2d0fa3" class="outline-3">
-<h3 id="orgf2d0fa3">Q163: What is compliance evidence for ingress operations?</h3>
-<div class="outline-text-3" id="text-orgf2d0fa3">
+<div id="outline-container-org6af76fb" class="outline-3">
+<h3 id="org6af76fb">Q163: What is compliance evidence for ingress operations?</h3>
+<div class="outline-text-3" id="text-org6af76fb">
 <p>
 Audit trails of exposure changes, cert rotations, and access controls.
 </p>
 </div>
 </div>
-<div id="outline-container-org71d276d" class="outline-3">
-<h3 id="org71d276d">Q164: What is segregation of duties pattern?</h3>
-<div class="outline-text-3" id="text-org71d276d">
+<div id="outline-container-orgfa4fc68" class="outline-3">
+<h3 id="orgfa4fc68">Q164: What is segregation of duties pattern?</h3>
+<div class="outline-text-3" id="text-orgfa4fc68">
 <p>
 Platform manages edge policy; app teams manage bounded route definitions.
 </p>
 </div>
 </div>
-<div id="outline-container-org4cb5283" class="outline-3">
-<h3 id="org4cb5283">Q165: What is advanced anti-pattern?</h3>
-<div class="outline-text-3" id="text-org4cb5283">
+<div id="outline-container-org9624699" class="outline-3">
+<h3 id="org9624699">Q165: What is advanced anti-pattern?</h3>
+<div class="outline-text-3" id="text-org9624699">
 <p>
 Treating ingress as static “set once” config without lifecycle ownership.
 </p>
 </div>
 </div>
-<div id="outline-container-org57090de" class="outline-3">
-<h3 id="org57090de">Q166: Better operating model?</h3>
-<div class="outline-text-3" id="text-org57090de">
+<div id="outline-container-org474696e" class="outline-3">
+<h3 id="org474696e">Q166: Better operating model?</h3>
+<div class="outline-text-3" id="text-org474696e">
 <p>
 Ingress as product: versioned standards, SLOs, and on-call ownership.
 </p>
 </div>
 </div>
-<div id="outline-container-org55ae675" class="outline-3">
-<h3 id="org55ae675">Q167: What is final reliability principle?</h3>
-<div class="outline-text-3" id="text-org55ae675">
+<div id="outline-container-orge9b8639" class="outline-3">
+<h3 id="orge9b8639">Q167: What is final reliability principle?</h3>
+<div class="outline-text-3" id="text-orge9b8639">
 <p>
 Edge routing must remain resilient during backend and infrastructure failures.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd4aab96" class="outline-3">
-<h3 id="orgd4aab96">Q168: What is final security principle?</h3>
-<div class="outline-text-3" id="text-orgd4aab96">
+<div id="outline-container-org83fa2e1" class="outline-3">
+<h3 id="org83fa2e1">Q168: What is final security principle?</h3>
+<div class="outline-text-3" id="text-org83fa2e1">
 <p>
 Default-deny exposure, strong TLS/auth, and strict policy governance.
 </p>
 </div>
 </div>
-<div id="outline-container-org446c422" class="outline-3">
-<h3 id="org446c422">Q169: What is final governance principle?</h3>
-<div class="outline-text-3" id="text-org446c422">
+<div id="outline-container-orgfa2e4de" class="outline-3">
+<h3 id="orgfa2e4de">Q169: What is final governance principle?</h3>
+<div class="outline-text-3" id="text-orgfa2e4de">
 <p>
 Standardize ingress patterns and enforce them automatically.
 </p>
 </div>
 </div>
-<div id="outline-container-org2a3e9ba" class="outline-3">
-<h3 id="org2a3e9ba">Q170: What is final architecture principle?</h3>
-<div class="outline-text-3" id="text-org2a3e9ba">
+<div id="outline-container-org42c0b7e" class="outline-3">
+<h3 id="org42c0b7e">Q170: What is final architecture principle?</h3>
+<div class="outline-text-3" id="text-org42c0b7e">
 <p>
 Segment edge planes by risk, tenancy, and performance profile.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc36431e" class="outline-3">
-<h3 id="orgc36431e">Q171: What is final operations principle?</h3>
-<div class="outline-text-3" id="text-orgc36431e">
+<div id="outline-container-org5257c63" class="outline-3">
+<h3 id="org5257c63">Q171: What is final operations principle?</h3>
+<div class="outline-text-3" id="text-org5257c63">
 <p>
 Continuously test upgrades, failover, and rollback paths.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd0c2c0c" class="outline-3">
-<h3 id="orgd0c2c0c">Q172: What is final collaboration principle?</h3>
-<div class="outline-text-3" id="text-orgd0c2c0c">
+<div id="outline-container-org41ae7ad" class="outline-3">
+<h3 id="org41ae7ad">Q172: What is final collaboration principle?</h3>
+<div class="outline-text-3" id="text-org41ae7ad">
 <p>
 Platform and app teams share responsibility through clear contracts.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfac307a" class="outline-3">
-<h3 id="orgfac307a">Q173: What is final scaling principle?</h3>
-<div class="outline-text-3" id="text-orgfac307a">
+<div id="outline-container-org0b29923" class="outline-3">
+<h3 id="org0b29923">Q173: What is final scaling principle?</h3>
+<div class="outline-text-3" id="text-org0b29923">
 <p>
 Scale data plane independently and isolate high-risk/high-load tenants.
 </p>
 </div>
 </div>
-<div id="outline-container-org6d401d1" class="outline-3">
-<h3 id="org6d401d1">Q174: What is final compliance principle?</h3>
-<div class="outline-text-3" id="text-org6d401d1">
+<div id="outline-container-orgfb3eda8" class="outline-3">
+<h3 id="orgfb3eda8">Q174: What is final compliance principle?</h3>
+<div class="outline-text-3" id="text-orgfb3eda8">
 <p>
 Maintain auditable records for all external exposure changes.
 </p>
 </div>
 </div>
-<div id="outline-container-org598386e" class="outline-3">
-<h3 id="org598386e">Q175: What is final performance principle?</h3>
-<div class="outline-text-3" id="text-org598386e">
+<div id="outline-container-org4a47282" class="outline-3">
+<h3 id="org4a47282">Q175: What is final performance principle?</h3>
+<div class="outline-text-3" id="text-org4a47282">
 <p>
 Tune and benchmark edge configs with real traffic characteristics.
 </p>
 </div>
 </div>
-<div id="outline-container-orge0ccd20" class="outline-3">
-<h3 id="orge0ccd20">Q176: What is final trust principle?</h3>
-<div class="outline-text-3" id="text-orge0ccd20">
+<div id="outline-container-org011a58a" class="outline-3">
+<h3 id="org011a58a">Q176: What is final trust principle?</h3>
+<div class="outline-text-3" id="text-org011a58a">
 <p>
 Minimize privileged ingress features and verify all identity signals.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd298c94" class="outline-3">
-<h3 id="orgd298c94">Q177: What is final resilience principle?</h3>
-<div class="outline-text-3" id="text-orgd298c94">
+<div id="outline-container-org38043de" class="outline-3">
+<h3 id="org38043de">Q177: What is final resilience principle?</h3>
+<div class="outline-text-3" id="text-org38043de">
 <p>
 Design for regional/LB/controller failure without total outage.
 </p>
 </div>
 </div>
-<div id="outline-container-org40ef467" class="outline-3">
-<h3 id="org40ef467">Q178: What is final strategy principle?</h3>
-<div class="outline-text-3" id="text-org40ef467">
+<div id="outline-container-org51d2ce2" class="outline-3">
+<h3 id="org51d2ce2">Q178: What is final strategy principle?</h3>
+<div class="outline-text-3" id="text-org51d2ce2">
 <p>
 Adopt Gateway API/service mesh where complexity justifies capability gains.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc5e9f3a" class="outline-3">
-<h3 id="orgc5e9f3a">Q179: What is final product principle?</h3>
-<div class="outline-text-3" id="text-orgc5e9f3a">
+<div id="outline-container-org2ab096e" class="outline-3">
+<h3 id="org2ab096e">Q179: What is final product principle?</h3>
+<div class="outline-text-3" id="text-org2ab096e">
 <p>
 Measure ingress platform success by user latency, availability, and safe change velocity.
 </p>
 </div>
 </div>
-<div id="outline-container-org34e343d" class="outline-3">
-<h3 id="org34e343d">Q180: Final maturity principle?</h3>
-<div class="outline-text-3" id="text-org34e343d">
+<div id="outline-container-org0e6b061" class="outline-3">
+<h3 id="org0e6b061">Q180: Final maturity principle?</h3>
+<div class="outline-text-3" id="text-org0e6b061">
 <p>
 Ingress excellence is secure, observable, and governable edge traffic engineering at scale.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orga4a4bb9" class="outline-2">
-<h2 id="orga4a4bb9">Bonus: Minimal Ingress Example (Conceptual)</h2>
-<div class="outline-text-2" id="text-orga4a4bb9">
+<div id="outline-container-org830e59d" class="outline-2">
+<h2 id="org830e59d">Bonus: Minimal Ingress Example (Conceptual)</h2>
+<div class="outline-text-2" id="text-org830e59d">
 <div class="org-src-container">
 <pre class="src src-yaml"><code>apiVersion: networking.k8s.io/v1
 kind: Ingress
