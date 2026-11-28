@@ -23,1621 +23,2836 @@
     <a href="/about.html">Bio</a>
   </nav>
 </div>
-<div id="outline-container-orgff12d04" class="outline-2">
-<h2 id="orgff12d04">Kubernetes NetworkPolicy</h2>
-<div class="outline-text-2" id="text-orgff12d04">
+<div id="outline-container-org23c9bf9" class="outline-2">
+<h2 id="org23c9bf9">Kubernetes NetworkPolicy</h2>
+<div class="outline-text-2" id="text-org23c9bf9">
+<ul class="org-ul">
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/">Kubernetes NetworkPolicy Documentation</a></li>
+</ul>
 <hr>
 </div>
 </div>
-<div id="outline-container-org6075762" class="outline-2">
-<h2 id="org6075762">Beginner</h2>
-<div class="outline-text-2" id="text-org6075762">
+<div id="outline-container-orgdc889e0" class="outline-2">
+<h2 id="orgdc889e0">Kubernetes NetworkPolicy Command Handbook:</h2>
+<div class="outline-text-2" id="text-orgdc889e0">
+<p>
+<b>1. Kubernetes &amp; kubectl Installation and Configuration</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check kubectl version
+</span>kubectl version --client
+kubectl version
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Kubernetes cluster information
+</span>kubectl cluster-info
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check cluster nodes
+</span>kubectl get nodes
+kubectl get nodes -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check current context
+</span>kubectl config current-context
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List available contexts
+</span>kubectl config get-contexts
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Switch Kubernetes context
+</span>kubectl config use-context my-cluster
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check API resources
+</span>kubectl api-resources | grep networkpolicy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check NetworkPolicy API version
+</span>kubectl explain networkpolicy
+kubectl explain networkpolicy.spec
+
+</code></pre>
 </div>
-<div id="outline-container-org85384be" class="outline-3">
-<h3 id="org85384be">Q1: What is a Kubernetes NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org85384be">
+
+<p>
+<b>2. Namespace Management</b>
+</p>
+
+<p>
+Namespaces provide logical boundaries for workloads and NetworkPolicies.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List namespaces
+</span>kubectl get namespaces
+kubectl get ns
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create namespace
+</span>kubectl create namespace production
+kubectl create namespace staging
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe namespace
+</span>kubectl describe namespace production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label namespace
+</span>kubectl label namespace production <span style="font-weight: bold; font-style: italic;">environment</span>=prod
+kubectl label namespace staging <span style="font-weight: bold; font-style: italic;">environment</span>=staging
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display namespace labels
+</span>kubectl get namespaces --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Filter namespaces by label
+</span>kubectl get namespaces -l <span style="font-weight: bold; font-style: italic;">environment</span>=prod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove namespace label
+</span>kubectl label namespace production environment-
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set default namespace for current context
+</span>kubectl config set-context --current --namespace=production
+
+</code></pre>
+</div>
+
+<p>
+<b>3. Pod Discovery &amp; Label Management</b>
+</p>
+
+<p>
+NetworkPolicies select Pods using labels. Always verify the actual Pod labels before creating policies.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Pods
+</span>kubectl get pods
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List Pods across all namespaces
+</span>kubectl get pods -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Pod labels
+</span>kubectl get pods --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Pods with additional details
+</span>kubectl get pods -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Filter Pods by label
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=frontend
+kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=backend
+kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=database
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display labels in custom columns
+</span>kubectl get pods <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,LABELS:.metadata.labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add label to a Pod
+</span>kubectl label pod frontend-abc123 <span style="font-weight: bold; font-style: italic;">app</span>=frontend
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Update an existing label
+</span>kubectl label pod frontend-abc123 <span style="font-weight: bold; font-style: italic;">app</span>=frontend --overwrite
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove label
+</span>kubectl label pod frontend-abc123 app-
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Pod YAML
+</span>kubectl get pod frontend-abc123 -o yaml
+
+</code></pre>
+</div>
+
+<p>
+<b>4. NetworkPolicy Discovery &amp; Inspection</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List NetworkPolicies in current namespace
+</span>kubectl get networkpolicy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Short command
+</span>kubectl get netpol
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List NetworkPolicies across all namespaces
+</span>kubectl get networkpolicy -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display detailed NetworkPolicy information
+</span>kubectl describe networkpolicy my-policy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display NetworkPolicy YAML
+</span>kubectl get networkpolicy my-policy -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display NetworkPolicy names
+</span>kubectl get networkpolicy <span style="font-style: italic;">\</span>
+  -o custom-columns=NAME:.metadata.name,NAMESPACE:.metadata.namespace
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Filter NetworkPolicies by namespace
+</span>kubectl get networkpolicy -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Watch NetworkPolicy changes
+</span>kubectl get networkpolicy -w
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check available NetworkPolicy API resources
+</span>kubectl api-resources | grep -i networkpolicy
+
+</code></pre>
+</div>
+
+<p>
+<b>5. Creating &amp; Applying NetworkPolicies</b>
+</p>
+
+<p>
+NetworkPolicies are defined using Kubernetes YAML manifests.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply a NetworkPolicy manifest
+</span>kubectl apply -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply all YAML files in a directory
+</span>kubectl apply -f ./network-policies/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply policies from a URL
+</span>kubectl apply -f https://example.com/network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate manifest without applying changes
+</span>kubectl apply --dry-run=server -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display changes before applying
+</span>kubectl diff -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create a NetworkPolicy declaratively
+</span>kubectl create -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Reapply updated configuration
+</span>kubectl apply -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply policy in a specific namespace
+</span>kubectl apply -n production -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a NetworkPolicy manifest
+</span>kubectl delete -f network-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a specific NetworkPolicy
+</span>kubectl delete networkpolicy my-policy
+
+</code></pre>
+</div>
+
+
+<p>
+<b>6. Default Deny NetworkPolicies</b>
+</p>
+
+<p>
+Default-deny policies are commonly used to implement zero-trust network segmentation.
+</p>
+
+<p>
+Deny all ingress traffic:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+
+</code></pre>
+</div>
+
+
+<p>
+Deny all egress traffic:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-egress
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+
+</code></pre>
+</div>
+
+<p>
+Deny all ingress and egress traffic:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply default-deny policies
+</span>kubectl apply -f default-deny-ingress.yaml
+kubectl apply -f default-deny-egress.yaml
+kubectl apply -f default-deny-all.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect default-deny policies
+</span>kubectl get networkpolicy -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe default-deny policy
+</span>kubectl describe networkpolicy default-deny-all -n production
+
+</code></pre>
+</div>
+
+<p>
+Note: Default-deny egress also blocks DNS unless a separate DNS allow policy is configured. Apply these policies carefully to avoid disrupting existing workloads.
+</p>
+
+<p>
+<b>7. Allow Ingress Traffic</b>
+</p>
+
+<p>
+Ingress policies control which sources can connect to selected Pods.
+</p>
+
+<p>
+Allow traffic from frontend Pods to backend Pods:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-to-backend
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply ingress policy
+</span>kubectl apply -f allow-frontend-to-backend.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect ingress policy
+</span>kubectl describe networkpolicy allow-frontend-to-backend
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check selected backend Pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=backend
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check frontend Pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=frontend
+
+</code></pre>
+</div>
+
+<p>
+<b>8. Allow Egress Traffic</b>
+</p>
+
+<p>
+Egress policies control which destinations selected Pods can access.
+</p>
+
+<p>
+Allow backend Pods to access a database:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-backend-to-database
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: database
+      ports:
+        - protocol: TCP
+          port: 5432
+
+</code></pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply egress policy
+</span>kubectl apply -f allow-backend-to-database.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect egress policy
+</span>kubectl describe networkpolicy allow-backend-to-database
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check database Pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=database
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check backend Pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=backend
+
+</code></pre>
+</div>
+
+<p>
+<b>9. DNS Egress &amp; NetworkPolicy Configuration</b>
+</p>
+
+<p>
+DNS must be explicitly permitted when workloads are isolated for egress.
+A common CoreDNS configuration uses the k8s-app=kube-dns label in the kube-system namespace. Verify the actual labels in your cluster first.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find DNS Pods
+</span>kubectl get pods -n kube-system -l k8s-app=kube-dns
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect DNS services
+</span>kubectl get services -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display DNS Pod labels
+</span>kubectl get pods -n kube-system --show-labels
+
+</code></pre>
+</div>
+
+
+<p>
+Allow DNS traffic:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: production
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply DNS policy
+</span>kubectl apply -f allow-dns-egress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check DNS Pods
+</span>kubectl get pods -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check DNS service
+</span>kubectl get svc -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect DNS policy
+</span>kubectl describe networkpolicy allow-dns-egress
+
+</code></pre>
+</div>
+
+<p>
+Note: DNS Pod labels and DNS architecture can differ between clusters. Adjust the selectors to match your actual DNS deployment.
+</p>
+
+<p>
+<b>10. Namespace &amp; Pod Selector Configuration</b>
+</p>
+
+<p>
+Namespace selectors and Pod selectors allow policies to control communication across namespace boundaries.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label frontend namespace
+</span>kubectl label namespace frontend <span style="font-weight: bold; font-style: italic;">team</span>=frontend
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label backend namespace
+</span>kubectl label namespace backend <span style="font-weight: bold; font-style: italic;">team</span>=backend
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label database namespace
+</span>kubectl label namespace database <span style="font-weight: bold; font-style: italic;">team</span>=database
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Verify namespace labels
+</span>kubectl get namespaces --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find Pods by namespace
+</span>kubectl get pods -n frontend
+kubectl get pods -n backend
+kubectl get pods -n database
+
+</code></pre>
+</div>
+
+<p>
+Allow traffic from selected Pods in another namespace:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-namespace
+  namespace: backend
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              team: frontend
+          podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+
+</code></pre>
+</div>
+
+
+<p>
+Important: When namespaceSelector and podSelector are in the same list item, both conditions must match. Separate list items represent alternative allowed sources.
+</p>
+
+<p>
+<b>11. IPBlock &amp; CIDR Configuration</b>
+</p>
+
+<p>
+IPBlock allows traffic based on specified IP ranges.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-api
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 203.0.113.0/24
+            except:
+              - 203.0.113.128/25
+      ports:
+        - protocol: TCP
+          port: 443
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply IPBlock policy
+</span>kubectl apply -f allow-external-api.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect IPBlock policy
+</span>kubectl describe networkpolicy allow-external-api
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check policy configuration
+</span>kubectl get networkpolicy allow-external-api -o yaml
+
+</code></pre>
+</div>
+
+
+<p>
+Note: 203.0.113.0/24 is a documentation-only address range. Replace it with the actual external network range required by your application. IPBlock is generally intended for external IP ranges rather than dynamically assigned Pod IPs.
+</p>
+
+<p>
+<b>12. Multi-Tier Application NetworkPolicies</b>
+</p>
+
+<p>
+A common architecture separates frontend, backend, and database workloads.
+</p>
+
+<p>
+Example communication model:
+</p>
+<div class="org-src-container">
+<pre class="src src-text"><code>
+Internet
+   |
+   v
+Frontend (TCP 80 / 443)
+   |
+   v
+Backend (TCP 8080)
+   |
+   v
+Database (TCP 5432)
+
+</code></pre>
+</div>
+
+<p>
+Frontend ingress policy:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-ingress
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+
+</code></pre>
+</div>
+
+<p>
+Backend ingress policy:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-ingress
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 8080
+
+</code></pre>
+</div>
+
+<p>
+Database ingress policy:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-ingress
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: database
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: backend
+      ports:
+        - protocol: TCP
+          port: 5432
+
+</code></pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply application policies
+</span>kubectl apply -f frontend-ingress.yaml
+kubectl apply -f backend-ingress.yaml
+kubectl apply -f database-ingress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List application policies
+</span>kubectl get networkpolicy -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect all policies
+</span>kubectl describe networkpolicy -n production
+
+</code></pre>
+</div>
+
+<p>
+These are ingress rules only. In a default-deny egress environment, additional egress policies are required for frontend, backend, and database dependencies.
+</p>
+
+<p>
+<b>13. NetworkPolicy Testing &amp; Connectivity Validation</b>
+</p>
+
+<p>
+Testing is essential to verify that policies enforce the expected traffic restrictions.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create frontend test Pod
+</span>kubectl run frontend-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  --labels=<span style="font-style: italic;">"app=frontend"</span> <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- sleep 3600
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Create backend test Pod
+</span>kubectl run backend-test <span style="font-style: italic;">\</span>
+  --image=busybox:1.36 <span style="font-style: italic;">\</span>
+  --labels=<span style="font-style: italic;">"app=backend"</span> <span style="font-style: italic;">\</span>
+  --restart=Never <span style="font-style: italic;">\</span>
+  -- sleep 3600
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List test Pods
+</span>kubectl get pods --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test frontend-to-backend connectivity
+</span>kubectl exec frontend-test -- <span style="font-style: italic;">\</span>
+  wget -T 3 -qO- http://backend-service:8080
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test DNS resolution
+</span>kubectl exec frontend-test -- <span style="font-style: italic;">\</span>
+  nslookup backend-service
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Test TCP connectivity
+</span>kubectl exec frontend-test -- <span style="font-style: italic;">\</span>
+  nc -zvw 3 backend-service 8080
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect test Pod
+</span>kubectl describe pod frontend-test
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Remove test Pods
+</span>kubectl delete pod frontend-test backend-test
+
+</code></pre>
+</div>
+
+<p>
+Note: The test commands assume that the corresponding test images contain the required utilities and that backend-service exists.
+</p>
+
+<p>
+<b>14. NetworkPolicy Troubleshooting &amp; Debugging</b>
+</p>
+
+<p>
+Network connectivity failures may be caused by incorrect selectors, blocked ports, DNS restrictions, or unsupported CNI functionality.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List all NetworkPolicies
+</span>kubectl get networkpolicy -A
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Describe specific NetworkPolicy
+</span>kubectl describe networkpolicy my-policy -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display policy YAML
+</span>kubectl get networkpolicy my-policy -n production -o yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check selected Pods
+</span>kubectl get pods -l <span style="font-weight: bold; font-style: italic;">app</span>=backend -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display Pod labels
+</span>kubectl get pods -n production --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Pod events
+</span>kubectl describe pod backend-pod -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Pod logs
+</span>kubectl logs backend-pod -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check previous container logs
+</span>kubectl logs backend-pod -n production --previous
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Services
+</span>kubectl get services -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check Endpoints
+</span>kubectl get endpoints -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check EndpointSlices
+</span>kubectl get endpointslices -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check cluster events
+</span>kubectl get events -n production --sort-by=.metadata.creationTimestamp
+
+</code></pre>
+</div>
+
+<p>
+Remember: Kubernetes NetworkPolicy does not provide a built-in command that shows every dropped packet or policy decision. Use your CNI plugin's observability and logging capabilities for deeper investigation.
+</p>
+
+<p>
+<b>15. CNI Plugins &amp; NetworkPolicy Support</b>
+</p>
+
+<p>
+NetworkPolicy enforcement depends on the Container Network Interface (CNI) implementation.
+</p>
+
+<p>
+Common implementations include:
+</p>
+<ul class="org-ul">
+<li>Calico</li>
+<li>Cilium</li>
+<li>Antrea</li>
+<li>Kube-router</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check cluster nodes
+</span>kubectl get nodes -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">List system Pods
+</span>kubectl get pods -n kube-system -o wide
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Find CNI-related workloads
+</span>kubectl get pods -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect CNI DaemonSets
+</span>kubectl get daemonsets -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect CNI deployments
+</span>kubectl get deployments -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect CNI Pod logs
+</span>kubectl logs -n kube-system &lt;cni-pod-name&gt;
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect CNI Pod details
+</span>kubectl describe pod &lt;cni-pod-name&gt; -n kube-system
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Check NetworkPolicy API resources
+</span>kubectl api-resources | grep networkpolicy
+
+</code></pre>
+</div>
+
+<p>
+Note: Replace placeholders with the actual CNI workload names. A successful kubectl apply does not prove that the network plugin enforces the policy.
+</p>
+
+<p>
+<b>16. Advanced NetworkPolicy Rules &amp; Port Ranges</b>
+</p>
+
+<p>
+NetworkPolicies support TCP, UDP, and SCTP protocol definitions, subject to network plugin support.
+</p>
+
+<p>
+Allow a range of TCP ports:
+</p>
+<div class="org-src-container">
+<pre class="src src-yaml"><code>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-port-range
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8000
+          endPort: 8100
+
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply port range policy
+</span>kubectl apply -f allow-port-range.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect port range policy
+</span>kubectl describe networkpolicy allow-port-range
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Display YAML
+</span>kubectl get networkpolicy allow-port-range -o yaml
+
+</code></pre>
+</div>
+
+<p>
+endPort requires a numeric starting port and a numeric ending port greater than or equal to the starting port. Network plugin support should be verified.
+</p>
+
+
+<p>
+<b>17. NetworkPolicy Backup, Export &amp; Cleanup</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export all NetworkPolicies in current namespace
+</span>kubectl get networkpolicy -o yaml &gt; networkpolicies-backup.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export NetworkPolicies from a namespace
+</span>kubectl get networkpolicy -n production -o yaml <span style="font-style: italic;">\</span>
+  &gt; production-networkpolicies.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export a specific policy
+</span>kubectl get networkpolicy my-policy -o yaml <span style="font-style: italic;">\</span>
+  &gt; my-policy.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export policies from all namespaces
+</span>kubectl get networkpolicy -A -o yaml <span style="font-style: italic;">\</span>
+  &gt; all-networkpolicies.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a specific policy
+</span>kubectl delete networkpolicy my-policy
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete all NetworkPolicies in current namespace
+</span>kubectl delete networkpolicy --all
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete all policies from a namespace
+</span>kubectl delete networkpolicy --all -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Delete a policy using its manifest
+</span>kubectl delete -f network-policy.yaml
+
+</code></pre>
+</div>
+
+<p>
+Warning: Deleting default-deny policies can immediately restore unrestricted communication in the affected direction. Review the impact before cleanup.
+</p>
+
+<p>
+<b>18. Kubernetes NetworkPolicy CI/CD &amp; GitOps Workflows</b>
+</p>
+
+<p>
+NetworkPolicies should be managed as code and validated before production deployment.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validate YAML syntax and schema
+</span>kubectl apply --dry-run=server -f network-policies/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Preview changes
+</span>kubectl diff -f network-policies/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply policies to staging
+</span>kubectl apply -f network-policies/ -n staging
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Verify staging policies
+</span>kubectl get networkpolicy -n staging
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inspect applied configuration
+</span>kubectl describe networkpolicy -n staging
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Apply policies to production
+</span>kubectl apply -f network-policies/ -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Verify production policies
+</span>kubectl get networkpolicy -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Export production policy configuration
+</span>kubectl get networkpolicy -n production -o yaml
+
+</code></pre>
+</div>
+
+<p>
+Note: The namespace supplied with -n overrides namespaces specified in manifests for namespaced resources. Use separate environment-specific manifests or carefully controlled overlays when managing multiple environments.
+</p>
+
+<p>
+<b>19. Real-World NetworkPolicy Security Workflows</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A. Create production namespace
+</span>kubectl create namespace production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">B. Label application namespaces
+</span>kubectl label namespace production <span style="font-weight: bold; font-style: italic;">environment</span>=prod
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">C. Deploy default-deny policy
+</span>kubectl apply -f default-deny-all.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">D. Allow DNS traffic
+</span>kubectl apply -f allow-dns-egress.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">E. Allow frontend-to-backend communication
+</span>kubectl apply -f frontend-to-backend.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">F. Allow backend-to-database communication
+</span>kubectl apply -f backend-to-database.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">G. Inspect all policies
+</span>kubectl get networkpolicy -n production
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">H. Verify Pod labels
+</span>kubectl get pods -n production --show-labels
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">I. Test application connectivity
+</span>kubectl exec frontend-pod -n production -- <span style="font-style: italic;">\</span>
+  wget -T 3 -qO- http://backend-service:8080
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">J. Validate production configuration
+</span>kubectl diff -f network-policies/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">K. Export policy configuration
+</span>kubectl get networkpolicy -n production -o yaml <span style="font-style: italic;">\</span>
+  &gt; production-networkpolicies.yaml
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">L. Troubleshoot connectivity
+</span>kubectl describe networkpolicy -n production
+kubectl get events -n production
+
+</code></pre>
+</div>
+
+<p>
+<b>20. Commands Every Kubernetes NetworkPolicy Engineer Should Memorize</b>
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Command</td>
+<td class="org-left">Purpose</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get netpol</td>
+<td class="org-left">List NetworkPolicies</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get netpol -A</td>
+<td class="org-left">List policies across namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl describe netpol NAME</td>
+<td class="org-left">Inspect policy rules</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get netpol -o yaml</td>
+<td class="org-left">Export policy YAML</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl apply -f policy.yaml</td>
+<td class="org-left">Apply a policy</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl diff -f policy.yaml</td>
+<td class="org-left">Preview policy changes</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl delete netpol NAME</td>
+<td class="org-left">Delete a policy</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get pods &ndash;show-labels</td>
+<td class="org-left">Inspect Pod labels</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get ns &ndash;show-labels</td>
+<td class="org-left">Inspect namespace labels</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl label namespace NS KEY=VALUE</td>
+<td class="org-left">Label a namespace</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get pods -A</td>
+<td class="org-left">List Pods across namespaces</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get svc -A</td>
+<td class="org-left">List ServicesA</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get endpointslices -A</td>
+<td class="org-left">Inspect EndpointSlices</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl exec POD &ndash; nslookup SERVICE</td>
+<td class="org-left">Test DNS resolution</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl exec POD &ndash; nc -zvw 3 SERVICE PORT</td>
+<td class="org-left">Test TCP connectivity</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl logs POD -n kube-system</td>
+<td class="org-left">Inspect system Pod logs</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get events -A</td>
+<td class="org-left">Inspect cluster events</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl apply &ndash;dry-run=server -f policy.yaml</td>
+<td class="org-left">Validate policy against API server</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get networkpolicy -n production</td>
+<td class="org-left">Verify production policies</td>
+</tr>
+
+<tr>
+<td class="org-left">kubectl get networkpolicy -o yaml &gt; backup.yaml</td>
+<td class="org-left">Back up policies</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>21. Best Practices for Kubernetes NetworkPolicy &amp; DevSecOps</b>
+</p>
+
+<ol class="org-ol">
+<li>Start with default-deny ingress and egress policies where appropriate.</li>
+<li>Allow only explicitly required network communication.</li>
+<li>Always permit necessary DNS traffic when egress is restricted.</li>
+<li>Use consistent Pod labels and namespace labels.</li>
+<li>Apply least-privilege rules for application and database workloads.</li>
+<li>Restrict database access to authorized application Pods.</li>
+<li>Avoid unnecessary wildcard selectors and broad CIDR ranges.</li>
+<li>Validate NetworkPolicy support in your CNI plugin.</li>
+<li>Test connectivity before deploying policies to production.</li>
+<li>Use separate policies for ingress and egress where practical.</li>
+<li>Monitor network traffic and investigate unexpected connection failures.</li>
+<li>Keep NetworkPolicy manifests under version control.</li>
+<li>Use CI/CD validation before applying production policies.</li>
+<li>Review policies regularly as application dependencies change.</li>
+<li>Keep management and administrative ports private.</li>
+<li>Document required network paths between application tiers.</li>
+<li>Back up policies before making significant changes.</li>
+<li>Coordinate NetworkPolicy changes with ingress controllers and service infrastructure.</li>
+<li>Use CNI-specific observability tools for packet drops and policy debugging.</li>
+<li><p>
+Treat NetworkPolicies as one layer of defense, not a replacement for application security, authentication, or authorization.
+</p>
+
+<hr></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org9dadde9" class="outline-2">
+<h2 id="org9dadde9">Beginner</h2>
+<div class="outline-text-2" id="text-org9dadde9">
+</div>
+<div id="outline-container-org27d527e" class="outline-3">
+<h3 id="org27d527e">Q1: What is a Kubernetes NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org27d527e">
 <p>
 A NetworkPolicy is a Kubernetes resource that controls how Pods can communicate with each other and with network endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org2947530" class="outline-3">
-<h3 id="org2947530">Q2: Why do we need NetworkPolicies?</h3>
-<div class="outline-text-3" id="text-org2947530">
+<div id="outline-container-orge3f6fc1" class="outline-3">
+<h3 id="orge3f6fc1">Q2: Why do we need NetworkPolicies?</h3>
+<div class="outline-text-3" id="text-orge3f6fc1">
 <p>
 They provide network-level isolation and enforce who can talk to whom inside the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb18b1fe" class="outline-3">
-<h3 id="orgb18b1fe">Q3: What is network segmentation?</h3>
-<div class="outline-text-3" id="text-orgb18b1fe">
+<div id="outline-container-orgf50e4f0" class="outline-3">
+<h3 id="orgf50e4f0">Q3: What is network segmentation?</h3>
+<div class="outline-text-3" id="text-orgf50e4f0">
 <p>
 Network segmentation divides network traffic into trust zones or boundaries to reduce lateral movement.
 </p>
 </div>
 </div>
-<div id="outline-container-org3644fd3" class="outline-3">
-<h3 id="org3644fd3">Q4: Why is segmentation important?</h3>
-<div class="outline-text-3" id="text-org3644fd3">
+<div id="outline-container-org954c938" class="outline-3">
+<h3 id="org954c938">Q4: Why is segmentation important?</h3>
+<div class="outline-text-3" id="text-org954c938">
 <p>
 It helps restrict blast radius if a workload is compromised.
 </p>
 </div>
 </div>
-<div id="outline-container-org187bb71" class="outline-3">
-<h3 id="org187bb71">Q5: What is a Pod policy?</h3>
-<div class="outline-text-3" id="text-org187bb71">
+<div id="outline-container-org1cf80cb" class="outline-3">
+<h3 id="org1cf80cb">Q5: What is a Pod policy?</h3>
+<div class="outline-text-3" id="text-org1cf80cb">
 <p>
 A Pod policy defines network traffic rules for a set of Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org9d525fe" class="outline-3">
-<h3 id="org9d525fe">Q6: What are ingress rules?</h3>
-<div class="outline-text-3" id="text-org9d525fe">
+<div id="outline-container-orgfe45cd2" class="outline-3">
+<h3 id="orgfe45cd2">Q6: What are ingress rules?</h3>
+<div class="outline-text-3" id="text-orgfe45cd2">
 <p>
 Ingress rules define which connections are allowed into a Pod.
 </p>
 </div>
 </div>
-<div id="outline-container-org677e801" class="outline-3">
-<h3 id="org677e801">Q7: What are egress rules?</h3>
-<div class="outline-text-3" id="text-org677e801">
+<div id="outline-container-orgb331515" class="outline-3">
+<h3 id="orgb331515">Q7: What are egress rules?</h3>
+<div class="outline-text-3" id="text-orgb331515">
 <p>
 Egress rules define which connections a Pod is allowed to initiate outbound.
 </p>
 </div>
 </div>
-<div id="outline-container-org9c89326" class="outline-3">
-<h3 id="org9c89326">Q8: What is default-deny?</h3>
-<div class="outline-text-3" id="text-org9c89326">
+<div id="outline-container-org2427f78" class="outline-3">
+<h3 id="org2427f78">Q8: What is default-deny?</h3>
+<div class="outline-text-3" id="text-org2427f78">
 <p>
 Default-deny means no traffic is allowed unless a specific policy allows it.
 </p>
 </div>
 </div>
-<div id="outline-container-org5758946" class="outline-3">
-<h3 id="org5758946">Q9: Why is default-deny a common secure posture?</h3>
-<div class="outline-text-3" id="text-org5758946">
+<div id="outline-container-org78294e9" class="outline-3">
+<h3 id="org78294e9">Q9: Why is default-deny a common secure posture?</h3>
+<div class="outline-text-3" id="text-org78294e9">
 <p>
 It reduces accidental or malicious network access to a workload.
 </p>
 </div>
 </div>
-<div id="outline-container-org38841b0" class="outline-3">
-<h3 id="org38841b0">Q10: What does NetworkPolicy apply to?</h3>
-<div class="outline-text-3" id="text-org38841b0">
+<div id="outline-container-org98e150b" class="outline-3">
+<h3 id="org98e150b">Q10: What does NetworkPolicy apply to?</h3>
+<div class="outline-text-3" id="text-org98e150b">
 <p>
 A NetworkPolicy applies to Pods selected by labels and optional namespace selectors.
 </p>
 </div>
 </div>
-<div id="outline-container-org4fbee72" class="outline-3">
-<h3 id="org4fbee72">Q11: What is a `podSelector`?</h3>
-<div class="outline-text-3" id="text-org4fbee72">
+<div id="outline-container-org4aca0bf" class="outline-3">
+<h3 id="org4aca0bf">Q11: What is a `podSelector`?</h3>
+<div class="outline-text-3" id="text-org4aca0bf">
 <p>
 A `podSelector` selects the Pods that the policy applies to.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc6ce1f" class="outline-3">
-<h3 id="orgbc6ce1f">Q12: What is a `policyTypes` field?</h3>
-<div class="outline-text-3" id="text-orgbc6ce1f">
+<div id="outline-container-orgce1a891" class="outline-3">
+<h3 id="orgce1a891">Q12: What is a `policyTypes` field?</h3>
+<div class="outline-text-3" id="text-orgce1a891">
 <p>
 It defines whether the policy applies to ingress, egress, or both.
 </p>
 </div>
 </div>
-<div id="outline-container-org170d5b9" class="outline-3">
-<h3 id="org170d5b9">Q13: What is an ingress rule?</h3>
-<div class="outline-text-3" id="text-org170d5b9">
+<div id="outline-container-orgd7f2667" class="outline-3">
+<h3 id="orgd7f2667">Q13: What is an ingress rule?</h3>
+<div class="outline-text-3" id="text-orgd7f2667">
 <p>
 An ingress rule allows incoming connections to matching Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-org87be5d0" class="outline-3">
-<h3 id="org87be5d0">Q14: What is an egress rule?</h3>
-<div class="outline-text-3" id="text-org87be5d0">
+<div id="outline-container-org6ef2573" class="outline-3">
+<h3 id="org6ef2573">Q14: What is an egress rule?</h3>
+<div class="outline-text-3" id="text-org6ef2573">
 <p>
 An egress rule allows outgoing connections from matching Pods.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc90606" class="outline-3">
-<h3 id="orgbc90606">Q15: What are `from` rules?</h3>
-<div class="outline-text-3" id="text-orgbc90606">
+<div id="outline-container-org97015b9" class="outline-3">
+<h3 id="org97015b9">Q15: What are `from` rules?</h3>
+<div class="outline-text-3" id="text-org97015b9">
 <p>
 `from` rules specify who may connect to the selected Pods in ingress policies.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ceceff" class="outline-3">
-<h3 id="org7ceceff">Q16: What are `to` rules?</h3>
-<div class="outline-text-3" id="text-org7ceceff">
+<div id="outline-container-orga07f456" class="outline-3">
+<h3 id="orga07f456">Q16: What are `to` rules?</h3>
+<div class="outline-text-3" id="text-orga07f456">
 <p>
 `to` rules specify what destinations are allowed for egress traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc09a269" class="outline-3">
-<h3 id="orgc09a269">Q17: What is a namespace selector?</h3>
-<div class="outline-text-3" id="text-orgc09a269">
+<div id="outline-container-org9f3dc35" class="outline-3">
+<h3 id="org9f3dc35">Q17: What is a namespace selector?</h3>
+<div class="outline-text-3" id="text-org9f3dc35">
 <p>
 A namespace selector matches Pods in specific namespaces.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbb085f3" class="outline-3">
-<h3 id="orgbb085f3">Q18: What is a pod selector in a network policy?</h3>
-<div class="outline-text-3" id="text-orgbb085f3">
+<div id="outline-container-orgacc03bf" class="outline-3">
+<h3 id="orgacc03bf">Q18: What is a pod selector in a network policy?</h3>
+<div class="outline-text-3" id="text-orgacc03bf">
 <p>
 A pod selector can select specific workloads in the same or other namespaces.
 </p>
 </div>
 </div>
-<div id="outline-container-org87ff036" class="outline-3">
-<h3 id="org87ff036">Q19: What is an IPBlock?</h3>
-<div class="outline-text-3" id="text-org87ff036">
+<div id="outline-container-orgd41f658" class="outline-3">
+<h3 id="orgd41f658">Q19: What is an IPBlock?</h3>
+<div class="outline-text-3" id="text-orgd41f658">
 <p>
 An IPBlock allows or denies traffic to and from specific CIDR ranges.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc5ccaf0" class="outline-3">
-<h3 id="orgc5ccaf0">Q20: What is a CIDR?</h3>
-<div class="outline-text-3" id="text-orgc5ccaf0">
+<div id="outline-container-org1731658" class="outline-3">
+<h3 id="org1731658">Q20: What is a CIDR?</h3>
+<div class="outline-text-3" id="text-org1731658">
 <p>
 A CIDR is a network range such as 10.0.0.0/8 or 192.168.1.0/24.
 </p>
 </div>
 </div>
-<div id="outline-container-org762db02" class="outline-3">
-<h3 id="org762db02">Q21: Why use IPBlock?</h3>
-<div class="outline-text-3" id="text-org762db02">
+<div id="outline-container-orge1872dd" class="outline-3">
+<h3 id="orge1872dd">Q21: Why use IPBlock?</h3>
+<div class="outline-text-3" id="text-orge1872dd">
 <p>
 It allows policies to permit or deny traffic to known external networks or internal ranges.
 </p>
 </div>
 </div>
-<div id="outline-container-org808b709" class="outline-3">
-<h3 id="org808b709">Q22: What is a namespace + pod selector combination?</h3>
-<div class="outline-text-3" id="text-org808b709">
+<div id="outline-container-orgb2968ed" class="outline-3">
+<h3 id="orgb2968ed">Q22: What is a namespace + pod selector combination?</h3>
+<div class="outline-text-3" id="text-orgb2968ed">
 <p>
 It selects Pods in specific namespaces that match labels, useful for multi-tenant policies.
 </p>
 </div>
 </div>
-<div id="outline-container-org0be7c78" class="outline-3">
-<h3 id="org0be7c78">Q23: Why are NetworkPolicies namespaced?</h3>
-<div class="outline-text-3" id="text-org0be7c78">
+<div id="outline-container-org6308a32" class="outline-3">
+<h3 id="org6308a32">Q23: Why are NetworkPolicies namespaced?</h3>
+<div class="outline-text-3" id="text-org6308a32">
 <p>
 A NetworkPolicy is created in a namespace and applies only to Pods in that namespace unless cross-namespace selectors are used.
 </p>
 </div>
 </div>
-<div id="outline-container-org9aad7d3" class="outline-3">
-<h3 id="org9aad7d3">Q24: What is a Pod not selected by any policy?</h3>
-<div class="outline-text-3" id="text-org9aad7d3">
+<div id="outline-container-org0460b45" class="outline-3">
+<h3 id="org0460b45">Q24: What is a Pod not selected by any policy?</h3>
+<div class="outline-text-3" id="text-org0460b45">
 <p>
 If no policies apply, the default pod network behavior depends on the cluster CNI and default policy settings.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd5719d" class="outline-3">
-<h3 id="orgfd5719d">Q25: What is the default network behavior without NetworkPolicies?</h3>
-<div class="outline-text-3" id="text-orgfd5719d">
+<div id="outline-container-org3e8c81b" class="outline-3">
+<h3 id="org3e8c81b">Q25: What is the default network behavior without NetworkPolicies?</h3>
+<div class="outline-text-3" id="text-org3e8c81b">
 <p>
 Many clusters allow unrestricted pod-to-pod communication unless a CNI or security policy restricts it.
 </p>
 </div>
 </div>
-<div id="outline-container-orged614a4" class="outline-3">
-<h3 id="orged614a4">Q26: What is a CNI?</h3>
-<div class="outline-text-3" id="text-orged614a4">
+<div id="outline-container-org7ec1771" class="outline-3">
+<h3 id="org7ec1771">Q26: What is a CNI?</h3>
+<div class="outline-text-3" id="text-org7ec1771">
 <p>
 CNI (Container Network Interface) is the network plugin standard for Kubernetes networking.
 </p>
 </div>
 </div>
-<div id="outline-container-org948bebd" class="outline-3">
-<h3 id="org948bebd">Q27: Why does CNI matter for NetworkPolicies?</h3>
-<div class="outline-text-3" id="text-org948bebd">
+<div id="outline-container-orgdfdbcf0" class="outline-3">
+<h3 id="orgdfdbcf0">Q27: Why does CNI matter for NetworkPolicies?</h3>
+<div class="outline-text-3" id="text-orgdfdbcf0">
 <p>
 Because NetworkPolicy support depends on the CNI plugin implementing the policy enforcement.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdcf774e" class="outline-3">
-<h3 id="orgdcf774e">Q28: What is a network plugin with NetworkPolicy support?</h3>
-<div class="outline-text-3" id="text-orgdcf774e">
+<div id="outline-container-org8c79623" class="outline-3">
+<h3 id="org8c79623">Q28: What is a network plugin with NetworkPolicy support?</h3>
+<div class="outline-text-3" id="text-org8c79623">
 <p>
 Examples include Calico, Cilium, Antrea, and others.
 </p>
 </div>
 </div>
-<div id="outline-container-orge48ba51" class="outline-3">
-<h3 id="orge48ba51">Q29: What is an ingress allowlist?</h3>
-<div class="outline-text-3" id="text-orge48ba51">
+<div id="outline-container-org1c8dd2d" class="outline-3">
+<h3 id="org1c8dd2d">Q29: What is an ingress allowlist?</h3>
+<div class="outline-text-3" id="text-org1c8dd2d">
 <p>
 An ingress allowlist is a set of allowed sources for incoming traffic to a service or pod.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbcca418" class="outline-3">
-<h3 id="orgbcca418">Q30: What is an egress allowlist?</h3>
-<div class="outline-text-3" id="text-orgbcca418">
+<div id="outline-container-org861d8eb" class="outline-3">
+<h3 id="org861d8eb">Q30: What is an egress allowlist?</h3>
+<div class="outline-text-3" id="text-org861d8eb">
 <p>
 An egress allowlist is a set of allowed destinations for outbound traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf2cbf2b" class="outline-3">
-<h3 id="orgf2cbf2b">Q31: What is a default allow policy?</h3>
-<div class="outline-text-3" id="text-orgf2cbf2b">
+<div id="outline-container-org06265ff" class="outline-3">
+<h3 id="org06265ff">Q31: What is a default allow policy?</h3>
+<div class="outline-text-3" id="text-org06265ff">
 <p>
 A default allow policy allows traffic unless specifically denied by other rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org91c0ee8" class="outline-3">
-<h3 id="org91c0ee8">Q32: Why is default allow often discouraged?</h3>
-<div class="outline-text-3" id="text-org91c0ee8">
+<div id="outline-container-org3469880" class="outline-3">
+<h3 id="org3469880">Q32: Why is default allow often discouraged?</h3>
+<div class="outline-text-3" id="text-org3469880">
 <p>
 Because it exposes workloads to more network access than needed.
 </p>
 </div>
 </div>
-<div id="outline-container-orge651a77" class="outline-3">
-<h3 id="orge651a77">Q33: What is pod-to-pod communication?</h3>
-<div class="outline-text-3" id="text-orge651a77">
+<div id="outline-container-orgf8e5e1d" class="outline-3">
+<h3 id="orgf8e5e1d">Q33: What is pod-to-pod communication?</h3>
+<div class="outline-text-3" id="text-orgf8e5e1d">
 <p>
 Traffic between different Pods in the same or different namespaces.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaeadff6" class="outline-3">
-<h3 id="orgaeadff6">Q34: Why do security teams care about pod-to-pod communication?</h3>
-<div class="outline-text-3" id="text-orgaeadff6">
+<div id="outline-container-org9b38770" class="outline-3">
+<h3 id="org9b38770">Q34: Why do security teams care about pod-to-pod communication?</h3>
+<div class="outline-text-3" id="text-org9b38770">
 <p>
 Because compromised workloads can otherwise talk to many other workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org5d0c8fb" class="outline-3">
-<h3 id="org5d0c8fb">Q35: What is cluster egress?</h3>
-<div class="outline-text-3" id="text-org5d0c8fb">
+<div id="outline-container-org2ea3663" class="outline-3">
+<h3 id="org2ea3663">Q35: What is cluster egress?</h3>
+<div class="outline-text-3" id="text-org2ea3663">
 <p>
 Traffic leaving the cluster to external systems or services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd922162" class="outline-3">
-<h3 id="orgd922162">Q36: Why restrict cluster egress?</h3>
-<div class="outline-text-3" id="text-orgd922162">
+<div id="outline-container-orgc44ef33" class="outline-3">
+<h3 id="orgc44ef33">Q36: Why restrict cluster egress?</h3>
+<div class="outline-text-3" id="text-orgc44ef33">
 <p>
 Because it helps prevent data exfiltration or communication with malicious endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org781a400" class="outline-3">
-<h3 id="org781a400">Q37: What is cluster ingress?</h3>
-<div class="outline-text-3" id="text-org781a400">
+<div id="outline-container-org2b4f710" class="outline-3">
+<h3 id="org2b4f710">Q37: What is cluster ingress?</h3>
+<div class="outline-text-3" id="text-org2b4f710">
 <p>
 Traffic entering the cluster from outside or from another namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org94b0ec8" class="outline-3">
-<h3 id="org94b0ec8">Q38: Why restrict ingress?</h3>
-<div class="outline-text-3" id="text-org94b0ec8">
+<div id="outline-container-org0e5746a" class="outline-3">
+<h3 id="org0e5746a">Q38: Why restrict ingress?</h3>
+<div class="outline-text-3" id="text-org0e5746a">
 <p>
 Because the same principle applies: reduce the attack surface and lateral movement.
 </p>
 </div>
 </div>
-<div id="outline-container-org44a921a" class="outline-3">
-<h3 id="org44a921a">Q39: What is a network policy match label?</h3>
-<div class="outline-text-3" id="text-org44a921a">
+<div id="outline-container-orgc5aa185" class="outline-3">
+<h3 id="orgc5aa185">Q39: What is a network policy match label?</h3>
+<div class="outline-text-3" id="text-orgc5aa185">
 <p>
 A label is used to group Pods and match them to a NetworkPolicy.
 </p>
 </div>
 </div>
-<div id="outline-container-org38f7dad" class="outline-3">
-<h3 id="org38f7dad">Q40: What is a `namespaceSelector` match?</h3>
-<div class="outline-text-3" id="text-org38f7dad">
+<div id="outline-container-orgbd4ae35" class="outline-3">
+<h3 id="orgbd4ae35">Q40: What is a `namespaceSelector` match?</h3>
+<div class="outline-text-3" id="text-orgbd4ae35">
 <p>
 It selects Pods or namespaces by label rather than by exact namespace name.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfa6dcdf" class="outline-3">
-<h3 id="orgfa6dcdf">Q41: What is a `podSelector` match in the same namespace?</h3>
-<div class="outline-text-3" id="text-orgfa6dcdf">
+<div id="outline-container-orga9904a6" class="outline-3">
+<h3 id="orga9904a6">Q41: What is a `podSelector` match in the same namespace?</h3>
+<div class="outline-text-3" id="text-orga9904a6">
 <p>
 It selects pods in the same namespace as the policy.
 </p>
 </div>
 </div>
-<div id="outline-container-orgacde96d" class="outline-3">
-<h3 id="orgacde96d">Q42: What is a `podSelector` match in a different namespace?</h3>
-<div class="outline-text-3" id="text-orgacde96d">
+<div id="outline-container-org4b1b3e0" class="outline-3">
+<h3 id="org4b1b3e0">Q42: What is a `podSelector` match in a different namespace?</h3>
+<div class="outline-text-3" id="text-org4b1b3e0">
 <p>
 It can select Pods from other namespaces using a namespace selector and pod selector combination.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc253d46" class="outline-3">
-<h3 id="orgc253d46">Q43: What is a `ports` list in NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-orgc253d46">
+<div id="outline-container-orgad628e6" class="outline-3">
+<h3 id="orgad628e6">Q43: What is a `ports` list in NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-orgad628e6">
 <p>
 It lists the destination ports allowed by an ingress or egress rule.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2c3464" class="outline-3">
-<h3 id="orgc2c3464">Q44: Why list ports explicitly?</h3>
-<div class="outline-text-3" id="text-orgc2c3464">
+<div id="outline-container-orgc1d5aea" class="outline-3">
+<h3 id="orgc1d5aea">Q44: Why list ports explicitly?</h3>
+<div class="outline-text-3" id="text-orgc1d5aea">
 <p>
 Because policies should permit only the required ports and protocols.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf8c2b19" class="outline-3">
-<h3 id="orgf8c2b19">Q45: What is protocol in a NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-orgf8c2b19">
+<div id="outline-container-orgdc3521b" class="outline-3">
+<h3 id="orgdc3521b">Q45: What is protocol in a NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-orgdc3521b">
 <p>
 It is usually TCP, UDP, or SCTP.
 </p>
 </div>
 </div>
-<div id="outline-container-org1dd5bef" class="outline-3">
-<h3 id="org1dd5bef">Q46: Why are protocols important?</h3>
-<div class="outline-text-3" id="text-org1dd5bef">
+<div id="outline-container-org0578452" class="outline-3">
+<h3 id="org0578452">Q46: Why are protocols important?</h3>
+<div class="outline-text-3" id="text-org0578452">
 <p>
 Because a policy may allow HTTP on TCP but not UDP on the same port.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbbf2217" class="outline-3">
-<h3 id="orgbbf2217">Q47: Why might a workload need both ingress and egress policies?</h3>
-<div class="outline-text-3" id="text-orgbbf2217">
+<div id="outline-container-org5b91e9a" class="outline-3">
+<h3 id="org5b91e9a">Q47: Why might a workload need both ingress and egress policies?</h3>
+<div class="outline-text-3" id="text-org5b91e9a">
 <p>
 Because some apps must accept inbound traffic and also initiate outbound connections to dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org0765f26" class="outline-3">
-<h3 id="org0765f26">Q48: What is a database policy?</h3>
-<div class="outline-text-3" id="text-org0765f26">
+<div id="outline-container-orgb51fb11" class="outline-3">
+<h3 id="orgb51fb11">Q48: What is a database policy?</h3>
+<div class="outline-text-3" id="text-orgb51fb11">
 <p>
 A database policy may allow only the application tier to reach the database port.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb15cb2a" class="outline-3">
-<h3 id="orgb15cb2a">Q49: What is an application tier policy?</h3>
-<div class="outline-text-3" id="text-orgb15cb2a">
+<div id="outline-container-org11db3c5" class="outline-3">
+<h3 id="org11db3c5">Q49: What is an application tier policy?</h3>
+<div class="outline-text-3" id="text-org11db3c5">
 <p>
 It may allow inbound traffic only from the frontend or API tier.
 </p>
 </div>
 </div>
-<div id="outline-container-org6768a08" class="outline-3">
-<h3 id="org6768a08">Q50: What is an ingress from a namespace?</h3>
-<div class="outline-text-3" id="text-org6768a08">
+<div id="outline-container-orgb1be869" class="outline-3">
+<h3 id="orgb1be869">Q50: What is an ingress from a namespace?</h3>
+<div class="outline-text-3" id="text-orgb1be869">
 <p>
 A policy may allow ingress from pods in a specific namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org850d4c7" class="outline-3">
-<h3 id="org850d4c7">Q51: What is egress to a DNS service?</h3>
-<div class="outline-text-3" id="text-org850d4c7">
+<div id="outline-container-org93de84b" class="outline-3">
+<h3 id="org93de84b">Q51: What is egress to a DNS service?</h3>
+<div class="outline-text-3" id="text-org93de84b">
 <p>
 Pods often need egress to DNS services on UDP/TCP port 53 for name resolution.
 </p>
 </div>
 </div>
-<div id="outline-container-org7ba82b4" class="outline-3">
-<h3 id="org7ba82b4">Q52: Why allow DNS in egress policies?</h3>
-<div class="outline-text-3" id="text-org7ba82b4">
+<div id="outline-container-org76aadc6" class="outline-3">
+<h3 id="org76aadc6">Q52: Why allow DNS in egress policies?</h3>
+<div class="outline-text-3" id="text-org76aadc6">
 <p>
 Without DNS, pods may not resolve service names or external hostnames.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfabebfe" class="outline-3">
-<h3 id="orgfabebfe">Q53: Why do network policies often include DNS exceptions?</h3>
-<div class="outline-text-3" id="text-orgfabebfe">
+<div id="outline-container-org7bfc616" class="outline-3">
+<h3 id="org7bfc616">Q53: Why do network policies often include DNS exceptions?</h3>
+<div class="outline-text-3" id="text-org7bfc616">
 <p>
 Because many workloads still need to resolve names but should not contact arbitrary external endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org1e0d935" class="outline-3">
-<h3 id="org1e0d935">Q54: What is a `service` port and a network policy port?</h3>
-<div class="outline-text-3" id="text-org1e0d935">
+<div id="outline-container-org2c6002e" class="outline-3">
+<h3 id="org2c6002e">Q54: What is a `service` port and a network policy port?</h3>
+<div class="outline-text-3" id="text-org2c6002e">
 <p>
 The port in a policy is typically a destination port on the target pod or destination address.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba8c48c" class="outline-3">
-<h3 id="orgba8c48c">Q55: Why is policy portability important?</h3>
-<div class="outline-text-3" id="text-orgba8c48c">
+<div id="outline-container-org1ee7848" class="outline-3">
+<h3 id="org1ee7848">Q55: Why is policy portability important?</h3>
+<div class="outline-text-3" id="text-org1ee7848">
 <p>
 Because the same app should behave consistently across dev, test, and prod.
 </p>
 </div>
 </div>
-<div id="outline-container-org3e8b4a6" class="outline-3">
-<h3 id="org3e8b4a6">Q56: What is a namespace boundary for network policy?</h3>
-<div class="outline-text-3" id="text-org3e8b4a6">
+<div id="outline-container-org0de472d" class="outline-3">
+<h3 id="org0de472d">Q56: What is a namespace boundary for network policy?</h3>
+<div class="outline-text-3" id="text-org0de472d">
 <p>
 A namespace is a security boundary for policies, even when the network plugin supports cross-namespace rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org1c0bcd5" class="outline-3">
-<h3 id="org1c0bcd5">Q57: What is a selected Pod?</h3>
-<div class="outline-text-3" id="text-org1c0bcd5">
+<div id="outline-container-orgc8363ee" class="outline-3">
+<h3 id="orgc8363ee">Q57: What is a selected Pod?</h3>
+<div class="outline-text-3" id="text-orgc8363ee">
 <p>
 A selected Pod is one that matches the policy selectors.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3738ef" class="outline-3">
-<h3 id="orgc3738ef">Q58: Why is label design critical for policies?</h3>
-<div class="outline-text-3" id="text-orgc3738ef">
+<div id="outline-container-orgea4cfd5" class="outline-3">
+<h3 id="orgea4cfd5">Q58: Why is label design critical for policies?</h3>
+<div class="outline-text-3" id="text-orgea4cfd5">
 <p>
 Because labels are how policies select Pods and groups.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf2b1433" class="outline-3">
-<h3 id="orgf2b1433">Q59: What is a label pattern for service tiers?</h3>
-<div class="outline-text-3" id="text-orgf2b1433">
+<div id="outline-container-org175b5c2" class="outline-3">
+<h3 id="org175b5c2">Q59: What is a label pattern for service tiers?</h3>
+<div class="outline-text-3" id="text-org175b5c2">
 <p>
 Examples: `app: frontend`, `app: api`, `db: postgres`.
 </p>
 </div>
 </div>
-<div id="outline-container-org952f10f" class="outline-3">
-<h3 id="org952f10f">Q60: What is a `NetworkPolicy` YAML object?</h3>
-<div class="outline-text-3" id="text-org952f10f">
+<div id="outline-container-orgf7e0332" class="outline-3">
+<h3 id="orgf7e0332">Q60: What is a `NetworkPolicy` YAML object?</h3>
+<div class="outline-text-3" id="text-orgf7e0332">
 <p>
 It has metadata, spec, podSelector, policyTypes, ingress, and egress.
 </p>
 </div>
 </div>
-<div id="outline-container-orgff14597" class="outline-3">
-<h3 id="orgff14597">Q61: What is a Kubernetes network plugin model?</h3>
-<div class="outline-text-3" id="text-orgff14597">
+<div id="outline-container-orgeffa2eb" class="outline-3">
+<h3 id="orgeffa2eb">Q61: What is a Kubernetes network plugin model?</h3>
+<div class="outline-text-3" id="text-orgeffa2eb">
 <p>
 The plugin implements enforcement of NetworkPolicies and low-level networking.
 </p>
 </div>
 </div>
-<div id="outline-container-org907814a" class="outline-3">
-<h3 id="org907814a">Q62: Why are some policies ignored if the CNI lacks support?</h3>
-<div class="outline-text-3" id="text-org907814a">
+<div id="outline-container-orgb89a6b5" class="outline-3">
+<h3 id="orgb89a6b5">Q62: Why are some policies ignored if the CNI lacks support?</h3>
+<div class="outline-text-3" id="text-orgb89a6b5">
 <p>
 NetworkPolicy enforcement depends on the CNI plugin and cluster configuration.
 </p>
 </div>
 </div>
-<div id="outline-container-org1316004" class="outline-3">
-<h3 id="org1316004">Q63: Why should network policies be reviewed with the cluster architecture?</h3>
-<div class="outline-text-3" id="text-org1316004">
+<div id="outline-container-orga25953c" class="outline-3">
+<h3 id="orga25953c">Q63: Why should network policies be reviewed with the cluster architecture?</h3>
+<div class="outline-text-3" id="text-orga25953c">
 <p>
 Because some features require special CNI or network settings.
 </p>
 </div>
 </div>
-<div id="outline-container-org9ea1da9" class="outline-3">
-<h3 id="org9ea1da9">Q64: What is a cluster-managed firewall?</h3>
-<div class="outline-text-3" id="text-org9ea1da9">
+<div id="outline-container-org2ae417f" class="outline-3">
+<h3 id="org2ae417f">Q64: What is a cluster-managed firewall?</h3>
+<div class="outline-text-3" id="text-org2ae417f">
 <p>
 It is the network policy system enforced by the CNI plugin.
 </p>
 </div>
 </div>
-<div id="outline-container-org2829ee8" class="outline-3">
-<h3 id="org2829ee8">Q65: What is an inbound deny by default?</h3>
-<div class="outline-text-3" id="text-org2829ee8">
+<div id="outline-container-org4468544" class="outline-3">
+<h3 id="org4468544">Q65: What is an inbound deny by default?</h3>
+<div class="outline-text-3" id="text-org4468544">
 <p>
 No traffic enters the pod unless allowed.
 </p>
 </div>
 </div>
-<div id="outline-container-org2bbfa19" class="outline-3">
-<h3 id="org2bbfa19">Q66: What is an outbound deny by default?</h3>
-<div class="outline-text-3" id="text-org2bbfa19">
+<div id="outline-container-orge12c658" class="outline-3">
+<h3 id="orge12c658">Q66: What is an outbound deny by default?</h3>
+<div class="outline-text-3" id="text-orge12c658">
 <p>
 No traffic leaves the pod unless allowed.
 </p>
 </div>
 </div>
-<div id="outline-container-orgae9e8bb" class="outline-3">
-<h3 id="orgae9e8bb">Q67: Why do not all policies deny by default?</h3>
-<div class="outline-text-3" id="text-orgae9e8bb">
+<div id="outline-container-org002f29e" class="outline-3">
+<h3 id="org002f29e">Q67: Why do not all policies deny by default?</h3>
+<div class="outline-text-3" id="text-org002f29e">
 <p>
 Because some workloads need to talk to public APIs or dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a28d72" class="outline-3">
-<h3 id="org5a28d72">Q68: Why is it easier to reason about policies when selectors are explicit?</h3>
-<div class="outline-text-3" id="text-org5a28d72">
+<div id="outline-container-orgbe405ae" class="outline-3">
+<h3 id="orgbe405ae">Q68: Why is it easier to reason about policies when selectors are explicit?</h3>
+<div class="outline-text-3" id="text-orgbe405ae">
 <p>
 Because every allowed path is tied to specific labels or CIDR ranges.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3df118" class="outline-3">
-<h3 id="orgc3df118">Q69: What is a network policy for a database?</h3>
-<div class="outline-text-3" id="text-orgc3df118">
+<div id="outline-container-org86d80fa" class="outline-3">
+<h3 id="org86d80fa">Q69: What is a network policy for a database?</h3>
+<div class="outline-text-3" id="text-org86d80fa">
 <p>
 It may permit ingress only from app pods on database port 5432.
 </p>
 </div>
 </div>
-<div id="outline-container-org0720c1d" class="outline-3">
-<h3 id="org0720c1d">Q70: What is a network policy for a web server?</h3>
-<div class="outline-text-3" id="text-org0720c1d">
+<div id="outline-container-orge94a6e5" class="outline-3">
+<h3 id="orge94a6e5">Q70: What is a network policy for a web server?</h3>
+<div class="outline-text-3" id="text-orge94a6e5">
 <p>
 It may allow ingress from the ingress controller or load balancer on HTTP/HTTPS ports.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc2bc8a1" class="outline-3">
-<h3 id="orgc2bc8a1">Q71: What is a network policy for a worker job?</h3>
-<div class="outline-text-3" id="text-orgc2bc8a1">
+<div id="outline-container-orge0ca8a0" class="outline-3">
+<h3 id="orge0ca8a0">Q71: What is a network policy for a worker job?</h3>
+<div class="outline-text-3" id="text-orge0ca8a0">
 <p>
 It may allow egress to a queue or database while restricting inbound traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org2c40a28" class="outline-3">
-<h3 id="org2c40a28">Q72: Why is network policy a control for lateral movement?</h3>
-<div class="outline-text-3" id="text-org2c40a28">
+<div id="outline-container-org0c91c3c" class="outline-3">
+<h3 id="org0c91c3c">Q72: Why is network policy a control for lateral movement?</h3>
+<div class="outline-text-3" id="text-org0c91c3c">
 <p>
 Because compromised workloads cannot easily reach or use other workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd028c76" class="outline-3">
-<h3 id="orgd028c76">Q73: What is a security boundary in Kubernetes?</h3>
-<div class="outline-text-3" id="text-orgd028c76">
+<div id="outline-container-orgb89d49f" class="outline-3">
+<h3 id="orgb89d49f">Q73: What is a security boundary in Kubernetes?</h3>
+<div class="outline-text-3" id="text-orgb89d49f">
 <p>
 It is a boundary such as namespace, pod group, or trust zone used to isolate workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdd73441" class="outline-3">
-<h3 id="orgdd73441">Q74: Why is namespace-based isolation useful?</h3>
-<div class="outline-text-3" id="text-orgdd73441">
+<div id="outline-container-org168136e" class="outline-3">
+<h3 id="org168136e">Q74: Why is namespace-based isolation useful?</h3>
+<div class="outline-text-3" id="text-org168136e">
 <p>
 It separates workloads, teams, or environments and makes policy simpler.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf16099b" class="outline-3">
-<h3 id="orgf16099b">Q75: What is `policyTypes: [Ingress]`?</h3>
-<div class="outline-text-3" id="text-orgf16099b">
+<div id="outline-container-org005a47f" class="outline-3">
+<h3 id="org005a47f">Q75: What is `policyTypes: [Ingress]`?</h3>
+<div class="outline-text-3" id="text-org005a47f">
 <p>
 It means the policy only applies to ingress traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org9cc8b44" class="outline-3">
-<h3 id="org9cc8b44">Q76: What is `policyTypes: [Egress]`?</h3>
-<div class="outline-text-3" id="text-org9cc8b44">
+<div id="outline-container-orga21bc1f" class="outline-3">
+<h3 id="orga21bc1f">Q76: What is `policyTypes: [Egress]`?</h3>
+<div class="outline-text-3" id="text-orga21bc1f">
 <p>
 It means the policy only applies to egress traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org99ed905" class="outline-3">
-<h3 id="org99ed905">Q77: What is `policyTypes: [Ingress, Egress]`?</h3>
-<div class="outline-text-3" id="text-org99ed905">
+<div id="outline-container-org7c0fb4d" class="outline-3">
+<h3 id="org7c0fb4d">Q77: What is `policyTypes: [Ingress, Egress]`?</h3>
+<div class="outline-text-3" id="text-org7c0fb4d">
 <p>
 It applies both ingress and egress rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org20d6c63" class="outline-3">
-<h3 id="org20d6c63">Q78: Why should egress policies be used carefully?</h3>
-<div class="outline-text-3" id="text-org20d6c63">
+<div id="outline-container-org83abe74" class="outline-3">
+<h3 id="org83abe74">Q78: Why should egress policies be used carefully?</h3>
+<div class="outline-text-3" id="text-org83abe74">
 <p>
 Because apps may require outbound calls to databases, APIs, or DNS.
 </p>
 </div>
 </div>
-<div id="outline-container-orga33d0f6" class="outline-3">
-<h3 id="orga33d0f6">Q79: What is a egress network policy for DNS?</h3>
-<div class="outline-text-3" id="text-orga33d0f6">
+<div id="outline-container-orgca31205" class="outline-3">
+<h3 id="orgca31205">Q79: What is a egress network policy for DNS?</h3>
+<div class="outline-text-3" id="text-orgca31205">
 <p>
 Usually allow UDP/TCP 53 to the cluster DNS service or upstream DNS resolvers.
 </p>
 </div>
 </div>
-<div id="outline-container-org0b9e21f" class="outline-3">
-<h3 id="org0b9e21f">Q80: What is an ingress network policy for a load balancer?</h3>
-<div class="outline-text-3" id="text-org0b9e21f">
+<div id="outline-container-org103f31a" class="outline-3">
+<h3 id="org103f31a">Q80: What is an ingress network policy for a load balancer?</h3>
+<div class="outline-text-3" id="text-org103f31a">
 <p>
 It allows traffic from the load balancer or ingress controller only on relevant ports.
 </p>
 </div>
 </div>
-<div id="outline-container-org6efd1fa" class="outline-3">
-<h3 id="org6efd1fa">Q81: What is a namespace label used in policies?</h3>
-<div class="outline-text-3" id="text-org6efd1fa">
+<div id="outline-container-org1f4d598" class="outline-3">
+<h3 id="org1f4d598">Q81: What is a namespace label used in policies?</h3>
+<div class="outline-text-3" id="text-org1f4d598">
 <p>
 It selects namespaces by labels such as `team: payments` or `environment: prod`.
 </p>
 </div>
 </div>
-<div id="outline-container-org74f1b07" class="outline-3">
-<h3 id="org74f1b07">Q82: Why are namespace labels useful in policy design?</h3>
-<div class="outline-text-3" id="text-org74f1b07">
+<div id="outline-container-org40744d2" class="outline-3">
+<h3 id="org40744d2">Q82: Why are namespace labels useful in policy design?</h3>
+<div class="outline-text-3" id="text-org40744d2">
 <p>
 They allow team- or environment-specific traffic rules.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdf07dd3" class="outline-3">
-<h3 id="orgdf07dd3">Q83: What is a multi-tenant cluster?</h3>
-<div class="outline-text-3" id="text-orgdf07dd3">
+<div id="outline-container-org79b7879" class="outline-3">
+<h3 id="org79b7879">Q83: What is a multi-tenant cluster?</h3>
+<div class="outline-text-3" id="text-org79b7879">
 <p>
 A cluster where multiple teams or workloads share the same infrastructure but require isolation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf4fcb73" class="outline-3">
-<h3 id="orgf4fcb73">Q84: Why are network policies common in multi-tenant clusters?</h3>
-<div class="outline-text-3" id="text-orgf4fcb73">
+<div id="outline-container-orgd3265f0" class="outline-3">
+<h3 id="orgd3265f0">Q84: Why are network policies common in multi-tenant clusters?</h3>
+<div class="outline-text-3" id="text-orgd3265f0">
 <p>
 Because they provide strong isolation between teams and workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdead993" class="outline-3">
-<h3 id="orgdead993">Q85: What is a service mesh vs NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-orgdead993">
+<div id="outline-container-org3894237" class="outline-3">
+<h3 id="org3894237">Q85: What is a service mesh vs NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org3894237">
 <p>
 A service mesh handles L7 routing and security, while NetworkPolicy works at L3/L4 network enforcement.
 </p>
 </div>
 </div>
-<div id="outline-container-org595a6f6" class="outline-3">
-<h3 id="org595a6f6">Q86: What is a cluster-level network policy default?</h3>
-<div class="outline-text-3" id="text-org595a6f6">
+<div id="outline-container-org12e600c" class="outline-3">
+<h3 id="org12e600c">Q86: What is a cluster-level network policy default?</h3>
+<div class="outline-text-3" id="text-org12e600c">
 <p>
 It may be implemented for all workloads in a namespace or across namespaces.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc0a114" class="outline-3">
-<h3 id="orgdc0a114">Q87: Why monitor network policy behavior in troubleshooting?</h3>
-<div class="outline-text-3" id="text-orgdc0a114">
+<div id="outline-container-org0cf6917" class="outline-3">
+<h3 id="org0cf6917">Q87: Why monitor network policy behavior in troubleshooting?</h3>
+<div class="outline-text-3" id="text-org0cf6917">
 <p>
 Because policy violations may show as connection resets or timeouts without obvious application errors.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd298d82" class="outline-3">
-<h3 id="orgd298d82">Q88: Why does debugging network policy require pod labels and selectors?</h3>
-<div class="outline-text-3" id="text-orgd298d82">
+<div id="outline-container-org3309f9d" class="outline-3">
+<h3 id="org3309f9d">Q88: Why does debugging network policy require pod labels and selectors?</h3>
+<div class="outline-text-3" id="text-org3309f9d">
 <p>
 Because the policy is based on labels, namespace selectors, and IP rules.
 </p>
 </div>
 </div>
-<div id="outline-container-org22fe66f" class="outline-3">
-<h3 id="org22fe66f">Q89: What is a policy mismatch?</h3>
-<div class="outline-text-3" id="text-org22fe66f">
+<div id="outline-container-org075cd59" class="outline-3">
+<h3 id="org075cd59">Q89: What is a policy mismatch?</h3>
+<div class="outline-text-3" id="text-org075cd59">
 <p>
 It happens when a pod is selected incorrectly or a label is not matching the expected pattern.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd366330" class="outline-3">
-<h3 id="orgd366330">Q90: Why do network policies often need coordination with ingress controllers?</h3>
-<div class="outline-text-3" id="text-orgd366330">
+<div id="outline-container-org7498326" class="outline-3">
+<h3 id="org7498326">Q90: Why do network policies often need coordination with ingress controllers?</h3>
+<div class="outline-text-3" id="text-org7498326">
 <p>
 Because ingress controllers need to be allowed to reach the service ports.
 </p>
 </div>
 </div>
-<div id="outline-container-org2d53d13" class="outline-3">
-<h3 id="org2d53d13">Q91: What is an ingress controller source?</h3>
-<div class="outline-text-3" id="text-org2d53d13">
+<div id="outline-container-org913ba73" class="outline-3">
+<h3 id="org913ba73">Q91: What is an ingress controller source?</h3>
+<div class="outline-text-3" id="text-org913ba73">
 <p>
 It is usually the ingress controller pod or service IPs or a CIDR range.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbf2b260" class="outline-3">
-<h3 id="orgbf2b260">Q92: Why is egress to database important?</h3>
-<div class="outline-text-3" id="text-orgbf2b260">
+<div id="outline-container-org36a7367" class="outline-3">
+<h3 id="org36a7367">Q92: Why is egress to database important?</h3>
+<div class="outline-text-3" id="text-org36a7367">
 <p>
 Application pods need to reach their database service, often on a specific port.
 </p>
 </div>
 </div>
-<div id="outline-container-org7c57f2e" class="outline-3">
-<h3 id="org7c57f2e">Q93: Why might a policy block a startup dependency?</h3>
-<div class="outline-text-3" id="text-org7c57f2e">
+<div id="outline-container-orga3cabb2" class="outline-3">
+<h3 id="orga3cabb2">Q93: Why might a policy block a startup dependency?</h3>
+<div class="outline-text-3" id="text-orga3cabb2">
 <p>
 If a pod depends on a database or external API and the policy is too restrictive.
 </p>
 </div>
 </div>
-<div id="outline-container-org58f553f" class="outline-3">
-<h3 id="org58f553f">Q94: Why are policies usually tested in staging before production?</h3>
-<div class="outline-text-3" id="text-org58f553f">
+<div id="outline-container-org0d35ba4" class="outline-3">
+<h3 id="org0d35ba4">Q94: Why are policies usually tested in staging before production?</h3>
+<div class="outline-text-3" id="text-org0d35ba4">
 <p>
 Because connectivity mistakes can create outages or unexpected service breakage.
 </p>
 </div>
 </div>
-<div id="outline-container-org60e2583" class="outline-3">
-<h3 id="org60e2583">Q95: Why is performance not the main concern in NetworkPolicies?</h3>
-<div class="outline-text-3" id="text-org60e2583">
+<div id="outline-container-org14f3df0" class="outline-3">
+<h3 id="org14f3df0">Q95: Why is performance not the main concern in NetworkPolicies?</h3>
+<div class="outline-text-3" id="text-org14f3df0">
 <p>
 Security and traffic control are primary; performance is secondary but still matters.
 </p>
 </div>
 </div>
-<div id="outline-container-org92ffe29" class="outline-3">
-<h3 id="org92ffe29">Q96: What is a network policy path to an external service?</h3>
-<div class="outline-text-3" id="text-org92ffe29">
+<div id="outline-container-org73c0d69" class="outline-3">
+<h3 id="org73c0d69">Q96: What is a network policy path to an external service?</h3>
+<div class="outline-text-3" id="text-org73c0d69">
 <p>
 It may allow egress to a specific external IP or CIDR and port.
 </p>
 </div>
 </div>
-<div id="outline-container-org5876b13" class="outline-3">
-<h3 id="org5876b13">Q97: What is a DNS or metadata endpoint egress rule?</h3>
-<div class="outline-text-3" id="text-org5876b13">
+<div id="outline-container-org9a13be0" class="outline-3">
+<h3 id="org9a13be0">Q97: What is a DNS or metadata endpoint egress rule?</h3>
+<div class="outline-text-3" id="text-org9a13be0">
 <p>
 Some systems need egress to cloud metadata endpoints or internal DNS services.
 </p>
 </div>
 </div>
-<div id="outline-container-org5a3eec6" class="outline-3">
-<h3 id="org5a3eec6">Q98: What is a port 443 outbound API call?</h3>
-<div class="outline-text-3" id="text-org5a3eec6">
+<div id="outline-container-org0796427" class="outline-3">
+<h3 id="org0796427">Q98: What is a port 443 outbound API call?</h3>
+<div class="outline-text-3" id="text-org0796427">
 <p>
 A policy may allow HTTPS to certain endpoints while blocking all others.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbfb67c8" class="outline-3">
-<h3 id="orgbfb67c8">Q99: Why allow only necessary ports?</h3>
-<div class="outline-text-3" id="text-orgbfb67c8">
+<div id="outline-container-orgc768164" class="outline-3">
+<h3 id="orgc768164">Q99: Why allow only necessary ports?</h3>
+<div class="outline-text-3" id="text-orgc768164">
 <p>
 It reduces the number of possible attack paths from a workload.
 </p>
 </div>
 </div>
-<div id="outline-container-orge57748b" class="outline-3">
-<h3 id="orge57748b">Q100: What is a `podSelector` and a namespace selector combination used for?</h3>
-<div class="outline-text-3" id="text-orge57748b">
+<div id="outline-container-orgc94ebfc" class="outline-3">
+<h3 id="orgc94ebfc">Q100: What is a `podSelector` and a namespace selector combination used for?</h3>
+<div class="outline-text-3" id="text-orgc94ebfc">
 <p>
 To allow traffic only from selected pods in specific namespaces.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgdafedc0" class="outline-2">
-<h2 id="orgdafedc0">Intermediate</h2>
-<div class="outline-text-2" id="text-orgdafedc0">
+<div id="outline-container-org1e08f4e" class="outline-2">
+<h2 id="org1e08f4e">Intermediate</h2>
+<div class="outline-text-2" id="text-org1e08f4e">
 </div>
-<div id="outline-container-orgcf01c82" class="outline-3">
-<h3 id="orgcf01c82">Q101: What is a network policy precedence?</h3>
-<div class="outline-text-3" id="text-orgcf01c82">
+<div id="outline-container-org57ce4d2" class="outline-3">
+<h3 id="org57ce4d2">Q101: What is a network policy precedence?</h3>
+<div class="outline-text-3" id="text-org57ce4d2">
 <p>
 Kubernetes evaluates policies based on matching pods and the selected rules; traffic allowed must match at least one allowed policy.
 </p>
 </div>
 </div>
-<div id="outline-container-org6f3d1c3" class="outline-3">
-<h3 id="org6f3d1c3">Q102: What is implied deny?</h3>
-<div class="outline-text-3" id="text-org6f3d1c3">
+<div id="outline-container-orge188a9f" class="outline-3">
+<h3 id="orge188a9f">Q102: What is implied deny?</h3>
+<div class="outline-text-3" id="text-orge188a9f">
 <p>
 If no matching ingress or egress policy allows traffic, the traffic is denied.
 </p>
 </div>
 </div>
-<div id="outline-container-org8889ba4" class="outline-3">
-<h3 id="org8889ba4">Q103: Why is a default deny policy easiest to reason about?</h3>
-<div class="outline-text-3" id="text-org8889ba4">
+<div id="outline-container-org347d69c" class="outline-3">
+<h3 id="org347d69c">Q103: Why is a default deny policy easiest to reason about?</h3>
+<div class="outline-text-3" id="text-org347d69c">
 <p>
 Because it creates a clean list of allowed communications.
 </p>
 </div>
 </div>
-<div id="outline-container-org37462c5" class="outline-3">
-<h3 id="org37462c5">Q104: What is a `deny` rule in NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org37462c5">
+<div id="outline-container-org664da30" class="outline-3">
+<h3 id="org664da30">Q104: What is a `deny` rule in NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org664da30">
 <p>
 Kubernetes does not have a direct deny rule object; instead, you define allow rules and default deny by omission.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdb1f487" class="outline-3">
-<h3 id="orgdb1f487">Q105: What is zero-trust network design?</h3>
-<div class="outline-text-3" id="text-orgdb1f487">
+<div id="outline-container-orga7cbcd3" class="outline-3">
+<h3 id="orga7cbcd3">Q105: What is zero-trust network design?</h3>
+<div class="outline-text-3" id="text-orga7cbcd3">
 <p>
 It assumes no workload is trusted by default and restricts communication tightly.
 </p>
 </div>
 </div>
-<div id="outline-container-orge687908" class="outline-3">
-<h3 id="orge687908">Q106: Why is zero-trust relevant in Kubernetes?</h3>
-<div class="outline-text-3" id="text-orge687908">
+<div id="outline-container-org89060cd" class="outline-3">
+<h3 id="org89060cd">Q106: Why is zero-trust relevant in Kubernetes?</h3>
+<div class="outline-text-3" id="text-org89060cd">
 <p>
 Because container-to-container communication often occurs within the same cluster with no natural trust boundary.
 </p>
 </div>
 </div>
-<div id="outline-container-org27980bc" class="outline-3">
-<h3 id="org27980bc">Q107: What is an anti-affinity pattern in network policy?</h3>
-<div class="outline-text-3" id="text-org27980bc">
+<div id="outline-container-orga4e17c0" class="outline-3">
+<h3 id="orga4e17c0">Q107: What is an anti-affinity pattern in network policy?</h3>
+<div class="outline-text-3" id="text-orga4e17c0">
 <p>
 It uses specific selectors and policies to ensure workloads do not talk to each other when they should not.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd71e561" class="outline-3">
-<h3 id="orgd71e561">Q108: What is a pod-to-pod trust boundary?</h3>
-<div class="outline-text-3" id="text-orgd71e561">
+<div id="outline-container-orgbc2e4a4" class="outline-3">
+<h3 id="orgbc2e4a4">Q108: What is a pod-to-pod trust boundary?</h3>
+<div class="outline-text-3" id="text-orgbc2e4a4">
 <p>
 It is a logical boundary such as app tier, data tier, or external exposure layer.
 </p>
 </div>
 </div>
-<div id="outline-container-orga9e56dc" class="outline-3">
-<h3 id="orga9e56dc">Q109: Why should database tier not accept all inbound traffic?</h3>
-<div class="outline-text-3" id="text-orga9e56dc">
+<div id="outline-container-org01a48ec" class="outline-3">
+<h3 id="org01a48ec">Q109: Why should database tier not accept all inbound traffic?</h3>
+<div class="outline-text-3" id="text-org01a48ec">
 <p>
 Because only application services should reach the database on its proper port.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5ec4a3" class="outline-3">
-<h3 id="orgb5ec4a3">Q110: What is a frontend/backend isolation pattern?</h3>
-<div class="outline-text-3" id="text-orgb5ec4a3">
+<div id="outline-container-orgbb52b36" class="outline-3">
+<h3 id="orgbb52b36">Q110: What is a frontend/backend isolation pattern?</h3>
+<div class="outline-text-3" id="text-orgbb52b36">
 <p>
 It restricts frontend ingress to public traffic but blocks backend communication except from allowed APIs.
 </p>
 </div>
 </div>
-<div id="outline-container-org7d05f6d" class="outline-3">
-<h3 id="org7d05f6d">Q111: Why is the ingress controller allowed through policies?</h3>
-<div class="outline-text-3" id="text-org7d05f6d">
+<div id="outline-container-org8d532de" class="outline-3">
+<h3 id="org8d532de">Q111: Why is the ingress controller allowed through policies?</h3>
+<div class="outline-text-3" id="text-org8d532de">
 <p>
 Because it handles external traffic into application services.
 </p>
 </div>
 </div>
-<div id="outline-container-org9893ee3" class="outline-3">
-<h3 id="org9893ee3">Q112: What is a service-to-service isolation pattern?</h3>
-<div class="outline-text-3" id="text-org9893ee3">
+<div id="outline-container-org60f82ec" class="outline-3">
+<h3 id="org60f82ec">Q112: What is a service-to-service isolation pattern?</h3>
+<div class="outline-text-3" id="text-org60f82ec">
 <p>
 It isolates different service groups to reduce lateral movement.
 </p>
 </div>
 </div>
-<div id="outline-container-orga5d3fb6" class="outline-3">
-<h3 id="orga5d3fb6">Q113: What is a queue consumer policy?</h3>
-<div class="outline-text-3" id="text-orga5d3fb6">
+<div id="outline-container-orgeea2e9c" class="outline-3">
+<h3 id="orgeea2e9c">Q113: What is a queue consumer policy?</h3>
+<div class="outline-text-3" id="text-orgeea2e9c">
 <p>
 A worker or consumer may only egress to the queue, database, and DNS while denying all else.
 </p>
 </div>
 </div>
-<div id="outline-container-org268487b" class="outline-3">
-<h3 id="org268487b">Q114: What is a DNS egress exception?</h3>
-<div class="outline-text-3" id="text-org268487b">
+<div id="outline-container-org513331c" class="outline-3">
+<h3 id="org513331c">Q114: What is a DNS egress exception?</h3>
+<div class="outline-text-3" id="text-org513331c">
 <p>
 It allows DNS lookup to cluster or upstream resolvers while restricting other egress.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7ecf0a" class="outline-3">
-<h3 id="orgf7ecf0a">Q115: What is TLS and NetworkPolicy interaction?</h3>
-<div class="outline-text-3" id="text-orgf7ecf0a">
+<div id="outline-container-org9d04779" class="outline-3">
+<h3 id="org9d04779">Q115: What is TLS and NetworkPolicy interaction?</h3>
+<div class="outline-text-3" id="text-org9d04779">
 <p>
 A NetworkPolicy does not inspect HTTPS payload; it only controls traffic paths and ports.
 </p>
 </div>
 </div>
-<div id="outline-container-orge26762b" class="outline-3">
-<h3 id="orge26762b">Q116: Why does NetworkPolicy not replace app security?</h3>
-<div class="outline-text-3" id="text-orge26762b">
+<div id="outline-container-org6dbf6ab" class="outline-3">
+<h3 id="org6dbf6ab">Q116: Why does NetworkPolicy not replace app security?</h3>
+<div class="outline-text-3" id="text-org6dbf6ab">
 <p>
 Because an app still needs to validate inputs, APIs, and access control.
 </p>
 </div>
 </div>
-<div id="outline-container-orga3f1caa" class="outline-3">
-<h3 id="orga3f1caa">Q117: What is a port 80 and 443 service policy?</h3>
-<div class="outline-text-3" id="text-orga3f1caa">
+<div id="outline-container-org491e1db" class="outline-3">
+<h3 id="org491e1db">Q117: What is a port 80 and 443 service policy?</h3>
+<div class="outline-text-3" id="text-org491e1db">
 <p>
 A frontend might allow ingress from the world to HTTP/HTTPS but not to internal management ports.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc363a9e" class="outline-3">
-<h3 id="orgc363a9e">Q118: Why is it better to keep management ports private?</h3>
-<div class="outline-text-3" id="text-orgc363a9e">
+<div id="outline-container-org6e9b21e" class="outline-3">
+<h3 id="org6e9b21e">Q118: Why is it better to keep management ports private?</h3>
+<div class="outline-text-3" id="text-org6e9b21e">
 <p>
 Because management or admin ports should not be publicly reachable.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf5039cb" class="outline-3">
-<h3 id="orgf5039cb">Q119: What is `namespaceSelector` and `podSelector` cross-namespace policy?</h3>
-<div class="outline-text-3" id="text-orgf5039cb">
+<div id="outline-container-org1b335cc" class="outline-3">
+<h3 id="org1b335cc">Q119: What is `namespaceSelector` and `podSelector` cross-namespace policy?</h3>
+<div class="outline-text-3" id="text-org1b335cc">
 <p>
 It allows a Pod in namespace A to allow traffic from selected Pods in namespace B.
 </p>
 </div>
 </div>
-<div id="outline-container-org4f44882" class="outline-3">
-<h3 id="org4f44882">Q120: Why is cross-namespace policy useful?</h3>
-<div class="outline-text-3" id="text-org4f44882">
+<div id="outline-container-org660be81" class="outline-3">
+<h3 id="org660be81">Q120: Why is cross-namespace policy useful?</h3>
+<div class="outline-text-3" id="text-org660be81">
 <p>
 For shared services or multi-team architectures that need controlled communication.
 </p>
 </div>
 </div>
-<div id="outline-container-org8071426" class="outline-3">
-<h3 id="org8071426">Q121: What is a policy for external monitoring?</h3>
-<div class="outline-text-3" id="text-org8071426">
+<div id="outline-container-org273b0a1" class="outline-3">
+<h3 id="org273b0a1">Q121: What is a policy for external monitoring?</h3>
+<div class="outline-text-3" id="text-org273b0a1">
 <p>
 Monitoring daemons may need egress to metrics systems or collecting endpoints while all other egress is denied.
 </p>
 </div>
 </div>
-<div id="outline-container-org926ce70" class="outline-3">
-<h3 id="org926ce70">Q122: Why does traffic selection depend on labels?</h3>
-<div class="outline-text-3" id="text-org926ce70">
+<div id="outline-container-org6bbb459" class="outline-3">
+<h3 id="org6bbb459">Q122: Why does traffic selection depend on labels?</h3>
+<div class="outline-text-3" id="text-org6bbb459">
 <p>
 Labels are the stable identity used by selectors in policy rules.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc8e46d" class="outline-3">
-<h3 id="orgdc8e46d">Q123: What is a pod label mismatch issue?</h3>
-<div class="outline-text-3" id="text-orgdc8e46d">
+<div id="outline-container-org17fd28b" class="outline-3">
+<h3 id="org17fd28b">Q123: What is a pod label mismatch issue?</h3>
+<div class="outline-text-3" id="text-org17fd28b">
 <p>
 It occurs when labels do not match the intended policy and the Pod ends up with blocked or missing traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org8d342e0" class="outline-3">
-<h3 id="org8d342e0">Q124: What is a debug command for policies?</h3>
-<div class="outline-text-3" id="text-org8d342e0">
+<div id="outline-container-org509ecc4" class="outline-3">
+<h3 id="org509ecc4">Q124: What is a debug command for policies?</h3>
+<div class="outline-text-3" id="text-org509ecc4">
 <p>
 It often involves checking the pod labels, the NetworkPolicy manifest, and the CNI plugin logs.
 </p>
 </div>
 </div>
-<div id="outline-container-org5027fbc" class="outline-3">
-<h3 id="org5027fbc">Q125: Why do policy debug issues sometimes look like app failures?</h3>
-<div class="outline-text-3" id="text-org5027fbc">
+<div id="outline-container-org7cd4102" class="outline-3">
+<h3 id="org7cd4102">Q125: Why do policy debug issues sometimes look like app failures?</h3>
+<div class="outline-text-3" id="text-org7cd4102">
 <p>
 Because the app may be unreachable or unable to talk to dependencies even though the workload is running.
 </p>
 </div>
 </div>
-<div id="outline-container-org38a3724" class="outline-3">
-<h3 id="org38a3724">Q126: What is a cluster CNI log?</h3>
-<div class="outline-text-3" id="text-org38a3724">
+<div id="outline-container-orgef5ea98" class="outline-3">
+<h3 id="orgef5ea98">Q126: What is a cluster CNI log?</h3>
+<div class="outline-text-3" id="text-orgef5ea98">
 <p>
 It can show policy evaluation, packet drops, or agent decisions.
 </p>
 </div>
 </div>
-<div id="outline-container-org4d776ac" class="outline-3">
-<h3 id="org4d776ac">Q127: Why do some CNI plugins implement egress and ingress differently?</h3>
-<div class="outline-text-3" id="text-org4d776ac">
+<div id="outline-container-org3ff6039" class="outline-3">
+<h3 id="org3ff6039">Q127: Why do some CNI plugins implement egress and ingress differently?</h3>
+<div class="outline-text-3" id="text-org3ff6039">
 <p>
 Because the plugin-specific data plane has different support and semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-org51c2c90" class="outline-3">
-<h3 id="org51c2c90">Q128: What is application traffic timing and NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org51c2c90">
+<div id="outline-container-org6c641d9" class="outline-3">
+<h3 id="org6c641d9">Q128: What is application traffic timing and NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org6c641d9">
 <p>
 Policy checks happen in the data plane, so configuration changes may take effect after a short delay.
 </p>
 </div>
 </div>
-<div id="outline-container-org4412de6" class="outline-3">
-<h3 id="org4412de6">Q129: What is an ingress rule with `ipBlock`?</h3>
-<div class="outline-text-3" id="text-org4412de6">
+<div id="outline-container-orge21a48c" class="outline-3">
+<h3 id="orge21a48c">Q129: What is an ingress rule with `ipBlock`?</h3>
+<div class="outline-text-3" id="text-orge21a48c">
 <p>
 It can explicitly allow traffic from a CIDR while denying everything else.
 </p>
 </div>
 </div>
-<div id="outline-container-orge408952" class="outline-3">
-<h3 id="orge408952">Q130: Why use `ipBlock` for external dependencies?</h3>
-<div class="outline-text-3" id="text-orge408952">
+<div id="outline-container-org113fe83" class="outline-3">
+<h3 id="org113fe83">Q130: Why use `ipBlock` for external dependencies?</h3>
+<div class="outline-text-3" id="text-org113fe83">
 <p>
 Because the service may be a specific internal or vendor network range.
 </p>
 </div>
 </div>
-<div id="outline-container-org6779d41" class="outline-3">
-<h3 id="org6779d41">Q131: What is traffic allowed by default when no policies exist?</h3>
-<div class="outline-text-3" id="text-org6779d41">
+<div id="outline-container-org47aa1ea" class="outline-3">
+<h3 id="org47aa1ea">Q131: What is traffic allowed by default when no policies exist?</h3>
+<div class="outline-text-3" id="text-org47aa1ea">
 <p>
 This depends on the CNI plugin and cluster setup.
 </p>
 </div>
 </div>
-<div id="outline-container-orga5d8b1e" class="outline-3">
-<h3 id="orga5d8b1e">Q132: Why is default behavior before policy often not enough for security?</h3>
-<div class="outline-text-3" id="text-orga5d8b1e">
+<div id="outline-container-orgaa5cf46" class="outline-3">
+<h3 id="orgaa5cf46">Q132: Why is default behavior before policy often not enough for security?</h3>
+<div class="outline-text-3" id="text-orgaa5cf46">
 <p>
 Because it does not enforce least privilege or allowlist communication.
 </p>
 </div>
 </div>
-<div id="outline-container-org12fa7e7" class="outline-3">
-<h3 id="org12fa7e7">Q133: What is a “deny all by default” posture?</h3>
-<div class="outline-text-3" id="text-org12fa7e7">
+<div id="outline-container-org047413b" class="outline-3">
+<h3 id="org047413b">Q133: What is a “deny all by default” posture?</h3>
+<div class="outline-text-3" id="text-org047413b">
 <p>
 It is the set of policies that only allows explicitly permitted traffic paths.
 </p>
 </div>
 </div>
-<div id="outline-container-orgbc13fb0" class="outline-3">
-<h3 id="orgbc13fb0">Q134: Why is explicit allow-listing better than broad access?</h3>
-<div class="outline-text-3" id="text-orgbc13fb0">
+<div id="outline-container-org6f69b36" class="outline-3">
+<h3 id="org6f69b36">Q134: Why is explicit allow-listing better than broad access?</h3>
+<div class="outline-text-3" id="text-org6f69b36">
 <p>
 It reduces misconfiguration and prevents unvetted access.
 </p>
 </div>
 </div>
-<div id="outline-container-org144cf45" class="outline-3">
-<h3 id="org144cf45">Q135: What is a service dependency policy?</h3>
-<div class="outline-text-3" id="text-org144cf45">
+<div id="outline-container-org8d0ad26" class="outline-3">
+<h3 id="org8d0ad26">Q135: What is a service dependency policy?</h3>
+<div class="outline-text-3" id="text-org8d0ad26">
 <p>
 It restricts which workloads can reach a service, like only the API tier to the database.
 </p>
 </div>
 </div>
-<div id="outline-container-org12a8336" class="outline-3">
-<h3 id="org12a8336">Q136: What is a health check policy?</h3>
-<div class="outline-text-3" id="text-org12a8336">
+<div id="outline-container-org87d664d" class="outline-3">
+<h3 id="org87d664d">Q136: What is a health check policy?</h3>
+<div class="outline-text-3" id="text-org87d664d">
 <p>
 Some CNI or load balancers need allowed ingress for health probes or liveness checks.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc414ad5" class="outline-3">
-<h3 id="orgc414ad5">Q137: Why should health probes be considered in policy design?</h3>
-<div class="outline-text-3" id="text-orgc414ad5">
+<div id="outline-container-org2a5338d" class="outline-3">
+<h3 id="org2a5338d">Q137: Why should health probes be considered in policy design?</h3>
+<div class="outline-text-3" id="text-org2a5338d">
 <p>
 Because if the health check port is blocked, the workload may appear unhealthy or unready.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f7d657" class="outline-3">
-<h3 id="org5f7d657">Q138: What is the relation between NetworkPolicy and Service ports?</h3>
-<div class="outline-text-3" id="text-org5f7d657">
+<div id="outline-container-org7e1837f" class="outline-3">
+<h3 id="org7e1837f">Q138: What is the relation between NetworkPolicy and Service ports?</h3>
+<div class="outline-text-3" id="text-org7e1837f">
 <p>
 Policies usually allow traffic to Service ports and Pod ports, which are often the same or mapped.
 </p>
 </div>
 </div>
-<div id="outline-container-orgdd56972" class="outline-3">
-<h3 id="orgdd56972">Q139: What is a pod port requirement?</h3>
-<div class="outline-text-3" id="text-orgdd56972">
+<div id="outline-container-org609fa76" class="outline-3">
+<h3 id="org609fa76">Q139: What is a pod port requirement?</h3>
+<div class="outline-text-3" id="text-org609fa76">
 <p>
 The policy’s `ports` field should reflect the application’s listening port.
 </p>
 </div>
 </div>
-<div id="outline-container-org84ee8cc" class="outline-3">
-<h3 id="org84ee8cc">Q140: Why use port restrictions?</h3>
-<div class="outline-text-3" id="text-org84ee8cc">
+<div id="outline-container-orgf20db70" class="outline-3">
+<h3 id="orgf20db70">Q140: Why use port restrictions?</h3>
+<div class="outline-text-3" id="text-orgf20db70">
 <p>
 Because allowing all ports would expose unnecessary application functionality.
 </p>
 </div>
 </div>
-<div id="outline-container-org70d1233" class="outline-3">
-<h3 id="org70d1233">Q141: What is a malicious lateral movement path?</h3>
-<div class="outline-text-3" id="text-org70d1233">
+<div id="outline-container-org11c217c" class="outline-3">
+<h3 id="org11c217c">Q141: What is a malicious lateral movement path?</h3>
+<div class="outline-text-3" id="text-org11c217c">
 <p>
 It is an unintended path between compromised and valuable workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgba12773" class="outline-3">
-<h3 id="orgba12773">Q142: Why is namespace policy important for team isolation?</h3>
-<div class="outline-text-3" id="text-orgba12773">
+<div id="outline-container-org4e1c5ac" class="outline-3">
+<h3 id="org4e1c5ac">Q142: Why is namespace policy important for team isolation?</h3>
+<div class="outline-text-3" id="text-org4e1c5ac">
 <p>
 Because it prevents teams from inadvertently reaching each other’s services in a shared cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org6c137f9" class="outline-3">
-<h3 id="org6c137f9">Q143: What is a multi-namespace policy?</h3>
-<div class="outline-text-3" id="text-org6c137f9">
+<div id="outline-container-org5428e34" class="outline-3">
+<h3 id="org5428e34">Q143: What is a multi-namespace policy?</h3>
+<div class="outline-text-3" id="text-org5428e34">
 <p>
 It allows one namespace’s workloads to communicate with selected workloads in another namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org1bbc5df" class="outline-3">
-<h3 id="org1bbc5df">Q144: Why is egress restriction sometimes the source of application failures?</h3>
-<div class="outline-text-3" id="text-org1bbc5df">
+<div id="outline-container-org6087d53" class="outline-3">
+<h3 id="org6087d53">Q144: Why is egress restriction sometimes the source of application failures?</h3>
+<div class="outline-text-3" id="text-org6087d53">
 <p>
 Because a workload may need to talk to a database, a cloud service, or a queue.
 </p>
 </div>
 </div>
-<div id="outline-container-org30160bf" class="outline-3">
-<h3 id="org30160bf">Q145: Why should policies be tested at runtime?</h3>
-<div class="outline-text-3" id="text-org30160bf">
+<div id="outline-container-orga9b9d3d" class="outline-3">
+<h3 id="orga9b9d3d">Q145: Why should policies be tested at runtime?</h3>
+<div class="outline-text-3" id="text-orga9b9d3d">
 <p>
 Because policy can block traffic even when an app appears to start correctly.
 </p>
 </div>
 </div>
-<div id="outline-container-org1964303" class="outline-3">
-<h3 id="org1964303">Q146: Why is logging and monitoring needed with policies?</h3>
-<div class="outline-text-3" id="text-org1964303">
+<div id="outline-container-org15782c2" class="outline-3">
+<h3 id="org15782c2">Q146: Why is logging and monitoring needed with policies?</h3>
+<div class="outline-text-3" id="text-org15782c2">
 <p>
 To identify dropped connections or unreachable dependencies.
 </p>
 </div>
 </div>
-<div id="outline-container-org9332cec" class="outline-3">
-<h3 id="org9332cec">Q147: What is `kubectl describe networkpolicy`?</h3>
-<div class="outline-text-3" id="text-org9332cec">
+<div id="outline-container-org2fb7659" class="outline-3">
+<h3 id="org2fb7659">Q147: What is `kubectl describe networkpolicy`?</h3>
+<div class="outline-text-3" id="text-org2fb7659">
 <p>
 It displays the details and intent of NetworkPolicies in the cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-org2ade696" class="outline-3">
-<h3 id="org2ade696">Q148: Why is `kubectl get networkpolicy` useful?</h3>
-<div class="outline-text-3" id="text-org2ade696">
+<div id="outline-container-orgb6c974b" class="outline-3">
+<h3 id="orgb6c974b">Q148: Why is `kubectl get networkpolicy` useful?</h3>
+<div class="outline-text-3" id="text-orgb6c974b">
 <p>
 It helps validate the actual policy set applied to a namespace.
 </p>
 </div>
 </div>
-<div id="outline-container-org74d0fa4" class="outline-3">
-<h3 id="org74d0fa4">Q149: What is a pod service account and network policy relation?</h3>
-<div class="outline-text-3" id="text-org74d0fa4">
+<div id="outline-container-orgaca9224" class="outline-3">
+<h3 id="orgaca9224">Q149: What is a pod service account and network policy relation?</h3>
+<div class="outline-text-3" id="text-orgaca9224">
 <p>
 Service accounts are identity-level controls, while NetworkPolicies control network reachability.
 </p>
 </div>
 </div>
-<div id="outline-container-org3bb9ef7" class="outline-3">
-<h3 id="org3bb9ef7">Q150: Why is a zero-trust posture a good default for Kubernetes?</h3>
-<div class="outline-text-3" id="text-org3bb9ef7">
+<div id="outline-container-orge47f856" class="outline-3">
+<h3 id="orge47f856">Q150: Why is a zero-trust posture a good default for Kubernetes?</h3>
+<div class="outline-text-3" id="text-orge47f856">
 <p>
 Because it requires explicit traffic decisions rather than assuming trust.
 </p>
 </div>
 </div>
-<div id="outline-container-org340dca9" class="outline-3">
-<h3 id="org340dca9">Q151: What is a default deny plus explicit allow pattern?</h3>
-<div class="outline-text-3" id="text-org340dca9">
+<div id="outline-container-orgafe5f12" class="outline-3">
+<h3 id="orgafe5f12">Q151: What is a default deny plus explicit allow pattern?</h3>
+<div class="outline-text-3" id="text-orgafe5f12">
 <p>
 It is a security approach where only permitted traffic is allowed.
 </p>
 </div>
 </div>
-<div id="outline-container-org845b00a" class="outline-3">
-<h3 id="org845b00a">Q152: Why use explicit allow-lists for DBs and queues?</h3>
-<div class="outline-text-3" id="text-org845b00a">
+<div id="outline-container-org7caf4b3" class="outline-3">
+<h3 id="org7caf4b3">Q152: Why use explicit allow-lists for DBs and queues?</h3>
+<div class="outline-text-3" id="text-org7caf4b3">
 <p>
 Because they are mission-critical and should be reachable only by expected workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf5746ef" class="outline-3">
-<h3 id="orgf5746ef">Q153: What is a worker egress restriction?</h3>
-<div class="outline-text-3" id="text-orgf5746ef">
+<div id="outline-container-org5d69b90" class="outline-3">
+<h3 id="org5d69b90">Q153: What is a worker egress restriction?</h3>
+<div class="outline-text-3" id="text-org5d69b90">
 <p>
 A worker may only egress to the queue and internal APIs while everything else is blocked.
 </p>
 </div>
 </div>
-<div id="outline-container-org13aae9b" class="outline-3">
-<h3 id="org13aae9b">Q154: Why are CNI plugins so important for NetworkPolicies?</h3>
-<div class="outline-text-3" id="text-org13aae9b">
+<div id="outline-container-org6f50380" class="outline-3">
+<h3 id="org6f50380">Q154: Why are CNI plugins so important for NetworkPolicies?</h3>
+<div class="outline-text-3" id="text-org6f50380">
 <p>
 The plugin is the actual enforcement point, and different plugins may behave differently.
 </p>
 </div>
 </div>
-<div id="outline-container-orga91d698" class="outline-3">
-<h3 id="orga91d698">Q155: Why do some policies appear not to apply?</h3>
-<div class="outline-text-3" id="text-orga91d698">
+<div id="outline-container-orgc90bb28" class="outline-3">
+<h3 id="orgc90bb28">Q155: Why do some policies appear not to apply?</h3>
+<div class="outline-text-3" id="text-orgc90bb28">
 <p>
 Because the workload might not be selected by the policy, or the CNI may not support the feature.
 </p>
 </div>
 </div>
-<div id="outline-container-org6a993b5" class="outline-3">
-<h3 id="org6a993b5">Q156: What is a policy-limited external dependency?</h3>
-<div class="outline-text-3" id="text-org6a993b5">
+<div id="outline-container-orgd973c49" class="outline-3">
+<h3 id="orgd973c49">Q156: What is a policy-limited external dependency?</h3>
+<div class="outline-text-3" id="text-orgd973c49">
 <p>
 A pod may have explicit rules to permit egress to a specific CIDR or DNS endpoint.
 </p>
 </div>
 </div>
-<div id="outline-container-org3168a0d" class="outline-3">
-<h3 id="org3168a0d">Q157: Why should egress policies consider DNS resolution?</h3>
-<div class="outline-text-3" id="text-org3168a0d">
+<div id="outline-container-org9bc9fa9" class="outline-3">
+<h3 id="org9bc9fa9">Q157: Why should egress policies consider DNS resolution?</h3>
+<div class="outline-text-3" id="text-org9bc9fa9">
 <p>
 Because DNS is required for service discovery and name-based access.
 </p>
 </div>
 </div>
-<div id="outline-container-org05e7713" class="outline-3">
-<h3 id="org05e7713">Q158: What is introspection of dropped connections?</h3>
-<div class="outline-text-3" id="text-org05e7713">
+<div id="outline-container-org5a7346b" class="outline-3">
+<h3 id="org5a7346b">Q158: What is introspection of dropped connections?</h3>
+<div class="outline-text-3" id="text-org5a7346b">
 <p>
 It often uses logs, packet analysis, or CNI diagnostic outputs to find traffic that is being denied.
 </p>
 </div>
 </div>
-<div id="outline-container-orgadc9b85" class="outline-3">
-<h3 id="orgadc9b85">Q159: What is a network policy for cronjobs?</h3>
-<div class="outline-text-3" id="text-orgadc9b85">
+<div id="outline-container-org892df28" class="outline-3">
+<h3 id="org892df28">Q159: What is a network policy for cronjobs?</h3>
+<div class="outline-text-3" id="text-org892df28">
 <p>
 A cron job may need outbound access to a database or external API but does not need inbound traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-org2fd4136" class="outline-3">
-<h3 id="org2fd4136">Q160: What is a network policy for sidecars?</h3>
-<div class="outline-text-3" id="text-org2fd4136">
+<div id="outline-container-orge1b3946" class="outline-3">
+<h3 id="orge1b3946">Q160: What is a network policy for sidecars?</h3>
+<div class="outline-text-3" id="text-orge1b3946">
 <p>
 Sidecars may need specific traffic rules based on whether they serve metrics, proxy traffic, or act as a security agent.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc837587" class="outline-3">
-<h3 id="orgc837587">Q161: Why is network policy design often part of platform hardening?</h3>
-<div class="outline-text-3" id="text-orgc837587">
+<div id="outline-container-org2a52f45" class="outline-3">
+<h3 id="org2a52f45">Q161: Why is network policy design often part of platform hardening?</h3>
+<div class="outline-text-3" id="text-org2a52f45">
 <p>
 Because it reduces the risk of attack paths within a cluster.
 </p>
 </div>
 </div>
-<div id="outline-container-orga65671b" class="outline-3">
-<h3 id="orga65671b">Q162: What is an identity and network boundary?</h3>
-<div class="outline-text-3" id="text-orga65671b">
+<div id="outline-container-org1548558" class="outline-3">
+<h3 id="org1548558">Q162: What is an identity and network boundary?</h3>
+<div class="outline-text-3" id="text-org1548558">
 <p>
 An identity is the workload or user; a network boundary restricts traffic between identities.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb8fd65b" class="outline-3">
-<h3 id="orgb8fd65b">Q163: Why is cluster CNI support a prerequisite?</h3>
-<div class="outline-text-3" id="text-orgb8fd65b">
+<div id="outline-container-org7515838" class="outline-3">
+<h3 id="org7515838">Q163: Why is cluster CNI support a prerequisite?</h3>
+<div class="outline-text-3" id="text-org7515838">
 <p>
 Without support, network policies cannot be enforced.
 </p>
 </div>
 </div>
-<div id="outline-container-org3148338" class="outline-3">
-<h3 id="org3148338">Q164: What is control plane vs data plane in NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org3148338">
+<div id="outline-container-org339883c" class="outline-3">
+<h3 id="org339883c">Q164: What is control plane vs data plane in NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org339883c">
 <p>
 The control plane manages policy objects; the data plane enforces packet filtering.
 </p>
 </div>
 </div>
-<div id="outline-container-org3bfa9ff" class="outline-3">
-<h3 id="org3bfa9ff">Q165: Why is policy enforcement at the data plane important?</h3>
-<div class="outline-text-3" id="text-org3bfa9ff">
+<div id="outline-container-org8b10f46" class="outline-3">
+<h3 id="org8b10f46">Q165: Why is policy enforcement at the data plane important?</h3>
+<div class="outline-text-3" id="text-org8b10f46">
 <p>
 Because it stops traffic as it moves between pods rather than only at the app layer.
 </p>
 </div>
 </div>
-<div id="outline-container-org47a3651" class="outline-3">
-<h3 id="org47a3651">Q166: Why do teams often start with default-deny in dev/test?</h3>
-<div class="outline-text-3" id="text-org47a3651">
+<div id="outline-container-orga1483e4" class="outline-3">
+<h3 id="orga1483e4">Q166: Why do teams often start with default-deny in dev/test?</h3>
+<div class="outline-text-3" id="text-orga1483e4">
 <p>
 It uncovers app dependencies early and avoids hidden network assumptions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb713df9" class="outline-3">
-<h3 id="orgb713df9">Q167: Why is policy allowlist generation important?</h3>
-<div class="outline-text-3" id="text-orgb713df9">
+<div id="outline-container-orge42d65d" class="outline-3">
+<h3 id="orge42d65d">Q167: Why is policy allowlist generation important?</h3>
+<div class="outline-text-3" id="text-orge42d65d">
 <p>
 Because it ensures all required communication paths are explicitly accounted for.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7b9fd5" class="outline-3">
-<h3 id="orgf7b9fd5">Q168: What is a pod port for metrics scraping?</h3>
-<div class="outline-text-3" id="text-orgf7b9fd5">
+<div id="outline-container-org986b469" class="outline-3">
+<h3 id="org986b469">Q168: What is a pod port for metrics scraping?</h3>
+<div class="outline-text-3" id="text-org986b469">
 <p>
 Monitoring or metrics systems often need a policy exception to reach metrics endpoints.
 </p>
 </div>
 </div>
-<div id="outline-container-org90164b5" class="outline-3">
-<h3 id="org90164b5">Q169: Why allow only required ports to monitoring systems?</h3>
-<div class="outline-text-3" id="text-org90164b5">
+<div id="outline-container-org220bde9" class="outline-3">
+<h3 id="org220bde9">Q169: Why allow only required ports to monitoring systems?</h3>
+<div class="outline-text-3" id="text-org220bde9">
 <p>
 Because metrics endpoints are often not security-sensitive, but they still should be controlled.
 </p>
 </div>
 </div>
-<div id="outline-container-org715b143" class="outline-3">
-<h3 id="org715b143">Q170: Why should internal service traffic be explicit?</h3>
-<div class="outline-text-3" id="text-org715b143">
+<div id="outline-container-org7cce9d8" class="outline-3">
+<h3 id="org7cce9d8">Q170: Why should internal service traffic be explicit?</h3>
+<div class="outline-text-3" id="text-org7cce9d8">
 <p>
 Because internal service names and ports can otherwise be used in unexpected ways.
 </p>
 </div>
 </div>
-<div id="outline-container-org38a2a31" class="outline-3">
-<h3 id="org38a2a31">Q171: What is a Pod traffic map?</h3>
-<div class="outline-text-3" id="text-org38a2a31">
+<div id="outline-container-org34d3638" class="outline-3">
+<h3 id="org34d3638">Q171: What is a Pod traffic map?</h3>
+<div class="outline-text-3" id="text-org34d3638">
 <p>
 It is a diagram or inventory of which pods can talk to which workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf34c0bc" class="outline-3">
-<h3 id="orgf34c0bc">Q172: Why is traffic mapping useful for policy design?</h3>
-<div class="outline-text-3" id="text-orgf34c0bc">
+<div id="outline-container-org605f1be" class="outline-3">
+<h3 id="org605f1be">Q172: Why is traffic mapping useful for policy design?</h3>
+<div class="outline-text-3" id="text-org605f1be">
 <p>
 Because it makes security design easier to reason about.
 </p>
 </div>
 </div>
-<div id="outline-container-org9e7b17b" class="outline-3">
-<h3 id="org9e7b17b">Q173: What is a network policy for a queue consumer?</h3>
-<div class="outline-text-3" id="text-org9e7b17b">
+<div id="outline-container-orgcd984b5" class="outline-3">
+<h3 id="orgcd984b5">Q173: What is a network policy for a queue consumer?</h3>
+<div class="outline-text-3" id="text-orgcd984b5">
 <p>
 It could allow ingress from the queue service and egress to the database and internal APIs.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6c65b2" class="outline-3">
-<h3 id="orgd6c65b2">Q174: What is a network policy for a service mesh sidecar?</h3>
-<div class="outline-text-3" id="text-orgd6c65b2">
+<div id="outline-container-orgbee8746" class="outline-3">
+<h3 id="orgbee8746">Q174: What is a network policy for a service mesh sidecar?</h3>
+<div class="outline-text-3" id="text-orgbee8746">
 <p>
 It may allow inbound traffic from the mesh and outbound to backend services.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc096601" class="outline-3">
-<h3 id="orgc096601">Q175: What is a network policy for a logging agent?</h3>
-<div class="outline-text-3" id="text-orgc096601">
+<div id="outline-container-org75ed741" class="outline-3">
+<h3 id="org75ed741">Q175: What is a network policy for a logging agent?</h3>
+<div class="outline-text-3" id="text-org75ed741">
 <p>
 It may allow egress to logging endpoints while denying inbound access.
 </p>
 </div>
 </div>
-<div id="outline-container-orgec7e477" class="outline-3">
-<h3 id="orgec7e477">Q176: What is the typical pattern for web applications?</h3>
-<div class="outline-text-3" id="text-orgec7e477">
+<div id="outline-container-org3ce97a1" class="outline-3">
+<h3 id="org3ce97a1">Q176: What is the typical pattern for web applications?</h3>
+<div class="outline-text-3" id="text-org3ce97a1">
 <p>
 Allow ingress from ingress controllers or external ranges, egress to dependencies and DNS, deny all else.
 </p>
 </div>
 </div>
-<div id="outline-container-orga2c6c00" class="outline-3">
-<h3 id="orga2c6c00">Q177: What is a policy design challenge?</h3>
-<div class="outline-text-3" id="text-orga2c6c00">
+<div id="outline-container-orgc2c1690" class="outline-3">
+<h3 id="orgc2c1690">Q177: What is a policy design challenge?</h3>
+<div class="outline-text-3" id="text-orgc2c1690">
 <p>
 It must be strict enough for security but flexible enough for the app to function.
 </p>
 </div>
 </div>
-<div id="outline-container-org25d6b62" class="outline-3">
-<h3 id="org25d6b62">Q178: What is a liveness and readiness check effect on policy?</h3>
-<div class="outline-text-3" id="text-org25d6b62">
+<div id="outline-container-org50d0b80" class="outline-3">
+<h3 id="org50d0b80">Q178: What is a liveness and readiness check effect on policy?</h3>
+<div class="outline-text-3" id="text-org50d0b80">
 <p>
 If probes or monitoring systems are blocked, the service may appear unhealthy or fail health checks.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e0c98a" class="outline-3">
-<h3 id="org6e0c98a">Q179: Why is K8s network policy considered a control plane and data plane element?</h3>
-<div class="outline-text-3" id="text-org6e0c98a">
+<div id="outline-container-org30b092f" class="outline-3">
+<h3 id="org30b092f">Q179: Why is K8s network policy considered a control plane and data plane element?</h3>
+<div class="outline-text-3" id="text-org30b092f">
 <p>
 Because the policy exists in Kubernetes but is enforced in the network data plane by the CNI.
 </p>
 </div>
 </div>
-<div id="outline-container-org050b11b" class="outline-3">
-<h3 id="org050b11b">Q180: What is the core lesson of NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org050b11b">
+<div id="outline-container-org5813585" class="outline-3">
+<h3 id="org5813585">Q180: What is the core lesson of NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-org5813585">
 <p>
 NetworkPolicy is the Kubernetes mechanism for network isolation: it defines allowed ingress and egress paths so workloads can communicate only on explicitly permitted paths.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgb77eec7" class="outline-2">
-<h2 id="orgb77eec7">Advanced / Expert</h2>
-<div class="outline-text-2" id="text-orgb77eec7">
+<div id="outline-container-org6959349" class="outline-2">
+<h2 id="org6959349">Advanced / Expert</h2>
+<div class="outline-text-2" id="text-org6959349">
 </div>
-<div id="outline-container-org99f458a" class="outline-3">
-<h3 id="org99f458a">Q181: What is packet filtering in the CNI?</h3>
-<div class="outline-text-3" id="text-org99f458a">
+<div id="outline-container-org9114a8f" class="outline-3">
+<h3 id="org9114a8f">Q181: What is packet filtering in the CNI?</h3>
+<div class="outline-text-3" id="text-org9114a8f">
 <p>
 The CNI plugin filters packets based on source/destination labels, namespaces, and ports.
 </p>
 </div>
 </div>
-<div id="outline-container-org09f0793" class="outline-3">
-<h3 id="org09f0793">Q182: What is L3/L4 enforcement in NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org09f0793">
+<div id="outline-container-orgdf466ea" class="outline-3">
+<h3 id="orgdf466ea">Q182: What is L3/L4 enforcement in NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-orgdf466ea">
 <p>
 It enforces at the IP and port layer, not application content layer.
 </p>
 </div>
 </div>
-<div id="outline-container-org7d008d6" class="outline-3">
-<h3 id="org7d008d6">Q183: Why is L3/L4 not enough for all security?</h3>
-<div class="outline-text-3" id="text-org7d008d6">
+<div id="outline-container-orga29fa90" class="outline-3">
+<h3 id="orga29fa90">Q183: Why is L3/L4 not enough for all security?</h3>
+<div class="outline-text-3" id="text-orga29fa90">
 <p>
 Because it does not inspect HTTP paths, bodies, or application-level semantics.
 </p>
 </div>
 </div>
-<div id="outline-container-orga1cf5a9" class="outline-3">
-<h3 id="orga1cf5a9">Q184: What is a service mesh for L7 policy?</h3>
-<div class="outline-text-3" id="text-orga1cf5a9">
+<div id="outline-container-org39711d5" class="outline-3">
+<h3 id="org39711d5">Q184: What is a service mesh for L7 policy?</h3>
+<div class="outline-text-3" id="text-org39711d5">
 <p>
 A service mesh provides L7-aware routing, authorization, and observability.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc0f8730" class="outline-3">
-<h3 id="orgc0f8730">Q185: Why use both NetworkPolicy and service mesh?</h3>
-<div class="outline-text-3" id="text-orgc0f8730">
+<div id="outline-container-org585a7cf" class="outline-3">
+<h3 id="org585a7cf">Q185: Why use both NetworkPolicy and service mesh?</h3>
+<div class="outline-text-3" id="text-org585a7cf">
 <p>
 Because NetworkPolicy controls pod-to-pod network reachability while service mesh can control HTTP semantics and mTLS.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfa3ba84" class="outline-3">
-<h3 id="orgfa3ba84">Q186: What is mTLS and NetworkPolicy interaction?</h3>
-<div class="outline-text-3" id="text-orgfa3ba84">
+<div id="outline-container-orgb0c10c9" class="outline-3">
+<h3 id="orgb0c10c9">Q186: What is mTLS and NetworkPolicy interaction?</h3>
+<div class="outline-text-3" id="text-orgb0c10c9">
 <p>
 mTLS secures service-to-service traffic; NetworkPolicy restricts which endpoints can talk to each other.
 </p>
 </div>
 </div>
-<div id="outline-container-org81e2b91" class="outline-3">
-<h3 id="org81e2b91">Q187: What is policy enforcement drift?</h3>
-<div class="outline-text-3" id="text-org81e2b91">
+<div id="outline-container-org7f9b335" class="outline-3">
+<h3 id="org7f9b335">Q187: What is policy enforcement drift?</h3>
+<div class="outline-text-3" id="text-org7f9b335">
 <p>
 It happens when policy rules no longer match the actual network design or workload labels.
 </p>
 </div>
 </div>
-<div id="outline-container-orgea6d109" class="outline-3">
-<h3 id="orgea6d109">Q188: Why do labels matter for policy stability?</h3>
-<div class="outline-text-3" id="text-orgea6d109">
+<div id="outline-container-org7296ed6" class="outline-3">
+<h3 id="org7296ed6">Q188: Why do labels matter for policy stability?</h3>
+<div class="outline-text-3" id="text-org7296ed6">
 <p>
 Because if labels change, the policy may inadvertently select or stop selecting workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org6154095" class="outline-3">
-<h3 id="org6154095">Q189: What is policy-based segmentation?</h3>
-<div class="outline-text-3" id="text-org6154095">
+<div id="outline-container-org935f619" class="outline-3">
+<h3 id="org935f619">Q189: What is policy-based segmentation?</h3>
+<div class="outline-text-3" id="text-org935f619">
 <p>
 It is the use of NetworkPolicies to define boundaries and controls between workloads.
 </p>
 </div>
 </div>
-<div id="outline-container-org5f76709" class="outline-3">
-<h3 id="org5f76709">Q190: Why is policy at the cluster boundary important?</h3>
-<div class="outline-text-3" id="text-org5f76709">
+<div id="outline-container-orgc836c86" class="outline-3">
+<h3 id="orgc836c86">Q190: Why is policy at the cluster boundary important?</h3>
+<div class="outline-text-3" id="text-orgc836c86">
 <p>
 Because it reduces cross-namespace blast radius and helps maintain multi-tenant isolation.
 </p>
 </div>
 </div>
-<div id="outline-container-orga5e2581" class="outline-3">
-<h3 id="orga5e2581">Q191: What is cross-namespace policy design?</h3>
-<div class="outline-text-3" id="text-orga5e2581">
+<div id="outline-container-org3e9521e" class="outline-3">
+<h3 id="org3e9521e">Q191: What is cross-namespace policy design?</h3>
+<div class="outline-text-3" id="text-org3e9521e">
 <p>
 It allows controlled communication between namespaces without fully open traffic.
 </p>
 </div>
 </div>
-<div id="outline-container-orge60b5f7" class="outline-3">
-<h3 id="orge60b5f7">Q192: Why are cross-namespace policies security-sensitive?</h3>
-<div class="outline-text-3" id="text-orge60b5f7">
+<div id="outline-container-orgcfcac20" class="outline-3">
+<h3 id="orgcfcac20">Q192: Why are cross-namespace policies security-sensitive?</h3>
+<div class="outline-text-3" id="text-orgcfcac20">
 <p>
 Because they intentionally allow traffic across namespace boundaries and should be reviewed carefully.
 </p>
 </div>
 </div>
-<div id="outline-container-org223d1f5" class="outline-3">
-<h3 id="org223d1f5">Q193: What is egress to internet or external services?</h3>
-<div class="outline-text-3" id="text-org223d1f5">
+<div id="outline-container-org08d9bbe" class="outline-3">
+<h3 id="org08d9bbe">Q193: What is egress to internet or external services?</h3>
+<div class="outline-text-3" id="text-org08d9bbe">
 <p>
 It requires explicit IPBlock or external endpoint policy, often with DNS exceptions.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf646ec4" class="outline-3">
-<h3 id="orgf646ec4">Q194: What is the challenge of restricting internet egress?</h3>
-<div class="outline-text-3" id="text-orgf646ec4">
+<div id="outline-container-orgdc8470a" class="outline-3">
+<h3 id="orgdc8470a">Q194: What is the challenge of restricting internet egress?</h3>
+<div class="outline-text-3" id="text-orgdc8470a">
 <p>
 Because many workloads legitimately need outbound access to external APIs or package managers.
 </p>
 </div>
 </div>
-<div id="outline-container-org572bc4c" class="outline-3">
-<h3 id="org572bc4c">Q195: What is a restricted egress model?</h3>
-<div class="outline-text-3" id="text-org572bc4c">
+<div id="outline-container-org2458c8a" class="outline-3">
+<h3 id="org2458c8a">Q195: What is a restricted egress model?</h3>
+<div class="outline-text-3" id="text-org2458c8a">
 <p>
 It allows only specific destinations and protocols and blocks all others.
 </p>
 </div>
 </div>
-<div id="outline-container-org18e0592" class="outline-3">
-<h3 id="org18e0592">Q196: Why do some clusters restrict egress by default?</h3>
-<div class="outline-text-3" id="text-org18e0592">
+<div id="outline-container-org4f3a384" class="outline-3">
+<h3 id="org4f3a384">Q196: Why do some clusters restrict egress by default?</h3>
+<div class="outline-text-3" id="text-org4f3a384">
 <p>
 To prevent compromised workloads from contacting command-and-control endpoints or exfiltrating data.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf4d0cec" class="outline-3">
-<h3 id="orgf4d0cec">Q197: What is a trusted subnet?</h3>
-<div class="outline-text-3" id="text-orgf4d0cec">
+<div id="outline-container-orgc7891cd" class="outline-3">
+<h3 id="orgc7891cd">Q197: What is a trusted subnet?</h3>
+<div class="outline-text-3" id="text-orgc7891cd">
 <p>
 A trusted subnet is a CIDR range allowed for internal service access.
 </p>
 </div>
 </div>
-<div id="outline-container-org937b0a3" class="outline-3">
-<h3 id="org937b0a3">Q198: Why is IPBlock used for trusted subnet policies?</h3>
-<div class="outline-text-3" id="text-org937b0a3">
+<div id="outline-container-orgb65ec68" class="outline-3">
+<h3 id="orgb65ec68">Q198: Why is IPBlock used for trusted subnet policies?</h3>
+<div class="outline-text-3" id="text-orgb65ec68">
 <p>
 Because internal networks or service ranges are often more trusted and can be explicitly allowed.
 </p>
 </div>
 </div>
-<div id="outline-container-org9a913d9" class="outline-3">
-<h3 id="org9a913d9">Q199: Why are NetworkPolicies often paired with kube-proxy or CNI observability?</h3>
-<div class="outline-text-3" id="text-org9a913d9">
+<div id="outline-container-org0bf9360" class="outline-3">
+<h3 id="org0bf9360">Q199: Why are NetworkPolicies often paired with kube-proxy or CNI observability?</h3>
+<div class="outline-text-3" id="text-org0bf9360">
 <p>
 Because they help diagnose whether traffic is being dropped or allowed unexpectedly.
 </p>
 </div>
 </div>
-<div id="outline-container-org7d7b9c8" class="outline-3">
-<h3 id="org7d7b9c8">Q200: What is the ultimate point of NetworkPolicy?</h3>
-<div class="outline-text-3" id="text-org7d7b9c8">
+<div id="outline-container-orge35e5ab" class="outline-3">
+<h3 id="orge35e5ab">Q200: What is the ultimate point of NetworkPolicy?</h3>
+<div class="outline-text-3" id="text-orge35e5ab">
 <p>
 It is Kubernetes’ way to control the network trust boundaries between workloads, enforcing least privilege and reducing lateral movement risk inside the cluster.
 </p>
